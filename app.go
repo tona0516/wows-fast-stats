@@ -1,7 +1,11 @@
 package main
 
 import (
+	"changeme/backend/service"
+	"changeme/backend/vo"
 	"context"
+
+	"github.com/wailsapp/wails/v2/pkg/logger"
 )
 
 // App struct
@@ -20,15 +24,22 @@ func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
 }
 
-type Player struct {
-    Name string `json:"name"`
-    Id int `json:"id"`
+func (a *App) Load() vo.Team {
+	statsService := service.StatsService{
+		InstallPath: "./",
+		AppID:       "3bd34ff346625bf01cc8ba6a9204dd16",
+		Parallels:   5,
+	}
+	team, err := statsService.GetsStats()
+	if err != nil {
+		logger.NewDefaultLogger().Fatal(err.Error())
+	}
+
+	// logger.NewDefaultLogger().Debug(fmt.Sprintf("%#v", team))
+
+	return *team
 }
 
-func (a *App) Rows() []Player {
-    return []Player{
-        {Name: "hoge", Id: 1},
-        {Name: "fuga", Id: 2},
-    }
+func (a *App) Debug(message string) {
+	logger.NewDefaultLogger().Debug(message)
 }
-

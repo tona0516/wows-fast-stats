@@ -1,23 +1,86 @@
 <script lang="ts">
   import SvelteTable from "svelte-table";
-  import { Rows } from "../wailsjs/go/main/App.js";
+  import { Debug, Load } from "../wailsjs/go/main/App.js";
 
-  let rows = [];
-  const columns = [
-  {
-    key: "name",
-    title: "Name",
-    value: v => v.name,
-  },
-  {
-    key: "id",
-    title: "ID",
-    value: v => v.id,
-  },
-];
+  let friendRows = [];
+  let enemyRows = [];
+  let columns = [
+    {
+        title: "Clan",
+        value: v => v.player_player_info.clan
+    },
+    {
+        title: "Player name",
+        value: v => v.player_player_info.name
+    },
+    {
+        title: "CP",
+        value: v => v.player_ship_stats.combat_power
+    },
+    {
+        title: "PR",
+        value: v => v.player_ship_stats.personal_rating
+    },
+    {
+        title: "Ship name",
+        value: v => v.player_ship_info.name
+    },
+    {
+        title: "Tier",
+        value: v => v.player_ship_info.tier
+    },
+    {
+        title: "Ship dmg",
+        value: v => v.player_ship_stats.avg_damage
+    },
+    {
+        title: "Ship win",
+        value: v => v.player_ship_stats.win_rate
+    },
+    {
+        title: "Ship exp",
+        value: v => v.player_ship_stats.avg_exp
+    },
+    {
+        title: "Ship dmg",
+        value: v => v.player_ship_stats.avg_damage
+    },
+    {
+        title: "Ship battles",
+        value: v => v.player_ship_stats.battles
+    },
+    {
+        title: "Player dmg",
+        value: v => v.player_player_stats.avg_damage
+    },
+    {
+        title: "Player win",
+        value: v => v.player_player_stats.win_rate
+    },
+    {
+        title: "Player exp",
+        value: v => v.player_player_stats.avg_exp
+    },
+    {
+        title: "Player dmg",
+        value: v => v.player_player_stats.avg_damage
+    },
+    {
+        title: "Player battles",
+        value: v => v.player_player_stats.battles
+    },
+    {
+        title: "Tier avg",
+        value: v => v.player_player_stats.avg_tier
+    },
+  ];
 
 function generateRows(): Promise<any> {
-    return Rows().then((result) => rows = result);
+    return Load().then((result) => {
+        // Debug(JSON.stringify(result))
+        friendRows = result["friends"]
+        enemyRows = result["enemies"]
+    });
 }
 
 generateRows()
@@ -25,7 +88,8 @@ generateRows()
 </script>
 
 <main>
-  <SvelteTable columns="{columns}" rows="{rows}"></SvelteTable>
+  <SvelteTable columns="{columns}" rows="{friendRows}"></SvelteTable>
+  <SvelteTable columns="{columns}" rows="{enemyRows}"></SvelteTable>
 </main>
 
 <style>
