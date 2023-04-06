@@ -1,5 +1,6 @@
 <script lang="ts">
   import SvelteTable from "svelte-table";
+  import { BarLoader } from 'svelte-loading-spinners';
   import { Debug, GetTempArenaInfoHash, Load } from "../wailsjs/go/main/App.js";
 
   let latestHash = ""
@@ -88,6 +89,9 @@ const looper = async () => {
     }
 
     const hash = await GetTempArenaInfoHash()
+    if (hash === "") {
+        return
+    }
     if (hash !== latestHash) {
         state = State.FETCHING
         const stats = await Load()
@@ -103,8 +107,14 @@ setInterval(looper, 1000);
 </script>
 
 <main>
-  <SvelteTable columns="{columns}" rows="{friendRows}"></SvelteTable>
-  <SvelteTable columns="{columns}" rows="{enemyRows}"></SvelteTable>
+  {#if state === State.FETCHING}
+    <BarLoader color="#FF3E00" />
+  {/if}
+
+  {#if latestHash !== ""}
+    <SvelteTable columns="{columns}" rows="{friendRows}"></SvelteTable>
+    <SvelteTable columns="{columns}" rows="{enemyRows}"></SvelteTable>
+  {/if}
 </main>
 
 <style>

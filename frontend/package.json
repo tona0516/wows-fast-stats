@@ -20,6 +20,7 @@
     "vite": "^3.0.0"
   },
   "dependencies": {
+    "svelte-loading-spinners": "^0.3.4",
     "svelte-table": "^0.5.7"
   }
 }
