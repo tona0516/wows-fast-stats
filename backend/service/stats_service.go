@@ -9,6 +9,7 @@ import (
 	"math"
 	"sort"
 	"sync"
+	"time"
 )
 
 type StatsService struct {
@@ -30,6 +31,8 @@ func (s *StatsService) GetTempArenaInfoHash() string {
 }
 
 func (s *StatsService) GetsStats() (*vo.Team, error) {
+	now := time.Now()
+
 	wargaming := repo.Wargaming{AppID: s.AppID}
 	numbers := repo.Numbers{}
 	local := repo.Local{}
@@ -100,6 +103,7 @@ func (s *StatsService) GetsStats() (*vo.Team, error) {
 		expectedStats.Value,
 	)
 
+	fmt.Printf("処理時間: %vms\n", time.Since(now).Milliseconds())
 	return &team, nil
 }
 
