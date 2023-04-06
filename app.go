@@ -10,7 +10,8 @@ import (
 
 // App struct
 type App struct {
-	ctx context.Context
+	ctx          context.Context
+	statsService service.StatsService
 }
 
 // NewApp creates a new App application struct
@@ -22,15 +23,19 @@ func NewApp() *App {
 // so we can call the runtime methods
 func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
-}
-
-func (a *App) Load() vo.Team {
-	statsService := service.StatsService{
+	a.statsService = service.StatsService{
 		InstallPath: "./",
 		AppID:       "3bd34ff346625bf01cc8ba6a9204dd16",
 		Parallels:   5,
 	}
-	team, err := statsService.GetsStats()
+}
+
+func (a *App) GetTempArenaInfoHash() string {
+	return a.statsService.GetTempArenaInfoHash()
+}
+
+func (a *App) Load() vo.Team {
+	team, err := a.statsService.GetsStats()
 	if err != nil {
 		logger.NewDefaultLogger().Fatal(err.Error())
 	}

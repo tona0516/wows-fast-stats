@@ -6,6 +6,10 @@ export function Debug(arg1) {
   return window['go']['main']['App']['Debug'](arg1);
 }
 
+export function GetTempArenaInfoHash() {
+  return window['go']['main']['App']['GetTempArenaInfoHash']();
+}
+
 export function Load() {
   return window['go']['main']['App']['Load']();
 }

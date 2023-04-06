@@ -4,4 +4,6 @@ import {vo} from '../models';
 
 export function Debug(arg1:string):Promise<void>;
 
+export function GetTempArenaInfoHash():Promise<string>;
+
 export function Load():Promise<vo.Team>;

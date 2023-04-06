@@ -1,7 +1,13 @@
 <script lang="ts">
   import SvelteTable from "svelte-table";
-  import { Debug, Load } from "../wailsjs/go/main/App.js";
+  import { Debug, GetTempArenaInfoHash, Load } from "../wailsjs/go/main/App.js";
 
+  let latestHash = ""
+  enum State {
+    STANDBY,
+    FETCHING,
+};
+  let state = State.STANDBY
   let friendRows = [];
   let enemyRows = [];
   let columns = [
@@ -75,15 +81,24 @@
     },
   ];
 
-function generateRows(): Promise<any> {
-    return Load().then((result) => {
-        // Debug(JSON.stringify(result))
-        friendRows = result["friends"]
-        enemyRows = result["enemies"]
-    });
+
+const looper = async () => {
+    if (state === State.FETCHING) {
+        return
+    }
+
+    const hash = await GetTempArenaInfoHash()
+    if (hash !== latestHash) {
+        state = State.FETCHING
+        const stats = await Load()
+        friendRows = stats["friends"]
+        enemyRows = stats["enemies"]
+        latestHash = hash
+        state = State.STANDBY
+    }
 }
 
-generateRows()
+setInterval(looper, 1000);
 
 </script>
 

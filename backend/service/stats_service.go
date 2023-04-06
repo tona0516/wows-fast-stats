@@ -4,6 +4,8 @@ import (
 	"changeme/backend/domain"
 	"changeme/backend/repo"
 	"changeme/backend/vo"
+	"crypto/md5"
+	"fmt"
 	"math"
 	"sort"
 	"sync"
@@ -13,6 +15,18 @@ type StatsService struct {
 	InstallPath string
 	AppID       string
 	Parallels   uint
+}
+
+func (s *StatsService) GetTempArenaInfoHash() string {
+    local := repo.Local{}
+
+    tempArenaInfo, err := local.GetTempArenaInfo(s.InstallPath)
+    if err != nil {
+        return ""
+    }
+
+    md5 := md5.Sum([]byte(fmt.Sprintf("%x", tempArenaInfo)))
+    return fmt.Sprintf("%x", md5)
 }
 
 func (s *StatsService) GetsStats() (*vo.Team, error) {
