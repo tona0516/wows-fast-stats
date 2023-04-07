@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "svelte-loading-spinners": "^0.3.4",
-    "svelte-table": "^0.5.7"
+    "svelte-table": "^0.5.7",
+    "svelte-toasts": "^1.1.2"
   }
 }

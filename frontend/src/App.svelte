@@ -1,14 +1,26 @@
 <script lang="ts">
   import SvelteTable from "svelte-table";
   import { BarLoader } from 'svelte-loading-spinners';
-  import { Debug, GetTempArenaInfoHash, Load } from "../wailsjs/go/main/App.js";
+  import { toasts, ToastContainer, FlatToast }  from "svelte-toasts";
+  import { ApplyConfig, Debug, GetConfig, GetTempArenaInfoHash, Load, SelectDirectory } from "../wailsjs/go/main/App.js";
 
-  let latestHash = ""
+  enum Page {
+    MAIN,
+    CONFIG
+  }
+  let currentPage = Page.MAIN
+
   enum State {
     STANDBY,
     FETCHING,
-};
+    ERROR,
+  };
   let state = State.STANDBY
+  let latestHash = ""
+
+  let installPath = ""
+  let appid = ""
+
   let friendRows = [];
   let enemyRows = [];
   let columns = [
@@ -83,38 +95,134 @@
   ];
 
 
-const looper = async () => {
+  async function looper() {
+    if (state === State.ERROR) {
+        return
+    }
+
     if (state === State.FETCHING) {
         return
     }
 
-    const hash = await GetTempArenaInfoHash()
-    if (hash === "") {
+    let hash: string
+    try {
+        hash = await GetTempArenaInfoHash()
+    } catch (error) {
+        state = State.ERROR
+        showErrorToast(error)
         return
     }
-    if (hash !== latestHash) {
-        state = State.FETCHING
+
+    if (hash === latestHash) {
+        return
+    }
+
+    state = State.FETCHING
+    try {
         const stats = await Load()
         friendRows = stats["friends"]
         enemyRows = stats["enemies"]
         latestHash = hash
         state = State.STANDBY
+        showSuccessToast("updated!")
+    } catch (error) {
+        state = State.ERROR
+        showErrorToast(error)
     }
 }
 
 setInterval(looper, 1000);
 
+function clickMain() {
+    currentPage = Page.MAIN
+}
+
+function clickConfig() {
+    currentPage = Page.CONFIG
+    GetConfig().then((config) => {
+        installPath = config.install_path
+        appid = config.appid
+    }).catch((error) => {
+        showErrorToast(error)
+        installPath = ""
+        appid = ""
+    })
+}
+
+function clickApply() {
+    ApplyConfig(installPath, appid).then(_ => {
+        showSuccessToast("updated!")
+    }).catch((error) => {
+        showErrorToast(error)
+    })
+}
+
+function selectDirectory() {
+    SelectDirectory().then((result) => {
+        installPath = result
+    })
+}
+
+function showSuccessToast(message: string) {
+    toasts.add({
+      title: "Success",
+      description: message,
+      duration: 3000,
+      placement: 'bottom-right',
+      type: 'success',
+      theme: 'dark',
+      showProgress: true,
+    });
+}
+
+function showErrorToast(message: string) {
+    toasts.add({
+      title: "Error",
+      description: message,
+      duration: 3000,
+      placement: 'bottom-right',
+      type: 'error',
+      theme: 'dark',
+      showProgress: true,
+    });
+}
+
 </script>
 
 <main>
-  {#if state === State.FETCHING}
-    <BarLoader color="#FF3E00" />
+  {#if currentPage === Page.CONFIG}
+    <div>
+      <input type=”text” bind:value={installPath} size="50" placeholder="World of Warshipsインストールフォルダ">
+      <button on:click={selectDirectory}>フォルダ選択</button>
+    </div>
+
+    <div>
+      <input type=”text” bind:value={appid} size="50" id="appid" placeholder="App ID">
+    </div>
+
+    <div>
+      <button on:click={clickApply}>適用</button>
+      <button on:click={clickMain}>戻る</button>
+    </div>
   {/if}
 
-  {#if latestHash !== ""}
-    <SvelteTable columns="{columns}" rows="{friendRows}"></SvelteTable>
-    <SvelteTable columns="{columns}" rows="{enemyRows}"></SvelteTable>
+  {#if currentPage === Page.MAIN}
+    {#if state === State.FETCHING}
+      <BarLoader color="#FF3E00" />
+    {/if}
+
+    {#if latestHash !== ""}
+      <SvelteTable columns="{columns}" rows="{friendRows}"></SvelteTable>
+      <SvelteTable columns="{columns}" rows="{enemyRows}"></SvelteTable>
+    {/if}
+
+    <button on:click={clickConfig}>設定</button>
   {/if}
+
+  <ToastContainer let:data={data}>
+    <FlatToast {data} />
+  </ToastContainer>
+
 </main>
 
 <style>

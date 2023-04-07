@@ -18,19 +18,23 @@ type StatsService struct {
 	Parallels   uint
 }
 
-func (s *StatsService) GetTempArenaInfoHash() string {
+func (s *StatsService) GetTempArenaInfoHash() (string, error) {
+    var result string
     local := repo.Local{}
 
     tempArenaInfo, err := local.GetTempArenaInfo(s.InstallPath)
     if err != nil {
-        return ""
+        return result, err
     }
 
     md5 := md5.Sum([]byte(fmt.Sprintf("%x", tempArenaInfo)))
-    return fmt.Sprintf("%x", md5)
+    result = fmt.Sprintf("%x", md5)
+    return result, nil
 }
 
-func (s *StatsService) GetsStats() (*vo.Team, error) {
+func (s *StatsService) GetsStats() (vo.Team, error) {
+    var result vo.Team
+
 	now := time.Now()
 
 	wargaming := repo.Wargaming{AppID: s.AppID}
@@ -39,7 +43,7 @@ func (s *StatsService) GetsStats() (*vo.Team, error) {
 
 	tempArenaInfo, err := local.GetTempArenaInfo(s.InstallPath)
 	if err != nil {
-		return nil, err
+		return result, err
 	}
 
 	accountListResult := make(chan vo.Result[vo.WGAccountList])
@@ -55,7 +59,7 @@ func (s *StatsService) GetsStats() (*vo.Team, error) {
 
 	accountList := <-accountListResult
 	if accountList.Error != nil {
-		return nil, accountList.Error
+		return result, accountList.Error
 	}
 	accountIDs := accountList.Value.AccountIDs()
 
@@ -65,7 +69,7 @@ func (s *StatsService) GetsStats() (*vo.Team, error) {
 
 	encyclopediaInfo := <-encyclopediaInfoResult
 	if encyclopediaInfo.Error != nil {
-		return nil, encyclopediaInfo.Error
+		return result, encyclopediaInfo.Error
 	}
 	gameVersion := encyclopediaInfo.Value.Data.GameVersion
 
@@ -74,26 +78,26 @@ func (s *StatsService) GetsStats() (*vo.Team, error) {
 
 	accountInfo := <-accountInfoResult
 	if accountInfo.Error != nil {
-		return nil, accountInfo.Error
+		return result, accountInfo.Error
 	}
 	shipStats := <-shipStatsResult
 	if shipStats.Error != nil {
-		return nil, shipStats.Error
+		return result, shipStats.Error
 	}
 	clanTag := <-clanTagResult
 	if clanTag.Error != nil {
-		return nil, clanTag.Error
+		return result, clanTag.Error
 	}
 	shipInfo := <-shipInfoResult
 	if shipInfo.Error != nil {
-		return nil, shipInfo.Error
+		return result, shipInfo.Error
 	}
 	expectedStats := <-expectedStatsResult
 	if expectedStats.Error != nil {
-		return nil, expectedStats.Error
+		return result, expectedStats.Error
 	}
 
-	team := s.compose(
+	result = s.compose(
 		tempArenaInfo,
 		accountInfo.Value,
 		accountList.Value,
@@ -104,7 +108,7 @@ func (s *StatsService) GetsStats() (*vo.Team, error) {
 	)
 
 	fmt.Printf("処理時間: %vms\n", time.Since(now).Milliseconds())
-	return &team, nil
+	return result, nil
 }
 
 func (s *StatsService) fetchAccountList(wargaming *repo.Wargaming, tempArenaInfo vo.TempArenaInfo, result chan vo.Result[(vo.WGAccountList)]) {

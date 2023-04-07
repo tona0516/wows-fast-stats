@@ -1,17 +1,19 @@
 package main
 
 import (
+	"changeme/backend/repo"
 	"changeme/backend/service"
 	"changeme/backend/vo"
 	"context"
 
 	"github.com/wailsapp/wails/v2/pkg/logger"
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 // App struct
 type App struct {
-	ctx          context.Context
-	statsService service.StatsService
+	ctx    context.Context
+	config vo.Config
 }
 
 // NewApp creates a new App application struct
@@ -23,28 +25,60 @@ func NewApp() *App {
 // so we can call the runtime methods
 func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
-	a.statsService = service.StatsService{
-		InstallPath: "./",
-		AppID:       "3bd34ff346625bf01cc8ba6a9204dd16",
+	configAdapter := repo.ConfigAdapter{}
+	config, _ := configAdapter.Read()
+	a.config = config
+}
+
+func (a *App) GetTempArenaInfoHash() (string, error) {
+	statsService := service.StatsService{
+		InstallPath: a.config.InstallPath,
+		AppID:       a.config.Appid,
 		Parallels:   5,
 	}
+	return statsService.GetTempArenaInfoHash()
 }
 
-func (a *App) GetTempArenaInfoHash() string {
-	return a.statsService.GetTempArenaInfoHash()
-}
-
-func (a *App) Load() vo.Team {
-	team, err := a.statsService.GetsStats()
-	if err != nil {
-		logger.NewDefaultLogger().Fatal(err.Error())
+func (a *App) Load() (vo.Team, error) {
+	statsService := service.StatsService{
+		InstallPath: a.config.InstallPath,
+		AppID:       a.config.Appid,
+		Parallels:   5,
 	}
 
-	// logger.NewDefaultLogger().Debug(fmt.Sprintf("%#v", team))
-
-	return *team
+	return statsService.GetsStats()
 }
 
 func (a *App) Debug(message string) {
 	logger.NewDefaultLogger().Debug(message)
+}
+
+func (a *App) SelectDirectory() (string, error) {
+	return runtime.OpenDirectoryDialog(a.ctx, runtime.OpenDialogOptions{})
+}
+
+func (a *App) GetConfig() (vo.Config, error) {
+	configService := service.ConfigService{}
+	config, err := configService.Read()
+	if err != nil {
+		return config, err
+	}
+
+	return config, nil
+}
+
+func (a *App) ApplyConfig(installPath string, appid string) (vo.Config, error) {
+	configService := service.ConfigService{}
+	config := vo.Config{
+		InstallPath: installPath,
+		Appid:       appid,
+	}
+
+	updatedConfig, err := configService.Update(config)
+	if err != nil {
+		return updatedConfig, err
+	}
+
+	a.config = updatedConfig
+	return updatedConfig, nil
 }
