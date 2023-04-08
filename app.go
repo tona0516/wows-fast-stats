@@ -13,7 +13,7 @@ import (
 // App struct
 type App struct {
 	ctx    context.Context
-	config vo.Config
+	config vo.UserConfig
 }
 
 // NewApp creates a new App application struct
@@ -57,7 +57,7 @@ func (a *App) SelectDirectory() (string, error) {
 	return runtime.OpenDirectoryDialog(a.ctx, runtime.OpenDialogOptions{})
 }
 
-func (a *App) GetConfig() (vo.Config, error) {
+func (a *App) GetConfig() (vo.UserConfig, error) {
 	configService := service.ConfigService{}
 	config, err := configService.Read()
 	if err != nil {
@@ -67,9 +67,9 @@ func (a *App) GetConfig() (vo.Config, error) {
 	return config, nil
 }
 
-func (a *App) ApplyConfig(installPath string, appid string) (vo.Config, error) {
+func (a *App) ApplyConfig(installPath string, appid string) (vo.UserConfig, error) {
 	configService := service.ConfigService{}
-	config := vo.Config{
+	config := vo.UserConfig{
 		InstallPath: installPath,
 		Appid:       appid,
 	}

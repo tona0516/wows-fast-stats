@@ -10,10 +10,10 @@ import (
 type ConfigAdapter struct {
 }
 
-func (c *ConfigAdapter) Read() (vo.Config, error) {
+func (c *ConfigAdapter) Read() (vo.UserConfig, error) {
     os.Mkdir("config", 0755)
 
-    var config vo.Config
+    var config vo.UserConfig
 	file, err := os.ReadFile(filepath.Join("config", "user.json"))
 	if err != nil {
 		return config, err
@@ -27,7 +27,7 @@ func (c *ConfigAdapter) Read() (vo.Config, error) {
 	return config, nil
 }
 
-func (c *ConfigAdapter) Update(config vo.Config) error {
+func (c *ConfigAdapter) Update(config vo.UserConfig) error {
     os.Mkdir("config", 0755)
 
     file, err := os.Create(filepath.Join("config", "user.json"))

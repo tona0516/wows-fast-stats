@@ -8,14 +8,14 @@ import (
 type ConfigService struct {
 }
 
-func (c *ConfigService) Read() (vo.Config, error) {
-    var config vo.Config
+func (c *ConfigService) Read() (vo.UserConfig, error) {
+    var config vo.UserConfig
     configAdapter := repo.ConfigAdapter{}
     config, err := configAdapter.Read()
     return config, err
 }
 
-func (c *ConfigService) Update(config vo.Config) (vo.Config, error) {
+func (c *ConfigService) Update(config vo.UserConfig) (vo.UserConfig, error) {
     // TODO validation
     configAdapter := repo.ConfigAdapter{}
     if err := configAdapter.Update(config); err != nil {

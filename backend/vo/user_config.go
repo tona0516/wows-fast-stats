@@ -1,6 +1,6 @@
 package vo
 
-type Config struct {
+type UserConfig struct {
     InstallPath string `json:"install_path"`
     Appid string `json:"appid"`
 }
