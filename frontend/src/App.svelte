@@ -1,6 +1,5 @@
 <script lang="ts">
   import SvelteTable from "svelte-table";
-  import { BarLoader } from "svelte-loading-spinners";
   import { toasts, ToastContainer, FlatToast } from "svelte-toasts";
   import {
     ApplyConfig,
@@ -10,19 +9,14 @@
     Load,
     SelectDirectory,
   } from "../wailsjs/go/main/App.js";
+  import type { ToastProps } from "svelte-toasts/types/common.js";
 
-  enum Page {
-    MAIN,
-    CONFIG,
-  }
-  let currentPage = Page.MAIN;
+  type Page = "main" | "config";
+  let currentPage: Page = "main";
 
-  enum State {
-    STANDBY,
-    FETCHING,
-    ERROR,
-  }
-  let state = State.STANDBY;
+  type State = "standby" | "fetching" | "error";
+  let state: State = "standby";
+  let notInBattleToast: ToastProps;
   let latestHash = "";
 
   let installPath = "";
@@ -32,81 +26,94 @@
   let enemyRows = [];
   let columns = [
     {
-      title: "Clan",
+      title: "クラン",
       value: (v) => v.player_player_info.clan,
+      class: "text-left",
     },
     {
-      title: "Player name",
+      title: "プレイヤー",
       value: (v) => v.player_player_info.name,
+      class: "text-left omit",
     },
     {
       title: "CP",
       value: (v) => v.player_ship_stats.combat_power,
+      class: "text-right",
     },
     {
       title: "PR",
       value: (v) => v.player_ship_stats.personal_rating,
+      class: "text-right",
     },
     {
-      title: "Ship name",
+      title: "艦",
       value: (v) => v.player_ship_info.name,
+      class: "text-left omit",
     },
     {
-      title: "Tier",
-      value: (v) => v.player_ship_info.tier,
+      title: "T",
+      value: (v) =>
+        v.player_ship_info.tier === 11 ? "★" : v.player_ship_info.tier,
+      class: "text-right",
     },
     {
-      title: "Ship dmg",
+      title: "Dmg",
       value: (v) => v.player_ship_stats.avg_damage,
+      class: "text-right",
     },
     {
-      title: "Ship win",
-      value: (v) => v.player_ship_stats.win_rate,
+      title: "勝率",
+      value: (v) => v.player_ship_stats.win_rate.toFixed(1),
+      class: "text-right",
     },
     {
-      title: "Ship exp",
+      title: "Exp",
       value: (v) => v.player_ship_stats.avg_exp,
+      class: "text-right",
     },
     {
-      title: "Ship dmg",
-      value: (v) => v.player_ship_stats.avg_damage,
-    },
-    {
-      title: "Ship battles",
+      title: "戦闘数",
       value: (v) => v.player_ship_stats.battles,
+      class: "text-right",
     },
     {
-      title: "Player dmg",
+      title: "Dmg",
       value: (v) => v.player_player_stats.avg_damage,
+      class: "text-right",
     },
     {
-      title: "Player win",
-      value: (v) => v.player_player_stats.win_rate,
+      title: "勝率",
+      value: (v) => v.player_player_stats.win_rate.toFixed(1),
+      class: "text-right",
     },
     {
-      title: "Player exp",
+      title: "Exp",
       value: (v) => v.player_player_stats.avg_exp,
+      class: "text-right",
     },
     {
-      title: "Player dmg",
-      value: (v) => v.player_player_stats.avg_damage,
-    },
-    {
-      title: "Player battles",
+      title: "戦闘数",
       value: (v) => v.player_player_stats.battles,
+      class: "text-right",
     },
     {
-      title: "Tier avg",
-      value: (v) => v.player_player_stats.avg_tier,
+      title: "平均T",
+      value: (v) => v.player_player_stats.avg_tier.toFixed(1),
+      class: "text-right",
     },
   ];
 
+  setInterval(looper, 1000);
+
   async function looper() {
-    if (state === State.ERROR) {
+    try {
+      await GetConfig();
+    } catch (error) {
       return;
     }
 
-    if (state === State.FETCHING) {
+    if (state === "error" || state === "fetching") {
+      removeNotInBattleToastIfNeeded();
       return;
     }
 
@@ -114,8 +121,8 @@
     try {
       hash = await GetTempArenaInfoHash();
     } catch (error) {
-      state = State.ERROR;
-      showErrorToast(error);
+      state = "standby";
+      showNotInBattleToastIfNeeded();
       return;
     }
 
@@ -123,35 +130,32 @@
       return;
     }
 
-    state = State.FETCHING;
+    state = "fetching";
     try {
       const stats = await Load();
       friendRows = stats["friends"];
       enemyRows = stats["enemies"];
       latestHash = hash;
-      state = State.STANDBY;
+      state = "standby";
       showSuccessToast("updated!");
     } catch (error) {
-      state = State.ERROR;
+      state = "error";
       showErrorToast(error);
     }
   }
 
-  setInterval(looper, 1000);
-
   function clickMain() {
-    currentPage = Page.MAIN;
+    currentPage = "main";
   }
 
   function clickConfig() {
-    currentPage = Page.CONFIG;
+    currentPage = "config";
     GetConfig()
       .then((config) => {
         installPath = config.install_path;
         appid = config.appid;
       })
       .catch((error) => {
-        showErrorToast(error);
         installPath = "";
         appid = "";
       });
@@ -169,74 +173,153 @@
 
   function selectDirectory() {
     SelectDirectory().then((result) => {
+      if (!result) return;
       installPath = result;
     });
   }
 
   function showSuccessToast(message: string) {
     toasts.add({
-      title: "Success",
       description: message,
       duration: 3000,
       placement: "bottom-right",
       type: "success",
       theme: "dark",
-      showProgress: true,
     });
   }
 
   function showErrorToast(message: string) {
     toasts.add({
-      title: "Error",
       description: message,
       duration: 3000,
       placement: "bottom-right",
       type: "error",
       theme: "dark",
-      showProgress: true,
     });
+  }
+
+  function showNotInBattleToastIfNeeded() {
+    if (notInBattleToast) {
+      return;
+    }
+
+    notInBattleToast = toasts.add({
+      description: "戦闘中ではありません。開始時に自動的にリロードします。",
+      duration: 0,
+      placement: "bottom-right",
+      type: "info",
+      theme: "dark",
+    });
+  }
+
+  function removeNotInBattleToastIfNeeded() {
+    if (!notInBattleToast) {
+      return;
+    }
+
+    notInBattleToast.remove();
+    notInBattleToast = undefined;
   }
 </script>
 
 <main>
-  {#if currentPage === Page.CONFIG}
-    <div>
-      <input
-        type="”text”"
-        bind:value={installPath}
-        size="50"
-        placeholder="World of Warshipsインストールフォルダ"
-      />
-      <button on:click={selectDirectory}>フォルダ選択</button>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+      <span class="navbar-brand">wows-fast-stats</span>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#navbarNavAltMarkup"
+        aria-controls="navbarNavAltMarkup"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon" />
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+        <div class="navbar-nav">
+          <a
+            class="nav-link"
+            href="#"
+            data-bs-toggle="collapse"
+            data-bs-target=".navbar-collapse.show"
+            on:click={clickMain}>ホーム</a
+          >
+          <a
+            class="nav-link"
+            href="#"
+            data-bs-toggle="collapse"
+            data-bs-target=".navbar-collapse.show"
+            on:click={clickConfig}>設定</a
+          >
+        </div>
+      </div>
     </div>
+  </nav>
 
-    <div>
-      <input
-        type="”text”"
-        bind:value={appid}
-        size="50"
-        id="appid"
-        placeholder="App ID"
-      />
-    </div>
-
-    <div>
-      <button on:click={clickApply}>適用</button>
-      <button on:click={clickMain}>戻る</button>
+  {#if currentPage === "config"}
+    <div class="mt-3">
+      <form>
+        <div class="mb-3 form-style">
+          <label for="install-path" class="form-label"
+            >World of Warshipsインストールフォルダ</label
+          >
+          <div class="horizontal">
+            <input
+              type="text"
+              class="form-control"
+              id="install-path"
+              bind:value={installPath}
+            />
+            <button
+              type="button"
+              class="btn btn-secondary"
+              on:click={selectDirectory}>選択</button
+            >
+          </div>
+        </div>
+        <div class="mb-3 form-style">
+          <label for="appid" class="form-label">AppID</label>
+          <input
+            type="text"
+            class="form-control"
+            id="appid"
+            bind:value={appid}
+          />
+        </div>
+        <button type="button" class="btn btn-primary" on:click={clickApply}
+          >適用</button
+        >
+      </form>
     </div>
   {/if}
 
-  {#if currentPage === Page.MAIN}
-    {#if state === State.FETCHING}
-      <BarLoader color="#FF3E00" />
-    {/if}
+  {#if currentPage === "main"}
+    <div class="mt-3">
+      {#if state === "fetching"}
+        <div class="d-flex justify-content-center">
+          <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>
+      {/if}
 
-    {#if latestHash !== ""}
-      <SvelteTable {columns} rows={friendRows} />
-      <SvelteTable {columns} rows={enemyRows} />
-    {/if}
-
-    <button on:click={clickConfig}>設定</button>
+      {#if latestHash !== ""}
+        <div class="padding">
+          <SvelteTable
+            {columns}
+            rows={friendRows}
+            classNameTable="table table-sm table-dark table-striped"
+          />
+          <SvelteTable
+            {columns}
+            rows={enemyRows}
+            classNameTable="table table-sm table-dark table-striped"
+          />
+        </div>
+      {/if}
+    </div>
   {/if}
 
   <ToastContainer let:data>
@@ -245,4 +328,26 @@
 </main>
 
 <style>
+  :global(.text-right) {
+    text-align: right;
+  }
+  :global(.text-left) {
+    text-align: left;
+  }
+  :global(.omit) {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 64px;
+    white-space: nowrap;
+  }
+  :global(.padding) {
+    padding: 1em;
+  }
+  :global(.horizontal) {
+    display: flex;
+  }
+  :global(.form-style) {
+    width: 50%;
+    margin: auto;
+  }
 </style>

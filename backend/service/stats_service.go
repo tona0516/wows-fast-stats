@@ -6,7 +6,6 @@ import (
 	"changeme/backend/vo"
 	"crypto/md5"
 	"fmt"
-	"math"
 	"sort"
 	"sync"
 	"time"
@@ -343,7 +342,7 @@ func (s *StatsService) compose(
 				Battles:   summaryStats.Player.Battles,
 				AvgDamage: int(summaryStats.ShipAvgDamage()),
 				AvgExp:    int(summaryStats.ShipAvgExp()),
-				WinRate:   math.Round(summaryStats.ShipWinRate()*10) / 10,
+				WinRate:   summaryStats.ShipWinRate(),
 				KdRate:    summaryStats.ShipKdRate(),
 				CombatPower: rating.CombatPower(
 					summaryStats.ShipAvgDamage(),
@@ -369,9 +368,9 @@ func (s *StatsService) compose(
 				Battles:   summaryStats.Player.Battles,
 				AvgDamage: int(summaryStats.PlayerAvgDamage()),
 				AvgExp:    int(summaryStats.PlayerAvgExp()),
-				WinRate:   math.Round(summaryStats.PlayerWinRate()*10) / 10,
+				WinRate:   summaryStats.PlayerWinRate(),
 				KdRate:    summaryStats.PlayerKdRate(),
-				AvgTier:   math.Round(summaryStats.PlayerAvgTier(accountID, shipInfo, shipStats)*10) / 10,
+				AvgTier:   summaryStats.PlayerAvgTier(accountID, shipInfo, shipStats),
 			},
 		}
 
