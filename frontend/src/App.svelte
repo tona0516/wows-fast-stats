@@ -132,12 +132,14 @@
 
     state = "fetching";
     try {
+      const start = new Date().getTime();
       const stats = await Load();
       friendRows = stats["friends"];
       enemyRows = stats["enemies"];
       latestHash = hash;
       state = "standby";
-      showSuccessToast("updated!");
+      const elapsed = (new Date().getTime() - start) / 1000;
+      showSuccessToast(`データ取得完了: ${elapsed}秒`);
     } catch (error) {
       state = "error";
       showErrorToast(error);
@@ -164,7 +166,7 @@
   function clickApply() {
     ApplyConfig(installPath, appid)
       .then((_) => {
-        showSuccessToast("updated!");
+        showSuccessToast("更新しました。");
       })
       .catch((error) => {
         showErrorToast(error);
