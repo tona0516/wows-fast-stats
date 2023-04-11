@@ -36,6 +36,7 @@ func (w *Wargaming) GetAccountInfo(accountIDs []int) (vo.WGAccountInfo, error) {
 			"application_id": w.AppID,
 			"account_id":     strings.Join(accountIDsString, ","),
 			"fields": strings.Join([]string{
+                "hidden_profile",
 				"statistics.pvp.xp",
 				"statistics.pvp.survived_battles",
 				"statistics.pvp.battles",

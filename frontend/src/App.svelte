@@ -37,12 +37,16 @@
     },
     {
       title: "CP",
-      value: (v) => v.player_ship_stats.combat_power,
+      value: (v) =>
+        v.player_player_info.is_hidden ? "" : v.player_ship_stats.combat_power,
       class: "text-right",
     },
     {
       title: "PR",
-      value: (v) => v.player_ship_stats.personal_rating,
+      value: (v) =>
+        v.player_player_info.is_hidden
+          ? ""
+          : v.player_ship_stats.personal_rating,
       class: "text-right",
     },
     {
@@ -58,47 +62,62 @@
     },
     {
       title: "Dmg",
-      value: (v) => v.player_ship_stats.avg_damage,
+      value: (v) =>
+        v.player_player_info.is_hidden ? "" : v.player_ship_stats.avg_damage,
       class: "text-right",
     },
     {
       title: "勝率",
-      value: (v) => v.player_ship_stats.win_rate.toFixed(1),
+      value: (v) =>
+        v.player_player_info.is_hidden
+          ? ""
+          : v.player_ship_stats.win_rate.toFixed(1),
       class: "text-right",
     },
     {
       title: "Exp",
-      value: (v) => v.player_ship_stats.avg_exp,
+      value: (v) =>
+        v.player_player_info.is_hidden ? "" : v.player_ship_stats.avg_exp,
       class: "text-right",
     },
     {
       title: "戦闘数",
-      value: (v) => v.player_ship_stats.battles,
+      value: (v) =>
+        v.player_player_info.is_hidden ? "" : v.player_ship_stats.battles,
       class: "text-right",
     },
     {
       title: "Dmg",
-      value: (v) => v.player_player_stats.avg_damage,
+      value: (v) =>
+        v.player_player_info.is_hidden ? "" : v.player_player_stats.avg_damage,
       class: "text-right",
     },
     {
       title: "勝率",
-      value: (v) => v.player_player_stats.win_rate.toFixed(1),
+      value: (v) =>
+        v.player_player_info.is_hidden
+          ? ""
+          : v.player_player_stats.win_rate.toFixed(1),
       class: "text-right",
     },
     {
       title: "Exp",
-      value: (v) => v.player_player_stats.avg_exp,
+      value: (v) =>
+        v.player_player_info.is_hidden ? "" : v.player_player_stats.avg_exp,
       class: "text-right",
     },
     {
       title: "戦闘数",
-      value: (v) => v.player_player_stats.battles,
+      value: (v) =>
+        v.player_player_info.is_hidden ? "" : v.player_player_stats.battles,
       class: "text-right",
     },
     {
       title: "平均T",
-      value: (v) => v.player_player_stats.avg_tier.toFixed(1),
+      value: (v) =>
+        v.player_player_info.is_hidden
+          ? ""
+          : v.player_player_stats.avg_tier.toFixed(1),
       class: "text-right",
     },
   ];

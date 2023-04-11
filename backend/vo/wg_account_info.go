@@ -7,6 +7,7 @@ type WGAccountInfo struct {
 		Hidden interface{} `json:"hidden"`
 	} `json:"meta"`
 	Data map[int]struct {
+        HiddenProfile bool `json:"hidden_profile"`
 		Statistics struct {
 			Pvp struct {
 				Wins            uint `json:"wins"`

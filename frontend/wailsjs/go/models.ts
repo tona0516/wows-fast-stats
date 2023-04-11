@@ -25,7 +25,7 @@ export namespace vo {
 	export class PlayerPlayerInfo {
 	    name: string;
 	    clan: string;
-	    is_hidden: string;
+	    is_hidden: boolean;
 	    stats_url: string;
 	
 	    static createFrom(source: any = {}) {

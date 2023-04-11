@@ -368,6 +368,7 @@ func (s *StatsService) compose(
 			PlayerInfo: vo.PlayerPlayerInfo{
 				Name: nickname,
 				Clan: clan,
+                IsHidden: playerAccountInfo.HiddenProfile,
 			},
 			PlayerStats: vo.PlayerPlayerStats{
 				Battles:   summaryStats.Player.Battles,
