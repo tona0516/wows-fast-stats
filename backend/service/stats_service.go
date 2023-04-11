@@ -36,6 +36,7 @@ func (s *StatsService) GetsStats() (vo.Team, error) {
 	wargaming := repo.Wargaming{AppID: s.AppID}
 	numbers := repo.Numbers{}
 	local := repo.Local{}
+    unregistered := repo.Unregistered{}
 
 	tempArenaInfo, err := local.GetTempArenaInfo(s.InstallPath)
 	if err != nil {
@@ -92,6 +93,14 @@ func (s *StatsService) GetsStats() (vo.Team, error) {
 	if expectedStats.Error != nil {
 		return result, expectedStats.Error
 	}
+
+    unregisteredShipInfo, err := unregistered.GetShips()
+    if err != nil {
+        return result, err
+    }
+    for k, v := range unregisteredShipInfo {
+        shipInfo.Value[k] = v
+    }
 
 	result = s.compose(
 		tempArenaInfo,
