@@ -336,8 +336,8 @@ func (s *StatsService) compose(
 			},
 			ShipStats: vo.PlayerShipStats{
 				Battles:   summaryStats.Player.Battles,
-				AvgDamage: int(summaryStats.ShipAvgDamage()),
-				AvgExp:    int(summaryStats.ShipAvgExp()),
+				AvgDamage: uint(summaryStats.ShipAvgDamage()),
+				AvgExp:    uint(summaryStats.ShipAvgExp()),
 				WinRate:   summaryStats.ShipWinRate(),
 				KdRate:    summaryStats.ShipKdRate(),
 				CombatPower: rating.CombatPower(
@@ -362,8 +362,8 @@ func (s *StatsService) compose(
 			},
 			PlayerStats: vo.PlayerPlayerStats{
 				Battles:   summaryStats.Player.Battles,
-				AvgDamage: int(summaryStats.PlayerAvgDamage()),
-				AvgExp:    int(summaryStats.PlayerAvgExp()),
+				AvgDamage: uint(summaryStats.PlayerAvgDamage()),
+				AvgExp:    uint(summaryStats.PlayerAvgExp()),
 				WinRate:   summaryStats.PlayerWinRate(),
 				KdRate:    summaryStats.PlayerKdRate(),
 				AvgTier:   summaryStats.PlayerAvgTier(accountID, shipInfo, shipStats),

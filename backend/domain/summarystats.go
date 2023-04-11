@@ -4,12 +4,12 @@ import "changeme/backend/vo"
 
 
 type Stats struct {
-	Battles         int
-	SurvivedBattles int
-	DamageDealt     int
-	Frags           int
-	Xp              int
-	Wins            int
+	Battles         uint
+	SurvivedBattles uint
+	DamageDealt     uint
+	Frags           uint
+	Xp              uint
+	Wins            uint
 }
 type SummaryStats struct {
 	Ship   Stats
@@ -80,8 +80,8 @@ func (s *SummaryStats) PlayerWinRate() float64 {
 }
 
 func (s *SummaryStats) PlayerAvgTier(accountID int, shipInfo map[int]vo.ShipInfo, shipStats map[int]vo.WGShipsStats) float64 {
-	sum := 0
-	battles := 0
+	var sum uint = 0
+	var battles uint = 0
 	playerShipStats := shipStats[accountID].Data[accountID]
 	for i := range playerShipStats {
 		shipID := playerShipStats[i].ShipID

@@ -2,7 +2,7 @@ package vo
 
 type ShipInfo struct {
 	Name   string
-	Tier   int
+	Tier   uint
 	Type   string
 	Nation string
 }

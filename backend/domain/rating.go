@@ -10,9 +10,9 @@ func (s *Rating) CombatPower(
 	avgDamage float64,
 	kdRate float64,
 	avgExp float64,
-	tier int,
+	tier uint,
 	shipType string,
-) int {
+) uint {
 	shipTypeCoef := 1.0
 	if shipType == "Battleship" {
 		shipTypeCoef = 0.7
@@ -23,7 +23,7 @@ func (s *Rating) CombatPower(
 
 	combatPower := ((avgDamage * kdRate * avgExp) / 800.0) * (1.0 - 0.03*float64(tier)) * shipTypeCoef
 
-	return int(combatPower)
+	return uint(combatPower)
 }
 
 func (s *Rating) PersonalRating(
@@ -33,7 +33,7 @@ func (s *Rating) PersonalRating(
 	expectedDamage float64,
 	expectedFrags float64,
 	expectedWins float64,
-) int {
+) uint {
 	damageRatio := actualDamage / expectedDamage
 	fragsRatio := actualFrags / expectedFrags
 	winsRatio := actualWins / expectedWins
@@ -44,5 +44,5 @@ func (s *Rating) PersonalRating(
 
 	personalRating := 700*damageNorm + 300*fragsNorm + 150*winsNorm
 
-	return int(personalRating)
+	return uint(personalRating)
 }

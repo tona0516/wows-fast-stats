@@ -3,19 +3,19 @@ package vo
 type PlayerShipInfo struct {
 	Name     string `json:"name"`
 	Nation   string `json:"nation"`
-	Tier     int `json:"tier"`
+	Tier     uint `json:"tier"`
 	Type     string `json:"type"`
 	StatsURL string `json:"stats_url"`
 }
 
 type PlayerShipStats struct {
-	Battles        int `json:"battles"`
-	AvgDamage      int `json:"avg_damage"`
-	AvgExp         int `json:"avg_exp"`
+	Battles        uint `json:"battles"`
+	AvgDamage      uint `json:"avg_damage"`
+	AvgExp         uint `json:"avg_exp"`
 	WinRate        float64 `json:"win_rate"`
 	KdRate         float64 `json:"kd_rate"`
-	CombatPower    int `json:"combat_power"`
-	PersonalRating int `json:"personal_rating"`
+	CombatPower    uint `json:"combat_power"`
+	PersonalRating uint `json:"personal_rating"`
 }
 
 type PlayerPlayerInfo struct {
@@ -26,9 +26,9 @@ type PlayerPlayerInfo struct {
 }
 
 type PlayerPlayerStats struct {
-	Battles   int `json:"battles"`
-	AvgDamage int `json:"avg_damage"`
-	AvgExp    int `json:"avg_exp"`
+	Battles   uint `json:"battles"`
+	AvgDamage uint `json:"avg_damage"`
+	AvgExp    uint `json:"avg_exp"`
 	WinRate   float64 `json:"win_rate"`
 	KdRate    float64 `json:"kd_rate"`
 	AvgTier   float64 `json:"avg_tier"`

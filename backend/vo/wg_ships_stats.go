@@ -8,12 +8,12 @@ type WGShipsStats struct {
 	} `json:"meta"`
 	Data map[int][]struct {
 		Pvp struct {
-			Wins            int `json:"wins"`
-			Battles         int `json:"battles"`
-			DamageDealt     int `json:"damage_dealt"`
-			Xp              int `json:"xp"`
-			Frags           int `json:"frags"`
-			SurvivedBattles int `json:"survived_battles"`
+			Wins            uint `json:"wins"`
+			Battles         uint `json:"battles"`
+			DamageDealt     uint `json:"damage_dealt"`
+			Xp              uint `json:"xp"`
+			Frags           uint `json:"frags"`
+			SurvivedBattles uint `json:"survived_battles"`
 		} `json:"pvp"`
 		ShipID int `json:"ship_id"`
 	} `json:"data"`

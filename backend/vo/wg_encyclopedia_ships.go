@@ -10,7 +10,7 @@ type WGEncyclopediaShips struct {
 		Page      int `json:"page"`
 	} `json:"meta"`
 	Data map[int]struct {
-		Tier   int    `json:"tier"`
+		Tier   uint    `json:"tier"`
 		Type   string `json:"type"`
 		Name   string `json:"name"`
 		Nation string `json:"nation"`
