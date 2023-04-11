@@ -16,6 +16,9 @@
 
   type State = "standby" | "fetching" | "error";
   let state: State = "standby";
+
+  type StatsType = "ship" | "player";
+
   let notInBattleToast: ToastProps;
   let latestHash = "";
 
@@ -38,15 +41,17 @@
     {
       title: "CP",
       value: (v) =>
-        v.player_player_info.is_hidden ? "" : v.player_ship_stats.combat_power,
+        isValidStatsValue(v, "ship")
+          ? v.player_ship_stats.combat_power.toFixed(0)
+          : "",
       class: "text-right",
     },
     {
       title: "PR",
       value: (v) =>
-        v.player_player_info.is_hidden
-          ? ""
-          : v.player_ship_stats.personal_rating,
+        isValidStatsValue(v, "ship")
+          ? v.player_ship_stats.personal_rating.toFixed(0)
+          : "",
       class: "text-right",
     },
     {
@@ -63,61 +68,69 @@
     {
       title: "Dmg",
       value: (v) =>
-        v.player_player_info.is_hidden ? "" : v.player_ship_stats.avg_damage,
+        isValidStatsValue(v, "ship")
+          ? v.player_ship_stats.avg_damage.toFixed(0)
+          : "",
       class: "text-right",
     },
     {
       title: "勝率",
       value: (v) =>
-        v.player_player_info.is_hidden
-          ? ""
-          : v.player_ship_stats.win_rate.toFixed(1),
+        isValidStatsValue(v, "ship")
+          ? v.player_ship_stats.win_rate.toFixed(1)
+          : "",
       class: "text-right",
     },
     {
       title: "Exp",
       value: (v) =>
-        v.player_player_info.is_hidden ? "" : v.player_ship_stats.avg_exp,
+        isValidStatsValue(v, "ship")
+          ? v.player_ship_stats.avg_exp.toFixed(0)
+          : "",
       class: "text-right",
     },
     {
       title: "戦闘数",
       value: (v) =>
-        v.player_player_info.is_hidden ? "" : v.player_ship_stats.battles,
+        isValidStatsValue(v, "ship") ? v.player_ship_stats.battles : "",
       class: "text-right",
     },
     {
       title: "Dmg",
       value: (v) =>
-        v.player_player_info.is_hidden ? "" : v.player_player_stats.avg_damage,
+        isValidStatsValue(v, "player")
+          ? v.player_player_stats.avg_damage.toFixed(0)
+          : "",
       class: "text-right",
     },
     {
       title: "勝率",
       value: (v) =>
-        v.player_player_info.is_hidden
-          ? ""
-          : v.player_player_stats.win_rate.toFixed(1),
+        isValidStatsValue(v, "player")
+          ? v.player_player_stats.win_rate.toFixed(1)
+          : "",
       class: "text-right",
     },
     {
       title: "Exp",
       value: (v) =>
-        v.player_player_info.is_hidden ? "" : v.player_player_stats.avg_exp,
+        isValidStatsValue(v, "player")
+          ? v.player_player_stats.avg_exp.toFixed(0)
+          : "",
       class: "text-right",
     },
     {
       title: "戦闘数",
       value: (v) =>
-        v.player_player_info.is_hidden ? "" : v.player_player_stats.battles,
+        isValidStatsValue(v, "player") ? v.player_player_stats.battles : "",
       class: "text-right",
     },
     {
       title: "平均T",
       value: (v) =>
-        v.player_player_info.is_hidden
-          ? ""
-          : v.player_player_stats.avg_tier.toFixed(1),
+        isValidStatsValue(v, "player")
+          ? v.player_player_stats.avg_tier.toFixed(1)
+          : "",
       class: "text-right",
     },
   ];
@@ -241,6 +254,22 @@
     notInBattleToast.remove();
     notInBattleToast = undefined;
   }
+
+  function isValidStatsValue(player: any, statsType: StatsType) {
+    let battles: number;
+    switch (statsType) {
+      case "ship":
+        battles = player.player_ship_stats.battles;
+        break;
+      case "player":
+        battles = player.player_player_stats.battles;
+        break;
+      default:
+        battles = 0;
+        break;
+    }
+    return !player.player_player_info.is_hidden && battles > 0;
+  }
 </script>
 
 <main>
@@ -358,7 +387,7 @@
   :global(.omit) {
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 64px;
+    max-width: 100px;
     white-space: nowrap;
   }
   :global(.padding) {

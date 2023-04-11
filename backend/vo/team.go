@@ -10,12 +10,12 @@ type PlayerShipInfo struct {
 
 type PlayerShipStats struct {
 	Battles        uint `json:"battles"`
-	AvgDamage      uint `json:"avg_damage"`
-	AvgExp         uint `json:"avg_exp"`
+	AvgDamage      float64 `json:"avg_damage"`
+	AvgExp         float64 `json:"avg_exp"`
 	WinRate        float64 `json:"win_rate"`
 	KdRate         float64 `json:"kd_rate"`
-	CombatPower    uint `json:"combat_power"`
-	PersonalRating uint `json:"personal_rating"`
+	CombatPower    float64 `json:"combat_power"`
+	PersonalRating float64 `json:"personal_rating"`
 }
 
 type PlayerPlayerInfo struct {
@@ -27,8 +27,8 @@ type PlayerPlayerInfo struct {
 
 type PlayerPlayerStats struct {
 	Battles   uint `json:"battles"`
-	AvgDamage uint `json:"avg_damage"`
-	AvgExp    uint `json:"avg_exp"`
+	AvgDamage float64 `json:"avg_damage"`
+	AvgExp    float64 `json:"avg_exp"`
 	WinRate   float64 `json:"win_rate"`
 	KdRate    float64 `json:"kd_rate"`
 	AvgTier   float64 `json:"avg_tier"`

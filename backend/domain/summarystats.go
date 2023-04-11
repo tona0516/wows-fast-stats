@@ -16,6 +16,10 @@ type SummaryStats struct {
 	Player Stats
 }
 
+func (s *SummaryStats) SetShipStats(ship Stats) {
+    s.Ship = ship
+}
+
 func (s *SummaryStats) ShipAvgDamage() float64 {
 	if s.Ship.Battles != 0 {
 		return float64(s.Ship.DamageDealt) / float64(s.Ship.Battles)
