@@ -20,6 +20,7 @@
   type StatsType = "ship" | "player";
 
   let notInBattleToast: ToastProps;
+  let settingPromotionToast: ToastProps;
   let latestHash = "";
 
   let installPath = "";
@@ -140,7 +141,9 @@
   async function looper() {
     try {
       await GetConfig();
+      removeSettingPromotionIfNeeded()
     } catch (error) {
+      showSettingPromotionIfNeeded()
       return;
     }
 
@@ -253,6 +256,29 @@
 
     notInBattleToast.remove();
     notInBattleToast = undefined;
+  }
+
+  function showSettingPromotionIfNeeded() {
+    if (settingPromotionToast) {
+      return;
+    }
+
+    settingPromotionToast = toasts.add({
+      description: "未設定の状態のため開始できません。「設定」から入力してください。",
+      duration: 0,
+      placement: "bottom-right",
+      type: "info",
+      theme: "dark",
+    });
+  }
+
+  function removeSettingPromotionIfNeeded() {
+    if (!settingPromotionToast) {
+      return;
+    }
+
+    settingPromotionToast.remove();
+    settingPromotionToast = undefined;
   }
 
   function isValidStatsValue(player: any, statsType: StatsType) {
