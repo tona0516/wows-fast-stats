@@ -30,8 +30,8 @@ func (s *StatsService) GetTempArenaInfoHash() (string, error) {
     return result, nil
 }
 
-func (s *StatsService) GetsStats() (vo.Team, error) {
-    var result vo.Team
+func (s *StatsService) GetsStats() ([][]vo.Player, error) {
+    var result [][]vo.Player
 
 	wargaming := repo.Wargaming{AppID: s.AppID}
 	numbers := repo.Numbers{}
@@ -294,7 +294,8 @@ func (s *StatsService) compose(
 	shipStats map[int]vo.WGShipsStats,
 	shipInfo map[int]vo.ShipInfo,
 	expectedStats vo.NSExpectedStats,
-) (vo.Team) {
+) [][]vo.Player {
+    teams := make([][]vo.Player, 0)
 	friends := make([]vo.Player, 0)
 	enemies := make([]vo.Player, 0)
 	rating := domain.Rating{}
@@ -413,8 +414,8 @@ func (s *StatsService) compose(
 		}
 		return one.Name < second.Name
 	})
-	return vo.Team{
-        Friends: friends,
-        Enemies: enemies,
-    }
+
+    teams = append(teams, friends)
+    teams = append(teams, enemies)
+    return teams
 }

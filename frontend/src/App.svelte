@@ -1,5 +1,4 @@
 <script lang="ts">
-  import SvelteTable from "svelte-table";
   import { toasts, ToastContainer, FlatToast } from "svelte-toasts";
   import {
     ApplyConfig,
@@ -26,124 +25,15 @@
   let installPath = "";
   let appid = "";
 
-  let friendRows = [];
-  let enemyRows = [];
-  let columns = [
-    {
-      title: "クラン",
-      value: (v) => v.player_player_info.clan,
-      class: "text-left",
-    },
-    {
-      title: "プレイヤー",
-      value: (v) => v.player_player_info.name,
-      class: "text-left omit",
-    },
-    {
-      title: "CP",
-      value: (v) =>
-        isValidStatsValue(v, "ship")
-          ? v.player_ship_stats.combat_power.toFixed(0)
-          : "",
-      class: "text-right",
-    },
-    {
-      title: "PR",
-      value: (v) =>
-        isValidStatsValue(v, "ship")
-          ? v.player_ship_stats.personal_rating.toFixed(0)
-          : "",
-      class: "text-right",
-    },
-    {
-      title: "艦",
-      value: (v) => v.player_ship_info.name,
-      class: "text-left omit",
-    },
-    {
-      title: "T",
-      value: (v) =>
-        v.player_ship_info.tier === 11 ? "★" : v.player_ship_info.tier,
-      class: "text-right",
-    },
-    {
-      title: "Dmg",
-      value: (v) =>
-        isValidStatsValue(v, "ship")
-          ? v.player_ship_stats.avg_damage.toFixed(0)
-          : "",
-      class: "text-right",
-    },
-    {
-      title: "勝率",
-      value: (v) =>
-        isValidStatsValue(v, "ship")
-          ? v.player_ship_stats.win_rate.toFixed(1)
-          : "",
-      class: "text-right",
-    },
-    {
-      title: "Exp",
-      value: (v) =>
-        isValidStatsValue(v, "ship")
-          ? v.player_ship_stats.avg_exp.toFixed(0)
-          : "",
-      class: "text-right",
-    },
-    {
-      title: "戦闘数",
-      value: (v) =>
-        isValidStatsValue(v, "ship") ? v.player_ship_stats.battles : "",
-      class: "text-right",
-    },
-    {
-      title: "Dmg",
-      value: (v) =>
-        isValidStatsValue(v, "player")
-          ? v.player_player_stats.avg_damage.toFixed(0)
-          : "",
-      class: "text-right",
-    },
-    {
-      title: "勝率",
-      value: (v) =>
-        isValidStatsValue(v, "player")
-          ? v.player_player_stats.win_rate.toFixed(1)
-          : "",
-      class: "text-right",
-    },
-    {
-      title: "Exp",
-      value: (v) =>
-        isValidStatsValue(v, "player")
-          ? v.player_player_stats.avg_exp.toFixed(0)
-          : "",
-      class: "text-right",
-    },
-    {
-      title: "戦闘数",
-      value: (v) =>
-        isValidStatsValue(v, "player") ? v.player_player_stats.battles : "",
-      class: "text-right",
-    },
-    {
-      title: "平均T",
-      value: (v) =>
-        isValidStatsValue(v, "player")
-          ? v.player_player_stats.avg_tier.toFixed(1)
-          : "",
-      class: "text-right",
-    },
-  ];
-
+  let teams = [];
   setInterval(looper, 1000);
 
   async function looper() {
     try {
       await GetConfig();
-      removeSettingPromotionIfNeeded()
+      removeSettingPromotionIfNeeded();
     } catch (error) {
-      showSettingPromotionIfNeeded()
+      showSettingPromotionIfNeeded();
       return;
     }
 
@@ -168,9 +58,8 @@
     state = "fetching";
     try {
       const start = new Date().getTime();
-      const stats = await Load();
-      friendRows = stats["friends"];
-      enemyRows = stats["enemies"];
+      teams = await Load();
+      console.log(teams);
       latestHash = hash;
       state = "standby";
       const elapsed = (new Date().getTime() - start) / 1000;
@@ -264,7 +153,8 @@
     }
 
     settingPromotionToast = toasts.add({
-      description: "未設定の状態のため開始できません。「設定」から入力してください。",
+      description:
+        "未設定の状態のため開始できません。「設定」から入力してください。",
       duration: 0,
       placement: "bottom-right",
       type: "info",
@@ -383,16 +273,127 @@
 
       {#if latestHash !== ""}
         <div class="padding">
-          <SvelteTable
-            {columns}
-            rows={friendRows}
-            classNameTable="table table-sm table-dark table-striped"
-          />
-          <SvelteTable
-            {columns}
-            rows={enemyRows}
-            classNameTable="table table-sm table-dark table-striped"
-          />
+          {#each teams as team}
+            <table class="table table-sm table-dark table-striped">
+              <thead>
+                <tr>
+                  <th>クラン</th>
+                  <th>プレイヤー</th>
+                  <th>CP</th>
+                  <th>PR</th>
+                  <th>艦</th>
+                  <th>T</th>
+                  <th>Dmg</th>
+                  <th>勝率</th>
+                  <th>Exp</th>
+                  <th>戦闘数</th>
+                  <th>Dmg</th>
+                  <th>勝率</th>
+                  <th>Exp</th>
+                  <th>戦闘数</th>
+                  <th>平均T</th>
+                </tr>
+              </thead>
+              <tbody>
+                {#each team as player}
+                  <tr>
+                    <td class="text-left">{player.player_player_info.clan}</td>
+                    <td class="text-left omit"
+                      >{player.player_player_info.name}</td
+                    >
+                    {#if isValidStatsValue(player, "ship")}
+                      <td class="text-right"
+                        >{player.player_ship_stats.combat_power.toFixed(0)}</td
+                      >
+                    {:else}
+                      <td />
+                    {/if}
+                    {#if isValidStatsValue(player, "ship")}
+                      <td class="text-right"
+                        >{player.player_ship_stats.personal_rating.toFixed(
+                          0
+                        )}</td
+                      >
+                    {:else}
+                      <td />
+                    {/if}
+
+                    <td class="text-left omit"
+                      >{player.player_ship_info.name}</td
+                    >
+                    <td class="text-right">{player.player_ship_info.tier}</td>
+                    {#if isValidStatsValue(player, "ship")}
+                      <td class="text-right"
+                        >{player.player_ship_stats.avg_damage.toFixed(0)}</td
+                      >
+                    {:else}
+                      <td />
+                    {/if}
+
+                    {#if isValidStatsValue(player, "ship")}
+                      <td class="text-right"
+                        >{player.player_ship_stats.win_rate.toFixed(1)}</td
+                      >
+                    {:else}
+                      <td />
+                    {/if}
+
+                    {#if isValidStatsValue(player, "ship")}
+                      <td class="text-right"
+                        >{player.player_ship_stats.avg_exp.toFixed(0)}</td
+                      >
+                    {:else}
+                      <td />
+                    {/if}
+
+                    {#if isValidStatsValue(player, "ship")}
+                      <td class="text-right"
+                        >{player.player_ship_stats.battles}</td
+                      >
+                    {:else}
+                      <td />
+                    {/if}
+
+                    {#if isValidStatsValue(player, "player")}
+                      <td class="text-right"
+                        >{player.player_player_stats.avg_damage.toFixed(0)}</td
+                      >
+                    {:else}
+                      <td />
+                    {/if}
+                    {#if isValidStatsValue(player, "player")}
+                      <td class="text-right"
+                        >{player.player_player_stats.win_rate.toFixed(1)}</td
+                      >
+                    {:else}
+                      <td />
+                    {/if}
+                    {#if isValidStatsValue(player, "player")}
+                      <td class="text-right"
+                        >{player.player_player_stats.avg_exp.toFixed(0)}</td
+                      >
+                    {:else}
+                      <td />
+                    {/if}
+                    {#if isValidStatsValue(player, "player")}
+                      <td class="text-right"
+                        >{player.player_player_stats.battles}</td
+                      >
+                    {:else}
+                      <td />
+                    {/if}
+                    {#if isValidStatsValue(player, "player")}
+                      <td class="text-right"
+                        >{player.player_player_stats.avg_tier.toFixed(1)}</td
+                      >
+                    {:else}
+                      <td />
+                    {/if}
+                  </tr>
+                {/each}
+              </tbody>
+            </table>
+          {/each}
         </div>
       {/if}
     </div>

@@ -40,8 +40,3 @@ type Player struct {
 	PlayerInfo  PlayerPlayerInfo `json:"player_player_info"`
 	PlayerStats PlayerPlayerStats `json:"player_player_stats"`
 }
-
-type Team struct {
-    Friends []Player `json:"friends"`
-    Enemies []Player `json:"enemies"`
-}

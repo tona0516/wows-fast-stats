@@ -39,7 +39,7 @@ func (a *App) GetTempArenaInfoHash() (string, error) {
 	return statsService.GetTempArenaInfoHash()
 }
 
-func (a *App) Load() (vo.Team, error) {
+func (a *App) Load() ([][]vo.Player, error) {
 	statsService := service.StatsService{
 		InstallPath: a.config.InstallPath,
 		AppID:       a.config.Appid,
