@@ -3,3 +3,4 @@ node_modules
 frontend/dist
 cache/
 config/
+.DS_Store

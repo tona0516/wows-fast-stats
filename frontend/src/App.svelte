@@ -1,4 +1,11 @@
 <script lang="ts">
+  import iconCV from "./assets/images/icon-cv.png";
+  import iconBB from "./assets/images/icon-bb.png";
+  import iconCL from "./assets/images/icon-cl.png";
+  import iconDD from "./assets/images/icon-dd.png";
+  import iconSS from "./assets/images/icon-ss.png";
+  import iconNone from "./assets/images/icon-none.png";
+
   import { toasts, ToastContainer, FlatToast } from "svelte-toasts";
   import {
     ApplyConfig,
@@ -212,6 +219,40 @@
         return "";
     }
   }
+
+  function numberForDisplay(value: number): string {
+    if (value === 11) return "★";
+
+    const decimal = [10, 9, 5, 4, 1];
+    const romanNumeral = ["X", "IX", "V", "IV", "I"];
+
+    let romanized = "";
+
+    for (var i = 0; i < decimal.length; i++) {
+      while (decimal[i] <= value) {
+        romanized += romanNumeral[i];
+        value -= decimal[i];
+      }
+    }
+    return romanized;
+  }
+
+  function shipIconForDisplay(shipType: string): string {
+    switch (shipType) {
+      case "AirCarrier":
+        return iconCV;
+      case "Battleship":
+        return iconBB;
+      case "Cruiser":
+        return iconCL;
+      case "Destroyer":
+        return iconDD;
+      case "Submarine":
+        return iconSS;
+      default:
+        return iconNone;
+    }
+  }
 </script>
 
 <main>
@@ -303,16 +344,14 @@
             <table class="table table-sm">
               <thead>
                 <tr>
-                  <th>クラン</th>
                   <th>プレイヤー</th>
                   <th>CP</th>
                   <th>PR</th>
-                  <th>T</th>
                   <th>艦</th>
-                  <th>Dmg</th>
-                  <th>勝率</th>
-                  <th>Exp</th>
-                  <th>戦闘数</th>
+                  <th>Dmg(艦)</th>
+                  <th>勝率(艦)</th>
+                  <th>Exp(艦)</th>
+                  <th>戦闘数(艦)</th>
                   <th>Dmg</th>
                   <th>勝率</th>
                   <th>Exp</th>
@@ -327,10 +366,14 @@
                       player.player_ship_stats.personal_rating
                     )}
                   >
-                    <td class="text-left">{player.player_player_info.clan}</td>
-                    <td class="text-left omit"
-                      >{player.player_player_info.name}</td
-                    >
+                    <td class="text-left omit">
+                      {#if player.player_player_info.clan}
+                        [{player.player_player_info.clan}]{player
+                          .player_player_info.name}
+                      {:else}
+                        {player.player_player_info.name}
+                      {/if}
+                    </td>
                     {#if isValidStatsValue(player, "ship")}
                       <td class="text-right"
                         >{player.player_ship_stats.combat_power.toFixed(0)}</td
@@ -348,10 +391,18 @@
                       <td />
                     {/if}
 
-                    <td class="text-right">{player.player_ship_info.tier}</td>
-                    <td class="text-left omit"
-                      >{player.player_ship_info.name}</td
-                    >
+                    <td class="text-left omit">
+                      <div class="aligner">
+                        <img
+                          alt=""
+                          width="24px"
+                          height="24px"
+                          src={shipIconForDisplay(player.player_ship_info.type)}
+                        />
+                        {numberForDisplay(player.player_ship_info.tier)}
+                        {player.player_ship_info.name}
+                      </div>
+                    </td>
                     {#if isValidStatsValue(player, "ship")}
                       <td class="text-right"
                         >{player.player_ship_stats.avg_damage.toFixed(0)}</td
@@ -444,7 +495,7 @@
   :global(.omit) {
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 100px;
+    max-width: 160px;
     white-space: nowrap;
   }
   :global(.padding) {
@@ -456,5 +507,10 @@
   :global(.form-style) {
     width: 50%;
     margin: auto;
+  }
+
+  :global(.aligner) {
+    display: flex;
+    align-items: center;
   }
 </style>
