@@ -6,26 +6,6 @@ import (
 
 type Rating struct{}
 
-func (s *Rating) CombatPower(
-	avgDamage float64,
-	kdRate float64,
-	avgExp float64,
-	tier uint,
-	shipType string,
-) float64 {
-	shipTypeCoef := 1.0
-	if shipType == "Battleship" {
-		shipTypeCoef = 0.7
-	}
-	if shipType == "AirCarrier" {
-		shipTypeCoef = 0.5
-	}
-
-	combatPower := ((avgDamage * kdRate * avgExp) / 800.0) * (1.0 - 0.03*float64(tier)) * shipTypeCoef
-
-	return combatPower
-}
-
 func (s *Rating) PersonalRating(
 	actualDamage float64,
 	actualFrags float64,

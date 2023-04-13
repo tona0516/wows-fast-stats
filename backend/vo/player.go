@@ -14,7 +14,6 @@ type PlayerShipStats struct {
 	AvgExp         float64 `json:"avg_exp"`
 	WinRate        float64 `json:"win_rate"`
 	KdRate         float64 `json:"kd_rate"`
-	CombatPower    float64 `json:"combat_power"`
 	PersonalRating float64 `json:"personal_rating"`
 }
 

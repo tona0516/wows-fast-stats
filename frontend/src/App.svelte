@@ -345,7 +345,6 @@
               <thead>
                 <tr>
                   <th>プレイヤー</th>
-                  <th>CP</th>
                   <th>PR</th>
                   <th>艦</th>
                   <th>Dmg(艦)</th>
@@ -374,13 +373,6 @@
                         {player.player_player_info.name}
                       {/if}
                     </td>
-                    {#if isValidStatsValue(player, "ship")}
-                      <td class="text-right"
-                        >{player.player_ship_stats.combat_power.toFixed(0)}</td
-                      >
-                    {:else}
-                      <td />
-                    {/if}
                     {#if isValidStatsValue(player, "ship")}
                       <td class="text-right"
                         >{player.player_ship_stats.personal_rating.toFixed(

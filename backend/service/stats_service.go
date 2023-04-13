@@ -351,13 +351,6 @@ func (s *StatsService) compose(
 				AvgExp:    summaryStats.ShipAvgExp(),
 				WinRate:   summaryStats.ShipWinRate(),
 				KdRate:    summaryStats.ShipKdRate(),
-				CombatPower: rating.CombatPower(
-					summaryStats.ShipAvgDamage(),
-					summaryStats.ShipKdRate(),
-					summaryStats.ShipAvgExp(),
-					playerShipInfo.Tier,
-					playerShipInfo.Type,
-				),
 				PersonalRating: rating.PersonalRating(
 					summaryStats.ShipAvgDamage(),
 					summaryStats.ShipAvgFrags(),
