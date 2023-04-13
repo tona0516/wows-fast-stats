@@ -151,6 +151,7 @@ func (s *StatsService) fetchShipStats(wargaming *repo.Wargaming, accountIDs []in
 	shipStatsMap := make(map[int]vo.WGShipsStats)
 	limit := make(chan struct{}, s.Parallels)
 	wg := sync.WaitGroup{}
+    var mu sync.Mutex
 	for i := range accountIDs {
 		limit <- struct{}{}
 		wg.Add(1)
@@ -166,7 +167,9 @@ func (s *StatsService) fetchShipStats(wargaming *repo.Wargaming, accountIDs []in
 				return
 			}
 
+            mu.Lock()
 			shipStatsMap[accountID] = shipStats
+            mu.Unlock()
 		}(accountIDs[i])
 	}
 	wg.Wait()
