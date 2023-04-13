@@ -339,7 +339,7 @@
       {/if}
 
       {#if latestHash !== ""}
-        <div class="padding">
+        <div class="mx-3">
           {#each teams as team}
             <table class="table table-sm">
               <thead>
@@ -497,9 +497,6 @@
     text-overflow: ellipsis;
     max-width: 160px;
     white-space: nowrap;
-  }
-  :global(.padding) {
-    padding: 4px;
   }
   :global(.horizontal) {
     display: flex;
