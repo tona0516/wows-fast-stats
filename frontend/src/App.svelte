@@ -107,7 +107,7 @@
   function showSuccessToast(message: string) {
     toasts.add({
       description: message,
-      duration: 3000,
+      duration: 5000,
       placement: "bottom-right",
       type: "success",
       theme: "dark",
@@ -117,7 +117,7 @@
   function showErrorToast(message: string) {
     toasts.add({
       description: message,
-      duration: 3000,
+      duration: 5000,
       placement: "bottom-right",
       type: "error",
       theme: "dark",
@@ -185,6 +185,32 @@
         break;
     }
     return !player.player_player_info.is_hidden && battles > 0;
+  }
+
+  function backgroundClassForTr(personalRating: number): string {
+    console.log(personalRating);
+    switch (true) {
+      case personalRating == 0:
+        return "";
+      case personalRating < 750:
+        return "bad";
+      case personalRating < 1100:
+        return "below-average";
+      case personalRating < 1350:
+        return "average";
+      case personalRating < 1550:
+        return "good";
+      case personalRating < 1750:
+        return "very-good";
+      case personalRating < 2100:
+        return "great";
+      case personalRating < 2450:
+        return "unicum";
+      case personalRating >= 2450:
+        return "super-unicum";
+      default:
+        return "";
+    }
   }
 </script>
 
@@ -274,15 +300,15 @@
       {#if latestHash !== ""}
         <div class="padding">
           {#each teams as team}
-            <table class="table table-sm table-dark table-striped">
+            <table class="table table-sm">
               <thead>
                 <tr>
                   <th>クラン</th>
                   <th>プレイヤー</th>
                   <th>CP</th>
                   <th>PR</th>
-                  <th>艦</th>
                   <th>T</th>
+                  <th>艦</th>
                   <th>Dmg</th>
                   <th>勝率</th>
                   <th>Exp</th>
@@ -296,7 +322,11 @@
               </thead>
               <tbody>
                 {#each team as player}
-                  <tr>
+                  <tr
+                    class={backgroundClassForTr(
+                      player.player_ship_stats.personal_rating
+                    )}
+                  >
                     <td class="text-left">{player.player_player_info.clan}</td>
                     <td class="text-left omit"
                       >{player.player_player_info.name}</td
@@ -318,10 +348,10 @@
                       <td />
                     {/if}
 
+                    <td class="text-right">{player.player_ship_info.tier}</td>
                     <td class="text-left omit"
                       >{player.player_ship_info.name}</td
                     >
-                    <td class="text-right">{player.player_ship_info.tier}</td>
                     {#if isValidStatsValue(player, "ship")}
                       <td class="text-right"
                         >{player.player_ship_stats.avg_damage.toFixed(0)}</td
@@ -418,7 +448,7 @@
     white-space: nowrap;
   }
   :global(.padding) {
-    padding: 1em;
+    padding: 4px;
   }
   :global(.horizontal) {
     display: flex;

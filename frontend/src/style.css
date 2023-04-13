@@ -1,32 +1,73 @@
 html {
-    background-color: #212529;
-    text-align: center;
-    color: white;
+  background-color: #212529;
+  text-align: center;
+  color: #e5e5e5;
 }
 
 body {
-    margin: 0;
-    color: white;
-    font-family: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+  margin: 0;
+  color: #e5e5e5;
+  font-family: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
     "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif;
-    background-color: #212529;
+  background-color: #212529;
 }
 
 @font-face {
-    font-family: "Nunito";
-    font-style: normal;
-    font-weight: 400;
-    src: local(""),
+  font-family: "Nunito";
+  font-style: normal;
+  font-weight: 400;
+  src: local(""),
     url("assets/fonts/nunito-v16-latin-regular.woff2") format("woff2");
 }
 
 #app {
-    height: 100vh;
-    text-align: center;
+  height: 100vh;
+  text-align: center;
 }
 
 .btn {
-    white-space: nowrap;
-    text-align: center;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.table {
+  color: #e5e5e5;
+}
+
+.table td {
+  padding-top: 2px;
+  padding-bottom: 2px;
+}
+
+.bad {
+  background-color: #c60900;
+}
+
+.below-average {
+  background-color: #ca5f01;
+}
+
+.average {
+  background-color: #b28200;
+}
+
+.good {
+  background-color: #307f00;
+}
+
+.very-good {
+  background-color: #1d4c00;
+}
+
+.great {
+  background-color: #019281;
+}
+
+.unicum {
+  background-color: #cf0fff;
+}
+
+.super-unicum {
+  background-color: #760a93;
 }
