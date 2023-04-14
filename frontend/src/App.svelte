@@ -350,10 +350,12 @@
                   <th>艦</th>
                   <th>Dmg(艦)</th>
                   <th>勝率(艦)</th>
+                  <th>K/D(艦)</th>
                   <th>Exp(艦)</th>
                   <th>戦闘数(艦)</th>
                   <th>Dmg</th>
                   <th>勝率</th>
+                  <th>K/D</th>
                   <th>Exp</th>
                   <th>戦闘数</th>
                   <th>平均T</th>
@@ -430,6 +432,14 @@
 
                     {#if isValidStatsValue(player, "ship")}
                       <td class="text-right"
+                        >{player.player_ship_stats.kd_rate.toFixed(1)}</td
+                      >
+                    {:else}
+                      <td />
+                    {/if}
+
+                    {#if isValidStatsValue(player, "ship")}
+                      <td class="text-right"
                         >{player.player_ship_stats.avg_exp.toFixed(0)}</td
                       >
                     {:else}
@@ -454,6 +464,13 @@
                     {#if isValidStatsValue(player, "player")}
                       <td class="text-right"
                         >{player.player_player_stats.win_rate.toFixed(1)}</td
+                      >
+                    {:else}
+                      <td />
+                    {/if}
+                    {#if isValidStatsValue(player, "player")}
+                      <td class="text-right"
+                        >{player.player_player_stats.kd_rate.toFixed(1)}</td
                       >
                     {:else}
                       <td />
