@@ -39,3 +39,33 @@ func (p Players) Less(i, j int) bool {
     }
     return one.Name < second.Name
 }
+
+func (p Players) WinRateOfShips() float64 {
+    var sum float64 = 0
+    var size int = 0
+    for _, v := range p {
+        if v.ShipStats.Battles != 0 {
+            sum += v.ShipStats.WinRate
+            size += 1
+        }
+    }
+    if size == 0 {
+        return 0
+    }
+    return sum / float64(size)
+}
+
+func (p Players) WinRateOfPlayers() float64 {
+    var sum float64 = 0
+    var size int = 0
+    for _, v := range p {
+        if v.PlayerStats.Battles != 0 {
+            sum += v.PlayerStats.WinRate
+            size += 1
+        }
+    }
+    if size == 0 {
+        return 0
+    }
+    return sum / float64(size)
+}

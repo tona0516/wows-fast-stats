@@ -342,6 +342,11 @@
       {#if latestHash !== ""}
         <div class="mt-1 mx-3">
           {#each teams as team}
+            <span>
+              {team.name} 艦別:{team.win_rate_by_ship.toFixed(1)}% 全体:{team.win_rate_by_player.toFixed(
+                1
+              )}%
+            </span>
             <table class="table table-sm">
               <thead>
                 <tr>
@@ -360,7 +365,7 @@
                 </tr>
               </thead>
               <tbody>
-                {#each team as player}
+                {#each team.players as player}
                   <tr
                     class={backgroundClassForTr(
                       player.player_ship_stats.personal_rating
