@@ -5,6 +5,7 @@
   import iconDD from "./assets/images/icon-dd.png";
   import iconSS from "./assets/images/icon-ss.png";
   import iconNone from "./assets/images/icon-none.png";
+  import { BrowserOpenURL } from "../wailsjs/runtime";
 
   import { toasts, ToastContainer, FlatToast } from "svelte-toasts";
   import {
@@ -366,12 +367,19 @@
                     )}
                   >
                     <td class="text-left omit">
-                      {#if player.player_player_info.clan}
-                        [{player.player_player_info.clan}]{player
-                          .player_player_info.name}
-                      {:else}
-                        {player.player_player_info.name}
-                      {/if}
+                      <a
+                        href="#"
+                        on:click={BrowserOpenURL(
+                          player.player_player_info.stats_url
+                        )}
+                      >
+                        {#if player.player_player_info.clan}
+                          [{player.player_player_info.clan}]{player
+                            .player_player_info.name}
+                        {:else}
+                          {player.player_player_info.name}
+                        {/if}
+                      </a>
                     </td>
                     {#if isValidStatsValue(player, "ship")}
                       <td class="text-right"
@@ -384,16 +392,25 @@
                     {/if}
 
                     <td class="text-left omit">
-                      <div class="aligner">
-                        <img
-                          alt=""
-                          width="24px"
-                          height="24px"
-                          src={shipIconForDisplay(player.player_ship_info.type)}
-                        />
-                        {numberForDisplay(player.player_ship_info.tier)}
-                        {player.player_ship_info.name}
-                      </div>
+                      <a
+                        href="#"
+                        on:click={BrowserOpenURL(
+                          player.player_ship_info.stats_url
+                        )}
+                      >
+                        <div class="aligner">
+                          <img
+                            alt=""
+                            width="24px"
+                            height="24px"
+                            src={shipIconForDisplay(
+                              player.player_ship_info.type
+                            )}
+                          />
+                          {numberForDisplay(player.player_ship_info.tier)}
+                          {player.player_ship_info.name}
+                        </div>
+                      </a>
                     </td>
                     {#if isValidStatsValue(player, "ship")}
                       <td class="text-right"

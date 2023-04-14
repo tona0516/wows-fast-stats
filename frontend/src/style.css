@@ -44,6 +44,10 @@ body {
   white-space: nowrap;
 }
 
+a {
+  color: #e5e5e5;
+}
+
 .bad {
   background-color: #c60900;
 }

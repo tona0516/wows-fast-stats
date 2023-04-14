@@ -298,6 +298,8 @@ func (s *StatsService) compose(
 	shipInfo map[int]vo.ShipInfo,
 	expectedStats vo.NSExpectedStats,
 ) [][]vo.Player {
+    numbersURLGenerator := domain.NumbersURLGenerator{}
+
     teams := make([][]vo.Player, 0)
 	friends := make([]vo.Player, 0)
 	enemies := make([]vo.Player, 0)
@@ -344,6 +346,7 @@ func (s *StatsService) compose(
 				Nation: playerShipInfo.Nation,
 				Tier:   playerShipInfo.Tier,
 				Type:   playerShipInfo.Type,
+                StatsURL: numbersURLGenerator.ShipPage(vehicle.ShipID, playerShipInfo.Name),
 			},
 			ShipStats: vo.PlayerShipStats{
 				Battles:   summaryStats.Ship.Battles,
@@ -364,6 +367,7 @@ func (s *StatsService) compose(
 				Name: nickname,
 				Clan: clan,
                 IsHidden: playerAccountInfo.HiddenProfile,
+                StatsURL: numbersURLGenerator.PlayerPage(accountID, nickname),
 			},
 			PlayerStats: vo.PlayerPlayerStats{
 				Battles:   summaryStats.Player.Battles,
