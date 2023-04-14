@@ -37,7 +37,6 @@ func (w *Wargaming) GetAccountInfo(accountIDs []int) (vo.WGAccountInfo, error) {
 			"account_id":     strings.Join(accountIDsString, ","),
 			"fields": strings.Join([]string{
                 "hidden_profile",
-				"statistics.pvp.xp",
 				"statistics.pvp.survived_battles",
 				"statistics.pvp.battles",
 				"statistics.pvp.frags",
@@ -155,7 +154,6 @@ func (w *Wargaming) GetShipsStats(accountID int) (vo.WGShipsStats, error) {
 				"pvp.wins",
 				"pvp.battles",
 				"pvp.damage_dealt",
-				"pvp.xp",
 				"pvp.frags",
 				"pvp.survived_battles",
 			}, ","),

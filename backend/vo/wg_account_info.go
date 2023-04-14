@@ -13,7 +13,6 @@ type WGAccountInfo struct {
 				Wins            uint `json:"wins"`
 				Battles         uint `json:"battles"`
 				DamageDealt     uint `json:"damage_dealt"`
-				Xp              uint `json:"xp"`
 				Frags           uint `json:"frags"`
 				SurvivedBattles uint `json:"survived_battles"`
 			} `json:"pvp"`

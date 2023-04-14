@@ -319,7 +319,6 @@ func (s *StatsService) compose(
                 Battles:         playerAccountInfo.Statistics.Pvp.Battles,
                 SurvivedBattles: playerAccountInfo.Statistics.Pvp.SurvivedBattles,
                 DamageDealt:     playerAccountInfo.Statistics.Pvp.DamageDealt,
-                Xp:              playerAccountInfo.Statistics.Pvp.Xp,
                 Frags:           playerAccountInfo.Statistics.Pvp.Frags,
                 Wins:            playerAccountInfo.Statistics.Pvp.Wins,
             },
@@ -330,7 +329,6 @@ func (s *StatsService) compose(
                     Battles:         v.Pvp.Battles,
                     SurvivedBattles: v.Pvp.SurvivedBattles,
                     DamageDealt:     v.Pvp.DamageDealt,
-                    Xp:              v.Pvp.Xp,
                     Frags:           v.Pvp.Frags,
                     Wins:            v.Pvp.Wins,
                 })
@@ -351,7 +349,6 @@ func (s *StatsService) compose(
 			ShipStats: vo.PlayerShipStats{
 				Battles:   summaryStats.Ship.Battles,
 				AvgDamage: summaryStats.ShipAvgDamage(),
-				AvgExp:    summaryStats.ShipAvgExp(),
 				WinRate:   summaryStats.ShipWinRate(),
 				KdRate:    summaryStats.ShipKdRate(),
 				PersonalRating: rating.PersonalRating(
@@ -372,7 +369,6 @@ func (s *StatsService) compose(
 			PlayerStats: vo.PlayerPlayerStats{
 				Battles:   summaryStats.Player.Battles,
 				AvgDamage: summaryStats.PlayerAvgDamage(),
-				AvgExp:    summaryStats.PlayerAvgExp(),
 				WinRate:   summaryStats.PlayerWinRate(),
 				KdRate:    summaryStats.PlayerKdRate(),
 				AvgTier:   summaryStats.PlayerAvgTier(accountID, shipInfo, shipStats),

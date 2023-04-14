@@ -8,7 +8,6 @@ type Stats struct {
 	SurvivedBattles uint
 	DamageDealt     uint
 	Frags           uint
-	Xp              uint
 	Wins            uint
 }
 type SummaryStats struct {
@@ -23,13 +22,6 @@ func (s *SummaryStats) SetShipStats(ship Stats) {
 func (s *SummaryStats) ShipAvgDamage() float64 {
 	if s.Ship.Battles != 0 {
 		return float64(s.Ship.DamageDealt) / float64(s.Ship.Battles)
-	}
-	return 0
-}
-
-func (s *SummaryStats) ShipAvgExp() float64 {
-	if s.Ship.Battles != 0 {
-		return float64(s.Ship.Xp) / float64(s.Ship.Battles)
 	}
 	return 0
 }
@@ -58,13 +50,6 @@ func (s *SummaryStats) ShipWinRate() float64 {
 func (s *SummaryStats) PlayerAvgDamage() float64 {
 	if s.Player.Battles > 0 {
 		return float64(s.Player.DamageDealt) / float64(s.Player.Battles)
-	}
-	return 0
-}
-
-func (s *SummaryStats) PlayerAvgExp() float64 {
-	if s.Player.Battles > 0 {
-		return float64(s.Player.Xp) / float64(s.Player.Battles)
 	}
 	return 0
 }

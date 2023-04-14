@@ -11,7 +11,6 @@ type PlayerShipInfo struct {
 type PlayerShipStats struct {
 	Battles        uint `json:"battles"`
 	AvgDamage      float64 `json:"avg_damage"`
-	AvgExp         float64 `json:"avg_exp"`
 	WinRate        float64 `json:"win_rate"`
 	KdRate         float64 `json:"kd_rate"`
 	PersonalRating float64 `json:"personal_rating"`
@@ -27,7 +26,6 @@ type PlayerPlayerInfo struct {
 type PlayerPlayerStats struct {
 	Battles   uint `json:"battles"`
 	AvgDamage float64 `json:"avg_damage"`
-	AvgExp    float64 `json:"avg_exp"`
 	WinRate   float64 `json:"win_rate"`
 	KdRate    float64 `json:"kd_rate"`
 	AvgTier   float64 `json:"avg_tier"`
