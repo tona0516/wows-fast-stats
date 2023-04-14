@@ -330,9 +330,9 @@
   {/if}
 
   {#if currentPage === "main"}
-    <div class="mt-3">
+    <div>
       {#if state === "fetching"}
-        <div class="d-flex justify-content-center">
+        <div class="d-flex justify-content-center m-3">
           <div class="spinner-border" role="status">
             <span class="visually-hidden">Loading...</span>
           </div>
@@ -340,7 +340,7 @@
       {/if}
 
       {#if latestHash !== ""}
-        <div class="mx-3">
+        <div class="mt-1 mx-3">
           {#each teams as team}
             <table class="table table-sm">
               <thead>
@@ -368,7 +368,7 @@
                       player.player_ship_stats.personal_rating
                     )}
                   >
-                    <td class="text-left omit">
+                    <td class="name omit">
                       <a
                         href="#"
                         on:click={BrowserOpenURL(
@@ -384,16 +384,16 @@
                       </a>
                     </td>
                     {#if isValidStatsValue(player, "ship")}
-                      <td class="text-right"
+                      <td class="pr"
                         >{player.player_ship_stats.personal_rating.toFixed(
                           0
                         )}</td
                       >
                     {:else}
-                      <td />
+                      <td class="pr" />
                     {/if}
 
-                    <td class="text-left omit">
+                    <td class="name omit">
                       <a
                         href="#"
                         on:click={BrowserOpenURL(
@@ -409,92 +409,93 @@
                               player.player_ship_info.type
                             )}
                           />
-                          {numberForDisplay(player.player_ship_info.tier)}
-                          {player.player_ship_info.name}
+                          <div class="omit">
+                            {numberForDisplay(player.player_ship_info.tier)}
+                            {player.player_ship_info.name}
+                          </div>
                         </div>
                       </a>
                     </td>
                     {#if isValidStatsValue(player, "ship")}
-                      <td class="text-right"
+                      <td class="damage"
                         >{player.player_ship_stats.avg_damage.toFixed(0)}</td
                       >
                     {:else}
-                      <td />
+                      <td class="damage" />
                     {/if}
 
                     {#if isValidStatsValue(player, "ship")}
-                      <td class="text-right"
+                      <td class="win"
                         >{player.player_ship_stats.win_rate.toFixed(1)}</td
                       >
                     {:else}
-                      <td />
+                      <td class="win" />
                     {/if}
 
                     {#if isValidStatsValue(player, "ship")}
-                      <td class="text-right"
+                      <td class="kd"
                         >{player.player_ship_stats.kd_rate.toFixed(1)}</td
                       >
                     {:else}
-                      <td />
+                      <td class="kd" />
                     {/if}
 
                     {#if isValidStatsValue(player, "ship")}
-                      <td class="text-right"
+                      <td class="exp"
                         >{player.player_ship_stats.avg_exp.toFixed(0)}</td
                       >
                     {:else}
-                      <td />
+                      <td class="exp" />
                     {/if}
 
                     {#if isValidStatsValue(player, "ship")}
-                      <td class="text-right"
-                        >{player.player_ship_stats.battles}</td
+                      <td class="battles">{player.player_ship_stats.battles}</td
                       >
                     {:else}
-                      <td />
+                      <td class="battles" />
                     {/if}
 
                     {#if isValidStatsValue(player, "player")}
-                      <td class="text-right"
+                      <td class="damage"
                         >{player.player_player_stats.avg_damage.toFixed(0)}</td
                       >
                     {:else}
-                      <td />
+                      <td class="damage" />
                     {/if}
                     {#if isValidStatsValue(player, "player")}
-                      <td class="text-right"
+                      <td class="win"
                         >{player.player_player_stats.win_rate.toFixed(1)}</td
                       >
                     {:else}
-                      <td />
+                      <td class="win" />
                     {/if}
                     {#if isValidStatsValue(player, "player")}
-                      <td class="text-right"
+                      <td class="kd"
                         >{player.player_player_stats.kd_rate.toFixed(1)}</td
                       >
                     {:else}
-                      <td />
+                      <td class="kd" />
                     {/if}
                     {#if isValidStatsValue(player, "player")}
-                      <td class="text-right"
+                      <td class="exp"
                         >{player.player_player_stats.avg_exp.toFixed(0)}</td
                       >
                     {:else}
-                      <td />
+                      <td class="exp" />
                     {/if}
                     {#if isValidStatsValue(player, "player")}
-                      <td class="text-right"
+                      <td class="battles"
                         >{player.player_player_stats.battles}</td
                       >
                     {:else}
-                      <td />
+                      <td class="battles" />
                     {/if}
                     {#if isValidStatsValue(player, "player")}
-                      <td class="text-right"
+                      <td class="avg-tier"
                         >{player.player_player_stats.avg_tier.toFixed(1)}</td
                       >
                     {:else}
-                      <td />
+                      <td class="avg-tier" />
                     {/if}
                   </tr>
                 {/each}
@@ -512,18 +513,6 @@
 </main>
 
 <style>
-  :global(.text-right) {
-    text-align: right;
-  }
-  :global(.text-left) {
-    text-align: left;
-  }
-  :global(.omit) {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 160px;
-    white-space: nowrap;
-  }
   :global(.horizontal) {
     display: flex;
   }

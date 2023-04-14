@@ -79,3 +79,51 @@ a {
 .super-unicum {
   background-color: #760a93;
 }
+
+.name {
+  text-align: left;
+  max-width: 15ch;
+}
+
+.pr {
+  width: 4ch;
+  text-align: right;
+}
+
+.damage {
+  width: 6ch;
+  text-align: right;
+}
+
+.win {
+  width: 4ch;
+  text-align: right;
+}
+
+.kd {
+  width: 3ch;
+  text-align: right;
+}
+
+.exp {
+  width: 4ch;
+  text-align: right;
+}
+
+.battles {
+  width: 5ch;
+  text-align: right;
+}
+
+.avg-tier {
+  width: 3ch;
+  text-align: right;
+}
+
+.omit {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-text-overflow: ellipsis;
+  -ms-text-overflow: ellipsis;
+  white-space: nowrap;
+}
