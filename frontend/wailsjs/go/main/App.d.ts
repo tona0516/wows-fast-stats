@@ -10,6 +10,6 @@ export function GetConfig():Promise<vo.UserConfig>;
 
 export function GetTempArenaInfoHash():Promise<string>;
 
-export function Load():Promise<Array<any>>;
+export function Load():Promise<Array<vo.Players>>;
 
 export function SelectDirectory():Promise<string>;

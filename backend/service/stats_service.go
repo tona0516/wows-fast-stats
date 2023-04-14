@@ -30,8 +30,8 @@ func (s *StatsService) GetTempArenaInfoHash() (string, error) {
     return result, nil
 }
 
-func (s *StatsService) GetsStats() ([][]vo.Player, error) {
-    var result [][]vo.Player
+func (s *StatsService) GetsStats() ([]vo.Players, error) {
+    var result []vo.Players
 
 	wargaming := repo.Wargaming{AppID: s.AppID}
 	numbers := repo.Numbers{}
@@ -99,7 +99,9 @@ func (s *StatsService) GetsStats() ([][]vo.Player, error) {
         return result, err
     }
     for k, v := range unregisteredShipInfo {
-        shipInfo.Value[k] = v
+        if _, ok := shipInfo.Value[k]; !ok {
+            shipInfo.Value[k] = v
+        }
     }
 
 	result = s.compose(
@@ -297,12 +299,12 @@ func (s *StatsService) compose(
 	shipStats map[int]vo.WGShipsStats,
 	shipInfo map[int]vo.ShipInfo,
 	expectedStats vo.NSExpectedStats,
-) [][]vo.Player {
+) []vo.Players {
     numbersURLGenerator := domain.NumbersURLGenerator{}
 
-    teams := make([][]vo.Player, 0)
-	friends := make([]vo.Player, 0)
-	enemies := make([]vo.Player, 0)
+    teams := make([]vo.Players, 0)
+	friends := make(vo.Players, 0)
+	enemies := make(vo.Players, 0)
 	rating := domain.Rating{}
 
 	for i := range tempArenaInfo.Vehicles {
@@ -381,36 +383,8 @@ func (s *StatsService) compose(
 			enemies = append(enemies, player)
 		}
 	}
-
-	sort.Slice(friends, func(i, j int) bool {
-		one := friends[i].ShipInfo
-		second := friends[j].ShipInfo
-		if one.Type != second.Type {
-			return one.Type < second.Type
-		}
-		if one.Tier != second.Tier {
-			return one.Tier > second.Tier
-		}
-		if one.Nation != second.Nation {
-			return one.Nation < second.Nation
-		}
-		return one.Name < second.Name
-	})
-	sort.Slice(enemies, func(i, j int) bool {
-		one := enemies[i].ShipInfo
-		second := enemies[j].ShipInfo
-		if one.Type != second.Type {
-			return one.Type < second.Type
-		}
-		if one.Tier != second.Tier {
-			return one.Tier > second.Tier
-		}
-		if one.Nation != second.Nation {
-			return one.Nation < second.Nation
-		}
-		return one.Name < second.Name
-	})
-
+	sort.Sort(friends)
+	sort.Sort(enemies)
     teams = append(teams, friends)
     teams = append(teams, enemies)
     return teams
