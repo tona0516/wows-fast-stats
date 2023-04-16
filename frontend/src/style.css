@@ -38,10 +38,12 @@ body {
 .table td {
   padding-top: 2px;
   padding-bottom: 2px;
+  vertical-align: middle;
 }
 
 .table th {
   white-space: nowrap;
+  vertical-align: middle;
 }
 
 a {
@@ -121,4 +123,9 @@ a {
   -webkit-text-overflow: ellipsis;
   -ms-text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.icon-scale {
+  height: 1.5em;
+  width: 1.5em;
 }

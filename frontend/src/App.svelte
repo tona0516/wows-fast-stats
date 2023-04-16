@@ -351,8 +351,8 @@
               <thead>
                 <tr>
                   <th>プレイヤー</th>
-                  <th>PR</th>
                   <th>艦</th>
+                  <th>PR</th>
                   <th>Dmg(艦)</th>
                   <th>勝率(艦)</th>
                   <th>K/D(艦)</th>
@@ -386,15 +386,6 @@
                         {/if}
                       </a>
                     </td>
-                    {#if isValidStatsValue(player, "ship")}
-                      <td class="pr"
-                        >{player.player_ship_stats.personal_rating.toFixed(
-                          0
-                        )}</td
-                      >
-                    {:else}
-                      <td class="pr" />
-                    {/if}
 
                     <td class="name omit">
                       <a
@@ -406,11 +397,10 @@
                         <div class="aligner">
                           <img
                             alt=""
-                            width="24px"
-                            height="24px"
                             src={shipIconForDisplay(
                               player.player_ship_info.type
                             )}
+                            class="icon-scale"
                           />
                           <div class="omit">
                             {numberForDisplay(player.player_ship_info.tier)}
@@ -419,6 +409,17 @@
                         </div>
                       </a>
                     </td>
+
+                    {#if isValidStatsValue(player, "ship")}
+                      <td class="pr"
+                        >{player.player_ship_stats.personal_rating.toFixed(
+                          0
+                        )}</td
+                      >
+                    {:else}
+                      <td class="pr" />
+                    {/if}
+
                     {#if isValidStatsValue(player, "ship")}
                       <td class="damage"
                         >{player.player_ship_stats.avg_damage.toFixed(0)}</td
