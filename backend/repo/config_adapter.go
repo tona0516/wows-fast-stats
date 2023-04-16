@@ -13,7 +13,10 @@ type ConfigAdapter struct {
 func (c *ConfigAdapter) Read() (vo.UserConfig, error) {
     os.Mkdir("config", 0755)
 
-    var config vo.UserConfig
+    // note: set default value
+    config := vo.UserConfig{
+        FontSize: "medium",
+    }
 	file, err := os.ReadFile(filepath.Join("config", "user.json"))
 	if err != nil {
 		return config, err

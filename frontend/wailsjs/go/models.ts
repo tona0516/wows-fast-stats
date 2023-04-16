@@ -157,6 +157,7 @@ export namespace vo {
 	export class UserConfig {
 	    install_path: string;
 	    appid: string;
+	    font_size: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new UserConfig(source);
@@ -166,6 +167,7 @@ export namespace vo {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.install_path = source["install_path"];
 	        this.appid = source["appid"];
+	        this.font_size = source["font_size"];
 	    }
 	}
 

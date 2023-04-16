@@ -67,11 +67,12 @@ func (a *App) GetConfig() (vo.UserConfig, error) {
 	return config, nil
 }
 
-func (a *App) ApplyConfig(installPath string, appid string) (vo.UserConfig, error) {
+func (a *App) ApplyConfig(installPath string, appid string, fontSize string) (vo.UserConfig, error) {
 	configService := service.ConfigService{}
 	config := vo.UserConfig{
 		InstallPath: installPath,
 		Appid:       appid,
+		FontSize:    fontSize,
 	}
 
 	updatedConfig, err := configService.Update(config)
