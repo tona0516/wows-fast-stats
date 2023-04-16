@@ -129,3 +129,13 @@ a {
   height: 1.5em;
   width: 1.5em;
 }
+
+.horizontal {
+  display: flex;
+  align-items: center;
+}
+
+.form-style {
+  width: 50%;
+  margin: auto;
+}

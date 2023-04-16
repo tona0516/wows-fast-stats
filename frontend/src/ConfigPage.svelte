@@ -48,6 +48,7 @@
 
 <div class="mt-3">
   <form>
+    <!-- install path -->
     <div class="mb-3 form-style">
       <label for="install-path" class="form-label"
         >World of Warshipsインストールフォルダ</label
@@ -66,10 +67,14 @@
         >
       </div>
     </div>
+
+    <!-- appid -->
     <div class="mb-3 form-style">
       <label for="appid" class="form-label">AppID</label>
       <input type="text" class="form-control" id="appid" bind:value={appid} />
     </div>
+
+    <!-- font-size -->
     <div class="mb-3 form-style">
       <label for="font-size" class="form-label">文字サイズ</label>
       <select class="form-select" bind:value={fontSize}>
@@ -80,18 +85,10 @@
         <option value="x-large">極大</option>
       </select>
     </div>
+
+    <!-- apply -->
     <button type="button" class="btn btn-primary" on:click={clickApply}
       >適用</button
     >
   </form>
 </div>
-
-<style>
-  :global(.horizontal) {
-    display: flex;
-  }
-  :global(.form-style) {
-    width: 50%;
-    margin: auto;
-  }
-</style>

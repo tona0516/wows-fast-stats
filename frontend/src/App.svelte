@@ -1,26 +1,22 @@
 <script lang="ts">
-  import { toasts, ToastContainer, FlatToast } from "svelte-toasts";
-  import { fade } from "svelte/transition";
   import {
     Debug,
     GetConfig,
     GetTempArenaInfoHash,
     Load,
   } from "../wailsjs/go/main/App.js";
-  import type { ToastProps } from "svelte-toasts/types/common.js";
   import ConfigPage from "./ConfigPage.svelte";
-  import StatsPage from "./StatsPage.svelte";
+  import StatsPage from "./MainPage.svelte";
   import type { vo } from "wailsjs/go/models.js";
+  import Notification from "./Notification.svelte";
 
   type Page = "main" | "config";
   let currentPage: Page = "main";
 
-  let notInBattleToast: ToastProps;
-  let settingPromotionToast: ToastProps;
-
-  let state;
-  let latestHash;
-  let teams;
+  let loadState: LoadState;
+  let latestHash: string;
+  let teams: vo.Team[];
+  let notification: Notification;
 
   let config: vo.UserConfig;
 
@@ -29,14 +25,18 @@
   async function looper() {
     try {
       config = await GetConfig();
-      removeSettingPromotionIfNeeded();
+      notification.removeToastWithKey("need_config");
     } catch (error) {
-      showSettingPromotionIfNeeded();
+      notification.showToastWithKey(
+        "未設定の状態のため開始できません。「設定」から入力してください。",
+        "info",
+        "need_config"
+      );
       return;
     }
 
-    if (state === "error" || state === "fetching") {
-      removeNotInBattleToastIfNeeded();
+    if (loadState === "error" || loadState === "fetching") {
+      notification.removeToastWithKey("not_in_battle");
       return;
     }
 
@@ -44,8 +44,12 @@
     try {
       hash = await GetTempArenaInfoHash();
     } catch (error) {
-      state = "standby";
-      showNotInBattleToastIfNeeded();
+      loadState = "standby";
+      notification.showToastWithKey(
+        "戦闘中ではありません。開始時に自動的にリロードします。",
+        "info",
+        "not_in_battle"
+      );
       return;
     }
 
@@ -53,17 +57,17 @@
       return;
     }
 
-    state = "fetching";
+    loadState = "fetching";
     try {
       const start = new Date().getTime();
       teams = await Load();
       latestHash = hash;
-      state = "standby";
+      loadState = "standby";
       const elapsed = (new Date().getTime() - start) / 1000;
-      showSuccessToast(`データ取得完了: ${elapsed}秒`);
+      notification.showToast(`データ取得完了: ${elapsed}秒`, "success");
     } catch (error) {
-      state = "error";
-      showErrorToast(error);
+      loadState = "error";
+      notification.showToast(error, "error");
     }
   }
 
@@ -74,80 +78,11 @@
   function clickConfig() {
     currentPage = "config";
   }
-
-  function showSuccessToast(message: string) {
-    toasts.add({
-      description: message,
-      duration: 5000,
-      placement: "bottom-right",
-      type: "success",
-      theme: "dark",
-    });
-  }
-
-  function showErrorToast(message: string) {
-    toasts.add({
-      description: message,
-      duration: 5000,
-      placement: "bottom-right",
-      type: "error",
-      theme: "dark",
-    });
-  }
-
-  function showNotInBattleToastIfNeeded() {
-    if (notInBattleToast) {
-      return;
-    }
-
-    notInBattleToast = toasts.add({
-      description: "戦闘中ではありません。開始時に自動的にリロードします。",
-      duration: 0,
-      placement: "bottom-right",
-      type: "info",
-      theme: "dark",
-    });
-  }
-
-  function removeNotInBattleToastIfNeeded() {
-    if (!notInBattleToast) {
-      return;
-    }
-
-    notInBattleToast.remove();
-    notInBattleToast = undefined;
-  }
-
-  function showSettingPromotionIfNeeded() {
-    if (settingPromotionToast) {
-      return;
-    }
-
-    settingPromotionToast = toasts.add({
-      description:
-        "未設定の状態のため開始できません。「設定」から入力してください。",
-      duration: 0,
-      placement: "bottom-right",
-      type: "info",
-      theme: "dark",
-    });
-  }
-
-  function removeSettingPromotionIfNeeded() {
-    if (!settingPromotionToast) {
-      return;
-    }
-
-    settingPromotionToast.remove();
-    settingPromotionToast = undefined;
-  }
 </script>
 
 <main>
   <div style="font-size: {config?.font_size || 'medium'};">
-    <ToastContainer let:data>
-      <FlatToast {data} />
-    </ToastContainer>
+    <Notification bind:this={notification} />
 
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
       <div class="container-fluid">
@@ -165,6 +100,7 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
           <div class="navbar-nav">
+            <!-- svelte-ignore a11y-invalid-attribute -->
             <a
               class="nav-link"
               href="#"
@@ -172,6 +108,7 @@
               data-bs-target=".navbar-collapse.show"
               on:click={clickMain}>ホーム</a
             >
+            <!-- svelte-ignore a11y-invalid-attribute -->
             <a
               class="nav-link"
               href="#"
@@ -186,20 +123,15 @@
 
     {#if currentPage === "config"}
       <ConfigPage
-        on:SuccessToast={(event) => showSuccessToast(event.detail.message)}
-        on:ErrorToast={(event) => showErrorToast(event.detail.message)}
+        on:SuccessToast={(event) =>
+          notification.showToast(event.detail.message, "success")}
+        on:ErrorToast={(event) =>
+          notification.showToast(event.detail.message, "error")}
       />
     {/if}
 
     {#if currentPage === "main"}
-      <StatsPage bind:state bind:latestHash bind:teams />
+      <StatsPage bind:loadState bind:latestHash bind:teams />
     {/if}
   </div>
 </main>
-
-<style>
-  :global(.aligner) {
-    display: flex;
-    align-items: center;
-  }
-</style>

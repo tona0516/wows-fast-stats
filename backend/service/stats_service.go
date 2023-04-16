@@ -315,7 +315,7 @@ func (s *StatsService) compose(
 		clan := clanTag[accountID]
 
 		playerAccountInfo := accountInfo.Data[accountID]
-        summaryStats := domain.SummaryStats{
+        statsCalculator := domain.StatsCalculator{
             Player: domain.Stats{
                 Battles:         playerAccountInfo.Statistics.Pvp.Battles,
                 SurvivedBattles: playerAccountInfo.Statistics.Pvp.SurvivedBattles,
@@ -326,7 +326,7 @@ func (s *StatsService) compose(
         }
 		for _, v:= range shipStats[accountID].Data[accountID] {
 			if v.ShipID == vehicle.ShipID {
-                summaryStats.SetShipStats(domain.Stats{
+                statsCalculator.SetShipStats(domain.Stats{
                     Battles:         v.Pvp.Battles,
                     SurvivedBattles: v.Pvp.SurvivedBattles,
                     DamageDealt:     v.Pvp.DamageDealt,
@@ -348,14 +348,14 @@ func (s *StatsService) compose(
                 StatsURL: numbersURLGenerator.ShipPage(vehicle.ShipID, playerShipInfo.Name),
 			},
 			ShipStats: vo.PlayerShipStats{
-				Battles:   summaryStats.Ship.Battles,
-				AvgDamage: summaryStats.ShipAvgDamage(),
-				WinRate:   summaryStats.ShipWinRate(),
-				KdRate:    summaryStats.ShipKdRate(),
+				Battles:   statsCalculator.Ship.Battles,
+				AvgDamage: statsCalculator.ShipAvgDamage(),
+				WinRate:   statsCalculator.ShipWinRate(),
+				KdRate:    statsCalculator.ShipKdRate(),
 				PersonalRating: rating.PersonalRating(
-					summaryStats.ShipAvgDamage(),
-					summaryStats.ShipAvgFrags(),
-					summaryStats.ShipWinRate(),
+					statsCalculator.ShipAvgDamage(),
+					statsCalculator.ShipAvgFrags(),
+					statsCalculator.ShipWinRate(),
 					expectedShipStats.AverageDamageDealt,
 					expectedShipStats.AverageFrags,
 					expectedShipStats.WinRate,
@@ -368,11 +368,11 @@ func (s *StatsService) compose(
                 StatsURL: numbersURLGenerator.PlayerPage(accountID, nickname),
 			},
 			PlayerStats: vo.PlayerPlayerStats{
-				Battles:   summaryStats.Player.Battles,
-				AvgDamage: summaryStats.PlayerAvgDamage(),
-				WinRate:   summaryStats.PlayerWinRate(),
-				KdRate:    summaryStats.PlayerKdRate(),
-				AvgTier:   summaryStats.PlayerAvgTier(accountID, shipInfo, shipStats),
+				Battles:   statsCalculator.Player.Battles,
+				AvgDamage: statsCalculator.PlayerAvgDamage(),
+				WinRate:   statsCalculator.PlayerWinRate(),
+				KdRate:    statsCalculator.PlayerKdRate(),
+				AvgTier:   statsCalculator.PlayerAvgTier(accountID, shipInfo, shipStats),
 			},
 		}
 
