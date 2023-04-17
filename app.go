@@ -6,7 +6,6 @@ import (
 	"changeme/backend/vo"
 	"context"
 
-	"github.com/wailsapp/wails/v2/pkg/logger"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
@@ -47,10 +46,6 @@ func (a *App) Load() ([]vo.Team, error) {
 	}
 
 	return statsService.GetsStats()
-}
-
-func (a *App) Debug(message string) {
-	logger.NewDefaultLogger().Debug(message)
 }
 
 func (a *App) SelectDirectory() (string, error) {

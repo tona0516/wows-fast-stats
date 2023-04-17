@@ -4,8 +4,6 @@ import {vo} from '../models';
 
 export function ApplyConfig(arg1:string,arg2:string,arg3:string):Promise<vo.UserConfig>;
 
-export function Debug(arg1:string):Promise<void>;
-
 export function GetConfig():Promise<vo.UserConfig>;
 
 export function GetTempArenaInfoHash():Promise<string>;

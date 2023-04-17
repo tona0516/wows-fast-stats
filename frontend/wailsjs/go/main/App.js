@@ -6,10 +6,6 @@ export function ApplyConfig(arg1, arg2, arg3) {
   return window['go']['main']['App']['ApplyConfig'](arg1, arg2, arg3);
 }
 
-export function Debug(arg1) {
-  return window['go']['main']['App']['Debug'](arg1);
-}
-
 export function GetConfig() {
   return window['go']['main']['App']['GetConfig']();
 }
