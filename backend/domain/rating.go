@@ -15,15 +15,15 @@ func (s *Rating) PersonalRating(
 	expectedWins float64,
 ) float64 {
 	damageRatio := actualDamage / expectedDamage
-    if math.IsNaN(damageRatio) {
+    if math.IsNaN(damageRatio) || math.IsInf(damageRatio, 1) {
         damageRatio = 0
     }
 	fragsRatio := actualFrags / expectedFrags
-    if math.IsNaN(fragsRatio) {
+    if math.IsNaN(fragsRatio) || math.IsInf(fragsRatio, 1){
         fragsRatio = 0
     }
 	winsRatio := actualWins / expectedWins
-    if math.IsNaN(winsRatio) {
+    if math.IsNaN(winsRatio) || math.IsInf(winsRatio, 1){
         winsRatio = 0
     }
 

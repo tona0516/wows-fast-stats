@@ -93,7 +93,6 @@ func (s *StatsService) GetsStats() ([]vo.Team, error) {
 	if expectedStats.Error != nil {
 		return result, expectedStats.Error
 	}
-
     unregisteredShipInfo, err := unregistered.GetShips()
     if err != nil {
         return result, err

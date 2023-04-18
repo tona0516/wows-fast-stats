@@ -29,6 +29,8 @@
 
   function backgroundClass(personalRating: number): string {
     switch (true) {
+      case personalRating == 0:
+        return "";
       case personalRating < 750:
         return "bad";
       case personalRating < 1100:
@@ -164,7 +166,7 @@
 
               <!-- personal rating -->
               <td class="pr">
-                {#if isValidStatsValue(player, "ship")}
+                {#if isValidStatsValue(player, "ship") && player.player_ship_stats.personal_rating !== 0}
                   {player.player_ship_stats.personal_rating.toFixed(0)}
                 {/if}
               </td>

@@ -3,7 +3,6 @@ package repo
 import (
 	"changeme/backend/vo"
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"strconv"
@@ -19,20 +18,17 @@ func (n *Numbers) Get() (*vo.NSExpectedStats, error) {
 	}
 
 	if err != nil {
-		fmt.Println(err)
 		return nil, err
 	}
 
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
-		fmt.Println(err)
 		return nil, err
 	}
 
 	depth1 := make(map[string]interface{})
 	err = json.Unmarshal(body, &depth1)
 	if err != nil {
-		fmt.Println(err)
 		return nil, err
 	}
 
