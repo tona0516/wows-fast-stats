@@ -21,6 +21,7 @@ export namespace vo {
 	    }
 	}
 	export class PlayerPlayerInfo {
+	    id: number;
 	    name: string;
 	    clan: string;
 	    is_hidden: boolean;
@@ -32,6 +33,7 @@ export namespace vo {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.id = source["id"];
 	        this.name = source["name"];
 	        this.clan = source["clan"];
 	        this.is_hidden = source["is_hidden"];

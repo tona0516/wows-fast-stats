@@ -8,23 +8,45 @@
   import { BrowserOpenURL } from "../wailsjs/runtime/runtime";
   import type { vo } from "wailsjs/go/models";
 
-  type StatsType = "ship" | "player";
-
   export let loadState: LoadState = "standby";
   export let latestHash: string = "";
   export let teams: vo.Team[] = [];
 
-  function isValidStatsValue(player: vo.Player, statsType: StatsType) {
+  /**
+   * private: hidden player.
+   * nodata: invalid player(bot/deleted account) or 0 for all random battle.
+   * noshipstats: 0 in for random battle with the ship.
+   * nopr: not exist expected value in numbers api.
+   * full: all values exists.
+   */
+  type PlayerDataPattern =
+    | "private"
+    | "nodata"
+    | "noshipstats"
+    | "nopr"
+    | "full";
+
+  function decidePlayerDataPattern(player: vo.Player): PlayerDataPattern {
     if (player.player_player_info.is_hidden) {
-      return false;
+      return "private";
     }
 
-    switch (statsType) {
-      case "ship":
-        return player.player_ship_stats.battles > 0;
-      case "player":
-        return player.player_player_stats.battles > 0;
+    if (
+      player.player_player_info.id === 0 ||
+      player.player_player_stats.battles == 0
+    ) {
+      return "nodata";
     }
+
+    if (player.player_ship_stats.battles === 0) {
+      return "noshipstats";
+    }
+
+    if (player.player_ship_stats.personal_rating === 0) {
+      return "nopr";
+    }
+
+    return "full";
   }
 
   function backgroundClass(personalRating: number): string {
@@ -122,6 +144,7 @@
         </thead>
         <tbody>
           {#each team.players as player}
+            {@const dataPattern = decidePlayerDataPattern(player)}
             <tr
               class={backgroundClass(player.player_ship_stats.personal_rating)}
             >
@@ -164,75 +187,91 @@
                 </a>
               </td>
 
+              {#if dataPattern === "private"}
+                <td colspan="10">PRIVATE</td>
+              {:else if dataPattern === "nodata"}
+                <td colspan="10">NO DATA</td>
+              {/if}
+
               <!-- personal rating -->
-              <td class="pr">
-                {#if isValidStatsValue(player, "ship") && player.player_ship_stats.personal_rating !== 0}
+              {#if dataPattern === "full"}
+                <td class="pr">
                   {player.player_ship_stats.personal_rating.toFixed(0)}
-                {/if}
-              </td>
+                </td>
+              {:else if dataPattern === "noshipstats" || dataPattern === "nopr"}
+                <td />
+              {/if}
 
               <!-- ship avg damage -->
-              <td class="damage">
-                {#if isValidStatsValue(player, "ship")}
+              {#if dataPattern === "full" || dataPattern === "nopr"}
+                <td class="damage">
                   {player.player_ship_stats.avg_damage.toFixed(0)}
-                {/if}
-              </td>
+                </td>
+              {:else if dataPattern === "noshipstats"}
+                <td />
+              {/if}
 
               <!-- ship win rate -->
-              <td class="win">
-                {#if isValidStatsValue(player, "ship")}
+              {#if dataPattern === "full" || dataPattern === "nopr"}
+                <td class="win">
                   {player.player_ship_stats.win_rate.toFixed(1)}
-                {/if}
-              </td>
+                </td>
+              {:else if dataPattern === "noshipstats"}
+                <td />
+              {/if}
 
               <!-- ship kd rate -->
-              <td class="kd">
-                {#if isValidStatsValue(player, "ship")}
+              {#if dataPattern === "full" || dataPattern === "nopr"}
+                <td class="kd">
                   {player.player_ship_stats.kd_rate.toFixed(1)}
-                {/if}
-              </td>
+                </td>
+              {:else if dataPattern === "noshipstats"}
+                <td />
+              {/if}
 
               <!-- ship battles -->
-              <td class="battles">
-                {#if isValidStatsValue(player, "ship")}
+              {#if dataPattern === "full" || dataPattern === "nopr"}
+                <td class="battles">
                   {player.player_ship_stats.battles}
-                {/if}
-              </td>
+                </td>
+              {:else if dataPattern === "noshipstats"}
+                <td />
+              {/if}
 
               <!-- player avg damage -->
-              <td class="damage">
-                {#if isValidStatsValue(player, "player")}
+              {#if dataPattern === "noshipstats" || dataPattern === "full" || dataPattern === "nopr"}
+                <td class="damage">
                   {player.player_player_stats.avg_damage.toFixed(0)}
-                {/if}
-              </td>
+                </td>
+              {/if}
 
               <!-- player win rate -->
-              <td class="win">
-                {#if isValidStatsValue(player, "player")}
+              {#if dataPattern === "noshipstats" || dataPattern === "full" || dataPattern === "nopr"}
+                <td class="win">
                   {player.player_player_stats.win_rate.toFixed(1)}
-                {/if}
-              </td>
+                </td>
+              {/if}
 
               <!-- player kd rate -->
-              <td class="kd">
-                {#if isValidStatsValue(player, "player")}
+              {#if dataPattern === "noshipstats" || dataPattern === "full" || dataPattern === "nopr"}
+                <td class="kd">
                   {player.player_player_stats.kd_rate.toFixed(1)}
-                {/if}
-              </td>
+                </td>
+              {/if}
 
               <!-- player battles -->
-              <td class="battles">
-                {#if isValidStatsValue(player, "player")}
+              {#if dataPattern === "noshipstats" || dataPattern === "full" || dataPattern === "nopr"}
+                <td class="battles">
                   {player.player_player_stats.battles}
-                {/if}
-              </td>
+                </td>
+              {/if}
 
               <!-- avg tier -->
-              <td class="avg-tier">
-                {#if isValidStatsValue(player, "player")}
+              {#if dataPattern === "noshipstats" || dataPattern === "full" || dataPattern === "nopr"}
+                <td class="avg-tier">
                   {player.player_player_stats.avg_tier.toFixed(1)}
-                {/if}
-              </td>
+                </td>
+              {/if}
             </tr>
           {/each}
         </tbody>

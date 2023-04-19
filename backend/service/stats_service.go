@@ -361,6 +361,7 @@ func (s *StatsService) compose(
 				),
 			},
 			PlayerInfo: vo.PlayerPlayerInfo{
+                ID: accountID,
 				Name: nickname,
 				Clan: clan,
                 IsHidden: playerAccountInfo.HiddenProfile,

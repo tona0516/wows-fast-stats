@@ -17,6 +17,7 @@ type PlayerShipStats struct {
 }
 
 type PlayerPlayerInfo struct {
+    ID       int `json:"id"`
 	Name     string `json:"name"`
 	Clan     string `json:"clan"`
 	IsHidden bool `json:"is_hidden"`
