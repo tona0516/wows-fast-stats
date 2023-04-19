@@ -139,3 +139,11 @@ a {
   width: 50%;
   margin: auto;
 }
+
+.higher {
+  color: #307f00;
+}
+
+.lower {
+  color: #c60900;
+}

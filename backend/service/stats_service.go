@@ -390,14 +390,12 @@ func (s *StatsService) compose(
     teams = append(teams, vo.Team{
         Players: friends,
         Name: "味方チーム",
-        WinRateByShip: friends.WinRateOfShips(),
-        WinRateByPlayer: friends.WinRateOfPlayers(),
+        TeamAverage: friends.TeamAverage(),
     })
     teams = append(teams, vo.Team{
         Players: enemies,
         Name: "敵チーム",
-        WinRateByShip: enemies.WinRateOfShips(),
-        WinRateByPlayer: enemies.WinRateOfPlayers(),
+        TeamAverage: enemies.TeamAverage(),
     })
 
     return teams

@@ -40,32 +40,38 @@ func (p Players) Less(i, j int) bool {
     return one.Name < second.Name
 }
 
-func (p Players) WinRateOfShips() float64 {
-    var sum float64 = 0
-    var size int = 0
+func (p Players) TeamAverage() TeamAverage {
+    var result TeamAverage
+    var nShip uint
+    var nPlayer uint
     for _, v := range p {
         if v.ShipStats.Battles != 0 {
-            sum += v.ShipStats.WinRate
-            size += 1
+            result.PersonalRating += v.ShipStats.PersonalRating
+            result.DamageByShip += v.ShipStats.AvgDamage
+            result.WinRateByShip += v.ShipStats.WinRate
+            result.KdRateByShip += v.ShipStats.KdRate
+            nShip += 1
         }
-    }
-    if size == 0 {
-        return 0
-    }
-    return sum / float64(size)
-}
-
-func (p Players) WinRateOfPlayers() float64 {
-    var sum float64 = 0
-    var size int = 0
-    for _, v := range p {
         if v.PlayerStats.Battles != 0 {
-            sum += v.PlayerStats.WinRate
-            size += 1
+            result.DamageByPlayer += v.PlayerStats.AvgDamage
+            result.WinRateByPlayer += v.PlayerStats.WinRate
+            result.KdRateByPlayer += v.PlayerStats.KdRate
+            nPlayer += 1
         }
     }
-    if size == 0 {
-        return 0
+
+    if nShip != 0 {
+        result.PersonalRating = result.PersonalRating / float64(nShip)
+        result.DamageByShip = result.DamageByShip / float64(nShip)
+        result.WinRateByShip = result.WinRateByShip / float64(nShip)
+        result.KdRateByShip = result.KdRateByShip / float64(nShip)
     }
-    return sum / float64(size)
+
+    if nPlayer != 0 {
+        result.DamageByPlayer = result.DamageByPlayer / float64(nPlayer)
+        result.WinRateByPlayer = result.WinRateByPlayer / float64(nPlayer)
+        result.KdRateByPlayer = result.KdRateByPlayer / float64(nPlayer)
+    }
+
+    return result
 }

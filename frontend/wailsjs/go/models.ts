@@ -120,11 +120,34 @@ export namespace vo {
 	
 	
 	
+	export class TeamAverage {
+	    personal_rating: number;
+	    damage_by_ship: number;
+	    win_rate_by_ship: number;
+	    kd_rate_by_ship: number;
+	    damage_by_player: number;
+	    win_rate_by_player: number;
+	    kd_rate_by_player: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new TeamAverage(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.personal_rating = source["personal_rating"];
+	        this.damage_by_ship = source["damage_by_ship"];
+	        this.win_rate_by_ship = source["win_rate_by_ship"];
+	        this.kd_rate_by_ship = source["kd_rate_by_ship"];
+	        this.damage_by_player = source["damage_by_player"];
+	        this.win_rate_by_player = source["win_rate_by_player"];
+	        this.kd_rate_by_player = source["kd_rate_by_player"];
+	    }
+	}
 	export class Team {
 	    players: Player[];
 	    name: string;
-	    win_rate_by_ship: number;
-	    win_rate_by_player: number;
+	    team_average: TeamAverage;
 	
 	    static createFrom(source: any = {}) {
 	        return new Team(source);
@@ -134,8 +157,7 @@ export namespace vo {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.players = this.convertValues(source["players"], Player);
 	        this.name = source["name"];
-	        this.win_rate_by_ship = source["win_rate_by_ship"];
-	        this.win_rate_by_player = source["win_rate_by_player"];
+	        this.team_average = this.convertValues(source["team_average"], TeamAverage);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -156,6 +178,7 @@ export namespace vo {
 		    return a;
 		}
 	}
+	
 	export class UserConfig {
 	    install_path: string;
 	    appid: string;

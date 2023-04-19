@@ -107,6 +107,25 @@
         return iconNone;
     }
   }
+
+  function fontColorForTeamSummary(
+    value1: number,
+    value2: number,
+    digits: number
+  ): string {
+    const value1Round = +value1.toFixed(digits);
+    const value2Round = +value2.toFixed(digits);
+
+    if (value1Round > value2Round) {
+      return "higher";
+    }
+
+    if (value1Round < value2Round) {
+      return "lower";
+    }
+
+    return "";
+  }
 </script>
 
 {#if loadState === "fetching"}
@@ -118,13 +137,9 @@
 {/if}
 
 {#if latestHash !== ""}
-  <div class="mt-1 mx-3">
+  <div class="mt-1 mx-4">
+    <span> プレイヤー統計 </span>
     {#each teams as team}
-      <span>
-        {team.name} 艦別:{team.win_rate_by_ship.toFixed(1)}% 全体:{team.win_rate_by_player.toFixed(
-          1
-        )}%
-      </span>
       <table class="table table-sm">
         <thead>
           <tr>
@@ -277,5 +292,63 @@
         </tbody>
       </table>
     {/each}
+  </div>
+
+  <div class="mt-1">
+    <span> チームサマリー </span>
+    <table class="table table-sm w-auto" align="center">
+      <thead>
+        <tr>
+          <th />
+          {#each teams as team}
+            <th>{team.name}</th>
+          {/each}
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>PR</td>
+          {#each teams as team}
+            <td>{team.team_average.personal_rating.toFixed(0)}</td>
+          {/each}
+        </tr>
+        <tr>
+          <td>ダメージ(艦別)</td>
+          {#each teams as team}
+            <td>{team.team_average.damage_by_ship.toFixed(0)}</td>
+          {/each}
+        </tr>
+        <tr>
+          <td>ダメージ(プレイヤー)</td>
+          {#each teams as team}
+            <td>{team.team_average.damage_by_player.toFixed(0)}</td>
+          {/each}
+        </tr>
+        <tr>
+          <td>勝率(艦別)</td>
+          {#each teams as team}
+            <td>{team.team_average.win_rate_by_ship.toFixed(1)}</td>
+          {/each}
+        </tr>
+        <tr>
+          <td>勝率(プレイヤー)</td>
+          {#each teams as team}
+            <td>{team.team_average.win_rate_by_player.toFixed(1)}</td>
+          {/each}
+        </tr>
+        <tr>
+          <td>K/D(艦別)</td>
+          {#each teams as team}
+            <td>{team.team_average.kd_rate_by_ship.toFixed(1)}</td>
+          {/each}
+        </tr>
+        <tr>
+          <td>K/D(プレイヤー)</td>
+          {#each teams as team}
+            <td>{team.team_average.kd_rate_by_player.toFixed(1)}</td>
+          {/each}
+        </tr>
+      </tbody>
+    </table>
   </div>
 {/if}
