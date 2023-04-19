@@ -145,16 +145,16 @@
           <tr>
             <th>プレイヤー</th>
             <th>艦</th>
-            <th>PR</th>
-            <th>Dmg(艦)</th>
-            <th>勝率(艦)</th>
-            <th>K/D(艦)</th>
-            <th>戦闘数(艦)</th>
-            <th>Dmg</th>
-            <th>勝率</th>
-            <th>K/D</th>
-            <th>戦闘数</th>
-            <th>平均T</th>
+            <th class="bl">S:PR</th>
+            <th>S:Dmg</th>
+            <th>S:勝率</th>
+            <th>S:K/D</th>
+            <th>S:戦闘数</th>
+            <th class="bl">P:Dmg</th>
+            <th>P:勝率</th>
+            <th>P:K/D</th>
+            <th>P:戦闘数</th>
+            <th>P:平均T</th>
           </tr>
         </thead>
         <tbody>
@@ -203,18 +203,18 @@
               </td>
 
               {#if dataPattern === "private"}
-                <td colspan="10">PRIVATE</td>
+                <td colspan="10" class="bl">PRIVATE</td>
               {:else if dataPattern === "nodata"}
-                <td colspan="10">NO DATA</td>
+                <td colspan="10" class="bl">NO DATA</td>
               {/if}
 
               <!-- personal rating -->
               {#if dataPattern === "full"}
-                <td class="pr">
+                <td class="pr bl">
                   {player.player_ship_stats.personal_rating.toFixed(0)}
                 </td>
               {:else if dataPattern === "noshipstats" || dataPattern === "nopr"}
-                <td />
+                <td class="pr bl" />
               {/if}
 
               <!-- ship avg damage -->
@@ -223,7 +223,7 @@
                   {player.player_ship_stats.avg_damage.toFixed(0)}
                 </td>
               {:else if dataPattern === "noshipstats"}
-                <td />
+                <td class="damage" />
               {/if}
 
               <!-- ship win rate -->
@@ -232,7 +232,7 @@
                   {player.player_ship_stats.win_rate.toFixed(1)}
                 </td>
               {:else if dataPattern === "noshipstats"}
-                <td />
+                <td class="win" />
               {/if}
 
               <!-- ship kd rate -->
@@ -241,7 +241,7 @@
                   {player.player_ship_stats.kd_rate.toFixed(1)}
                 </td>
               {:else if dataPattern === "noshipstats"}
-                <td />
+                <td class="kd" />
               {/if}
 
               <!-- ship battles -->
@@ -250,12 +250,12 @@
                   {player.player_ship_stats.battles}
                 </td>
               {:else if dataPattern === "noshipstats"}
-                <td />
+                <td class="battles" />
               {/if}
 
               <!-- player avg damage -->
               {#if dataPattern === "noshipstats" || dataPattern === "full" || dataPattern === "nopr"}
-                <td class="damage">
+                <td class="damage bl">
                   {player.player_player_stats.avg_damage.toFixed(0)}
                 </td>
               {/if}
