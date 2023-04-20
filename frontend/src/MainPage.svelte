@@ -155,7 +155,7 @@
         <thead>
           <tr>
             <th>プレイヤー</th>
-            <th>艦</th>
+            <th class="border-right">艦</th>
             {#if config.displays.pr}
               <th>PR</th>
             {/if}
@@ -230,7 +230,7 @@
               </td>
 
               <!-- ship info -->
-              <td class="name omit">
+              <td class="name omit border-right">
                 <!-- svelte-ignore a11y-invalid-attribute -->
                 <a
                   href="#"
@@ -251,10 +251,13 @@
                 </a>
               </td>
 
-              {#if dataPattern === "private"}
-                <td colspan={countDisplays(config)}>PRIVATE</td>
-              {:else if dataPattern === "nodata"}
-                <td colspan={countDisplays(config)}>NO DATA</td>
+              <!-- join column case -->
+              {#if countDisplays(config) > 0}
+                {#if dataPattern === "private"}
+                  <td colspan={countDisplays(config)}>PRIVATE</td>
+                {:else if dataPattern === "nodata"}
+                  <td colspan={countDisplays(config)}>NO DATA</td>
+                {/if}
               {/if}
 
               <!-- personal rating -->

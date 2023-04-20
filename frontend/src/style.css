@@ -85,7 +85,7 @@ a {
 
 .name {
   text-align: left;
-  max-width: 15ch;
+  max-width: 120px;
 }
 
 .pr {
@@ -161,4 +161,8 @@ a {
 
 .form-style {
   text-align: left;
+}
+
+.border-right {
+  border-right: 1px solid #e5e5e5;
 }
