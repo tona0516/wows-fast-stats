@@ -54,21 +54,11 @@ func (a *App) SelectDirectory() (string, error) {
 
 func (a *App) GetConfig() (vo.UserConfig, error) {
 	configService := service.ConfigService{}
-	config, err := configService.Read()
-	if err != nil {
-		return config, err
-	}
-
-	return config, nil
+	return configService.Read()
 }
 
-func (a *App) ApplyConfig(installPath string, appid string, fontSize string) (vo.UserConfig, error) {
+func (a *App) ApplyConfig(config vo.UserConfig) (vo.UserConfig, error) {
 	configService := service.ConfigService{}
-	config := vo.UserConfig{
-		InstallPath: installPath,
-		Appid:       appid,
-		FontSize:    fontSize,
-	}
 
 	updatedConfig, err := configService.Update(config)
 	if err != nil {

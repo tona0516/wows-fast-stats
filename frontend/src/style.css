@@ -38,6 +38,7 @@ body {
 .table td {
   padding-top: 2px;
   padding-bottom: 2px;
+  white-space: nowrap;
   vertical-align: middle;
 }
 
@@ -148,6 +149,6 @@ a {
   color: #fe0e00;
 }
 
-.bl {
-  border-left: 1px solid #e5e5e5;
+.form-style {
+  text-align: left;
 }

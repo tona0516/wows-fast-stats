@@ -1,5 +1,35 @@
 export namespace vo {
 	
+	export class Displays {
+	    pr: boolean;
+	    ship_damage: boolean;
+	    ship_win_rate: boolean;
+	    ship_kd_rate: boolean;
+	    ship_battles: boolean;
+	    player_damage: boolean;
+	    player_win_rate: boolean;
+	    player_kd_rate: boolean;
+	    player_battles: boolean;
+	    player_avg_tier: boolean;
+	
+	    static createFrom(source: any = {}) {
+	        return new Displays(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.pr = source["pr"];
+	        this.ship_damage = source["ship_damage"];
+	        this.ship_win_rate = source["ship_win_rate"];
+	        this.ship_kd_rate = source["ship_kd_rate"];
+	        this.ship_battles = source["ship_battles"];
+	        this.player_damage = source["player_damage"];
+	        this.player_win_rate = source["player_win_rate"];
+	        this.player_kd_rate = source["player_kd_rate"];
+	        this.player_battles = source["player_battles"];
+	        this.player_avg_tier = source["player_avg_tier"];
+	    }
+	}
 	export class PlayerPlayerStats {
 	    battles: number;
 	    avg_damage: number;
@@ -183,6 +213,7 @@ export namespace vo {
 	    install_path: string;
 	    appid: string;
 	    font_size: string;
+	    displays: Displays;
 	
 	    static createFrom(source: any = {}) {
 	        return new UserConfig(source);
@@ -193,7 +224,26 @@ export namespace vo {
 	        this.install_path = source["install_path"];
 	        this.appid = source["appid"];
 	        this.font_size = source["font_size"];
+	        this.displays = this.convertValues(source["displays"], Displays);
 	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
 	}
 
 }

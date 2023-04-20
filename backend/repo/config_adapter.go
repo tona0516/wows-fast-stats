@@ -23,11 +23,7 @@ func (c *ConfigAdapter) Read() (vo.UserConfig, error) {
 	}
 
 	err = json.Unmarshal(file, &config)
-	if err != nil {
-		return config, err
-	}
-
-	return config, nil
+    return config, err
 }
 
 func (c *ConfigAdapter) Update(config vo.UserConfig) error {
@@ -40,9 +36,6 @@ func (c *ConfigAdapter) Update(config vo.UserConfig) error {
     defer file.Close()
 
     encoder := json.NewEncoder(file)
-	if err := encoder.Encode(config); err != nil {
-		return err
-	}
-
-    return nil
+    err = encoder.Encode(config)
+    return err
 }

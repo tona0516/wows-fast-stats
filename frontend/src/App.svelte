@@ -16,9 +16,9 @@
   let loadState: LoadState;
   let latestHash: string;
   let teams: vo.Team[];
-  let notification: Notification;
-
   let config: vo.UserConfig;
+
+  let notification: Notification;
 
   setInterval(looper, 1000);
 
@@ -183,7 +183,7 @@
     {/if}
 
     {#if currentPage === "main"}
-      <StatsPage bind:loadState bind:latestHash bind:teams />
+      <StatsPage bind:loadState bind:latestHash bind:teams bind:config />
     {/if}
   </div>
 </main>

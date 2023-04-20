@@ -7,10 +7,12 @@
   import iconNone from "./assets/images/icon-none.png";
   import { BrowserOpenURL } from "../wailsjs/runtime/runtime";
   import type { vo } from "wailsjs/go/models";
+  import Const from "./Const";
 
   export let loadState: LoadState = "standby";
   export let latestHash: string = "";
   export let teams: vo.Team[] = [];
+  export let config: vo.UserConfig = Const.DEFAULT_USER_CONFIG;
 
   /**
    * private: hidden player.
@@ -131,6 +133,10 @@
       digits
     )}</td><td class="${value2Class}">${value2Round.toFixed(digits)}</td>`;
   }
+
+  function countDisplays(config: vo.UserConfig): number {
+    return Object.values(config.displays).filter((it) => it === true).length;
+  }
 </script>
 
 {#if loadState === "fetching"}
@@ -150,16 +156,36 @@
           <tr>
             <th>プレイヤー</th>
             <th>艦</th>
-            <th class="bl">S:PR</th>
-            <th>S:Dmg</th>
-            <th>S:勝率</th>
-            <th>S:K/D</th>
-            <th>S:戦闘数</th>
-            <th class="bl">P:Dmg</th>
-            <th>P:勝率</th>
-            <th>P:K/D</th>
-            <th>P:戦闘数</th>
-            <th>P:平均T</th>
+            {#if config.displays.pr}
+              <th>S:PR</th>
+            {/if}
+            {#if config.displays.ship_damage}
+              <th>S:Dmg</th>
+            {/if}
+            {#if config.displays.ship_win_rate}
+              <th>S:勝率</th>
+            {/if}
+            {#if config.displays.ship_kd_rate}
+              <th>S:K/D</th>
+            {/if}
+            {#if config.displays.ship_battles}
+              <th>S:戦闘数</th>
+            {/if}
+            {#if config.displays.player_damage}
+              <th>P:Dmg</th>
+            {/if}
+            {#if config.displays.player_win_rate}
+              <th>P:勝率</th>
+            {/if}
+            {#if config.displays.player_kd_rate}
+              <th>P:K/D</th>
+            {/if}
+            {#if config.displays.player_battles}
+              <th>P:戦闘数</th>
+            {/if}
+            {#if config.displays.player_avg_tier}
+              <th>P:平均T</th>
+            {/if}
           </tr>
         </thead>
         <tbody>
@@ -208,89 +234,109 @@
               </td>
 
               {#if dataPattern === "private"}
-                <td colspan="10" class="bl">PRIVATE</td>
+                <td colspan={countDisplays(config)}>PRIVATE</td>
               {:else if dataPattern === "nodata"}
-                <td colspan="10" class="bl">NO DATA</td>
+                <td colspan={countDisplays(config)}>NO DATA</td>
               {/if}
 
               <!-- personal rating -->
-              {#if dataPattern === "full"}
-                <td class="pr bl">
-                  {player.player_ship_stats.personal_rating.toFixed(0)}
-                </td>
-              {:else if dataPattern === "noshipstats" || dataPattern === "nopr"}
-                <td class="pr bl" />
+              {#if config.displays.pr}
+                {#if dataPattern === "full"}
+                  <td class="pr">
+                    {player.player_ship_stats.personal_rating.toFixed(0)}
+                  </td>
+                {:else if dataPattern === "noshipstats" || dataPattern === "nopr"}
+                  <td class="pr" />
+                {/if}
               {/if}
 
               <!-- ship avg damage -->
-              {#if dataPattern === "full" || dataPattern === "nopr"}
-                <td class="damage">
-                  {player.player_ship_stats.avg_damage.toFixed(0)}
-                </td>
-              {:else if dataPattern === "noshipstats"}
-                <td class="damage" />
+              {#if config.displays.ship_damage}
+                {#if dataPattern === "full" || dataPattern === "nopr"}
+                  <td class="damage">
+                    {player.player_ship_stats.avg_damage.toFixed(0)}
+                  </td>
+                {:else if dataPattern === "noshipstats"}
+                  <td class="damage" />
+                {/if}
               {/if}
 
               <!-- ship win rate -->
-              {#if dataPattern === "full" || dataPattern === "nopr"}
-                <td class="win">
-                  {player.player_ship_stats.win_rate.toFixed(1)}
-                </td>
-              {:else if dataPattern === "noshipstats"}
-                <td class="win" />
+              {#if config.displays.ship_win_rate}
+                {#if dataPattern === "full" || dataPattern === "nopr"}
+                  <td class="win">
+                    {player.player_ship_stats.win_rate.toFixed(1)}
+                  </td>
+                {:else if dataPattern === "noshipstats"}
+                  <td class="win" />
+                {/if}
               {/if}
 
               <!-- ship kd rate -->
-              {#if dataPattern === "full" || dataPattern === "nopr"}
-                <td class="kd">
-                  {player.player_ship_stats.kd_rate.toFixed(1)}
-                </td>
-              {:else if dataPattern === "noshipstats"}
-                <td class="kd" />
+              {#if config.displays.ship_kd_rate}
+                {#if dataPattern === "full" || dataPattern === "nopr"}
+                  <td class="kd">
+                    {player.player_ship_stats.kd_rate.toFixed(1)}
+                  </td>
+                {:else if dataPattern === "noshipstats"}
+                  <td class="kd" />
+                {/if}
               {/if}
 
               <!-- ship battles -->
-              {#if dataPattern === "full" || dataPattern === "nopr"}
-                <td class="battles">
-                  {player.player_ship_stats.battles}
-                </td>
-              {:else if dataPattern === "noshipstats"}
-                <td class="battles" />
+              {#if config.displays.ship_battles}
+                {#if dataPattern === "full" || dataPattern === "nopr"}
+                  <td class="battles">
+                    {player.player_ship_stats.battles}
+                  </td>
+                {:else if dataPattern === "noshipstats"}
+                  <td class="battles" />
+                {/if}
               {/if}
 
               <!-- player avg damage -->
-              {#if dataPattern === "noshipstats" || dataPattern === "full" || dataPattern === "nopr"}
-                <td class="damage bl">
-                  {player.player_player_stats.avg_damage.toFixed(0)}
-                </td>
+              {#if config.displays.player_damage}
+                {#if dataPattern === "noshipstats" || dataPattern === "full" || dataPattern === "nopr"}
+                  <td class="damage">
+                    {player.player_player_stats.avg_damage.toFixed(0)}
+                  </td>
+                {/if}
               {/if}
 
               <!-- player win rate -->
-              {#if dataPattern === "noshipstats" || dataPattern === "full" || dataPattern === "nopr"}
-                <td class="win">
-                  {player.player_player_stats.win_rate.toFixed(1)}
-                </td>
+              {#if config.displays.player_win_rate}
+                {#if dataPattern === "noshipstats" || dataPattern === "full" || dataPattern === "nopr"}
+                  <td class="win">
+                    {player.player_player_stats.win_rate.toFixed(1)}
+                  </td>
+                {/if}
               {/if}
 
               <!-- player kd rate -->
-              {#if dataPattern === "noshipstats" || dataPattern === "full" || dataPattern === "nopr"}
-                <td class="kd">
-                  {player.player_player_stats.kd_rate.toFixed(1)}
-                </td>
+              {#if config.displays.player_kd_rate}
+                {#if dataPattern === "noshipstats" || dataPattern === "full" || dataPattern === "nopr"}
+                  <td class="kd">
+                    {player.player_player_stats.kd_rate.toFixed(1)}
+                  </td>
+                {/if}
               {/if}
 
               <!-- player battles -->
-              {#if dataPattern === "noshipstats" || dataPattern === "full" || dataPattern === "nopr"}
-                <td class="battles">
-                  {player.player_player_stats.battles}
-                </td>
+              {#if config.displays.player_battles}
+                {#if dataPattern === "noshipstats" || dataPattern === "full" || dataPattern === "nopr"}
+                  <td class="battles">
+                    {player.player_player_stats.battles}
+                  </td>
+                {/if}
               {/if}
 
               <!-- avg tier -->
-              {#if dataPattern === "noshipstats" || dataPattern === "full" || dataPattern === "nopr"}
-                <td class="avg-tier">
-                  {player.player_player_stats.avg_tier.toFixed(1)}
-                </td>
+              {#if config.displays.player_avg_tier}
+                {#if dataPattern === "noshipstats" || dataPattern === "full" || dataPattern === "nopr"}
+                  <td class="avg-tier">
+                    {player.player_player_stats.avg_tier.toFixed(1)}
+                  </td>
+                {/if}
               {/if}
             </tr>
           {/each}
