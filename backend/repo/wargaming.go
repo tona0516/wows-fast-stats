@@ -37,11 +37,13 @@ func (w *Wargaming) GetAccountInfo(accountIDs []int) (vo.WGAccountInfo, error) {
 			"account_id":     strings.Join(accountIDsString, ","),
 			"fields": strings.Join([]string{
                 "hidden_profile",
-				"statistics.pvp.survived_battles",
-				"statistics.pvp.battles",
+                "statistics.pvp.battles",
+                "statistics.pvp.wins",
 				"statistics.pvp.frags",
-				"statistics.pvp.wins",
-				"statistics.pvp.damage_dealt",
+                "statistics.pvp.damage_dealt",
+                "statistics.pvp.xp",
+                "statistics.pvp.survived_battles",
+                "statistics.pvp.survived_wins",
 			}, ","),
 		},
 	)
@@ -151,11 +153,13 @@ func (w *Wargaming) GetShipsStats(accountID int) (vo.WGShipsStats, error) {
 			"account_id":     strconv.Itoa(accountID),
 			"fields": strings.Join([]string{
 				"ship_id",
+                "pvp.battles",
 				"pvp.wins",
-				"pvp.battles",
+                "pvp.frags",
 				"pvp.damage_dealt",
-				"pvp.frags",
+                "pvp.xp",
 				"pvp.survived_battles",
+                "pvp.survived_wins",
 			}, ","),
 		},
 	)

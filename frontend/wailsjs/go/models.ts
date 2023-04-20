@@ -5,10 +5,16 @@ export namespace vo {
 	    ship_damage: boolean;
 	    ship_win_rate: boolean;
 	    ship_kd_rate: boolean;
+	    ship_win_survived_rate: boolean;
+	    ship_lose_survived_rate: boolean;
+	    ship_exp: boolean;
 	    ship_battles: boolean;
 	    player_damage: boolean;
 	    player_win_rate: boolean;
 	    player_kd_rate: boolean;
+	    player_win_survived_rate: boolean;
+	    player_lose_survived_rate: boolean;
+	    player_exp: boolean;
 	    player_battles: boolean;
 	    player_avg_tier: boolean;
 	
@@ -22,10 +28,16 @@ export namespace vo {
 	        this.ship_damage = source["ship_damage"];
 	        this.ship_win_rate = source["ship_win_rate"];
 	        this.ship_kd_rate = source["ship_kd_rate"];
+	        this.ship_win_survived_rate = source["ship_win_survived_rate"];
+	        this.ship_lose_survived_rate = source["ship_lose_survived_rate"];
+	        this.ship_exp = source["ship_exp"];
 	        this.ship_battles = source["ship_battles"];
 	        this.player_damage = source["player_damage"];
 	        this.player_win_rate = source["player_win_rate"];
 	        this.player_kd_rate = source["player_kd_rate"];
+	        this.player_win_survived_rate = source["player_win_survived_rate"];
+	        this.player_lose_survived_rate = source["player_lose_survived_rate"];
+	        this.player_exp = source["player_exp"];
 	        this.player_battles = source["player_battles"];
 	        this.player_avg_tier = source["player_avg_tier"];
 	    }
@@ -34,7 +46,10 @@ export namespace vo {
 	    battles: number;
 	    avg_damage: number;
 	    win_rate: number;
+	    win_survived_rate: number;
+	    lose_survived_rate: number;
 	    kd_rate: number;
+	    exp: number;
 	    avg_tier: number;
 	
 	    static createFrom(source: any = {}) {
@@ -46,7 +61,10 @@ export namespace vo {
 	        this.battles = source["battles"];
 	        this.avg_damage = source["avg_damage"];
 	        this.win_rate = source["win_rate"];
+	        this.win_survived_rate = source["win_survived_rate"];
+	        this.lose_survived_rate = source["lose_survived_rate"];
 	        this.kd_rate = source["kd_rate"];
+	        this.exp = source["exp"];
 	        this.avg_tier = source["avg_tier"];
 	    }
 	}
@@ -74,7 +92,10 @@ export namespace vo {
 	    battles: number;
 	    avg_damage: number;
 	    win_rate: number;
+	    win_survived_rate: number;
+	    lose_survived_rate: number;
 	    kd_rate: number;
+	    exp: number;
 	    personal_rating: number;
 	
 	    static createFrom(source: any = {}) {
@@ -86,7 +107,10 @@ export namespace vo {
 	        this.battles = source["battles"];
 	        this.avg_damage = source["avg_damage"];
 	        this.win_rate = source["win_rate"];
+	        this.win_survived_rate = source["win_survived_rate"];
+	        this.lose_survived_rate = source["lose_survived_rate"];
 	        this.kd_rate = source["kd_rate"];
+	        this.exp = source["exp"];
 	        this.personal_rating = source["personal_rating"];
 	    }
 	}

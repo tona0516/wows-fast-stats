@@ -126,6 +126,37 @@
         <input
           class="form-check-input"
           type="checkbox"
+          id="ship-win-survived-rate"
+          bind:checked={inputConfig.displays.ship_win_survived_rate}
+        />
+        <label class="form-check-label" for="ship-win-survived-rate"
+          >艦別:勝利生存率</label
+        >
+      </div>
+      <div class="form-check">
+        <input
+          class="form-check-input"
+          type="checkbox"
+          id="ship-lose-survived-rate"
+          bind:checked={inputConfig.displays.ship_lose_survived_rate}
+        />
+        <label class="form-check-label" for="ship-lose-survived-rate"
+          >艦別:敗北生存率</label
+        >
+      </div>
+      <div class="form-check">
+        <input
+          class="form-check-input"
+          type="checkbox"
+          id="ship-exp"
+          bind:checked={inputConfig.displays.ship_exp}
+        />
+        <label class="form-check-label" for="ship-exp">艦別:経験値</label>
+      </div>
+      <div class="form-check">
+        <input
+          class="form-check-input"
+          type="checkbox"
           id="ship-battles"
           bind:checked={inputConfig.displays.ship_battles}
         />
@@ -158,6 +189,37 @@
           bind:checked={inputConfig.displays.player_kd_rate}
         />
         <label class="form-check-label" for="player-kd-rate">総合:K/D</label>
+      </div>
+      <div class="form-check">
+        <input
+          class="form-check-input"
+          type="checkbox"
+          id="player-win-survived-rate"
+          bind:checked={inputConfig.displays.player_win_survived_rate}
+        />
+        <label class="form-check-label" for="player-win-survived-rate"
+          >総合:勝利生存率</label
+        >
+      </div>
+      <div class="form-check">
+        <input
+          class="form-check-input"
+          type="checkbox"
+          id="player-lose-survived-rate"
+          bind:checked={inputConfig.displays.player_lose_survived_rate}
+        />
+        <label class="form-check-label" for="player-lose-survived-rate"
+          >総合:敗北生存率</label
+        >
+      </div>
+      <div class="form-check">
+        <input
+          class="form-check-input"
+          type="checkbox"
+          id="player-exp"
+          bind:checked={inputConfig.displays.player_exp}
+        />
+        <label class="form-check-label" for="player-exp">総合:経験値</label>
       </div>
       <div class="form-check">
         <input

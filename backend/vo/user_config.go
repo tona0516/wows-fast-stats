@@ -5,10 +5,16 @@ type Displays struct {
     ShipDamage bool `json:"ship_damage"`
     ShipWinRate bool `json:"ship_win_rate"`
     ShipKdRate bool `json:"ship_kd_rate"`
+    ShipWinSurvivedRate bool `json:"ship_win_survived_rate"`
+    ShipLoseSurvivedRate bool `json:"ship_lose_survived_rate"`
+    ShipExp bool `json:"ship_exp"`
     ShipBattles bool `json:"ship_battles"`
     PlayerDamage bool `json:"player_damage"`
     PlayerWinRate bool `json:"player_win_rate"`
     PlayerKdRate bool `json:"player_kd_rate"`
+    PlayerWinSurvivedRate bool `json:"player_win_survived_rate"`
+    PlayerLoseSurvivedRate bool `json:"player_lose_survived_rate"`
+    PlayerExp bool `json:"player_exp"`
     PlayerBattles bool `json:"player_battles"`
     PlayerAvgTier bool `json:"player_avg_tier"`
 }

@@ -157,7 +157,7 @@
             <th>プレイヤー</th>
             <th>艦</th>
             {#if config.displays.pr}
-              <th>S:PR</th>
+              <th>PR</th>
             {/if}
             {#if config.displays.ship_damage}
               <th>S:Dmg</th>
@@ -167,6 +167,15 @@
             {/if}
             {#if config.displays.ship_kd_rate}
               <th>S:K/D</th>
+            {/if}
+            {#if config.displays.ship_win_survived_rate}
+              <th>S:勝利生存率</th>
+            {/if}
+            {#if config.displays.ship_lose_survived_rate}
+              <th>S:敗北生存率</th>
+            {/if}
+            {#if config.displays.ship_exp}
+              <th>S:Exp</th>
             {/if}
             {#if config.displays.ship_battles}
               <th>S:戦闘数</th>
@@ -179,6 +188,15 @@
             {/if}
             {#if config.displays.player_kd_rate}
               <th>P:K/D</th>
+            {/if}
+            {#if config.displays.player_win_survived_rate}
+              <th>P:勝利生存率</th>
+            {/if}
+            {#if config.displays.player_lose_survived_rate}
+              <th>P:敗北生存率</th>
+            {/if}
+            {#if config.displays.player_exp}
+              <th>P:Exp</th>
             {/if}
             {#if config.displays.player_battles}
               <th>P:戦闘数</th>
@@ -283,6 +301,39 @@
                 {/if}
               {/if}
 
+              <!-- ship win survived rate -->
+              {#if config.displays.ship_win_survived_rate}
+                {#if dataPattern === "full" || dataPattern === "nopr"}
+                  <td class="survived-rate">
+                    {player.player_ship_stats.win_survived_rate.toFixed(1)}
+                  </td>
+                {:else if dataPattern === "noshipstats"}
+                  <td class="survived-rate" />
+                {/if}
+              {/if}
+
+              <!-- ship lose survived rate -->
+              {#if config.displays.ship_lose_survived_rate}
+                {#if dataPattern === "full" || dataPattern === "nopr"}
+                  <td class="survived-rate">
+                    {player.player_ship_stats.lose_survived_rate.toFixed(1)}
+                  </td>
+                {:else if dataPattern === "noshipstats"}
+                  <td class="survived-rate" />
+                {/if}
+              {/if}
+
+              <!-- ship exp -->
+              {#if config.displays.ship_exp}
+                {#if dataPattern === "full" || dataPattern === "nopr"}
+                  <td class="exp">
+                    {player.player_ship_stats.exp.toFixed(0)}
+                  </td>
+                {:else if dataPattern === "noshipstats"}
+                  <td class="exp" />
+                {/if}
+              {/if}
+
               <!-- ship battles -->
               {#if config.displays.ship_battles}
                 {#if dataPattern === "full" || dataPattern === "nopr"}
@@ -318,6 +369,39 @@
                   <td class="kd">
                     {player.player_player_stats.kd_rate.toFixed(1)}
                   </td>
+                {/if}
+              {/if}
+
+              <!-- player win survived rate -->
+              {#if config.displays.player_win_survived_rate}
+                {#if dataPattern === "full" || dataPattern === "nopr"}
+                  <td class="survived-rate">
+                    {player.player_player_stats.win_survived_rate.toFixed(1)}
+                  </td>
+                {:else if dataPattern === "noshipstats"}
+                  <td class="survived-rate" />
+                {/if}
+              {/if}
+
+              <!-- player lose survived rate -->
+              {#if config.displays.player_lose_survived_rate}
+                {#if dataPattern === "full" || dataPattern === "nopr"}
+                  <td class="survived-rate">
+                    {player.player_player_stats.lose_survived_rate.toFixed(1)}
+                  </td>
+                {:else if dataPattern === "noshipstats"}
+                  <td class="survived-rate" />
+                {/if}
+              {/if}
+
+              <!-- player exp -->
+              {#if config.displays.player_exp}
+                {#if dataPattern === "full" || dataPattern === "nopr"}
+                  <td class="exp">
+                    {player.player_player_stats.exp.toFixed(0)}
+                  </td>
+                {:else if dataPattern === "noshipstats"}
+                  <td class="exp" />
                 {/if}
               {/if}
 
