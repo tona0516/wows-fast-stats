@@ -10,8 +10,6 @@ export function GetConfig():Promise<vo.UserConfig>;
 
 export function GetTempArenaInfoHash():Promise<string>;
 
-export function SaveScreenshot(arg1:string,arg2:string):Promise<void>;
-
-export function SaveScreenshotWithDialog(arg1:string,arg2:string):Promise<void>;
+export function SaveScreenshot(arg1:string,arg2:string,arg3:boolean):Promise<void>;
 
 export function SelectDirectory():Promise<string>;

@@ -8,8 +8,7 @@ import (
 	"path/filepath"
 )
 
-type ConfigService struct {
-}
+type ConfigService struct{}
 
 func (c *ConfigService) Read() (vo.UserConfig, error) {
     var config vo.UserConfig

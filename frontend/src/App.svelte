@@ -4,7 +4,6 @@
     GetTempArenaInfoHash,
     GetBattle,
     SaveScreenshot,
-    SaveScreenshotWithDialog,
   } from "../wailsjs/go/main/App.js";
   import type { vo } from "wailsjs/go/models.js";
   import Notification from "./Notification.svelte";
@@ -13,6 +12,8 @@
   import Navigation from "./Navigation.svelte";
   import domtoimage from "dom-to-image";
   import { LogDebug } from "../wailsjs/runtime/runtime.js";
+
+  type ScreenshotType = "auto" | "manual";
 
   let currentPage: Page;
 
@@ -25,24 +26,32 @@
 
   setInterval(looper, 1000);
 
-  function deriveFilename(meta: vo.Meta): string {
-    const date = battle.meta.date.replaceAll(":", "-").replaceAll(" ", "-");
-    const ownShip = battle.meta.own_ship.replaceAll(" ", "-");
-    return `${date}_${ownShip}_${battle.meta.arena}_${battle.meta.type}.png`;
-  }
-
-  async function onScrrenshot() {
-    try {
-      const dataUrl = (await domtoimage.toPng(
-        document.getElementById("mainpage")
-      )) as string;
-      const filename = deriveFilename(battle.meta);
-      const base64Data = dataUrl.split(",")[1];
-      await SaveScreenshotWithDialog(filename, base64Data);
-      notification.showToast("スクリーンショットを保存しました。", "success");
-    } catch (error) {
-      notification.showToast(error, "error");
-    }
+  function saveScreenshot(type: ScreenshotType) {
+    domtoimage
+      .toPng(document.getElementById("mainpage"))
+      .then((dataUrl) => {
+        const date = battle.meta.date.replaceAll(":", "-").replaceAll(" ", "-");
+        const ownShip = battle.meta.own_ship.replaceAll(" ", "-");
+        const filename = `${date}_${ownShip}_${battle.meta.arena}_${battle.meta.type}.png`;
+        const base64Data = dataUrl.split(",")[1];
+        if (type === "auto") {
+          return SaveScreenshot(filename, base64Data, false);
+        }
+        if (type === "manual") {
+          return SaveScreenshot(filename, base64Data, true);
+        }
+      })
+      .then(() => {
+        if (type === "manual") {
+          notification.showToast(
+            "スクリーンショットを保存しました。",
+            "success"
+          );
+        }
+      })
+      .error((error) => {
+        notification.showToast(error, "error");
+      });
   }
 
   async function looper() {
@@ -95,16 +104,7 @@
     }
 
     if (config.save_screenshot) {
-      try {
-        const dataUrl = (await domtoimage.toPng(
-          document.getElementById("mainpage")
-        )) as string;
-        const filename = deriveFilename(battle.meta);
-        const base64Data = dataUrl.split(",")[1];
-        await SaveScreenshot(filename, base64Data);
-      } catch (error) {
-        notification.showToast(error, "error");
-      }
+      await saveScreenshot("auto");
     }
   }
 </script>
@@ -115,7 +115,7 @@
 
     <Navigation
       bind:currentPage
-      on:SaveScreenshotWithDialog={() => onScrrenshot()}
+      on:SaveScreenshotWithDialog={() => saveScreenshot("manual")}
     />
 
     {#if currentPage === "config"}

@@ -18,12 +18,8 @@ export function GetTempArenaInfoHash() {
   return window['go']['main']['App']['GetTempArenaInfoHash']();
 }
 
-export function SaveScreenshot(arg1, arg2) {
-  return window['go']['main']['App']['SaveScreenshot'](arg1, arg2);
-}
-
-export function SaveScreenshotWithDialog(arg1, arg2) {
-  return window['go']['main']['App']['SaveScreenshotWithDialog'](arg1, arg2);
+export function SaveScreenshot(arg1, arg2, arg3) {
+  return window['go']['main']['App']['SaveScreenshot'](arg1, arg2, arg3);
 }
 
 export function SelectDirectory() {

@@ -1,7 +1,6 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
   import { WindowReloadApp } from "../wailsjs/runtime/runtime";
-  import domtoimage from "dom-to-image";
 
   const dispatch = createEventDispatcher();
 

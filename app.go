@@ -31,21 +31,17 @@ func (a *App) startup(ctx context.Context) {
 
 func (a *App) GetTempArenaInfoHash() (string, error) {
 	statsService := service.StatsService{
-		InstallPath: a.config.InstallPath,
-		AppID:       a.config.Appid,
-		Parallels:   5,
+        Parallels:   5,
 	}
-	return statsService.GetTempArenaInfoHash()
+	return statsService.GetTempArenaInfoHash(a.config.InstallPath)
 }
 
 func (a *App) GetBattle() (vo.Battle, error) {
 	statsService := service.StatsService{
-		InstallPath: a.config.InstallPath,
-		AppID:       a.config.Appid,
 		Parallels:   5,
 	}
 
-	return statsService.GetsBattle()
+	return statsService.GetsBattle(a.config.InstallPath, a.config.Appid)
 }
 
 func (a *App) SelectDirectory() (string, error) {
@@ -69,12 +65,11 @@ func (a *App) ApplyConfig(config vo.UserConfig) (vo.UserConfig, error) {
 	return updatedConfig, nil
 }
 
-func (a *App) SaveScreenshot(filename string, base64Data string) error {
+func (a *App) SaveScreenshot(filename string, base64Data string, isSelectable bool) error {
 	screenshotService := service.ScreenshotService{}
-	return screenshotService.Save(filename, base64Data)
-}
+	if isSelectable {
+		return screenshotService.SaveWithDialog(a.ctx, filename, base64Data)
+	}
 
-func (a *App) SaveScreenshotWithDialog(filename string, base64Data string) error {
-	screenshotService := service.ScreenshotService{}
-	return screenshotService.SaveWithDialog(a.ctx, filename, base64Data)
+	return screenshotService.SaveForAuto(filename, base64Data)
 }

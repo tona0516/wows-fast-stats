@@ -10,17 +10,15 @@ import (
 	"sync"
 )
 
-type StatsService struct {
-	InstallPath string
-	AppID       string
-	Parallels   uint
+type StatsService struct{
+    Parallels uint
 }
 
-func (s *StatsService) GetTempArenaInfoHash() (string, error) {
+func (s *StatsService) GetTempArenaInfoHash(installPath string) (string, error) {
     var result string
     local := repo.Local{}
 
-    tempArenaInfo, err := local.GetTempArenaInfo(s.InstallPath)
+    tempArenaInfo, err := local.GetTempArenaInfo(installPath)
     if err != nil {
         return result, err
     }
@@ -30,15 +28,15 @@ func (s *StatsService) GetTempArenaInfoHash() (string, error) {
     return result, nil
 }
 
-func (s *StatsService) GetsBattle() (vo.Battle, error) {
+func (s *StatsService) GetsBattle(installPath string, appid string) (vo.Battle, error) {
     var result vo.Battle
 
-	wargaming := repo.Wargaming{AppID: s.AppID}
+	wargaming := repo.Wargaming{AppID: appid}
 	numbers := repo.Numbers{}
 	local := repo.Local{}
     unregistered := repo.Unregistered{}
 
-	tempArenaInfo, err := local.GetTempArenaInfo(s.InstallPath)
+	tempArenaInfo, err := local.GetTempArenaInfo(installPath)
 	if err != nil {
 		return result, err
 	}
