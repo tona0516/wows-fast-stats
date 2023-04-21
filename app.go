@@ -68,3 +68,8 @@ func (a *App) ApplyConfig(config vo.UserConfig) (vo.UserConfig, error) {
 	a.config = updatedConfig
 	return updatedConfig, nil
 }
+
+func (a *App) SaveScreenshot(base64Data string) error {
+	screenshotService := service.ScreenshotService{}
+	return screenshotService.Save(base64Data)
+}

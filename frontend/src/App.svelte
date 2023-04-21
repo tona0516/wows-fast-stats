@@ -4,12 +4,15 @@
     GetConfig,
     GetTempArenaInfoHash,
     Load,
+    SaveScreenshot,
   } from "../wailsjs/go/main/App.js";
   import type { vo } from "wailsjs/go/models.js";
   import Notification from "./Notification.svelte";
   import ConfigPage from "./ConfigPage.svelte";
   import MainPage from "./MainPage.svelte";
   import Navigation from "./Navigation.svelte";
+  import domtoimage from "dom-to-image";
+  import { LogDebug } from "../wailsjs/runtime/runtime.js";
 
   type Page = "main" | "config";
   let currentPage: Page = "main";
@@ -37,6 +40,10 @@
       default:
         break;
     }
+  }
+
+  async function sleep(ms: number) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   async function looper() {
@@ -80,11 +87,24 @@
       teams = await Load();
       latestHash = hash;
       loadState = "standby";
+
       const elapsed = (new Date().getTime() - start) / 1000;
       notification.showToast(`データ取得完了: ${elapsed}秒`, "success");
     } catch (error) {
       loadState = "error";
       notification.showToast(error, "error");
+    }
+
+    if (config.save_screenshot) {
+      try {
+        const dataUrl = (await domtoimage.toPng(
+          document.getElementById("mainpage")
+        )) as string;
+        const base64Data = dataUrl.split(",")[1];
+        await SaveScreenshot(base64Data);
+      } catch (error) {
+        notification.showToast(error, "error");
+      }
     }
   }
 </script>
@@ -105,7 +125,9 @@
     {/if}
 
     {#if currentPage === "main"}
-      <MainPage bind:loadState bind:latestHash bind:teams bind:config />
+      <div id="mainpage">
+        <MainPage bind:loadState bind:latestHash bind:teams bind:config />
+      </div>
     {/if}
   </div>
 </main>

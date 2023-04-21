@@ -10,4 +10,6 @@ export function GetTempArenaInfoHash():Promise<string>;
 
 export function Load():Promise<Array<vo.Team>>;
 
+export function SaveScreenshot(arg1:string):Promise<void>;
+
 export function SelectDirectory():Promise<string>;

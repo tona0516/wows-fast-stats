@@ -12,6 +12,7 @@
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^1.0.1",
     "@tsconfig/svelte": "^3.0.0",
+    "@types/dom-to-image": "^2.6.4",
     "prettier": "^2.8.7",
     "prettier-plugin-svelte": "^2.10.0",
     "svelte": "^3.49.0",
@@ -22,6 +23,7 @@
     "vite": "^3.0.0"
   },
   "dependencies": {
+    "dom-to-image": "^2.6.0",
     "svelte-toasts": "^1.1.2"
   }
 }

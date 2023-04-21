@@ -167,7 +167,7 @@ a {
   border-right: 1px solid #e5e5e5;
 }
 
-.config-label {
-  text-align: center;
-  display: block;
+.centerize {
+  display: flex;
+  justify-content: center;
 }

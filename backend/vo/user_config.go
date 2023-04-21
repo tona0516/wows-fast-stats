@@ -24,4 +24,5 @@ type UserConfig struct {
     Appid string `json:"appid"`
     FontSize string `json:"font_size"`
     Displays Displays `json:"displays"`
+    SaveScreenshot bool `json:"save_screenshot"`
 }

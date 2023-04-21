@@ -48,7 +48,7 @@
   <form>
     <!-- install path -->
     <div class="mb-3 form-style">
-      <div class="config-label">
+      <div class="centerize">
         <label for="install-path" class="form-label"
           >World of Warshipsインストールフォルダ</label
         >
@@ -70,7 +70,7 @@
 
     <!-- appid -->
     <div class="mb-3 form-style">
-      <div class="config-label">
+      <div class="centerize">
         <label for="appid" class="form-label">AppID</label>
       </div>
       <input
@@ -83,7 +83,7 @@
 
     <!-- font-size -->
     <div class="mb-3 form-style">
-      <div class="config-label">
+      <div class="centerize">
         <label for="font-size" class="form-label">文字サイズ</label>
       </div>
       <select class="form-select" bind:value={inputConfig.font_size}>
@@ -97,7 +97,7 @@
 
     <!-- display values -->
     <div class="mb-3 form-style">
-      <div class="config-label">
+      <div class="centerize">
         <label for="font-column" class="form-lavel">表示項目</label>
       </div>
       <div class="row">
@@ -282,6 +282,21 @@
             />
             <label class="form-check-label" for="avg-tier">総合:平均Tier</label>
           </div>
+        </div>
+      </div>
+
+      <!-- save-screenshot -->
+      <div class="mb-3 centerize">
+        <div class="form-check form-switch">
+          <input
+            class="form-check-input"
+            type="checkbox"
+            id="save-scrrenshot"
+            bind:checked={inputConfig.save_screenshot}
+          />
+          <label class="form-check-label" for="save-scrrenshot"
+            >自動でスクリーンショットを保存する</label
+          >
         </div>
       </div>
     </div>

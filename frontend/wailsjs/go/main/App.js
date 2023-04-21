@@ -18,6 +18,10 @@ export function Load() {
   return window['go']['main']['App']['Load']();
 }
 
+export function SaveScreenshot(arg1) {
+  return window['go']['main']['App']['SaveScreenshot'](arg1);
+}
+
 export function SelectDirectory() {
   return window['go']['main']['App']['SelectDirectory']();
 }
