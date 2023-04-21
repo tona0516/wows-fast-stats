@@ -11,7 +11,6 @@
   const dispatch = createEventDispatcher();
 
   let inputConfig: vo.UserConfig = Const.DEFAULT_USER_CONFIG;
-  let allSelectToggle = false;
 
   GetConfig().then((config) => {
     inputConfig = config;
@@ -38,11 +37,10 @@
     });
   }
 
-  function toggleAllSelectForDisplayValue() {
-    const isSelectAll = !allSelectToggle;
+  function toggleAll(e) {
     const keys = Object.keys(inputConfig.displays);
+    const isSelectAll: boolean = e.target.checked;
     keys.forEach((key) => (inputConfig.displays[key] = isSelectAll));
-    allSelectToggle = !allSelectToggle;
   }
 </script>
 
@@ -109,7 +107,10 @@
               class="form-check-input"
               type="checkbox"
               id="select-all"
-              on:click={() => toggleAllSelectForDisplayValue()}
+              on:change={toggleAll}
+              checked={Object.values(inputConfig.displays).length ===
+                Object.values(inputConfig.displays).filter((it) => it === true)
+                  .length}
             />
             <label class="form-check-label" for="select-all">全選択</label>
           </div>
