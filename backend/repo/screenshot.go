@@ -6,7 +6,8 @@ import (
 )
 
 type Screenshot struct {
-    FileName string}
+    FileName string
+}
 
 func (s *Screenshot) Save(base64Data string) error {
     os.Mkdir("screenshot", 0755)

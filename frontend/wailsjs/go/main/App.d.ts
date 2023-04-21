@@ -12,4 +12,6 @@ export function GetTempArenaInfoHash():Promise<string>;
 
 export function SaveScreenshot(arg1:string,arg2:string):Promise<void>;
 
+export function SaveScreenshotWithDialog(arg1:string,arg2:string):Promise<void>;
+
 export function SelectDirectory():Promise<string>;

@@ -22,6 +22,10 @@ export function SaveScreenshot(arg1, arg2) {
   return window['go']['main']['App']['SaveScreenshot'](arg1, arg2);
 }
 
+export function SaveScreenshotWithDialog(arg1, arg2) {
+  return window['go']['main']['App']['SaveScreenshotWithDialog'](arg1, arg2);
+}
+
 export function SelectDirectory() {
   return window['go']['main']['App']['SelectDirectory']();
 }

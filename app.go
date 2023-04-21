@@ -73,3 +73,8 @@ func (a *App) SaveScreenshot(filename string, base64Data string) error {
 	screenshotService := service.ScreenshotService{}
 	return screenshotService.Save(filename, base64Data)
 }
+
+func (a *App) SaveScreenshotWithDialog(filename string, base64Data string) error {
+	screenshotService := service.ScreenshotService{}
+	return screenshotService.SaveWithDialog(a.ctx, filename, base64Data)
+}

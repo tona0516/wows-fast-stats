@@ -1,10 +1,10 @@
 <script lang="ts">
-  import { WindowReloadApp } from "../wailsjs/runtime/runtime.js";
   import {
     GetConfig,
     GetTempArenaInfoHash,
     GetBattle,
     SaveScreenshot,
+    SaveScreenshotWithDialog,
   } from "../wailsjs/go/main/App.js";
   import type { vo } from "wailsjs/go/models.js";
   import Notification from "./Notification.svelte";
@@ -14,8 +14,7 @@
   import domtoimage from "dom-to-image";
   import { LogDebug } from "../wailsjs/runtime/runtime.js";
 
-  type Page = "main" | "config";
-  let currentPage: Page = "main";
+  let currentPage: Page;
 
   let loadState: LoadState;
   let latestHash: string;
@@ -26,26 +25,24 @@
 
   setInterval(looper, 1000);
 
-  function onClickMenu(menu: NavigationMenu) {
-    switch (menu) {
-      case "main":
-        currentPage = "main";
-        break;
-      case "config":
-        currentPage = "config";
-        break;
-      case "reload":
-        WindowReloadApp();
-        break;
-      default:
-        break;
-    }
-  }
-
   function deriveFilename(meta: vo.Meta): string {
     const date = battle.meta.date.replaceAll(":", "-").replaceAll(" ", "-");
     const ownShip = battle.meta.own_ship.replaceAll(" ", "-");
     return `${date}_${ownShip}_${battle.meta.arena}_${battle.meta.type}.png`;
+  }
+
+  async function onScrrenshot() {
+    try {
+      const dataUrl = (await domtoimage.toPng(
+        document.getElementById("mainpage")
+      )) as string;
+      const filename = deriveFilename(battle.meta);
+      const base64Data = dataUrl.split(",")[1];
+      await SaveScreenshotWithDialog(filename, base64Data);
+      notification.showToast("スクリーンショットを保存しました。", "success");
+    } catch (error) {
+      notification.showToast(error, "error");
+    }
   }
 
   async function looper() {
@@ -116,7 +113,10 @@
   <div style="font-size: {config?.font_size || 'medium'};">
     <Notification bind:this={notification} />
 
-    <Navigation on:onClickMemu={(event) => onClickMenu(event.detail.menu)} />
+    <Navigation
+      bind:currentPage
+      on:SaveScreenshotWithDialog={() => onScrrenshot()}
+    />
 
     {#if currentPage === "config"}
       <ConfigPage
