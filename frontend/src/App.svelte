@@ -3,7 +3,7 @@
   import {
     GetConfig,
     GetTempArenaInfoHash,
-    Load,
+    GetBattle,
     SaveScreenshot,
   } from "../wailsjs/go/main/App.js";
   import type { vo } from "wailsjs/go/models.js";
@@ -19,7 +19,7 @@
 
   let loadState: LoadState;
   let latestHash: string;
-  let teams: vo.Team[];
+  let battle: vo.Battle;
   let config: vo.UserConfig;
 
   let notification: Notification;
@@ -42,8 +42,10 @@
     }
   }
 
-  async function sleep(ms: number) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
+  function deriveFilename(meta: vo.Meta): string {
+    const date = battle.meta.date.replaceAll(":", "-").replaceAll(" ", "-");
+    const ownShip = battle.meta.own_ship.replaceAll(" ", "-");
+    return `${date}_${ownShip}_${battle.meta.arena}_${battle.meta.type}.png`;
   }
 
   async function looper() {
@@ -84,7 +86,7 @@
     loadState = "fetching";
     try {
       const start = new Date().getTime();
-      teams = await Load();
+      battle = await GetBattle();
       latestHash = hash;
       loadState = "standby";
 
@@ -100,8 +102,9 @@
         const dataUrl = (await domtoimage.toPng(
           document.getElementById("mainpage")
         )) as string;
+        const filename = deriveFilename(battle.meta);
         const base64Data = dataUrl.split(",")[1];
-        await SaveScreenshot(base64Data);
+        await SaveScreenshot(filename, base64Data);
       } catch (error) {
         notification.showToast(error, "error");
       }
@@ -126,7 +129,7 @@
 
     {#if currentPage === "main"}
       <div id="mainpage">
-        <MainPage bind:loadState bind:latestHash bind:teams bind:config />
+        <MainPage bind:loadState bind:latestHash bind:battle bind:config />
       </div>
     {/if}
   </div>

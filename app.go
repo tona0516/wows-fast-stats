@@ -38,14 +38,14 @@ func (a *App) GetTempArenaInfoHash() (string, error) {
 	return statsService.GetTempArenaInfoHash()
 }
 
-func (a *App) Load() ([]vo.Team, error) {
+func (a *App) GetBattle() (vo.Battle, error) {
 	statsService := service.StatsService{
 		InstallPath: a.config.InstallPath,
 		AppID:       a.config.Appid,
 		Parallels:   5,
 	}
 
-	return statsService.GetsStats()
+	return statsService.GetsBattle()
 }
 
 func (a *App) SelectDirectory() (string, error) {
@@ -69,7 +69,7 @@ func (a *App) ApplyConfig(config vo.UserConfig) (vo.UserConfig, error) {
 	return updatedConfig, nil
 }
 
-func (a *App) SaveScreenshot(base64Data string) error {
+func (a *App) SaveScreenshot(filename string, base64Data string) error {
 	screenshotService := service.ScreenshotService{}
-	return screenshotService.Save(base64Data)
+	return screenshotService.Save(filename, base64Data)
 }

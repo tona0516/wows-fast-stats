@@ -6,6 +6,10 @@ export function ApplyConfig(arg1) {
   return window['go']['main']['App']['ApplyConfig'](arg1);
 }
 
+export function GetBattle() {
+  return window['go']['main']['App']['GetBattle']();
+}
+
 export function GetConfig() {
   return window['go']['main']['App']['GetConfig']();
 }
@@ -14,12 +18,8 @@ export function GetTempArenaInfoHash() {
   return window['go']['main']['App']['GetTempArenaInfoHash']();
 }
 
-export function Load() {
-  return window['go']['main']['App']['Load']();
-}
-
-export function SaveScreenshot(arg1) {
-  return window['go']['main']['App']['SaveScreenshot'](arg1);
+export function SaveScreenshot(arg1, arg2) {
+  return window['go']['main']['App']['SaveScreenshot'](arg1, arg2);
 }
 
 export function SelectDirectory() {

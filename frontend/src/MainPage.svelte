@@ -11,7 +11,7 @@
 
   export let loadState: LoadState = "standby";
   export let latestHash: string = "";
-  export let teams: vo.Team[] = [];
+  export let battle: vo.Battle;
   export let config: vo.UserConfig = Const.DEFAULT_USER_CONFIG;
 
   /**
@@ -111,12 +111,14 @@
   }
 
   function renderTdForTeamSummary(
-    teams: vo.Team[],
+    battle: vo.Battle,
     key: string,
     digits: number
   ): string {
-    const value1Round = +teams[0]["team_average"][key].toFixed(digits);
-    const value2Round = +teams[1]["team_average"][key].toFixed(digits);
+    const value1Round =
+      +battle["teams"][0]["team_average"][key].toFixed(digits);
+    const value2Round =
+      +battle["teams"][1]["team_average"][key].toFixed(digits);
 
     let value1Class = "";
     let value2Class = "";
@@ -148,9 +150,9 @@
 {/if}
 
 {#if latestHash !== ""}
-  <div class="mt-1 mx-4">
+  <div class="mt-2 mx-4">
     <span> プレイヤー統計 </span>
-    {#each teams as team}
+    {#each battle.teams as team}
       <table class="table table-sm">
         <thead>
           <tr>
@@ -432,47 +434,72 @@
     {/each}
   </div>
 
-  <div class="mt-1">
-    <span> チームサマリー </span>
-    <table class="table table-sm w-auto" align="center">
-      <thead>
+  <div class="mt-2 row">
+    <div class="col">
+      <span> 戦闘サマリー </span>
+      <table class="table table-sm w-auto" align="center">
         <tr>
-          <th />
-          {#each teams as team}
-            <th>{team.name}</th>
-          {/each}
+          <th>項目</th>
+          <th>値</th>
         </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>PR</td>
-          {@html renderTdForTeamSummary(teams, "personal_rating", 0)}
-        </tr>
-        <tr>
-          <td>S:Dmg</td>
-          {@html renderTdForTeamSummary(teams, "damage_by_ship", 0)}
-        </tr>
-        <tr>
-          <td>S:勝率</td>
-          {@html renderTdForTeamSummary(teams, "win_rate_by_ship", 1)}
-        </tr>
-        <tr>
-          <td>S:K/D</td>
-          {@html renderTdForTeamSummary(teams, "kd_rate_by_ship", 1)}
-        </tr>
-        <tr>
-          <td>P:Dmg</td>
-          {@html renderTdForTeamSummary(teams, "damage_by_player", 0)}
-        </tr>
-        <tr>
-          <td>P:勝率</td>
-          {@html renderTdForTeamSummary(teams, "win_rate_by_player", 1)}
-        </tr>
-        <tr>
-          <td>P:K/D</td>
-          {@html renderTdForTeamSummary(teams, "kd_rate_by_player", 1)}
-        </tr>
-      </tbody>
-    </table>
+        <tbody>
+          <tr>
+            <td>開始時刻</td>
+            <td>{battle.meta.date}</td>
+          </tr>
+          <tr>
+            <td>マップ</td>
+            <td>{battle.meta.arena}</td>
+          </tr>
+          <tr>
+            <td>戦闘タイプ</td>
+            <td>{battle.meta.type}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="col">
+      <span> チームサマリー </span>
+      <table class="table table-sm w-auto" align="center">
+        <thead>
+          <tr>
+            <th />
+            {#each battle.teams as team}
+              <th>{team.name}</th>
+            {/each}
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>PR</td>
+            {@html renderTdForTeamSummary(battle, "personal_rating", 0)}
+          </tr>
+          <tr>
+            <td>S:Dmg</td>
+            {@html renderTdForTeamSummary(battle, "damage_by_ship", 0)}
+          </tr>
+          <tr>
+            <td>S:勝率</td>
+            {@html renderTdForTeamSummary(battle, "win_rate_by_ship", 1)}
+          </tr>
+          <tr>
+            <td>S:K/D</td>
+            {@html renderTdForTeamSummary(battle, "kd_rate_by_ship", 1)}
+          </tr>
+          <tr>
+            <td>P:Dmg</td>
+            {@html renderTdForTeamSummary(battle, "damage_by_player", 0)}
+          </tr>
+          <tr>
+            <td>P:勝率</td>
+            {@html renderTdForTeamSummary(battle, "win_rate_by_player", 1)}
+          </tr>
+          <tr>
+            <td>P:K/D</td>
+            {@html renderTdForTeamSummary(battle, "kd_rate_by_player", 1)}
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 {/if}

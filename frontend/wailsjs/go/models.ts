@@ -1,45 +1,27 @@
 export namespace vo {
 	
-	export class Displays {
-	    pr: boolean;
-	    ship_damage: boolean;
-	    ship_win_rate: boolean;
-	    ship_kd_rate: boolean;
-	    ship_win_survived_rate: boolean;
-	    ship_lose_survived_rate: boolean;
-	    ship_exp: boolean;
-	    ship_battles: boolean;
-	    player_damage: boolean;
-	    player_win_rate: boolean;
-	    player_kd_rate: boolean;
-	    player_win_survived_rate: boolean;
-	    player_lose_survived_rate: boolean;
-	    player_exp: boolean;
-	    player_battles: boolean;
-	    player_avg_tier: boolean;
+	export class TeamAverage {
+	    personal_rating: number;
+	    damage_by_ship: number;
+	    win_rate_by_ship: number;
+	    kd_rate_by_ship: number;
+	    damage_by_player: number;
+	    win_rate_by_player: number;
+	    kd_rate_by_player: number;
 	
 	    static createFrom(source: any = {}) {
-	        return new Displays(source);
+	        return new TeamAverage(source);
 	    }
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.pr = source["pr"];
-	        this.ship_damage = source["ship_damage"];
-	        this.ship_win_rate = source["ship_win_rate"];
-	        this.ship_kd_rate = source["ship_kd_rate"];
-	        this.ship_win_survived_rate = source["ship_win_survived_rate"];
-	        this.ship_lose_survived_rate = source["ship_lose_survived_rate"];
-	        this.ship_exp = source["ship_exp"];
-	        this.ship_battles = source["ship_battles"];
-	        this.player_damage = source["player_damage"];
-	        this.player_win_rate = source["player_win_rate"];
-	        this.player_kd_rate = source["player_kd_rate"];
-	        this.player_win_survived_rate = source["player_win_survived_rate"];
-	        this.player_lose_survived_rate = source["player_lose_survived_rate"];
-	        this.player_exp = source["player_exp"];
-	        this.player_battles = source["player_battles"];
-	        this.player_avg_tier = source["player_avg_tier"];
+	        this.personal_rating = source["personal_rating"];
+	        this.damage_by_ship = source["damage_by_ship"];
+	        this.win_rate_by_ship = source["win_rate_by_ship"];
+	        this.kd_rate_by_ship = source["kd_rate_by_ship"];
+	        this.damage_by_player = source["damage_by_player"];
+	        this.win_rate_by_player = source["win_rate_by_player"];
+	        this.kd_rate_by_player = source["kd_rate_by_player"];
 	    }
 	}
 	export class PlayerPlayerStats {
@@ -170,34 +152,6 @@ export namespace vo {
 		    return a;
 		}
 	}
-	
-	
-	
-	
-	export class TeamAverage {
-	    personal_rating: number;
-	    damage_by_ship: number;
-	    win_rate_by_ship: number;
-	    kd_rate_by_ship: number;
-	    damage_by_player: number;
-	    win_rate_by_player: number;
-	    kd_rate_by_player: number;
-	
-	    static createFrom(source: any = {}) {
-	        return new TeamAverage(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.personal_rating = source["personal_rating"];
-	        this.damage_by_ship = source["damage_by_ship"];
-	        this.win_rate_by_ship = source["win_rate_by_ship"];
-	        this.kd_rate_by_ship = source["kd_rate_by_ship"];
-	        this.damage_by_player = source["damage_by_player"];
-	        this.win_rate_by_player = source["win_rate_by_player"];
-	        this.kd_rate_by_player = source["kd_rate_by_player"];
-	    }
-	}
 	export class Team {
 	    players: Player[];
 	    name: string;
@@ -232,6 +186,105 @@ export namespace vo {
 		    return a;
 		}
 	}
+	export class Meta {
+	    date: string;
+	    arena: string;
+	    type: string;
+	    own_ship: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new Meta(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.date = source["date"];
+	        this.arena = source["arena"];
+	        this.type = source["type"];
+	        this.own_ship = source["own_ship"];
+	    }
+	}
+	export class Battle {
+	    meta: Meta;
+	    teams: Team[];
+	
+	    static createFrom(source: any = {}) {
+	        return new Battle(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.meta = this.convertValues(source["meta"], Meta);
+	        this.teams = this.convertValues(source["teams"], Team);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class Displays {
+	    pr: boolean;
+	    ship_damage: boolean;
+	    ship_win_rate: boolean;
+	    ship_kd_rate: boolean;
+	    ship_win_survived_rate: boolean;
+	    ship_lose_survived_rate: boolean;
+	    ship_exp: boolean;
+	    ship_battles: boolean;
+	    player_damage: boolean;
+	    player_win_rate: boolean;
+	    player_kd_rate: boolean;
+	    player_win_survived_rate: boolean;
+	    player_lose_survived_rate: boolean;
+	    player_exp: boolean;
+	    player_battles: boolean;
+	    player_avg_tier: boolean;
+	
+	    static createFrom(source: any = {}) {
+	        return new Displays(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.pr = source["pr"];
+	        this.ship_damage = source["ship_damage"];
+	        this.ship_win_rate = source["ship_win_rate"];
+	        this.ship_kd_rate = source["ship_kd_rate"];
+	        this.ship_win_survived_rate = source["ship_win_survived_rate"];
+	        this.ship_lose_survived_rate = source["ship_lose_survived_rate"];
+	        this.ship_exp = source["ship_exp"];
+	        this.ship_battles = source["ship_battles"];
+	        this.player_damage = source["player_damage"];
+	        this.player_win_rate = source["player_win_rate"];
+	        this.player_kd_rate = source["player_kd_rate"];
+	        this.player_win_survived_rate = source["player_win_survived_rate"];
+	        this.player_lose_survived_rate = source["player_lose_survived_rate"];
+	        this.player_exp = source["player_exp"];
+	        this.player_battles = source["player_battles"];
+	        this.player_avg_tier = source["player_avg_tier"];
+	    }
+	}
+	
+	
+	
+	
+	
+	
+	
 	
 	export class UserConfig {
 	    install_path: string;

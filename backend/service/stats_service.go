@@ -30,8 +30,8 @@ func (s *StatsService) GetTempArenaInfoHash() (string, error) {
     return result, nil
 }
 
-func (s *StatsService) GetsStats() ([]vo.Team, error) {
-    var result []vo.Team
+func (s *StatsService) GetsBattle() (vo.Battle, error) {
+    var result vo.Battle
 
 	wargaming := repo.Wargaming{AppID: s.AppID}
 	numbers := repo.Numbers{}
@@ -50,6 +50,8 @@ func (s *StatsService) GetsStats() ([]vo.Team, error) {
 	clanTagResult := make(chan vo.Result[map[int]string])
 	shipInfoResult := make(chan vo.Result[map[int]vo.ShipInfo])
 	expectedStatsResult := make(chan vo.Result[vo.NSExpectedStats])
+    battleArenasResult := make(chan vo.Result[vo.WGBattleArenas])
+    battleTypesResult := make(chan vo.Result[vo.WGBattleTypes])
 
 	go s.fetchAccountList(&wargaming, tempArenaInfo, accountListResult)
 	go s.fetchEncyclopediaInfo(&wargaming, encyclopediaInfoResult)
@@ -72,6 +74,8 @@ func (s *StatsService) GetsStats() ([]vo.Team, error) {
 
 	go s.fetchShipInfo(&wargaming, gameVersion, shipInfoResult)
 	go s.fetchExpectedStats(&numbers, gameVersion, expectedStatsResult)
+    go s.fetchBattleArenas(&wargaming, gameVersion, battleArenasResult)
+    go s.fetchBattleTypes(&wargaming, gameVersion, battleTypesResult)
 
 	accountInfo := <-accountInfoResult
 	if accountInfo.Error != nil {
@@ -102,6 +106,14 @@ func (s *StatsService) GetsStats() ([]vo.Team, error) {
             shipInfo.Value[k] = v
         }
     }
+    battleArenas := <-battleArenasResult
+    if battleArenas.Error != nil {
+        return result, battleArenas.Error
+    }
+    battleTypes := <-battleTypesResult
+    if battleTypes.Error != nil {
+        return result, battleTypes.Error
+    }
 
 	result = s.compose(
 		tempArenaInfo,
@@ -111,6 +123,8 @@ func (s *StatsService) GetsStats() ([]vo.Team, error) {
 		shipStats.Value,
 		shipInfo.Value,
 		expectedStats.Value,
+        battleArenas.Value,
+        battleTypes.Value,
 	)
 
 	return result, nil
@@ -290,6 +304,56 @@ func (s *StatsService) fetchExpectedStats(numbers *repo.Numbers, gameVersion str
 	result <- vo.Result[vo.NSExpectedStats]{Value: *expectedStats, Error: err}
 }
 
+func (s *StatsService) fetchBattleArenas(wargaming *repo.Wargaming, gameVersion string, result chan vo.Result[vo.WGBattleArenas]) {
+	cache := repo.Cache[vo.WGBattleArenas]{
+		FileName: "battlearenas_" + gameVersion + ".bin",
+	}
+
+	object, err := cache.Deserialize()
+	if err == nil {
+		result <- vo.Result[vo.WGBattleArenas]{Value: object, Error: nil}
+		return
+	}
+
+	battleArenas, err := wargaming.GetBattleArenas()
+	if err != nil {
+		result <- vo.Result[vo.WGBattleArenas]{Value: battleArenas, Error: err}
+		return
+	}
+
+	if err := cache.Serialize(battleArenas); err != nil {
+		result <- vo.Result[vo.WGBattleArenas]{Value: battleArenas, Error: err}
+		return
+	}
+
+    result <- vo.Result[vo.WGBattleArenas]{Value: battleArenas, Error: err}
+}
+
+func (s *StatsService) fetchBattleTypes(wargaming *repo.Wargaming, gameVersion string, result chan vo.Result[vo.WGBattleTypes]) {
+	cache := repo.Cache[vo.WGBattleTypes]{
+		FileName: "battletypes_" + gameVersion + ".bin",
+	}
+
+	object, err := cache.Deserialize()
+	if err == nil {
+		result <- vo.Result[vo.WGBattleTypes]{Value: object, Error: nil}
+		return
+	}
+
+	battleTypes, err := wargaming.GetBattleTypes()
+	if err != nil {
+		result <- vo.Result[vo.WGBattleTypes]{Value: battleTypes, Error: err}
+		return
+	}
+
+	if err := cache.Serialize(battleTypes); err != nil {
+		result <- vo.Result[vo.WGBattleTypes]{Value: battleTypes, Error: err}
+		return
+	}
+
+    result <- vo.Result[vo.WGBattleTypes]{Value: battleTypes, Error: err}
+}
+
 func (s *StatsService) compose(
 	tempArenaInfo vo.TempArenaInfo,
 	accountInfo vo.WGAccountInfo,
@@ -298,18 +362,25 @@ func (s *StatsService) compose(
 	shipStats map[int]vo.WGShipsStats,
 	shipInfo map[int]vo.ShipInfo,
 	expectedStats vo.NSExpectedStats,
-) []vo.Team {
+    battleArenas vo.WGBattleArenas,
+    battleTypes vo.WGBattleTypes,
+) vo.Battle {
     numbersURLGenerator := domain.NumbersURLGenerator{}
 
 	friends := make(vo.Players, 0)
 	enemies := make(vo.Players, 0)
 	rating := domain.Rating{}
 
+    var Ownship string
+
 	for i := range tempArenaInfo.Vehicles {
 		vehicle := tempArenaInfo.Vehicles[i]
 		playerShipInfo := shipInfo[vehicle.ShipID]
 
 		nickname := vehicle.Name
+        if nickname == tempArenaInfo.PlayerName {
+            Ownship = playerShipInfo.Name
+        }
 		accountID := accountList.AccountID(nickname)
 		clan := clanTag[accountID]
 
@@ -408,5 +479,15 @@ func (s *StatsService) compose(
         TeamAverage: enemies.TeamAverage(),
     })
 
-    return teams
+    battle := vo.Battle {
+        Meta: vo.Meta{
+            Date: tempArenaInfo.FormattedDateTime(),
+            Arena: tempArenaInfo.BattleArena(battleArenas),
+            Type: tempArenaInfo.BattleType(battleTypes),
+            OwnShip: Ownship,
+        },
+        Teams: teams,
+    }
+
+    return battle
 }

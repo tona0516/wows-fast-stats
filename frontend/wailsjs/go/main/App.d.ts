@@ -4,12 +4,12 @@ import {vo} from '../models';
 
 export function ApplyConfig(arg1:vo.UserConfig):Promise<vo.UserConfig>;
 
+export function GetBattle():Promise<vo.Battle>;
+
 export function GetConfig():Promise<vo.UserConfig>;
 
 export function GetTempArenaInfoHash():Promise<string>;
 
-export function Load():Promise<Array<vo.Team>>;
-
-export function SaveScreenshot(arg1:string):Promise<void>;
+export function SaveScreenshot(arg1:string,arg2:string):Promise<void>;
 
 export function SelectDirectory():Promise<string>;

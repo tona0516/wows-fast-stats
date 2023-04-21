@@ -188,3 +188,39 @@ func (w *Wargaming) GetEncyclopediaInfo() (vo.WGEncyclopediaInfo, error) {
 	}
 	return res, err
 }
+
+func (w *Wargaming) GetBattleArenas() (vo.WGBattleArenas, error) {
+	u := buildUrl(
+		"/wows/encyclopedia/battlearenas/",
+		map[string]string{
+			"application_id": w.AppID,
+			"fields":         "name",
+            "language": "ja",
+		},
+	)
+
+	client := ApiClient[vo.WGBattleArenas]{}
+	res, err := client.GetRequest(u.String())
+	if res.Status == "error" {
+		return res, errors.New(res.Error.Message)
+	}
+	return res, err
+}
+
+func (w *Wargaming) GetBattleTypes() (vo.WGBattleTypes, error) {
+	u := buildUrl(
+		"/wows/encyclopedia/battletypes/",
+		map[string]string{
+			"application_id": w.AppID,
+			"fields":         "name",
+            "language": "ja",
+		},
+	)
+
+	client := ApiClient[vo.WGBattleTypes]{}
+	res, err := client.GetRequest(u.String())
+	if res.Status == "error" {
+		return res, errors.New(res.Error.Message)
+	}
+	return res, err
+}
