@@ -1,1 +1,0 @@
-type Page = "main" | "config";

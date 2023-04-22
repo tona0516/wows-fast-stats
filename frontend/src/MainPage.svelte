@@ -151,7 +151,6 @@
 
 {#if latestHash !== ""}
   <div class="mt-2 mx-4">
-    <span> プレイヤー統計 </span>
     {#each battle.teams as team}
       <table class="table table-sm">
         <thead>
@@ -434,14 +433,9 @@
     {/each}
   </div>
 
-  <div class="mt-2 row">
-    <div class="col">
-      <span> 戦闘サマリー </span>
-      <table class="table table-sm w-auto" align="center">
-        <tr>
-          <th>項目</th>
-          <th>値</th>
-        </tr>
+  <div class="mt-2 mx-4 d-flex flex-row">
+    <div class="mx-2">
+      <table class="table table-sm w-auto">
         <tbody>
           <tr>
             <td>開始時刻</td>
@@ -458,9 +452,8 @@
         </tbody>
       </table>
     </div>
-    <div class="col">
-      <span> チームサマリー </span>
-      <table class="table table-sm w-auto" align="center">
+    <div class="mx-2">
+      <table class="table table-sm w-auto">
         <thead>
           <tr>
             <th />

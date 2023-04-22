@@ -9,13 +9,18 @@
   import Notification from "./Notification.svelte";
   import ConfigPage from "./ConfigPage.svelte";
   import MainPage from "./MainPage.svelte";
-  import Navigation from "./Navigation.svelte";
   import domtoimage from "dom-to-image";
-  import { LogDebug } from "../wailsjs/runtime/runtime.js";
+  import { LogDebug, WindowReloadApp } from "../wailsjs/runtime/runtime.js";
+  import HomeIcon from "./HomeIcon.svelte";
+  import ConfigIcon from "./ConfigIcon.svelte";
+  import ReloadIcon from "./ReloadIcon.svelte";
+  import CameraIcon from "./CameraIcon.svelte";
 
+  type NavigationMenu = "main" | "config" | "reload" | "screenshot";
   type ScreenshotType = "auto" | "manual";
+  type Page = "main" | "config";
 
-  let currentPage: Page;
+  let currentPage: Page = "main";
 
   let loadState: LoadState;
   let latestHash: string;
@@ -25,6 +30,24 @@
   let notification: Notification;
 
   setInterval(looper, 1000);
+
+  function onClickMenu(menu: NavigationMenu) {
+    switch (menu) {
+      case "main":
+        currentPage = "main";
+        break;
+      case "config":
+        currentPage = "config";
+        break;
+      case "reload":
+        WindowReloadApp();
+        break;
+      case "screenshot":
+        saveScreenshot("manual");
+      default:
+        break;
+    }
+  }
 
   function saveScreenshot(type: ScreenshotType) {
     domtoimage
@@ -111,12 +134,68 @@
 
 <main>
   <div style="font-size: {config?.font_size || 'medium'};">
-    <Notification bind:this={notification} />
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <div class="container-fluid">
+        <span class="navbar-brand">wows-fast-stats</span>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNavAltMarkup"
+          aria-controls="navbarNavAltMarkup"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon" />
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+          <div class="navbar-nav">
+            <button
+              type="button"
+              class="btn btn-outline-secondary mx-1"
+              title="ホーム"
+              on:click={() => onClickMenu("main")}
+            >
+              <HomeIcon />
+            </button>
+            <button
+              type="button"
+              class="btn btn-outline-secondary mx-1"
+              title="設定"
+              on:click={() => onClickMenu("config")}
+            >
+              <ConfigIcon />
+            </button>
+            {#if currentPage == "main"}
+              <button
+                type="button"
+                class="btn btn-outline-success mx-1"
+                title="リロード"
+                on:click={() => onClickMenu("reload")}
+              >
+                <ReloadIcon />
+              </button>
 
-    <Navigation
-      bind:currentPage
-      on:SaveScreenshotWithDialog={() => saveScreenshot("manual")}
-    />
+              <button
+                type="button"
+                class="btn btn-outline-success mx-1"
+                title="スクリーンショット"
+                disabled={battle === undefined || loadState === "fetching"}
+                on:click={() => onClickMenu("screenshot")}
+              >
+                <CameraIcon />
+              </button>
+            {/if}
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    {#if currentPage === "main"}
+      <div id="mainpage">
+        <MainPage bind:loadState bind:latestHash bind:battle bind:config />
+      </div>
+    {/if}
 
     {#if currentPage === "config"}
       <ConfigPage
@@ -127,10 +206,6 @@
       />
     {/if}
 
-    {#if currentPage === "main"}
-      <div id="mainpage">
-        <MainPage bind:loadState bind:latestHash bind:battle bind:config />
-      </div>
-    {/if}
+    <Notification bind:this={notification} />
   </div>
 </main>
