@@ -120,6 +120,17 @@
             <input
               class="form-check-input"
               type="checkbox"
+              id="player-name"
+              bind:checked={inputConfig.displays.player_name}
+            />
+            <label class="form-check-label" for="player-name"
+              >プレイヤー名</label
+            >
+          </div>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="checkbox"
               id="pr"
               bind:checked={inputConfig.displays.pr}
             />

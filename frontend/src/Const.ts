@@ -6,6 +6,7 @@ namespace Const {
         appid: "",
         font_size: "medium",
         displays: {
+            player_name: true,
             pr: true,
             ship_damage: true,
             ship_win_rate: true,
@@ -22,10 +23,12 @@ namespace Const {
             player_exp: false,
             player_battles: true,
             player_avg_tier: false,
+            player_using_ship_type_rate: false
         },
         convertValues: function (a: any, classs: any, asMap?: boolean) {
             throw new Error("Function not implemented.");
-        }
+        },
+        save_screenshot: false
     };
 }
 

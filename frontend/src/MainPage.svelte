@@ -159,7 +159,9 @@
       <table class="table table-sm">
         <thead>
           <tr>
-            <th>プレイヤー</th>
+            {#if config.displays.player_name}
+              <th>プレイヤー</th>
+            {/if}
             <th class="border-right">艦</th>
             {#if config.displays.pr}
               <th>PR</th>
@@ -219,19 +221,22 @@
             {@const dataPattern = decidePlayerDataPattern(player)}
             <tr class={backgroundClass(player.ship_stats.personal_rating)}>
               <!-- player name -->
-              <td class="name omit">
-                <!-- svelte-ignore a11y-invalid-attribute -->
-                <a
-                  href="#"
-                  on:click={() => BrowserOpenURL(player.player_info.stats_url)}
-                >
-                  {#if player.player_info.clan}
-                    [{player.player_info.clan}]{player.player_info.name}
-                  {:else}
-                    {player.player_info.name}
-                  {/if}
-                </a>
-              </td>
+              {#if config.displays.player_name}
+                <td class="name omit">
+                  <!-- svelte-ignore a11y-invalid-attribute -->
+                  <a
+                    href="#"
+                    on:click={() =>
+                      BrowserOpenURL(player.player_info.stats_url)}
+                  >
+                    {#if player.player_info.clan}
+                      [{player.player_info.clan}]{player.player_info.name}
+                    {:else}
+                      {player.player_info.name}
+                    {/if}
+                  </a>
+                </td>
+              {/if}
 
               <!-- ship info -->
               <td class="name omit border-right">

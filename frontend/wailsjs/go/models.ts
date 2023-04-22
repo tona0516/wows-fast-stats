@@ -277,6 +277,7 @@ export namespace vo {
 		}
 	}
 	export class Displays {
+	    player_name: boolean;
 	    pr: boolean;
 	    ship_damage: boolean;
 	    ship_win_rate: boolean;
@@ -301,6 +302,7 @@ export namespace vo {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.player_name = source["player_name"];
 	        this.pr = source["pr"];
 	        this.ship_damage = source["ship_damage"];
 	        this.ship_win_rate = source["ship_win_rate"];
