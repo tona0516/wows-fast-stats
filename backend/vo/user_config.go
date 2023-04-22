@@ -17,6 +17,7 @@ type Displays struct {
     PlayerExp bool `json:"player_exp"`
     PlayerBattles bool `json:"player_battles"`
     PlayerAvgTier bool `json:"player_avg_tier"`
+    PlayerUsingShipTypeRate bool `json:"player_using_ship_type_rate"`
 }
 
 type UserConfig struct {

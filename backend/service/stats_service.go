@@ -452,6 +452,7 @@ func (s *StatsService) compose(
 				KdRate:    statsCalculator.PlayerKdRate(),
                 Exp: statsCalculator.PlayerAvgExp(),
 				AvgTier:   statsCalculator.PlayerAvgTier(accountID, shipInfo, shipStats),
+                UsingShipTypeRate: statsCalculator.UsingShipTypeRate(accountID, shipInfo, shipStats),
 			},
 		}
 

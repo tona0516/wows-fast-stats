@@ -128,6 +128,10 @@ a {
   text-align: right;
 }
 
+.using_ship_type_rate {
+  min-width: 120px;
+}
+
 .omit {
   overflow: hidden;
   text-overflow: ellipsis;

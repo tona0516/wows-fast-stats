@@ -24,6 +24,26 @@ export namespace vo {
 	        this.kd_rate_by_player = source["kd_rate_by_player"];
 	    }
 	}
+	export class ShipTypeValue {
+	    ss: number;
+	    dd: number;
+	    cl: number;
+	    bb: number;
+	    cv: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new ShipTypeValue(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.ss = source["ss"];
+	        this.dd = source["dd"];
+	        this.cl = source["cl"];
+	        this.bb = source["bb"];
+	        this.cv = source["cv"];
+	    }
+	}
 	export class PlayerPlayerStats {
 	    battles: number;
 	    avg_damage: number;
@@ -33,6 +53,7 @@ export namespace vo {
 	    kd_rate: number;
 	    exp: number;
 	    avg_tier: number;
+	    using_ship_type_rate: ShipTypeValue;
 	
 	    static createFrom(source: any = {}) {
 	        return new PlayerPlayerStats(source);
@@ -48,7 +69,26 @@ export namespace vo {
 	        this.kd_rate = source["kd_rate"];
 	        this.exp = source["exp"];
 	        this.avg_tier = source["avg_tier"];
+	        this.using_ship_type_rate = this.convertValues(source["using_ship_type_rate"], ShipTypeValue);
 	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
 	}
 	export class PlayerPlayerInfo {
 	    id: number;
@@ -253,6 +293,7 @@ export namespace vo {
 	    player_exp: boolean;
 	    player_battles: boolean;
 	    player_avg_tier: boolean;
+	    player_using_ship_type_rate: boolean;
 	
 	    static createFrom(source: any = {}) {
 	        return new Displays(source);
@@ -276,8 +317,10 @@ export namespace vo {
 	        this.player_exp = source["player_exp"];
 	        this.player_battles = source["player_battles"];
 	        this.player_avg_tier = source["player_avg_tier"];
+	        this.player_using_ship_type_rate = source["player_using_ship_type_rate"];
 	    }
 	}
+	
 	
 	
 	

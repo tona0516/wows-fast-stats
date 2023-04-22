@@ -1,6 +1,8 @@
 package domain
 
-import "changeme/backend/vo"
+import (
+	"changeme/backend/vo"
+)
 
 
 type Stats struct {
@@ -118,11 +120,11 @@ func (s *StatsCalculator) PlayerAvgTier(accountID int, shipInfo map[int]vo.ShipI
 	var sum uint = 0
 	var battles uint = 0
 	playerShipStats := shipStats[accountID].Data[accountID]
-	for i := range playerShipStats {
-		shipID := playerShipStats[i].ShipID
+	for _, ship := range playerShipStats {
+		shipID := ship.ShipID
 		tier := shipInfo[shipID].Tier
-		sum += playerShipStats[i].Pvp.Battles * tier
-		battles += playerShipStats[i].Pvp.Battles
+		sum += ship.Pvp.Battles * tier
+		battles += ship.Pvp.Battles
 	}
 
 	if battles == 0 {
@@ -130,4 +132,36 @@ func (s *StatsCalculator) PlayerAvgTier(accountID int, shipInfo map[int]vo.ShipI
 	} else {
 		return float64(sum) / float64(battles)
 	}
+}
+
+func (s *StatsCalculator) UsingShipTypeRate(accountID int, shipInfo map[int]vo.ShipInfo, shipStats map[int]vo.WGShipsStats) vo.ShipTypeValue {
+    var result vo.ShipTypeValue
+    shipTypeMap := make(map[string]float64, 0)
+    var allBattles uint
+
+    playerShipStats := shipStats[accountID].Data[accountID]
+	for _, ship := range playerShipStats {
+        if ship.Pvp.Battles != 0 {
+            shipID := ship.ShipID
+            shipType := shipInfo[shipID].Type
+            shipTypeMap[shipType] += 1
+            allBattles += 1
+        }
+	}
+
+    if allBattles == 0 {
+        return result
+    }
+
+    for k, v := range shipTypeMap {
+        shipTypeMap[k] = v / float64(allBattles) * 100
+    }
+
+    result.Ss = shipTypeMap["Submarine"]
+    result.Dd = shipTypeMap["Destroyer"]
+    result.Cl = shipTypeMap["Cruiser"]
+    result.Bb = shipTypeMap["Battleship"]
+    result.Cv = shipTypeMap["AirCarrier"]
+
+    return result
 }

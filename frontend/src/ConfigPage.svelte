@@ -282,6 +282,17 @@
             />
             <label class="form-check-label" for="avg-tier">総合:平均Tier</label>
           </div>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              id="player_using_ship_type_rate"
+              bind:checked={inputConfig.displays.player_using_ship_type_rate}
+            />
+            <label class="form-check-label" for="player_using_ship_type_rate"
+              >総合:使用艦率(SS|DD|CL|BB|CV)</label
+            >
+          </div>
         </div>
       </div>
 

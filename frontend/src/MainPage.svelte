@@ -5,7 +5,7 @@
   import iconDD from "./assets/images/icon-dd.png";
   import iconSS from "./assets/images/icon-ss.png";
   import iconNone from "./assets/images/icon-none.png";
-  import { BrowserOpenURL } from "../wailsjs/runtime/runtime";
+  import { BrowserOpenURL, LogDebug } from "../wailsjs/runtime/runtime";
   import type { vo } from "wailsjs/go/models";
   import Const from "./Const";
 
@@ -90,6 +90,7 @@
         value -= decimal[i];
       }
     }
+
     return romanized;
   }
 
@@ -138,6 +139,20 @@
 
   function countDisplays(config: vo.UserConfig): number {
     return Object.values(config.displays).filter((it) => it === true).length;
+  }
+
+  function formatUsingShipTypeRate(value: vo.ShipTypeValue): string {
+    const array = [
+      spacePadding(value.ss.toFixed(1), 4),
+      spacePadding(value.dd.toFixed(1), 4),
+      spacePadding(value.cl.toFixed(1), 4),
+      spacePadding(value.bb.toFixed(1), 4),
+      spacePadding(value.cv.toFixed(1), 4),
+    ];
+
+    LogDebug(JSON.stringify(array));
+
+    return array.join(" | ");
   }
 </script>
 
@@ -204,6 +219,9 @@
             {/if}
             {#if config.displays.player_avg_tier}
               <th>P:平均T</th>
+            {/if}
+            {#if config.displays.player_using_ship_type_rate}
+              <th>P:使用艦率</th>
             {/if}
           </tr>
         </thead>
@@ -423,6 +441,51 @@
                 {#if dataPattern === "noshipstats" || dataPattern === "full" || dataPattern === "nopr"}
                   <td class="avg-tier">
                     {player.player_player_stats.avg_tier.toFixed(1)}
+                  </td>
+                {/if}
+              {/if}
+
+              <!-- using ship type rate -->
+              {#if config.displays.player_using_ship_type_rate}
+                {#if dataPattern === "noshipstats" || dataPattern === "full" || dataPattern === "nopr"}
+                  <td class="using_ship_type_rate">
+                    <div class="progress">
+                      <div
+                        class="progress-bar progress-bar-striped bg-primary"
+                        role="progressbar"
+                        style="width: {player.player_player_stats.using_ship_type_rate.ss.toFixed(
+                          0
+                        )}%"
+                      />
+                      <div
+                        class="progress-bar progress-bar-striped bg-info"
+                        role="progressbar"
+                        style="width: {player.player_player_stats.using_ship_type_rate.dd.toFixed(
+                          0
+                        )}%"
+                      />
+                      <div
+                        class="progress-bar progress-bar-striped bg-success"
+                        role="progressbar"
+                        style="width: {player.player_player_stats.using_ship_type_rate.cl.toFixed(
+                          0
+                        )}%"
+                      />
+                      <div
+                        class="progress-bar progress-bar-striped bg-warning"
+                        role="progressbar"
+                        style="width: {player.player_player_stats.using_ship_type_rate.bb.toFixed(
+                          0
+                        )}%"
+                      />
+                      <div
+                        class="progress-bar progress-bar-striped bg-danger"
+                        role="progressbar"
+                        style="width: {player.player_player_stats.using_ship_type_rate.cv.toFixed(
+                          0
+                        )}%"
+                      />
+                    </div>
                   </td>
                 {/if}
               {/if}
