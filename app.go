@@ -1,7 +1,6 @@
 package main
 
 import (
-	"changeme/backend/repo"
 	"changeme/backend/service"
 	"changeme/backend/vo"
 	"context"
@@ -11,8 +10,10 @@ import (
 
 // App struct
 type App struct {
-	ctx    context.Context
-	config vo.UserConfig
+	ctx           context.Context
+	configService service.ConfigService
+	userConfig    vo.UserConfig
+	appConfig     vo.AppConfig
 }
 
 // NewApp creates a new App application struct
@@ -24,24 +25,38 @@ func NewApp() *App {
 // so we can call the runtime methods
 func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
-	configAdapter := repo.ConfigAdapter{}
-	config, _ := configAdapter.Read()
-	a.config = config
+	a.configService = service.ConfigService{}
+	a.userConfig, _ = a.configService.ReadUserConfig()
+	a.appConfig, _ = a.configService.ReadAppConfig()
+
+	window := a.appConfig.Window
+	if window.Width != 0 && window.Height != 0 {
+		runtime.WindowSetSize(ctx, window.Width, window.Height)
+	}
+}
+
+func (a *App) beforeClose(ctx context.Context) (prevent bool) {
+	width, height := runtime.WindowGetSize(ctx)
+	a.appConfig.Window.Width = width
+	a.appConfig.Window.Height = height
+	a.configService.UpdateAppConfig(a.appConfig)
+
+	return false
 }
 
 func (a *App) GetTempArenaInfoHash() (string, error) {
 	statsService := service.StatsService{
-        Parallels:   5,
+		Parallels: 5,
 	}
-	return statsService.GetTempArenaInfoHash(a.config.InstallPath)
+	return statsService.GetTempArenaInfoHash(a.userConfig.InstallPath)
 }
 
 func (a *App) GetBattle() (vo.Battle, error) {
 	statsService := service.StatsService{
-		Parallels:   5,
+		Parallels: 5,
 	}
 
-	return statsService.GetsBattle(a.config.InstallPath, a.config.Appid)
+	return statsService.GetsBattle(a.userConfig.InstallPath, a.userConfig.Appid)
 }
 
 func (a *App) SelectDirectory() (string, error) {
@@ -50,18 +65,18 @@ func (a *App) SelectDirectory() (string, error) {
 
 func (a *App) GetConfig() (vo.UserConfig, error) {
 	configService := service.ConfigService{}
-	return configService.Read()
+	return configService.ReadUserConfig()
 }
 
 func (a *App) ApplyConfig(config vo.UserConfig) (vo.UserConfig, error) {
 	configService := service.ConfigService{}
 
-	updatedConfig, err := configService.Update(config)
+	updatedConfig, err := configService.UpdateUserConfig(config)
 	if err != nil {
 		return updatedConfig, err
 	}
 
-	a.config = updatedConfig
+	a.userConfig = updatedConfig
 	return updatedConfig, nil
 }
 

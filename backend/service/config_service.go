@@ -10,21 +10,38 @@ import (
 
 type ConfigService struct{}
 
-func (c *ConfigService) Read() (vo.UserConfig, error) {
+func (c *ConfigService) ReadUserConfig() (vo.UserConfig, error) {
     var config vo.UserConfig
     configAdapter := repo.ConfigAdapter{}
-    config, err := configAdapter.Read()
+    config, err := configAdapter.ReadUserConfig()
     return config, err
 }
 
-func (c *ConfigService) Update(config vo.UserConfig) (vo.UserConfig, error) {
+func (c *ConfigService) UpdateUserConfig(config vo.UserConfig) (vo.UserConfig, error) {
     configAdapter := repo.ConfigAdapter{}
 
     if err := validate(config); err != nil {
         return config, err
     }
 
-    if err := configAdapter.Update(config); err != nil {
+    if err := configAdapter.UpdateUserConfig(config); err != nil {
+        return config, err
+    }
+
+    return config, nil
+}
+
+func (c *ConfigService) ReadAppConfig() (vo.AppConfig, error) {
+    var config vo.AppConfig
+    configAdapter := repo.ConfigAdapter{}
+    config, err := configAdapter.ReadAppConfig()
+    return config, err
+}
+
+func (c *ConfigService) UpdateAppConfig(config vo.AppConfig) (vo.AppConfig, error) {
+    configAdapter := repo.ConfigAdapter{}
+
+    if err := configAdapter.UpdateAppConfig(config); err != nil {
         return config, err
     }
 
