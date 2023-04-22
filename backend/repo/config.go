@@ -7,10 +7,10 @@ import (
 	"path/filepath"
 )
 
-type ConfigAdapter struct {
+type Config struct {
 }
 
-func (c *ConfigAdapter) ReadUserConfig() (vo.UserConfig, error) {
+func (c *Config) User() (vo.UserConfig, error) {
     os.Mkdir("config", 0755)
 
     // note: set default value
@@ -26,7 +26,7 @@ func (c *ConfigAdapter) ReadUserConfig() (vo.UserConfig, error) {
     return config, err
 }
 
-func (c *ConfigAdapter) UpdateUserConfig(config vo.UserConfig) error {
+func (c *Config) UpdateUser(config vo.UserConfig) error {
     os.Mkdir("config", 0755)
 
     file, err := os.Create(filepath.Join("config", "user.json"))
@@ -40,7 +40,7 @@ func (c *ConfigAdapter) UpdateUserConfig(config vo.UserConfig) error {
     return err
 }
 
-func (c *ConfigAdapter) ReadAppConfig() (vo.AppConfig, error) {
+func (c *Config) App() (vo.AppConfig, error) {
     var config vo.AppConfig
     os.Mkdir("config", 0755)
 
@@ -53,7 +53,7 @@ func (c *ConfigAdapter) ReadAppConfig() (vo.AppConfig, error) {
     return config, err
 }
 
-func (c *ConfigAdapter) UpdateAppConfig(config vo.AppConfig) error {
+func (c *Config) UpdateApp(config vo.AppConfig) error {
     os.Mkdir("config", 0755)
 
     file, err := os.Create(filepath.Join("config", "app.json"))

@@ -1,8 +1,8 @@
 <script lang="ts">
   import {
-    GetConfig,
-    GetTempArenaInfoHash,
-    GetBattle,
+    UserConfig,
+    TempArenaInfoHash,
+    Battle,
     SaveScreenshot,
   } from "../wailsjs/go/main/App.js";
   import type { vo } from "wailsjs/go/models.js";
@@ -79,7 +79,7 @@
 
   async function looper() {
     try {
-      config = await GetConfig();
+      config = await UserConfig();
       notification.removeToastWithKey("need_config");
     } catch (error) {
       notification.showToastWithKey(
@@ -97,7 +97,7 @@
 
     let hash: string;
     try {
-      hash = await GetTempArenaInfoHash();
+      hash = await TempArenaInfoHash();
     } catch (error) {
       loadState = "standby";
       notification.showToastWithKey(
@@ -115,7 +115,7 @@
     loadState = "fetching";
     try {
       const start = new Date().getTime();
-      battle = await GetBattle();
+      battle = await Battle();
       latestHash = hash;
       loadState = "standby";
 

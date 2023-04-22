@@ -18,7 +18,7 @@ func (l *Local) IsClientInstalled(installPath string) bool {
 	}
 }
 
-func (l *Local) GetTempArenaInfo(installPath string) (vo.TempArenaInfo, error) {
+func (l *Local) TempArenaInfo(installPath string) (vo.TempArenaInfo, error) {
 	var tempArenaInfo vo.TempArenaInfo
 	data, err := os.ReadFile(filepath.Join(installPath, "replays", "tempArenaInfo.json"))
 	if err != nil {

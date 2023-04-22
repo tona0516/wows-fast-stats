@@ -1,8 +1,8 @@
 <script lang="ts">
   import type { vo } from "wailsjs/go/models.js";
   import {
-    ApplyConfig,
-    GetConfig,
+    ApplyUserConfig,
+    UserConfig,
     SelectDirectory,
   } from "../wailsjs/go/main/App.js";
   import { createEventDispatcher } from "svelte";
@@ -12,12 +12,12 @@
 
   let inputConfig: vo.UserConfig = Const.DEFAULT_USER_CONFIG;
 
-  GetConfig().then((config) => {
+  UserConfig().then((config) => {
     inputConfig = config;
   });
 
   function clickApply() {
-    ApplyConfig(inputConfig)
+    ApplyUserConfig(inputConfig)
       .then((_) => {
         dispatch("SuccessToast", {
           message: "更新しました。",

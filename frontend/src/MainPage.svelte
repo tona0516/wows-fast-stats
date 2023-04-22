@@ -29,22 +29,19 @@
     | "full";
 
   function decidePlayerDataPattern(player: vo.Player): PlayerDataPattern {
-    if (player.player_player_info.is_hidden) {
+    if (player.player_info.is_hidden) {
       return "private";
     }
 
-    if (
-      player.player_player_info.id === 0 ||
-      player.player_player_stats.battles == 0
-    ) {
+    if (player.player_info.id === 0 || player.player_stats.battles == 0) {
       return "nodata";
     }
 
-    if (player.player_ship_stats.battles === 0) {
+    if (player.ship_stats.battles === 0) {
       return "noshipstats";
     }
 
-    if (player.player_ship_stats.personal_rating === 0) {
+    if (player.ship_stats.personal_rating === 0) {
       return "nopr";
     }
 
@@ -140,20 +137,6 @@
   function countDisplays(config: vo.UserConfig): number {
     return Object.values(config.displays).filter((it) => it === true).length;
   }
-
-  function formatUsingShipTypeRate(value: vo.ShipTypeValue): string {
-    const array = [
-      spacePadding(value.ss.toFixed(1), 4),
-      spacePadding(value.dd.toFixed(1), 4),
-      spacePadding(value.cl.toFixed(1), 4),
-      spacePadding(value.bb.toFixed(1), 4),
-      spacePadding(value.cv.toFixed(1), 4),
-    ];
-
-    LogDebug(JSON.stringify(array));
-
-    return array.join(" | ");
-  }
 </script>
 
 {#if loadState === "fetching"}
@@ -228,22 +211,18 @@
         <tbody>
           {#each team.players as player}
             {@const dataPattern = decidePlayerDataPattern(player)}
-            <tr
-              class={backgroundClass(player.player_ship_stats.personal_rating)}
-            >
+            <tr class={backgroundClass(player.ship_stats.personal_rating)}>
               <!-- player name -->
               <td class="name omit">
                 <!-- svelte-ignore a11y-invalid-attribute -->
                 <a
                   href="#"
-                  on:click={() =>
-                    BrowserOpenURL(player.player_player_info.stats_url)}
+                  on:click={() => BrowserOpenURL(player.player_info.stats_url)}
                 >
-                  {#if player.player_player_info.clan}
-                    [{player.player_player_info.clan}]{player.player_player_info
-                      .name}
+                  {#if player.player_info.clan}
+                    [{player.player_info.clan}]{player.player_info.name}
                   {:else}
-                    {player.player_player_info.name}
+                    {player.player_info.name}
                   {/if}
                 </a>
               </td>
@@ -253,18 +232,17 @@
                 <!-- svelte-ignore a11y-invalid-attribute -->
                 <a
                   href="#"
-                  on:click={() =>
-                    BrowserOpenURL(player.player_ship_info.stats_url)}
+                  on:click={() => BrowserOpenURL(player.ship_info.stats_url)}
                 >
                   <div class="horizontal">
                     <img
                       alt=""
-                      src={shipIcon(player.player_ship_info.type)}
+                      src={shipIcon(player.ship_info.type)}
                       class="icon-scale"
                     />
                     <div class="omit">
-                      {tierString(player.player_ship_info.tier)}
-                      {player.player_ship_info.name}
+                      {tierString(player.ship_info.tier)}
+                      {player.ship_info.name}
                     </div>
                   </div>
                 </a>
@@ -283,7 +261,7 @@
               {#if config.displays.pr}
                 {#if dataPattern === "full"}
                   <td class="pr">
-                    {player.player_ship_stats.personal_rating.toFixed(0)}
+                    {player.ship_stats.personal_rating.toFixed(0)}
                   </td>
                 {:else if dataPattern === "noshipstats" || dataPattern === "nopr"}
                   <td class="pr" />
@@ -294,7 +272,7 @@
               {#if config.displays.ship_damage}
                 {#if dataPattern === "full" || dataPattern === "nopr"}
                   <td class="damage">
-                    {player.player_ship_stats.avg_damage.toFixed(0)}
+                    {player.ship_stats.avg_damage.toFixed(0)}
                   </td>
                 {:else if dataPattern === "noshipstats"}
                   <td class="damage" />
@@ -305,7 +283,7 @@
               {#if config.displays.ship_win_rate}
                 {#if dataPattern === "full" || dataPattern === "nopr"}
                   <td class="win">
-                    {player.player_ship_stats.win_rate.toFixed(1)}
+                    {player.ship_stats.win_rate.toFixed(1)}
                   </td>
                 {:else if dataPattern === "noshipstats"}
                   <td class="win" />
@@ -316,7 +294,7 @@
               {#if config.displays.ship_kd_rate}
                 {#if dataPattern === "full" || dataPattern === "nopr"}
                   <td class="kd">
-                    {player.player_ship_stats.kd_rate.toFixed(1)}
+                    {player.ship_stats.kd_rate.toFixed(1)}
                   </td>
                 {:else if dataPattern === "noshipstats"}
                   <td class="kd" />
@@ -327,7 +305,7 @@
               {#if config.displays.ship_win_survived_rate}
                 {#if dataPattern === "full" || dataPattern === "nopr"}
                   <td class="survived-rate">
-                    {player.player_ship_stats.win_survived_rate.toFixed(1)}
+                    {player.ship_stats.win_survived_rate.toFixed(1)}
                   </td>
                 {:else if dataPattern === "noshipstats"}
                   <td class="survived-rate" />
@@ -338,7 +316,7 @@
               {#if config.displays.ship_lose_survived_rate}
                 {#if dataPattern === "full" || dataPattern === "nopr"}
                   <td class="survived-rate">
-                    {player.player_ship_stats.lose_survived_rate.toFixed(1)}
+                    {player.ship_stats.lose_survived_rate.toFixed(1)}
                   </td>
                 {:else if dataPattern === "noshipstats"}
                   <td class="survived-rate" />
@@ -349,7 +327,7 @@
               {#if config.displays.ship_exp}
                 {#if dataPattern === "full" || dataPattern === "nopr"}
                   <td class="exp">
-                    {player.player_ship_stats.exp.toFixed(0)}
+                    {player.ship_stats.exp.toFixed(0)}
                   </td>
                 {:else if dataPattern === "noshipstats"}
                   <td class="exp" />
@@ -360,7 +338,7 @@
               {#if config.displays.ship_battles}
                 {#if dataPattern === "full" || dataPattern === "nopr"}
                   <td class="battles">
-                    {player.player_ship_stats.battles}
+                    {player.ship_stats.battles}
                   </td>
                 {:else if dataPattern === "noshipstats"}
                   <td class="battles" />
@@ -371,7 +349,7 @@
               {#if config.displays.player_damage}
                 {#if dataPattern === "noshipstats" || dataPattern === "full" || dataPattern === "nopr"}
                   <td class="damage">
-                    {player.player_player_stats.avg_damage.toFixed(0)}
+                    {player.player_stats.avg_damage.toFixed(0)}
                   </td>
                 {/if}
               {/if}
@@ -380,7 +358,7 @@
               {#if config.displays.player_win_rate}
                 {#if dataPattern === "noshipstats" || dataPattern === "full" || dataPattern === "nopr"}
                   <td class="win">
-                    {player.player_player_stats.win_rate.toFixed(1)}
+                    {player.player_stats.win_rate.toFixed(1)}
                   </td>
                 {/if}
               {/if}
@@ -389,7 +367,7 @@
               {#if config.displays.player_kd_rate}
                 {#if dataPattern === "noshipstats" || dataPattern === "full" || dataPattern === "nopr"}
                   <td class="kd">
-                    {player.player_player_stats.kd_rate.toFixed(1)}
+                    {player.player_stats.kd_rate.toFixed(1)}
                   </td>
                 {/if}
               {/if}
@@ -398,7 +376,7 @@
               {#if config.displays.player_win_survived_rate}
                 {#if dataPattern === "full" || dataPattern === "nopr"}
                   <td class="survived-rate">
-                    {player.player_player_stats.win_survived_rate.toFixed(1)}
+                    {player.player_stats.win_survived_rate.toFixed(1)}
                   </td>
                 {:else if dataPattern === "noshipstats"}
                   <td class="survived-rate" />
@@ -409,7 +387,7 @@
               {#if config.displays.player_lose_survived_rate}
                 {#if dataPattern === "full" || dataPattern === "nopr"}
                   <td class="survived-rate">
-                    {player.player_player_stats.lose_survived_rate.toFixed(1)}
+                    {player.player_stats.lose_survived_rate.toFixed(1)}
                   </td>
                 {:else if dataPattern === "noshipstats"}
                   <td class="survived-rate" />
@@ -420,7 +398,7 @@
               {#if config.displays.player_exp}
                 {#if dataPattern === "full" || dataPattern === "nopr"}
                   <td class="exp">
-                    {player.player_player_stats.exp.toFixed(0)}
+                    {player.player_stats.exp.toFixed(0)}
                   </td>
                 {:else if dataPattern === "noshipstats"}
                   <td class="exp" />
@@ -431,7 +409,7 @@
               {#if config.displays.player_battles}
                 {#if dataPattern === "noshipstats" || dataPattern === "full" || dataPattern === "nopr"}
                   <td class="battles">
-                    {player.player_player_stats.battles}
+                    {player.player_stats.battles}
                   </td>
                 {/if}
               {/if}
@@ -440,7 +418,7 @@
               {#if config.displays.player_avg_tier}
                 {#if dataPattern === "noshipstats" || dataPattern === "full" || dataPattern === "nopr"}
                   <td class="avg-tier">
-                    {player.player_player_stats.avg_tier.toFixed(1)}
+                    {player.player_stats.avg_tier.toFixed(1)}
                   </td>
                 {/if}
               {/if}
@@ -453,35 +431,35 @@
                       <div
                         class="progress-bar progress-bar-striped bg-primary"
                         role="progressbar"
-                        style="width: {player.player_player_stats.using_ship_type_rate.ss.toFixed(
+                        style="width: {player.player_stats.using_ship_type_rate.ss.toFixed(
                           0
                         )}%"
                       />
                       <div
                         class="progress-bar progress-bar-striped bg-info"
                         role="progressbar"
-                        style="width: {player.player_player_stats.using_ship_type_rate.dd.toFixed(
+                        style="width: {player.player_stats.using_ship_type_rate.dd.toFixed(
                           0
                         )}%"
                       />
                       <div
                         class="progress-bar progress-bar-striped bg-success"
                         role="progressbar"
-                        style="width: {player.player_player_stats.using_ship_type_rate.cl.toFixed(
+                        style="width: {player.player_stats.using_ship_type_rate.cl.toFixed(
                           0
                         )}%"
                       />
                       <div
                         class="progress-bar progress-bar-striped bg-warning"
                         role="progressbar"
-                        style="width: {player.player_player_stats.using_ship_type_rate.bb.toFixed(
+                        style="width: {player.player_stats.using_ship_type_rate.bb.toFixed(
                           0
                         )}%"
                       />
                       <div
                         class="progress-bar progress-bar-striped bg-danger"
                         role="progressbar"
-                        style="width: {player.player_player_stats.using_ship_type_rate.cv.toFixed(
+                        style="width: {player.player_stats.using_ship_type_rate.cv.toFixed(
                           0
                         )}%"
                       />

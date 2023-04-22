@@ -1,6 +1,6 @@
 package vo
 
-type PlayerShipInfo struct {
+type ShipInfo struct {
 	Name     string `json:"name"`
 	Nation   string `json:"nation"`
 	Tier     uint `json:"tier"`
@@ -8,7 +8,7 @@ type PlayerShipInfo struct {
 	StatsURL string `json:"stats_url"`
 }
 
-type PlayerShipStats struct {
+type ShipStats struct {
 	Battles        uint `json:"battles"`
 	AvgDamage      float64 `json:"avg_damage"`
 	WinRate        float64 `json:"win_rate"`
@@ -19,7 +19,7 @@ type PlayerShipStats struct {
 	PersonalRating float64 `json:"personal_rating"`
 }
 
-type PlayerPlayerInfo struct {
+type PlayerInfo struct {
     ID       int `json:"id"`
 	Name     string `json:"name"`
 	Clan     string `json:"clan"`
@@ -27,7 +27,7 @@ type PlayerPlayerInfo struct {
 	StatsURL string `json:"stats_url"`
 }
 
-type PlayerPlayerStats struct {
+type PlayerStats struct {
 	Battles   uint `json:"battles"`
 	AvgDamage float64 `json:"avg_damage"`
 	WinRate   float64 `json:"win_rate"`
@@ -40,8 +40,8 @@ type PlayerPlayerStats struct {
 }
 
 type Player struct {
-	ShipInfo    PlayerShipInfo `json:"player_ship_info"`
-	ShipStats   PlayerShipStats `json:"player_ship_stats"`
-	PlayerInfo  PlayerPlayerInfo `json:"player_player_info"`
-	PlayerStats PlayerPlayerStats `json:"player_player_stats"`
+	ShipInfo    ShipInfo `json:"ship_info"`
+	ShipStats   ShipStats `json:"ship_stats"`
+	PlayerInfo  PlayerInfo `json:"player_info"`
+	PlayerStats PlayerStats `json:"player_stats"`
 }

@@ -11,7 +11,7 @@ import (
 type Numbers struct {
 }
 
-func (n *Numbers) Get() (*vo.NSExpectedStats, error) {
+func (n *Numbers) ExpectedStats() (*vo.NSExpectedStats, error) {
 	res, err := http.Get("https://api.wows-numbers.com/personal/rating/expected/json/")
 	if res != nil {
 		defer res.Body.Close()

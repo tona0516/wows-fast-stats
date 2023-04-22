@@ -25,7 +25,7 @@ type Wargaming struct {
 	AppID string
 }
 
-func (w *Wargaming) GetAccountInfo(accountIDs []int) (vo.WGAccountInfo, error) {
+func (w *Wargaming) AccountInfo(accountIDs []int) (vo.WGAccountInfo, error) {
 	accountIDsString := make([]string, 0)
 	for i := range accountIDs {
 		accountIDsString = append(accountIDsString, strconv.Itoa(accountIDs[i]))
@@ -56,7 +56,7 @@ func (w *Wargaming) GetAccountInfo(accountIDs []int) (vo.WGAccountInfo, error) {
 	return res, err
 }
 
-func (w *Wargaming) GetAccountList(accountNames []string) (vo.WGAccountList, error) {
+func (w *Wargaming) AccountList(accountNames []string) (vo.WGAccountList, error) {
 	u := buildUrl(
 		"/wows/account/list/",
 		map[string]string{
@@ -75,7 +75,7 @@ func (w *Wargaming) GetAccountList(accountNames []string) (vo.WGAccountList, err
 	return res, err
 }
 
-func (w *Wargaming) GetClansAccountInfo(accountIDs []int) (vo.WGClansAccountInfo, error) {
+func (w *Wargaming) ClansAccountInfo(accountIDs []int) (vo.WGClansAccountInfo, error) {
 	accountIDsString := make([]string, 0)
 	for i := range accountIDs {
 		accountIDsString = append(accountIDsString, strconv.Itoa(accountIDs[i]))
@@ -98,7 +98,7 @@ func (w *Wargaming) GetClansAccountInfo(accountIDs []int) (vo.WGClansAccountInfo
 	return res, err
 }
 
-func (w *Wargaming) GetClansInfo(clanIDs []int) (vo.WGClansInfo, error) {
+func (w *Wargaming) ClansInfo(clanIDs []int) (vo.WGClansInfo, error) {
 	clanIDsString := make([]string, 0)
 	for i := range clanIDs {
 		clanIDsString = append(clanIDsString, strconv.Itoa(clanIDs[i]))
@@ -121,7 +121,7 @@ func (w *Wargaming) GetClansInfo(clanIDs []int) (vo.WGClansInfo, error) {
 	return res, err
 }
 
-func (w *Wargaming) GetEncyclopediaShips(pageNo int) (vo.WGEncyclopediaShips, error) {
+func (w *Wargaming) EncyclopediaShips(pageNo int) (vo.WGEncyclopediaShips, error) {
 	u := buildUrl(
 		"/wows/encyclopedia/ships/",
 		map[string]string{
@@ -145,7 +145,7 @@ func (w *Wargaming) GetEncyclopediaShips(pageNo int) (vo.WGEncyclopediaShips, er
 	return res, err
 }
 
-func (w *Wargaming) GetShipsStats(accountID int) (vo.WGShipsStats, error) {
+func (w *Wargaming) ShipsStats(accountID int) (vo.WGShipsStats, error) {
 	u := buildUrl(
 		"/wows/ships/stats/",
 		map[string]string{
@@ -172,7 +172,7 @@ func (w *Wargaming) GetShipsStats(accountID int) (vo.WGShipsStats, error) {
 	return res, err
 }
 
-func (w *Wargaming) GetEncyclopediaInfo() (vo.WGEncyclopediaInfo, error) {
+func (w *Wargaming) EncyclopediaInfo() (vo.WGEncyclopediaInfo, error) {
 	u := buildUrl(
 		"/wows/encyclopedia/info/",
 		map[string]string{
@@ -189,7 +189,7 @@ func (w *Wargaming) GetEncyclopediaInfo() (vo.WGEncyclopediaInfo, error) {
 	return res, err
 }
 
-func (w *Wargaming) GetBattleArenas() (vo.WGBattleArenas, error) {
+func (w *Wargaming) BattleArenas() (vo.WGBattleArenas, error) {
 	u := buildUrl(
 		"/wows/encyclopedia/battlearenas/",
 		map[string]string{
@@ -207,7 +207,7 @@ func (w *Wargaming) GetBattleArenas() (vo.WGBattleArenas, error) {
 	return res, err
 }
 
-func (w *Wargaming) GetBattleTypes() (vo.WGBattleTypes, error) {
+func (w *Wargaming) BattleTypes() (vo.WGBattleTypes, error) {
 	u := buildUrl(
 		"/wows/encyclopedia/battletypes/",
 		map[string]string{

@@ -13,9 +13,9 @@ var shipsByte []byte
 type Unregistered struct {
 }
 
-func (u *Unregistered) GetShips() (map[int]vo.ShipInfo, error) {
+func (u *Unregistered) Warship() (map[int]vo.Warship, error) {
     var ships []unregisteredShip
-    result := make(map[int]vo.ShipInfo, 0)
+    result := make(map[int]vo.Warship, 0)
 
     err := json.Unmarshal(shipsByte, &ships)
 	if err != nil {
@@ -28,7 +28,7 @@ func (u *Unregistered) GetShips() (map[int]vo.ShipInfo, error) {
             nation = "uk"
         }
 
-        result[us.Id] = vo.ShipInfo{
+        result[us.Id] = vo.Warship{
             Name: us.En,
             Tier: us.Level,
             Type: us.Species,

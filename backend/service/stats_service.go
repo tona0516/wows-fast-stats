@@ -14,11 +14,11 @@ type StatsService struct{
     Parallels uint
 }
 
-func (s *StatsService) GetTempArenaInfoHash(installPath string) (string, error) {
+func (s *StatsService) TempArenaInfoHash(installPath string) (string, error) {
     var result string
     local := repo.Local{}
 
-    tempArenaInfo, err := local.GetTempArenaInfo(installPath)
+    tempArenaInfo, err := local.TempArenaInfo(installPath)
     if err != nil {
         return result, err
     }
@@ -28,7 +28,7 @@ func (s *StatsService) GetTempArenaInfoHash(installPath string) (string, error) 
     return result, nil
 }
 
-func (s *StatsService) GetsBattle(installPath string, appid string) (vo.Battle, error) {
+func (s *StatsService) Battle(installPath string, appid string) (vo.Battle, error) {
     var result vo.Battle
 
 	wargaming := repo.Wargaming{AppID: appid}
@@ -36,7 +36,7 @@ func (s *StatsService) GetsBattle(installPath string, appid string) (vo.Battle, 
 	local := repo.Local{}
     unregistered := repo.Unregistered{}
 
-	tempArenaInfo, err := local.GetTempArenaInfo(installPath)
+	tempArenaInfo, err := local.TempArenaInfo(installPath)
 	if err != nil {
 		return result, err
 	}
@@ -46,13 +46,13 @@ func (s *StatsService) GetsBattle(installPath string, appid string) (vo.Battle, 
 	accountInfoResult := make(chan vo.Result[vo.WGAccountInfo])
 	shipStatsResult := make(chan vo.Result[map[int]vo.WGShipsStats])
 	clanTagResult := make(chan vo.Result[map[int]string])
-	shipInfoResult := make(chan vo.Result[map[int]vo.ShipInfo])
+	shipInfoResult := make(chan vo.Result[map[int]vo.Warship])
 	expectedStatsResult := make(chan vo.Result[vo.NSExpectedStats])
     battleArenasResult := make(chan vo.Result[vo.WGBattleArenas])
     battleTypesResult := make(chan vo.Result[vo.WGBattleTypes])
 
-	go s.fetchAccountList(&wargaming, tempArenaInfo, accountListResult)
-	go s.fetchEncyclopediaInfo(&wargaming, encyclopediaInfoResult)
+	go s.accountList(&wargaming, tempArenaInfo, accountListResult)
+	go s.encyclopediaInfo(&wargaming, encyclopediaInfoResult)
 
 	accountList := <-accountListResult
 	if accountList.Error != nil {
@@ -60,9 +60,9 @@ func (s *StatsService) GetsBattle(installPath string, appid string) (vo.Battle, 
 	}
 	accountIDs := accountList.Value.AccountIDs()
 
-	go s.fetchAccountInfo(&wargaming, accountIDs, accountInfoResult)
-	go s.fetchShipStats(&wargaming, accountIDs, shipStatsResult)
-	go s.fetchClanTag(&wargaming, accountIDs, clanTagResult)
+	go s.accountInfo(&wargaming, accountIDs, accountInfoResult)
+	go s.shipStats(&wargaming, accountIDs, shipStatsResult)
+	go s.clanTag(&wargaming, accountIDs, clanTagResult)
 
 	encyclopediaInfo := <-encyclopediaInfoResult
 	if encyclopediaInfo.Error != nil {
@@ -70,10 +70,10 @@ func (s *StatsService) GetsBattle(installPath string, appid string) (vo.Battle, 
 	}
 	gameVersion := encyclopediaInfo.Value.Data.GameVersion
 
-	go s.fetchShipInfo(&wargaming, gameVersion, shipInfoResult)
-	go s.fetchExpectedStats(&numbers, gameVersion, expectedStatsResult)
-    go s.fetchBattleArenas(&wargaming, gameVersion, battleArenasResult)
-    go s.fetchBattleTypes(&wargaming, gameVersion, battleTypesResult)
+	go s.warship(&wargaming, gameVersion, shipInfoResult)
+	go s.expectedStats(&numbers, gameVersion, expectedStatsResult)
+    go s.battleArenas(&wargaming, gameVersion, battleArenasResult)
+    go s.battleTypes(&wargaming, gameVersion, battleTypesResult)
 
 	accountInfo := <-accountInfoResult
 	if accountInfo.Error != nil {
@@ -95,7 +95,7 @@ func (s *StatsService) GetsBattle(installPath string, appid string) (vo.Battle, 
 	if expectedStats.Error != nil {
 		return result, expectedStats.Error
 	}
-    unregisteredShipInfo, err := unregistered.GetShips()
+    unregisteredShipInfo, err := unregistered.Warship()
     if err != nil {
         return result, err
     }
@@ -128,10 +128,10 @@ func (s *StatsService) GetsBattle(installPath string, appid string) (vo.Battle, 
 	return result, nil
 }
 
-func (s *StatsService) fetchAccountList(wargaming *repo.Wargaming, tempArenaInfo vo.TempArenaInfo, result chan vo.Result[(vo.WGAccountList)]) {
+func (s *StatsService) accountList(wargaming *repo.Wargaming, tempArenaInfo vo.TempArenaInfo, result chan vo.Result[(vo.WGAccountList)]) {
 	accountNames := tempArenaInfo.AccountNames()
 
-	accountList, err := wargaming.GetAccountList(accountNames)
+	accountList, err := wargaming.AccountList(accountNames)
 	if err != nil {
 		result <- vo.Result[vo.WGAccountList]{Value: accountList, Error: err}
 		return
@@ -140,8 +140,8 @@ func (s *StatsService) fetchAccountList(wargaming *repo.Wargaming, tempArenaInfo
 	result <- vo.Result[vo.WGAccountList]{Value: accountList, Error: nil}
 }
 
-func (s *StatsService) fetchEncyclopediaInfo(wargaming *repo.Wargaming, result chan vo.Result[vo.WGEncyclopediaInfo]) {
-	encyclopediaInfo, err := wargaming.GetEncyclopediaInfo()
+func (s *StatsService) encyclopediaInfo(wargaming *repo.Wargaming, result chan vo.Result[vo.WGEncyclopediaInfo]) {
+	encyclopediaInfo, err := wargaming.EncyclopediaInfo()
 	if err != nil {
 		result <- vo.Result[vo.WGEncyclopediaInfo]{Value: encyclopediaInfo, Error: err}
 		return
@@ -150,8 +150,8 @@ func (s *StatsService) fetchEncyclopediaInfo(wargaming *repo.Wargaming, result c
 	result <- vo.Result[vo.WGEncyclopediaInfo]{Value: encyclopediaInfo, Error: nil}
 }
 
-func (s *StatsService) fetchAccountInfo(wargaming *repo.Wargaming, accountIDs []int, result chan vo.Result[vo.WGAccountInfo]) {
-	accountInfo, err := wargaming.GetAccountInfo(accountIDs)
+func (s *StatsService) accountInfo(wargaming *repo.Wargaming, accountIDs []int, result chan vo.Result[vo.WGAccountInfo]) {
+	accountInfo, err := wargaming.AccountInfo(accountIDs)
 	if err != nil {
 		result <- vo.Result[vo.WGAccountInfo]{Value: accountInfo, Error: err}
 		return
@@ -160,7 +160,7 @@ func (s *StatsService) fetchAccountInfo(wargaming *repo.Wargaming, accountIDs []
 	result <- vo.Result[vo.WGAccountInfo]{Value: accountInfo, Error: nil}
 }
 
-func (s *StatsService) fetchShipStats(wargaming *repo.Wargaming, accountIDs []int, result chan vo.Result[map[int]vo.WGShipsStats]) {
+func (s *StatsService) shipStats(wargaming *repo.Wargaming, accountIDs []int, result chan vo.Result[map[int]vo.WGShipsStats]) {
 	shipStatsMap := make(map[int]vo.WGShipsStats)
 	limit := make(chan struct{}, s.Parallels)
 	wg := sync.WaitGroup{}
@@ -174,7 +174,7 @@ func (s *StatsService) fetchShipStats(wargaming *repo.Wargaming, accountIDs []in
 				<-limit
 			}()
 
-			shipStats, err := wargaming.GetShipsStats(accountID)
+			shipStats, err := wargaming.ShipsStats(accountID)
 			if err != nil {
 				result <- vo.Result[map[int]vo.WGShipsStats]{Value: shipStatsMap, Error: err}
 				return
@@ -190,10 +190,10 @@ func (s *StatsService) fetchShipStats(wargaming *repo.Wargaming, accountIDs []in
 	result <- vo.Result[map[int]vo.WGShipsStats]{Value: shipStatsMap, Error: nil}
 }
 
-func (s *StatsService) fetchClanTag(wargaming *repo.Wargaming, accountIDs []int, result chan vo.Result[map[int]string]) {
+func (s *StatsService) clanTag(wargaming *repo.Wargaming, accountIDs []int, result chan vo.Result[map[int]string]) {
 	clanTagMap := make(map[int]string)
 
-	clansAccountInfo, err := wargaming.GetClansAccountInfo(accountIDs)
+	clansAccountInfo, err := wargaming.ClansAccountInfo(accountIDs)
 	if err != nil {
 		result <- vo.Result[map[int]string]{Value: clanTagMap, Error: err}
 		return
@@ -201,7 +201,7 @@ func (s *StatsService) fetchClanTag(wargaming *repo.Wargaming, accountIDs []int,
 
 	clanIDs := clansAccountInfo.ClanIDs()
 
-	clansInfo, err := wargaming.GetClansInfo(clanIDs)
+	clansInfo, err := wargaming.ClansInfo(clanIDs)
 	if err != nil {
 		result <- vo.Result[map[int]string]{Value: clanTagMap, Error: err}
 		return
@@ -217,22 +217,22 @@ func (s *StatsService) fetchClanTag(wargaming *repo.Wargaming, accountIDs []int,
 	result <- vo.Result[map[int]string]{Value: clanTagMap, Error: nil}
 }
 
-func (s *StatsService) fetchShipInfo(wargaming *repo.Wargaming, gameVersion string, result chan vo.Result[map[int]vo.ShipInfo]) {
-	shipInfoMap := make(map[int]vo.ShipInfo, 0)
+func (s *StatsService) warship(wargaming *repo.Wargaming, gameVersion string, result chan vo.Result[map[int]vo.Warship]) {
+	shipInfoMap := make(map[int]vo.Warship, 0)
 
-	cache := repo.Cache[map[int]vo.ShipInfo]{
+	cache := repo.Cache[map[int]vo.Warship]{
 		FileName: "shipinfo_" + gameVersion + ".bin",
 	}
 
 	object, err := cache.Deserialize()
 	if err == nil {
-		result <- vo.Result[map[int]vo.ShipInfo]{Value: object, Error: nil}
+		result <- vo.Result[map[int]vo.Warship]{Value: object, Error: nil}
 		return
 	}
 
-	res, err := wargaming.GetEncyclopediaShips(1)
+	res, err := wargaming.EncyclopediaShips(1)
 	if err != nil {
-		result <- vo.Result[map[int]vo.ShipInfo]{Value: shipInfoMap, Error: err}
+		result <- vo.Result[map[int]vo.Warship]{Value: shipInfoMap, Error: err}
 		return
 	}
 	pageTotal := res.Meta.PageTotal
@@ -249,15 +249,15 @@ func (s *StatsService) fetchShipInfo(wargaming *repo.Wargaming, gameVersion stri
 				<-limit
 			}()
 
-			encyclopediaShips, err := wargaming.GetEncyclopediaShips(pageNo)
+			encyclopediaShips, err := wargaming.EncyclopediaShips(pageNo)
 			if err != nil {
-				result <- vo.Result[map[int]vo.ShipInfo]{Value: shipInfoMap, Error: err}
+				result <- vo.Result[map[int]vo.Warship]{Value: shipInfoMap, Error: err}
 				return
 			}
 
 			for shipID, shipInfo := range encyclopediaShips.Data {
 				mu.Lock()
-				shipInfoMap[shipID] = vo.ShipInfo{
+				shipInfoMap[shipID] = vo.Warship{
 					Name:   shipInfo.Name,
 					Tier:   shipInfo.Tier,
 					Type:   shipInfo.Type,
@@ -270,14 +270,14 @@ func (s *StatsService) fetchShipInfo(wargaming *repo.Wargaming, gameVersion stri
 	wg.Wait()
 
 	if err := cache.Serialize(shipInfoMap); err != nil {
-		result <- vo.Result[map[int]vo.ShipInfo]{Value: shipInfoMap, Error: err}
+		result <- vo.Result[map[int]vo.Warship]{Value: shipInfoMap, Error: err}
 		return
 	}
 
-	result <- vo.Result[map[int]vo.ShipInfo]{Value: shipInfoMap, Error: nil}
+	result <- vo.Result[map[int]vo.Warship]{Value: shipInfoMap, Error: nil}
 }
 
-func (s *StatsService) fetchExpectedStats(numbers *repo.Numbers, gameVersion string, result chan vo.Result[vo.NSExpectedStats]) {
+func (s *StatsService) expectedStats(numbers *repo.Numbers, gameVersion string, result chan vo.Result[vo.NSExpectedStats]) {
 	cache := repo.Cache[vo.NSExpectedStats]{
 		FileName: "expectedstats_" + gameVersion + ".bin",
 	}
@@ -288,7 +288,7 @@ func (s *StatsService) fetchExpectedStats(numbers *repo.Numbers, gameVersion str
 		return
 	}
 
-	expectedStats, err := numbers.Get()
+	expectedStats, err := numbers.ExpectedStats()
 	if err != nil {
 		result <- vo.Result[vo.NSExpectedStats]{Value: *expectedStats, Error: err}
 		return
@@ -302,7 +302,7 @@ func (s *StatsService) fetchExpectedStats(numbers *repo.Numbers, gameVersion str
 	result <- vo.Result[vo.NSExpectedStats]{Value: *expectedStats, Error: err}
 }
 
-func (s *StatsService) fetchBattleArenas(wargaming *repo.Wargaming, gameVersion string, result chan vo.Result[vo.WGBattleArenas]) {
+func (s *StatsService) battleArenas(wargaming *repo.Wargaming, gameVersion string, result chan vo.Result[vo.WGBattleArenas]) {
 	cache := repo.Cache[vo.WGBattleArenas]{
 		FileName: "battlearenas_" + gameVersion + ".bin",
 	}
@@ -313,7 +313,7 @@ func (s *StatsService) fetchBattleArenas(wargaming *repo.Wargaming, gameVersion 
 		return
 	}
 
-	battleArenas, err := wargaming.GetBattleArenas()
+	battleArenas, err := wargaming.BattleArenas()
 	if err != nil {
 		result <- vo.Result[vo.WGBattleArenas]{Value: battleArenas, Error: err}
 		return
@@ -327,7 +327,7 @@ func (s *StatsService) fetchBattleArenas(wargaming *repo.Wargaming, gameVersion 
     result <- vo.Result[vo.WGBattleArenas]{Value: battleArenas, Error: err}
 }
 
-func (s *StatsService) fetchBattleTypes(wargaming *repo.Wargaming, gameVersion string, result chan vo.Result[vo.WGBattleTypes]) {
+func (s *StatsService) battleTypes(wargaming *repo.Wargaming, gameVersion string, result chan vo.Result[vo.WGBattleTypes]) {
 	cache := repo.Cache[vo.WGBattleTypes]{
 		FileName: "battletypes_" + gameVersion + ".bin",
 	}
@@ -338,7 +338,7 @@ func (s *StatsService) fetchBattleTypes(wargaming *repo.Wargaming, gameVersion s
 		return
 	}
 
-	battleTypes, err := wargaming.GetBattleTypes()
+	battleTypes, err := wargaming.BattleTypes()
 	if err != nil {
 		result <- vo.Result[vo.WGBattleTypes]{Value: battleTypes, Error: err}
 		return
@@ -358,7 +358,7 @@ func (s *StatsService) compose(
 	accountList vo.WGAccountList,
 	clanTag map[int]string,
 	shipStats map[int]vo.WGShipsStats,
-	shipInfo map[int]vo.ShipInfo,
+	shipInfo map[int]vo.Warship,
 	expectedStats vo.NSExpectedStats,
     battleArenas vo.WGBattleArenas,
     battleTypes vo.WGBattleTypes,
@@ -412,14 +412,14 @@ func (s *StatsService) compose(
 		expectedShipStats := expectedStats.Data[vehicle.ShipID]
 
 		player := vo.Player{
-			ShipInfo: vo.PlayerShipInfo{
+			ShipInfo: vo.ShipInfo{
 				Name:   playerShipInfo.Name,
 				Nation: playerShipInfo.Nation,
 				Tier:   playerShipInfo.Tier,
 				Type:   playerShipInfo.Type,
                 StatsURL: numbersURLGenerator.ShipPage(vehicle.ShipID, playerShipInfo.Name),
 			},
-			ShipStats: vo.PlayerShipStats{
+			ShipStats: vo.ShipStats{
 				Battles:   statsCalculator.Ship.Battles,
 				AvgDamage: statsCalculator.ShipAvgDamage(),
 				WinRate:   statsCalculator.ShipWinRate(),
@@ -436,14 +436,14 @@ func (s *StatsService) compose(
 					expectedShipStats.WinRate,
 				),
 			},
-			PlayerInfo: vo.PlayerPlayerInfo{
+			PlayerInfo: vo.PlayerInfo{
                 ID: accountID,
 				Name: nickname,
 				Clan: clan,
                 IsHidden: playerAccountInfo.HiddenProfile,
                 StatsURL: numbersURLGenerator.PlayerPage(accountID, nickname),
 			},
-			PlayerStats: vo.PlayerPlayerStats{
+			PlayerStats: vo.PlayerStats{
 				Battles:   statsCalculator.Player.Battles,
 				AvgDamage: statsCalculator.PlayerAvgDamage(),
 				WinRate:   statsCalculator.PlayerWinRate(),

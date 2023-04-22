@@ -10,38 +10,38 @@ import (
 
 type ConfigService struct{}
 
-func (c *ConfigService) ReadUserConfig() (vo.UserConfig, error) {
+func (c *ConfigService) User() (vo.UserConfig, error) {
     var config vo.UserConfig
-    configAdapter := repo.ConfigAdapter{}
-    config, err := configAdapter.ReadUserConfig()
+    configAdapter := repo.Config{}
+    config, err := configAdapter.User()
     return config, err
 }
 
-func (c *ConfigService) UpdateUserConfig(config vo.UserConfig) (vo.UserConfig, error) {
-    configAdapter := repo.ConfigAdapter{}
+func (c *ConfigService) UpdateUser(config vo.UserConfig) (vo.UserConfig, error) {
+    configAdapter := repo.Config{}
 
     if err := validate(config); err != nil {
         return config, err
     }
 
-    if err := configAdapter.UpdateUserConfig(config); err != nil {
+    if err := configAdapter.UpdateUser(config); err != nil {
         return config, err
     }
 
     return config, nil
 }
 
-func (c *ConfigService) ReadAppConfig() (vo.AppConfig, error) {
+func (c *ConfigService) App() (vo.AppConfig, error) {
     var config vo.AppConfig
-    configAdapter := repo.ConfigAdapter{}
-    config, err := configAdapter.ReadAppConfig()
+    configAdapter := repo.Config{}
+    config, err := configAdapter.App()
     return config, err
 }
 
-func (c *ConfigService) UpdateAppConfig(config vo.AppConfig) (vo.AppConfig, error) {
-    configAdapter := repo.ConfigAdapter{}
+func (c *ConfigService) UpdateApp(config vo.AppConfig) (vo.AppConfig, error) {
+    configAdapter := repo.Config{}
 
-    if err := configAdapter.UpdateAppConfig(config); err != nil {
+    if err := configAdapter.UpdateApp(config); err != nil {
         return config, err
     }
 
@@ -55,7 +55,7 @@ func validate(config vo.UserConfig) error {
     }
 
     wargaming := repo.Wargaming{AppID: config.Appid}
-    if _, err := wargaming.GetEncyclopediaInfo(); err != nil {
+    if _, err := wargaming.EncyclopediaInfo(); err != nil {
         err := errors.New("AppIDが間違っています。")
         return err
     }

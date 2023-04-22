@@ -1,6 +1,6 @@
 package vo
 
-type ShipInfo struct {
+type Warship struct {
 	Name   string
 	Tier   uint
 	Type   string

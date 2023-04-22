@@ -44,7 +44,7 @@ export namespace vo {
 	        this.cv = source["cv"];
 	    }
 	}
-	export class PlayerPlayerStats {
+	export class PlayerStats {
 	    battles: number;
 	    avg_damage: number;
 	    win_rate: number;
@@ -56,7 +56,7 @@ export namespace vo {
 	    using_ship_type_rate: ShipTypeValue;
 	
 	    static createFrom(source: any = {}) {
-	        return new PlayerPlayerStats(source);
+	        return new PlayerStats(source);
 	    }
 	
 	    constructor(source: any = {}) {
@@ -90,7 +90,7 @@ export namespace vo {
 		    return a;
 		}
 	}
-	export class PlayerPlayerInfo {
+	export class PlayerInfo {
 	    id: number;
 	    name: string;
 	    clan: string;
@@ -98,7 +98,7 @@ export namespace vo {
 	    stats_url: string;
 	
 	    static createFrom(source: any = {}) {
-	        return new PlayerPlayerInfo(source);
+	        return new PlayerInfo(source);
 	    }
 	
 	    constructor(source: any = {}) {
@@ -110,7 +110,7 @@ export namespace vo {
 	        this.stats_url = source["stats_url"];
 	    }
 	}
-	export class PlayerShipStats {
+	export class ShipStats {
 	    battles: number;
 	    avg_damage: number;
 	    win_rate: number;
@@ -121,7 +121,7 @@ export namespace vo {
 	    personal_rating: number;
 	
 	    static createFrom(source: any = {}) {
-	        return new PlayerShipStats(source);
+	        return new ShipStats(source);
 	    }
 	
 	    constructor(source: any = {}) {
@@ -136,7 +136,7 @@ export namespace vo {
 	        this.personal_rating = source["personal_rating"];
 	    }
 	}
-	export class PlayerShipInfo {
+	export class ShipInfo {
 	    name: string;
 	    nation: string;
 	    tier: number;
@@ -144,7 +144,7 @@ export namespace vo {
 	    stats_url: string;
 	
 	    static createFrom(source: any = {}) {
-	        return new PlayerShipInfo(source);
+	        return new ShipInfo(source);
 	    }
 	
 	    constructor(source: any = {}) {
@@ -157,10 +157,10 @@ export namespace vo {
 	    }
 	}
 	export class Player {
-	    player_ship_info: PlayerShipInfo;
-	    player_ship_stats: PlayerShipStats;
-	    player_player_info: PlayerPlayerInfo;
-	    player_player_stats: PlayerPlayerStats;
+	    ship_info: ShipInfo;
+	    ship_stats: ShipStats;
+	    player_info: PlayerInfo;
+	    player_stats: PlayerStats;
 	
 	    static createFrom(source: any = {}) {
 	        return new Player(source);
@@ -168,10 +168,10 @@ export namespace vo {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.player_ship_info = this.convertValues(source["player_ship_info"], PlayerShipInfo);
-	        this.player_ship_stats = this.convertValues(source["player_ship_stats"], PlayerShipStats);
-	        this.player_player_info = this.convertValues(source["player_player_info"], PlayerPlayerInfo);
-	        this.player_player_stats = this.convertValues(source["player_player_stats"], PlayerPlayerStats);
+	        this.ship_info = this.convertValues(source["ship_info"], ShipInfo);
+	        this.ship_stats = this.convertValues(source["ship_stats"], ShipStats);
+	        this.player_info = this.convertValues(source["player_info"], PlayerInfo);
+	        this.player_stats = this.convertValues(source["player_stats"], PlayerStats);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

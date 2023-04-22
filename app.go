@@ -26,8 +26,8 @@ func NewApp() *App {
 func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
 	a.configService = service.ConfigService{}
-	a.userConfig, _ = a.configService.ReadUserConfig()
-	a.appConfig, _ = a.configService.ReadAppConfig()
+	a.userConfig, _ = a.configService.User()
+	a.appConfig, _ = a.configService.App()
 
 	window := a.appConfig.Window
 	if window.Width != 0 && window.Height != 0 {
@@ -39,39 +39,39 @@ func (a *App) beforeClose(ctx context.Context) (prevent bool) {
 	width, height := runtime.WindowGetSize(ctx)
 	a.appConfig.Window.Width = width
 	a.appConfig.Window.Height = height
-	a.configService.UpdateAppConfig(a.appConfig)
+	a.configService.UpdateApp(a.appConfig)
 
 	return false
 }
 
-func (a *App) GetTempArenaInfoHash() (string, error) {
+func (a *App) TempArenaInfoHash() (string, error) {
 	statsService := service.StatsService{
 		Parallels: 5,
 	}
-	return statsService.GetTempArenaInfoHash(a.userConfig.InstallPath)
+	return statsService.TempArenaInfoHash(a.userConfig.InstallPath)
 }
 
-func (a *App) GetBattle() (vo.Battle, error) {
+func (a *App) Battle() (vo.Battle, error) {
 	statsService := service.StatsService{
 		Parallels: 5,
 	}
 
-	return statsService.GetsBattle(a.userConfig.InstallPath, a.userConfig.Appid)
+	return statsService.Battle(a.userConfig.InstallPath, a.userConfig.Appid)
 }
 
 func (a *App) SelectDirectory() (string, error) {
 	return runtime.OpenDirectoryDialog(a.ctx, runtime.OpenDialogOptions{})
 }
 
-func (a *App) GetConfig() (vo.UserConfig, error) {
+func (a *App) UserConfig() (vo.UserConfig, error) {
 	configService := service.ConfigService{}
-	return configService.ReadUserConfig()
+	return configService.User()
 }
 
-func (a *App) ApplyConfig(config vo.UserConfig) (vo.UserConfig, error) {
+func (a *App) ApplyUserConfig(config vo.UserConfig) (vo.UserConfig, error) {
 	configService := service.ConfigService{}
 
-	updatedConfig, err := configService.UpdateUserConfig(config)
+	updatedConfig, err := configService.UpdateUser(config)
 	if err != nil {
 		return updatedConfig, err
 	}

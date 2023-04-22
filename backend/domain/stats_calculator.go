@@ -116,7 +116,7 @@ func (s *StatsCalculator) PlayerLoseSurvivedRate() float64 {
     return 0
 }
 
-func (s *StatsCalculator) PlayerAvgTier(accountID int, shipInfo map[int]vo.ShipInfo, shipStats map[int]vo.WGShipsStats) float64 {
+func (s *StatsCalculator) PlayerAvgTier(accountID int, shipInfo map[int]vo.Warship, shipStats map[int]vo.WGShipsStats) float64 {
 	var sum uint = 0
 	var battles uint = 0
 	playerShipStats := shipStats[accountID].Data[accountID]
@@ -134,7 +134,7 @@ func (s *StatsCalculator) PlayerAvgTier(accountID int, shipInfo map[int]vo.ShipI
 	}
 }
 
-func (s *StatsCalculator) UsingShipTypeRate(accountID int, shipInfo map[int]vo.ShipInfo, shipStats map[int]vo.WGShipsStats) vo.ShipTypeValue {
+func (s *StatsCalculator) UsingShipTypeRate(accountID int, shipInfo map[int]vo.Warship, shipStats map[int]vo.WGShipsStats) vo.ShipTypeValue {
     var result vo.ShipTypeValue
     shipTypeMap := make(map[string]float64, 0)
     var allBattles uint
