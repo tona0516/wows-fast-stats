@@ -201,7 +201,7 @@
     {/each}
   </div>
 
-  <div class="mt-2 mx-4 d-flex flex-row">
+  <div class="mt-2 mx-4 d-flex flex-row centerize">
     <div class="mx-2">
       <table class="table table-sm w-auto">
         <tbody>

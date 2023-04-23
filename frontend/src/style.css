@@ -1,12 +1,12 @@
 html {
   background-color: #212529;
   text-align: center;
-  color: #e5e5e5;
+  color: #F2F2F2;
 }
 
 body {
   margin: 0;
-  color: #e5e5e5;
+  color: #F2F2F2;
   font-family: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
     "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif;
@@ -27,7 +27,7 @@ body {
 }
 
 a {
-  color: #e5e5e5;
+  color: #F2F2F2;
 }
 
 .btn {
@@ -36,7 +36,7 @@ a {
 }
 
 .table {
-  color: #e5e5e5;
+  color: #F2F2F2;
 }
 
 .table td {
@@ -52,35 +52,35 @@ a {
 }
 
 .bad {
-  background-color: #c60900;
+  background-color: #A41200;
 }
 
 .below-average {
-  background-color: #ca5f01;
+  background-color: #A34A02;
 }
 
 .average {
-  background-color: #b28200;
+  background-color: #A38204;
 }
 
 .good {
-  background-color: #307f00;
+  background-color: #518517;
 }
 
 .very-good {
-  background-color: #1d4c00;
+  background-color: #2F6F41;
 }
 
 .great {
-  background-color: #019281;
+  background-color: #04436D;
 }
 
 .unicum {
-  background-color: #cf0fff;
+  background-color: #232166;
 }
 
 .super-unicum {
-  background-color: #760a93;
+  background-color: #531460;
 }
 
 .name {
@@ -164,11 +164,11 @@ a {
 }
 
 .higher {
-  color: #44b300;
+  color: #99D02B;
 }
 
 .lower {
-  color: #fe0e00;
+  color: #FC4E32;
 }
 
 .form-style {
@@ -176,7 +176,7 @@ a {
 }
 
 .border-right {
-  border-right: 1px solid #e5e5e5;
+  border-right: 1px solid #F2F2F2;
 }
 
 .centerize {
