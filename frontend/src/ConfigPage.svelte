@@ -304,6 +304,17 @@
               >総合:使用艦率(SS|DD|CL|BB|CV)</label
             >
           </div>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              id="player_using_tier_rate"
+              bind:checked={inputConfig.displays.player_using_tier_rate}
+            />
+            <label class="form-check-label" for="player_using_tier_rate"
+              >総合:ティア別割合(1~4|5~7|8~★)</label
+            >
+          </div>
         </div>
       </div>
 

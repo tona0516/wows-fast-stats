@@ -132,6 +132,10 @@ a {
   min-width: 120px;
 }
 
+.using_tier_rate {
+  min-width: 120px;
+}
+
 .omit {
   overflow: hidden;
   text-overflow: ellipsis;

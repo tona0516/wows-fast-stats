@@ -134,34 +134,80 @@ func (s *StatsCalculator) PlayerAvgTier(accountID int, shipInfo map[int]vo.Warsh
 	}
 }
 
-func (s *StatsCalculator) UsingShipTypeRate(accountID int, shipInfo map[int]vo.Warship, shipStats map[int]vo.WGShipsStats) vo.ShipTypeValue {
-    var result vo.ShipTypeValue
-    shipTypeMap := make(map[string]float64, 0)
-    var allBattles uint
+func (s *StatsCalculator) UsingTierRate(accountID int, shipInfo map[int]vo.Warship, shipStats map[int]vo.WGShipsStats) vo.TierGroup[float64] {
+	var result vo.TierGroup[float64]
+	var allBattles uint = 0
 
-    playerShipStats := shipStats[accountID].Data[accountID]
+	playerShipStats := shipStats[accountID].Data[accountID]
 	for _, ship := range playerShipStats {
-        if ship.Pvp.Battles != 0 {
-            shipID := ship.ShipID
-            shipType := shipInfo[shipID].Type
-            shipTypeMap[shipType] += 1
-            allBattles += 1
+		shipID := ship.ShipID
+		tier := shipInfo[shipID].Tier
+        battles := ship.Pvp.Battles
+        if battles != 0 {
+            switch {
+            case tier >= 1 && tier <= 4:
+                result.Low += float64(battles)
+                allBattles += battles
+            case tier >= 5 && tier <= 7:
+                result.Middle += float64(battles)
+                allBattles += battles
+            case tier >= 8:
+                result.High += float64(battles)
+                allBattles += battles
+            }
         }
 	}
 
     if allBattles == 0 {
-        return result
+        return vo.TierGroup[float64]{}
     }
 
-    for k, v := range shipTypeMap {
-        shipTypeMap[k] = v / float64(allBattles) * 100
+    result.Low = result.Low / float64(allBattles) * 100
+    result.Middle = result.Middle / float64(allBattles) * 100
+    result.High = result.High / float64(allBattles) * 100
+
+    return result
+}
+
+func (s *StatsCalculator) UsingShipTypeRate(accountID int, shipInfo map[int]vo.Warship, shipStats map[int]vo.WGShipsStats) vo.ShipTypeValue {
+    var result vo.ShipTypeValue
+    var allBattles uint
+
+    playerShipStats := shipStats[accountID].Data[accountID]
+	for _, ship := range playerShipStats {
+        shipID := ship.ShipID
+        shipType := shipInfo[shipID].Type
+        battles := ship.Pvp.Battles
+        if battles != 0 {
+            switch shipType {
+            case "Submarine":
+                result.Ss += float64(battles)
+                allBattles += battles
+            case "Destroyer":
+                result.Dd += float64(battles)
+                allBattles += battles
+            case "Cruiser":
+                result.Cl += float64(battles)
+                allBattles += battles
+            case "Battleship":
+                result.Bb += float64(battles)
+                allBattles += battles
+            case "AirCarrier":
+                result.Cv += float64(battles)
+                allBattles += battles
+            }
+        }
+	}
+
+    if allBattles == 0 {
+        return vo.ShipTypeValue{}
     }
 
-    result.Ss = shipTypeMap["Submarine"]
-    result.Dd = shipTypeMap["Destroyer"]
-    result.Cl = shipTypeMap["Cruiser"]
-    result.Bb = shipTypeMap["Battleship"]
-    result.Cv = shipTypeMap["AirCarrier"]
+    result.Ss = result.Ss / float64(allBattles) * 100
+    result.Dd = result.Dd / float64(allBattles) * 100
+    result.Cl = result.Cl / float64(allBattles) * 100
+    result.Bb = result.Bb / float64(allBattles) * 100
+    result.Cv = result.Cv / float64(allBattles) * 100
 
     return result
 }

@@ -214,6 +214,9 @@
             {#if config.displays.player_using_ship_type_rate}
               <th>P:使用艦率</th>
             {/if}
+            {#if config.displays.player_using_tier_rate}
+              <th>P:ティア別割合</th>
+            {/if}
           </tr>
         </thead>
         <tbody>
@@ -472,6 +475,37 @@
                         role="progressbar"
                         style="width: {roundup(
                           player.player_stats.using_ship_type_rate.cv
+                        )}%"
+                      />
+                    </div>
+                  </td>
+                {/if}
+              {/if}
+
+              <!-- using tier rate -->
+              {#if config.displays.player_using_tier_rate}
+                {#if dataPattern === "noshipstats" || dataPattern === "full" || dataPattern === "nopr"}
+                  <td class="using_tier_rate">
+                    <div class="progress">
+                      <div
+                        class="progress-bar progress-bar-striped bg-primary"
+                        role="progressbar"
+                        style="width: {roundup(
+                          player.player_stats.using_tier_rate.low
+                        )}%"
+                      />
+                      <div
+                        class="progress-bar progress-bar-striped bg-info"
+                        role="progressbar"
+                        style="width: {roundup(
+                          player.player_stats.using_tier_rate.middle
+                        )}%"
+                      />
+                      <div
+                        class="progress-bar progress-bar-striped bg-success"
+                        role="progressbar"
+                        style="width: {roundup(
+                          player.player_stats.using_tier_rate.high
                         )}%"
                       />
                     </div>

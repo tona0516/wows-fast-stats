@@ -24,6 +24,22 @@ export namespace vo {
 	        this.kd_rate_by_player = source["kd_rate_by_player"];
 	    }
 	}
+	export class TierGroup[float64] {
+	    low: number;
+	    middle: number;
+	    high: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new TierGroup[float64](source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.low = source["low"];
+	        this.middle = source["middle"];
+	        this.high = source["high"];
+	    }
+	}
 	export class ShipTypeValue {
 	    ss: number;
 	    dd: number;
@@ -54,6 +70,7 @@ export namespace vo {
 	    exp: number;
 	    avg_tier: number;
 	    using_ship_type_rate: ShipTypeValue;
+	    using_tier_rate: TierGroup[float64];
 	
 	    static createFrom(source: any = {}) {
 	        return new PlayerStats(source);
@@ -70,6 +87,7 @@ export namespace vo {
 	        this.exp = source["exp"];
 	        this.avg_tier = source["avg_tier"];
 	        this.using_ship_type_rate = this.convertValues(source["using_ship_type_rate"], ShipTypeValue);
+	        this.using_tier_rate = this.convertValues(source["using_tier_rate"], TierGroup[float64]);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -295,6 +313,7 @@ export namespace vo {
 	    player_battles: boolean;
 	    player_avg_tier: boolean;
 	    player_using_ship_type_rate: boolean;
+	    player_using_tier_rate: boolean;
 	
 	    static createFrom(source: any = {}) {
 	        return new Displays(source);
@@ -320,8 +339,10 @@ export namespace vo {
 	        this.player_battles = source["player_battles"];
 	        this.player_avg_tier = source["player_avg_tier"];
 	        this.player_using_ship_type_rate = source["player_using_ship_type_rate"];
+	        this.player_using_tier_rate = source["player_using_tier_rate"];
 	    }
 	}
+	
 	
 	
 	

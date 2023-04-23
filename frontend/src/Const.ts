@@ -23,7 +23,8 @@ namespace Const {
             player_exp: false,
             player_battles: true,
             player_avg_tier: false,
-            player_using_ship_type_rate: false
+            player_using_ship_type_rate: false,
+            player_using_tier_rate: false
         },
         convertValues: function (a: any, classs: any, asMap?: boolean) {
             throw new Error("Function not implemented.");
