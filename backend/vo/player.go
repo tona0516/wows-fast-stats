@@ -36,7 +36,7 @@ type PlayerStats struct {
 	KdRate    float64 `json:"kd_rate"`
     Exp float64 `json:"exp"`
 	AvgTier   float64 `json:"avg_tier"`
-    UsingShipTypeRate ShipTypeValue `json:"using_ship_type_rate"`
+    UsingShipTypeRate ShipTypeGroup[float64] `json:"using_ship_type_rate"`
     UsingTierRate TierGroup[float64] `json:"using_tier_rate"`
 }
 

@@ -40,7 +40,7 @@ export namespace vo {
 	        this.high = source["high"];
 	    }
 	}
-	export class ShipTypeValue {
+	export class ShipTypeGroup[float64] {
 	    ss: number;
 	    dd: number;
 	    cl: number;
@@ -48,7 +48,7 @@ export namespace vo {
 	    cv: number;
 	
 	    static createFrom(source: any = {}) {
-	        return new ShipTypeValue(source);
+	        return new ShipTypeGroup[float64](source);
 	    }
 	
 	    constructor(source: any = {}) {
@@ -69,7 +69,7 @@ export namespace vo {
 	    kd_rate: number;
 	    exp: number;
 	    avg_tier: number;
-	    using_ship_type_rate: ShipTypeValue;
+	    using_ship_type_rate: ShipTypeGroup[float64];
 	    using_tier_rate: TierGroup[float64];
 	
 	    static createFrom(source: any = {}) {
@@ -86,7 +86,7 @@ export namespace vo {
 	        this.kd_rate = source["kd_rate"];
 	        this.exp = source["exp"];
 	        this.avg_tier = source["avg_tier"];
-	        this.using_ship_type_rate = this.convertValues(source["using_ship_type_rate"], ShipTypeValue);
+	        this.using_ship_type_rate = this.convertValues(source["using_ship_type_rate"], ShipTypeGroup[float64]);
 	        this.using_tier_rate = this.convertValues(source["using_tier_rate"], TierGroup[float64]);
 	    }
 	
@@ -296,6 +296,7 @@ export namespace vo {
 	}
 	export class Displays {
 	    player_name: boolean;
+	    ship_info: boolean;
 	    pr: boolean;
 	    ship_damage: boolean;
 	    ship_win_rate: boolean;
@@ -322,6 +323,7 @@ export namespace vo {
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.player_name = source["player_name"];
+	        this.ship_info = source["ship_info"];
 	        this.pr = source["pr"];
 	        this.ship_damage = source["ship_damage"];
 	        this.ship_win_rate = source["ship_win_rate"];

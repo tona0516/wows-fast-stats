@@ -1,34 +1,76 @@
 <script lang="ts">
-  import iconCV from "./assets/images/icon-cv.png";
-  import iconBB from "./assets/images/icon-bb.png";
-  import iconCL from "./assets/images/icon-cl.png";
-  import iconDD from "./assets/images/icon-dd.png";
-  import iconSS from "./assets/images/icon-ss.png";
-  import iconNone from "./assets/images/icon-none.png";
-  import { BrowserOpenURL, LogDebug } from "../wailsjs/runtime/runtime";
   import type { vo } from "wailsjs/go/models";
   import Const from "./Const";
+  import Pr from "./Pr.svelte";
+  import PlayerName from "./PlayerName.svelte";
+  import ShipInfo from "./ShipInfo.svelte";
+  import ShipDamage from "./ShipDamage.svelte";
+  import ShipWinRate from "./ShipWinRate.svelte";
+  import ShipKdRate from "./ShipKdRate.svelte";
+  import ShipWinSurvivedRate from "./ShipWinSurvivedRate.svelte";
+  import ShipLoseSurvivedRate from "./ShipLoseSurvivedRate.svelte";
+  import ShipExp from "./ShipExp.svelte";
+  import ShipBattles from "./ShipBattles.svelte";
+  import OverallDamage from "./OverallDamage.svelte";
+  import OverallWinRate from "./OverallWinRate.svelte";
+  import OverallKdRate from "./OverallKdRate.svelte";
+  import OverallWinSurvivedRate from "./OverallWinSurvivedRate.svelte";
+  import OverallLoseSurvivedRate from "./OverallLoseSurvivedRate.svelte";
+  import OverallExp from "./OverallExp.svelte";
+  import AvgTier from "./AvgTier.svelte";
+  import ShipTypeRate from "./ShipTypeRate.svelte";
+  import TierRate from "./TierRate.svelte";
+  import OverallBattles from "./OverallBattles.svelte";
+  import NoData from "./NoData.svelte";
 
   export let loadState: LoadState = "standby";
   export let latestHash: string = "";
   export let battle: vo.Battle;
   export let config: vo.UserConfig = Const.DEFAULT_USER_CONFIG;
 
-  /**
-   * private: hidden player.
-   * nodata: invalid player(bot/deleted account) or 0 for all random battle.
-   * noshipstats: 0 in for random battle with the ship.
-   * nopr: not exist expected value in numbers api.
-   * full: all values exists.
-   */
-  type PlayerDataPattern =
-    | "private"
-    | "nodata"
-    | "noshipstats"
-    | "nopr"
-    | "full";
+  const basicComponents: { [key: string]: { header: string; component: any } } =
+    {
+      player_name: { header: "プレイヤー", component: PlayerName },
+      ship_info: { header: "艦", component: ShipInfo },
+    };
 
-  function decidePlayerDataPattern(player: vo.Player): PlayerDataPattern {
+  const components: { [key: string]: { header: string; component: any } } = {
+    pr: { header: "PR", component: Pr },
+    ship_damage: { header: "S:Dmg", component: ShipDamage },
+    ship_win_rate: { header: "S:勝率", component: ShipWinRate },
+    ship_kd_rate: { header: "S:K/D", component: ShipKdRate },
+    ship_win_survived_rate: {
+      header: "S:勝利生存率",
+      component: ShipWinSurvivedRate,
+    },
+    ship_lose_survived_rate: {
+      header: "S:敗北生存率",
+      component: ShipLoseSurvivedRate,
+    },
+    ship_exp: { header: "S:Exp", component: ShipExp },
+    ship_battles: { header: "S:戦闘数", component: ShipBattles },
+    player_damage: { header: "O:Dmg", component: OverallDamage },
+    player_win_rate: { header: "O:勝率", component: OverallWinRate },
+    player_kd_rate: { header: "O:K/D", component: OverallKdRate },
+    player_win_survived_rate: {
+      header: "O:勝利生存率",
+      component: OverallWinSurvivedRate,
+    },
+    player_lose_survived_rate: {
+      header: "O:敗北生存率",
+      component: OverallLoseSurvivedRate,
+    },
+    player_exp: { header: "O:Exp", component: OverallExp },
+    player_battles: { header: "O:戦闘数", component: OverallBattles },
+    player_avg_tier: { header: "O:平均T", component: AvgTier },
+    player_using_ship_type_rate: {
+      header: "O:艦種割合",
+      component: ShipTypeRate,
+    },
+    player_using_tier_rate: { header: "O:T別割合", component: TierRate },
+  };
+
+  function decidePlayerDataPattern(player: vo.Player): DisplayPattern {
     if (player.player_info.is_hidden) {
       return "private";
     }
@@ -73,41 +115,6 @@
     }
   }
 
-  function tierString(value: number): string {
-    if (value === 11) return "★";
-
-    const decimal = [10, 9, 5, 4, 1];
-    const romanNumeral = ["X", "IX", "V", "IV", "I"];
-
-    let romanized = "";
-
-    for (var i = 0; i < decimal.length; i++) {
-      while (decimal[i] <= value) {
-        romanized += romanNumeral[i];
-        value -= decimal[i];
-      }
-    }
-
-    return romanized;
-  }
-
-  function shipIcon(shipType: string): string {
-    switch (shipType) {
-      case "AirCarrier":
-        return iconCV;
-      case "Battleship":
-        return iconBB;
-      case "Cruiser":
-        return iconCL;
-      case "Destroyer":
-        return iconDD;
-      case "Submarine":
-        return iconSS;
-      default:
-        return iconNone;
-    }
-  }
-
   function renderTdForTeamSummary(
     battle: vo.Battle,
     key: string,
@@ -133,16 +140,6 @@
       digits
     )}</td><td class="${value2Class}">${value2Round.toFixed(digits)}</td>`;
   }
-
-  function countDisplays(config: vo.UserConfig): number {
-    return Object.values(config.displays).filter((it) => it === true).length;
-  }
-
-  function roundup(value: number, digit: number = 0): string {
-    const digitVal = Math.pow(10, digit);
-    const result = String(Math.ceil(value * digitVal) / digitVal);
-    return result;
-  }
 </script>
 
 {#if loadState === "fetching"}
@@ -159,359 +156,44 @@
       <table class="table table-sm">
         <thead>
           <tr>
-            {#if config.displays.player_name}
-              <th>プレイヤー</th>
-            {/if}
-            <th class="border-right">艦</th>
-            {#if config.displays.pr}
-              <th>PR</th>
-            {/if}
-            {#if config.displays.ship_damage}
-              <th>S:Dmg</th>
-            {/if}
-            {#if config.displays.ship_win_rate}
-              <th>S:勝率</th>
-            {/if}
-            {#if config.displays.ship_kd_rate}
-              <th>S:K/D</th>
-            {/if}
-            {#if config.displays.ship_win_survived_rate}
-              <th>S:勝利生存率</th>
-            {/if}
-            {#if config.displays.ship_lose_survived_rate}
-              <th>S:敗北生存率</th>
-            {/if}
-            {#if config.displays.ship_exp}
-              <th>S:Exp</th>
-            {/if}
-            {#if config.displays.ship_battles}
-              <th>S:戦闘数</th>
-            {/if}
-            {#if config.displays.player_damage}
-              <th>P:Dmg</th>
-            {/if}
-            {#if config.displays.player_win_rate}
-              <th>P:勝率</th>
-            {/if}
-            {#if config.displays.player_kd_rate}
-              <th>P:K/D</th>
-            {/if}
-            {#if config.displays.player_win_survived_rate}
-              <th>P:勝利生存率</th>
-            {/if}
-            {#if config.displays.player_lose_survived_rate}
-              <th>P:敗北生存率</th>
-            {/if}
-            {#if config.displays.player_exp}
-              <th>P:Exp</th>
-            {/if}
-            {#if config.displays.player_battles}
-              <th>P:戦闘数</th>
-            {/if}
-            {#if config.displays.player_avg_tier}
-              <th>P:平均T</th>
-            {/if}
-            {#if config.displays.player_using_ship_type_rate}
-              <th>P:使用艦率</th>
-            {/if}
-            {#if config.displays.player_using_tier_rate}
-              <th>P:ティア別割合</th>
-            {/if}
+            {#each Object.entries(basicComponents) as [k, v]}
+              {#if config.displays[k]}
+                <th>{v.header}</th>
+              {/if}
+            {/each}
+
+            {#each Object.entries(components) as [k, v]}
+              {#if config.displays[k]}
+                <th>{v.header}</th>
+              {/if}
+            {/each}
           </tr>
         </thead>
         <tbody>
           {#each team.players as player}
-            {@const dataPattern = decidePlayerDataPattern(player)}
+            {@const displayPattern = decidePlayerDataPattern(player)}
             <tr class={backgroundClass(player.ship_stats.personal_rating)}>
-              <!-- player name -->
-              {#if config.displays.player_name}
-                <td class="name omit">
-                  <!-- svelte-ignore a11y-invalid-attribute -->
-                  <a
-                    href="#"
-                    on:click={() =>
-                      BrowserOpenURL(player.player_info.stats_url)}
-                  >
-                    {#if player.player_info.clan}
-                      [{player.player_info.clan}]{player.player_info.name}
-                    {:else}
-                      {player.player_info.name}
-                    {/if}
-                  </a>
-                </td>
-              {/if}
+              <!-- basics -->
+              {#each Object.entries(basicComponents) as [k, v]}
+                <svelte:component
+                  this={v.component}
+                  {config}
+                  {player}
+                  {displayPattern}
+                />
+              {/each}
 
-              <!-- ship info -->
-              <td class="name omit border-right">
-                <!-- svelte-ignore a11y-invalid-attribute -->
-                <a
-                  href="#"
-                  on:click={() => BrowserOpenURL(player.ship_info.stats_url)}
-                >
-                  <div class="horizontal">
-                    <img
-                      alt=""
-                      src={shipIcon(player.ship_info.type)}
-                      class="icon-scale"
-                    />
-                    <div class="omit">
-                      {tierString(player.ship_info.tier)}
-                      {player.ship_info.name}
-                    </div>
-                  </div>
-                </a>
-              </td>
+              <NoData {config} {displayPattern} />
 
-              <!-- join column case -->
-              {#if countDisplays(config) > 0}
-                {#if dataPattern === "private"}
-                  <td colspan={countDisplays(config)}>PRIVATE</td>
-                {:else if dataPattern === "nodata"}
-                  <td colspan={countDisplays(config)}>NO DATA</td>
-                {/if}
-              {/if}
-
-              <!-- personal rating -->
-              {#if config.displays.pr}
-                {#if dataPattern === "full"}
-                  <td class="pr">
-                    {player.ship_stats.personal_rating.toFixed(0)}
-                  </td>
-                {:else if dataPattern === "noshipstats" || dataPattern === "nopr"}
-                  <td class="pr" />
-                {/if}
-              {/if}
-
-              <!-- ship avg damage -->
-              {#if config.displays.ship_damage}
-                {#if dataPattern === "full" || dataPattern === "nopr"}
-                  <td class="damage">
-                    {player.ship_stats.avg_damage.toFixed(0)}
-                  </td>
-                {:else if dataPattern === "noshipstats"}
-                  <td class="damage" />
-                {/if}
-              {/if}
-
-              <!-- ship win rate -->
-              {#if config.displays.ship_win_rate}
-                {#if dataPattern === "full" || dataPattern === "nopr"}
-                  <td class="win">
-                    {player.ship_stats.win_rate.toFixed(1)}
-                  </td>
-                {:else if dataPattern === "noshipstats"}
-                  <td class="win" />
-                {/if}
-              {/if}
-
-              <!-- ship kd rate -->
-              {#if config.displays.ship_kd_rate}
-                {#if dataPattern === "full" || dataPattern === "nopr"}
-                  <td class="kd">
-                    {player.ship_stats.kd_rate.toFixed(1)}
-                  </td>
-                {:else if dataPattern === "noshipstats"}
-                  <td class="kd" />
-                {/if}
-              {/if}
-
-              <!-- ship win survived rate -->
-              {#if config.displays.ship_win_survived_rate}
-                {#if dataPattern === "full" || dataPattern === "nopr"}
-                  <td class="survived-rate">
-                    {player.ship_stats.win_survived_rate.toFixed(1)}
-                  </td>
-                {:else if dataPattern === "noshipstats"}
-                  <td class="survived-rate" />
-                {/if}
-              {/if}
-
-              <!-- ship lose survived rate -->
-              {#if config.displays.ship_lose_survived_rate}
-                {#if dataPattern === "full" || dataPattern === "nopr"}
-                  <td class="survived-rate">
-                    {player.ship_stats.lose_survived_rate.toFixed(1)}
-                  </td>
-                {:else if dataPattern === "noshipstats"}
-                  <td class="survived-rate" />
-                {/if}
-              {/if}
-
-              <!-- ship exp -->
-              {#if config.displays.ship_exp}
-                {#if dataPattern === "full" || dataPattern === "nopr"}
-                  <td class="exp">
-                    {player.ship_stats.exp.toFixed(0)}
-                  </td>
-                {:else if dataPattern === "noshipstats"}
-                  <td class="exp" />
-                {/if}
-              {/if}
-
-              <!-- ship battles -->
-              {#if config.displays.ship_battles}
-                {#if dataPattern === "full" || dataPattern === "nopr"}
-                  <td class="battles">
-                    {player.ship_stats.battles}
-                  </td>
-                {:else if dataPattern === "noshipstats"}
-                  <td class="battles" />
-                {/if}
-              {/if}
-
-              <!-- player avg damage -->
-              {#if config.displays.player_damage}
-                {#if dataPattern === "noshipstats" || dataPattern === "full" || dataPattern === "nopr"}
-                  <td class="damage">
-                    {player.player_stats.avg_damage.toFixed(0)}
-                  </td>
-                {/if}
-              {/if}
-
-              <!-- player win rate -->
-              {#if config.displays.player_win_rate}
-                {#if dataPattern === "noshipstats" || dataPattern === "full" || dataPattern === "nopr"}
-                  <td class="win">
-                    {player.player_stats.win_rate.toFixed(1)}
-                  </td>
-                {/if}
-              {/if}
-
-              <!-- player kd rate -->
-              {#if config.displays.player_kd_rate}
-                {#if dataPattern === "noshipstats" || dataPattern === "full" || dataPattern === "nopr"}
-                  <td class="kd">
-                    {player.player_stats.kd_rate.toFixed(1)}
-                  </td>
-                {/if}
-              {/if}
-
-              <!-- player win survived rate -->
-              {#if config.displays.player_win_survived_rate}
-                {#if dataPattern === "full" || dataPattern === "nopr"}
-                  <td class="survived-rate">
-                    {player.player_stats.win_survived_rate.toFixed(1)}
-                  </td>
-                {:else if dataPattern === "noshipstats"}
-                  <td class="survived-rate" />
-                {/if}
-              {/if}
-
-              <!-- player lose survived rate -->
-              {#if config.displays.player_lose_survived_rate}
-                {#if dataPattern === "full" || dataPattern === "nopr"}
-                  <td class="survived-rate">
-                    {player.player_stats.lose_survived_rate.toFixed(1)}
-                  </td>
-                {:else if dataPattern === "noshipstats"}
-                  <td class="survived-rate" />
-                {/if}
-              {/if}
-
-              <!-- player exp -->
-              {#if config.displays.player_exp}
-                {#if dataPattern === "full" || dataPattern === "nopr"}
-                  <td class="exp">
-                    {player.player_stats.exp.toFixed(0)}
-                  </td>
-                {:else if dataPattern === "noshipstats"}
-                  <td class="exp" />
-                {/if}
-              {/if}
-
-              <!-- player battles -->
-              {#if config.displays.player_battles}
-                {#if dataPattern === "noshipstats" || dataPattern === "full" || dataPattern === "nopr"}
-                  <td class="battles">
-                    {player.player_stats.battles}
-                  </td>
-                {/if}
-              {/if}
-
-              <!-- avg tier -->
-              {#if config.displays.player_avg_tier}
-                {#if dataPattern === "noshipstats" || dataPattern === "full" || dataPattern === "nopr"}
-                  <td class="avg-tier">
-                    {player.player_stats.avg_tier.toFixed(1)}
-                  </td>
-                {/if}
-              {/if}
-
-              <!-- using ship type rate -->
-              {#if config.displays.player_using_ship_type_rate}
-                {#if dataPattern === "noshipstats" || dataPattern === "full" || dataPattern === "nopr"}
-                  <td class="using_ship_type_rate">
-                    <div class="progress">
-                      <div
-                        class="progress-bar progress-bar-striped bg-primary"
-                        role="progressbar"
-                        style="width: {roundup(
-                          player.player_stats.using_ship_type_rate.ss
-                        )}%"
-                      />
-                      <div
-                        class="progress-bar progress-bar-striped bg-info"
-                        role="progressbar"
-                        style="width: {roundup(
-                          player.player_stats.using_ship_type_rate.dd
-                        )}%"
-                      />
-                      <div
-                        class="progress-bar progress-bar-striped bg-success"
-                        role="progressbar"
-                        style="width: {roundup(
-                          player.player_stats.using_ship_type_rate.cl
-                        )}%"
-                      />
-                      <div
-                        class="progress-bar progress-bar-striped bg-warning"
-                        role="progressbar"
-                        style="width: {roundup(
-                          player.player_stats.using_ship_type_rate.bb
-                        )}%"
-                      />
-                      <div
-                        class="progress-bar progress-bar-striped bg-danger"
-                        role="progressbar"
-                        style="width: {roundup(
-                          player.player_stats.using_ship_type_rate.cv
-                        )}%"
-                      />
-                    </div>
-                  </td>
-                {/if}
-              {/if}
-
-              <!-- using tier rate -->
-              {#if config.displays.player_using_tier_rate}
-                {#if dataPattern === "noshipstats" || dataPattern === "full" || dataPattern === "nopr"}
-                  <td class="using_tier_rate">
-                    <div class="progress">
-                      <div
-                        class="progress-bar progress-bar-striped bg-primary"
-                        role="progressbar"
-                        style="width: {roundup(
-                          player.player_stats.using_tier_rate.low
-                        )}%"
-                      />
-                      <div
-                        class="progress-bar progress-bar-striped bg-info"
-                        role="progressbar"
-                        style="width: {roundup(
-                          player.player_stats.using_tier_rate.middle
-                        )}%"
-                      />
-                      <div
-                        class="progress-bar progress-bar-striped bg-success"
-                        role="progressbar"
-                        style="width: {roundup(
-                          player.player_stats.using_tier_rate.high
-                        )}%"
-                      />
-                    </div>
-                  </td>
-                {/if}
-              {/if}
+              <!-- values -->
+              {#each Object.entries(components) as [k, v]}
+                <svelte:component
+                  this={v.component}
+                  {config}
+                  {player}
+                  {displayPattern}
+                />
+              {/each}
             </tr>
           {/each}
         </tbody>

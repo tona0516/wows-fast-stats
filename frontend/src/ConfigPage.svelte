@@ -38,7 +38,9 @@
   }
 
   function toggleAll(e) {
-    const keys = Object.keys(inputConfig.displays);
+    const keys = Object.keys(inputConfig.displays).filter(
+      (key) => key !== "ship_info"
+    );
     const isSelectAll: boolean = e.target.checked;
     keys.forEach((key) => (inputConfig.displays[key] = isSelectAll));
   }
@@ -126,6 +128,16 @@
             <label class="form-check-label" for="player-name"
               >プレイヤー名</label
             >
+          </div>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              id="player-name"
+              bind:checked={inputConfig.displays.ship_info}
+              disabled={true}
+            />
+            <label class="form-check-label" for="player-name">艦</label>
           </div>
           <div class="form-check">
             <input

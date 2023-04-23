@@ -2,6 +2,7 @@ package vo
 
 type Displays struct {
     PlaterName bool `json:"player_name"`
+    ShipInfo bool `json:"ship_info"`
     PR bool `json:"pr"`
     ShipDamage bool `json:"ship_damage"`
     ShipWinRate bool `json:"ship_win_rate"`

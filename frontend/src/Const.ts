@@ -7,6 +7,7 @@ namespace Const {
         font_size: "medium",
         displays: {
             player_name: true,
+            ship_info: true,
             pr: true,
             ship_damage: true,
             ship_win_rate: true,
@@ -24,7 +25,7 @@ namespace Const {
             player_battles: true,
             player_avg_tier: false,
             player_using_ship_type_rate: false,
-            player_using_tier_rate: false
+            player_using_tier_rate: false,
         },
         convertValues: function (a: any, classs: any, asMap?: boolean) {
             throw new Error("Function not implemented.");

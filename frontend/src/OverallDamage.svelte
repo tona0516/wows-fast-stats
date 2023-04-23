@@ -1,0 +1,16 @@
+<script lang="ts">
+  import type { vo } from "wailsjs/go/models";
+  export let config: vo.UserConfig;
+  export let player: vo.Player;
+  export let displayPattern: DisplayPattern;
+</script>
+
+{#if config.displays.player_damage}
+  {#if displayPattern === "full" || displayPattern === "nopr"}
+    <td class="damage">
+      {player.player_stats.avg_damage.toFixed(0)}
+    </td>
+  {:else if displayPattern === "noshipstats"}
+    <td class="damage" />
+  {/if}
+{/if}

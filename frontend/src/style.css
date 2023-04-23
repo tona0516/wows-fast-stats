@@ -136,6 +136,10 @@ a {
   min-width: 120px;
 }
 
+.no_data {
+  max-width: 0px;
+}
+
 .omit {
   overflow: hidden;
   text-overflow: ellipsis;

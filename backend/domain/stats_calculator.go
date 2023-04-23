@@ -169,8 +169,8 @@ func (s *StatsCalculator) UsingTierRate(accountID int, shipInfo map[int]vo.Warsh
     return result
 }
 
-func (s *StatsCalculator) UsingShipTypeRate(accountID int, shipInfo map[int]vo.Warship, shipStats map[int]vo.WGShipsStats) vo.ShipTypeValue {
-    var result vo.ShipTypeValue
+func (s *StatsCalculator) UsingShipTypeRate(accountID int, shipInfo map[int]vo.Warship, shipStats map[int]vo.WGShipsStats) vo.ShipTypeGroup[float64] {
+    var result vo.ShipTypeGroup[float64]
     var allBattles uint
 
     playerShipStats := shipStats[accountID].Data[accountID]
@@ -181,33 +181,33 @@ func (s *StatsCalculator) UsingShipTypeRate(accountID int, shipInfo map[int]vo.W
         if battles != 0 {
             switch shipType {
             case "Submarine":
-                result.Ss += float64(battles)
+                result.SS += float64(battles)
                 allBattles += battles
             case "Destroyer":
-                result.Dd += float64(battles)
+                result.DD += float64(battles)
                 allBattles += battles
             case "Cruiser":
-                result.Cl += float64(battles)
+                result.CL += float64(battles)
                 allBattles += battles
             case "Battleship":
-                result.Bb += float64(battles)
+                result.BB += float64(battles)
                 allBattles += battles
             case "AirCarrier":
-                result.Cv += float64(battles)
+                result.CV += float64(battles)
                 allBattles += battles
             }
         }
 	}
 
     if allBattles == 0 {
-        return vo.ShipTypeValue{}
+        return vo.ShipTypeGroup[float64]{}
     }
 
-    result.Ss = result.Ss / float64(allBattles) * 100
-    result.Dd = result.Dd / float64(allBattles) * 100
-    result.Cl = result.Cl / float64(allBattles) * 100
-    result.Bb = result.Bb / float64(allBattles) * 100
-    result.Cv = result.Cv / float64(allBattles) * 100
+    result.SS = result.SS / float64(allBattles) * 100
+    result.DD = result.DD / float64(allBattles) * 100
+    result.CL = result.CL / float64(allBattles) * 100
+    result.BB = result.BB / float64(allBattles) * 100
+    result.CV = result.CV / float64(allBattles) * 100
 
     return result
 }
