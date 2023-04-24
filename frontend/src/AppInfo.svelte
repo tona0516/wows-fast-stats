@@ -1,5 +1,7 @@
 <script lang="ts">
   import { BrowserOpenURL } from "../wailsjs/runtime/runtime";
+  import GitHubIcon from "./GitHubIcon.svelte";
+  import TwitterIcon from "./TwitterIcon.svelte";
   import iconApp from "./assets/images/appicon.png";
 </script>
 
@@ -13,7 +15,7 @@
     バージョン 0.0.1
   </p>
   <p>
-    Twitter:
+    <TwitterIcon />
     <!-- svelte-ignore a11y-invalid-attribute -->
     <a
       href="#"
@@ -22,7 +24,7 @@
       @tonango_0516
     </a>
     <br />
-    GitHub:
+    <GitHubIcon />
     <!-- svelte-ignore a11y-invalid-attribute -->
     <a
       href="#"
