@@ -6,11 +6,9 @@
 </script>
 
 {#if config.displays.player_exp}
-  {#if displayPattern === "full" || displayPattern === "nopr"}
+  {#if displayPattern === "full" || displayPattern === "nopr" || displayPattern === "noshipstats"}
     <td class="exp">
       {player.player_stats.exp.toFixed(0)}
     </td>
-  {:else if displayPattern === "noshipstats"}
-    <td class="exp" />
   {/if}
 {/if}

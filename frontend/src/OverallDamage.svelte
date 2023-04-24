@@ -6,11 +6,9 @@
 </script>
 
 {#if config.displays.player_damage}
-  {#if displayPattern === "full" || displayPattern === "nopr"}
+  {#if displayPattern === "full" || displayPattern === "nopr" || displayPattern === "noshipstats"}
     <td class="damage">
       {player.player_stats.avg_damage.toFixed(0)}
     </td>
-  {:else if displayPattern === "noshipstats"}
-    <td class="damage" />
   {/if}
 {/if}

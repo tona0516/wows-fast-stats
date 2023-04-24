@@ -6,11 +6,9 @@
 </script>
 
 {#if config.displays.player_battles}
-  {#if displayPattern === "full" || displayPattern === "nopr"}
+  {#if displayPattern === "full" || displayPattern === "nopr" || displayPattern === "noshipstats"}
     <td class="battles">
       {player.player_stats.battles}
     </td>
-  {:else if displayPattern === "noshipstats"}
-    <td class="battles" />
   {/if}
 {/if}

@@ -6,11 +6,9 @@
 </script>
 
 {#if config.displays.player_kd_rate}
-  {#if displayPattern === "full" || displayPattern === "nopr"}
+  {#if displayPattern === "full" || displayPattern === "nopr" || displayPattern === "noshipstats"}
     <td class="kd">
       {player.player_stats.kd_rate.toFixed(1)}
     </td>
-  {:else if displayPattern === "noshipstats"}
-    <td class="kd" />
   {/if}
 {/if}

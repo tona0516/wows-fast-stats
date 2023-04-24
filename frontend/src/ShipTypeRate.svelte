@@ -12,7 +12,7 @@
 </script>
 
 {#if config.displays.player_using_ship_type_rate}
-  {#if displayPattern === "noshipstats" || displayPattern === "full" || displayPattern === "nopr"}
+  {#if displayPattern === "full" || displayPattern === "nopr" || displayPattern === "noshipstats"}
     <td class="using_ship_type_rate">
       <div class="progress">
         <div

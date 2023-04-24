@@ -462,6 +462,10 @@ func (s *StatsService) compose(
 		} else {
 			enemies = append(enemies, player)
 		}
+
+        if nickname == "Hades_XB" {
+            fmt.Println(player)
+        }
 	}
 
 	sort.Sort(friends)

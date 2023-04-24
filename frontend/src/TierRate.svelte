@@ -13,7 +13,7 @@
 
 <!-- using tier rate -->
 {#if config.displays.player_using_tier_rate}
-  {#if displayPattern === "noshipstats" || displayPattern === "full" || displayPattern === "nopr"}
+  {#if displayPattern === "full" || displayPattern === "nopr" || displayPattern === "noshipstats"}
     <td class="using_tier_rate">
       <div class="progress">
         <div
