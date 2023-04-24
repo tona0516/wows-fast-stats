@@ -15,6 +15,7 @@
   import ConfigIcon from "./ConfigIcon.svelte";
   import ReloadIcon from "./ReloadIcon.svelte";
   import CameraIcon from "./CameraIcon.svelte";
+  import iconApp from "./assets/images/appicon.png";
 
   type NavigationMenu = "main" | "config" | "reload" | "screenshot";
   type ScreenshotType = "auto" | "manual";
@@ -136,7 +137,7 @@
   <div style="font-size: {config?.font_size || 'medium'};">
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
       <div class="container-fluid">
-        <span class="navbar-brand">wows-fast-stats</span>
+        <img class="me-2" src={iconApp} alt="" width="36px" height="36px">
         <button
           class="navbar-toggler"
           type="button"
