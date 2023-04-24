@@ -340,7 +340,7 @@
             bind:checked={inputConfig.save_screenshot}
           />
           <label class="form-check-label" for="save-scrrenshot"
-            >自動でスクリーンショットを保存する</label
+            >自動でスクリーンショットを保存する(<i>&lt;exeファイルがあるフォルダ&gt;/screenshot</i>)</label
           >
         </div>
       </div>
