@@ -158,7 +158,7 @@
           <div class="navbar-nav">
             <button
               type="button"
-              class="btn btn-outline-secondary mx-1"
+              class="btn btn-outline-secondary m-1"
               title="ホーム"
               on:click={() => onClickMenu("main")}
             >
@@ -166,7 +166,7 @@
             </button>
             <button
               type="button"
-              class="btn btn-outline-secondary mx-1"
+              class="btn btn-outline-secondary m-1"
               title="設定"
               on:click={() => onClickMenu("config")}
             >
@@ -174,7 +174,7 @@
             </button>
             <button
               type="button"
-              class="btn btn-outline-secondary mx-1"
+              class="btn btn-outline-secondary m-1"
               title="アプリ情報"
               on:click={() => onClickMenu("appinfo")}
             >
@@ -183,7 +183,7 @@
             {#if currentPage == "main"}
               <button
                 type="button"
-                class="btn btn-outline-success mx-1"
+                class="btn btn-outline-success m-1"
                 title="リロード"
                 on:click={() => onClickMenu("reload")}
               >
@@ -192,7 +192,7 @@
 
               <button
                 type="button"
-                class="btn btn-outline-success mx-1"
+                class="btn btn-outline-success m-1"
                 title="スクリーンショット"
                 disabled={battle === undefined || loadState === "fetching"}
                 on:click={() => onClickMenu("screenshot")}
