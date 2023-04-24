@@ -16,10 +16,12 @@
   import ReloadIcon from "./ReloadIcon.svelte";
   import CameraIcon from "./CameraIcon.svelte";
   import iconApp from "./assets/images/appicon.png";
+  import InfoIcon from "./InfoIcon.svelte";
+  import AppInfo from "./AppInfo.svelte";
 
-  type NavigationMenu = "main" | "config" | "reload" | "screenshot";
+  type NavigationMenu = "main" | "config" | "appinfo" | "reload" | "screenshot";
   type ScreenshotType = "auto" | "manual";
-  type Page = "main" | "config";
+  type Page = "main" | "config" | "appinfo";
 
   let currentPage: Page = "main";
 
@@ -39,6 +41,9 @@
         break;
       case "config":
         currentPage = "config";
+        break;
+      case "appinfo":
+        currentPage = "appinfo";
         break;
       case "reload":
         WindowReloadApp();
@@ -137,7 +142,7 @@
   <div style="font-size: {config?.font_size || 'medium'};">
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
       <div class="container-fluid">
-        <img class="me-2" src={iconApp} alt="" width="36px" height="36px">
+        <img class="me-2" src={iconApp} alt="" width="36px" height="36px" />
         <button
           class="navbar-toggler"
           type="button"
@@ -166,6 +171,14 @@
               on:click={() => onClickMenu("config")}
             >
               <ConfigIcon />
+            </button>
+            <button
+              type="button"
+              class="btn btn-outline-secondary mx-1"
+              title="アプリ情報"
+              on:click={() => onClickMenu("appinfo")}
+            >
+              <InfoIcon />
             </button>
             {#if currentPage == "main"}
               <button
@@ -205,6 +218,10 @@
         on:ErrorToast={(event) =>
           notification.showToast(event.detail.message, "error")}
       />
+    {/if}
+
+    {#if currentPage === "appinfo"}
+      <AppInfo />
     {/if}
 
     <Notification bind:this={notification} />
