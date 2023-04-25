@@ -34,5 +34,5 @@
       wows-fast-stats
     </a>
   </p>
-  <p>Copyright© 2023 tona0516 All Rights Reserved.</p>
+  <p>Copyright © 2023 tona0516 All Rights Reserved.</p>
 </div>
