@@ -140,7 +140,7 @@
 
 <main>
   <div style="font-size: {config?.font_size || 'medium'};">
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <nav class="navbar navbar-expand-sm navbar-light bg-light">
       <div class="container-fluid">
         <img class="me-2" src={iconApp} alt="" width="36px" height="36px" />
         <button
@@ -158,7 +158,8 @@
           <div class="navbar-nav">
             <button
               type="button"
-              class="btn btn-outline-secondary m-1"
+              class="btn btn-outline-secondary m-1 {currentPage === 'main' &&
+                'active'}"
               title="ホーム"
               on:click={() => onClickMenu("main")}
             >
@@ -166,7 +167,8 @@
             </button>
             <button
               type="button"
-              class="btn btn-outline-secondary m-1"
+              class="btn btn-outline-secondary m-1 {currentPage === 'config' &&
+                'active'}"
               title="設定"
               on:click={() => onClickMenu("config")}
             >
@@ -174,7 +176,8 @@
             </button>
             <button
               type="button"
-              class="btn btn-outline-secondary m-1"
+              class="btn btn-outline-secondary m-1 {currentPage === 'appinfo' &&
+                'active'}"
               title="アプリ情報"
               on:click={() => onClickMenu("appinfo")}
             >

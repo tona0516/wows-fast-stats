@@ -46,10 +46,10 @@
   }
 </script>
 
-<div class="mt-3">
+<div class="mt-3 form-style">
   <form>
     <!-- install path -->
-    <div class="mb-3 form-style">
+    <div class="mb-3">
       <div class="centerize">
         <label for="install-path" class="form-label"
           >World of Warshipsインストールフォルダ</label
@@ -71,7 +71,7 @@
     </div>
 
     <!-- appid -->
-    <div class="mb-3 form-style">
+    <div class="mb-3">
       <div class="centerize">
         <label for="appid" class="form-label">AppID</label>
       </div>
@@ -84,7 +84,7 @@
     </div>
 
     <!-- font-size -->
-    <div class="mb-3 form-style">
+    <div class="mb-3">
       <div class="centerize">
         <label for="font-size" class="form-label">文字サイズ</label>
       </div>
@@ -98,7 +98,7 @@
     </div>
 
     <!-- display values -->
-    <div class="mb-3 form-style">
+    <div class="mb-3">
       <div class="centerize">
         <label for="font-column" class="form-lavel">表示項目</label>
       </div>
@@ -348,9 +348,11 @@
       </div>
     </div>
 
-    <!-- apply -->
-    <button type="button" class="btn btn-primary" on:click={clickApply}
-      >適用</button
-    >
+    <div class="centerize">
+      <!-- apply -->
+      <button type="button" class="btn btn-primary mb-3" on:click={clickApply}
+        >適用</button
+      >
+    </div>
   </form>
 </div>
