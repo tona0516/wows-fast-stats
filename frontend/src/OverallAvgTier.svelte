@@ -6,7 +6,7 @@
 </script>
 
 <!-- avg tier -->
-{#if config.displays.player_avg_tier}
+{#if config.displays.overall.avg_tier}
   {#if displayPattern === "noshipstats" || displayPattern === "full" || displayPattern === "nopr"}
     <td class="avg-tier">
       {player.player_stats.avg_tier.toFixed(1)}

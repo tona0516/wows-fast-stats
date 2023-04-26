@@ -11,34 +11,25 @@
   }
 </script>
 
-{#if config.displays.player_using_ship_type_rate}
+<!-- using tier rate -->
+{#if config.displays.overall.using_tier_rate}
   {#if displayPattern === "full" || displayPattern === "nopr" || displayPattern === "noshipstats"}
-    <td class="using_ship_type_rate">
+    <td class="using_tier_rate">
       <div class="progress">
         <div
           class="progress-bar progress-bar-striped bg-primary"
           role="progressbar"
-          style="width: {roundup(player.player_stats.using_ship_type_rate.ss)}%"
+          style="width: {roundup(player.player_stats.using_tier_rate.low)}%"
         />
         <div
           class="progress-bar progress-bar-striped bg-info"
           role="progressbar"
-          style="width: {roundup(player.player_stats.using_ship_type_rate.dd)}%"
+          style="width: {roundup(player.player_stats.using_tier_rate.middle)}%"
         />
         <div
           class="progress-bar progress-bar-striped bg-success"
           role="progressbar"
-          style="width: {roundup(player.player_stats.using_ship_type_rate.cl)}%"
-        />
-        <div
-          class="progress-bar progress-bar-striped bg-warning"
-          role="progressbar"
-          style="width: {roundup(player.player_stats.using_ship_type_rate.bb)}%"
-        />
-        <div
-          class="progress-bar progress-bar-striped bg-danger"
-          role="progressbar"
-          style="width: {roundup(player.player_stats.using_ship_type_rate.cv)}%"
+          style="width: {roundup(player.player_stats.using_tier_rate.high)}%"
         />
       </div>
     </td>

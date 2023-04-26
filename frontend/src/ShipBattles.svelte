@@ -5,7 +5,7 @@
   export let displayPattern: DisplayPattern;
 </script>
 
-{#if config.displays.ship_battles}
+{#if config.displays.ship.battles}
   {#if displayPattern === "full" || displayPattern === "nopr"}
     <td class="battles">
       {player.ship_stats.battles}

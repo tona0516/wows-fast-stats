@@ -1,26 +1,38 @@
 package vo
 
-type Displays struct {
+type Basic struct {
     PlaterName bool `json:"player_name"`
     ShipInfo bool `json:"ship_info"`
+}
+
+type Ship struct {
     PR bool `json:"pr"`
-    ShipDamage bool `json:"ship_damage"`
-    ShipWinRate bool `json:"ship_win_rate"`
-    ShipKdRate bool `json:"ship_kd_rate"`
-    ShipWinSurvivedRate bool `json:"ship_win_survived_rate"`
-    ShipLoseSurvivedRate bool `json:"ship_lose_survived_rate"`
-    ShipExp bool `json:"ship_exp"`
-    ShipBattles bool `json:"ship_battles"`
-    PlayerDamage bool `json:"player_damage"`
-    PlayerWinRate bool `json:"player_win_rate"`
-    PlayerKdRate bool `json:"player_kd_rate"`
-    PlayerWinSurvivedRate bool `json:"player_win_survived_rate"`
-    PlayerLoseSurvivedRate bool `json:"player_lose_survived_rate"`
-    PlayerExp bool `json:"player_exp"`
-    PlayerBattles bool `json:"player_battles"`
-    PlayerAvgTier bool `json:"player_avg_tier"`
-    PlayerUsingShipTypeRate bool `json:"player_using_ship_type_rate"`
-    PlayerUsingTierRate bool `json:"player_using_tier_rate"`
+    Damage bool `json:"damage"`
+    WinRate bool `json:"win_rate"`
+    KdRate bool `json:"kd_rate"`
+    WinSurvivedRate bool `json:"win_survived_rate"`
+    LoseSurvivedRate bool `json:"lose_survived_rate"`
+    Exp bool `json:"exp"`
+    Battles bool `json:"battles"`
+}
+
+type Overall struct {
+    Damage bool `json:"damage"`
+    WinRate bool `json:"win_rate"`
+    KdRate bool `json:"kd_rate"`
+    WinSurvivedRate bool `json:"win_survived_rate"`
+    LoseSurvivedRate bool `json:"lose_survived_rate"`
+    Exp bool `json:"exp"`
+    Battles bool `json:"battles"`
+    AvgTier bool `json:"avg_tier"`
+    UsingShipTypeRate bool `json:"using_ship_type_rate"`
+    UsingTierRate bool `json:"using_tier_rate"`
+}
+
+type Displays struct {
+    Basic Basic `json:"basic"`
+    Ship Ship `json:"ship"`
+    Overall Overall `json:"overall"`
 }
 
 type UserConfig struct {

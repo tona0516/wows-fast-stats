@@ -6,7 +6,7 @@
 </script>
 
 <!-- ship kd rate -->
-{#if config.displays.ship_kd_rate}
+{#if config.displays.ship.kd_rate}
   {#if displayPattern === "full" || displayPattern === "nopr"}
     <td class="kd">
       {player.ship_stats.kd_rate.toFixed(1)}

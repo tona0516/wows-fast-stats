@@ -1,9 +1,9 @@
 <script lang="ts">
   import type { vo } from "wailsjs/go/models";
   import Const from "./Const";
-  import Pr from "./Pr.svelte";
-  import PlayerName from "./PlayerName.svelte";
-  import ShipInfo from "./ShipInfo.svelte";
+  import ShipPr from "./ShipPr.svelte";
+  import BasicPlayerName from "./BasicPlayerName.svelte";
+  import BasicShipInfo from "./BasicShipInfo.svelte";
   import ShipDamage from "./ShipDamage.svelte";
   import ShipWinRate from "./ShipWinRate.svelte";
   import ShipKdRate from "./ShipKdRate.svelte";
@@ -17,9 +17,9 @@
   import OverallWinSurvivedRate from "./OverallWinSurvivedRate.svelte";
   import OverallLoseSurvivedRate from "./OverallLoseSurvivedRate.svelte";
   import OverallExp from "./OverallExp.svelte";
-  import AvgTier from "./AvgTier.svelte";
-  import ShipTypeRate from "./ShipTypeRate.svelte";
-  import TierRate from "./TierRate.svelte";
+  import AvgTier from "./OverallAvgTier.svelte";
+  import ShipTypeRate from "./OverallShipTypeRate.svelte";
+  import TierRate from "./OverallTierRate.svelte";
   import OverallBattles from "./OverallBattles.svelte";
   import NoData from "./NoData.svelte";
 
@@ -28,46 +28,48 @@
   export let battle: vo.Battle;
   export let config: vo.UserConfig = Const.DEFAULT_USER_CONFIG;
 
-  const basicComponents: { [key: string]: { header: string; component: any } } =
-    {
-      player_name: { header: "プレイヤー", component: PlayerName },
-      ship_info: { header: "艦", component: ShipInfo },
-    };
-
-  const components: { [key: string]: { header: string; component: any } } = {
-    pr: { header: "PR", component: Pr },
-    ship_damage: { header: "S:Dmg", component: ShipDamage },
-    ship_win_rate: { header: "S:勝率", component: ShipWinRate },
-    ship_kd_rate: { header: "S:K/D", component: ShipKdRate },
-    ship_win_survived_rate: {
-      header: "S:勝利生存率",
-      component: ShipWinSurvivedRate,
+  const components = {
+    basic: {
+      player_name: { header: "プレイヤー", component: BasicPlayerName },
+      ship_info: { header: "艦", component: BasicShipInfo },
     },
-    ship_lose_survived_rate: {
-      header: "S:敗北生存率",
-      component: ShipLoseSurvivedRate,
+    ship: {
+      pr: { header: "PR", component: ShipPr },
+      damage: { header: "Dmg", component: ShipDamage },
+      win_rate: { header: "勝率", component: ShipWinRate },
+      kd_rate: { header: "K/D", component: ShipKdRate },
+      win_survived_rate: {
+        header: "勝利生存率",
+        component: ShipWinSurvivedRate,
+      },
+      lose_survived_rate: {
+        header: "敗北生存率",
+        component: ShipLoseSurvivedRate,
+      },
+      exp: { header: "Exp", component: ShipExp },
+      battles: { header: "戦闘数", component: ShipBattles },
     },
-    ship_exp: { header: "S:Exp", component: ShipExp },
-    ship_battles: { header: "S:戦闘数", component: ShipBattles },
-    player_damage: { header: "O:Dmg", component: OverallDamage },
-    player_win_rate: { header: "O:勝率", component: OverallWinRate },
-    player_kd_rate: { header: "O:K/D", component: OverallKdRate },
-    player_win_survived_rate: {
-      header: "O:勝利生存率",
-      component: OverallWinSurvivedRate,
+    overall: {
+      damage: { header: "Dmg", component: OverallDamage },
+      win_rate: { header: "勝率", component: OverallWinRate },
+      kd_rate: { header: "K/D", component: OverallKdRate },
+      win_survived_rate: {
+        header: "勝利生存率",
+        component: OverallWinSurvivedRate,
+      },
+      lose_survived_rate: {
+        header: "敗北生存率",
+        component: OverallLoseSurvivedRate,
+      },
+      exp: { header: "Exp", component: OverallExp },
+      battles: { header: "戦闘数", component: OverallBattles },
+      avg_tier: { header: "平均T", component: AvgTier },
+      using_ship_type_rate: {
+        header: "艦種割合",
+        component: ShipTypeRate,
+      },
+      using_tier_rate: { header: "T別割合", component: TierRate },
     },
-    player_lose_survived_rate: {
-      header: "O:敗北生存率",
-      component: OverallLoseSurvivedRate,
-    },
-    player_exp: { header: "O:Exp", component: OverallExp },
-    player_battles: { header: "O:戦闘数", component: OverallBattles },
-    player_avg_tier: { header: "O:平均T", component: AvgTier },
-    player_using_ship_type_rate: {
-      header: "O:艦種割合",
-      component: ShipTypeRate,
-    },
-    player_using_tier_rate: { header: "O:T別割合", component: TierRate },
   };
 
   function decidePlayerDataPattern(player: vo.Player): DisplayPattern {
@@ -153,17 +155,44 @@
 {#if latestHash !== ""}
   <div class="mt-2 mx-4">
     {#each battle.teams as team}
-      <table class="table table-sm">
+      <table class="table table-sm table-bordered">
         <thead>
           <tr>
-            {#each Object.entries(basicComponents) as [k, v]}
-              {#if config.displays[k]}
+            <th
+              colspan={Object.values(config.displays.basic).filter(
+                (it) => it === true
+              ).length}>基本情報</th
+            >
+            {#if Object.values(config.displays.ship).filter((it) => it === true).length !== 0}
+              <th
+                colspan={Object.values(config.displays.ship).filter(
+                  (it) => it === true
+                ).length}>艦成績</th
+              >
+            {/if}
+            {#if Object.values(config.displays.overall).filter((it) => it === true).length !== 0}
+              <th
+                colspan={Object.values(config.displays.overall).filter(
+                  (it) => it === true
+                ).length}>総合成績</th
+              >
+            {/if}
+          </tr>
+          <tr>
+            {#each Object.entries(components.basic) as [k, v]}
+              {#if config.displays.basic[k]}
                 <th>{v.header}</th>
               {/if}
             {/each}
 
-            {#each Object.entries(components) as [k, v]}
-              {#if config.displays[k]}
+            {#each Object.entries(components.ship) as [k, v]}
+              {#if config.displays.ship[k]}
+                <th>{v.header}</th>
+              {/if}
+            {/each}
+
+            {#each Object.entries(components.overall) as [k, v]}
+              {#if config.displays.overall[k]}
                 <th>{v.header}</th>
               {/if}
             {/each}
@@ -174,7 +203,7 @@
             {@const displayPattern = decidePlayerDataPattern(player)}
             <tr class={backgroundClass(player.ship_stats.personal_rating)}>
               <!-- basics -->
-              {#each Object.entries(basicComponents) as [k, v]}
+              {#each Object.entries(components.basic) as [k, v]}
                 <svelte:component
                   this={v.component}
                   {config}
@@ -186,7 +215,17 @@
               <NoData {config} {displayPattern} />
 
               <!-- values -->
-              {#each Object.entries(components) as [k, v]}
+              {#each Object.entries(components.ship) as [k, v]}
+                <svelte:component
+                  this={v.component}
+                  {config}
+                  {player}
+                  {displayPattern}
+                />
+              {/each}
+
+              <!-- values -->
+              {#each Object.entries(components.overall) as [k, v]}
                 <svelte:component
                   this={v.component}
                   {config}

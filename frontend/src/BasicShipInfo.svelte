@@ -47,7 +47,7 @@
   }
 </script>
 
-<td class="name omit border-right">
+<td class="name omit">
   <!-- svelte-ignore a11y-invalid-attribute -->
   <a href="#" on:click={() => BrowserOpenURL(player.ship_info.stats_url)}>
     <div class="horizontal">

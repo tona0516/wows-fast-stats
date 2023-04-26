@@ -5,7 +5,7 @@
   export let displayPattern: DisplayPattern;
 </script>
 
-{#if config.displays.player_win_survived_rate}
+{#if config.displays.overall.win_survived_rate}
   {#if displayPattern === "full" || displayPattern === "nopr" || displayPattern === "noshipstats"}
     <td class="survived-rate">
       {player.player_stats.win_survived_rate.toFixed(1)}

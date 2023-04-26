@@ -5,7 +5,7 @@
   export let displayPattern: DisplayPattern;
 </script>
 
-{#if config.displays.player_damage}
+{#if config.displays.overall.damage}
   {#if displayPattern === "full" || displayPattern === "nopr" || displayPattern === "noshipstats"}
     <td class="damage">
       {player.player_stats.avg_damage.toFixed(0)}

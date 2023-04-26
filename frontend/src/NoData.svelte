@@ -5,11 +5,14 @@
   export let displayPattern: DisplayPattern;
 
   function countDisplays(config: vo.UserConfig): number {
-    const excludedColumns = ["player_name", "ship_info"];
-
-    return Object.entries(config.displays).filter(
-      ([k, v]) => !excludedColumns.includes(k) && v === true
+    const shipCount = Object.values(config.displays.ship).filter(
+      (it) => it === true
     ).length;
+    const overallCount = Object.values(config.displays.overall).filter(
+      (it) => it === true
+    ).length;
+
+    return shipCount + overallCount;
   }
 </script>
 

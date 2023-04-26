@@ -6,32 +6,41 @@ namespace Const {
         appid: "",
         font_size: "medium",
         displays: {
-            player_name: true,
-            ship_info: true,
-            pr: true,
-            ship_damage: true,
-            ship_win_rate: true,
-            ship_kd_rate: true,
-            ship_win_survived_rate: false,
-            ship_lose_survived_rate: false,
-            ship_exp: false,
-            ship_battles: true,
-            player_damage: true,
-            player_win_rate: true,
-            player_kd_rate: true,
-            player_win_survived_rate: false,
-            player_lose_survived_rate: false,
-            player_exp: false,
-            player_battles: true,
-            player_avg_tier: false,
-            player_using_ship_type_rate: false,
-            player_using_tier_rate: false,
-        },
-        convertValues: function (a: any, classs: any, asMap?: boolean) {
-            throw new Error("Function not implemented.");
+            basic: {
+                player_name: true,
+                ship_info: true
+            },
+            ship: {
+                pr: true,
+                damage: true,
+                win_rate: true,
+                kd_rate: false,
+                win_survived_rate: false,
+                lose_survived_rate: false,
+                exp: false,
+                battles: true
+            },
+            overall: {
+                damage: true,
+                win_rate: true,
+                kd_rate: false,
+                win_survived_rate: false,
+                lose_survived_rate: false,
+                exp: false,
+                battles: true,
+                avg_tier: false,
+                using_ship_type_rate: false,
+                using_tier_rate: false
+            },
+            convertValues: function (a: any, classs: any, asMap?: boolean) {
+                throw new Error("Function not implemented.");
+            }
         },
         save_screenshot: false,
-        save_temp_arena_info: false
+        save_temp_arena_info: false,
+        convertValues: function (a: any, classs: any, asMap?: boolean) {
+            throw new Error("Function not implemented.");
+        }
     };
 }
 

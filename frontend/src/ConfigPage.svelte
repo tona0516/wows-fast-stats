@@ -41,11 +41,26 @@
   }
 
   function toggleAll(e) {
-    const keys = Object.keys(inputConfig.displays).filter(
-      (key) => key !== "ship_info"
-    );
     const isSelectAll: boolean = e.target.checked;
-    keys.forEach((key) => (inputConfig.displays[key] = isSelectAll));
+
+    Object.keys(inputConfig.displays.ship).forEach(
+      (key) => (inputConfig.displays.ship[key] = isSelectAll)
+    );
+    Object.keys(inputConfig.displays.overall).forEach(
+      (key) => (inputConfig.displays.overall[key] = isSelectAll)
+    );
+  }
+
+  function isAllChecked(): boolean {
+    const shipValues = Object.values(inputConfig.displays.ship);
+    const isShipCheckAll =
+      shipValues.length === shipValues.filter((it) => it === true).length;
+
+    const overallValues = Object.values(inputConfig.displays.overall);
+    const isOverallCheckAll =
+      overallValues.length === overallValues.filter((it) => it === true).length;
+
+    return isOverallCheckAll && isOverallCheckAll;
   }
 
   Cwd()
@@ -117,9 +132,7 @@
               type="checkbox"
               id="select-all"
               on:change={toggleAll}
-              checked={Object.values(inputConfig.displays).length ===
-                Object.values(inputConfig.displays).filter((it) => it === true)
-                  .length}
+              checked={isAllChecked()}
             />
             <label class="form-check-label" for="select-all">全選択</label>
           </div>
@@ -129,29 +142,8 @@
             <input
               class="form-check-input"
               type="checkbox"
-              id="player-name"
-              bind:checked={inputConfig.displays.player_name}
-            />
-            <label class="form-check-label" for="player-name"
-              >プレイヤー名</label
-            >
-          </div>
-          <div class="form-check">
-            <input
-              class="form-check-input"
-              type="checkbox"
-              id="player-name"
-              bind:checked={inputConfig.displays.ship_info}
-              disabled={true}
-            />
-            <label class="form-check-label" for="player-name">艦</label>
-          </div>
-          <div class="form-check">
-            <input
-              class="form-check-input"
-              type="checkbox"
               id="pr"
-              bind:checked={inputConfig.displays.pr}
+              bind:checked={inputConfig.displays.ship.pr}
             />
             <label class="form-check-label" for="pr">PR</label>
           </div>
@@ -160,10 +152,10 @@
               class="form-check-input"
               type="checkbox"
               id="shio-damage"
-              bind:checked={inputConfig.displays.ship_damage}
+              bind:checked={inputConfig.displays.ship.damage}
             />
-            <label class="form-check-label" for="shio-damage "
-              >艦別:ダメージ</label
+            <label class="form-check-label" for="shio-damage"
+              >艦:ダメージ</label
             >
           </div>
           <div class="form-check">
@@ -171,9 +163,9 @@
               class="form-check-input"
               type="checkbox"
               id="ship-win-rate"
-              bind:checked={inputConfig.displays.ship_win_rate}
+              bind:checked={inputConfig.displays.ship.win_rate}
             />
-            <label class="form-check-label" for="ship-win-rate">艦別:勝率</label
+            <label class="form-check-label" for="ship-win-rate">艦:勝率</label
             >
           </div>
           <div class="form-check">
@@ -181,19 +173,19 @@
               class="form-check-input"
               type="checkbox"
               id="ship-kd-rate"
-              bind:checked={inputConfig.displays.ship_kd_rate}
+              bind:checked={inputConfig.displays.ship.kd_rate}
             />
-            <label class="form-check-label" for="ship-kd-rate">艦別:K/D</label>
+            <label class="form-check-label" for="ship-kd-rate">艦:K/D</label>
           </div>
           <div class="form-check">
             <input
               class="form-check-input"
               type="checkbox"
               id="ship-win-survived-rate"
-              bind:checked={inputConfig.displays.ship_win_survived_rate}
+              bind:checked={inputConfig.displays.ship.win_survived_rate}
             />
             <label class="form-check-label" for="ship-win-survived-rate"
-              >艦別:勝利生存率</label
+              >艦:勝利生存率</label
             >
           </div>
           <div class="form-check">
@@ -201,10 +193,10 @@
               class="form-check-input"
               type="checkbox"
               id="ship-lose-survived-rate"
-              bind:checked={inputConfig.displays.ship_lose_survived_rate}
+              bind:checked={inputConfig.displays.ship.lose_survived_rate}
             />
             <label class="form-check-label" for="ship-lose-survived-rate"
-              >艦別:敗北生存率</label
+              >艦:敗北生存率</label
             >
           </div>
           <div class="form-check">
@@ -212,19 +204,19 @@
               class="form-check-input"
               type="checkbox"
               id="ship-exp"
-              bind:checked={inputConfig.displays.ship_exp}
+              bind:checked={inputConfig.displays.ship.exp}
             />
-            <label class="form-check-label" for="ship-exp">艦別:経験値</label>
+            <label class="form-check-label" for="ship-exp">艦:経験値</label>
           </div>
           <div class="form-check">
             <input
               class="form-check-input"
               type="checkbox"
               id="ship-battles"
-              bind:checked={inputConfig.displays.ship_battles}
+              bind:checked={inputConfig.displays.ship.battles}
             />
             <label class="form-check-label" for="ship-battles"
-              >艦別:戦闘数</label
+              >艦戦闘数</label
             >
           </div>
         </div>
@@ -234,7 +226,7 @@
               class="form-check-input"
               type="checkbox"
               id="player-damage"
-              bind:checked={inputConfig.displays.player_damage}
+              bind:checked={inputConfig.displays.overall.damage}
             />
             <label class="form-check-label" for="player-damage"
               >総合:ダメージ</label
@@ -245,7 +237,7 @@
               class="form-check-input"
               type="checkbox"
               id="player-win-rate"
-              bind:checked={inputConfig.displays.player_win_rate}
+              bind:checked={inputConfig.displays.overall.win_rate}
             />
             <label class="form-check-label" for="player-win-rate"
               >総合:勝率</label
@@ -256,7 +248,7 @@
               class="form-check-input"
               type="checkbox"
               id="player-kd-rate"
-              bind:checked={inputConfig.displays.player_kd_rate}
+              bind:checked={inputConfig.displays.overall.kd_rate}
             />
             <label class="form-check-label" for="player-kd-rate">総合:K/D</label
             >
@@ -266,7 +258,7 @@
               class="form-check-input"
               type="checkbox"
               id="player-win-survived-rate"
-              bind:checked={inputConfig.displays.player_win_survived_rate}
+              bind:checked={inputConfig.displays.overall.win_survived_rate}
             />
             <label class="form-check-label" for="player-win-survived-rate"
               >総合:勝利生存率</label
@@ -277,7 +269,7 @@
               class="form-check-input"
               type="checkbox"
               id="player-lose-survived-rate"
-              bind:checked={inputConfig.displays.player_lose_survived_rate}
+              bind:checked={inputConfig.displays.overall.lose_survived_rate}
             />
             <label class="form-check-label" for="player-lose-survived-rate"
               >総合:敗北生存率</label
@@ -288,7 +280,7 @@
               class="form-check-input"
               type="checkbox"
               id="player-exp"
-              bind:checked={inputConfig.displays.player_exp}
+              bind:checked={inputConfig.displays.overall.exp}
             />
             <label class="form-check-label" for="player-exp">総合:経験値</label>
           </div>
@@ -297,7 +289,7 @@
               class="form-check-input"
               type="checkbox"
               id="player-battles"
-              bind:checked={inputConfig.displays.player_battles}
+              bind:checked={inputConfig.displays.overall.battles}
             />
             <label class="form-check-label" for="player-battles"
               >総合:戦闘数</label
@@ -308,7 +300,7 @@
               class="form-check-input"
               type="checkbox"
               id="avg-tier"
-              bind:checked={inputConfig.displays.player_avg_tier}
+              bind:checked={inputConfig.displays.overall.avg_tier}
             />
             <label class="form-check-label" for="avg-tier">総合:平均Tier</label>
           </div>
@@ -317,10 +309,10 @@
               class="form-check-input"
               type="checkbox"
               id="player_using_ship_type_rate"
-              bind:checked={inputConfig.displays.player_using_ship_type_rate}
+              bind:checked={inputConfig.displays.overall.using_ship_type_rate}
             />
             <label class="form-check-label" for="player_using_ship_type_rate"
-              >総合:使用艦率(SS|DD|CL|BB|CV)</label
+              >総合:使用艦割合(SS|DD|CL|BB|CV)</label
             >
           </div>
           <div class="form-check">
@@ -328,10 +320,10 @@
               class="form-check-input"
               type="checkbox"
               id="player_using_tier_rate"
-              bind:checked={inputConfig.displays.player_using_tier_rate}
+              bind:checked={inputConfig.displays.overall.using_tier_rate}
             />
             <label class="form-check-label" for="player_using_tier_rate"
-              >総合:ティア別割合(1~4|5~7|8~★)</label
+              >総合:ティア割合(1~4|5~7|8~★)</label
             >
           </div>
         </div>

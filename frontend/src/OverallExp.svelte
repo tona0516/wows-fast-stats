@@ -5,7 +5,7 @@
   export let displayPattern: DisplayPattern;
 </script>
 
-{#if config.displays.player_exp}
+{#if config.displays.overall.exp}
   {#if displayPattern === "full" || displayPattern === "nopr" || displayPattern === "noshipstats"}
     <td class="exp">
       {player.player_stats.exp.toFixed(0)}

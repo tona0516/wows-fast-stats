@@ -1,5 +1,19 @@
 export namespace vo {
 	
+	export class Basic {
+	    player_name: boolean;
+	    ship_info: boolean;
+	
+	    static createFrom(source: any = {}) {
+	        return new Basic(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.player_name = source["player_name"];
+	        this.ship_info = source["ship_info"];
+	    }
+	}
 	export class TeamAverage {
 	    personal_rating: number;
 	    damage_by_ship: number;
@@ -294,27 +308,66 @@ export namespace vo {
 		    return a;
 		}
 	}
-	export class Displays {
-	    player_name: boolean;
-	    ship_info: boolean;
+	export class Overall {
+	    damage: boolean;
+	    win_rate: boolean;
+	    kd_rate: boolean;
+	    win_survived_rate: boolean;
+	    lose_survived_rate: boolean;
+	    exp: boolean;
+	    battles: boolean;
+	    avg_tier: boolean;
+	    using_ship_type_rate: boolean;
+	    using_tier_rate: boolean;
+	
+	    static createFrom(source: any = {}) {
+	        return new Overall(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.damage = source["damage"];
+	        this.win_rate = source["win_rate"];
+	        this.kd_rate = source["kd_rate"];
+	        this.win_survived_rate = source["win_survived_rate"];
+	        this.lose_survived_rate = source["lose_survived_rate"];
+	        this.exp = source["exp"];
+	        this.battles = source["battles"];
+	        this.avg_tier = source["avg_tier"];
+	        this.using_ship_type_rate = source["using_ship_type_rate"];
+	        this.using_tier_rate = source["using_tier_rate"];
+	    }
+	}
+	export class Ship {
 	    pr: boolean;
-	    ship_damage: boolean;
-	    ship_win_rate: boolean;
-	    ship_kd_rate: boolean;
-	    ship_win_survived_rate: boolean;
-	    ship_lose_survived_rate: boolean;
-	    ship_exp: boolean;
-	    ship_battles: boolean;
-	    player_damage: boolean;
-	    player_win_rate: boolean;
-	    player_kd_rate: boolean;
-	    player_win_survived_rate: boolean;
-	    player_lose_survived_rate: boolean;
-	    player_exp: boolean;
-	    player_battles: boolean;
-	    player_avg_tier: boolean;
-	    player_using_ship_type_rate: boolean;
-	    player_using_tier_rate: boolean;
+	    damage: boolean;
+	    win_rate: boolean;
+	    kd_rate: boolean;
+	    win_survived_rate: boolean;
+	    lose_survived_rate: boolean;
+	    exp: boolean;
+	    battles: boolean;
+	
+	    static createFrom(source: any = {}) {
+	        return new Ship(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.pr = source["pr"];
+	        this.damage = source["damage"];
+	        this.win_rate = source["win_rate"];
+	        this.kd_rate = source["kd_rate"];
+	        this.win_survived_rate = source["win_survived_rate"];
+	        this.lose_survived_rate = source["lose_survived_rate"];
+	        this.exp = source["exp"];
+	        this.battles = source["battles"];
+	    }
+	}
+	export class Displays {
+	    basic: Basic;
+	    ship: Ship;
+	    overall: Overall;
 	
 	    static createFrom(source: any = {}) {
 	        return new Displays(source);
@@ -322,28 +375,31 @@ export namespace vo {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.player_name = source["player_name"];
-	        this.ship_info = source["ship_info"];
-	        this.pr = source["pr"];
-	        this.ship_damage = source["ship_damage"];
-	        this.ship_win_rate = source["ship_win_rate"];
-	        this.ship_kd_rate = source["ship_kd_rate"];
-	        this.ship_win_survived_rate = source["ship_win_survived_rate"];
-	        this.ship_lose_survived_rate = source["ship_lose_survived_rate"];
-	        this.ship_exp = source["ship_exp"];
-	        this.ship_battles = source["ship_battles"];
-	        this.player_damage = source["player_damage"];
-	        this.player_win_rate = source["player_win_rate"];
-	        this.player_kd_rate = source["player_kd_rate"];
-	        this.player_win_survived_rate = source["player_win_survived_rate"];
-	        this.player_lose_survived_rate = source["player_lose_survived_rate"];
-	        this.player_exp = source["player_exp"];
-	        this.player_battles = source["player_battles"];
-	        this.player_avg_tier = source["player_avg_tier"];
-	        this.player_using_ship_type_rate = source["player_using_ship_type_rate"];
-	        this.player_using_tier_rate = source["player_using_tier_rate"];
+	        this.basic = this.convertValues(source["basic"], Basic);
+	        this.ship = this.convertValues(source["ship"], Ship);
+	        this.overall = this.convertValues(source["overall"], Overall);
 	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
 	}
+	
+	
 	
 	
 	
