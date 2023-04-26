@@ -1,6 +1,7 @@
 package main
 
 import (
+	"changeme/backend/repo"
 	"changeme/backend/service"
 	"changeme/backend/vo"
 	"context"
@@ -37,10 +38,18 @@ func (a *App) startup(ctx context.Context) {
 }
 
 func (a *App) beforeClose(ctx context.Context) (prevent bool) {
+	// save window size
 	width, height := runtime.WindowGetSize(ctx)
 	a.appConfig.Window.Width = width
 	a.appConfig.Window.Height = height
 	a.configService.UpdateApp(a.appConfig)
+
+	// Remove old caches
+	wargaming := repo.Wargaming{AppID: a.userConfig.Appid}
+	encyclopediaInfo, _ := wargaming.EncyclopediaInfo()
+	gameVersion := encyclopediaInfo.Data.GameVersion
+	caches := repo.NewCaches(gameVersion)
+	caches.RemoveOld()
 
 	return false
 }

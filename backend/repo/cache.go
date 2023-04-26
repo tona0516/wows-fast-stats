@@ -3,33 +3,38 @@ package repo
 import (
 	"encoding/gob"
 	"os"
+	"path/filepath"
+	"strings"
 )
 
+const DIRECTORY = "cache"
+
 type Cache[T any] struct {
-	FileName string
+	Prefix string
+    GameVersion string
 }
 
-func (s *Cache[T]) Serialize(object T) error {
-	os.Mkdir("cache", 0755)
+func (c *Cache[T]) Serialize(object T) error {
+	os.Mkdir(DIRECTORY, 0755)
 
-	f, err := os.Create("cache/" + s.FileName)
+    filename := c.Prefix + "_" + c.GameVersion + ".bin"
+    path := filepath.Join(DIRECTORY, filename)
+	f, err := os.Create(path)
 	if err != nil {
 		return err
 	}
 	defer f.Close()
+
 	enc := gob.NewEncoder(f)
-
-	if err := enc.Encode(object); err != nil {
-		return err
-	}
-
-	return nil
+    return enc.Encode(object)
 }
 
-func (s *Cache[T]) Deserialize() (T, error) {
+func (c *Cache[T]) Deserialize() (T, error) {
 	var object T
 
-	f, err := os.Open("cache/" + s.FileName)
+    filename := c.Prefix + "_" + c.GameVersion + ".bin"
+    path := filepath.Join(DIRECTORY, filename)
+	f, err := os.Open(path)
 	if err != nil {
 		return object, err
 	}
@@ -39,6 +44,31 @@ func (s *Cache[T]) Deserialize() (T, error) {
 	if err := dec.Decode(&object); err != nil {
 		return object, err
 	}
-
 	return object, nil
+}
+
+func (c *Cache[T]) RemoveOld() error {
+    entries, err := os.ReadDir(DIRECTORY)
+    if err != nil {
+        return err
+    }
+
+    for _, entry := range entries {
+        if entry.IsDir() {
+            continue
+        }
+
+        if !strings.HasPrefix(entry.Name(), c.Prefix) {
+            continue
+        }
+
+        filename := c.Prefix + "_" + c.GameVersion + ".bin"
+        if entry.Name() == filename {
+            continue
+        }
+
+        os.Remove(filepath.Join(DIRECTORY, entry.Name()))
+	}
+
+    return nil
 }

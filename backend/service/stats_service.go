@@ -13,6 +13,7 @@ import (
 type StatsService struct{
     Parallels uint
     UserConfig vo.UserConfig
+    caches repo.Caches
 }
 
 func (s *StatsService) TempArenaInfoHash() (string, error) {
@@ -46,7 +47,6 @@ func (s *StatsService) Battle() (vo.Battle, error) {
         if err := tempArenaInfoRepo.Save(tempArenaInfo); err != nil {
             return result, err
         }
-        fmt.Println("saved!")
     }
 
 	accountListResult := make(chan vo.Result[vo.WGAccountList])
@@ -77,11 +77,12 @@ func (s *StatsService) Battle() (vo.Battle, error) {
 		return result, encyclopediaInfo.Error
 	}
 	gameVersion := encyclopediaInfo.Value.Data.GameVersion
+    s.caches = *repo.NewCaches(gameVersion)
 
-	go s.warship(&wargaming, gameVersion, shipInfoResult)
-	go s.expectedStats(&numbers, gameVersion, expectedStatsResult)
-    go s.battleArenas(&wargaming, gameVersion, battleArenasResult)
-    go s.battleTypes(&wargaming, gameVersion, battleTypesResult)
+	go s.warship(&wargaming, shipInfoResult)
+	go s.expectedStats(&numbers, expectedStatsResult)
+    go s.battleArenas(&wargaming, battleArenasResult)
+    go s.battleTypes(&wargaming, battleTypesResult)
 
 	accountInfo := <-accountInfoResult
 	if accountInfo.Error != nil {
@@ -225,13 +226,10 @@ func (s *StatsService) clanTag(wargaming *repo.Wargaming, accountIDs []int, resu
 	result <- vo.Result[map[int]string]{Value: clanTagMap, Error: nil}
 }
 
-func (s *StatsService) warship(wargaming *repo.Wargaming, gameVersion string, result chan vo.Result[map[int]vo.Warship]) {
+func (s *StatsService) warship(wargaming *repo.Wargaming, result chan vo.Result[map[int]vo.Warship]) {
 	shipInfoMap := make(map[int]vo.Warship, 0)
 
-	cache := repo.Cache[map[int]vo.Warship]{
-		FileName: "shipinfo_" + gameVersion + ".bin",
-	}
-
+	cache := s.caches.Warships
 	object, err := cache.Deserialize()
 	if err == nil {
 		result <- vo.Result[map[int]vo.Warship]{Value: object, Error: nil}
@@ -285,11 +283,8 @@ func (s *StatsService) warship(wargaming *repo.Wargaming, gameVersion string, re
 	result <- vo.Result[map[int]vo.Warship]{Value: shipInfoMap, Error: nil}
 }
 
-func (s *StatsService) expectedStats(numbers *repo.Numbers, gameVersion string, result chan vo.Result[vo.NSExpectedStats]) {
-	cache := repo.Cache[vo.NSExpectedStats]{
-		FileName: "expectedstats_" + gameVersion + ".bin",
-	}
-
+func (s *StatsService) expectedStats(numbers *repo.Numbers, result chan vo.Result[vo.NSExpectedStats]) {
+	cache := s.caches.ExpectedStats
 	object, err := cache.Deserialize()
 	if err == nil {
 		result <- vo.Result[vo.NSExpectedStats]{Value: object, Error: nil}
@@ -310,11 +305,8 @@ func (s *StatsService) expectedStats(numbers *repo.Numbers, gameVersion string, 
 	result <- vo.Result[vo.NSExpectedStats]{Value: *expectedStats, Error: err}
 }
 
-func (s *StatsService) battleArenas(wargaming *repo.Wargaming, gameVersion string, result chan vo.Result[vo.WGBattleArenas]) {
-	cache := repo.Cache[vo.WGBattleArenas]{
-		FileName: "battlearenas_" + gameVersion + ".bin",
-	}
-
+func (s *StatsService) battleArenas(wargaming *repo.Wargaming, result chan vo.Result[vo.WGBattleArenas]) {
+	cache := s.caches.BattleArenas
 	object, err := cache.Deserialize()
 	if err == nil {
 		result <- vo.Result[vo.WGBattleArenas]{Value: object, Error: nil}
@@ -335,11 +327,8 @@ func (s *StatsService) battleArenas(wargaming *repo.Wargaming, gameVersion strin
     result <- vo.Result[vo.WGBattleArenas]{Value: battleArenas, Error: err}
 }
 
-func (s *StatsService) battleTypes(wargaming *repo.Wargaming, gameVersion string, result chan vo.Result[vo.WGBattleTypes]) {
-	cache := repo.Cache[vo.WGBattleTypes]{
-		FileName: "battletypes_" + gameVersion + ".bin",
-	}
-
+func (s *StatsService) battleTypes(wargaming *repo.Wargaming, result chan vo.Result[vo.WGBattleTypes]) {
+	cache := s.caches.BattleTypes
 	object, err := cache.Deserialize()
 	if err == nil {
 		result <- vo.Result[vo.WGBattleTypes]{Value: object, Error: nil}
