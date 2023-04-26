@@ -78,7 +78,7 @@
           );
         }
       })
-      .error((error) => {
+      .catch((error) => {
         notification.showToast(error, "error");
       });
   }
