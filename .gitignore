@@ -4,5 +4,6 @@ frontend/dist
 cache/
 config/
 screenshot/
+temp_arena_info/
 test_install_dir/replays/tempArenaInfo.json
 .DS_Store
