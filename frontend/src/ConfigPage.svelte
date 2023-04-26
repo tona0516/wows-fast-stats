@@ -145,7 +145,7 @@
               id="pr"
               bind:checked={inputConfig.displays.ship.pr}
             />
-            <label class="form-check-label" for="pr">PR</label>
+            <label class="form-check-label" for="pr">艦:PR</label>
           </div>
           <div class="form-check">
             <input
@@ -154,8 +154,7 @@
               id="shio-damage"
               bind:checked={inputConfig.displays.ship.damage}
             />
-            <label class="form-check-label" for="shio-damage"
-              >艦:ダメージ</label
+            <label class="form-check-label" for="shio-damage">艦:ダメージ</label
             >
           </div>
           <div class="form-check">
@@ -165,8 +164,7 @@
               id="ship-win-rate"
               bind:checked={inputConfig.displays.ship.win_rate}
             />
-            <label class="form-check-label" for="ship-win-rate">艦:勝率</label
-            >
+            <label class="form-check-label" for="ship-win-rate">艦:勝率</label>
           </div>
           <div class="form-check">
             <input
@@ -215,9 +213,7 @@
               id="ship-battles"
               bind:checked={inputConfig.displays.ship.battles}
             />
-            <label class="form-check-label" for="ship-battles"
-              >艦戦闘数</label
-            >
+            <label class="form-check-label" for="ship-battles">艦:戦闘数</label>
           </div>
         </div>
         <div class="col">

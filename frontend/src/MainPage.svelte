@@ -154,8 +154,8 @@
 
 {#if latestHash !== ""}
   <div class="mt-2 mx-4">
-    {#each battle.teams as team}
-      <table class="table table-sm table-bordered">
+    <table class="table table-sm table-bordered">
+      {#each battle.teams as team}
         <thead>
           <tr>
             <th
@@ -236,8 +236,8 @@
             </tr>
           {/each}
         </tbody>
-      </table>
-    {/each}
+      {/each}
+    </table>
   </div>
 
   <div class="mt-2 mx-4 d-flex flex-row centerize">
