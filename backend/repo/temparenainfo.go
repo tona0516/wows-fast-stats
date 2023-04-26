@@ -40,6 +40,7 @@ func (t *TempArenaInfo) Save(tempArenaInfo vo.TempArenaInfo) error {
     defer file.Close()
 
     encoder := json.NewEncoder(file)
+    encoder.SetIndent("", "  ")
     err = encoder.Encode(tempArenaInfo)
     return err
 }

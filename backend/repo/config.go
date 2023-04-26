@@ -36,6 +36,7 @@ func (c *Config) UpdateUser(config vo.UserConfig) error {
     defer file.Close()
 
     encoder := json.NewEncoder(file)
+    encoder.SetIndent("", "  ")
     err = encoder.Encode(config)
     return err
 }
@@ -63,6 +64,7 @@ func (c *Config) UpdateApp(config vo.AppConfig) error {
     defer file.Close()
 
     encoder := json.NewEncoder(file)
+    encoder.SetIndent("", "  ")
     err = encoder.Encode(config)
     return err
 }
