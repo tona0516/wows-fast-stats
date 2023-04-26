@@ -30,7 +30,8 @@ namespace Const {
         convertValues: function (a: any, classs: any, asMap?: boolean) {
             throw new Error("Function not implemented.");
         },
-        save_screenshot: false
+        save_screenshot: false,
+        save_temp_arena_info: false
     };
 }
 

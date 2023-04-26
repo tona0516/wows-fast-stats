@@ -6,6 +6,8 @@ export function ApplyUserConfig(arg1:vo.UserConfig):Promise<vo.UserConfig>;
 
 export function Battle():Promise<vo.Battle>;
 
+export function Cwd():Promise<string>;
+
 export function SaveScreenshot(arg1:string,arg2:string,arg3:boolean):Promise<void>;
 
 export function SelectDirectory():Promise<string>;

@@ -4,6 +4,7 @@
     ApplyUserConfig,
     UserConfig,
     SelectDirectory,
+    Cwd,
   } from "../wailsjs/go/main/App.js";
   import { createEventDispatcher } from "svelte";
   import Const from "./Const.js";
@@ -11,6 +12,8 @@
   const dispatch = createEventDispatcher();
 
   let inputConfig: vo.UserConfig = Const.DEFAULT_USER_CONFIG;
+
+  let cwd: string;
 
   UserConfig().then((config) => {
     inputConfig = config;
@@ -44,6 +47,10 @@
     const isSelectAll: boolean = e.target.checked;
     keys.forEach((key) => (inputConfig.displays[key] = isSelectAll));
   }
+
+  Cwd()
+    .then((result) => (cwd = result))
+    .catch((error) => "");
 </script>
 
 <div class="mt-3 form-style">
@@ -331,7 +338,7 @@
       </div>
 
       <!-- save-screenshot -->
-      <div class="mb-3 centerize">
+      <div class="mb-3">
         <div class="form-check form-switch">
           <input
             class="form-check-input"
@@ -340,9 +347,24 @@
             bind:checked={inputConfig.save_screenshot}
           />
           <label class="form-check-label" for="save-scrrenshot"
-            >自動でスクリーンショットを保存する(<i
-              >&lt;exeファイルがあるフォルダ&gt;/screenshot</i
+            >自動でスクリーンショットを保存する<br />(<i>{cwd}/screenshot</i
             >)</label
+          >
+        </div>
+      </div>
+
+      <!-- save-temp-arena-info -->
+      <div class="mb-3">
+        <div class="form-check form-switch">
+          <input
+            class="form-check-input"
+            type="checkbox"
+            id="save-temp-arena-info"
+            bind:checked={inputConfig.save_temp_arena_info}
+          />
+          <label class="form-check-label" for="save-temp-arena-info"
+            >【開発用】自動で戦闘情報(<i>tempArenaInfo.json</i>)を保存する<br
+            />(<i>{cwd}/temp_arena_info</i>)</label
           >
         </div>
       </div>

@@ -360,6 +360,7 @@ export namespace vo {
 	    font_size: string;
 	    displays: Displays;
 	    save_screenshot: boolean;
+	    save_temp_arena_info: boolean;
 	
 	    static createFrom(source: any = {}) {
 	        return new UserConfig(source);
@@ -372,6 +373,7 @@ export namespace vo {
 	        this.font_size = source["font_size"];
 	        this.displays = this.convertValues(source["displays"], Displays);
 	        this.save_screenshot = source["save_screenshot"];
+	        this.save_temp_arena_info = source["save_temp_arena_info"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

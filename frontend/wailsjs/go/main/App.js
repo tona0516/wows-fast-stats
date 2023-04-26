@@ -10,6 +10,10 @@ export function Battle() {
   return window['go']['main']['App']['Battle']();
 }
 
+export function Cwd() {
+  return window['go']['main']['App']['Cwd']();
+}
+
 export function SaveScreenshot(arg1, arg2, arg3) {
   return window['go']['main']['App']['SaveScreenshot'](arg1, arg2, arg3);
 }

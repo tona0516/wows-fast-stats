@@ -29,4 +29,5 @@ type UserConfig struct {
     FontSize string `json:"font_size"`
     Displays Displays `json:"displays"`
     SaveScreenshot bool `json:"save_screenshot"`
+    SaveTempArenaInfo bool `json:"save_temp_arena_info"`
 }

@@ -12,13 +12,14 @@ import (
 
 type StatsService struct{
     Parallels uint
+    UserConfig vo.UserConfig
 }
 
-func (s *StatsService) TempArenaInfoHash(installPath string) (string, error) {
+func (s *StatsService) TempArenaInfoHash() (string, error) {
     var result string
-    local := repo.Local{}
+    tempArenaInfoRepo := repo.TempArenaInfo{}
 
-    tempArenaInfo, err := local.TempArenaInfo(installPath)
+    tempArenaInfo, err := tempArenaInfoRepo.Get(s.UserConfig.InstallPath)
     if err != nil {
         return result, err
     }
@@ -28,18 +29,25 @@ func (s *StatsService) TempArenaInfoHash(installPath string) (string, error) {
     return result, nil
 }
 
-func (s *StatsService) Battle(installPath string, appid string) (vo.Battle, error) {
+func (s *StatsService) Battle() (vo.Battle, error) {
     var result vo.Battle
 
-	wargaming := repo.Wargaming{AppID: appid}
+	wargaming := repo.Wargaming{AppID: s.UserConfig.Appid}
 	numbers := repo.Numbers{}
-	local := repo.Local{}
     unregistered := repo.Unregistered{}
+    tempArenaInfoRepo := repo.TempArenaInfo{}
 
-	tempArenaInfo, err := local.TempArenaInfo(installPath)
+	tempArenaInfo, err := tempArenaInfoRepo.Get(s.UserConfig.InstallPath)
 	if err != nil {
 		return result, err
 	}
+
+    if s.UserConfig.SaveTempArenaInfo {
+        if err := tempArenaInfoRepo.Save(tempArenaInfo); err != nil {
+            return result, err
+        }
+        fmt.Println("saved!")
+    }
 
 	accountListResult := make(chan vo.Result[vo.WGAccountList])
 	encyclopediaInfoResult := make(chan vo.Result[vo.WGEncyclopediaInfo])

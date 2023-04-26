@@ -4,6 +4,7 @@ import (
 	"changeme/backend/service"
 	"changeme/backend/vo"
 	"context"
+	"os"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
@@ -46,17 +47,19 @@ func (a *App) beforeClose(ctx context.Context) (prevent bool) {
 
 func (a *App) TempArenaInfoHash() (string, error) {
 	statsService := service.StatsService{
-		Parallels: 5,
+		Parallels:  5,
+		UserConfig: a.userConfig,
 	}
-	return statsService.TempArenaInfoHash(a.userConfig.InstallPath)
+	return statsService.TempArenaInfoHash()
 }
 
 func (a *App) Battle() (vo.Battle, error) {
 	statsService := service.StatsService{
-		Parallels: 5,
+		Parallels:  5,
+		UserConfig: a.userConfig,
 	}
 
-	return statsService.Battle(a.userConfig.InstallPath, a.userConfig.Appid)
+	return statsService.Battle()
 }
 
 func (a *App) SelectDirectory() (string, error) {
@@ -87,4 +90,8 @@ func (a *App) SaveScreenshot(filename string, base64Data string, isSelectable bo
 	}
 
 	return screenshotService.SaveForAuto(filename, base64Data)
+}
+
+func (a *App) Cwd() (string, error) {
+	return os.Getwd()
 }
