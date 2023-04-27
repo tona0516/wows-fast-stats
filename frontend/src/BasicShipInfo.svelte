@@ -7,6 +7,7 @@
   import iconSS from "./assets/images/icon-ss.png";
   import iconNone from "./assets/images/icon-none.png";
   import { BrowserOpenURL } from "../wailsjs/runtime/runtime";
+  import { Cell } from "@smui/data-table";
   export let config: vo.UserConfig;
   export let player: vo.Player;
   export let displayPattern: DisplayPattern;
@@ -47,7 +48,7 @@
   }
 </script>
 
-<td class="name omit">
+<Cell class="name omit">
   <!-- svelte-ignore a11y-invalid-attribute -->
   <a href="#" on:click={() => BrowserOpenURL(player.ship_info.stats_url)}>
     <div class="horizontal">
@@ -58,4 +59,4 @@
       </div>
     </div>
   </a>
-</td>
+</Cell>

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { Cell } from "@smui/data-table";
   import type { vo } from "wailsjs/go/models";
   export let config: vo.UserConfig;
   export let player: vo.Player;
@@ -7,10 +8,10 @@
 
 {#if config.displays.ship.battles}
   {#if displayPattern === "full" || displayPattern === "nopr"}
-    <td class="battles">
+    <Cell class="battles">
       {player.ship_stats.battles}
-    </td>
+    </Cell>
   {:else if displayPattern === "noshipstats"}
-    <td class="battles" />
+    <Cell class="battles" />
   {/if}
 {/if}

@@ -8,12 +8,36 @@
   } from "../wailsjs/go/main/App.js";
   import { createEventDispatcher } from "svelte";
   import Const from "./Const.js";
+  import Textfield from "@smui/textfield";
+  import IconButton from "@smui/icon-button";
+  import Select, { Option } from "@smui/select";
+  import Checkbox from "@smui/checkbox";
+  import Switch from "@smui/switch";
+  import Button, { Label } from "@smui/button";
+  import FormField from "@smui/form-field";
 
   const dispatch = createEventDispatcher();
 
   let inputConfig: vo.UserConfig = Const.DEFAULT_USER_CONFIG;
 
   let cwd: string;
+
+  const fontSizes = ["x-small", "small", "medium", "large", "x-large"];
+
+  // TODO 翻訳
+  const displayLabels: { [key: string]: string } = {
+    pr: "PR",
+    damage: "Dmg",
+    win_rate: "勝率",
+    kd_rate: "K/D",
+    win_survived_rate: "勝利生存率",
+    lose_survived_rate: "敗北生存率",
+    exp: "Exp",
+    battles: "戦闘数",
+    avg_tier: "平均T",
+    using_ship_type_rate: "艦種割合",
+    using_tier_rate: "ティア割合",
+  };
 
   UserConfig().then((config) => {
     inputConfig = config;
@@ -40,329 +64,79 @@
     });
   }
 
-  function toggleAll(e) {
-    const isSelectAll: boolean = e.target.checked;
-
-    Object.keys(inputConfig.displays.ship).forEach(
-      (key) => (inputConfig.displays.ship[key] = isSelectAll)
-    );
-    Object.keys(inputConfig.displays.overall).forEach(
-      (key) => (inputConfig.displays.overall[key] = isSelectAll)
-    );
-  }
-
-  function isAllChecked(): boolean {
-    const shipValues = Object.values(inputConfig.displays.ship);
-    const isShipCheckAll =
-      shipValues.length === shipValues.filter((it) => it === true).length;
-
-    const overallValues = Object.values(inputConfig.displays.overall);
-    const isOverallCheckAll =
-      overallValues.length === overallValues.filter((it) => it === true).length;
-
-    return isOverallCheckAll && isOverallCheckAll;
-  }
-
   Cwd()
     .then((result) => (cwd = result))
     .catch((error) => "");
 </script>
 
-<div class="mt-3 form-style">
-  <form>
-    <!-- install path -->
-    <div class="mb-3">
-      <div class="centerize">
-        <label for="install-path" class="form-label"
-          >World of Warshipsインストールフォルダ</label
-        >
-      </div>
-      <div class="horizontal">
-        <input
-          type="text"
-          class="form-control"
-          id="install-path"
-          bind:value={inputConfig.install_path}
-        />
-        <button
-          type="button"
-          class="btn btn-secondary"
-          on:click={selectDirectory}>選択</button
-        >
-      </div>
+<div class="form-style">
+  <div>
+    <Textfield
+      type="text"
+      label="World of Warshipsインストールフォルダ"
+      bind:value={inputConfig.install_path}
+    />
+    <IconButton class="material-icons" on:click={selectDirectory}
+      >folder_open</IconButton
+    >
+  </div>
+
+  <div>
+    <Textfield type="text" label="AppID" bind:value={inputConfig.appid} />
+  </div>
+
+  <div>
+    <Select bind:value={inputConfig.font_size} label="文字サイズ">
+      {#each fontSizes as fontSize}
+        <Option value={fontSize}>{fontSize}</Option>
+      {/each}
+    </Select>
+  </div>
+
+  <div style="display: flex; align-items: right;">
+    <div>
+      {#each Object.entries(inputConfig.displays.ship) as [k, v]}
+        <FormField>
+          <Checkbox bind:checked={inputConfig.displays.ship[k]} />
+          <span slot="label">艦:{displayLabels[k]}</span>
+        </FormField>
+        <br />
+      {/each}
     </div>
-
-    <!-- appid -->
-    <div class="mb-3">
-      <div class="centerize">
-        <label for="appid" class="form-label">AppID</label>
-      </div>
-      <input
-        type="text"
-        class="form-control"
-        id="appid"
-        bind:value={inputConfig.appid}
-      />
+    <div>
+      {#each Object.entries(inputConfig.displays.overall) as [k, v]}
+        <FormField>
+          <Checkbox bind:checked={inputConfig.displays.overall[k]} />
+          <span slot="label">総合:{displayLabels[k]}</span>
+        </FormField>
+        <br />
+      {/each}
     </div>
+  </div>
 
-    <!-- font-size -->
-    <div class="mb-3">
-      <div class="centerize">
-        <label for="font-size" class="form-label">文字サイズ</label>
-      </div>
-      <select class="form-select" bind:value={inputConfig.font_size}>
-        <option value="x-small">極小</option>
-        <option value="small">小</option>
-        <option value="medium">中</option>
-        <option value="large">大</option>
-        <option value="x-large">極大</option>
-      </select>
-    </div>
-
-    <!-- display values -->
-    <div class="mb-3">
-      <div class="centerize">
-        <label for="font-column" class="form-lavel">表示項目</label>
-      </div>
-      <div class="row">
-        <div class="col">
-          <div class="form-check">
-            <input
-              class="form-check-input"
-              type="checkbox"
-              id="select-all"
-              on:change={toggleAll}
-              checked={isAllChecked()}
-            />
-            <label class="form-check-label" for="select-all">全選択</label>
-          </div>
-        </div>
-        <div class="col">
-          <div class="form-check">
-            <input
-              class="form-check-input"
-              type="checkbox"
-              id="pr"
-              bind:checked={inputConfig.displays.ship.pr}
-            />
-            <label class="form-check-label" for="pr">艦:PR</label>
-          </div>
-          <div class="form-check">
-            <input
-              class="form-check-input"
-              type="checkbox"
-              id="shio-damage"
-              bind:checked={inputConfig.displays.ship.damage}
-            />
-            <label class="form-check-label" for="shio-damage">艦:ダメージ</label
-            >
-          </div>
-          <div class="form-check">
-            <input
-              class="form-check-input"
-              type="checkbox"
-              id="ship-win-rate"
-              bind:checked={inputConfig.displays.ship.win_rate}
-            />
-            <label class="form-check-label" for="ship-win-rate">艦:勝率</label>
-          </div>
-          <div class="form-check">
-            <input
-              class="form-check-input"
-              type="checkbox"
-              id="ship-kd-rate"
-              bind:checked={inputConfig.displays.ship.kd_rate}
-            />
-            <label class="form-check-label" for="ship-kd-rate">艦:K/D</label>
-          </div>
-          <div class="form-check">
-            <input
-              class="form-check-input"
-              type="checkbox"
-              id="ship-win-survived-rate"
-              bind:checked={inputConfig.displays.ship.win_survived_rate}
-            />
-            <label class="form-check-label" for="ship-win-survived-rate"
-              >艦:勝利生存率</label
-            >
-          </div>
-          <div class="form-check">
-            <input
-              class="form-check-input"
-              type="checkbox"
-              id="ship-lose-survived-rate"
-              bind:checked={inputConfig.displays.ship.lose_survived_rate}
-            />
-            <label class="form-check-label" for="ship-lose-survived-rate"
-              >艦:敗北生存率</label
-            >
-          </div>
-          <div class="form-check">
-            <input
-              class="form-check-input"
-              type="checkbox"
-              id="ship-exp"
-              bind:checked={inputConfig.displays.ship.exp}
-            />
-            <label class="form-check-label" for="ship-exp">艦:経験値</label>
-          </div>
-          <div class="form-check">
-            <input
-              class="form-check-input"
-              type="checkbox"
-              id="ship-battles"
-              bind:checked={inputConfig.displays.ship.battles}
-            />
-            <label class="form-check-label" for="ship-battles">艦:戦闘数</label>
-          </div>
-        </div>
-        <div class="col">
-          <div class="form-check">
-            <input
-              class="form-check-input"
-              type="checkbox"
-              id="player-damage"
-              bind:checked={inputConfig.displays.overall.damage}
-            />
-            <label class="form-check-label" for="player-damage"
-              >総合:ダメージ</label
-            >
-          </div>
-          <div class="form-check">
-            <input
-              class="form-check-input"
-              type="checkbox"
-              id="player-win-rate"
-              bind:checked={inputConfig.displays.overall.win_rate}
-            />
-            <label class="form-check-label" for="player-win-rate"
-              >総合:勝率</label
-            >
-          </div>
-          <div class="form-check">
-            <input
-              class="form-check-input"
-              type="checkbox"
-              id="player-kd-rate"
-              bind:checked={inputConfig.displays.overall.kd_rate}
-            />
-            <label class="form-check-label" for="player-kd-rate">総合:K/D</label
-            >
-          </div>
-          <div class="form-check">
-            <input
-              class="form-check-input"
-              type="checkbox"
-              id="player-win-survived-rate"
-              bind:checked={inputConfig.displays.overall.win_survived_rate}
-            />
-            <label class="form-check-label" for="player-win-survived-rate"
-              >総合:勝利生存率</label
-            >
-          </div>
-          <div class="form-check">
-            <input
-              class="form-check-input"
-              type="checkbox"
-              id="player-lose-survived-rate"
-              bind:checked={inputConfig.displays.overall.lose_survived_rate}
-            />
-            <label class="form-check-label" for="player-lose-survived-rate"
-              >総合:敗北生存率</label
-            >
-          </div>
-          <div class="form-check">
-            <input
-              class="form-check-input"
-              type="checkbox"
-              id="player-exp"
-              bind:checked={inputConfig.displays.overall.exp}
-            />
-            <label class="form-check-label" for="player-exp">総合:経験値</label>
-          </div>
-          <div class="form-check">
-            <input
-              class="form-check-input"
-              type="checkbox"
-              id="player-battles"
-              bind:checked={inputConfig.displays.overall.battles}
-            />
-            <label class="form-check-label" for="player-battles"
-              >総合:戦闘数</label
-            >
-          </div>
-          <div class="form-check">
-            <input
-              class="form-check-input"
-              type="checkbox"
-              id="avg-tier"
-              bind:checked={inputConfig.displays.overall.avg_tier}
-            />
-            <label class="form-check-label" for="avg-tier">総合:平均Tier</label>
-          </div>
-          <div class="form-check">
-            <input
-              class="form-check-input"
-              type="checkbox"
-              id="player_using_ship_type_rate"
-              bind:checked={inputConfig.displays.overall.using_ship_type_rate}
-            />
-            <label class="form-check-label" for="player_using_ship_type_rate"
-              >総合:使用艦割合(SS|DD|CL|BB|CV)</label
-            >
-          </div>
-          <div class="form-check">
-            <input
-              class="form-check-input"
-              type="checkbox"
-              id="player_using_tier_rate"
-              bind:checked={inputConfig.displays.overall.using_tier_rate}
-            />
-            <label class="form-check-label" for="player_using_tier_rate"
-              >総合:ティア割合(1~4|5~7|8~★)</label
-            >
-          </div>
-        </div>
-      </div>
-
-      <!-- save-screenshot -->
-      <div class="mb-3">
-        <div class="form-check form-switch">
-          <input
-            class="form-check-input"
-            type="checkbox"
-            id="save-scrrenshot"
-            bind:checked={inputConfig.save_screenshot}
-          />
-          <label class="form-check-label" for="save-scrrenshot"
-            >自動でスクリーンショットを保存する<br />(<i>{cwd}/screenshot</i
-            >)</label
-          >
-        </div>
-      </div>
-
-      <!-- save-temp-arena-info -->
-      <div class="mb-3">
-        <div class="form-check form-switch">
-          <input
-            class="form-check-input"
-            type="checkbox"
-            id="save-temp-arena-info"
-            bind:checked={inputConfig.save_temp_arena_info}
-          />
-          <label class="form-check-label" for="save-temp-arena-info"
-            >【開発用】自動で戦闘情報(<i>tempArenaInfo.json</i>)を保存する<br
-            />(<i>{cwd}/temp_arena_info</i>)</label
-          >
-        </div>
-      </div>
-    </div>
-
-    <div class="centerize">
-      <!-- apply -->
-      <button type="button" class="btn btn-primary mb-3" on:click={clickApply}
-        >適用</button
+  <div>
+    <FormField>
+      <Switch bind:checked={inputConfig.save_screenshot} />
+      <span slot="label"
+        >自動でスクリーンショットを保存する<br />(<i>{cwd}/screenshot</i>)</span
       >
-    </div>
-  </form>
+    </FormField>
+  </div>
+
+  <div>
+    <FormField>
+      <Switch bind:checked={inputConfig.save_temp_arena_info} />
+      <span slot="label"
+        >【開発用】自動で戦闘情報(<i>tempArenaInfo.json</i>)を保存する<br />(<i
+          >{cwd}/temp_arena_info</i
+        >)</span
+      >
+    </FormField>
+  </div>
+</div>
+
+<div class="centerize">
+  <Button on:click={clickApply} variant="raised">
+    <Label>適用</Label>
+  </Button>
 </div>

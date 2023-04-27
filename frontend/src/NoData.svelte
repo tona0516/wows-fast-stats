@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { vo } from "wailsjs/go/models";
   import { LogDebug } from "../wailsjs/runtime/runtime";
+  import { Cell } from "@smui/data-table";
   export let config: vo.UserConfig;
   export let displayPattern: DisplayPattern;
 
@@ -18,8 +19,8 @@
 
 {#if countDisplays(config) > 0}
   {#if displayPattern === "private"}
-    <td class="no_data omit" colspan={countDisplays(config)}>PRIVATE</td>
+    <Cell class="no_data omit" colspan={countDisplays(config)}>PRIVATE</Cell>
   {:else if displayPattern === "nodata"}
-    <td class="no_data omit" colspan={countDisplays(config)}>N/A</td>
+    <Cell class="no_data omit" colspan={countDisplays(config)}>N/A</Cell>
   {/if}
 {/if}

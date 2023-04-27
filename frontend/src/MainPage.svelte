@@ -22,11 +22,17 @@
   import TierRate from "./OverallTierRate.svelte";
   import OverallBattles from "./OverallBattles.svelte";
   import NoData from "./NoData.svelte";
+  import IconButton from "@smui/icon-button";
+  import { createEventDispatcher } from "svelte";
+  import { WindowReloadApp } from "../wailsjs/runtime/runtime";
+  import DataTable, { Head, Body, Row, Cell } from "@smui/data-table";
 
   export let loadState: LoadState = "standby";
   export let latestHash: string = "";
   export let battle: vo.Battle;
   export let config: vo.UserConfig = Const.DEFAULT_USER_CONFIG;
+
+  const dispatch = createEventDispatcher();
 
   const components = {
     basic: {
@@ -138,168 +144,186 @@
       value2Class = "higher";
     }
 
-    return `<td class="${value1Class}">${value1Round.toFixed(
+    return `<Cell class="${value1Class}">${value1Round.toFixed(
       digits
-    )}</td><td class="${value2Class}">${value2Round.toFixed(digits)}</td>`;
+    )}</Cell><Cell class="${value2Class}">${value2Round.toFixed(
+      digits
+    )}</Cell>`;
   }
 </script>
 
-{#if loadState === "fetching"}
-  <div class="d-flex justify-content-center m-3">
-    <div class="spinner-border" role="status">
-      <span class="visually-hidden">Loading...</span>
-    </div>
-  </div>
-{/if}
+<div style="display: flex; align-items: right;">
+  <IconButton
+    class="material-icons"
+    on:click={() => dispatch("onClickScreenshot", null)}
+    disabled={battle === undefined || loadState === "fetching"}
+    >photo_camera</IconButton
+  >
+  <IconButton class="material-icons" on:click={() => WindowReloadApp()}
+    >restart_alt</IconButton
+  >
+</div>
 
 {#if latestHash !== ""}
-  <div class="mt-2 mx-4">
-    <table class="table table-sm table-bordered">
-      {#each battle.teams as team}
-        <thead>
-          <tr>
-            <th
-              colspan={Object.values(config.displays.basic).filter(
+  <DataTable class="table" stickyHeader>
+    {#each battle.teams as team}
+      <Head>
+        <Row>
+          <Cell
+            colspan={Object.values(config.displays.basic).filter(
+              (it) => it === true
+            ).length}>基本情報</Cell
+          >
+          {#if Object.values(config.displays.ship).filter((it) => it === true).length !== 0}
+            <Cell
+              colspan={Object.values(config.displays.ship).filter(
                 (it) => it === true
-              ).length}>基本情報</th
+              ).length}>艦成績</Cell
             >
-            {#if Object.values(config.displays.ship).filter((it) => it === true).length !== 0}
-              <th
-                colspan={Object.values(config.displays.ship).filter(
-                  (it) => it === true
-                ).length}>艦成績</th
-              >
+          {/if}
+          {#if Object.values(config.displays.overall).filter((it) => it === true).length !== 0}
+            <Cell
+              colspan={Object.values(config.displays.overall).filter(
+                (it) => it === true
+              ).length}>総合成績</Cell
+            >
+          {/if}
+        </Row>
+        <Row>
+          {#each Object.entries(components.basic) as [k, v]}
+            {#if config.displays.basic[k]}
+              <Cell>{v.header}</Cell>
             {/if}
-            {#if Object.values(config.displays.overall).filter((it) => it === true).length !== 0}
-              <th
-                colspan={Object.values(config.displays.overall).filter(
-                  (it) => it === true
-                ).length}>総合成績</th
-              >
-            {/if}
-          </tr>
-          <tr>
-            {#each Object.entries(components.basic) as [k, v]}
-              {#if config.displays.basic[k]}
-                <th>{v.header}</th>
-              {/if}
-            {/each}
-
-            {#each Object.entries(components.ship) as [k, v]}
-              {#if config.displays.ship[k]}
-                <th>{v.header}</th>
-              {/if}
-            {/each}
-
-            {#each Object.entries(components.overall) as [k, v]}
-              {#if config.displays.overall[k]}
-                <th>{v.header}</th>
-              {/if}
-            {/each}
-          </tr>
-        </thead>
-        <tbody>
-          {#each team.players as player}
-            {@const displayPattern = decidePlayerDataPattern(player)}
-            <tr class={backgroundClass(player.ship_stats.personal_rating)}>
-              <!-- basics -->
-              {#each Object.entries(components.basic) as [k, v]}
-                <svelte:component
-                  this={v.component}
-                  {config}
-                  {player}
-                  {displayPattern}
-                />
-              {/each}
-
-              <NoData {config} {displayPattern} />
-
-              <!-- values -->
-              {#each Object.entries(components.ship) as [k, v]}
-                <svelte:component
-                  this={v.component}
-                  {config}
-                  {player}
-                  {displayPattern}
-                />
-              {/each}
-
-              <!-- values -->
-              {#each Object.entries(components.overall) as [k, v]}
-                <svelte:component
-                  this={v.component}
-                  {config}
-                  {player}
-                  {displayPattern}
-                />
-              {/each}
-            </tr>
           {/each}
-        </tbody>
-      {/each}
-    </table>
-  </div>
 
-  <div class="mt-2 mx-4 d-flex flex-row centerize">
-    <div class="mx-2">
-      <table class="table table-sm w-auto">
-        <tbody>
-          <tr>
-            <td>開始時刻</td>
-            <td>{battle.meta.date}</td>
-          </tr>
-          <tr>
-            <td>マップ</td>
-            <td>{battle.meta.arena}</td>
-          </tr>
-          <tr>
-            <td>戦闘タイプ</td>
-            <td>{battle.meta.type}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="mx-2">
-      <table class="table table-sm w-auto">
-        <thead>
-          <tr>
-            <th />
-            {#each battle.teams as team}
-              <th>{team.name}</th>
+          {#each Object.entries(components.ship) as [k, v]}
+            {#if config.displays.ship[k]}
+              <Cell>{v.header}</Cell>
+            {/if}
+          {/each}
+
+          {#each Object.entries(components.overall) as [k, v]}
+            {#if config.displays.overall[k]}
+              <Cell>{v.header}</Cell>
+            {/if}
+          {/each}
+        </Row>
+      </Head>
+      <Body>
+        {#each team.players as player}
+          {@const displayPattern = decidePlayerDataPattern(player)}
+          <Row class={backgroundClass(player.ship_stats.personal_rating)}>
+            <!-- basics -->
+            {#each Object.entries(components.basic) as [k, v]}
+              <svelte:component
+                this={v.component}
+                {config}
+                {player}
+                {displayPattern}
+              />
             {/each}
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>PR</td>
-            {@html renderTdForTeamSummary(battle, "personal_rating", 0)}
-          </tr>
-          <tr>
-            <td>S:Dmg</td>
-            {@html renderTdForTeamSummary(battle, "damage_by_ship", 0)}
-          </tr>
-          <tr>
-            <td>S:勝率</td>
-            {@html renderTdForTeamSummary(battle, "win_rate_by_ship", 1)}
-          </tr>
-          <tr>
-            <td>S:K/D</td>
-            {@html renderTdForTeamSummary(battle, "kd_rate_by_ship", 1)}
-          </tr>
-          <tr>
-            <td>P:Dmg</td>
-            {@html renderTdForTeamSummary(battle, "damage_by_player", 0)}
-          </tr>
-          <tr>
-            <td>P:勝率</td>
-            {@html renderTdForTeamSummary(battle, "win_rate_by_player", 1)}
-          </tr>
-          <tr>
-            <td>P:K/D</td>
-            {@html renderTdForTeamSummary(battle, "kd_rate_by_player", 1)}
-          </tr>
-        </tbody>
-      </table>
-    </div>
+
+            <NoData {config} {displayPattern} />
+
+            <!-- values -->
+            {#each Object.entries(components.ship) as [k, v]}
+              <svelte:component
+                this={v.component}
+                {config}
+                {player}
+                {displayPattern}
+              />
+            {/each}
+
+            <!-- values -->
+            {#each Object.entries(components.overall) as [k, v]}
+              <svelte:component
+                this={v.component}
+                {config}
+                {player}
+                {displayPattern}
+              />
+            {/each}
+          </Row>
+        {/each}
+      </Body>
+    {/each}
+  </DataTable>
+
+  <div style="display: flex; align-items: center;">
+    <DataTable>
+      <Body>
+        <Row>
+          <Cell>開始時刻</Cell>
+          <Cell>{battle.meta.date}</Cell>
+        </Row>
+        <Row>
+          <Cell>マップ</Cell>
+          <Cell>{battle.meta.arena}</Cell>
+        </Row>
+        <Row>
+          <Cell>戦闘タイプ</Cell>
+          <Cell>{battle.meta.type}</Cell>
+        </Row>
+      </Body>
+    </DataTable>
+    <DataTable>
+      <Head>
+        <Row>
+          <Cell />
+          <Cell>{battle.teams[0].name}</Cell>
+          <Cell>{battle.teams[1].name}</Cell>
+        </Row>
+      </Head>
+      <Body>
+        <Row>
+          <Cell>艦:PR</Cell>
+          <Cell>{battle.teams[0].team_average.personal_rating.toFixed(0)}</Cell>
+          <Cell>{battle.teams[1].team_average.personal_rating.toFixed(0)}</Cell>
+        </Row>
+        <Row>
+          <Cell>艦:Dmg</Cell>
+          <Cell>{battle.teams[0].team_average.damage_by_ship.toFixed(0)}</Cell>
+          <Cell>{battle.teams[1].team_average.damage_by_ship.toFixed(0)}</Cell>
+        </Row>
+        <Row>
+          <Cell>艦:勝率</Cell>
+          <Cell>{battle.teams[0].team_average.win_rate_by_ship.toFixed(1)}</Cell
+          >
+          <Cell>{battle.teams[1].team_average.win_rate_by_ship.toFixed(1)}</Cell
+          >
+        </Row>
+        <Row>
+          <Cell>艦:K/D</Cell>
+          <Cell>{battle.teams[0].team_average.kd_rate_by_ship.toFixed(1)}</Cell>
+          <Cell>{battle.teams[1].team_average.kd_rate_by_ship.toFixed(1)}</Cell>
+        </Row>
+        <Row>
+          <Cell>総合:Dmg</Cell>
+          <Cell>{battle.teams[0].team_average.damage_by_player.toFixed(0)}</Cell
+          >
+          <Cell>{battle.teams[1].team_average.damage_by_player.toFixed(0)}</Cell
+          >
+        </Row>
+        <Row>
+          <Cell>総合:勝率</Cell>
+          <Cell
+            >{battle.teams[0].team_average.win_rate_by_player.toFixed(1)}</Cell
+          >
+          <Cell
+            >{battle.teams[1].team_average.win_rate_by_player.toFixed(1)}</Cell
+          >
+        </Row>
+        <Row>
+          <Cell>総合:K/D</Cell>
+          <Cell
+            >{battle.teams[0].team_average.kd_rate_by_player.toFixed(1)}</Cell
+          >
+          <Cell
+            >{battle.teams[1].team_average.kd_rate_by_player.toFixed(1)}</Cell
+          >
+        </Row>
+      </Body>
+    </DataTable>
   </div>
 {/if}

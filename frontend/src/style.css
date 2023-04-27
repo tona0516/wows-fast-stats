@@ -1,16 +1,16 @@
 html {
-  background-color: #212529;
+  /* background-color: #212529; */
   text-align: center;
-  color: #f2f2f2;
+  /* color: #f2f2f2; */
 }
 
 body {
   margin: 0;
-  color: #f2f2f2;
+  /* color: #f2f2f2; */
   font-family: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
     "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif;
-  background-color: #212529;
+  /* background-color: #212529; */
 }
 
 @font-face {
@@ -36,17 +36,19 @@ a {
 }
 
 .table {
-  color: #f2f2f2;
+  margin-right: 24px;
+  margin-left: 24px;
 }
 
-.table td {
-  padding-top: 2px;
-  padding-bottom: 2px;
+.cell {
+  margin-top: 2px;
+  margin-bottom: 2px;
   white-space: nowrap;
-  vertical-align: middle;
 }
 
-.table th {
+.cell-head {
+  margin-top: 2px;
+  margin-bottom: 2px;
   white-space: nowrap;
   vertical-align: middle;
 }
@@ -129,11 +131,11 @@ a {
 }
 
 .using_ship_type_rate {
-  min-width: 120px;
+  width: 120px;
 }
 
 .using_tier_rate {
-  min-width: 120px;
+  width: 40px;
 }
 
 .no_data {
@@ -162,6 +164,7 @@ a {
   width: 75%;
   max-width: 600px;
   margin: auto;
+  text-align: left;
 }
 
 .higher {
@@ -170,10 +173,6 @@ a {
 
 .lower {
   color: #fc4e32;
-}
-
-.form-style {
-  text-align: left;
 }
 
 .centerize {
