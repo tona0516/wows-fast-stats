@@ -4,22 +4,23 @@
   export let config: vo.UserConfig;
   export let displayPattern: DisplayPattern;
 
-  function countDisplays(config: vo.UserConfig): number {
-    const shipCount = Object.values(config.displays.ship).filter(
-      (it) => it === true
-    ).length;
-    const overallCount = Object.values(config.displays.overall).filter(
-      (it) => it === true
-    ).length;
+  type ResultType = "ship" | "overall";
 
-    return shipCount + overallCount;
-  }
+  const shipCounts = Object.values(config.displays.ship).filter(
+    (it) => it === true
+  ).length;
+
+  const overallCounts = Object.values(config.displays.overall).filter(
+    (it) => it === true
+  ).length;
 </script>
 
-{#if countDisplays(config) > 0}
+{#if shipCounts + overallCounts > 0}
   {#if displayPattern === "private"}
-    <td class="no_data omit" colspan={countDisplays(config)}>PRIVATE</td>
+    <td class="no_data omit" colspan={shipCounts + overallCounts}>PRIVATE</td>
   {:else if displayPattern === "nodata"}
-    <td class="no_data omit" colspan={countDisplays(config)}>N/A</td>
+    <td class="no_data omit" colspan={shipCounts + overallCounts}>N/A</td>
+  {:else if displayPattern === "noshipstats"}
+    <td class="no_data omit" colspan={shipCounts}>N/A</td>
   {/if}
 {/if}

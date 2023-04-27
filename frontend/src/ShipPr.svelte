@@ -10,7 +10,7 @@
     <td class="pr">
       {player.ship_stats.personal_rating.toFixed(0)}
     </td>
-  {:else if displayPattern === "noshipstats" || displayPattern === "nopr"}
+  {:else if displayPattern === "nopr"}
     <td class="pr" />
   {/if}
 {/if}

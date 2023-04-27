@@ -117,30 +117,72 @@
     }
   }
 
-  function renderTdForTeamSummary(
-    battle: vo.Battle,
-    key: string,
-    digits: number
-  ): string {
-    const value1Round =
-      +battle["teams"][0]["team_average"][key].toFixed(digits);
-    const value2Round =
-      +battle["teams"][1]["team_average"][key].toFixed(digits);
+  function buildTeamSummary(battle: vo.Battle): {
+    name: string;
+    value1: string;
+    value2: string;
+    diff: string;
+    color_class: string;
+  }[] {
+    let result: {
+      name: string;
+      value1: string;
+      value2: string;
+      diff: string;
+      color_class: string;
+    }[] = [];
+    Object.entries({
+      personal_rating: {
+        label: "艦:PR",
+        digit: 0,
+      },
+      damage_by_ship: {
+        label: "艦:Dmg",
+        digit: 0,
+      },
+      win_rate_by_ship: {
+        label: "艦:勝率",
+        digit: 1,
+      },
+      kd_rate_by_ship: {
+        label: "艦:K/D",
+        digit: 1,
+      },
+      damage_by_player: {
+        label: "総合:Dmg",
+        digit: 0,
+      },
+      win_rate_by_player: {
+        label: "総合:勝率",
+        digit: 1,
+      },
+      kd_rate_by_player: {
+        label: "総合:K/D",
+        digit: 1,
+      },
+    }).forEach(([k, v]) => {
+      const value1 = battle.teams[0].team_average[k];
+      const value2 = battle.teams[1].team_average[k];
+      const diff = value1 - value2;
+      let colorClass = "";
+      let sign = "";
+      if (diff > 0) {
+        sign = "+";
+        colorClass = "higher";
+      } else if (diff < 0) {
+        colorClass = "lower";
+      }
 
-    let value1Class = "";
-    let value2Class = "";
-    if (value1Round > value2Round) {
-      value1Class = "higher";
-      value2Class = "lower";
-    }
-    if (value1Round < value2Round) {
-      value1Class = "lower";
-      value2Class = "higher";
-    }
+      result.push({
+        name: v.label,
+        value1: value1.toFixed(v.digit),
+        value2: value2.toFixed(v.digit),
+        diff: sign + diff.toFixed(v.digit),
+        color_class: colorClass,
+      });
+    });
 
-    return `<td class="${value1Class}">${value1Round.toFixed(
-      digits
-    )}</td><td class="${value2Class}">${value2Round.toFixed(digits)}</td>`;
+    return result;
   }
 </script>
 
@@ -264,40 +306,20 @@
         <thead>
           <tr>
             <th />
-            {#each battle.teams as team}
-              <th>{team.name}</th>
-            {/each}
+            <th>{battle.teams[0].name}</th>
+            <th>差</th>
+            <th>{battle.teams[1].name}</th>
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>PR</td>
-            {@html renderTdForTeamSummary(battle, "personal_rating", 0)}
-          </tr>
-          <tr>
-            <td>S:Dmg</td>
-            {@html renderTdForTeamSummary(battle, "damage_by_ship", 0)}
-          </tr>
-          <tr>
-            <td>S:勝率</td>
-            {@html renderTdForTeamSummary(battle, "win_rate_by_ship", 1)}
-          </tr>
-          <tr>
-            <td>S:K/D</td>
-            {@html renderTdForTeamSummary(battle, "kd_rate_by_ship", 1)}
-          </tr>
-          <tr>
-            <td>P:Dmg</td>
-            {@html renderTdForTeamSummary(battle, "damage_by_player", 0)}
-          </tr>
-          <tr>
-            <td>P:勝率</td>
-            {@html renderTdForTeamSummary(battle, "win_rate_by_player", 1)}
-          </tr>
-          <tr>
-            <td>P:K/D</td>
-            {@html renderTdForTeamSummary(battle, "kd_rate_by_player", 1)}
-          </tr>
+          {#each buildTeamSummary(battle) as row}
+            <tr>
+              <td>{row.name}</td>
+              <td>{row.value1}</td>
+              <td class={row.color_class}>{row.diff}</td>
+              <td>{row.value2}</td>
+            </tr>
+          {/each}
         </tbody>
       </table>
     </div>

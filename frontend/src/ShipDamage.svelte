@@ -10,7 +10,5 @@
     <td class="damage">
       {player.ship_stats.avg_damage.toFixed(0)}
     </td>
-  {:else if displayPattern === "noshipstats"}
-    <td class="damage" />
   {/if}
 {/if}

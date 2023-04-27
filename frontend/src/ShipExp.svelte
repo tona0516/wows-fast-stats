@@ -10,7 +10,5 @@
     <td class="exp">
       {player.ship_stats.exp.toFixed(0)}
     </td>
-  {:else if displayPattern === "noshipstats"}
-    <td class="exp" />
   {/if}
 {/if}

@@ -10,7 +10,5 @@
     <td class="battles">
       {player.ship_stats.battles}
     </td>
-  {:else if displayPattern === "noshipstats"}
-    <td class="battles" />
   {/if}
 {/if}

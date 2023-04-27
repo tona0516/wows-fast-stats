@@ -11,7 +11,5 @@
     <td class="kd">
       {player.ship_stats.kd_rate.toFixed(1)}
     </td>
-  {:else if displayPattern === "noshipstats"}
-    <td class="kd" />
   {/if}
 {/if}

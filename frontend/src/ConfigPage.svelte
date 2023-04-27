@@ -120,8 +120,11 @@
               type="checkbox"
               id="select-all"
               on:change={toggleAll}
-              checked={Object.values(inputConfig.displays.ship).filter((it) => !it).length === 0 &&
-                  Object.values(inputConfig.displays.overall).filter((it) => !it).length === 0 }
+              checked={Object.values(inputConfig.displays.ship).filter(
+                (it) => !it
+              ).length === 0 &&
+                Object.values(inputConfig.displays.overall).filter((it) => !it)
+                  .length === 0}
             />
             <label class="form-check-label" for="select-all">全選択</label>
           </div>

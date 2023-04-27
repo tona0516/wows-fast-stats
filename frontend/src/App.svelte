@@ -15,7 +15,6 @@
   import ConfigIcon from "./ConfigIcon.svelte";
   import ReloadIcon from "./ReloadIcon.svelte";
   import CameraIcon from "./CameraIcon.svelte";
-  import iconApp from "./assets/images/appicon.png";
   import InfoIcon from "./InfoIcon.svelte";
   import AppInfo from "./AppInfo.svelte";
 
@@ -157,49 +156,54 @@
           <div class="navbar-nav">
             <button
               type="button"
-              class="btn btn-outline-secondary m-1 {currentPage === 'main' &&
-                'active'}"
+              class="btn btn-sm btn-outline-secondary m-1 {currentPage ===
+                'main' && 'active'}"
               title="ホーム"
               on:click={() => onClickMenu("main")}
             >
               <HomeIcon />
+              ホーム
             </button>
             <button
               type="button"
-              class="btn btn-outline-secondary m-1 {currentPage === 'config' &&
-                'active'}"
+              class="btn btn-sm btn-outline-secondary m-1 {currentPage ===
+                'config' && 'active'}"
               title="設定"
               on:click={() => onClickMenu("config")}
             >
               <ConfigIcon />
+              設定
             </button>
             <button
               type="button"
-              class="btn btn-outline-secondary m-1 {currentPage === 'appinfo' &&
-                'active'}"
+              class="btn btn-sm btn-outline-secondary m-1 {currentPage ===
+                'appinfo' && 'active'}"
               title="アプリ情報"
               on:click={() => onClickMenu("appinfo")}
             >
               <InfoIcon />
+              アプリ情報
             </button>
             {#if currentPage == "main"}
               <button
                 type="button"
-                class="btn btn-outline-success m-1"
+                class="btn btn-sm btn-outline-success m-1"
                 title="リロード"
                 on:click={() => onClickMenu("reload")}
               >
                 <ReloadIcon />
+                リロード
               </button>
 
               <button
                 type="button"
-                class="btn btn-outline-success m-1"
+                class="btn btn-sm btn-outline-success m-1"
                 title="スクリーンショット"
                 disabled={battle === undefined || loadState === "fetching"}
                 on:click={() => onClickMenu("screenshot")}
               >
                 <CameraIcon />
+                スクリーンショット
               </button>
             {/if}
           </div>

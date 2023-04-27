@@ -10,7 +10,5 @@
     <td class="survived-rate">
       {player.ship_stats.win_survived_rate.toFixed(1)}
     </td>
-  {:else if displayPattern === "noshipstats"}
-    <td class="survived-rate" />
   {/if}
 {/if}

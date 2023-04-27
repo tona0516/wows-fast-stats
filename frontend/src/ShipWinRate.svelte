@@ -10,7 +10,5 @@
     <td class="win">
       {player.ship_stats.win_rate.toFixed(1)}
     </td>
-  {:else if displayPattern === "noshipstats"}
-    <td class="win" />
   {/if}
 {/if}
