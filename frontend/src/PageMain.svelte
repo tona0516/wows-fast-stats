@@ -17,11 +17,12 @@
   import OverallWinSurvivedRate from "./OverallWinSurvivedRate.svelte";
   import OverallLoseSurvivedRate from "./OverallLoseSurvivedRate.svelte";
   import OverallExp from "./OverallExp.svelte";
-  import AvgTier from "./OverallAvgTier.svelte";
-  import ShipTypeRate from "./OverallShipTypeRate.svelte";
-  import TierRate from "./OverallTierRate.svelte";
+  import OverallAvgTier from "./OverallAvgTier.svelte";
+  import OverallShipTypeRate from "./OverallShipTypeRate.svelte";
+  import OverallTierRate from "./OverallTierRate.svelte";
   import OverallBattles from "./OverallBattles.svelte";
   import NoData from "./NoData.svelte";
+  import { LogDebug } from "../wailsjs/runtime/runtime";
 
   export let loadState: LoadState = "standby";
   export let latestHash: string = "";
@@ -30,45 +31,30 @@
 
   const components = {
     basic: {
-      player_name: { header: "プレイヤー", component: BasicPlayerName },
-      ship_info: { header: "艦", component: BasicShipInfo },
+      player_name: BasicPlayerName,
+      ship_info: BasicShipInfo,
     },
     ship: {
-      pr: { header: "PR", component: ShipPr },
-      damage: { header: "Dmg", component: ShipDamage },
-      win_rate: { header: "勝率", component: ShipWinRate },
-      kd_rate: { header: "K/D", component: ShipKdRate },
-      win_survived_rate: {
-        header: "勝利生存率",
-        component: ShipWinSurvivedRate,
-      },
-      lose_survived_rate: {
-        header: "敗北生存率",
-        component: ShipLoseSurvivedRate,
-      },
-      exp: { header: "Exp", component: ShipExp },
-      battles: { header: "戦闘数", component: ShipBattles },
+      pr: ShipPr,
+      damage: ShipDamage,
+      win_rate: ShipWinRate,
+      kd_rate: ShipKdRate,
+      win_survived_rate: ShipWinSurvivedRate,
+      lose_survived_rate: ShipLoseSurvivedRate,
+      exp: ShipExp,
+      battles: ShipBattles,
     },
     overall: {
-      damage: { header: "Dmg", component: OverallDamage },
-      win_rate: { header: "勝率", component: OverallWinRate },
-      kd_rate: { header: "K/D", component: OverallKdRate },
-      win_survived_rate: {
-        header: "勝利生存率",
-        component: OverallWinSurvivedRate,
-      },
-      lose_survived_rate: {
-        header: "敗北生存率",
-        component: OverallLoseSurvivedRate,
-      },
-      exp: { header: "Exp", component: OverallExp },
-      battles: { header: "戦闘数", component: OverallBattles },
-      avg_tier: { header: "平均T", component: AvgTier },
-      using_ship_type_rate: {
-        header: "艦種割合",
-        component: ShipTypeRate,
-      },
-      using_tier_rate: { header: "T別割合", component: TierRate },
+      damage: OverallDamage,
+      win_rate: OverallWinRate,
+      kd_rate: OverallKdRate,
+      win_survived_rate: OverallWinSurvivedRate,
+      lose_survived_rate: OverallLoseSurvivedRate,
+      exp: OverallExp,
+      battles: OverallBattles,
+      avg_tier: OverallAvgTier,
+      using_ship_type_rate: OverallShipTypeRate,
+      using_tier_rate: OverallTierRate,
     },
   };
 
@@ -85,7 +71,7 @@
       return "noshipstats";
     }
 
-    if (player.ship_stats.personal_rating === 0) {
+    if (player.ship_stats.pr === 0) {
       return "nopr";
     }
 
@@ -117,67 +103,51 @@
     }
   }
 
-  function buildTeamSummary(battle: vo.Battle): {
-    name: string;
-    value1: string;
-    value2: string;
+  function buildTeamSummary(comp: vo.Comparision): {
+    label: string;
+    friend: string;
+    enemy: string;
     diff: string;
     color_class: string;
   }[] {
     let result: {
-      name: string;
-      value1: string;
-      value2: string;
+      label: string;
+      friend: string;
+      enemy: string;
       diff: string;
       color_class: string;
     }[] = [];
-    Object.entries({
-      personal_rating: {
-        label: "艦:PR",
-        digit: 0,
-      },
-      damage_by_ship: {
-        label: "艦:Dmg",
-        digit: 0,
-      },
-      win_rate_by_ship: {
-        label: "艦:勝率",
-        digit: 1,
-      },
-      kd_rate_by_ship: {
-        label: "艦:K/D",
-        digit: 1,
-      },
-      damage_by_player: {
-        label: "総合:Dmg",
-        digit: 0,
-      },
-      win_rate_by_player: {
-        label: "総合:勝率",
-        digit: 1,
-      },
-      kd_rate_by_player: {
-        label: "総合:K/D",
-        digit: 1,
-      },
-    }).forEach(([k, v]) => {
-      const value1 = battle.teams[0].team_average[k];
-      const value2 = battle.teams[1].team_average[k];
-      const diff = value1 - value2;
+
+    let resultKeys: { key1: string; key2: string }[] = [];
+
+    Object.keys(comp.ship).forEach((it) => {
+      resultKeys.push({ key1: "ship", key2: it });
+    });
+
+    Object.keys(comp.overall).forEach((it) => {
+      resultKeys.push({ key1: "overall", key2: it });
+    });
+
+    resultKeys.forEach((it) => {
+      const between: vo.Between = comp[it.key1][it.key2];
+
       let colorClass = "";
       let sign = "";
-      if (diff > 0) {
+      if (between.diff > 0) {
         sign = "+";
         colorClass = "higher";
-      } else if (diff < 0) {
+      } else if (between.diff < 0) {
         colorClass = "lower";
       }
 
       result.push({
-        name: v.label,
-        value1: value1.toFixed(v.digit),
-        value2: value2.toFixed(v.digit),
-        diff: sign + diff.toFixed(v.digit),
+        label:
+          Const.COLUMN_NAMES[it.key1].minName +
+          ":" +
+          Const.COLUMN_NAMES[it.key2].minName,
+        friend: between.friend.toFixed(Const.DIGITS[it.key2]),
+        enemy: between.enemy.toFixed(Const.DIGITS[it.key2]),
+        diff: sign + between.diff.toFixed(Const.DIGITS[it.key2]),
         color_class: colorClass,
       });
     });
@@ -223,19 +193,19 @@
           <tr>
             {#each Object.entries(components.basic) as [k, v]}
               {#if config.displays.basic[k]}
-                <th>{v.header}</th>
+                <th>{Const.COLUMN_NAMES[k].minName}</th>
               {/if}
             {/each}
 
             {#each Object.entries(components.ship) as [k, v]}
               {#if config.displays.ship[k]}
-                <th>{v.header}</th>
+                <th>{Const.COLUMN_NAMES[k].minName}</th>
               {/if}
             {/each}
 
             {#each Object.entries(components.overall) as [k, v]}
               {#if config.displays.overall[k]}
-                <th>{v.header}</th>
+                <th>{Const.COLUMN_NAMES[k].minName}</th>
               {/if}
             {/each}
           </tr>
@@ -243,37 +213,22 @@
         <tbody>
           {#each team.players as player}
             {@const displayPattern = decidePlayerDataPattern(player)}
-            <tr class={backgroundClass(player.ship_stats.personal_rating)}>
+            <tr class={backgroundClass(player.ship_stats.pr)}>
               <!-- basics -->
               {#each Object.entries(components.basic) as [k, v]}
-                <svelte:component
-                  this={v.component}
-                  {config}
-                  {player}
-                  {displayPattern}
-                />
+                <svelte:component this={v} {config} {player} {displayPattern} />
               {/each}
 
               <NoData {config} {displayPattern} />
 
               <!-- values -->
               {#each Object.entries(components.ship) as [k, v]}
-                <svelte:component
-                  this={v.component}
-                  {config}
-                  {player}
-                  {displayPattern}
-                />
+                <svelte:component this={v} {config} {player} {displayPattern} />
               {/each}
 
               <!-- values -->
               {#each Object.entries(components.overall) as [k, v]}
-                <svelte:component
-                  this={v.component}
-                  {config}
-                  {player}
-                  {displayPattern}
-                />
+                <svelte:component this={v} {config} {player} {displayPattern} />
               {/each}
             </tr>
           {/each}
@@ -312,12 +267,12 @@
           </tr>
         </thead>
         <tbody>
-          {#each buildTeamSummary(battle) as row}
+          {#each buildTeamSummary(battle.comparision) as row}
             <tr>
-              <td>{row.name}</td>
-              <td>{row.value1}</td>
+              <td>{row.label}</td>
+              <td>{row.friend}</td>
               <td class={row.color_class}>{row.diff}</td>
-              <td>{row.value2}</td>
+              <td>{row.enemy}</td>
             </tr>
           {/each}
         </tbody>

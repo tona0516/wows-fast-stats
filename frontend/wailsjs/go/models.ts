@@ -14,30 +14,6 @@ export namespace vo {
 	        this.ship_info = source["ship_info"];
 	    }
 	}
-	export class TeamAverage {
-	    personal_rating: number;
-	    damage_by_ship: number;
-	    win_rate_by_ship: number;
-	    kd_rate_by_ship: number;
-	    damage_by_player: number;
-	    win_rate_by_player: number;
-	    kd_rate_by_player: number;
-	
-	    static createFrom(source: any = {}) {
-	        return new TeamAverage(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.personal_rating = source["personal_rating"];
-	        this.damage_by_ship = source["damage_by_ship"];
-	        this.win_rate_by_ship = source["win_rate_by_ship"];
-	        this.kd_rate_by_ship = source["kd_rate_by_ship"];
-	        this.damage_by_player = source["damage_by_player"];
-	        this.win_rate_by_player = source["win_rate_by_player"];
-	        this.kd_rate_by_player = source["kd_rate_by_player"];
-	    }
-	}
 	export class TierGroup[float64] {
 	    low: number;
 	    middle: number;
@@ -76,7 +52,7 @@ export namespace vo {
 	}
 	export class PlayerStats {
 	    battles: number;
-	    avg_damage: number;
+	    damage: number;
 	    win_rate: number;
 	    win_survived_rate: number;
 	    lose_survived_rate: number;
@@ -93,7 +69,7 @@ export namespace vo {
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.battles = source["battles"];
-	        this.avg_damage = source["avg_damage"];
+	        this.damage = source["damage"];
 	        this.win_rate = source["win_rate"];
 	        this.win_survived_rate = source["win_survived_rate"];
 	        this.lose_survived_rate = source["lose_survived_rate"];
@@ -144,13 +120,13 @@ export namespace vo {
 	}
 	export class ShipStats {
 	    battles: number;
-	    avg_damage: number;
+	    damage: number;
 	    win_rate: number;
 	    win_survived_rate: number;
 	    lose_survived_rate: number;
 	    kd_rate: number;
 	    exp: number;
-	    personal_rating: number;
+	    pr: number;
 	
 	    static createFrom(source: any = {}) {
 	        return new ShipStats(source);
@@ -159,13 +135,13 @@ export namespace vo {
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.battles = source["battles"];
-	        this.avg_damage = source["avg_damage"];
+	        this.damage = source["damage"];
 	        this.win_rate = source["win_rate"];
 	        this.win_survived_rate = source["win_survived_rate"];
 	        this.lose_survived_rate = source["lose_survived_rate"];
 	        this.kd_rate = source["kd_rate"];
 	        this.exp = source["exp"];
-	        this.personal_rating = source["personal_rating"];
+	        this.pr = source["pr"];
 	    }
 	}
 	export class ShipInfo {
@@ -227,7 +203,6 @@ export namespace vo {
 	export class Team {
 	    players: Player[];
 	    name: string;
-	    team_average: TeamAverage;
 	
 	    static createFrom(source: any = {}) {
 	        return new Team(source);
@@ -237,7 +212,124 @@ export namespace vo {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.players = this.convertValues(source["players"], Player);
 	        this.name = source["name"];
-	        this.team_average = this.convertValues(source["team_average"], TeamAverage);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class OverallComp {
+	    damage: Between;
+	    win_rate: Between;
+	    kd_rate: Between;
+	
+	    static createFrom(source: any = {}) {
+	        return new OverallComp(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.damage = this.convertValues(source["damage"], Between);
+	        this.win_rate = this.convertValues(source["win_rate"], Between);
+	        this.kd_rate = this.convertValues(source["kd_rate"], Between);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class Between {
+	    friend: number;
+	    enemy: number;
+	    diff: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new Between(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.friend = source["friend"];
+	        this.enemy = source["enemy"];
+	        this.diff = source["diff"];
+	    }
+	}
+	export class ShipComp {
+	    pr: Between;
+	    damage: Between;
+	    win_rate: Between;
+	    kd_rate: Between;
+	
+	    static createFrom(source: any = {}) {
+	        return new ShipComp(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.pr = this.convertValues(source["pr"], Between);
+	        this.damage = this.convertValues(source["damage"], Between);
+	        this.win_rate = this.convertValues(source["win_rate"], Between);
+	        this.kd_rate = this.convertValues(source["kd_rate"], Between);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class Comparision {
+	    ship: ShipComp;
+	    overall: OverallComp;
+	
+	    static createFrom(source: any = {}) {
+	        return new Comparision(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.ship = this.convertValues(source["ship"], ShipComp);
+	        this.overall = this.convertValues(source["overall"], OverallComp);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -278,6 +370,7 @@ export namespace vo {
 	}
 	export class Battle {
 	    meta: Meta;
+	    comparision: Comparision;
 	    teams: Team[];
 	
 	    static createFrom(source: any = {}) {
@@ -287,6 +380,7 @@ export namespace vo {
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.meta = this.convertValues(source["meta"], Meta);
+	        this.comparision = this.convertValues(source["comparision"], Comparision);
 	        this.teams = this.convertValues(source["teams"], Team);
 	    }
 	
@@ -308,6 +402,8 @@ export namespace vo {
 		    return a;
 		}
 	}
+	
+	
 	export class Overall {
 	    damage: boolean;
 	    win_rate: boolean;
@@ -398,6 +494,7 @@ export namespace vo {
 		    return a;
 		}
 	}
+	
 	
 	
 	

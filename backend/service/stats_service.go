@@ -418,13 +418,13 @@ func (s *StatsService) compose(
 			},
 			ShipStats: vo.ShipStats{
 				Battles:   statsCalculator.Ship.Battles,
-				AvgDamage: statsCalculator.ShipAvgDamage(),
+				Damage: statsCalculator.ShipAvgDamage(),
 				WinRate:   statsCalculator.ShipWinRate(),
                 WinSurvivedRate: statsCalculator.ShipWinSurvivedRate(),
                 LoseSurvivedRate: statsCalculator.ShipLoseSurvivedRate(),
 				KdRate:    statsCalculator.ShipKdRate(),
                 Exp: statsCalculator.ShipAvgExp(),
-				PersonalRating: rating.PersonalRating(
+				PR: rating.PersonalRating(
 					statsCalculator.ShipAvgDamage(),
 					statsCalculator.ShipAvgFrags(),
 					statsCalculator.ShipWinRate(),
@@ -442,7 +442,7 @@ func (s *StatsService) compose(
 			},
 			PlayerStats: vo.PlayerStats{
 				Battles:   statsCalculator.Player.Battles,
-				AvgDamage: statsCalculator.PlayerAvgDamage(),
+				Damage: statsCalculator.PlayerAvgDamage(),
 				WinRate:   statsCalculator.PlayerWinRate(),
                 WinSurvivedRate: statsCalculator.PlayerWinSurvivedRate(),
                 LoseSurvivedRate: statsCalculator.PlayerLoseSurvivedRate(),
@@ -459,25 +459,19 @@ func (s *StatsService) compose(
 		} else {
 			enemies = append(enemies, player)
 		}
-
-        if nickname == "Hades_XB" {
-            fmt.Println(player)
-        }
 	}
 
 	sort.Sort(friends)
 	sort.Sort(enemies)
 
-    teams := make([]vo.Team, 0)
+    teams := make(vo.Teams, 0)
     teams = append(teams, vo.Team{
         Players: friends,
         Name: "味方チーム",
-        TeamAverage: friends.TeamAverage(),
     })
     teams = append(teams, vo.Team{
         Players: enemies,
         Name: "敵チーム",
-        TeamAverage: enemies.TeamAverage(),
     })
 
     battle := vo.Battle {
@@ -487,6 +481,7 @@ func (s *StatsService) compose(
             Type: tempArenaInfo.BattleType(battleTypes),
             OwnShip: Ownship,
         },
+        Comparision: teams.Comparition(),
         Teams: teams,
     }
 

@@ -8,7 +8,7 @@
 {#if config.displays.overall.damage}
   {#if displayPattern === "full" || displayPattern === "nopr" || displayPattern === "noshipstats"}
     <td class="damage">
-      {player.player_stats.avg_damage.toFixed(0)}
+      {player.player_stats.damage.toFixed(0)}
     </td>
   {/if}
 {/if}

@@ -156,7 +156,7 @@
               title="ホーム"
               on:click={() => onClickMenu("main")}
             >
-              <i class="bi bi-house"></i>
+              <i class="bi bi-house" />
               ホーム
             </button>
             <button
@@ -166,7 +166,7 @@
               title="設定"
               on:click={() => onClickMenu("config")}
             >
-              <i class="bi bi-gear"></i>
+              <i class="bi bi-gear" />
               設定
             </button>
             <button
@@ -176,7 +176,7 @@
               title="アプリ情報"
               on:click={() => onClickMenu("appinfo")}
             >
-                <i class="bi bi-info-circle"></i>
+              <i class="bi bi-info-circle" />
               アプリ情報
             </button>
             {#if currentPage == "main"}
@@ -186,7 +186,7 @@
                 title="リロード"
                 on:click={() => onClickMenu("reload")}
               >
-              <i class="bi bi-arrow-clockwise"></i>
+                <i class="bi bi-arrow-clockwise" />
                 リロード
               </button>
 
@@ -197,7 +197,7 @@
                 disabled={battle === undefined || loadState === "fetching"}
                 on:click={() => onClickMenu("screenshot")}
               >
-              <i class="bi bi-camera"></i>
+                <i class="bi bi-camera" />
                 スクリーンショット
               </button>
             {/if}

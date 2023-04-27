@@ -8,7 +8,7 @@
 {#if config.displays.ship.pr}
   {#if displayPattern === "full"}
     <td class="pr">
-      {player.ship_stats.personal_rating.toFixed(0)}
+      {player.ship_stats.pr.toFixed(0)}
     </td>
   {:else if displayPattern === "nopr"}
     <td class="pr" />

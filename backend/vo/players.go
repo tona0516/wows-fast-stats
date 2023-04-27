@@ -40,37 +40,37 @@ func (p Players) Less(i, j int) bool {
     return one.Name < second.Name
 }
 
-func (p Players) TeamAverage() TeamAverage {
-    var result TeamAverage
+func (p Players) TeamAverage() Player {
+    var result Player
     var nShip uint
     var nPlayer uint
     for _, v := range p {
         if v.ShipStats.Battles != 0 {
-            result.PersonalRating += v.ShipStats.PersonalRating
-            result.DamageByShip += v.ShipStats.AvgDamage
-            result.WinRateByShip += v.ShipStats.WinRate
-            result.KdRateByShip += v.ShipStats.KdRate
+            result.ShipStats.PR += v.ShipStats.PR
+            result.ShipStats.Damage += v.ShipStats.Damage
+            result.ShipStats.WinRate += v.ShipStats.WinRate
+            result.ShipStats.KdRate += v.ShipStats.KdRate
             nShip += 1
         }
         if v.PlayerStats.Battles != 0 {
-            result.DamageByPlayer += v.PlayerStats.AvgDamage
-            result.WinRateByPlayer += v.PlayerStats.WinRate
-            result.KdRateByPlayer += v.PlayerStats.KdRate
+            result.PlayerStats.Damage += v.PlayerStats.Damage
+            result.PlayerStats.WinRate += v.PlayerStats.WinRate
+            result.PlayerStats.KdRate += v.PlayerStats.KdRate
             nPlayer += 1
         }
     }
 
     if nShip != 0 {
-        result.PersonalRating = result.PersonalRating / float64(nShip)
-        result.DamageByShip = result.DamageByShip / float64(nShip)
-        result.WinRateByShip = result.WinRateByShip / float64(nShip)
-        result.KdRateByShip = result.KdRateByShip / float64(nShip)
+        result.ShipStats.PR = result.ShipStats.PR / float64(nShip)
+        result.ShipStats.Damage = result.ShipStats.Damage / float64(nShip)
+        result.ShipStats.WinRate = result.ShipStats.WinRate / float64(nShip)
+        result.ShipStats.KdRate = result.ShipStats.KdRate / float64(nShip)
     }
 
     if nPlayer != 0 {
-        result.DamageByPlayer = result.DamageByPlayer / float64(nPlayer)
-        result.WinRateByPlayer = result.WinRateByPlayer / float64(nPlayer)
-        result.KdRateByPlayer = result.KdRateByPlayer / float64(nPlayer)
+        result.PlayerStats.Damage = result.PlayerStats.Damage / float64(nPlayer)
+        result.PlayerStats.WinRate = result.PlayerStats.WinRate / float64(nPlayer)
+        result.PlayerStats.KdRate = result.PlayerStats.KdRate / float64(nPlayer)
     }
 
     return result

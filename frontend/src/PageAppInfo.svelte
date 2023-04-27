@@ -13,7 +13,7 @@
     バージョン 0.0.1
   </p>
   <p>
-    <i class="bi bi-twitter"></i>
+    <i class="bi bi-twitter" />
     <!-- svelte-ignore a11y-invalid-attribute -->
     <a
       href="#"
@@ -22,7 +22,7 @@
       @tonango_0516
     </a>
     <br />
-    <i class="bi bi-github"></i>
+    <i class="bi bi-github" />
     <!-- svelte-ignore a11y-invalid-attribute -->
     <a
       href="#"

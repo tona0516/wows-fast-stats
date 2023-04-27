@@ -9,5 +9,6 @@ type Meta struct {
 
 type Battle struct {
     Meta Meta `json:"meta"`
-    Teams []Team `json:"teams"`
+    Comparision Comparision `json:"comparision"`
+    Teams Teams `json:"teams"`
 }
