@@ -142,7 +142,6 @@
   <div style="font-size: {config?.font_size || 'medium'};">
     <nav class="navbar navbar-expand-sm navbar-light bg-light">
       <div class="container-fluid">
-        <img class="me-2" src={iconApp} alt="" width="36px" height="36px" />
         <button
           class="navbar-toggler"
           type="button"
