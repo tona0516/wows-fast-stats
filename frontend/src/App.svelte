@@ -74,9 +74,7 @@
           );
         }
       })
-      .catch((error) => {
-        notification.showToast(error, "error");
-      });
+      .catch((_) => {});
   }
 
   async function looper() {
