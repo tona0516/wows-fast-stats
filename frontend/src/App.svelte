@@ -7,16 +7,13 @@
   } from "../wailsjs/go/main/App.js";
   import type { vo } from "wailsjs/go/models.js";
   import Notification from "./Notification.svelte";
-  import ConfigPage from "./ConfigPage.svelte";
-  import MainPage from "./MainPage.svelte";
+  import ConfigPage from "./PageConfig.svelte";
+  import MainPage from "./PageMain.svelte";
   import domtoimage from "dom-to-image";
   import { LogDebug, WindowReloadApp } from "../wailsjs/runtime/runtime.js";
-  import HomeIcon from "./HomeIcon.svelte";
-  import ConfigIcon from "./ConfigIcon.svelte";
-  import ReloadIcon from "./ReloadIcon.svelte";
-  import CameraIcon from "./CameraIcon.svelte";
-  import InfoIcon from "./InfoIcon.svelte";
-  import AppInfo from "./AppInfo.svelte";
+  import AppInfo from "./PageAppInfo.svelte";
+
+  import "bootstrap-icons/font/bootstrap-icons.css";
 
   type NavigationMenu = "main" | "config" | "appinfo" | "reload" | "screenshot";
   type ScreenshotType = "auto" | "manual";
@@ -161,7 +158,7 @@
               title="ホーム"
               on:click={() => onClickMenu("main")}
             >
-              <HomeIcon />
+              <i class="bi bi-house"></i>
               ホーム
             </button>
             <button
@@ -171,7 +168,7 @@
               title="設定"
               on:click={() => onClickMenu("config")}
             >
-              <ConfigIcon />
+              <i class="bi bi-gear"></i>
               設定
             </button>
             <button
@@ -181,7 +178,7 @@
               title="アプリ情報"
               on:click={() => onClickMenu("appinfo")}
             >
-              <InfoIcon />
+                <i class="bi bi-info-circle"></i>
               アプリ情報
             </button>
             {#if currentPage == "main"}
@@ -191,7 +188,7 @@
                 title="リロード"
                 on:click={() => onClickMenu("reload")}
               >
-                <ReloadIcon />
+              <i class="bi bi-arrow-clockwise"></i>
                 リロード
               </button>
 
@@ -202,7 +199,7 @@
                 disabled={battle === undefined || loadState === "fetching"}
                 on:click={() => onClickMenu("screenshot")}
               >
-                <CameraIcon />
+              <i class="bi bi-camera"></i>
                 スクリーンショット
               </button>
             {/if}
