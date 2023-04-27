@@ -51,18 +51,6 @@
     );
   }
 
-  function isAllChecked(): boolean {
-    const shipValues = Object.values(inputConfig.displays.ship);
-    const isShipCheckAll =
-      shipValues.length === shipValues.filter((it) => it === true).length;
-
-    const overallValues = Object.values(inputConfig.displays.overall);
-    const isOverallCheckAll =
-      overallValues.length === overallValues.filter((it) => it === true).length;
-
-    return isOverallCheckAll && isOverallCheckAll;
-  }
-
   Cwd()
     .then((result) => (cwd = result))
     .catch((error) => "");
@@ -132,7 +120,8 @@
               type="checkbox"
               id="select-all"
               on:change={toggleAll}
-              checked={isAllChecked()}
+              checked={Object.values(inputConfig.displays.ship).filter((it) => !it).length === 0 &&
+                  Object.values(inputConfig.displays.overall).filter((it) => !it).length === 0 }
             />
             <label class="form-check-label" for="select-all">全選択</label>
           </div>
