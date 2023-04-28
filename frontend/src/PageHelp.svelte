@@ -134,7 +134,12 @@
               {/each}
             </tbody>
           </table>
-          <p>以下のプレイ率の場合、バーの表示は以下のようになります。</p>
+          <p>例：以下のプレイ率でのバー表示</p>
+          <ul>
+            {#each Object.entries(exampleShipTypes) as [k, v]}
+              <li>{k}: {v}%</li>
+            {/each}
+          </ul>
           <div class="progress">
             {#each Object.entries(exampleShipTypes) as [k, v]}
               <div
@@ -144,11 +149,6 @@
               />
             {/each}
           </div>
-          <ul>
-            {#each Object.entries(exampleShipTypes) as [k, v]}
-              <li>{k}: {v}%</li>
-            {/each}
-          </ul>
         </div>
       </div>
     </div>
@@ -195,7 +195,12 @@
               {/each}
             </tbody>
           </table>
-          <p>以下のプレイ率の場合、バーの表示は以下のようになります。</p>
+          <p>例：以下のプレイ率でのバー表示</p>
+          <ul>
+            {#each Object.entries(exampleTierRate) as [k, v]}
+              <li>{k}: {v}%</li>
+            {/each}
+          </ul>
           <div class="progress">
             {#each Object.entries(exampleTierRate) as [k, v]}
               <div
@@ -205,11 +210,6 @@
               />
             {/each}
           </div>
-          <ul>
-            {#each Object.entries(exampleTierRate) as [k, v]}
-              <li>{k}: {v}%</li>
-            {/each}
-          </ul>
         </div>
       </div>
     </div>

@@ -92,13 +92,6 @@
         id="appid"
         bind:value={inputConfig.appid}
       />
-    </div>
-
-    <!-- font-size -->
-    <div class="mb-3">
-      <div class="centerize">
-        <label for="font-size" class="form-label">文字サイズ</label>
-      </div>
       <p>
         <!-- svelte-ignore a11y-invalid-attribute -->
         <a
@@ -109,6 +102,13 @@
           >Developer Room <i class="bi bi-box-arrow-up-right" /></a
         > で作成したIDを入力してください。
       </p>
+    </div>
+
+    <!-- font-size -->
+    <div class="mb-3">
+      <div class="centerize">
+        <label for="font-size" class="form-label">文字サイズ</label>
+      </div>
       <select class="form-select" bind:value={inputConfig.font_size}>
         <option value="x-small">極小</option>
         <option value="small">小</option>

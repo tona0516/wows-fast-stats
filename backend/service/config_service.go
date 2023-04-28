@@ -50,13 +50,13 @@ func (c *ConfigService) UpdateApp(config vo.AppConfig) (vo.AppConfig, error) {
 
 func validate(config vo.UserConfig) error {
     if _, err := os.Stat(filepath.Join(config.InstallPath, "WorldOfWarships.exe")); err != nil {
-        err := errors.New("選択したパスに「WorldOfWarships.exe」が存在しません。")
+        err := errors.New("選択したフォルダに「WorldOfWarships.exe」が存在しません。")
         return err
     }
 
     wargaming := repo.Wargaming{AppID: config.Appid}
     if _, err := wargaming.EncyclopediaInfo(); err != nil {
-        err := errors.New("AppIDが間違っています。")
+        err := errors.New("WG APIと通信できません。AppIDが間違っている可能性があります。")
         return err
     }
 
