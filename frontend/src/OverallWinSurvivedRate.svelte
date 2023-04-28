@@ -7,7 +7,7 @@
 
 {#if config.displays.overall.win_survived_rate}
   {#if displayPattern === "full" || displayPattern === "nopr" || displayPattern === "noshipstats"}
-    <td class="survived-rate">
+    <td class="td-number">
       {player.player_stats.win_survived_rate.toFixed(1)}
     </td>
   {/if}

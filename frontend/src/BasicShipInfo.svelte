@@ -47,11 +47,15 @@
   }
 </script>
 
-<td class="name omit">
+<td class="td-string">
   <!-- svelte-ignore a11y-invalid-attribute -->
   <a href="#" on:click={() => BrowserOpenURL(player.ship_info.stats_url)}>
     <div class="horizontal">
-      <img alt="" src={shipIcon(player.ship_info.type)} class="icon-scale" />
+      <img
+        alt=""
+        src={shipIcon(player.ship_info.type)}
+        class="ship-icon-scale"
+      />
       <div class="omit">
         {tierString(player.ship_info.tier)}
         {player.ship_info.name}

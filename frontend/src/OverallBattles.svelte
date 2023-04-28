@@ -7,7 +7,7 @@
 
 {#if config.displays.overall.battles}
   {#if displayPattern === "full" || displayPattern === "nopr" || displayPattern === "noshipstats"}
-    <td class="battles">
+    <td class="td-number">
       {player.player_stats.battles}
     </td>
   {/if}

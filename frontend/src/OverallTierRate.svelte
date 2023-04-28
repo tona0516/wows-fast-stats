@@ -14,7 +14,7 @@
 <!-- using tier rate -->
 {#if config.displays.overall.using_tier_rate}
   {#if displayPattern === "full" || displayPattern === "nopr" || displayPattern === "noshipstats"}
-    <td class="using_tier_rate">
+    <td class="td-graph">
       <div class="progress">
         <div
           class="progress-bar progress-bar-striped bg-primary"

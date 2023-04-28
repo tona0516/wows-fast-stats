@@ -13,7 +13,7 @@
 
 {#if config.displays.overall.using_ship_type_rate}
   {#if displayPattern === "full" || displayPattern === "nopr" || displayPattern === "noshipstats"}
-    <td class="using_ship_type_rate">
+    <td class="td-graph">
       <div class="progress">
         <div
           class="progress-bar progress-bar-striped bg-primary"

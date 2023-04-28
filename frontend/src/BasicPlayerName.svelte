@@ -6,7 +6,7 @@
   export let displayPattern: DisplayPattern;
 </script>
 
-<td class="name omit">
+<td class="td-string omit">
   <!-- svelte-ignore a11y-invalid-attribute -->
   <a href="#" on:click={() => BrowserOpenURL(player.player_info.stats_url)}>
     {#if player.player_info.clan}

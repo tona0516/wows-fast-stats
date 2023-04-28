@@ -8,7 +8,7 @@
 <!-- ship kd rate -->
 {#if config.displays.ship.kd_rate}
   {#if displayPattern === "full" || displayPattern === "nopr"}
-    <td class="kd">
+    <td class="td-number">
       {player.ship_stats.kd_rate.toFixed(1)}
     </td>
   {/if}

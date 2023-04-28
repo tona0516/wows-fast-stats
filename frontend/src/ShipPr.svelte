@@ -7,10 +7,10 @@
 
 {#if config.displays.ship.pr}
   {#if displayPattern === "full"}
-    <td class="pr">
+    <td class="td-number">
       {player.ship_stats.pr.toFixed(0)}
     </td>
   {:else if displayPattern === "nopr"}
-    <td class="pr" />
+    <td class="td-number" />
   {/if}
 {/if}

@@ -7,7 +7,7 @@
 
 {#if config.displays.ship.battles}
   {#if displayPattern === "full" || displayPattern === "nopr"}
-    <td class="battles">
+    <td class="td-number">
       {player.ship_stats.battles}
     </td>
   {/if}

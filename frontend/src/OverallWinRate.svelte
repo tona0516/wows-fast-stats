@@ -7,7 +7,7 @@
 
 {#if config.displays.overall.win_rate}
   {#if displayPattern === "full" || displayPattern === "nopr" || displayPattern === "noshipstats"}
-    <td class="win">
+    <td class="td-number">
       {player.player_stats.win_rate.toFixed(1)}
     </td>
   {/if}

@@ -7,7 +7,7 @@
 
 {#if config.displays.ship.damage}
   {#if displayPattern === "full" || displayPattern === "nopr"}
-    <td class="damage">
+    <td class="td-number">
       {player.ship_stats.damage.toFixed(0)}
     </td>
   {/if}

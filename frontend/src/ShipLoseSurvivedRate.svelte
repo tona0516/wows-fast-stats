@@ -7,7 +7,7 @@
 
 {#if config.displays.ship.lose_survived_rate}
   {#if displayPattern === "full" || displayPattern === "nopr"}
-    <td class="survived-rate">
+    <td class="td-number">
       {player.ship_stats.lose_survived_rate.toFixed(1)}
     </td>
   {/if}

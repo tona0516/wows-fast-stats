@@ -7,7 +7,7 @@
 
 {#if config.displays.overall.exp}
   {#if displayPattern === "full" || displayPattern === "nopr" || displayPattern === "noshipstats"}
-    <td class="exp">
+    <td class="td-number">
       {player.player_stats.exp.toFixed(0)}
     </td>
   {/if}
