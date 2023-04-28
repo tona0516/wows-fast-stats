@@ -49,7 +49,11 @@
 
 <td class="td-string">
   <!-- svelte-ignore a11y-invalid-attribute -->
-  <a href="#" on:click={() => BrowserOpenURL(player.ship_info.stats_url)}>
+  <a
+    class="td-link"
+    href="#"
+    on:click={() => BrowserOpenURL(player.ship_info.stats_url)}
+  >
     <div class="horizontal">
       <img
         alt=""

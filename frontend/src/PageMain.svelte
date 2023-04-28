@@ -166,7 +166,7 @@
 
 {#if latestHash !== ""}
   <div class="mt-2 mx-4">
-    <table class="table table-sm table-bordered">
+    <table class="table table-sm table-bordered table-text-color">
       {#each battle.teams as team}
         <thead>
           <tr>
@@ -239,25 +239,25 @@
 
   <div class="mt-2 mx-4 d-flex flex-row centerize">
     <div class="mx-2">
-      <table class="table table-sm w-auto">
+      <table class="table table-sm table-text-color w-auto">
         <tbody>
           <tr>
-            <td>開始時刻</td>
-            <td>{battle.meta.date}</td>
+            <td class="td-string">開始時刻</td>
+            <td class="td-string">{battle.meta.date}</td>
           </tr>
           <tr>
-            <td>マップ</td>
-            <td>{battle.meta.arena}</td>
+            <td class="td-string">マップ</td>
+            <td class="td-string">{battle.meta.arena}</td>
           </tr>
           <tr>
-            <td>戦闘タイプ</td>
-            <td>{battle.meta.type}</td>
+            <td class="td-string">戦闘タイプ</td>
+            <td class="td-string">{battle.meta.type}</td>
           </tr>
         </tbody>
       </table>
     </div>
     <div class="mx-2">
-      <table class="table table-sm w-auto">
+      <table class="table table-sm table-text-color w-auto">
         <thead>
           <tr>
             <th />
@@ -269,10 +269,10 @@
         <tbody>
           {#each buildTeamSummary(battle.comparision) as row}
             <tr>
-              <td>{row.label}</td>
-              <td>{row.friend}</td>
-              <td class={row.color_class}>{row.diff}</td>
-              <td>{row.enemy}</td>
+              <td class="td-string">{row.label}</td>
+              <td class="td-number">{row.friend}</td>
+              <td class="td-number {row.color_class}">{row.diff}</td>
+              <td class="td-number">{row.enemy}</td>
             </tr>
           {/each}
         </tbody>

@@ -59,8 +59,8 @@ namespace Const {
         exp: {minName: "Exp", fullName: "経験値"},
         battles: {minName: "戦闘数", fullName: "戦闘数"},
         avg_tier: {minName: "平均T", fullName: "平均Tier"},
-        using_ship_type_rate: {minName: "艦割合", fullName: "艦種別プレイ割合(SS,DD,CL,BB,CV)"},
-        using_tier_rate: {minName: "T割合", fullName: "ティア別プレイ割合(1~4,5~7,8~★)"},
+        using_ship_type_rate: {minName: "艦割合", fullName: "艦種別プレイ割合"},
+        using_tier_rate: {minName: "T割合", fullName: "ティア別プレイ割合"},
     }
 
     export const DIGITS: { [key: string]: number } = {

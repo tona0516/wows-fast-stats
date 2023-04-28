@@ -14,10 +14,12 @@
   import AppInfo from "./PageAppInfo.svelte";
 
   import "bootstrap-icons/font/bootstrap-icons.css";
+  import PageHelp from "./PageHelp.svelte";
 
-  type NavigationMenu = "main" | "config" | "appinfo" | "reload" | "screenshot";
+  type Page = "main" | "config" | "help" | "appinfo";
+  type Func = "reload" | "screenshot";
+  type NavigationMenu = Page | Func;
   type ScreenshotType = "auto" | "manual";
-  type Page = "main" | "config" | "appinfo";
 
   let currentPage: Page = "main";
 
@@ -37,6 +39,9 @@
         break;
       case "config":
         currentPage = "config";
+        break;
+      case "help":
+        currentPage = "help";
         break;
       case "appinfo":
         currentPage = "appinfo";
@@ -172,6 +177,16 @@
             <button
               type="button"
               class="btn btn-sm btn-outline-secondary m-1 {currentPage ===
+                'help' && 'active'}"
+              title="設定"
+              on:click={() => onClickMenu("help")}
+            >
+              <i class="bi bi-question-circle" />
+              ヘルプ
+            </button>
+            <button
+              type="button"
+              class="btn btn-sm btn-outline-secondary m-1 {currentPage ===
                 'appinfo' && 'active'}"
               title="アプリ情報"
               on:click={() => onClickMenu("appinfo")}
@@ -219,6 +234,10 @@
         on:ErrorToast={(event) =>
           notification.showToast(event.detail.message, "error")}
       />
+    {/if}
+
+    {#if currentPage === "help"}
+      <PageHelp />
     {/if}
 
     {#if currentPage === "appinfo"}

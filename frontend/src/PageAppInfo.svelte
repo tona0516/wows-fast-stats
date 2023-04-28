@@ -3,8 +3,8 @@
   import iconApp from "./assets/images/appicon.png";
 </script>
 
-<div class="m-2">
-  <img class="m-3" src={iconApp} alt="" width="128px" height="128px" />
+<div class="mt-3 appinfo">
+  <img class="m-1" src={iconApp} alt="" width="128px" height="128px" />
 
   <p>
     wows-fast-stats
@@ -16,6 +16,7 @@
     <i class="bi bi-twitter" />
     <!-- svelte-ignore a11y-invalid-attribute -->
     <a
+      class="td-link"
       href="#"
       on:click={() => BrowserOpenURL("https://twitter.com/tonango_0516")}
     >
@@ -25,6 +26,7 @@
     <i class="bi bi-github" />
     <!-- svelte-ignore a11y-invalid-attribute -->
     <a
+      class="td-link"
       href="#"
       on:click={() =>
         BrowserOpenURL("https://github.com/tona0516/wows-fast-stats")}

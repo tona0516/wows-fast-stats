@@ -8,7 +8,11 @@
 
 <td class="td-string omit">
   <!-- svelte-ignore a11y-invalid-attribute -->
-  <a href="#" on:click={() => BrowserOpenURL(player.player_info.stats_url)}>
+  <a
+    class="td-link"
+    href="#"
+    on:click={() => BrowserOpenURL(player.player_info.stats_url)}
+  >
     {#if player.player_info.clan}
       [{player.player_info.clan}]{player.player_info.name}
     {:else}

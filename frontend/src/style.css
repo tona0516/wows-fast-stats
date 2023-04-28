@@ -1,6 +1,5 @@
 html {
   background-color: #212529;
-  text-align: center;
   color: #f2f2f2;
 }
 
@@ -23,11 +22,6 @@ body {
 
 #app {
   height: 100vh;
-  text-align: center;
-}
-
-a {
-  color: #f2f2f2;
 }
 
 .btn {
@@ -35,7 +29,7 @@ a {
   text-align: center;
 }
 
-.table {
+.table-text-color {
   color: #f2f2f2;
 }
 
@@ -49,6 +43,7 @@ a {
 .table th {
   white-space: nowrap;
   vertical-align: middle;
+  text-align: center;
 }
 
 .bad {
@@ -83,6 +78,10 @@ a {
   background-color: #531460;
 }
 
+.td-link {
+  color: #f2f2f2;
+}
+
 .td-string {
   text-align: left;
   max-width: 160px;
@@ -98,6 +97,7 @@ a {
 
 .no_data {
   max-width: 0px;
+  text-align: center;
 }
 
 .omit {
@@ -139,4 +139,19 @@ a {
 .centerize {
   display: flex;
   justify-content: center;
+}
+
+.help {
+  width: 75%;
+  min-width: 300px;
+  max-width: 600px;
+  margin: auto;
+}
+
+.help-table {
+  table-layout: fixed;
+}
+
+.appinfo {
+  text-align: center;
 }
