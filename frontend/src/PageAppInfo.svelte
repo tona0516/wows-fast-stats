@@ -10,7 +10,7 @@
     wows-fast-stats
     <br />
     <!-- TOOD use https://github.com/Masterminds/semver -->
-    バージョン 0.0.1
+    バージョン 0.0.2
   </p>
   <p>
     <i class="bi bi-twitter" />
