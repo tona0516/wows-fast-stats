@@ -17,17 +17,17 @@
     <td class="td-graph">
       <div class="progress">
         <div
-          class="progress-bar progress-bar-striped bg-primary"
+          class="progress-bar progress-bar-striped bar-low"
           role="progressbar"
           style="width: {roundup(player.player_stats.using_tier_rate.low)}%"
         />
         <div
-          class="progress-bar progress-bar-striped bg-info"
+          class="progress-bar progress-bar-striped bar-middle"
           role="progressbar"
           style="width: {roundup(player.player_stats.using_tier_rate.middle)}%"
         />
         <div
-          class="progress-bar progress-bar-striped bg-success"
+          class="progress-bar progress-bar-striped bar-high"
           role="progressbar"
           style="width: {roundup(player.player_stats.using_tier_rate.high)}%"
         />

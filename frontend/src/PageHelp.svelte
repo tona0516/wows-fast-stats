@@ -13,11 +13,11 @@
   };
 
   const shipTypes: { [key: string]: string } = {
-    SS: "bg-primary",
-    DD: "bg-info",
-    CL: "bg-success",
-    BB: "bg-warning",
-    CV: "bg-danger",
+    SS: "bar-ss",
+    DD: "bar-dd",
+    CL: "bar-cl",
+    BB: "bar-bb",
+    CV: "bar-cv",
   };
 
   const exampleShipTypes: { [key: string]: number } = {
@@ -29,9 +29,9 @@
   };
 
   const tierRates: { [key: string]: string } = {
-    "Tier 1 ~ 4": "bg-primary",
-    "Tier 5 ~ 7": "bg-info",
-    "Tier 8 ~ ★": "bg-success",
+    "Tier 1 ~ 4": "bar-low",
+    "Tier 5 ~ 7": "bar-middle",
+    "Tier 8 ~ ★": "bar-high",
   };
 
   const exampleTierRate: { [key: string]: number } = {

@@ -16,27 +16,27 @@
     <td class="td-graph">
       <div class="progress">
         <div
-          class="progress-bar progress-bar-striped bg-primary"
+          class="progress-bar progress-bar-striped bar-ss"
           role="progressbar"
           style="width: {roundup(player.player_stats.using_ship_type_rate.ss)}%"
         />
         <div
-          class="progress-bar progress-bar-striped bg-info"
+          class="progress-bar progress-bar-striped bar-dd"
           role="progressbar"
           style="width: {roundup(player.player_stats.using_ship_type_rate.dd)}%"
         />
         <div
-          class="progress-bar progress-bar-striped bg-success"
+          class="progress-bar progress-bar-striped bar-cl"
           role="progressbar"
           style="width: {roundup(player.player_stats.using_ship_type_rate.cl)}%"
         />
         <div
-          class="progress-bar progress-bar-striped bg-warning"
+          class="progress-bar progress-bar-striped bar-bb"
           role="progressbar"
           style="width: {roundup(player.player_stats.using_ship_type_rate.bb)}%"
         />
         <div
-          class="progress-bar progress-bar-striped bg-danger"
+          class="progress-bar progress-bar-striped bar-cv"
           role="progressbar"
           style="width: {roundup(player.player_stats.using_ship_type_rate.cv)}%"
         />
