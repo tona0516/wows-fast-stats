@@ -100,6 +100,7 @@
         <label for="font-size" class="form-label">文字サイズ</label>
       </div>
       <p>
+        <!-- svelte-ignore a11y-invalid-attribute -->
         <a
           class="td-link"
           href="#"

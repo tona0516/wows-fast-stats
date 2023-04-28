@@ -65,6 +65,7 @@
       >
         <div class="accordion-body">
           <p>
+            <!-- svelte-ignore a11y-invalid-attribute -->
             <a
               href="#"
               on:click={() =>
