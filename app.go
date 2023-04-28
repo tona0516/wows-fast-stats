@@ -16,6 +16,7 @@ type App struct {
 	configService service.ConfigService
 	userConfig    vo.UserConfig
 	appConfig     vo.AppConfig
+	Version       vo.Version
 }
 
 // NewApp creates a new App application struct
@@ -103,4 +104,8 @@ func (a *App) SaveScreenshot(filename string, base64Data string, isSelectable bo
 
 func (a *App) Cwd() (string, error) {
 	return os.Getwd()
+}
+
+func (a *App) AppVersion() vo.Version {
+	return a.Version
 }

@@ -1,6 +1,11 @@
 <script lang="ts">
+  import { AppVersion } from "../wailsjs/go/main/App";
   import { BrowserOpenURL } from "../wailsjs/runtime/runtime";
   import iconApp from "./assets/images/appicon.png";
+  import type { vo } from "wailsjs/go/models";
+
+  let version: vo.Version = { semver: "", revision: "" };
+  AppVersion().then((result) => (version = result));
 </script>
 
 <div class="mt-3 appinfo">
@@ -9,8 +14,9 @@
   <p>
     wows-fast-stats
     <br />
-    <!-- TOOD use https://github.com/Masterminds/semver -->
-    バージョン 0.0.2
+    バージョン {version.semver}
+    <br />
+    リビジョン {version.revision}
   </p>
   <p>
     <i class="bi bi-twitter" />
