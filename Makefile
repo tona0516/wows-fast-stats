@@ -1,6 +1,8 @@
 DIR := test_install_dir/replays/
 SEMVER := 0.0.3
-APP_NAME := wows-fast-stats-$(SEMVER).exe
+APP := wows-fast-stats
+EXE := $(APP)-$(SEMVER).exe
+ZIP := $(APP).zip
 
 .PHONY: dev
 dev:
@@ -12,7 +14,15 @@ dev:
 build:
 	$(eval REV := $(shell git rev-parse --short HEAD))
 	$(eval LD_FLAGS := "-X main.semver=$(SEMVER) -X main.revision=$(REV)")
-	wails build -ldflags $(LD_FLAGS) -platform windows/amd64 -o $(APP_NAME)
+	wails build -ldflags $(LD_FLAGS) -platform windows/amd64 -o $(EXE)
+
+.PHONY: package
+package: build
+	rm -rf $(APP) $(ZIP)
+	mkdir $(APP)
+	cp build/bin/$(EXE) $(APP)
+	zip -r $(ZIP) $(APP)
+	rm -rf $(APP)
 
 .PHONY: fmt
 fmt:
