@@ -166,6 +166,11 @@
 
 {#if latestHash !== ""}
   <div class="mt-2 mx-4">
+    <span>
+      {battle.meta.date}
+      {battle.meta.arena}
+      {battle.meta.type}
+    </span>
     <table class="table table-sm table-bordered table-text-color">
       {#each battle.teams as team}
         <thead>
@@ -238,45 +243,25 @@
   </div>
 
   <div class="mt-2 mx-4 d-flex flex-row centerize">
-    <div class="mx-2">
-      <table class="table table-sm table-text-color w-auto">
-        <tbody>
+    <table class="table table-sm table-text-color w-auto">
+      <thead>
+        <tr>
+          <th />
+          <th>{battle.teams[0].name}</th>
+          <th>差</th>
+          <th>{battle.teams[1].name}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {#each buildTeamSummary(battle.comparision) as row}
           <tr>
-            <td class="td-string">開始時刻</td>
-            <td class="td-string">{battle.meta.date}</td>
+            <td class="td-string">{row.label}</td>
+            <td class="td-number">{row.friend}</td>
+            <td class="td-number {row.color_class}">{row.diff}</td>
+            <td class="td-number">{row.enemy}</td>
           </tr>
-          <tr>
-            <td class="td-string">マップ</td>
-            <td class="td-string">{battle.meta.arena}</td>
-          </tr>
-          <tr>
-            <td class="td-string">戦闘タイプ</td>
-            <td class="td-string">{battle.meta.type}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="mx-2">
-      <table class="table table-sm table-text-color w-auto">
-        <thead>
-          <tr>
-            <th />
-            <th>{battle.teams[0].name}</th>
-            <th>差</th>
-            <th>{battle.teams[1].name}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {#each buildTeamSummary(battle.comparision) as row}
-            <tr>
-              <td class="td-string">{row.label}</td>
-              <td class="td-number">{row.friend}</td>
-              <td class="td-number {row.color_class}">{row.diff}</td>
-              <td class="td-number">{row.enemy}</td>
-            </tr>
-          {/each}
-        </tbody>
-      </table>
-    </div>
+        {/each}
+      </tbody>
+    </table>
   </div>
 {/if}
