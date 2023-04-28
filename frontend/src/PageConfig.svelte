@@ -8,6 +8,7 @@
   } from "../wailsjs/go/main/App.js";
   import { createEventDispatcher } from "svelte";
   import Const from "./Const.js";
+  import { BrowserOpenURL } from "../wailsjs/runtime/runtime.js";
 
   const dispatch = createEventDispatcher();
 
@@ -98,6 +99,15 @@
       <div class="centerize">
         <label for="font-size" class="form-label">文字サイズ</label>
       </div>
+      <p>
+        <a
+          class="td-link"
+          href="#"
+          on:click={() =>
+            BrowserOpenURL("https://developers.wargaming.net/applications/")}
+          >Developer Room <i class="bi bi-box-arrow-up-right" /></a
+        > で作成したIDを入力してください。
+      </p>
       <select class="form-select" bind:value={inputConfig.font_size}>
         <option value="x-small">極小</option>
         <option value="small">小</option>

@@ -72,7 +72,8 @@
               >WoWS Stats & Numbers - Personal Rating <i
                 class="bi bi-box-arrow-up-right"
               /></a
-            >に基づいています。
+            >
+            に基づいています。
             <br />
             このアプリでは以下のような配色となっています。
           </p>
