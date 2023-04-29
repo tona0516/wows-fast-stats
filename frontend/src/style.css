@@ -141,6 +141,10 @@ body {
   justify-content: center;
 }
 
+.text-center {
+  text-align: center;
+}
+
 .help {
   width: 75%;
   min-width: 300px;

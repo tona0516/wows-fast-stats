@@ -256,9 +256,9 @@
         {#each buildTeamSummary(battle.comparision) as row}
           <tr>
             <td class="td-string">{row.label}</td>
-            <td class="td-number">{row.friend}</td>
-            <td class="td-number {row.color_class}">{row.diff}</td>
-            <td class="td-number">{row.enemy}</td>
+            <td class="text-center td-number">{row.friend}</td>
+            <td class="text-center td-number {row.color_class}">{row.diff}</td>
+            <td class="text-center td-number">{row.enemy}</td>
           </tr>
         {/each}
       </tbody>
