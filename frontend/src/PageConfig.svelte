@@ -201,7 +201,7 @@
             class="td-link"
             href="#"
             on:click={() => openDirectory(cwd + "/screenshot")}
-            ><i class="bi bi-folder2-open" />保存フォルダを開く
+            ><i class="bi bi-folder2-open" /> 保存フォルダを開く
           </a>
         </div>
       </div>
@@ -225,7 +225,7 @@
             class="td-link"
             href="#"
             on:click={() => openDirectory(cwd + "/temp_arena_info")}
-            ><i class="bi bi-folder2-open" />保存フォルダを開く</a
+            ><i class="bi bi-folder2-open" /> 保存フォルダを開く</a
           >
         </div>
       </div>
