@@ -23,7 +23,7 @@
 
   function clickApply() {
     ApplyUserConfig(inputConfig)
-      .then((_) => {
+      .then(() => {
         dispatch("SuccessToast", {
           message: "更新しました。",
         });

@@ -1,51 +1,42 @@
 package service
 
 import (
-	"changeme/backend/repo"
+	"changeme/backend/infra"
 	"changeme/backend/vo"
 	"errors"
 	"os"
 	"path/filepath"
 )
 
-type ConfigService struct{}
+type Config struct{}
 
-func (c *ConfigService) User() (vo.UserConfig, error) {
+func (c *Config) User() (vo.UserConfig, error) {
     var config vo.UserConfig
-    configAdapter := repo.Config{}
-    config, err := configAdapter.User()
+    configRepo := infra.Config{}
+    config, err := configRepo.User()
     return config, err
 }
 
-func (c *ConfigService) UpdateUser(config vo.UserConfig) (vo.UserConfig, error) {
-    configAdapter := repo.Config{}
+func (c *Config) UpdateUser(config vo.UserConfig) error {
+    configRepo := infra.Config{}
 
     if err := validate(config); err != nil {
-        return config, err
+        return err
     }
 
-    if err := configAdapter.UpdateUser(config); err != nil {
-        return config, err
-    }
-
-    return config, nil
+    return configRepo.UpdateUser(config)
 }
 
-func (c *ConfigService) App() (vo.AppConfig, error) {
+func (c *Config) App() (vo.AppConfig, error) {
     var config vo.AppConfig
-    configAdapter := repo.Config{}
-    config, err := configAdapter.App()
+    configRepo := infra.Config{}
+    config, err := configRepo.App()
     return config, err
 }
 
-func (c *ConfigService) UpdateApp(config vo.AppConfig) (vo.AppConfig, error) {
-    configAdapter := repo.Config{}
-
-    if err := configAdapter.UpdateApp(config); err != nil {
-        return config, err
-    }
-
-    return config, nil
+func (c *Config) UpdateApp(config vo.AppConfig) error {
+    configRepo := infra.Config{}
+    return configRepo.UpdateApp(config)
 }
 
 func validate(config vo.UserConfig) error {
@@ -54,7 +45,7 @@ func validate(config vo.UserConfig) error {
         return err
     }
 
-    wargaming := repo.Wargaming{AppID: config.Appid}
+    wargaming := infra.Wargaming{AppID: config.Appid}
     if _, err := wargaming.EncyclopediaInfo(); err != nil {
         err := errors.New("WG APIと通信できません。AppIDが間違っている可能性があります。")
         return err

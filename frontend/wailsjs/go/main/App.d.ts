@@ -4,7 +4,7 @@ import {vo} from '../models';
 
 export function AppVersion():Promise<vo.Version>;
 
-export function ApplyUserConfig(arg1:vo.UserConfig):Promise<vo.UserConfig>;
+export function ApplyUserConfig(arg1:vo.UserConfig):Promise<void>;
 
 export function Battle():Promise<vo.Battle>;
 

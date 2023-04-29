@@ -1,4 +1,4 @@
-package repo
+package infra
 
 import (
 	"changeme/backend/vo"

@@ -1,4 +1,4 @@
-package repo
+package infra
 
 import (
 	"encoding/json"
@@ -9,7 +9,7 @@ import (
 type ApiClient[T any] struct {
 }
 
-func (a *ApiClient[T]) GetRequest(url string) (T, error) {
+func (c *ApiClient[T]) GetRequest(url string) (T, error) {
 	var response T
 	res, err := http.Get(url)
 	if res != nil {

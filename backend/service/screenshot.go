@@ -1,21 +1,21 @@
 package service
 
 import (
-	"changeme/backend/repo"
+	"changeme/backend/infra"
 	"context"
 	"path/filepath"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
-type ScreenshotService struct{}
+type Screenshot struct{}
 
-func (s *ScreenshotService) SaveForAuto(filename string, base64Data string) error {
-    screenshot := repo.Screenshot{}
+func (s *Screenshot) SaveForAuto(filename string, base64Data string) error {
+    screenshot := infra.Screenshot{}
     return screenshot.Save(filepath.Join("screenshot", filename), base64Data)
 }
 
-func (s *ScreenshotService) SaveWithDialog(ctx context.Context, filename string, base64Data string) error {
+func (s *Screenshot) SaveWithDialog(ctx context.Context, filename string, base64Data string) error {
     path, err := runtime.SaveFileDialog(ctx, runtime.SaveDialogOptions{
         DefaultFilename: filename,
     })
@@ -23,6 +23,6 @@ func (s *ScreenshotService) SaveWithDialog(ctx context.Context, filename string,
         return err
     }
 
-    screenshot := repo.Screenshot{}
+    screenshot := infra.Screenshot{}
     return screenshot.Save(path, base64Data)
 }

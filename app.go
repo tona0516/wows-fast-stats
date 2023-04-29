@@ -1,7 +1,7 @@
 package main
 
 import (
-	"changeme/backend/repo"
+	"changeme/backend/infra"
 	"changeme/backend/service"
 	"changeme/backend/vo"
 	"context"
@@ -11,27 +11,22 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
-// App struct
 type App struct {
-	ctx           context.Context
-	configService service.ConfigService
-	userConfig    vo.UserConfig
-	appConfig     vo.AppConfig
-	Version       vo.Version
+	ctx        context.Context
+	userConfig vo.UserConfig
+	appConfig  vo.AppConfig
+	Version    vo.Version
 }
 
-// NewApp creates a new App application struct
 func NewApp() *App {
 	return &App{}
 }
 
-// startup is called when the app starts. The context is saved
-// so we can call the runtime methods
 func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
-	a.configService = service.ConfigService{}
-	a.userConfig, _ = a.configService.User()
-	a.appConfig, _ = a.configService.App()
+	configService := service.Config{}
+	a.userConfig, _ = configService.User()
+	a.appConfig, _ = configService.App()
 
 	window := a.appConfig.Window
 	if window.Width != 0 && window.Height != 0 {
@@ -44,33 +39,27 @@ func (a *App) beforeClose(ctx context.Context) (prevent bool) {
 	width, height := runtime.WindowGetSize(ctx)
 	a.appConfig.Window.Width = width
 	a.appConfig.Window.Height = height
-	a.configService.UpdateApp(a.appConfig)
+	configService := service.Config{}
+	configService.UpdateApp(a.appConfig)
 
 	// Remove old caches
-	wargaming := repo.Wargaming{AppID: a.userConfig.Appid}
+	wargaming := infra.Wargaming{AppID: a.userConfig.Appid}
 	encyclopediaInfo, _ := wargaming.EncyclopediaInfo()
 	gameVersion := encyclopediaInfo.Data.GameVersion
-	caches := repo.NewCaches(gameVersion)
+	caches := infra.NewCaches(gameVersion)
 	caches.RemoveOld()
 
 	return false
 }
 
 func (a *App) TempArenaInfoHash() (string, error) {
-	statsService := service.StatsService{
-		Parallels:  5,
-		UserConfig: a.userConfig,
-	}
-	return statsService.TempArenaInfoHash()
+	battle := service.Battle{Parallels: 5, UserConfig: a.userConfig}
+	return battle.TempArenaInfoHash()
 }
 
 func (a *App) Battle() (vo.Battle, error) {
-	statsService := service.StatsService{
-		Parallels:  5,
-		UserConfig: a.userConfig,
-	}
-
-	return statsService.Battle()
+	battle := service.Battle{Parallels: 5, UserConfig: a.userConfig}
+	return battle.Battle()
 }
 
 func (a *App) SelectDirectory() (string, error) {
@@ -78,24 +67,23 @@ func (a *App) SelectDirectory() (string, error) {
 }
 
 func (a *App) UserConfig() (vo.UserConfig, error) {
-	configService := service.ConfigService{}
+	configService := service.Config{}
 	return configService.User()
 }
 
-func (a *App) ApplyUserConfig(config vo.UserConfig) (vo.UserConfig, error) {
-	configService := service.ConfigService{}
+func (a *App) ApplyUserConfig(config vo.UserConfig) error {
+	configService := service.Config{}
 
-	updatedConfig, err := configService.UpdateUser(config)
-	if err != nil {
-		return updatedConfig, err
+	if err := configService.UpdateUser(config); err != nil {
+		return err
 	}
 
-	a.userConfig = updatedConfig
-	return updatedConfig, nil
+	a.userConfig = config
+	return nil
 }
 
 func (a *App) SaveScreenshot(filename string, base64Data string, isSelectable bool) error {
-	screenshotService := service.ScreenshotService{}
+	screenshotService := service.Screenshot{}
 	if isSelectable {
 		return screenshotService.SaveWithDialog(a.ctx, filename, base64Data)
 	}
