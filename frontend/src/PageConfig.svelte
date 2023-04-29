@@ -1,69 +1,69 @@
 <script lang="ts">
-  import type { vo } from "wailsjs/go/models.js";
-  import {
-    ApplyUserConfig,
-    UserConfig,
-    SelectDirectory,
-    Cwd,
-    OpenDirectory,
-  } from "../wailsjs/go/main/App.js";
-  import { createEventDispatcher } from "svelte";
-  import Const from "./Const.js";
-  import { BrowserOpenURL } from "../wailsjs/runtime/runtime.js";
+import type { vo } from "wailsjs/go/models.js";
+import {
+  ApplyUserConfig,
+  UserConfig,
+  SelectDirectory,
+  Cwd,
+  OpenDirectory,
+} from "../wailsjs/go/main/App.js";
+import { createEventDispatcher } from "svelte";
+import Const from "./Const.js";
+import { BrowserOpenURL } from "../wailsjs/runtime/runtime.js";
 
-  const dispatch = createEventDispatcher();
+const dispatch = createEventDispatcher();
 
-  let inputConfig: vo.UserConfig = Const.DEFAULT_USER_CONFIG;
+let inputConfig: vo.UserConfig = Const.DEFAULT_USER_CONFIG;
 
-  let cwd: string;
+let cwd: string;
 
-  UserConfig().then((config) => {
-    inputConfig = config;
-  });
+UserConfig().then((config) => {
+  inputConfig = config;
+});
 
-  function clickApply() {
-    ApplyUserConfig(inputConfig)
-      .then(() => {
-        dispatch("SuccessToast", {
-          message: "更新しました。",
-        });
-      })
-      .catch((error) => {
-        dispatch("ErrorToast", {
-          message: error,
-        });
+function clickApply() {
+  ApplyUserConfig(inputConfig)
+    .then(() => {
+      dispatch("SuccessToast", {
+        message: "更新しました。",
       });
-  }
-
-  function openDirectory(path: string) {
-    OpenDirectory(path).catch((error) => {
+    })
+    .catch((error) => {
       dispatch("ErrorToast", {
         message: error,
       });
     });
-  }
+}
 
-  function selectDirectory() {
-    SelectDirectory().then((result) => {
-      if (!result) return;
-      inputConfig.install_path = result;
+function openDirectory(path: string) {
+  OpenDirectory(path).catch((error) => {
+    dispatch("ErrorToast", {
+      message: error,
     });
-  }
+  });
+}
 
-  function toggleAll(e) {
-    const isSelectAll: boolean = e.target.checked;
+function selectDirectory() {
+  SelectDirectory().then((result) => {
+    if (!result) return;
+    inputConfig.install_path = result;
+  });
+}
 
-    Object.keys(inputConfig.displays.ship).forEach(
-      (key) => (inputConfig.displays.ship[key] = isSelectAll)
-    );
-    Object.keys(inputConfig.displays.overall).forEach(
-      (key) => (inputConfig.displays.overall[key] = isSelectAll)
-    );
-  }
+function toggleAll(e) {
+  const isSelectAll: boolean = e.target.checked;
 
-  Cwd()
-    .then((result) => (cwd = result))
-    .catch((error) => "");
+  Object.keys(inputConfig.displays.ship).forEach(
+    (key) => (inputConfig.displays.ship[key] = isSelectAll)
+  );
+  Object.keys(inputConfig.displays.overall).forEach(
+    (key) => (inputConfig.displays.overall[key] = isSelectAll)
+  );
+}
+
+Cwd()
+  .then((result) => (cwd = result))
+  .catch((error) => "");
 </script>
 
 <div class="mt-3 form-style">
@@ -80,12 +80,12 @@
           type="text"
           class="form-control"
           id="install-path"
-          bind:value={inputConfig.install_path}
+          bind:value="{inputConfig.install_path}"
         />
         <button
           type="button"
           class="btn btn-secondary"
-          on:click={selectDirectory}>選択</button
+          on:click="{selectDirectory}">選択</button
         >
       </div>
     </div>
@@ -99,16 +99,16 @@
         type="text"
         class="form-control"
         id="appid"
-        bind:value={inputConfig.appid}
+        bind:value="{inputConfig.appid}"
       />
       <p>
         <!-- svelte-ignore a11y-invalid-attribute -->
         <a
           class="td-link"
           href="#"
-          on:click={() =>
-            BrowserOpenURL("https://developers.wargaming.net/applications/")}
-          >Developer Room <i class="bi bi-box-arrow-up-right" /></a
+          on:click="{() =>
+            BrowserOpenURL('https://developers.wargaming.net/applications/')}"
+          >Developer Room <i class="bi bi-box-arrow-up-right"></i></a
         > で作成したIDを入力してください。
       </p>
     </div>
@@ -118,7 +118,7 @@
       <div class="centerize">
         <label for="font-size" class="form-label">文字サイズ</label>
       </div>
-      <select class="form-select" bind:value={inputConfig.font_size}>
+      <select class="form-select" bind:value="{inputConfig.font_size}">
         <option value="x-small">極小</option>
         <option value="small">小</option>
         <option value="medium">中</option>
@@ -139,12 +139,12 @@
               class="form-check-input"
               type="checkbox"
               id="select-all"
-              on:change={toggleAll}
-              checked={Object.values(inputConfig.displays.ship).filter(
+              on:change="{toggleAll}"
+              checked="{Object.values(inputConfig.displays.ship).filter(
                 (it) => !it
               ).length === 0 &&
                 Object.values(inputConfig.displays.overall).filter((it) => !it)
-                  .length === 0}
+                  .length === 0}"
             />
             <label class="form-check-label" for="select-all">全選択</label>
           </div>
@@ -157,7 +157,7 @@
                 class="form-check-input"
                 type="checkbox"
                 id="{prefix}-{key}"
-                bind:checked={inputConfig.displays.ship[key]}
+                bind:checked="{inputConfig.displays.ship[key]}"
               />
               <label class="form-check-label" for="{prefix}-{key}"
                 >艦:{Const.COLUMN_NAMES[key].full}</label
@@ -173,7 +173,7 @@
                 class="form-check-input"
                 type="checkbox"
                 id="{prefix}-{key}"
-                bind:checked={inputConfig.displays.overall[key]}
+                bind:checked="{inputConfig.displays.overall[key]}"
               />
               <label class="form-check-label" for="{prefix}-{key}"
                 >総合:{Const.COLUMN_NAMES[key].full}</label
@@ -190,7 +190,7 @@
             class="form-check-input"
             type="checkbox"
             id="save-scrrenshot"
-            bind:checked={inputConfig.save_screenshot}
+            bind:checked="{inputConfig.save_screenshot}"
           />
           <label class="form-check-label" for="save-scrrenshot"
             >自動でスクリーンショットを保存する</label
@@ -200,8 +200,8 @@
           <a
             class="td-link"
             href="#"
-            on:click={() => openDirectory(cwd + "/screenshot")}
-            ><i class="bi bi-folder2-open" /> 保存フォルダを開く
+            on:click="{() => openDirectory(cwd + '/screenshot')}"
+            ><i class="bi bi-folder2-open"></i> 保存フォルダを開く
           </a>
         </div>
       </div>
@@ -213,7 +213,7 @@
             class="form-check-input"
             type="checkbox"
             id="save-temp-arena-info"
-            bind:checked={inputConfig.save_temp_arena_info}
+            bind:checked="{inputConfig.save_temp_arena_info}"
           />
           <label class="form-check-label" for="save-temp-arena-info"
             >【開発用】自動で戦闘情報(<i>tempArenaInfo.json</i
@@ -224,8 +224,8 @@
           <a
             class="td-link"
             href="#"
-            on:click={() => openDirectory(cwd + "/temp_arena_info")}
-            ><i class="bi bi-folder2-open" /> 保存フォルダを開く</a
+            on:click="{() => openDirectory(cwd + '/temp_arena_info')}"
+            ><i class="bi bi-folder2-open"></i> 保存フォルダを開く</a
           >
         </div>
       </div>
@@ -233,7 +233,7 @@
 
     <div class="centerize">
       <!-- apply -->
-      <button type="button" class="btn btn-primary mb-3" on:click={clickApply}
+      <button type="button" class="btn btn-primary mb-3" on:click="{clickApply}"
         >適用</button
       >
     </div>

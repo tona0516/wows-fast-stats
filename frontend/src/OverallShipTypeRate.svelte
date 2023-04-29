@@ -1,16 +1,16 @@
 <script lang="ts">
-  import type { vo } from "wailsjs/go/models";
-  export let config: vo.UserConfig;
-  export let player: vo.Player;
-  export let displayPattern: DisplayPattern;
+import type { vo } from "wailsjs/go/models";
+export let config: vo.UserConfig;
+export let player: vo.Player;
+export let displayPattern: DisplayPattern;
 
-  const colors: { [key: string]: string } = {
-    ss: "#386cb0",
-    dd: "#fff231",
-    cl: "#99d02b",
-    bb: "#ff9914",
-    cv: "#a45aaa",
-  };
+const colors: { [key: string]: string } = {
+  ss: "#386cb0",
+  dd: "#fff231",
+  cl: "#99d02b",
+  bb: "#ff9914",
+  cv: "#a45aaa",
+};
 </script>
 
 {#if config.displays.overall.using_ship_type_rate}
@@ -21,7 +21,7 @@
       <table class="charts-css bar hide-data stacked">
         <thead>
           {#each keys as _}
-            <th scope="col" />
+            <th scope="col"></th>
           {/each}
         </thead>
         <tbody>

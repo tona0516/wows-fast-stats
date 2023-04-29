@@ -1,20 +1,20 @@
 <script lang="ts">
-  import type { vo } from "wailsjs/go/models";
-  export let config: vo.UserConfig;
-  export let player: vo.Player;
-  export let displayPattern: DisplayPattern;
+import type { vo } from "wailsjs/go/models";
+export let config: vo.UserConfig;
+export let player: vo.Player;
+export let displayPattern: DisplayPattern;
 
-  const colors: { [key: string]: string } = {
-    low: "#f9344c",
-    middle: "#33a65e",
-    high: "#1d86ae",
-  };
+const colors: { [key: string]: string } = {
+  low: "#f9344c",
+  middle: "#33a65e",
+  high: "#1d86ae",
+};
 
-  const texts: { [key: string]: string } = {
-    low: "1~4",
-    middle: "5~7",
-    high: "8~★",
-  };
+const texts: { [key: string]: string } = {
+  low: "1~4",
+  middle: "5~7",
+  high: "8~★",
+};
 </script>
 
 <!-- using tier rate -->
@@ -26,7 +26,7 @@
       <table class="charts-css bar hide-data stacked">
         <thead>
           {#each keys as _}
-            <th scope="col" />
+            <th scope="col"></th>
           {/each}
         </thead>
         <tbody>
