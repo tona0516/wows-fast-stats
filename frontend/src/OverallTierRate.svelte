@@ -3,15 +3,15 @@
   export let config: vo.UserConfig;
   export let player: vo.Player;
   export let displayPattern: DisplayPattern;
-
-  const low = player.player_stats.using_tier_rate.low.toFixed(1);
-  const middle = player.player_stats.using_tier_rate.middle.toFixed(1);
-  const high = player.player_stats.using_tier_rate.high.toFixed(1);
 </script>
 
 <!-- using tier rate -->
 {#if config.displays.overall.using_tier_rate}
   {#if displayPattern === "full" || displayPattern === "nopr" || displayPattern === "noshipstats"}
+    {@const low = player.player_stats.using_tier_rate.low.toFixed(1)}
+    {@const middle = player.player_stats.using_tier_rate.middle.toFixed(1)}
+    {@const high = player.player_stats.using_tier_rate.high.toFixed(1)}
+
     <td class="td-graph">
       <table class="charts-css bar hide-data stacked">
         <thead>

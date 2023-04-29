@@ -3,16 +3,16 @@
   export let config: vo.UserConfig;
   export let player: vo.Player;
   export let displayPattern: DisplayPattern;
-
-  const ss = player.player_stats.using_ship_type_rate.ss.toFixed(1);
-  const dd = player.player_stats.using_ship_type_rate.dd.toFixed(1);
-  const cl = player.player_stats.using_ship_type_rate.cl.toFixed(1);
-  const bb = player.player_stats.using_ship_type_rate.bb.toFixed(1);
-  const cv = player.player_stats.using_ship_type_rate.cv.toFixed(1);
 </script>
 
 {#if config.displays.overall.using_ship_type_rate}
   {#if displayPattern === "full" || displayPattern === "nopr" || displayPattern === "noshipstats"}
+    {@const ss = player.player_stats.using_ship_type_rate.ss.toFixed(1)}
+    {@const dd = player.player_stats.using_ship_type_rate.dd.toFixed(1)}
+    {@const cl = player.player_stats.using_ship_type_rate.cl.toFixed(1)}
+    {@const bb = player.player_stats.using_ship_type_rate.bb.toFixed(1)}
+    {@const cv = player.player_stats.using_ship_type_rate.cv.toFixed(1)}
+
     <td class="td-graph">
       <table class="charts-css bar hide-data stacked">
         <thead>
