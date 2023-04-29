@@ -92,7 +92,7 @@ body {
 }
 
 .td-graph {
-  min-width: 120px;
+  min-width: 160px;
 }
 
 .no_data {
@@ -154,36 +154,4 @@ body {
 
 .appinfo {
   text-align: center;
-}
-
-.bar-ss {
-  background-color: #386cb0;
-}
-
-.bar-dd {
-  background-color: #fff231;
-}
-
-.bar-cl {
-  background-color: #99d02b;
-}
-
-.bar-bb {
-  background-color: #ff9914;
-}
-
-.bar-cv {
-  background-color: #a45aaa;
-}
-
-.bar-low {
-  background-color: #f9344c;
-}
-
-.bar-middle {
-  background-color: #33a65e;
-}
-
-.bar-high {
-  background-color: #1d86ae;
 }

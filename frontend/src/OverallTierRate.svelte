@@ -4,34 +4,41 @@
   export let player: vo.Player;
   export let displayPattern: DisplayPattern;
 
-  function roundup(value: number, digit: number = 0): string {
-    const digitVal = Math.pow(10, digit);
-    const result = String(Math.ceil(value * digitVal) / digitVal);
-    return result;
-  }
+  const low = player.player_stats.using_tier_rate.low.toFixed(1);
+  const middle = player.player_stats.using_tier_rate.middle.toFixed(1);
+  const high = player.player_stats.using_tier_rate.high.toFixed(1);
 </script>
 
 <!-- using tier rate -->
 {#if config.displays.overall.using_tier_rate}
   {#if displayPattern === "full" || displayPattern === "nopr" || displayPattern === "noshipstats"}
     <td class="td-graph">
-      <div class="progress">
-        <div
-          class="progress-bar progress-bar-striped bar-low"
-          role="progressbar"
-          style="width: {roundup(player.player_stats.using_tier_rate.low)}%"
-        />
-        <div
-          class="progress-bar progress-bar-striped bar-middle"
-          role="progressbar"
-          style="width: {roundup(player.player_stats.using_tier_rate.middle)}%"
-        />
-        <div
-          class="progress-bar progress-bar-striped bar-high"
-          role="progressbar"
-          style="width: {roundup(player.player_stats.using_tier_rate.high)}%"
-        />
-      </div>
+      <table class="charts-css bar hide-data stacked">
+        <thead>
+          <th scope="col"> #1 </th>
+          <th scope="col"> #2 </th>
+          <th scope="col"> #3 </th>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="--size: calc({low}/100); --color: #f9344c;"
+              ><span class="data">{low}</span><span class="tooltip"
+                >1~4<br />{low}%</span
+              ></td
+            >
+            <td style="--size: calc({middle}/100); --color: #33a65e;"
+              ><span class="data">{middle}</span><span class="tooltip"
+                >5~7<br />{middle}%</span
+              ></td
+            >
+            <td style="--size: calc({high}/100); --color: #1d86ae;"
+              ><span class="data">{high}</span><span class="tooltip"
+                >8~★<br />{high}%</span
+              ></td
+            >
+          </tr>
+        </tbody>
+      </table>
     </td>
   {/if}
 {/if}
