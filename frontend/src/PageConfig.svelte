@@ -160,7 +160,7 @@
                 bind:checked={inputConfig.displays.ship[key]}
               />
               <label class="form-check-label" for="{prefix}-{key}"
-                >艦:{Const.COLUMN_NAMES[key].fullName}</label
+                >艦:{Const.COLUMN_NAMES[key].full}</label
               >
             </div>
           {/each}
@@ -176,7 +176,7 @@
                 bind:checked={inputConfig.displays.overall[key]}
               />
               <label class="form-check-label" for="{prefix}-{key}"
-                >総合:{Const.COLUMN_NAMES[key].fullName}</label
+                >総合:{Const.COLUMN_NAMES[key].full}</label
               >
             </div>
           {/each}

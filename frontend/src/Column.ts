@@ -1,4 +1,4 @@
 export interface Column {
-    minName: string,
-    fullName: string
+    min: string,
+    full: string
 }

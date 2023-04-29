@@ -142,9 +142,9 @@
 
       result.push({
         label:
-          Const.COLUMN_NAMES[it.key1].minName +
+          Const.COLUMN_NAMES[it.key1].min +
           ":" +
-          Const.COLUMN_NAMES[it.key2].minName,
+          Const.COLUMN_NAMES[it.key2].min,
         friend: between.friend.toFixed(Const.DIGITS[it.key2]),
         enemy: between.enemy.toFixed(Const.DIGITS[it.key2]),
         diff: sign + between.diff.toFixed(Const.DIGITS[it.key2]),
@@ -198,19 +198,19 @@
           <tr>
             {#each Object.entries(components.basic) as [k, v]}
               {#if config.displays.basic[k]}
-                <th>{Const.COLUMN_NAMES[k].minName}</th>
+                <th>{Const.COLUMN_NAMES[k].min}</th>
               {/if}
             {/each}
 
             {#each Object.entries(components.ship) as [k, v]}
               {#if config.displays.ship[k]}
-                <th>{Const.COLUMN_NAMES[k].minName}</th>
+                <th>{Const.COLUMN_NAMES[k].min}</th>
               {/if}
             {/each}
 
             {#each Object.entries(components.overall) as [k, v]}
               {#if config.displays.overall[k]}
-                <th>{Const.COLUMN_NAMES[k].minName}</th>
+                <th>{Const.COLUMN_NAMES[k].min}</th>
               {/if}
             {/each}
           </tr>

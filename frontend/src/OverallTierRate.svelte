@@ -3,39 +3,43 @@
   export let config: vo.UserConfig;
   export let player: vo.Player;
   export let displayPattern: DisplayPattern;
+
+  const colors: { [key: string]: string } = {
+    low: "#f9344c",
+    middle: "#33a65e",
+    high: "#1d86ae",
+  };
+
+  const texts: { [key: string]: string } = {
+    low: "1~4",
+    middle: "5~7",
+    high: "8~★",
+  };
 </script>
 
 <!-- using tier rate -->
 {#if config.displays.overall.using_tier_rate}
   {#if displayPattern === "full" || displayPattern === "nopr" || displayPattern === "noshipstats"}
-    {@const low = player.player_stats.using_tier_rate.low.toFixed(1)}
-    {@const middle = player.player_stats.using_tier_rate.middle.toFixed(1)}
-    {@const high = player.player_stats.using_tier_rate.high.toFixed(1)}
+    {@const keys = Object.keys(player.player_stats.using_tier_rate)}
 
     <td class="td-graph">
       <table class="charts-css bar hide-data stacked">
         <thead>
-          <th scope="col"> #1 </th>
-          <th scope="col"> #2 </th>
-          <th scope="col"> #3 </th>
+          {#each keys as _}
+            <th scope="col" />
+          {/each}
         </thead>
         <tbody>
           <tr>
-            <td style="--size: calc({low}/100); --color: #f9344c;"
-              ><span class="data">{low}</span><span class="tooltip"
-                >1~4<br />{low}%</span
-              ></td
-            >
-            <td style="--size: calc({middle}/100); --color: #33a65e;"
-              ><span class="data">{middle}</span><span class="tooltip"
-                >5~7<br />{middle}%</span
-              ></td
-            >
-            <td style="--size: calc({high}/100); --color: #1d86ae;"
-              ><span class="data">{high}</span><span class="tooltip"
-                >8~★<br />{high}%</span
-              ></td
-            >
+            {#each keys as key}
+              {@const value =
+                player.player_stats.using_tier_rate[key].toFixed(1)}
+              <td style="--size: calc({value}/100); --color: {colors[key]};"
+                ><span class="data">{value}</span><span class="tooltip"
+                  >{texts[key]}<br />{value}%</span
+                ></td
+              >
+            {/each}
           </tr>
         </tbody>
       </table>

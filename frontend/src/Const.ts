@@ -45,22 +45,22 @@ namespace Const {
     };
 
     export const COLUMN_NAMES: {[key: string]: Column} = {
-        basic: {minName: "基本情報", fullName: "基本情報"},
-        ship: {minName: "艦", fullName: "艦成績"},
-        overall: {minName: "総合", fullName: "総合成績"},
-        player_name: {minName: "プレイヤー", fullName: "プレイヤー"},
-        ship_info: {minName: "艦", fullName: "艦情報"},
-        pr: {minName: "PR", fullName: "Personal Rating"},
-        damage: {minName: "Dmg", fullName: "ダメージ"},
-        win_rate: {minName: "勝率", fullName: "勝率"},
-        kd_rate: {minName: "K/D", fullName: "K/D比"},
-        win_survived_rate: {minName: "生存率(勝)", fullName: "勝利生存率"},
-        lose_survived_rate: {minName: "生存率(負)", fullName: "敗北生存率"},
-        exp: {minName: "Exp", fullName: "経験値"},
-        battles: {minName: "戦闘数", fullName: "戦闘数"},
-        avg_tier: {minName: "平均T", fullName: "平均Tier"},
-        using_ship_type_rate: {minName: "艦割合", fullName: "艦種別プレイ割合"},
-        using_tier_rate: {minName: "T割合", fullName: "ティア別プレイ割合"},
+        basic: {min: "基本情報", full: "基本情報"},
+        ship: {min: "艦", full: "艦成績"},
+        overall: {min: "総合", full: "総合成績"},
+        player_name: {min: "プレイヤー", full: "プレイヤー"},
+        ship_info: {min: "艦", full: "艦情報"},
+        pr: {min: "PR", full: "Personal Rating"},
+        damage: {min: "Dmg", full: "ダメージ"},
+        win_rate: {min: "勝率", full: "勝率"},
+        kd_rate: {min: "K/D", full: "K/D比"},
+        win_survived_rate: {min: "生存率(勝)", full: "勝利生存率"},
+        lose_survived_rate: {min: "生存率(負)", full: "敗北生存率"},
+        exp: {min: "Exp", full: "経験値"},
+        battles: {min: "戦闘数", full: "戦闘数"},
+        avg_tier: {min: "平均T", full: "平均Tier"},
+        using_ship_type_rate: {min: "艦割合", full: "艦種別プレイ割合"},
+        using_tier_rate: {min: "T割合", full: "ティア別プレイ割合"},
     }
 
     export const DIGITS: { [key: string]: number } = {
