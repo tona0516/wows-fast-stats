@@ -18,6 +18,10 @@ export function Cwd() {
   return window['go']['main']['App']['Cwd']();
 }
 
+export function OpenDirectory(arg1) {
+  return window['go']['main']['App']['OpenDirectory'](arg1);
+}
+
 export function SaveScreenshot(arg1, arg2, arg3) {
   return window['go']['main']['App']['SaveScreenshot'](arg1, arg2, arg3);
 }

@@ -5,7 +5,6 @@
     Battle,
     SaveScreenshot,
   } from "../wailsjs/go/main/App.js";
-  import type { vo } from "wailsjs/go/models.js";
   import Notification from "./Notification.svelte";
   import ConfigPage from "./PageConfig.svelte";
   import MainPage from "./PageMain.svelte";
@@ -15,6 +14,7 @@
 
   import "bootstrap-icons/font/bootstrap-icons.css";
   import PageHelp from "./PageHelp.svelte";
+  import type { vo } from "wailsjs/go/models.js";
 
   type Page = "main" | "config" | "help" | "appinfo";
   type Func = "reload" | "screenshot";
@@ -30,7 +30,7 @@
 
   let notification: Notification;
 
-  setInterval(looper, 1000);
+  let timer = setInterval(looper, 1000);
 
   function onClickMenu(menu: NavigationMenu) {
     switch (menu) {
@@ -117,6 +117,7 @@
       return;
     }
 
+    clearInterval(timer);
     loadState = "fetching";
     try {
       const start = new Date().getTime();
@@ -126,6 +127,7 @@
 
       const elapsed = (new Date().getTime() - start) / 1000;
       notification.showToast(`データ取得完了: ${elapsed}秒`, "success");
+      timer = setInterval(looper, 1000);
     } catch (error) {
       loadState = "error";
       notification.showToast(error, "error");

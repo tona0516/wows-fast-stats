@@ -5,6 +5,7 @@
     UserConfig,
     SelectDirectory,
     Cwd,
+    OpenDirectory,
   } from "../wailsjs/go/main/App.js";
   import { createEventDispatcher } from "svelte";
   import Const from "./Const.js";
@@ -32,6 +33,14 @@
           message: error,
         });
       });
+  }
+
+  function openDirectory(path: string) {
+    OpenDirectory(path).catch((error) => {
+      dispatch("ErrorToast", {
+        message: error,
+      });
+    });
   }
 
   function selectDirectory() {
@@ -184,9 +193,16 @@
             bind:checked={inputConfig.save_screenshot}
           />
           <label class="form-check-label" for="save-scrrenshot"
-            >自動でスクリーンショットを保存する<br />(<i>{cwd}/screenshot</i
-            >)</label
+            >自動でスクリーンショットを保存する</label
           >
+          <br />
+          <!-- svelte-ignore a11y-invalid-attribute -->
+          <a
+            class="td-link"
+            href="#"
+            on:click={() => openDirectory(cwd + "/screenshot")}
+            ><i class="bi bi-folder2-open" />保存フォルダを開く
+          </a>
         </div>
       </div>
 
@@ -200,8 +216,16 @@
             bind:checked={inputConfig.save_temp_arena_info}
           />
           <label class="form-check-label" for="save-temp-arena-info"
-            >【開発用】自動で戦闘情報(<i>tempArenaInfo.json</i>)を保存する<br
-            />(<i>{cwd}/temp_arena_info</i>)</label
+            >【開発用】自動で戦闘情報(<i>tempArenaInfo.json</i
+            >)を保存する</label
+          >
+          <br />
+          <!-- svelte-ignore a11y-invalid-attribute -->
+          <a
+            class="td-link"
+            href="#"
+            on:click={() => openDirectory(cwd + "/temp_arena_info")}
+            ><i class="bi bi-folder2-open" />保存フォルダを開く</a
           >
         </div>
       </div>

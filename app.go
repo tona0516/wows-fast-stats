@@ -7,6 +7,7 @@ import (
 	"context"
 	"os"
 
+	"github.com/skratchdot/open-golang/open"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
@@ -108,4 +109,8 @@ func (a *App) Cwd() (string, error) {
 
 func (a *App) AppVersion() vo.Version {
 	return a.Version
+}
+
+func (a *App) OpenDirectory(path string) error {
+	return open.Run(path)
 }

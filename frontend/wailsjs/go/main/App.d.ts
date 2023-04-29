@@ -10,6 +10,8 @@ export function Battle():Promise<vo.Battle>;
 
 export function Cwd():Promise<string>;
 
+export function OpenDirectory(arg1:string):Promise<void>;
+
 export function SaveScreenshot(arg1:string,arg2:string,arg3:boolean):Promise<void>;
 
 export function SelectDirectory():Promise<string>;
