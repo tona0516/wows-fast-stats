@@ -52,7 +52,7 @@ namespace Const {
         ship_info: {min: "艦", full: "艦情報"},
         pr: {min: "PR", full: "Personal Rating"},
         damage: {min: "Dmg", full: "ダメージ"},
-        win_rate: {min: "勝率", full: "勝率"},
+        win_rate: {min: "勝率[%]", full: "勝率"},
         kd_rate: {min: "K/D", full: "K/D比"},
         win_survived_rate: {min: "生存率(勝)", full: "勝利生存率"},
         lose_survived_rate: {min: "生存率(負)", full: "敗北生存率"},
