@@ -71,7 +71,7 @@ function decidePlayerDataPattern(player: vo.Player): DisplayPattern {
     return "noshipstats";
   }
 
-  if (player.ship_stats.pr === 0) {
+  if (player.ship_stats.pr === -1) {
     return "nopr";
   }
 

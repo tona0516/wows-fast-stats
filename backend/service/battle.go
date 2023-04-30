@@ -425,12 +425,16 @@ func (b *Battle) compose(
 				KdRate:    statsCalculator.ShipKdRate(),
                 Exp: statsCalculator.ShipAvgExp(),
 				PR: rating.PersonalRating(
-					statsCalculator.ShipAvgDamage(),
-					statsCalculator.ShipAvgFrags(),
-					statsCalculator.ShipWinRate(),
-					expectedShipStats.AverageDamageDealt,
-					expectedShipStats.AverageFrags,
-					expectedShipStats.WinRate,
+                    domain.RatingFactor{
+                        Damage: statsCalculator.ShipAvgDamage(),
+                        Frags: statsCalculator.ShipAvgFrags(),
+                        Wins: statsCalculator.ShipWinRate(),
+                    },
+                    domain.RatingFactor{
+                        Damage: expectedShipStats.AverageDamageDealt,
+                        Frags: expectedShipStats.AverageFrags,
+                        Wins: expectedShipStats.WinRate,
+                    },
 				),
 			},
 			PlayerInfo: vo.PlayerInfo{
