@@ -68,7 +68,7 @@ function decidePlayerDataPattern(player: vo.Player): DisplayPattern {
     return "private";
   }
 
-  if (player.player_info.id === 0 || player.player_stats.battles == 0) {
+  if (player.player_info.id === 0 || player.overall_stats.battles == 0) {
     return "nodata";
   }
 

@@ -52,10 +52,10 @@ func (p Players) TeamAverage() Player {
             result.ShipStats.KdRate += v.ShipStats.KdRate
             nShip += 1
         }
-        if v.PlayerStats.Battles != 0 {
-            result.PlayerStats.Damage += v.PlayerStats.Damage
-            result.PlayerStats.WinRate += v.PlayerStats.WinRate
-            result.PlayerStats.KdRate += v.PlayerStats.KdRate
+        if v.OverallStats.Battles != 0 {
+            result.OverallStats.Damage += v.OverallStats.Damage
+            result.OverallStats.WinRate += v.OverallStats.WinRate
+            result.OverallStats.KdRate += v.OverallStats.KdRate
             nPlayer += 1
         }
     }
@@ -68,9 +68,9 @@ func (p Players) TeamAverage() Player {
     }
 
     if nPlayer != 0 {
-        result.PlayerStats.Damage = result.PlayerStats.Damage / float64(nPlayer)
-        result.PlayerStats.WinRate = result.PlayerStats.WinRate / float64(nPlayer)
-        result.PlayerStats.KdRate = result.PlayerStats.KdRate / float64(nPlayer)
+        result.OverallStats.Damage = result.OverallStats.Damage / float64(nPlayer)
+        result.OverallStats.WinRate = result.OverallStats.WinRate / float64(nPlayer)
+        result.OverallStats.KdRate = result.OverallStats.KdRate / float64(nPlayer)
     }
 
     return result

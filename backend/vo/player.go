@@ -27,7 +27,7 @@ type PlayerInfo struct {
 	StatsURL string `json:"stats_url"`
 }
 
-type PlayerStats struct {
+type OverallStats struct {
 	Battles   uint `json:"battles"`
 	Damage float64 `json:"damage"`
 	WinRate   float64 `json:"win_rate"`
@@ -44,5 +44,5 @@ type Player struct {
 	ShipInfo    ShipInfo `json:"ship_info"`
 	ShipStats   ShipStats `json:"ship_stats"`
 	PlayerInfo  PlayerInfo `json:"player_info"`
-	PlayerStats PlayerStats `json:"player_stats"`
+	OverallStats OverallStats `json:"overall_stats"`
 }

@@ -8,7 +8,7 @@ export let displayPattern: DisplayPattern;
 {#if config.displays.overall.win_rate}
   {#if displayPattern === "full" || displayPattern === "nopr" || displayPattern === "noshipstats"}
     <td class="td-number">
-      {player.player_stats.win_rate.toFixed(1)}
+      {player.overall_stats.win_rate.toFixed(1)}
     </td>
   {/if}
 {/if}

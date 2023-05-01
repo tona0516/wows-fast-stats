@@ -8,7 +8,7 @@ export let displayPattern: DisplayPattern;
 {#if config.displays.overall.exp}
   {#if displayPattern === "full" || displayPattern === "nopr" || displayPattern === "noshipstats"}
     <td class="td-number">
-      {player.player_stats.exp.toFixed(0)}
+      {player.overall_stats.exp.toFixed(0)}
     </td>
   {/if}
 {/if}

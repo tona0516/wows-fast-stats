@@ -16,7 +16,7 @@ type StatsFactor struct {
 }
 type Stats struct {
 	Ship   StatsFactor
-	Player StatsFactor
+	Overall StatsFactor
 }
 
 func (s *Stats) SetShipStats(ship StatsFactor) {
@@ -73,50 +73,50 @@ func (s *Stats) ShipLoseSurvivedRate() float64 {
     return 0
 }
 
-func (s *Stats) PlayerAvgDamage() float64 {
-	if s.Player.Battles > 0 {
-		return float64(s.Player.DamageDealt) / float64(s.Player.Battles)
+func (s *Stats) OverallAvgDamage() float64 {
+	if s.Overall.Battles > 0 {
+		return float64(s.Overall.DamageDealt) / float64(s.Overall.Battles)
 	}
 	return 0
 }
 
-func (s *Stats) PlayerKdRate() float64 {
-	if s.Player.Battles-s.Player.SurvivedBattles > 0 {
-		return float64(s.Player.Frags) / float64(s.Player.Battles-s.Player.SurvivedBattles)
+func (s *Stats) OverallKdRate() float64 {
+	if s.Overall.Battles-s.Overall.SurvivedBattles > 0 {
+		return float64(s.Overall.Frags) / float64(s.Overall.Battles-s.Overall.SurvivedBattles)
 	}
 	return 0
 }
 
-func (s *Stats) PlayerAvgExp() float64 {
-    if s.Player.Battles > 0 {
-        return float64(s.Player.Xp) / float64(s.Player.Battles)
+func (s *Stats) OverallAvgExp() float64 {
+    if s.Overall.Battles > 0 {
+        return float64(s.Overall.Xp) / float64(s.Overall.Battles)
     }
     return 0
 }
 
-func (s *Stats) PlayerWinRate() float64 {
-	if s.Player.Battles != 0 {
-		return float64(s.Player.Wins) / float64(s.Player.Battles) * 100
+func (s *Stats) OverallWinRate() float64 {
+	if s.Overall.Battles != 0 {
+		return float64(s.Overall.Wins) / float64(s.Overall.Battles) * 100
 	}
 	return 0
 }
 
-func (s *Stats) PlayerWinSurvivedRate() float64 {
-    if s.Player.Wins > 0 {
-        return float64(s.Player.SurvivedWins) / float64(s.Player.Wins) * 100
+func (s *Stats) OverallWinSurvivedRate() float64 {
+    if s.Overall.Wins > 0 {
+        return float64(s.Overall.SurvivedWins) / float64(s.Overall.Wins) * 100
     }
     return 0
 }
 
-func (s *Stats) PlayerLoseSurvivedRate() float64 {
-    loses := s.Player.Battles - s.Player.Wins
+func (s *Stats) OverallLoseSurvivedRate() float64 {
+    loses := s.Overall.Battles - s.Overall.Wins
     if loses > 0 {
-        return float64(s.Player.SurvivedBattles - s.Player.SurvivedWins) / float64(loses) * 100
+        return float64(s.Overall.SurvivedBattles - s.Overall.SurvivedWins) / float64(loses) * 100
     }
     return 0
 }
 
-func (s *Stats) PlayerAvgTier(accountID int, shipInfo map[int]vo.Warship, shipStats map[int]vo.WGShipsStats) float64 {
+func (s *Stats) OverallAvgTier(accountID int, shipInfo map[int]vo.Warship, shipStats map[int]vo.WGShipsStats) float64 {
 	var sum uint = 0
 	var battles uint = 0
 	playerShipStats := shipStats[accountID].Data[accountID]
@@ -134,7 +134,7 @@ func (s *Stats) PlayerAvgTier(accountID int, shipInfo map[int]vo.Warship, shipSt
 	}
 }
 
-func (s *Stats) UsingTierRate(accountID int, shipInfo map[int]vo.Warship, shipStats map[int]vo.WGShipsStats) vo.TierGroup[float64] {
+func (s *Stats) OverallUsingTierRate(accountID int, shipInfo map[int]vo.Warship, shipStats map[int]vo.WGShipsStats) vo.TierGroup[float64] {
 	var result vo.TierGroup[float64]
 	var allBattles uint = 0
 
@@ -169,7 +169,7 @@ func (s *Stats) UsingTierRate(accountID int, shipInfo map[int]vo.Warship, shipSt
     return result
 }
 
-func (s *Stats) UsingShipTypeRate(accountID int, shipInfo map[int]vo.Warship, shipStats map[int]vo.WGShipsStats) vo.ShipTypeGroup[float64] {
+func (s *Stats) OverallUsingShipTypeRate(accountID int, shipInfo map[int]vo.Warship, shipStats map[int]vo.WGShipsStats) vo.ShipTypeGroup[float64] {
     var result vo.ShipTypeGroup[float64]
     var allBattles uint
 

@@ -365,7 +365,7 @@ func (b *Battle) compose(
 
 		playerAccountInfo := accountInfo.Data[accountID]
         stats := domain.Stats{
-            Player: domain.StatsFactor{
+            Overall: domain.StatsFactor{
                 Battles:         playerAccountInfo.Statistics.Pvp.Battles,
                 SurvivedBattles: playerAccountInfo.Statistics.Pvp.SurvivedBattles,
                 DamageDealt:     playerAccountInfo.Statistics.Pvp.DamageDealt,
@@ -428,17 +428,17 @@ func (b *Battle) compose(
                 IsHidden: playerAccountInfo.HiddenProfile,
                 StatsURL: urlGen.PlayerPage(accountID, nickname),
 			},
-			PlayerStats: vo.PlayerStats{
-				Battles:   stats.Player.Battles,
-				Damage: stats.PlayerAvgDamage(),
-				WinRate:   stats.PlayerWinRate(),
-                WinSurvivedRate: stats.PlayerWinSurvivedRate(),
-                LoseSurvivedRate: stats.PlayerLoseSurvivedRate(),
-				KdRate:    stats.PlayerKdRate(),
-                Exp: stats.PlayerAvgExp(),
-				AvgTier:   stats.PlayerAvgTier(accountID, warships, shipStats),
-                UsingShipTypeRate: stats.UsingShipTypeRate(accountID, warships, shipStats),
-                UsingTierRate: stats.UsingTierRate(accountID, warships, shipStats),
+			OverallStats: vo.OverallStats{
+				Battles:   stats.Overall.Battles,
+				Damage: stats.OverallAvgDamage(),
+				WinRate:   stats.OverallWinRate(),
+                WinSurvivedRate: stats.OverallWinSurvivedRate(),
+                LoseSurvivedRate: stats.OverallLoseSurvivedRate(),
+				KdRate:    stats.OverallKdRate(),
+                Exp: stats.OverallAvgExp(),
+				AvgTier:   stats.OverallAvgTier(accountID, warships, shipStats),
+                UsingShipTypeRate: stats.OverallUsingShipTypeRate(accountID, warships, shipStats),
+                UsingTierRate: stats.OverallUsingTierRate(accountID, warships, shipStats),
 			},
 		}
 

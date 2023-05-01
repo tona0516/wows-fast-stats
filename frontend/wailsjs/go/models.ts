@@ -52,7 +52,7 @@ export namespace vo {
 	        this.cv = source["cv"];
 	    }
 	}
-	export class PlayerStats {
+	export class OverallStats {
 	    battles: number;
 	    damage: number;
 	    win_rate: number;
@@ -65,7 +65,7 @@ export namespace vo {
 	    using_tier_rate: TierGroup[float64];
 	
 	    static createFrom(source: any = {}) {
-	        return new PlayerStats(source);
+	        return new OverallStats(source);
 	    }
 	
 	    constructor(source: any = {}) {
@@ -170,7 +170,7 @@ export namespace vo {
 	    ship_info: ShipInfo;
 	    ship_stats: ShipStats;
 	    player_info: PlayerInfo;
-	    player_stats: PlayerStats;
+	    overall_stats: OverallStats;
 	
 	    static createFrom(source: any = {}) {
 	        return new Player(source);
@@ -181,7 +181,7 @@ export namespace vo {
 	        this.ship_info = this.convertValues(source["ship_info"], ShipInfo);
 	        this.ship_stats = this.convertValues(source["ship_stats"], ShipStats);
 	        this.player_info = this.convertValues(source["player_info"], PlayerInfo);
-	        this.player_stats = this.convertValues(source["player_stats"], PlayerStats);
+	        this.overall_stats = this.convertValues(source["overall_stats"], OverallStats);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

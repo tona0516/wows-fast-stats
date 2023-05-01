@@ -26,9 +26,9 @@ export class Average {
             {key1: "ship_stats", key2: "damage"},
             {key1: "ship_stats", key2: "win_rate"},
             {key1: "ship_stats", key2: "kd_rate"},
-            {key1: "player_stats", key2: "damage"},
-            {key1: "player_stats", key2: "win_rate"},
-            {key1: "player_stats", key2: "kd_rate"},
+            {key1: "overall_stats", key2: "damage"},
+            {key1: "overall_stats", key2: "win_rate"},
+            {key1: "overall_stats", key2: "kd_rate"},
         ].forEach(it => {
             result.push(calcFactor(it.key1, it.key2, friends, enemies))
         });
