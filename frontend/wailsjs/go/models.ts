@@ -16,13 +16,13 @@ export namespace vo {
 	        this.ship_info = source["ship_info"];
 	    }
 	}
-	export class TierGroup[float64] {
+	export class TierGroup {
 	    low: number;
 	    middle: number;
 	    high: number;
 	
 	    static createFrom(source: any = {}) {
-	        return new TierGroup[float64](source);
+	        return new TierGroup(source);
 	    }
 	
 	    constructor(source: any = {}) {
@@ -32,7 +32,7 @@ export namespace vo {
 	        this.high = source["high"];
 	    }
 	}
-	export class ShipTypeGroup[float64] {
+	export class ShipTypeGroup {
 	    ss: number;
 	    dd: number;
 	    cl: number;
@@ -40,7 +40,7 @@ export namespace vo {
 	    cv: number;
 	
 	    static createFrom(source: any = {}) {
-	        return new ShipTypeGroup[float64](source);
+	        return new ShipTypeGroup(source);
 	    }
 	
 	    constructor(source: any = {}) {
@@ -61,8 +61,8 @@ export namespace vo {
 	    kd_rate: number;
 	    exp: number;
 	    avg_tier: number;
-	    using_ship_type_rate: ShipTypeGroup[float64];
-	    using_tier_rate: TierGroup[float64];
+	    using_ship_type_rate: ShipTypeGroup;
+	    using_tier_rate: TierGroup;
 	
 	    static createFrom(source: any = {}) {
 	        return new OverallStats(source);
@@ -78,8 +78,8 @@ export namespace vo {
 	        this.kd_rate = source["kd_rate"];
 	        this.exp = source["exp"];
 	        this.avg_tier = source["avg_tier"];
-	        this.using_ship_type_rate = this.convertValues(source["using_ship_type_rate"], ShipTypeGroup[float64]);
-	        this.using_tier_rate = this.convertValues(source["using_tier_rate"], TierGroup[float64]);
+	        this.using_ship_type_rate = this.convertValues(source["using_ship_type_rate"], ShipTypeGroup);
+	        this.using_tier_rate = this.convertValues(source["using_tier_rate"], TierGroup);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

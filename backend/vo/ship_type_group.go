@@ -1,9 +1,9 @@
 package vo
 
-type ShipTypeGroup[T any] struct {
-    SS T `json:"ss"`
-    DD T `json:"dd"`
-    CL T `json:"cl"`
-    BB T `json:"bb"`
-    CV T `json:"cv"`
+type ShipTypeGroup struct {
+    SS float64 `json:"ss"`
+    DD float64 `json:"dd"`
+    CL float64 `json:"cl"`
+    BB float64 `json:"bb"`
+    CV float64 `json:"cv"`
 }

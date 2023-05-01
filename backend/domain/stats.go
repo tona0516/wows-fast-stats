@@ -134,8 +134,8 @@ func (s *Stats) OverallAvgTier(accountID int, shipInfo map[int]vo.Warship, shipS
 	}
 }
 
-func (s *Stats) OverallUsingTierRate(accountID int, shipInfo map[int]vo.Warship, shipStats map[int]vo.WGShipsStats) vo.TierGroup[float64] {
-	var result vo.TierGroup[float64]
+func (s *Stats) OverallUsingTierRate(accountID int, shipInfo map[int]vo.Warship, shipStats map[int]vo.WGShipsStats) vo.TierGroup {
+	var result vo.TierGroup
 	var allBattles uint = 0
 
 	playerShipStats := shipStats[accountID].Data[accountID]
@@ -159,7 +159,7 @@ func (s *Stats) OverallUsingTierRate(accountID int, shipInfo map[int]vo.Warship,
 	}
 
     if allBattles == 0 {
-        return vo.TierGroup[float64]{}
+        return vo.TierGroup{}
     }
 
     result.Low = result.Low / float64(allBattles) * 100
@@ -169,8 +169,8 @@ func (s *Stats) OverallUsingTierRate(accountID int, shipInfo map[int]vo.Warship,
     return result
 }
 
-func (s *Stats) OverallUsingShipTypeRate(accountID int, shipInfo map[int]vo.Warship, shipStats map[int]vo.WGShipsStats) vo.ShipTypeGroup[float64] {
-    var result vo.ShipTypeGroup[float64]
+func (s *Stats) OverallUsingShipTypeRate(accountID int, shipInfo map[int]vo.Warship, shipStats map[int]vo.WGShipsStats) vo.ShipTypeGroup {
+    var result vo.ShipTypeGroup
     var allBattles uint
 
     playerShipStats := shipStats[accountID].Data[accountID]
@@ -200,7 +200,7 @@ func (s *Stats) OverallUsingShipTypeRate(accountID int, shipInfo map[int]vo.Wars
 	}
 
     if allBattles == 0 {
-        return vo.ShipTypeGroup[float64]{}
+        return vo.ShipTypeGroup{}
     }
 
     result.SS = result.SS / float64(allBattles) * 100
