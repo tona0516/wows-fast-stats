@@ -23,11 +23,16 @@ import OverallTierRate from "./OverallTierRate.svelte";
 import OverallBattles from "./OverallBattles.svelte";
 import NoData from "./NoData.svelte";
 import { LogDebug } from "../wailsjs/runtime/runtime";
+import IsContainedAvg from "./IsContainedAvg.svelte";
+import { Average, type AverageFactor } from "./Average";
+import { ExcludePlayerIDs } from "../wailsjs/go/main/App.js";
 
 export let loadState: LoadState = "standby";
 export let latestHash: string = "";
 export let battle: vo.Battle;
 export let config: vo.UserConfig = Const.DEFAULT_USER_CONFIG;
+export let averageFactors: AverageFactor[] = [];
+export let excludePlayerIDs: number[] = [];
 
 const components = {
   basic: {
@@ -80,7 +85,7 @@ function decidePlayerDataPattern(player: vo.Player): DisplayPattern {
 
 function backgroundClass(personalRating: number): string {
   switch (true) {
-    case personalRating == 0:
+    case personalRating <= 0:
       return "";
     case personalRating < 750:
       return "bad";
@@ -103,54 +108,12 @@ function backgroundClass(personalRating: number): string {
   }
 }
 
-function buildTeamSummary(comp: vo.Comparision): {
-  label: string;
-  friend: string;
-  enemy: string;
-  diff: string;
-  color_class: string;
-}[] {
-  let result: {
-    label: string;
-    friend: string;
-    enemy: string;
-    diff: string;
-    color_class: string;
-  }[] = [];
-
-  let resultKeys: { key1: string; key2: string }[] = [];
-
-  Object.keys(comp.ship).forEach((it) => {
-    resultKeys.push({ key1: "ship", key2: it });
+function onCheckPlayer() {
+  ExcludePlayerIDs().then((result) => {
+    excludePlayerIDs = result;
+    const average = new Average(battle);
+    averageFactors = average.calc(result);
   });
-
-  Object.keys(comp.overall).forEach((it) => {
-    resultKeys.push({ key1: "overall", key2: it });
-  });
-
-  resultKeys.forEach((it) => {
-    const between: vo.Between = comp[it.key1][it.key2];
-
-    let colorClass = "";
-    let sign = "";
-    if (between.diff > 0) {
-      sign = "+";
-      colorClass = "higher";
-    } else if (between.diff < 0) {
-      colorClass = "lower";
-    }
-
-    result.push({
-      label:
-        Const.COLUMN_NAMES[it.key1].min + ":" + Const.COLUMN_NAMES[it.key2].min,
-      friend: between.friend.toFixed(Const.DIGITS[it.key2]),
-      enemy: between.enemy.toFixed(Const.DIGITS[it.key2]),
-      diff: sign + between.diff.toFixed(Const.DIGITS[it.key2]),
-      color_class: colorClass,
-    });
-  });
-
-  return result;
 }
 </script>
 
@@ -194,6 +157,7 @@ function buildTeamSummary(comp: vo.Comparision): {
             {/if}
           </tr>
           <tr>
+            <th></th>
             {#each Object.entries(components.basic) as [k, v]}
               {#if config.displays.basic[k]}
                 <th>{Const.COLUMN_NAMES[k].min}</th>
@@ -217,6 +181,12 @@ function buildTeamSummary(comp: vo.Comparision): {
           {#each team.players as player}
             {@const displayPattern = decidePlayerDataPattern(player)}
             <tr class="{backgroundClass(player.ship_stats.pr)}">
+              <IsContainedAvg
+                player="{player}"
+                excludePlayerIDs="{excludePlayerIDs}"
+                on:onCheck="{onCheckPlayer}"
+              />
+
               <!-- basics -->
               {#each Object.entries(components.basic) as [k, v]}
                 <svelte:component
@@ -266,12 +236,14 @@ function buildTeamSummary(comp: vo.Comparision): {
         </tr>
       </thead>
       <tbody>
-        {#each buildTeamSummary(battle.comparision) as row}
+        {#each averageFactors as factor}
           <tr>
-            <td class="td-string">{row.label}</td>
-            <td class="text-center td-number">{row.friend}</td>
-            <td class="text-center td-number {row.color_class}">{row.diff}</td>
-            <td class="text-center td-number">{row.enemy}</td>
+            <td class="td-string">{factor.label}</td>
+            <td class="text-center td-number">{factor.friend}</td>
+            <td class="text-center td-number {factor.colorClass}"
+              >{factor.diff}</td
+            >
+            <td class="text-center td-number">{factor.enemy}</td>
           </tr>
         {/each}
       </tbody>

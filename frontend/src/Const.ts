@@ -8,8 +8,9 @@ namespace Const {
         font_size: "medium",
         displays: {
             basic: {
+                is_contained_avg: true,
                 player_name: true,
-                ship_info: true
+                ship_info: true,
             },
             ship: {
                 pr: true,
@@ -46,13 +47,14 @@ namespace Const {
 
     export const COLUMN_NAMES: {[key: string]: Column} = {
         basic: {min: "基本情報", full: "基本情報"},
-        ship: {min: "艦", full: "艦成績"},
-        overall: {min: "総合", full: "総合成績"},
+        ship_stats: {min: "艦", full: "艦成績"},
+        player_stats: {min: "総合", full: "総合成績"},
+        is_contained_avg: {min: "", full: ""},
         player_name: {min: "プレイヤー", full: "プレイヤー"},
         ship_info: {min: "艦", full: "艦情報"},
         pr: {min: "PR", full: "Personal Rating"},
         damage: {min: "Dmg", full: "ダメージ"},
-        win_rate: {min: "勝率[%]", full: "勝率"},
+        win_rate: {min: "勝率", full: "勝率"},
         kd_rate: {min: "K/D", full: "K/D比"},
         win_survived_rate: {min: "生存率(勝)", full: "勝利生存率"},
         lose_survived_rate: {min: "生存率(負)", full: "敗北生存率"},

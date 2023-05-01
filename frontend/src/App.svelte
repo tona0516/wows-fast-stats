@@ -4,6 +4,7 @@ import {
   TempArenaInfoHash,
   Battle,
   SaveScreenshot,
+  ExcludePlayerIDs,
 } from "../wailsjs/go/main/App.js";
 import Notification from "./Notification.svelte";
 import ConfigPage from "./PageConfig.svelte";
@@ -15,6 +16,7 @@ import AppInfo from "./PageAppInfo.svelte";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import PageHelp from "./PageHelp.svelte";
 import type { vo } from "wailsjs/go/models.js";
+import { Average, type AverageFactor } from "./Average.js";
 
 type Page = "main" | "config" | "help" | "appinfo";
 type Func = "reload" | "screenshot";
@@ -27,6 +29,8 @@ let loadState: LoadState;
 let latestHash: string;
 let battle: vo.Battle;
 let config: vo.UserConfig;
+let averageFactors: AverageFactor[];
+let excludePlayerIDs: number[];
 
 let notification: Notification;
 
@@ -120,6 +124,9 @@ async function looper() {
     const start = new Date().getTime();
     battle = await Battle();
     latestHash = hash;
+    excludePlayerIDs = await ExcludePlayerIDs();
+    const average = new Average(battle);
+    averageFactors = average.calc(excludePlayerIDs);
     loadState = "standby";
 
     const elapsed = (new Date().getTime() - start) / 1000;
@@ -227,6 +234,8 @@ async function looper() {
           bind:latestHash="{latestHash}"
           bind:battle="{battle}"
           bind:config="{config}"
+          bind:averageFactors="{averageFactors}"
+          bind:excludePlayerIDs="{excludePlayerIDs}"
         />
       </div>
     {/if}

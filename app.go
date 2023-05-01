@@ -9,13 +9,15 @@ import (
 
 	"github.com/skratchdot/open-golang/open"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
+	"golang.org/x/exp/slices"
 )
 
 type App struct {
-	ctx        context.Context
-	userConfig vo.UserConfig
-	appConfig  vo.AppConfig
-	Version    vo.Version
+	Version         vo.Version
+	ctx             context.Context
+	userConfig      vo.UserConfig
+	appConfig       vo.AppConfig
+	excludePlayerID []int
 }
 
 func NewApp() *App {
@@ -27,6 +29,7 @@ func (a *App) startup(ctx context.Context) {
 	configService := service.Config{}
 	a.userConfig, _ = configService.User()
 	a.appConfig, _ = configService.App()
+	a.excludePlayerID = make([]int, 0)
 
 	window := a.appConfig.Window
 	if window.Width != 0 && window.Height != 0 {
@@ -101,4 +104,21 @@ func (a *App) AppVersion() vo.Version {
 
 func (a *App) OpenDirectory(path string) error {
 	return open.Run(path)
+}
+
+func (a *App) ExcludePlayerIDs() []int {
+	return a.excludePlayerID
+}
+
+func (a *App) AddExcludePlayerID(playerID int) {
+	if !slices.Contains(a.excludePlayerID, playerID) {
+		a.excludePlayerID = append(a.excludePlayerID, playerID)
+	}
+}
+
+func (a *App) RemoveExcludePlayerID(playerID int) {
+	index := slices.Index(a.excludePlayerID, playerID)
+	if index != -1 {
+		a.excludePlayerID = append(a.excludePlayerID[:index], a.excludePlayerID[index+1:]...)
+	}
 }

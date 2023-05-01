@@ -452,7 +452,7 @@ func (b *Battle) compose(
 	sort.Sort(friends)
 	sort.Sort(enemies)
 
-    teams := make(vo.Teams, 0)
+    teams := make([]vo.Team, 0)
     teams = append(teams, vo.Team{
         Players: friends,
         Name: "味方チーム",
@@ -469,7 +469,6 @@ func (b *Battle) compose(
             Type: tempArenaInfo.BattleType(battleTypes),
             OwnShip: ownShip,
         },
-        Comparision: teams.Comparition(),
         Teams: teams,
     }
 

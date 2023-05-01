@@ -16,6 +16,13 @@ func (c *Config) User() (vo.UserConfig, error) {
     // note: set default value
     config := vo.UserConfig{
         FontSize: "medium",
+        Displays: vo.Displays{
+            Basic: vo.Basic{
+                IsContainedAvg: true,
+                PlaterName: true,
+                ShipInfo: true,
+            },
+        },
     }
 	file, err := os.ReadFile(filepath.Join("config", "user.json"))
 	if err != nil {
