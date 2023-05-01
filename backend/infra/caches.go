@@ -33,8 +33,8 @@ func NewCaches(gameVersion string) *Caches {
 }
 
 func (c *Caches) RemoveOld() {
-    c.Warships.RemoveOld()
-    c.ExpectedStats.RemoveOld()
-    c.BattleArenas.RemoveOld()
-    c.BattleTypes.RemoveOld()
+    _ = c.Warships.RemoveOld()
+    _ = c.ExpectedStats.RemoveOld()
+    _ = c.BattleArenas.RemoveOld()
+    _ = c.BattleTypes.RemoveOld()
 }

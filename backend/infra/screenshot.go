@@ -10,7 +10,7 @@ type Screenshot struct {}
 
 func (s *Screenshot) Save(path string, base64Data string) error {
     dir := filepath.Dir(path)
-    os.Mkdir(dir, 0755)
+    _ = os.Mkdir(dir, 0755)
 
     data, err := base64.StdEncoding.DecodeString(base64Data)
     if err != nil {

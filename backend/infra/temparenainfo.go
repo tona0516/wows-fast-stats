@@ -27,7 +27,7 @@ func (t *TempArenaInfo) Get(installPath string) (vo.TempArenaInfo, error) {
 }
 
 func (t *TempArenaInfo) Save(tempArenaInfo vo.TempArenaInfo) error {
-    os.Mkdir("temp_arena_info", 0755)
+    _ = os.Mkdir("temp_arena_info", 0755)
 
     date, err := time.Parse("2006-01-02 15:04:05", tempArenaInfo.FormattedDateTime())
     if err != nil {

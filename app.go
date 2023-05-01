@@ -43,7 +43,7 @@ func (a *App) beforeClose(ctx context.Context) (prevent bool) {
 	a.appConfig.Window.Width = width
 	a.appConfig.Window.Height = height
 	configService := service.Config{}
-	configService.UpdateApp(a.appConfig)
+	_ = configService.UpdateApp(a.appConfig)
 
 	// Remove old caches
 	wargaming := infra.Wargaming{AppID: a.userConfig.Appid}

@@ -43,7 +43,3 @@ func (r *Rating) PersonalRating(
 
 	return personalRating
 }
-
-func validValue(value float64) bool {
-    return !(math.IsNaN(value) || math.IsInf(value, 1))
-}

@@ -11,7 +11,7 @@ type Config struct {
 }
 
 func (c *Config) User() (vo.UserConfig, error) {
-    os.Mkdir("config", 0755)
+    _ = os.Mkdir("config", 0755)
 
     // note: set default value
     config := vo.UserConfig{
@@ -34,7 +34,7 @@ func (c *Config) User() (vo.UserConfig, error) {
 }
 
 func (c *Config) UpdateUser(config vo.UserConfig) error {
-    os.Mkdir("config", 0755)
+    _ = os.Mkdir("config", 0755)
 
     file, err := os.Create(filepath.Join("config", "user.json"))
 	if err != nil {
@@ -50,7 +50,7 @@ func (c *Config) UpdateUser(config vo.UserConfig) error {
 
 func (c *Config) App() (vo.AppConfig, error) {
     var config vo.AppConfig
-    os.Mkdir("config", 0755)
+    _ = os.Mkdir("config", 0755)
 
 	file, err := os.ReadFile(filepath.Join("config", "app.json"))
 	if err != nil {
@@ -62,7 +62,7 @@ func (c *Config) App() (vo.AppConfig, error) {
 }
 
 func (c *Config) UpdateApp(config vo.AppConfig) error {
-    os.Mkdir("config", 0755)
+    _ = os.Mkdir("config", 0755)
 
     file, err := os.Create(filepath.Join("config", "app.json"))
 	if err != nil {

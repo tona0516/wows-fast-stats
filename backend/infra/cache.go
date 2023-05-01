@@ -15,7 +15,7 @@ type Cache[T any] struct {
 }
 
 func (c *Cache[T]) Serialize(object T) error {
-	os.Mkdir(DIRECTORY, 0755)
+	_ = os.Mkdir(DIRECTORY, 0755)
 
     filename := c.Prefix + "_" + c.GameVersion + ".bin"
     path := filepath.Join(DIRECTORY, filename)
