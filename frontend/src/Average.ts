@@ -38,8 +38,8 @@ export class Average {
 }
 
 function calcFactor(key1: string, key2: string, friends: vo.Player[], enemies: vo.Player[]): AverageFactor {
-    const friend = friends.map((it) => it[key1][key2]).reduce((a, b) => a + b, 0) / friends.length
-    const enemy = enemies.map((it) => it[key1][key2]).reduce((a, b) => a + b, 0) / enemies.length
+    const friend = friends.map((it) => it[key1][key2]).reduce((a, b) => a + b, 0) / friends.length || 0
+    const enemy = enemies.map((it) => it[key1][key2]).reduce((a, b) => a + b, 0) / enemies.length || 0
     const diff = friend - enemy
     let colorClass = "";
     let sign = "";
