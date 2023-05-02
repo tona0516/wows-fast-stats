@@ -24,7 +24,7 @@ func (s *Stats) SetShipStats(ship StatsFactor) {
 }
 
 func (s *Stats) ShipAvgDamage() float64 {
-	if s.Ship.Battles != 0 {
+	if s.Ship.Battles > 0 {
 		return float64(s.Ship.DamageDealt) / float64(s.Ship.Battles)
 	}
 	return 0
@@ -52,7 +52,7 @@ func (s *Stats) ShipAvgExp() float64 {
 }
 
 func (s *Stats) ShipWinRate() float64 {
-	if s.Ship.Battles != 0 {
+	if s.Ship.Battles > 0 {
 		return float64(s.Ship.Wins) / float64(s.Ship.Battles) * 100
 	}
 	return 0
@@ -95,7 +95,7 @@ func (s *Stats) OverallAvgExp() float64 {
 }
 
 func (s *Stats) OverallWinRate() float64 {
-	if s.Overall.Battles != 0 {
+	if s.Overall.Battles > 0 {
 		return float64(s.Overall.Wins) / float64(s.Overall.Battles) * 100
 	}
 	return 0
@@ -127,34 +127,40 @@ func (s *Stats) OverallAvgTier(accountID int, shipInfo map[int]vo.Warship, shipS
 		battles += ship.Pvp.Battles
 	}
 
-	if battles == 0 {
-		return 0
-	} else {
-		return float64(sum) / float64(battles)
-	}
+    if battles == 0 {
+        return 0
+    }
+    return float64(sum) / float64(battles)
 }
 
 func (s *Stats) OverallUsingTierRate(accountID int, shipInfo map[int]vo.Warship, shipStats map[int]vo.WGShipsStats) vo.TierGroup {
-	var result vo.TierGroup
-	var allBattles uint = 0
+	var (
+        low uint
+        middle uint
+        high uint
+        allBattles uint
+    )
 
 	playerShipStats := shipStats[accountID].Data[accountID]
 	for _, ship := range playerShipStats {
+        battles := ship.Pvp.Battles
+        if battles == 0 {
+            continue
+        }
+
 		shipID := ship.ShipID
 		tier := shipInfo[shipID].Tier
-        battles := ship.Pvp.Battles
-        if battles != 0 {
-            switch {
-            case tier >= 1 && tier <= 4:
-                result.Low += float64(battles)
-                allBattles += battles
-            case tier >= 5 && tier <= 7:
-                result.Middle += float64(battles)
-                allBattles += battles
-            case tier >= 8:
-                result.High += float64(battles)
-                allBattles += battles
-            }
+
+        switch {
+        case tier >= 1 && tier <= 4:
+            low += battles
+            allBattles += battles
+        case tier >= 5 && tier <= 7:
+            middle += battles
+            allBattles += battles
+        case tier >= 8:
+            high += battles
+            allBattles += battles
         }
 	}
 
@@ -162,40 +168,49 @@ func (s *Stats) OverallUsingTierRate(accountID int, shipInfo map[int]vo.Warship,
         return vo.TierGroup{}
     }
 
-    result.Low = result.Low / float64(allBattles) * 100
-    result.Middle = result.Middle / float64(allBattles) * 100
-    result.High = result.High / float64(allBattles) * 100
-
-    return result
+    return vo.TierGroup{
+        Low: float64(low) / float64(allBattles) * 100,
+        Middle: float64(middle) / float64(allBattles) * 100,
+        High: float64(high) / float64(allBattles) * 100,
+    }
 }
 
 func (s *Stats) OverallUsingShipTypeRate(accountID int, shipInfo map[int]vo.Warship, shipStats map[int]vo.WGShipsStats) vo.ShipTypeGroup {
-    var result vo.ShipTypeGroup
-    var allBattles uint
+    var (
+        ss uint
+        dd uint
+        cl uint
+        bb uint
+        cv uint
+        allBattles uint
+    )
 
     playerShipStats := shipStats[accountID].Data[accountID]
 	for _, ship := range playerShipStats {
+        battles := ship.Pvp.Battles
+        if battles == 0 {
+            continue
+        }
+
         shipID := ship.ShipID
         shipType := shipInfo[shipID].Type
-        battles := ship.Pvp.Battles
-        if battles != 0 {
-            switch shipType {
-            case "Submarine":
-                result.SS += float64(battles)
-                allBattles += battles
-            case "Destroyer":
-                result.DD += float64(battles)
-                allBattles += battles
-            case "Cruiser":
-                result.CL += float64(battles)
-                allBattles += battles
-            case "Battleship":
-                result.BB += float64(battles)
-                allBattles += battles
-            case "AirCarrier":
-                result.CV += float64(battles)
-                allBattles += battles
-            }
+
+        switch shipType {
+        case "Submarine":
+            ss += battles
+            allBattles += battles
+        case "Destroyer":
+            dd += battles
+            allBattles += battles
+        case "Cruiser":
+            cl += battles
+            allBattles += battles
+        case "Battleship":
+            bb += battles
+            allBattles += battles
+        case "AirCarrier":
+            cv += battles
+            allBattles += battles
         }
 	}
 
@@ -203,11 +218,11 @@ func (s *Stats) OverallUsingShipTypeRate(accountID int, shipInfo map[int]vo.Wars
         return vo.ShipTypeGroup{}
     }
 
-    result.SS = result.SS / float64(allBattles) * 100
-    result.DD = result.DD / float64(allBattles) * 100
-    result.CL = result.CL / float64(allBattles) * 100
-    result.BB = result.BB / float64(allBattles) * 100
-    result.CV = result.CV / float64(allBattles) * 100
-
-    return result
+    return vo.ShipTypeGroup{
+        SS: float64(ss) / float64(allBattles) * 100,
+        DD: float64(dd) / float64(allBattles) * 100,
+        CL: float64(cl) / float64(allBattles) * 100,
+        BB: float64(bb) / float64(allBattles) * 100,
+        CV: float64(cv) / float64(allBattles) * 100,
+    }
 }

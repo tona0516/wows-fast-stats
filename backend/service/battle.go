@@ -13,7 +13,6 @@ import (
 type Battle struct{
     Parallels uint
     UserConfig vo.UserConfig
-    caches infra.Caches
 }
 
 func (b *Battle) TempArenaInfoHash() (string, error) {
@@ -34,8 +33,6 @@ func (b *Battle) Battle() (vo.Battle, error) {
     var result vo.Battle
 
 	wargaming := infra.Wargaming{AppID: b.UserConfig.Appid}
-	numbers := infra.Numbers{}
-    unregistered := infra.Unregistered{}
     tempArenaInfoRepo := infra.TempArenaInfo{}
 
 	tempArenaInfo, err := tempArenaInfoRepo.Get(b.UserConfig.InstallPath)
@@ -54,10 +51,6 @@ func (b *Battle) Battle() (vo.Battle, error) {
 	accountInfoResult := make(chan vo.Result[vo.WGAccountInfo])
 	shipStatsResult := make(chan vo.Result[map[int]vo.WGShipsStats])
 	clanTagResult := make(chan vo.Result[map[int]string])
-	shipInfoResult := make(chan vo.Result[map[int]vo.Warship])
-	expectedStatsResult := make(chan vo.Result[vo.NSExpectedStats])
-    battleArenasResult := make(chan vo.Result[vo.WGBattleArenas])
-    battleTypesResult := make(chan vo.Result[vo.WGBattleTypes])
 
 	go b.accountList(&wargaming, tempArenaInfo, accountListResult)
 	go b.encyclopediaInfo(&wargaming, encyclopediaInfoResult)
@@ -72,17 +65,29 @@ func (b *Battle) Battle() (vo.Battle, error) {
 	go b.shipStats(&wargaming, accountIDs, shipStatsResult)
 	go b.clanTag(&wargaming, accountIDs, clanTagResult)
 
-	encyclopediaInfo := <-encyclopediaInfoResult
-	if encyclopediaInfo.Error != nil {
-		return result, encyclopediaInfo.Error
-	}
-	gameVersion := encyclopediaInfo.Value.Data.GameVersion
-    b.caches = *infra.NewCaches(gameVersion)
+    warshipCache := infra.Cache[map[int]vo.Warship]{Name: "warship"}
+    warship, err := warshipCache.Deserialize()
+    if err != nil {
+        return result, err
+    }
 
-	go b.warship(&wargaming, shipInfoResult)
-	go b.expectedStats(&numbers, expectedStatsResult)
-    go b.battleArenas(&wargaming, battleArenasResult)
-    go b.battleTypes(&wargaming, battleTypesResult)
+    expectedStatsCache := infra.Cache[vo.NSExpectedStats]{Name: "expectedstats"}
+    expectedStats, err := expectedStatsCache.Deserialize()
+    if err != nil {
+        return result, err
+    }
+
+    battleArenasCache := infra.Cache[vo.WGBattleArenas]{Name: "battlearenas"}
+    battleArenas, err := battleArenasCache.Deserialize()
+    if err != nil {
+        return result, err
+    }
+
+    battleTypesCache := infra.Cache[vo.WGBattleTypes]{Name: "battletypes"}
+    battleTypes, err := battleTypesCache.Deserialize()
+    if err != nil {
+        return result, err
+    }
 
 	accountInfo := <-accountInfoResult
 	if accountInfo.Error != nil {
@@ -96,31 +101,6 @@ func (b *Battle) Battle() (vo.Battle, error) {
 	if clanTag.Error != nil {
 		return result, clanTag.Error
 	}
-	shipInfo := <-shipInfoResult
-	if shipInfo.Error != nil {
-		return result, shipInfo.Error
-	}
-	expectedStats := <-expectedStatsResult
-	if expectedStats.Error != nil {
-		return result, expectedStats.Error
-	}
-    unregisteredShipInfo, err := unregistered.Warship()
-    if err != nil {
-        return result, err
-    }
-    for k, v := range unregisteredShipInfo {
-        if _, ok := shipInfo.Value[k]; !ok {
-            shipInfo.Value[k] = v
-        }
-    }
-    battleArenas := <-battleArenasResult
-    if battleArenas.Error != nil {
-        return result, battleArenas.Error
-    }
-    battleTypes := <-battleTypesResult
-    if battleTypes.Error != nil {
-        return result, battleTypes.Error
-    }
 
 	result = b.compose(
 		tempArenaInfo,
@@ -128,10 +108,10 @@ func (b *Battle) Battle() (vo.Battle, error) {
 		accountList.Value,
 		clanTag.Value,
 		shipStats.Value,
-		shipInfo.Value,
-		expectedStats.Value,
-        battleArenas.Value,
-        battleTypes.Value,
+		warship,
+		expectedStats,
+        battleArenas,
+        battleTypes,
 	)
 
 	return result, nil
@@ -208,129 +188,6 @@ func (b *Battle) clanTag(wargaming *infra.Wargaming, accountIDs []int, result ch
 	}
 
 	result <- vo.Result[map[int]string]{Value: clanTagMap, Error: nil}
-}
-
-func (b *Battle) warship(wargaming *infra.Wargaming, result chan vo.Result[map[int]vo.Warship]) {
-	shipInfoMap := make(map[int]vo.Warship, 0)
-
-	cache := b.caches.Warships
-	object, err := cache.Deserialize()
-	if err == nil {
-		result <- vo.Result[map[int]vo.Warship]{Value: object, Error: nil}
-		return
-	}
-
-	res, err := wargaming.EncyclopediaShips(1)
-	if err != nil {
-		result <- vo.Result[map[int]vo.Warship]{Value: shipInfoMap, Error: err}
-		return
-	}
-	pageTotal := res.Meta.PageTotal
-
-	var mu sync.Mutex
-	limit := make(chan struct{}, b.Parallels)
-	wg := sync.WaitGroup{}
-	for i := 1; i <= pageTotal; i++ {
-		limit <- struct{}{}
-		wg.Add(1)
-		go func(pageNo int) {
-			defer func() {
-				wg.Done()
-				<-limit
-			}()
-
-			encyclopediaShips, err := wargaming.EncyclopediaShips(pageNo)
-			if err != nil {
-				result <- vo.Result[map[int]vo.Warship]{Value: shipInfoMap, Error: err}
-				return
-			}
-
-			for shipID, shipInfo := range encyclopediaShips.Data {
-				mu.Lock()
-				shipInfoMap[shipID] = vo.Warship{
-					Name:   shipInfo.Name,
-					Tier:   shipInfo.Tier,
-					Type:   shipInfo.Type,
-					Nation: shipInfo.Nation,
-				}
-				mu.Unlock()
-			}
-		}(i)
-	}
-	wg.Wait()
-
-	if err := cache.Serialize(shipInfoMap); err != nil {
-		result <- vo.Result[map[int]vo.Warship]{Value: shipInfoMap, Error: err}
-		return
-	}
-
-	result <- vo.Result[map[int]vo.Warship]{Value: shipInfoMap, Error: nil}
-}
-
-func (b *Battle) expectedStats(numbers *infra.Numbers, result chan vo.Result[vo.NSExpectedStats]) {
-	cache := b.caches.ExpectedStats
-	object, err := cache.Deserialize()
-	if err == nil {
-		result <- vo.Result[vo.NSExpectedStats]{Value: object, Error: nil}
-		return
-	}
-
-	expectedStats, err := numbers.ExpectedStats()
-	if err != nil {
-		result <- vo.Result[vo.NSExpectedStats]{Value: *expectedStats, Error: err}
-		return
-	}
-
-	if err := cache.Serialize(*expectedStats); err != nil {
-		result <- vo.Result[vo.NSExpectedStats]{Value: *expectedStats, Error: err}
-		return
-	}
-
-	result <- vo.Result[vo.NSExpectedStats]{Value: *expectedStats, Error: nil}
-}
-
-func (b *Battle) battleArenas(wargaming *infra.Wargaming, result chan vo.Result[vo.WGBattleArenas]) {
-	cache := b.caches.BattleArenas
-	object, err := cache.Deserialize()
-	if err == nil {
-		result <- vo.Result[vo.WGBattleArenas]{Value: object, Error: nil}
-		return
-	}
-
-	battleArenas, err := wargaming.BattleArenas()
-	if err != nil {
-		result <- vo.Result[vo.WGBattleArenas]{Value: battleArenas, Error: err}
-		return
-	}
-
-	if err := cache.Serialize(battleArenas); err != nil {
-		result <- vo.Result[vo.WGBattleArenas]{Value: battleArenas, Error: err}
-		return
-	}
-
-    result <- vo.Result[vo.WGBattleArenas]{Value: battleArenas, Error: err}
-}
-
-func (b *Battle) battleTypes(wargaming *infra.Wargaming, result chan vo.Result[vo.WGBattleTypes]) {
-	cache := b.caches.BattleTypes
-	object, err := cache.Deserialize()
-	if err == nil {
-		result <- vo.Result[vo.WGBattleTypes]{Value: object, Error: nil}
-		return
-	}
-
-	battleTypes, err := wargaming.BattleTypes()
-	if err != nil {
-		result <- vo.Result[vo.WGBattleTypes]{Value: battleTypes, Error: err}
-		return
-	}
-
-	if err := cache.Serialize(battleTypes); err != nil {
-		result <- vo.Result[vo.WGBattleTypes]{Value: battleTypes, Error: err}
-		return
-	}
-
-    result <- vo.Result[vo.WGBattleTypes]{Value: battleTypes, Error: err}
 }
 
 func (b *Battle) compose(

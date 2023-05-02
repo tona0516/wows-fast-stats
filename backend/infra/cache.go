@@ -4,21 +4,19 @@ import (
 	"encoding/gob"
 	"os"
 	"path/filepath"
-	"strings"
 )
 
-const DIRECTORY = "cache"
+const CACHE_DIRECTORY = "cache"
 
 type Cache[T any] struct {
-	Prefix string
-    GameVersion string
+	Name string
 }
 
 func (c *Cache[T]) Serialize(object T) error {
-	_ = os.Mkdir(DIRECTORY, 0755)
+	_ = os.Mkdir(CACHE_DIRECTORY, 0755)
 
-    filename := c.Prefix + "_" + c.GameVersion + ".bin"
-    path := filepath.Join(DIRECTORY, filename)
+    filename := c.Name + ".bin"
+    path := filepath.Join(CACHE_DIRECTORY, filename)
 	f, err := os.Create(path)
 	if err != nil {
 		return err
@@ -32,8 +30,8 @@ func (c *Cache[T]) Serialize(object T) error {
 func (c *Cache[T]) Deserialize() (T, error) {
 	var object T
 
-    filename := c.Prefix + "_" + c.GameVersion + ".bin"
-    path := filepath.Join(DIRECTORY, filename)
+    filename := c.Name + ".bin"
+    path := filepath.Join(CACHE_DIRECTORY, filename)
 	f, err := os.Open(path)
 	if err != nil {
 		return object, err
@@ -45,30 +43,4 @@ func (c *Cache[T]) Deserialize() (T, error) {
 		return object, err
 	}
 	return object, nil
-}
-
-func (c *Cache[T]) RemoveOld() error {
-    entries, err := os.ReadDir(DIRECTORY)
-    if err != nil {
-        return err
-    }
-
-    for _, entry := range entries {
-        if entry.IsDir() {
-            continue
-        }
-
-        if !strings.HasPrefix(entry.Name(), c.Prefix) {
-            continue
-        }
-
-        filename := c.Prefix + "_" + c.GameVersion + ".bin"
-        if entry.Name() == filename {
-            continue
-        }
-
-        os.Remove(filepath.Join(DIRECTORY, entry.Name()))
-	}
-
-    return nil
 }

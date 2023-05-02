@@ -1,5 +1,7 @@
 package vo
 
+import "golang.org/x/exp/slices"
+
 type WGClansAccountInfo struct {
 	Status string `json:"status"`
 	Data   map[int]struct {
@@ -17,9 +19,15 @@ func (w *WGClansAccountInfo) ClanIDs() []int {
 	clanIDs := make([]int, 0)
 	for i := range w.Data {
 		clanID := w.Data[i].ClanID
-		if clanID != 0 {
-			clanIDs = append(clanIDs, w.Data[i].ClanID)
-		}
+        if clanID == 0 {
+            continue
+        }
+
+        if slices.Contains(clanIDs, clanID) {
+            continue
+        }
+
+        clanIDs = append(clanIDs, clanID)
 	}
 	return clanIDs
 }

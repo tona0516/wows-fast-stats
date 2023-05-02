@@ -18,6 +18,7 @@ type App struct {
 	userConfig      vo.UserConfig
 	appConfig       vo.AppConfig
 	excludePlayerID []int
+	isFirstBattle   bool
 }
 
 func NewApp() *App {
@@ -30,6 +31,7 @@ func (a *App) startup(ctx context.Context) {
 	a.userConfig, _ = configService.User()
 	a.appConfig, _ = configService.App()
 	a.excludePlayerID = make([]int, 0)
+	a.isFirstBattle = true
 
 	window := a.appConfig.Window
 	if window.Width != 0 && window.Height != 0 {
@@ -45,13 +47,6 @@ func (a *App) beforeClose(ctx context.Context) (prevent bool) {
 	configService := service.Config{}
 	_ = configService.UpdateApp(a.appConfig)
 
-	// Remove old caches
-	wargaming := infra.Wargaming{AppID: a.userConfig.Appid}
-	encyclopediaInfo, _ := wargaming.EncyclopediaInfo()
-	gameVersion := encyclopediaInfo.Data.GameVersion
-	caches := infra.NewCaches(gameVersion)
-	caches.RemoveOld()
-
 	return false
 }
 
@@ -61,6 +56,17 @@ func (a *App) TempArenaInfoHash() (string, error) {
 }
 
 func (a *App) Battle() (vo.Battle, error) {
+	if a.isFirstBattle {
+		prepare := service.NewPrepare(
+			5,
+			infra.Wargaming{AppID: a.userConfig.Appid},
+			infra.Numbers{},
+		)
+		if err := prepare.FetchCachable(); err != nil {
+			return vo.Battle{}, err
+		}
+		a.isFirstBattle = false
+	}
 	battle := service.Battle{Parallels: 5, UserConfig: a.userConfig}
 	return battle.Battle()
 }
