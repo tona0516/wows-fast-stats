@@ -36,7 +36,7 @@ lint:
 .PHONY: fmt
 fmt:
 	go fmt
-	cd frontend/ && npx prettier --write **/*.{svelte,html,css}
+	cd frontend/ && npx prettier --write **/*.{ts,svelte,html,css}
 
 .PHONY: put-temp-arema-info
 put-temp-arema-info:

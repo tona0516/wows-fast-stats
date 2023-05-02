@@ -1,4 +1,4 @@
 export interface Column {
-    min: string,
-    full: string
+  min: string;
+  full: string;
 }

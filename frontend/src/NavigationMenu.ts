@@ -1,1 +1,1 @@
-type NavigationMenu = "main" | "config" | "reload" | "screenshot"
+type NavigationMenu = "main" | "config" | "reload" | "screenshot";
