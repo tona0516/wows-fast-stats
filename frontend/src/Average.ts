@@ -84,9 +84,18 @@ export class Average {
 }
 
 function average(key1: string, key2: string, players: vo.Player[]): number {
-  const values = players
+  let values: number[] = []
+
+  // Note: PR is -1 when expected values can't retrieve.
+  if (key2 == "pr") {
+    values = players
+    .filter((it) => it[key1]["battles"] !== 0 && it[key1][key2] >= 0)
+    .map((it) => it[key1][key2] as number);
+  } else {
+    values = players
     .filter((it) => it[key1]["battles"] !== 0)
     .map((it) => it[key1][key2] as number);
+  }
 
   if (values.length === 0) {
     return 0;
