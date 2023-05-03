@@ -6,37 +6,38 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+
+	"golang.org/x/exp/slices"
 )
 
-type Config struct{}
+type Config struct{
+    configRepo infra.Config
+}
+
+func NewConfig(configRepo infra.Config) *Config {
+    return &Config{
+        configRepo: configRepo,
+    }
+}
 
 func (c *Config) User() (vo.UserConfig, error) {
-    var config vo.UserConfig
-    configRepo := infra.Config{}
-    config, err := configRepo.User()
-    return config, err
+    return c.configRepo.User()
 }
 
 func (c *Config) UpdateUser(config vo.UserConfig) error {
-    configRepo := infra.Config{}
-
     if err := validate(config); err != nil {
         return err
     }
 
-    return configRepo.UpdateUser(config)
+    return c.configRepo.UpdateUser(config)
 }
 
 func (c *Config) App() (vo.AppConfig, error) {
-    var config vo.AppConfig
-    configRepo := infra.Config{}
-    config, err := configRepo.App()
-    return config, err
+    return  c.configRepo.App()
 }
 
 func (c *Config) UpdateApp(config vo.AppConfig) error {
-    configRepo := infra.Config{}
-    return configRepo.UpdateApp(config)
+    return c.configRepo.UpdateApp(config)
 }
 
 func validate(config vo.UserConfig) error {
@@ -52,20 +53,10 @@ func validate(config vo.UserConfig) error {
     }
 
     // Same value as "font-size": https://developer.mozilla.org/ja/docs/Web/CSS/font-size
-    if !contains([]string{"x-small", "small", "medium", "large", "x-large"}, config.FontSize) {
+    if !slices.Contains([]string{"x-small", "small", "medium", "large", "x-large"}, config.FontSize) {
         err := errors.New("不正な文字サイズです。")
         return err
     }
 
     return nil
-}
-
-func contains(s []string, str string) bool {
-	for _, v := range s {
-		if v == str {
-			return true
-		}
-	}
-
-	return false
 }

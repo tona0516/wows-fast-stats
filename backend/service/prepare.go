@@ -11,13 +11,15 @@ type Prepare struct {
     parallels uint
     wargaming infra.Wargaming
     numbers infra.Numbers
+    unregistered infra.Unregistered
 }
 
-func NewPrepare(parallels uint, wargaming infra.Wargaming, numbers infra.Numbers) *Prepare {
+func NewPrepare(parallels uint, wargaming infra.Wargaming, numbers infra.Numbers, unregistered infra.Unregistered) *Prepare {
     return &Prepare{
         parallels: parallels,
         wargaming: wargaming,
         numbers: numbers,
+        unregistered: unregistered,
     }
 }
 
@@ -26,30 +28,24 @@ func (p *Prepare) FetchCachable() error {
         return err
     }
 
-    warshipResult := make(chan error)
-	expectedStatsResult := make(chan error)
-    battleArenasResult := make(chan error)
-    battleTypesResult := make(chan error)
-
-    go p.warship(warshipResult)
-    go p.expectedStats(expectedStatsResult)
-    go p.battleArenas(battleArenasResult)
-    go p.battleTypes(battleTypesResult)
-
-    if err := <-warshipResult; err != nil {
-        return err
+    fns := [](func(chan error)){
+       p.warship,
+       p.expectedStats,
+       p.battleArenas,
+       p.battleTypes,
     }
 
-    if err := <-expectedStatsResult; err != nil {
-        return err
+    results := make([](*chan error), 0)
+    for _, fn := range fns {
+        result := make(chan error)
+        go fn(result)
+        results = append(results, &result)
     }
 
-    if err := <-battleArenasResult; err != nil {
-        return err
-    }
-
-    if err := <-battleTypesResult; err != nil {
-        return err
+    for _, result := range results {
+        if err := <-*result; err != nil {
+            return err
+        }
     }
 
     return nil
@@ -67,6 +63,7 @@ func (p *Prepare) warship(result chan error) {
 		result <- err
 		return
 	}
+
 	pageTotal := res.Meta.PageTotal
 
 	var mu sync.Mutex
@@ -87,13 +84,13 @@ func (p *Prepare) warship(result chan error) {
 				return
 			}
 
-			for shipID, shipInfo := range encyclopediaShips.Data {
+			for shipID, warship := range encyclopediaShips.Data {
 				mu.Lock()
 				warships[shipID] = vo.Warship{
-					Name:   shipInfo.Name,
-					Tier:   shipInfo.Tier,
-					Type:   shipInfo.Type,
-					Nation: shipInfo.Nation,
+					Name:   warship.Name,
+					Tier:   warship.Tier,
+					Type:   warship.Type,
+					Nation: warship.Nation,
 				}
 				mu.Unlock()
 			}
@@ -101,8 +98,7 @@ func (p *Prepare) warship(result chan error) {
 	}
 	wg.Wait()
 
-    unregistered := infra.Unregistered{}
-    unregisteredShipInfo, err := unregistered.Warship()
+    unregisteredShipInfo, err := p.unregistered.Warship()
     if err != nil {
         result <- err
 		return

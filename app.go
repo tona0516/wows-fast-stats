@@ -12,6 +12,8 @@ import (
 	"golang.org/x/exp/slices"
 )
 
+const PARALLELS = 5
+
 type App struct {
 	Version         vo.Version
 	ctx             context.Context
@@ -40,7 +42,6 @@ func (a *App) startup(ctx context.Context) {
 }
 
 func (a *App) beforeClose(ctx context.Context) (prevent bool) {
-	// save window size
 	width, height := runtime.WindowGetSize(ctx)
 	a.appConfig.Window.Width = width
 	a.appConfig.Window.Height = height
@@ -51,23 +52,34 @@ func (a *App) beforeClose(ctx context.Context) (prevent bool) {
 }
 
 func (a *App) TempArenaInfoHash() (string, error) {
-	battle := service.Battle{Parallels: 5, UserConfig: a.userConfig}
+	battle := service.NewBattle(
+		PARALLELS,
+		a.userConfig,
+		infra.Wargaming{AppID: a.userConfig.Appid},
+		infra.TempArenaInfo{},
+	)
 	return battle.TempArenaInfoHash()
 }
 
 func (a *App) Battle() (vo.Battle, error) {
 	if a.isFirstBattle {
 		prepare := service.NewPrepare(
-			5,
+			PARALLELS,
 			infra.Wargaming{AppID: a.userConfig.Appid},
 			infra.Numbers{},
+			infra.Unregistered{},
 		)
 		if err := prepare.FetchCachable(); err != nil {
 			return vo.Battle{}, err
 		}
 		a.isFirstBattle = false
 	}
-	battle := service.Battle{Parallels: 5, UserConfig: a.userConfig}
+	battle := service.NewBattle(
+		PARALLELS,
+		a.userConfig,
+		infra.Wargaming{AppID: a.userConfig.Appid},
+		infra.TempArenaInfo{},
+	)
 	return battle.Battle()
 }
 
