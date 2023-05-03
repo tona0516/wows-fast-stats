@@ -33,7 +33,7 @@ export let loadState: LoadState = "standby";
 export let latestHash: string = "";
 export let battle: vo.Battle;
 export let config: vo.UserConfig = Const.DEFAULT_USER_CONFIG;
-export let averageFactors: AverageFactor[] = [];
+export let averageFactors: AverageFactor;
 export let excludePlayerIDs: number[] = [];
 
 const components = {
@@ -128,7 +128,7 @@ function onCheckPlayer() {
 {/if}
 
 {#if latestHash !== ""}
-  <div class="mt-2 mx-4">
+  <div class="mt-1 mx-4">
     <span>
       {battle.meta.date}
       {battle.meta.arena}
@@ -186,6 +186,7 @@ function onCheckPlayer() {
               <BasicIsInAvg
                 player="{player}"
                 excludePlayerIDs="{excludePlayerIDs}"
+                displayPattern="{displayPattern}"
                 on:onCheck="{onCheckPlayer}"
               />
 
@@ -227,28 +228,45 @@ function onCheckPlayer() {
     </table>
   </div>
 
-  <div class="mt-2 mx-4 d-flex flex-row centerize">
-    <table class="table table-sm table-text-color w-auto">
-      <thead>
-        <tr>
-          <th></th>
-          <th>{battle.teams[0].name}</th>
-          <th>差</th>
-          <th>{battle.teams[1].name}</th>
-        </tr>
-      </thead>
-      <tbody>
-        {#each averageFactors as factor}
+  {#if averageFactors}
+    <div class="mt-1 mx-4 d-flex flex-row centerize">
+      <table class="table table-sm table-text-color w-auto">
+        <thead>
           <tr>
-            <td class="td-string">{factor.label}</td>
-            <td class="text-center td-number">{factor.friend}</td>
-            <td class="text-center td-number {factor.colorClass}"
-              >{factor.diff}</td
-            >
-            <td class="text-center td-number">{factor.enemy}</td>
+            <th></th>
+            <th colspan="{averageFactors.shipStatsCount}">艦成績</th>
+            <th colspan="{averageFactors.overallCount}">総合成績</th>
           </tr>
-        {/each}
-      </tbody>
-    </table>
-  </div>
+          <tr>
+            <th></th>
+            {#each averageFactors.labels as label}
+              <th>{label}</th>
+            {/each}
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="td-string">{battle.teams[0].name}</td>
+            {#each averageFactors.friends as friend}
+              <td class="td-number">{friend}</td>
+            {/each}
+          </tr>
+
+          <tr>
+            <td class="td-string">{battle.teams[1].name}</td>
+            {#each averageFactors.enemies as enemy}
+              <td class="td-number">{enemy}</td>
+            {/each}
+          </tr>
+
+          <tr>
+            <td class="td-string">差</td>
+            {#each averageFactors.diffs as diff}
+              <td class="td-number {diff.colorClass}">{diff.value}</td>
+            {/each}
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  {/if}
 {/if}

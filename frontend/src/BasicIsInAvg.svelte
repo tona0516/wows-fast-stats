@@ -5,9 +5,11 @@ import {
   RemoveExcludePlayerID,
 } from "../wailsjs/go/main/App.js";
 import { createEventDispatcher } from "svelte";
+import type { DisplayPattern } from "./DisplayPattern.js";
 
 export let player: vo.Player;
 export let excludePlayerIDs: number[];
+export let displayPattern: DisplayPattern;
 
 $: isChecked = !excludePlayerIDs.includes(player.player_info.id);
 
@@ -27,7 +29,7 @@ function onCheck(event) {
 </script>
 
 <td class="p-0">
-  {#if player.player_info.id !== 0}
+  {#if displayPattern === "noshipstats" || displayPattern === "full" || displayPattern === "nopr"}
     <div class="form-check centerize">
       <input
         class="form-check-input"
