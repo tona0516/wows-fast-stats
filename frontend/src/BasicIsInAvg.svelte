@@ -26,9 +26,9 @@ function onCheck(event) {
 }
 </script>
 
-<td>
+<td class="p-0">
   {#if player.player_info.id !== 0}
-    <div class="form-check m-0 centerize">
+    <div class="form-check centerize">
       <input
         class="form-check-input"
         type="checkbox"
