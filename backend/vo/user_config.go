@@ -2,7 +2,7 @@ package vo
 
 type Basic struct {
     IsContainedAvg bool `json:"is_contained_avg"`
-    PlaterName bool `json:"player_name"`
+    PlayerName bool `json:"player_name"`
     ShipInfo bool `json:"ship_info"`
 }
 

@@ -19,7 +19,7 @@ func (c *Config) User() (vo.UserConfig, error) {
         Displays: vo.Displays{
             Basic: vo.Basic{
                 IsContainedAvg: true,
-                PlaterName: true,
+                PlayerName: true,
                 ShipInfo: true,
             },
         },
