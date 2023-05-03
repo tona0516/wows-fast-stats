@@ -54,10 +54,6 @@ func (b *Battle) Battle() (vo.Battle, error) {
     }
 
 	accountListResult := make(chan vo.Result[vo.WGAccountList])
-	accountInfoResult := make(chan vo.Result[vo.WGAccountInfo])
-	shipStatsResult := make(chan vo.Result[map[int]vo.WGShipsStats])
-	clanTagResult := make(chan vo.Result[map[int]string])
-
 	go b.accountList(tempArenaInfo, accountListResult)
 
 	accountList := <-accountListResult
@@ -66,6 +62,9 @@ func (b *Battle) Battle() (vo.Battle, error) {
 	}
 	accountIDs := accountList.Value.AccountIDs()
 
+    accountInfoResult := make(chan vo.Result[vo.WGAccountInfo])
+	shipStatsResult := make(chan vo.Result[map[int]vo.WGShipsStats])
+	clanTagResult := make(chan vo.Result[map[int]string])
 	go b.accountInfo(accountIDs, accountInfoResult)
 	go b.shipStats(accountIDs, shipStatsResult)
 	go b.clanTag(accountIDs, clanTagResult)
@@ -134,33 +133,22 @@ func (b *Battle) accountInfo(accountIDs []int, result chan vo.Result[vo.WGAccoun
 }
 
 func (b *Battle) shipStats(accountIDs []int, result chan vo.Result[map[int]vo.WGShipsStats]) {
-	shipStatsMap := make(map[int]vo.WGShipsStats)
-	limit := make(chan struct{}, b.parallels)
-	wg := sync.WaitGroup{}
+    shipStatsMap := make(map[int]vo.WGShipsStats)
     var mu sync.Mutex
-	for i := range accountIDs {
-		limit <- struct{}{}
-		wg.Add(1)
-		go func(accountID int) {
-			defer func() {
-				wg.Done()
-				<-limit
-			}()
+    err := doParallel(b.parallels, accountIDs, func(accountID int) error {
+        shipStats, err := b.wargaming.ShipsStats(accountID)
+        if err != nil {
+            return err
+        }
 
-			shipStats, err := b.wargaming.ShipsStats(accountID)
-			if err != nil {
-				result <- vo.Result[map[int]vo.WGShipsStats]{Value: shipStatsMap, Error: err}
-				return
-			}
+        mu.Lock()
+        shipStatsMap[accountID] = shipStats
+        mu.Unlock()
 
-            mu.Lock()
-			shipStatsMap[accountID] = shipStats
-            mu.Unlock()
-		}(accountIDs[i])
-	}
-	wg.Wait()
+        return nil
+    })
 
-	result <- vo.Result[map[int]vo.WGShipsStats]{Value: shipStatsMap, Error: nil}
+	result <- vo.Result[map[int]vo.WGShipsStats]{Value: shipStatsMap, Error: err}
 }
 
 func (b *Battle) clanTag(accountIDs []int, result chan vo.Result[map[int]string]) {

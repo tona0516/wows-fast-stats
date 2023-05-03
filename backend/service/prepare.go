@@ -64,39 +64,31 @@ func (p *Prepare) warship(result chan error) {
 		return
 	}
 
-	pageTotal := res.Meta.PageTotal
+    var mu sync.Mutex
+    pages := makeRange(1, res.Meta.PageTotal)
+    err = doParallel(p.parallels, pages, func(page int) error {
+        encyclopediaShips, err := p.wargaming.EncyclopediaShips(page)
+        if err != nil {
+            return err
+        }
 
-	var mu sync.Mutex
-	limit := make(chan struct{}, p.parallels)
-	wg := sync.WaitGroup{}
-	for i := 1; i <= pageTotal; i++ {
-		limit <- struct{}{}
-		wg.Add(1)
-		go func(pageNo int) {
-			defer func() {
-				wg.Done()
-				<-limit
-			}()
+        for shipID, warship := range encyclopediaShips.Data {
+            mu.Lock()
+            warships[shipID] = vo.Warship{
+                Name:   warship.Name,
+                Tier:   warship.Tier,
+                Type:   warship.Type,
+                Nation: warship.Nation,
+            }
+            mu.Unlock()
+        }
 
-			encyclopediaShips, err := p.wargaming.EncyclopediaShips(pageNo)
-			if err != nil {
-				result <- err
-				return
-			}
-
-			for shipID, warship := range encyclopediaShips.Data {
-				mu.Lock()
-				warships[shipID] = vo.Warship{
-					Name:   warship.Name,
-					Tier:   warship.Tier,
-					Type:   warship.Type,
-					Nation: warship.Nation,
-				}
-				mu.Unlock()
-			}
-		}(i)
-	}
-	wg.Wait()
+        return nil
+    })
+    if err != nil {
+        result <- err
+        return
+    }
 
     unregisteredShipInfo, err := p.unregistered.Warship()
     if err != nil {
