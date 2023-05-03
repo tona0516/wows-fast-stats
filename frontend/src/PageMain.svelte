@@ -23,7 +23,7 @@ import OverallTierRate from "./OverallTierRate.svelte";
 import OverallBattles from "./OverallBattles.svelte";
 import NoData from "./NoData.svelte";
 import { LogDebug } from "../wailsjs/runtime/runtime";
-import IsContainedAvg from "./IsContainedAvg.svelte";
+import BasicIsInAvg from "./BasicIsInAvg.svelte";
 import { Average, type AverageFactor } from "./Average";
 import { ExcludePlayerIDs } from "../wailsjs/go/main/App.js";
 
@@ -181,7 +181,7 @@ function onCheckPlayer() {
           {#each team.players as player}
             {@const displayPattern = decidePlayerDataPattern(player)}
             <tr class="{backgroundClass(player.ship_stats.pr)}">
-              <IsContainedAvg
+              <BasicIsInAvg
                 player="{player}"
                 excludePlayerIDs="{excludePlayerIDs}"
                 on:onCheck="{onCheckPlayer}"

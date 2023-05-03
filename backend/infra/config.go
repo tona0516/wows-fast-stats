@@ -18,7 +18,7 @@ func (c *Config) User() (vo.UserConfig, error) {
         FontSize: "medium",
         Displays: vo.Displays{
             Basic: vo.Basic{
-                IsContainedAvg: true,
+                IsInAvg: true,
                 PlayerName: true,
                 ShipInfo: true,
             },

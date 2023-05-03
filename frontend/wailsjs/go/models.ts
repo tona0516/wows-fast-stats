@@ -1,7 +1,7 @@
 export namespace vo {
 	
 	export class Basic {
-	    is_contained_avg: boolean;
+	    is_in_avg: boolean;
 	    player_name: boolean;
 	    ship_info: boolean;
 	
@@ -11,7 +11,7 @@ export namespace vo {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.is_contained_avg = source["is_contained_avg"];
+	        this.is_in_avg = source["is_in_avg"];
 	        this.player_name = source["player_name"];
 	        this.ship_info = source["ship_info"];
 	    }
