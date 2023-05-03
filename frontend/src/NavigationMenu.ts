@@ -1,1 +1,1 @@
-type NavigationMenu = "main" | "config" | "reload" | "screenshot";
+export type NavigationMenu = "main" | "config" | "reload" | "screenshot";

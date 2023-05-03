@@ -1,1 +1,1 @@
-type LoadState = "standby" | "fetching" | "error";
+export type LoadState = "standby" | "fetching" | "error";

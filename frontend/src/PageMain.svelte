@@ -26,6 +26,8 @@ import { LogDebug } from "../wailsjs/runtime/runtime";
 import BasicIsInAvg from "./BasicIsInAvg.svelte";
 import { Average, type AverageFactor } from "./Average";
 import { ExcludePlayerIDs } from "../wailsjs/go/main/App.js";
+import type { LoadState } from "./LoadState";
+import type { DisplayPattern } from "./DisplayPattern";
 
 export let loadState: LoadState = "standby";
 export let latestHash: string = "";

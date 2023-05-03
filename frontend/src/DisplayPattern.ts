@@ -5,4 +5,9 @@
  * nopr: not exist expected value in numbers api.
  * full: all values exists.
  */
-type DisplayPattern = "private" | "nodata" | "noshipstats" | "nopr" | "full";
+export type DisplayPattern =
+  | "private"
+  | "nodata"
+  | "noshipstats"
+  | "nopr"
+  | "full";

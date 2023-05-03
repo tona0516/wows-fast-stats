@@ -17,6 +17,7 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 import PageHelp from "./PageHelp.svelte";
 import type { vo } from "wailsjs/go/models.js";
 import { Average, type AverageFactor } from "./Average.js";
+import type { LoadState } from "./LoadState.js";
 
 type Page = "main" | "config" | "help" | "appinfo";
 type Func = "reload" | "screenshot";
