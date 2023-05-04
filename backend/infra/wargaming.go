@@ -2,10 +2,11 @@ package infra
 
 import (
 	"changeme/backend/vo"
-	"errors"
 	"net/url"
 	"strconv"
 	"strings"
+
+	"github.com/pkg/errors"
 )
 
 func buildUrl(path string, query map[string]string) *url.URL {

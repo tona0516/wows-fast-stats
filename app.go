@@ -21,6 +21,7 @@ type App struct {
 	appConfig       vo.AppConfig
 	excludePlayerID []int
 	isFirstBattle   bool
+	logger          Logger
 }
 
 func NewApp() *App {
@@ -28,10 +29,21 @@ func NewApp() *App {
 }
 
 func (a *App) startup(ctx context.Context) {
+	a.logger = *NewLogger()
 	a.ctx = ctx
+
+	var err error
 	configService := service.Config{}
-	a.userConfig, _ = configService.User()
-	a.appConfig, _ = configService.App()
+	a.userConfig, err = configService.User()
+	if err != nil {
+		a.logger.Info("No user config.")
+	}
+
+	a.appConfig, err = configService.App()
+	if err != nil {
+		a.logger.Info("No app config.")
+	}
+
 	a.excludePlayerID = make([]int, 0)
 	a.isFirstBattle = true
 
@@ -46,12 +58,16 @@ func (a *App) beforeClose(ctx context.Context) (prevent bool) {
 	a.appConfig.Window.Width = width
 	a.appConfig.Window.Height = height
 	configService := service.Config{}
-	_ = configService.UpdateApp(a.appConfig)
+	err := configService.UpdateApp(a.appConfig)
+	if err != nil {
+		a.logger.Warn("Failed to update config.", err)
+	}
 
 	return false
 }
 
 func (a *App) TempArenaInfoHash() (string, error) {
+	// Note: no logging because this method is called looper
 	battle := service.NewBattle(
 		PARALLELS,
 		a.userConfig,
@@ -70,6 +86,7 @@ func (a *App) Battle() (vo.Battle, error) {
 			infra.Unregistered{},
 		)
 		if err := prepare.FetchCachable(); err != nil {
+			a.logger.Error("Failed to fetch cachable.", err)
 			return vo.Battle{}, err
 		}
 		a.isFirstBattle = false
@@ -80,14 +97,25 @@ func (a *App) Battle() (vo.Battle, error) {
 		infra.Wargaming{AppID: a.userConfig.Appid},
 		infra.TempArenaInfo{},
 	)
-	return battle.Battle()
+
+	result, err := battle.Battle()
+	if err != nil {
+		a.logger.Error("Failed to get battle.", err)
+	}
+
+	return result, err
 }
 
 func (a *App) SelectDirectory() (string, error) {
-	return runtime.OpenDirectoryDialog(a.ctx, runtime.OpenDialogOptions{})
+	path, err := runtime.OpenDirectoryDialog(a.ctx, runtime.OpenDialogOptions{})
+	if err != nil {
+		a.logger.Error("Failed to get client installing path.", err)
+	}
+	return path, err
 }
 
 func (a *App) UserConfig() (vo.UserConfig, error) {
+	// Note: no logging because this method is called looper
 	configService := service.Config{}
 	return configService.User()
 }
@@ -96,6 +124,7 @@ func (a *App) ApplyUserConfig(config vo.UserConfig) error {
 	configService := service.Config{}
 
 	if err := configService.UpdateUser(config); err != nil {
+		a.logger.Error("Failed to apply user config.", err)
 		return err
 	}
 
@@ -106,14 +135,25 @@ func (a *App) ApplyUserConfig(config vo.UserConfig) error {
 func (a *App) SaveScreenshot(filename string, base64Data string, isSelectable bool) error {
 	screenshotService := service.Screenshot{}
 	if isSelectable {
-		return screenshotService.SaveWithDialog(a.ctx, filename, base64Data)
+		err := screenshotService.SaveWithDialog(a.ctx, filename, base64Data)
+		if err != nil {
+			a.logger.Error("Failed to save screenshot.", err)
+		}
 	}
 
-	return screenshotService.SaveForAuto(filename, base64Data)
+	err := screenshotService.SaveForAuto(filename, base64Data)
+	if err != nil {
+		a.logger.Error("Failed to autosave screenshot.", err)
+	}
+	return err
 }
 
 func (a *App) Cwd() (string, error) {
-	return os.Getwd()
+	cwd, err := os.Getwd()
+	if err != nil {
+		a.logger.Warn("Failed to get cwd.", err)
+	}
+	return cwd, err
 }
 
 func (a *App) AppVersion() vo.Version {
@@ -121,7 +161,11 @@ func (a *App) AppVersion() vo.Version {
 }
 
 func (a *App) OpenDirectory(path string) error {
-	return open.Run(path)
+	err := open.Run(path)
+	if err != nil {
+		a.logger.Warn("Failed to open directory.", err)
+	}
+	return err
 }
 
 func (a *App) ExcludePlayerIDs() []int {

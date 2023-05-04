@@ -8,7 +8,7 @@ ZIP := $(APP).zip
 dev:
 	$(eval REV := $(shell git rev-parse --short HEAD))
 	$(eval LD_FLAGS := "-X main.semver=$(SEMVER) -X main.revision=$(REV)")
-	wails dev -ldflags $(LD_FLAGS)
+	wails dev -ldflags $(LD_FLAGS) -loglevel "Warning"
 
 .PHONY: setup
 setup:

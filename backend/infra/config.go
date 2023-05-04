@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+
+	"github.com/pkg/errors"
 )
 
 type Config struct {
@@ -26,11 +28,11 @@ func (c *Config) User() (vo.UserConfig, error) {
     }
 	file, err := os.ReadFile(filepath.Join("config", "user.json"))
 	if err != nil {
-		return config, err
+		return config, errors.WithStack(err)
 	}
 
 	err = json.Unmarshal(file, &config)
-    return config, err
+    return config, errors.WithStack(err)
 }
 
 func (c *Config) UpdateUser(config vo.UserConfig) error {
@@ -38,14 +40,14 @@ func (c *Config) UpdateUser(config vo.UserConfig) error {
 
     file, err := os.Create(filepath.Join("config", "user.json"))
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
     defer file.Close()
 
     encoder := json.NewEncoder(file)
     encoder.SetIndent("", "  ")
     err = encoder.Encode(config)
-    return err
+    return errors.WithStack(err)
 }
 
 func (c *Config) App() (vo.AppConfig, error) {
@@ -58,7 +60,7 @@ func (c *Config) App() (vo.AppConfig, error) {
 	}
 
 	err = json.Unmarshal(file, &config)
-    return config, err
+    return config, errors.WithStack(err)
 }
 
 func (c *Config) UpdateApp(config vo.AppConfig) error {
@@ -73,5 +75,5 @@ func (c *Config) UpdateApp(config vo.AppConfig) error {
     encoder := json.NewEncoder(file)
     encoder.SetIndent("", "  ")
     err = encoder.Encode(config)
-    return err
+    return errors.WithStack(err)
 }

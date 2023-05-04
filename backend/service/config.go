@@ -3,11 +3,11 @@ package service
 import (
 	"changeme/backend/infra"
 	"changeme/backend/vo"
-	"errors"
 	"os"
 	"path/filepath"
 
 	"golang.org/x/exp/slices"
+    "github.com/pkg/errors"
 )
 
 type Config struct{

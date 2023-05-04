@@ -5,6 +5,8 @@ import (
 	"changeme/backend/vo"
 	"os"
 	"sync"
+
+	"github.com/pkg/errors"
 )
 
 type Prepare struct {
@@ -52,7 +54,7 @@ func (p *Prepare) FetchCachable() error {
 }
 
 func (p *Prepare) deleteOldCache() error {
-    return os.RemoveAll(infra.CACHE_DIRECTORY)
+    return errors.WithStack(os.RemoveAll(infra.CACHE_DIRECTORY))
 }
 
 func (p *Prepare) warship(result chan error) {

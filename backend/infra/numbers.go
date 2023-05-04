@@ -6,6 +6,8 @@ import (
 	"io"
 	"net/http"
 	"strconv"
+
+	"github.com/pkg/errors"
 )
 
 type Numbers struct {
@@ -18,18 +20,18 @@ func (n *Numbers) ExpectedStats() (*vo.NSExpectedStats, error) {
 	}
 
 	if err != nil {
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 
 	depth1 := make(map[string]interface{})
 	err = json.Unmarshal(body, &depth1)
 	if err != nil {
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 
 	time := depth1["time"].(float64)
