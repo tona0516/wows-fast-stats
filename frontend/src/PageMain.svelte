@@ -128,11 +128,6 @@ function onCheckPlayer() {
 
 {#if latestHash !== ""}
   <div class="mt-1 mx-4">
-    <span>
-      {battle.meta.date}
-      {battle.meta.arena}
-      {battle.meta.type}
-    </span>
     <table class="table table-sm table-bordered table-text-color">
       {#each battle.teams as team}
         <thead>
@@ -223,8 +218,27 @@ function onCheckPlayer() {
   </div>
 
   {#if averageFactors}
-    <div class="mt-1 mx-4 d-flex flex-row centerize">
-      <table class="table table-sm table-text-color w-auto">
+    <div class="mx-4 d-flex flex-row centerize">
+      <table class="mx-2 table table-sm table-text-color w-auto">
+        <tbody>
+          <tr>
+            <td class="td-string">日時</td>
+            <td class="td-string">{battle.meta.date}</td>
+          </tr>
+
+          <tr>
+            <td class="td-string">戦闘タイプ</td>
+            <td class="td-string">{battle.meta.type}</td>
+          </tr>
+
+          <tr>
+            <td class="td-string">マップ</td>
+            <td class="td-string">{battle.meta.arena}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <table class="mx-2 table table-sm table-text-color w-auto">
         <thead>
           <tr>
             <th></th>
