@@ -15,8 +15,8 @@ $: isChecked = !excludePlayerIDs.includes(player.player_info.id);
 
 const dispatch = createEventDispatcher();
 
-function onCheck(event) {
-  if (event.target.checked) {
+function onCheck(e: any) {
+  if (e.target.checked) {
     RemoveExcludePlayerID(player.player_info.id).then(() => {
       dispatch("onCheck", null);
     });

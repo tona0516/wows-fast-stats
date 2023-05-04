@@ -34,13 +34,13 @@ namespace Const {
         using_ship_type_rate: false,
         using_tier_rate: false,
       },
-      convertValues: function (a: any, classs: any, asMap?: boolean) {
+      convertValues: function (_a: any, _classs: any, _asMap?: boolean) {
         throw new Error("Function not implemented.");
       },
     },
     save_screenshot: false,
     save_temp_arena_info: false,
-    convertValues: function (a: any, classs: any, asMap?: boolean) {
+    convertValues: function (_a: any, _classs: any, _asMap?: boolean) {
       throw new Error("Function not implemented.");
     },
   };

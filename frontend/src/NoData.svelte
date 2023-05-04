@@ -1,10 +1,8 @@
 <script lang="ts">
 import type { vo } from "wailsjs/go/models";
-import { LogDebug } from "../wailsjs/runtime/runtime";
+import type { DisplayPattern } from "./DisplayPattern";
 export let config: vo.UserConfig;
 export let displayPattern: DisplayPattern;
-
-type ResultType = "ship" | "overall";
 
 const shipCounts = Object.values(config.displays.ship).filter(
   (it) => it === true

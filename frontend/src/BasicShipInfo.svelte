@@ -7,9 +7,7 @@ import iconDD from "./assets/images/icon-dd.png";
 import iconSS from "./assets/images/icon-ss.png";
 import iconNone from "./assets/images/icon-none.png";
 import { BrowserOpenURL } from "../wailsjs/runtime/runtime";
-export let config: vo.UserConfig;
 export let player: vo.Player;
-export let displayPattern: DisplayPattern;
 
 function tierString(value: number): string {
   if (value === 11) return "★";

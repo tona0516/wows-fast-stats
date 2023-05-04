@@ -10,7 +10,7 @@ import Notification from "./Notification.svelte";
 import ConfigPage from "./PageConfig.svelte";
 import MainPage from "./PageMain.svelte";
 import domtoimage from "dom-to-image";
-import { LogDebug, WindowReloadApp } from "../wailsjs/runtime/runtime.js";
+import { WindowReloadApp } from "../wailsjs/runtime/runtime.js";
 import AppInfo from "./PageAppInfo.svelte";
 
 import "bootstrap-icons/font/bootstrap-icons.css";
@@ -30,7 +30,7 @@ let loadState: LoadState;
 let latestHash: string;
 let battle: vo.Battle;
 let config: vo.UserConfig;
-let averageFactors: AverageFactor[];
+let averageFactors: AverageFactor;
 let excludePlayerIDs: number[];
 
 let notification: Notification;
@@ -139,7 +139,7 @@ async function looper() {
   }
 
   if (config.save_screenshot) {
-    await saveScreenshot("auto");
+    saveScreenshot("auto");
   }
 }
 </script>

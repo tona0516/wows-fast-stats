@@ -22,7 +22,6 @@ import OverallShipTypeRate from "./OverallShipTypeRate.svelte";
 import OverallTierRate from "./OverallTierRate.svelte";
 import OverallBattles from "./OverallBattles.svelte";
 import NoData from "./NoData.svelte";
-import { LogDebug } from "../wailsjs/runtime/runtime";
 import BasicIsInAvg from "./BasicIsInAvg.svelte";
 import { Average, type AverageFactor } from "./Average";
 import { ExcludePlayerIDs } from "../wailsjs/go/main/App.js";
@@ -160,19 +159,19 @@ function onCheckPlayer() {
           </tr>
           <tr>
             <th></th>
-            {#each Object.entries(components.basic) as [k, v]}
+            {#each Object.keys(components.basic) as k}
               {#if config.displays.basic[k]}
                 <th>{Const.COLUMN_NAMES[k].min}</th>
               {/if}
             {/each}
 
-            {#each Object.entries(components.ship) as [k, v]}
+            {#each Object.keys(components.ship) as k}
               {#if config.displays.ship[k]}
                 <th>{Const.COLUMN_NAMES[k].min}</th>
               {/if}
             {/each}
 
-            {#each Object.entries(components.overall) as [k, v]}
+            {#each Object.keys(components.overall) as k}
               {#if config.displays.overall[k]}
                 <th>{Const.COLUMN_NAMES[k].min}</th>
               {/if}
@@ -191,21 +190,16 @@ function onCheckPlayer() {
               />
 
               <!-- basics -->
-              {#each Object.entries(components.basic) as [k, v]}
-                <svelte:component
-                  this="{v}"
-                  config="{config}"
-                  player="{player}"
-                  displayPattern="{displayPattern}"
-                />
+              {#each Object.values(components.basic) as _v}
+                <svelte:component this="{_v}" player="{player}" />
               {/each}
 
               <NoData config="{config}" displayPattern="{displayPattern}" />
 
               <!-- values -->
-              {#each Object.entries(components.ship) as [k, v]}
+              {#each Object.values(components.ship) as _v}
                 <svelte:component
-                  this="{v}"
+                  this="{_v}"
                   config="{config}"
                   player="{player}"
                   displayPattern="{displayPattern}"
@@ -213,9 +207,9 @@ function onCheckPlayer() {
               {/each}
 
               <!-- values -->
-              {#each Object.entries(components.overall) as [k, v]}
+              {#each Object.values(components.overall) as _v}
                 <svelte:component
-                  this="{v}"
+                  this="{_v}"
                   config="{config}"
                   player="{player}"
                   displayPattern="{displayPattern}"

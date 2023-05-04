@@ -16,7 +16,7 @@ setup:
 	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.52.2
 
 .PHONY: build
-build:
+build: lint
 	$(eval REV := $(shell git rev-parse --short HEAD))
 	$(eval LD_FLAGS := "-X main.semver=$(SEMVER) -X main.revision=$(REV)")
 	wails build -ldflags $(LD_FLAGS) -platform windows/amd64 -o $(EXE)
@@ -32,6 +32,7 @@ package: build
 .PHONY: lint
 lint:
 	golangci-lint run --fix
+	cd frontend/ && npm run check
 
 .PHONY: fmt
 fmt:

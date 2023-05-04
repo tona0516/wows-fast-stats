@@ -50,7 +50,7 @@ function selectDirectory() {
   });
 }
 
-function toggleAll(e) {
+function toggleAll(e: any) {
   const isSelectAll: boolean = e.target.checked;
 
   Object.keys(inputConfig.displays.ship).forEach(
@@ -63,7 +63,7 @@ function toggleAll(e) {
 
 Cwd()
   .then((result) => (cwd = result))
-  .catch((error) => "");
+  .catch((_) => "");
 </script>
 
 <div class="mt-3 form-style">
