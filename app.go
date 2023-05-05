@@ -12,7 +12,7 @@ import (
 	"golang.org/x/exp/slices"
 )
 
-const PARALLELS = 5
+const PARALLELS = 20
 
 type App struct {
 	Version         vo.Version
@@ -29,7 +29,7 @@ func NewApp() *App {
 }
 
 func (a *App) startup(ctx context.Context) {
-	a.logger = *NewLogger()
+	a.logger = *NewLogger(a.Version)
 	a.ctx = ctx
 
 	var err error

@@ -5,6 +5,7 @@ cache/
 config/
 screenshot/
 temp_arena_info/
+log/
 test_install_dir/replays/tempArenaInfo.json
 wows-fast-stats.zip
 .DS_Store
