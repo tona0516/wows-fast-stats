@@ -36,7 +36,7 @@ func (a *App) startup(ctx context.Context) {
 	a.logger = *NewLogger(a.Env, a.Version)
 	a.ctx = ctx
 
-	a.logger.Debug("startup()")
+	a.logger.Info("start app.")
 
 	var err error
 	configService := service.Config{}
@@ -54,7 +54,7 @@ func (a *App) startup(ctx context.Context) {
 	a.isFirstBattle = true
 
 	window := a.appConfig.Window
-	if window.Width != 0 && window.Height != 0 {
+	if window.Width > 0 && window.Height > 0 {
 		runtime.WindowSetSize(ctx, window.Width, window.Height)
 	}
 }
@@ -66,7 +66,7 @@ func (a *App) beforeClose(ctx context.Context) (prevent bool) {
 	configService := service.Config{}
 	err := configService.UpdateApp(a.appConfig)
 	if err != nil {
-		a.logger.Warn("Failed to update config.", err)
+		a.logger.Warn("Failed to update app config.", err)
 	}
 
 	return false
@@ -104,9 +104,10 @@ func (a *App) Battle() (vo.Battle, error) {
 		infra.TempArenaInfo{},
 	)
 
-	result, err := battle.Battle()
+	result, tempArenaInfo, err := battle.Battle()
 	if err != nil {
 		a.logger.Error("Failed to get battle.", err)
+		a.logger.Info(tempArenaInfo.ToBase64())
 	}
 
 	return result, err
