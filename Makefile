@@ -7,7 +7,7 @@ ZIP := $(APP).zip
 .PHONY: dev
 dev:
 	$(eval REV := $(shell git rev-parse --short HEAD))
-	$(eval LD_FLAGS := "-X main.semver=$(SEMVER) -X main.revision=$(REV)")
+	$(eval LD_FLAGS := "-X main.semver=$(SEMVER) -X main.revision=$(REV) -X main.env=debug")
 	wails dev -ldflags $(LD_FLAGS) -loglevel "Warning"
 
 .PHONY: setup
@@ -18,7 +18,7 @@ setup:
 .PHONY: build
 build: lint
 	$(eval REV := $(shell git rev-parse --short HEAD))
-	$(eval LD_FLAGS := "-X main.semver=$(SEMVER) -X main.revision=$(REV)")
+	$(eval LD_FLAGS := "-X main.semver=$(SEMVER) -X main.revision=$(REV) -X main.env=production")
 	wails build -ldflags $(LD_FLAGS) -platform windows/amd64 -o $(EXE)
 
 .PHONY: package

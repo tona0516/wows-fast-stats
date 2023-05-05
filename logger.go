@@ -17,7 +17,7 @@ type Logger struct {
 	zlog zerolog.Logger
 }
 
-func NewLogger(version vo.Version) *Logger {
+func NewLogger(env vo.Env, version vo.Version) *Logger {
 	_ = os.Mkdir(LOG_DIRECTORY, 0755)
 
 	writer := &lumberjack.Logger{
@@ -40,6 +40,10 @@ func NewLogger(version vo.Version) *Logger {
 		return file + ":" + strconv.Itoa(line)
 	}
 
+	if env.IsProduction() {
+		zerolog.SetGlobalLevel(zerolog.InfoLevel)
+	}
+
 	return &Logger{
 		zlog: zerolog.New(writer).
 			With().
@@ -49,6 +53,10 @@ func NewLogger(version vo.Version) *Logger {
 			Str("revision", version.Revision).
 			Logger(),
 	}
+}
+
+func (l *Logger) Debug(msg string) {
+	l.zlog.Debug().Caller(1).Msg(msg)
 }
 
 func (l *Logger) Info(msg string) {

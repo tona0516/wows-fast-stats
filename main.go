@@ -15,12 +15,15 @@ var assets embed.FS
 var (
 	semver   string
 	revision string
+	env      string
 )
 
 func main() {
 	// Create an instance of the app structure
-	app := NewApp()
-	app.Version = vo.Version{Semver: semver, Revision: revision}
+	app := NewApp(
+		vo.Env{Str: env},
+		vo.Version{Semver: semver, Revision: revision},
+	)
 
 	// Create application with options
 	err := wails.Run(&options.App{

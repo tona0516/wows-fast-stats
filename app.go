@@ -16,6 +16,7 @@ const PARALLELS = 5
 
 type App struct {
 	Version         vo.Version
+	Env             vo.Env
 	ctx             context.Context
 	userConfig      vo.UserConfig
 	appConfig       vo.AppConfig
@@ -24,13 +25,18 @@ type App struct {
 	logger          Logger
 }
 
-func NewApp() *App {
-	return &App{}
+func NewApp(env vo.Env, version vo.Version) *App {
+	return &App{
+		Env:     env,
+		Version: version,
+	}
 }
 
 func (a *App) startup(ctx context.Context) {
-	a.logger = *NewLogger(a.Version)
+	a.logger = *NewLogger(a.Env, a.Version)
 	a.ctx = ctx
+
+	a.logger.Debug("startup()")
 
 	var err error
 	configService := service.Config{}
