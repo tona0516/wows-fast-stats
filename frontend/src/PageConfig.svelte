@@ -24,22 +24,16 @@ UserConfig().then((config) => {
 function clickApply() {
   ApplyUserConfig(inputConfig)
     .then(() => {
-      dispatch("SuccessToast", {
-        message: "更新しました。",
-      });
+      dispatch("onUpdateSuccess", { message: "更新しました。"})
     })
     .catch((error) => {
-      dispatch("ErrorToast", {
-        message: error,
-      });
+      dispatch("onUpdateFailure", { message: error });
     });
 }
 
 function openDirectory(path: string) {
   OpenDirectory(path).catch((error) => {
-    dispatch("ErrorToast", {
-      message: error,
-    });
+    dispatch("onOpenDirectoryFailure", { message: error,})
   });
 }
 

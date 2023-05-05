@@ -14,6 +14,10 @@ export function ApplyUserConfig(arg1) {
   return window['go']['main']['App']['ApplyUserConfig'](arg1);
 }
 
+export function AutoScreenshot(arg1, arg2) {
+  return window['go']['main']['App']['AutoScreenshot'](arg1, arg2);
+}
+
 export function Battle() {
   return window['go']['main']['App']['Battle']();
 }
@@ -26,16 +30,24 @@ export function ExcludePlayerIDs() {
   return window['go']['main']['App']['ExcludePlayerIDs']();
 }
 
+export function IsFinishedPrepare() {
+  return window['go']['main']['App']['IsFinishedPrepare']();
+}
+
+export function ManualScreenshot(arg1, arg2) {
+  return window['go']['main']['App']['ManualScreenshot'](arg1, arg2);
+}
+
 export function OpenDirectory(arg1) {
   return window['go']['main']['App']['OpenDirectory'](arg1);
 }
 
-export function RemoveExcludePlayerID(arg1) {
-  return window['go']['main']['App']['RemoveExcludePlayerID'](arg1);
+export function Prepare() {
+  return window['go']['main']['App']['Prepare']();
 }
 
-export function SaveScreenshot(arg1, arg2, arg3) {
-  return window['go']['main']['App']['SaveScreenshot'](arg1, arg2, arg3);
+export function RemoveExcludePlayerID(arg1) {
+  return window['go']['main']['App']['RemoveExcludePlayerID'](arg1);
 }
 
 export function SelectDirectory() {

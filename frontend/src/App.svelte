@@ -3,8 +3,11 @@ import {
   UserConfig,
   TempArenaInfoHash,
   Battle,
-  SaveScreenshot,
+  ManualScreenshot,
+  AutoScreenshot,
   ExcludePlayerIDs,
+  Prepare,
+  IsFinishedPrepare,
 } from "../wailsjs/go/main/App.js";
 import Notification from "./Notification.svelte";
 import ConfigPage from "./PageConfig.svelte";
@@ -22,7 +25,6 @@ import type { LoadState } from "./LoadState.js";
 type Page = "main" | "config" | "help" | "appinfo";
 type Func = "reload" | "screenshot";
 type NavigationMenu = Page | Func;
-type ScreenshotType = "auto" | "manual";
 
 let currentPage: Page = "main";
 
@@ -35,7 +37,7 @@ let excludePlayerIDs: number[];
 
 let notification: Notification;
 
-let timer = setInterval(looper, 1000);
+let timer: number
 
 function onClickMenu(menu: NavigationMenu) {
   switch (menu) {
@@ -55,47 +57,37 @@ function onClickMenu(menu: NavigationMenu) {
       WindowReloadApp();
       break;
     case "screenshot":
-      saveScreenshot("manual");
+      manualScreenshot();
     default:
       break;
   }
 }
 
-function saveScreenshot(type: ScreenshotType) {
-  toPng(document.getElementById("mainpage"))
-    .then((dataUrl) => {
-      const date = battle.meta.date.replaceAll(":", "-").replaceAll(" ", "-");
-      const ownShip = battle.meta.own_ship.replaceAll(" ", "-");
-      const filename = `${date}_${ownShip}_${battle.meta.arena}_${battle.meta.type}.png`;
-      const base64Data = dataUrl.split(",")[1];
-      if (type === "auto") {
-        return SaveScreenshot(filename, base64Data, false);
-      }
-      if (type === "manual") {
-        return SaveScreenshot(filename, base64Data, true);
-      }
-    })
-    .then(() => {
-      if (type === "manual") {
+async function getScreenshotBase64(): Promise<[string, string]> {
+    const dataUrl = await toPng(document.getElementById("mainpage"))
+    const date = battle.meta.date.replaceAll(":", "-").replaceAll(" ", "-");
+    const ownShip = battle.meta.own_ship.replaceAll(" ", "-");
+    const filename = `${date}_${ownShip}_${battle.meta.arena}_${battle.meta.type}.png`;
+    const base64Data = dataUrl.split(",")[1];
+    return [filename, base64Data]
+}
+
+async function manualScreenshot() {
+    const [filename, data] = await getScreenshotBase64()
+    try {
+        await ManualScreenshot(filename, data);
         notification.showToast("スクリーンショットを保存しました。", "success");
-      }
-    })
-    .catch((_) => {});
+    } catch (error) {
+        notification.showToast("スクリーンショットの保存に失敗しました。", "error");
+    }
+}
+
+async function autoScreenshot() {
+    const [filename, data] = await getScreenshotBase64()
+    await AutoScreenshot(filename, data)
 }
 
 async function looper() {
-  try {
-    config = await UserConfig();
-    notification.removeToastWithKey("need_config");
-  } catch (error) {
-    notification.showToastWithKey(
-      "未設定の状態のため開始できません。「設定」から入力してください。",
-      "info",
-      "need_config"
-    );
-    return;
-  }
-
   if (loadState === "error" || loadState === "fetching") {
     notification.removeToastWithKey("not_in_battle");
     return;
@@ -134,13 +126,54 @@ async function looper() {
     timer = setInterval(looper, 1000);
   } catch (error) {
     loadState = "error";
-    notification.showToast(error, "error");
+    notification.showToastWithKey(error, "error", "error");
   }
 
   if (config.save_screenshot) {
-    saveScreenshot("auto");
+    autoScreenshot()
   }
 }
+
+window.onload = function() {
+    main()
+}
+
+async function main() {
+    try {
+        config = await UserConfig();
+    } catch (error) {
+        notification.showToastWithKey(
+            "未設定の状態のため開始できません。「設定」から入力してください。",
+            "info",
+            "need_config"
+        );
+        return;
+    }
+
+    const isFinishedPrepare = await IsFinishedPrepare()
+    if (!isFinishedPrepare) {
+        loadState = "fetching"
+        notification.showToastWithKey(
+            "非プレイヤーデータの取得中...",
+            "info",
+            "prepare"
+        );
+
+        try {
+            await Prepare()
+        } catch(error) {
+            loadState = "error"
+            notification.showToastWithKey(error, "error", "error");
+            return
+        } finally {
+            notification.removeToastWithKey("prepare")
+        }
+    }
+
+    loadState = "standby"
+    timer = setInterval(looper, 1000);
+}
+
 </script>
 
 <main>
@@ -242,9 +275,14 @@ async function looper() {
 
     {#if currentPage === "config"}
       <ConfigPage
-        on:SuccessToast="{(event) =>
-          notification.showToast(event.detail.message, 'success')}"
-        on:ErrorToast="{(event) =>
+        on:onUpdateSuccess="{(event) => {
+            notification.showToast(event.detail.message, 'success')
+            UserConfig().then((result) => config = result);
+            notification.removeToastWithKey("need_config")
+        }}"
+        on:onUpdateFailure="{(event) =>
+          notification.showToast(event.detail.message, 'error')}"
+        on:onOpenDirectoryFailure="{(event) =>
           notification.showToast(event.detail.message, 'error')}"
       />
     {/if}

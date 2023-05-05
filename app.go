@@ -1,6 +1,7 @@
 package main
 
 import (
+	"changeme/backend/domain"
 	"changeme/backend/infra"
 	"changeme/backend/service"
 	"changeme/backend/vo"
@@ -9,50 +10,35 @@ import (
 
 	"github.com/skratchdot/open-golang/open"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
-	"golang.org/x/exp/slices"
 )
 
 const PARALLELS = 5
 
 type App struct {
-	Version         vo.Version
-	Env             vo.Env
-	ctx             context.Context
-	userConfig      vo.UserConfig
-	appConfig       vo.AppConfig
-	excludePlayerID []int
-	isFirstBattle   bool
-	logger          Logger
+	Version           vo.Version
+	Env               vo.Env
+	ctx               context.Context
+	userConfig        vo.UserConfig
+	appConfig         vo.AppConfig
+	excludePlayer     domain.ExcludePlayer
+	isFinishedPrepare bool
+	logger            Logger
 }
 
 func NewApp(env vo.Env, version vo.Version) *App {
 	return &App{
-		Env:     env,
-		Version: version,
+		Env:           env,
+		Version:       version,
+		excludePlayer: *domain.NewExcludePlayer(),
+		logger:        *NewLogger(env, version),
 	}
 }
 
 func (a *App) startup(ctx context.Context) {
-	a.logger = *NewLogger(a.Env, a.Version)
+	a.logger.Info("start app.")
 	a.ctx = ctx
 
-	a.logger.Info("start app.")
-
-	var err error
-	configService := service.Config{}
-	a.userConfig, err = configService.User()
-	if err != nil {
-		a.logger.Info("No user config.")
-	}
-
-	a.appConfig, err = configService.App()
-	if err != nil {
-		a.logger.Info("No app config.")
-	}
-
-	a.excludePlayerID = make([]int, 0)
-	a.isFirstBattle = true
-
+	// Set window size
 	window := a.appConfig.Window
 	if window.Width > 0 && window.Height > 0 {
 		runtime.WindowSetSize(ctx, window.Width, window.Height)
@@ -72,6 +58,41 @@ func (a *App) beforeClose(ctx context.Context) (prevent bool) {
 	return false
 }
 
+func (a *App) IsFinishedPrepare() bool {
+    return a.isFinishedPrepare
+}
+
+func (a *App) Prepare() error {
+	// Read configs
+	configService := service.Config{}
+	userConfig, err := configService.User()
+	if err != nil {
+		a.logger.Info("No user config.")
+	}
+	a.userConfig = userConfig
+
+	appConfig, err := configService.App()
+	if err != nil {
+		a.logger.Info("No app config.")
+	}
+	a.appConfig = appConfig
+
+	// Fetch cachable
+	prepare := service.NewPrepare(
+		PARALLELS,
+		infra.Wargaming{AppID: a.userConfig.Appid},
+		infra.Numbers{},
+		infra.Unregistered{},
+	)
+
+	if err := prepare.FetchCachable(); err != nil {
+		return err
+	}
+
+	a.isFinishedPrepare = true
+	return nil
+}
+
 func (a *App) TempArenaInfoHash() (string, error) {
 	// Note: no logging because this method is called looper
 	battle := service.NewBattle(
@@ -84,19 +105,13 @@ func (a *App) TempArenaInfoHash() (string, error) {
 }
 
 func (a *App) Battle() (vo.Battle, error) {
-	if a.isFirstBattle {
-		prepare := service.NewPrepare(
-			PARALLELS,
-			infra.Wargaming{AppID: a.userConfig.Appid},
-			infra.Numbers{},
-			infra.Unregistered{},
-		)
-		if err := prepare.FetchCachable(); err != nil {
-			a.logger.Error("Failed to fetch cachable.", err)
+	if !a.isFinishedPrepare {
+		if err := a.Prepare(); err != nil {
+			a.logger.Error("Failed to prepare", err)
 			return vo.Battle{}, err
 		}
-		a.isFirstBattle = false
 	}
+
 	battle := service.NewBattle(
 		PARALLELS,
 		a.userConfig,
@@ -139,18 +154,20 @@ func (a *App) ApplyUserConfig(config vo.UserConfig) error {
 	return nil
 }
 
-func (a *App) SaveScreenshot(filename string, base64Data string, isSelectable bool) error {
+func (a *App) ManualScreenshot(filename string, base64Data string) error {
 	screenshotService := service.Screenshot{}
-	if isSelectable {
-		err := screenshotService.SaveWithDialog(a.ctx, filename, base64Data)
-		if err != nil {
-			a.logger.Error("Failed to save screenshot.", err)
-		}
+	err := screenshotService.SaveWithDialog(a.ctx, filename, base64Data)
+	if err != nil {
+		a.logger.Error("Failed to save screenshot by manual.", err)
 	}
+	return err
+}
 
+func (a *App) AutoScreenshot(filename string, base64Data string) error {
+	screenshotService := service.Screenshot{}
 	err := screenshotService.SaveForAuto(filename, base64Data)
 	if err != nil {
-		a.logger.Error("Failed to autosave screenshot.", err)
+		a.logger.Error("Failed to save screenshot by auto.", err)
 	}
 	return err
 }
@@ -176,18 +193,13 @@ func (a *App) OpenDirectory(path string) error {
 }
 
 func (a *App) ExcludePlayerIDs() []int {
-	return a.excludePlayerID
+	return a.excludePlayer.Get()
 }
 
 func (a *App) AddExcludePlayerID(playerID int) {
-	if !slices.Contains(a.excludePlayerID, playerID) {
-		a.excludePlayerID = append(a.excludePlayerID, playerID)
-	}
+	a.excludePlayer.Add(playerID)
 }
 
 func (a *App) RemoveExcludePlayerID(playerID int) {
-	index := slices.Index(a.excludePlayerID, playerID)
-	if index != -1 {
-		a.excludePlayerID = append(a.excludePlayerID[:index], a.excludePlayerID[index+1:]...)
-	}
+	a.excludePlayer.Remove(playerID)
 }

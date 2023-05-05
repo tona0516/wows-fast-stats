@@ -8,17 +8,23 @@ export function AppVersion():Promise<vo.Version>;
 
 export function ApplyUserConfig(arg1:vo.UserConfig):Promise<void>;
 
+export function AutoScreenshot(arg1:string,arg2:string):Promise<void>;
+
 export function Battle():Promise<vo.Battle>;
 
 export function Cwd():Promise<string>;
 
 export function ExcludePlayerIDs():Promise<Array<number>>;
 
+export function IsFinishedPrepare():Promise<boolean>;
+
+export function ManualScreenshot(arg1:string,arg2:string):Promise<void>;
+
 export function OpenDirectory(arg1:string):Promise<void>;
 
-export function RemoveExcludePlayerID(arg1:number):Promise<void>;
+export function Prepare():Promise<void>;
 
-export function SaveScreenshot(arg1:string,arg2:string,arg3:boolean):Promise<void>;
+export function RemoveExcludePlayerID(arg1:number):Promise<void>;
 
 export function SelectDirectory():Promise<string>;
 
