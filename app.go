@@ -12,7 +12,7 @@ import (
 	"golang.org/x/exp/slices"
 )
 
-const PARALLELS = 20
+const PARALLELS = 5
 
 type App struct {
 	Version         vo.Version

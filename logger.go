@@ -5,10 +5,10 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
-	"time"
 
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/pkgerrors"
+	"gopkg.in/natefinch/lumberjack.v2"
 )
 
 const LOG_DIRECTORY = "log"
@@ -20,15 +20,10 @@ type Logger struct {
 func NewLogger(version vo.Version) *Logger {
 	_ = os.Mkdir(LOG_DIRECTORY, 0755)
 
-	now := time.Now()
-	f, err := os.OpenFile(
-		filepath.Join(LOG_DIRECTORY, now.Format("20060102")+".log"),
-		os.O_APPEND|os.O_CREATE|os.O_WRONLY,
-		0644,
-	)
-
-	if err != nil {
-		panic(err)
+	writer := &lumberjack.Logger{
+		Filename: filepath.Join(LOG_DIRECTORY, "app.log"),
+		MaxAge:   14,
+		Compress: true,
 	}
 
 	zerolog.ErrorStackMarshaler = pkgerrors.MarshalStack
@@ -46,7 +41,7 @@ func NewLogger(version vo.Version) *Logger {
 	}
 
 	return &Logger{
-		zlog: zerolog.New(f).
+		zlog: zerolog.New(writer).
 			With().
 			Timestamp().
 			Stack().
