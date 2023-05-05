@@ -22,7 +22,7 @@ func NewLogger(env vo.Env, version vo.Version) *Logger {
 
 	writer := &lumberjack.Logger{
 		Filename: filepath.Join(LOG_DIRECTORY, "app.log"),
-		MaxAge:   14,
+		MaxAge:   7,
 		Compress: true,
 	}
 
