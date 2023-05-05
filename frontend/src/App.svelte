@@ -9,7 +9,7 @@ import {
 import Notification from "./Notification.svelte";
 import ConfigPage from "./PageConfig.svelte";
 import MainPage from "./PageMain.svelte";
-import domtoimage from "dom-to-image";
+import { toPng } from "html-to-image";
 import { WindowReloadApp } from "../wailsjs/runtime/runtime.js";
 import AppInfo from "./PageAppInfo.svelte";
 
@@ -62,8 +62,7 @@ function onClickMenu(menu: NavigationMenu) {
 }
 
 function saveScreenshot(type: ScreenshotType) {
-  domtoimage
-    .toPng(document.getElementById("mainpage"))
+  toPng(document.getElementById("mainpage"))
     .then((dataUrl) => {
       const date = battle.meta.date.replaceAll(":", "-").replaceAll(" ", "-");
       const ownShip = battle.meta.own_ship.replaceAll(" ", "-");
