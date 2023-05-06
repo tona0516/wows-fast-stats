@@ -8,7 +8,7 @@ ZIP := $(APP).zip
 dev:
 	$(eval REV := $(shell git rev-parse --short HEAD))
 	$(eval LD_FLAGS := "-X main.semver=$(SEMVER) -X main.revision=$(REV) -X main.env=debug")
-	wails dev -ldflags $(LD_FLAGS) -loglevel "Warning"
+	wails dev -ldflags $(LD_FLAGS)
 
 .PHONY: setup
 setup:
@@ -19,7 +19,7 @@ setup:
 build: lint
 	$(eval REV := $(shell git rev-parse --short HEAD))
 	$(eval LD_FLAGS := "-X main.semver=$(SEMVER) -X main.revision=$(REV) -X main.env=production")
-	wails build -ldflags $(LD_FLAGS) -platform windows/amd64 -o $(EXE)
+	wails build -ldflags $(LD_FLAGS) -platform windows/amd64 -o $(EXE) -trimpath
 
 .PHONY: package
 package: build

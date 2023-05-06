@@ -1,26 +1,29 @@
 <script lang="ts">
 import {
   UserConfig,
-  TempArenaInfoHash,
   Battle,
   ManualScreenshot,
   AutoScreenshot,
   ExcludePlayerIDs,
   Prepare,
   IsFinishedPrepare,
+  Ready,
 } from "../wailsjs/go/main/App.js";
 import Notification from "./Notification.svelte";
 import ConfigPage from "./PageConfig.svelte";
 import MainPage from "./PageMain.svelte";
 import { toPng } from "html-to-image";
-import { WindowReloadApp } from "../wailsjs/runtime/runtime.js";
+import {
+  EventsOn,
+  LogInfo,
+  WindowReloadApp,
+} from "../wailsjs/runtime/runtime.js";
 import AppInfo from "./PageAppInfo.svelte";
 
 import "bootstrap-icons/font/bootstrap-icons.css";
 import PageHelp from "./PageHelp.svelte";
 import type { vo } from "wailsjs/go/models.js";
 import { Average, type AverageFactor } from "./Average.js";
-import type { LoadState } from "./LoadState.js";
 
 type Page = "main" | "config" | "help" | "appinfo";
 type Func = "reload" | "screenshot";
@@ -28,16 +31,12 @@ type NavigationMenu = Page | Func;
 
 let currentPage: Page = "main";
 
-let loadState: LoadState;
-let latestHash: string;
 let battle: vo.Battle;
 let config: vo.UserConfig;
 let averageFactors: AverageFactor;
 let excludePlayerIDs: number[];
 
 let notification: Notification;
-
-let timer: number
 
 function onClickMenu(menu: NavigationMenu) {
   switch (menu) {
@@ -64,116 +63,102 @@ function onClickMenu(menu: NavigationMenu) {
 }
 
 async function getScreenshotBase64(): Promise<[string, string]> {
-    const dataUrl = await toPng(document.getElementById("mainpage"))
-    const date = battle.meta.date.replaceAll(":", "-").replaceAll(" ", "-");
-    const ownShip = battle.meta.own_ship.replaceAll(" ", "-");
-    const filename = `${date}_${ownShip}_${battle.meta.arena}_${battle.meta.type}.png`;
-    const base64Data = dataUrl.split(",")[1];
-    return [filename, base64Data]
+  const dataUrl = await toPng(document.getElementById("mainpage"));
+  const date = battle.meta.date.replaceAll(":", "-").replaceAll(" ", "-");
+  const ownShip = battle.meta.own_ship.replaceAll(" ", "-");
+  const filename = `${date}_${ownShip}_${battle.meta.arena}_${battle.meta.type}.png`;
+  const base64Data = dataUrl.split(",")[1];
+  return [filename, base64Data];
 }
 
 async function manualScreenshot() {
-    const [filename, data] = await getScreenshotBase64()
-    try {
-        await ManualScreenshot(filename, data);
-        notification.showToast("スクリーンショットを保存しました。", "success");
-    } catch (error) {
-        notification.showToast("スクリーンショットの保存に失敗しました。", "error");
-    }
+  const [filename, data] = await getScreenshotBase64();
+  try {
+    await ManualScreenshot(filename, data);
+    notification.showToast("スクリーンショットを保存しました。", "success");
+  } catch (error) {
+    notification.showToast("スクリーンショットの保存に失敗しました。", "error");
+  }
 }
 
 async function autoScreenshot() {
-    const [filename, data] = await getScreenshotBase64()
-    await AutoScreenshot(filename, data)
+  const [filename, data] = await getScreenshotBase64();
+  await AutoScreenshot(filename, data);
 }
 
-async function looper() {
-  if (loadState === "error" || loadState === "fetching") {
-    notification.removeToastWithKey("not_in_battle");
-    return;
-  }
-
-  let hash: string;
+EventsOn("BATTLE_START", async () => {
   try {
-    hash = await TempArenaInfoHash();
+    notification.removeToastWithKey("not_in_battle");
+    notification.showToastWithKey("戦闘データの取得中...", "info", "battle");
+
+    const start = new Date().getTime();
+
+    battle = await Battle();
+    excludePlayerIDs = await ExcludePlayerIDs();
+    const average = new Average(battle);
+    averageFactors = average.calc(excludePlayerIDs);
+
+    const elapsed = (new Date().getTime() - start) / 1000;
+    notification.showToast(`データ取得完了: ${elapsed}秒`, "success");
+
+    if (config.save_screenshot) {
+      autoScreenshot();
+    }
   } catch (error) {
-    loadState = "standby";
+    notification.showToastWithKey(error, "error", "error");
+  } finally {
+    notification.removeToastWithKey("battle");
+  }
+});
+
+EventsOn("BATTLE_END", () => {
+  notification.showToastWithKey(
+    "戦闘中ではありません。開始時に自動的にリロードします。",
+    "info",
+    "not_in_battle"
+  );
+});
+
+EventsOn("BATTLE_ERROR", (error) => {
+  notification.showToastWithKey(error, "error", "error");
+});
+
+async function main() {
+  try {
+    config = await UserConfig();
+  } catch (error) {
     notification.showToastWithKey(
-      "戦闘中ではありません。開始時に自動的にリロードします。",
+      "未設定の状態のため開始できません。「設定」から入力してください。",
       "info",
-      "not_in_battle"
+      "need_config"
     );
     return;
   }
 
-  if (hash === latestHash) {
-    return;
-  }
+  const isFinishedPrepare = await IsFinishedPrepare();
+  if (!isFinishedPrepare) {
+    notification.showToastWithKey(
+      "非プレイヤーデータの取得中...",
+      "info",
+      "prepare"
+    );
 
-  clearInterval(timer);
-  loadState = "fetching";
-  try {
-    const start = new Date().getTime();
-    battle = await Battle();
-    latestHash = hash;
-    excludePlayerIDs = await ExcludePlayerIDs();
-    const average = new Average(battle);
-    averageFactors = average.calc(excludePlayerIDs);
-    loadState = "standby";
-
-    const elapsed = (new Date().getTime() - start) / 1000;
-    notification.showToast(`データ取得完了: ${elapsed}秒`, "success");
-    timer = setInterval(looper, 1000);
-  } catch (error) {
-    loadState = "error";
-    notification.showToastWithKey(error, "error", "error");
-  }
-
-  if (config.save_screenshot) {
-    autoScreenshot()
-  }
-}
-
-window.onload = function() {
-    main()
-}
-
-async function main() {
     try {
-        config = await UserConfig();
+      await Prepare();
     } catch (error) {
-        notification.showToastWithKey(
-            "未設定の状態のため開始できません。「設定」から入力してください。",
-            "info",
-            "need_config"
-        );
-        return;
+      notification.showToastWithKey(error, "error", "error");
+      return;
+    } finally {
+      notification.removeToastWithKey("prepare");
     }
+  }
 
-    const isFinishedPrepare = await IsFinishedPrepare()
-    if (!isFinishedPrepare) {
-        loadState = "fetching"
-        notification.showToastWithKey(
-            "非プレイヤーデータの取得中...",
-            "info",
-            "prepare"
-        );
-
-        try {
-            await Prepare()
-        } catch(error) {
-            loadState = "error"
-            notification.showToastWithKey(error, "error", "error");
-            return
-        } finally {
-            notification.removeToastWithKey("prepare")
-        }
-    }
-
-    loadState = "standby"
-    timer = setInterval(looper, 1000);
+  Ready();
 }
 
+window.onload = function () {
+  main();
+};
 </script>
 
 <main>
@@ -248,7 +233,7 @@ async function main() {
                 type="button"
                 class="btn btn-sm btn-outline-success m-1"
                 title="スクリーンショット"
-                disabled="{battle === undefined || loadState === 'fetching'}"
+                disabled="{battle === undefined}"
                 on:click="{() => onClickMenu('screenshot')}"
               >
                 <i class="bi bi-camera"></i>
@@ -263,8 +248,6 @@ async function main() {
     {#if currentPage === "main"}
       <div id="mainpage">
         <MainPage
-          bind:loadState="{loadState}"
-          bind:latestHash="{latestHash}"
           bind:battle="{battle}"
           bind:config="{config}"
           bind:averageFactors="{averageFactors}"
@@ -276,9 +259,9 @@ async function main() {
     {#if currentPage === "config"}
       <ConfigPage
         on:onUpdateSuccess="{(event) => {
-            notification.showToast(event.detail.message, 'success')
-            UserConfig().then((result) => config = result);
-            notification.removeToastWithKey("need_config")
+          notification.showToast(event.detail.message, 'success');
+          UserConfig().then((result) => (config = result));
+          notification.removeToastWithKey('need_config');
         }}"
         on:onUpdateFailure="{(event) =>
           notification.showToast(event.detail.message, 'error')}"

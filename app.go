@@ -23,6 +23,7 @@ type App struct {
 	excludePlayer     domain.ExcludePlayer
 	isFinishedPrepare bool
 	logger            Logger
+	cancelWatch       context.CancelFunc
 }
 
 func NewApp(env vo.Env, version vo.Version) *App {
@@ -58,8 +59,19 @@ func (a *App) beforeClose(ctx context.Context) (prevent bool) {
 	return false
 }
 
+func (a *App) Ready() {
+	if a.cancelWatch != nil {
+		a.cancelWatch()
+	}
+	ctx, cancel := context.WithCancel(context.Background())
+	a.cancelWatch = cancel
+
+	rw := service.NewReplayWatcher(a.ctx, infra.Config{}, infra.TempArenaInfo{})
+	go rw.Start(ctx)
+}
+
 func (a *App) IsFinishedPrepare() bool {
-    return a.isFinishedPrepare
+	return a.isFinishedPrepare
 }
 
 func (a *App) Prepare() error {
@@ -91,17 +103,6 @@ func (a *App) Prepare() error {
 
 	a.isFinishedPrepare = true
 	return nil
-}
-
-func (a *App) TempArenaInfoHash() (string, error) {
-	// Note: no logging because this method is called looper
-	battle := service.NewBattle(
-		PARALLELS,
-		a.userConfig,
-		infra.Wargaming{AppID: a.userConfig.Appid},
-		infra.TempArenaInfo{},
-	)
-	return battle.TempArenaInfoHash()
 }
 
 func (a *App) Battle() (vo.Battle, error) {

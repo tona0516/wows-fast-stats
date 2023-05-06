@@ -46,16 +46,16 @@ export function Prepare() {
   return window['go']['main']['App']['Prepare']();
 }
 
+export function Ready() {
+  return window['go']['main']['App']['Ready']();
+}
+
 export function RemoveExcludePlayerID(arg1) {
   return window['go']['main']['App']['RemoveExcludePlayerID'](arg1);
 }
 
 export function SelectDirectory() {
   return window['go']['main']['App']['SelectDirectory']();
-}
-
-export function TempArenaInfoHash() {
-  return window['go']['main']['App']['TempArenaInfoHash']();
 }
 
 export function UserConfig() {

@@ -24,7 +24,7 @@ UserConfig().then((config) => {
 function clickApply() {
   ApplyUserConfig(inputConfig)
     .then(() => {
-      dispatch("onUpdateSuccess", { message: "更新しました。"})
+      dispatch("onUpdateSuccess", { message: "設定を更新しました。" });
     })
     .catch((error) => {
       dispatch("onUpdateFailure", { message: error });
@@ -33,7 +33,7 @@ function clickApply() {
 
 function openDirectory(path: string) {
   OpenDirectory(path).catch((error) => {
-    dispatch("onOpenDirectoryFailure", { message: error,})
+    dispatch("onOpenDirectoryFailure", { message: error });
   });
 }
 

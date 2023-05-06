@@ -10,6 +10,8 @@ require (
 
 require github.com/rs/zerolog v1.29.1
 
+require github.com/fsnotify/fsnotify v1.6.0
+
 require (
 	github.com/bep/debounce v1.2.1 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect

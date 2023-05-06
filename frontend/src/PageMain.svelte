@@ -25,11 +25,8 @@ import NoData from "./NoData.svelte";
 import BasicIsInAvg from "./BasicIsInAvg.svelte";
 import { Average, type AverageFactor } from "./Average";
 import { ExcludePlayerIDs } from "../wailsjs/go/main/App.js";
-import type { LoadState } from "./LoadState";
 import type { DisplayPattern } from "./DisplayPattern";
 
-export let loadState: LoadState = "standby";
-export let latestHash: string = "";
 export let battle: vo.Battle;
 export let config: vo.UserConfig = Const.DEFAULT_USER_CONFIG;
 export let averageFactors: AverageFactor;
@@ -118,15 +115,7 @@ function onCheckPlayer() {
 }
 </script>
 
-{#if loadState === "fetching"}
-  <div class="d-flex justify-content-center m-3">
-    <div class="spinner-border" role="status">
-      <span class="visually-hidden">Loading...</span>
-    </div>
-  </div>
-{/if}
-
-{#if latestHash !== ""}
+{#if battle}
   <div class="mt-1 mx-4">
     <table class="table table-sm table-bordered table-text-color">
       {#each battle.teams as team}

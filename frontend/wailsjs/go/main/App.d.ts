@@ -24,10 +24,10 @@ export function OpenDirectory(arg1:string):Promise<void>;
 
 export function Prepare():Promise<void>;
 
+export function Ready():Promise<void>;
+
 export function RemoveExcludePlayerID(arg1:number):Promise<void>;
 
 export function SelectDirectory():Promise<string>;
-
-export function TempArenaInfoHash():Promise<string>;
 
 export function UserConfig():Promise<vo.UserConfig>;

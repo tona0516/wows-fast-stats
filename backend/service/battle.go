@@ -4,8 +4,6 @@ import (
 	"changeme/backend/domain"
 	"changeme/backend/infra"
 	"changeme/backend/vo"
-	"crypto/md5"
-	"fmt"
 	"sort"
 	"sync"
 )
@@ -24,19 +22,6 @@ func NewBattle(parallels uint, userConfig vo.UserConfig, wargaming infra.Wargami
         wargaming: wargaming,
         tempArenaInfoRepo: tempArenaInfoRepo,
     }
-}
-
-func (b *Battle) TempArenaInfoHash() (string, error) {
-    var result string
-
-    tempArenaInfo, err := b.tempArenaInfoRepo.Get(b.userConfig.InstallPath)
-    if err != nil {
-        return result, err
-    }
-
-    md5 := md5.Sum([]byte(fmt.Sprintf("%x", tempArenaInfo)))
-    result = fmt.Sprintf("%x", md5)
-    return result, nil
 }
 
 func (b *Battle) Battle() (vo.Battle, vo.TempArenaInfo, error) {
