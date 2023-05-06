@@ -62,7 +62,13 @@ function onClickMenu(menu: NavigationMenu) {
   }
 }
 
+let firstScreenshot = true;
 async function getScreenshotBase64(): Promise<[string, string]> {
+  // Workaround: first screenshot cann't draw values in table.
+  if (firstScreenshot) {
+    await toPng(document.getElementById("mainpage"));
+    firstScreenshot = false;
+  }
   const dataUrl = await toPng(document.getElementById("mainpage"));
   const date = battle.meta.date.replaceAll(":", "-").replaceAll(" ", "-");
   const ownShip = battle.meta.own_ship.replaceAll(" ", "-");
