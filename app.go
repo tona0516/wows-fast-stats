@@ -1,6 +1,7 @@
 package main
 
 import (
+	"changeme/backend/apperr"
 	"changeme/backend/domain"
 	"changeme/backend/infra"
 	"changeme/backend/service"
@@ -8,6 +9,7 @@ import (
 	"context"
 	"os"
 
+	"github.com/morikuni/failure"
 	"github.com/skratchdot/open-golang/open"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
@@ -15,29 +17,46 @@ import (
 const PARALLELS = 5
 
 type App struct {
-	Version           vo.Version
-	Env               vo.Env
-	ctx               context.Context
-	userConfig        vo.UserConfig
-	appConfig         vo.AppConfig
-	excludePlayer     domain.ExcludePlayer
-	isFinishedPrepare bool
-	logger            Logger
-	cancelWatch       context.CancelFunc
+	version             vo.Version
+	env                 vo.Env
+	ctx                 context.Context
+	userConfig          vo.UserConfig
+	appConfig           vo.AppConfig
+	excludePlayer       domain.ExcludePlayer
+	isFinishedPrepare   bool
+	logger              Logger
+	cancelReplayWatcher context.CancelFunc
+	configService       service.Config
+	screenshotService   service.Screenshot
 }
 
 func NewApp(env vo.Env, version vo.Version) *App {
 	return &App{
-		Env:           env,
-		Version:       version,
-		excludePlayer: *domain.NewExcludePlayer(),
-		logger:        *NewLogger(env, version),
+		env:               env,
+		version:           version,
+		excludePlayer:     *domain.NewExcludePlayer(),
+		logger:            *NewLogger(env, version),
+		configService:     *service.NewConfig(infra.Config{}),
+		screenshotService: *service.NewScreenshot(infra.Screenshot{}),
 	}
 }
 
-func (a *App) startup(ctx context.Context) {
+func (a *App) onStartup(ctx context.Context) {
 	a.logger.Info("start app.")
 	a.ctx = ctx
+
+	// Read configs
+	userConfig, err := a.configService.User()
+	if err != nil {
+		a.logger.Info("No user config.")
+	}
+	a.userConfig = userConfig
+
+	appConfig, err := a.configService.App()
+	if err != nil {
+		a.logger.Info("No app config.")
+	}
+	a.appConfig = appConfig
 
 	// Set window size
 	window := a.appConfig.Window
@@ -46,25 +65,25 @@ func (a *App) startup(ctx context.Context) {
 	}
 }
 
-func (a *App) beforeClose(ctx context.Context) (prevent bool) {
+func (a *App) onShutdown(ctx context.Context) {
+	a.logger.Info("shutdown app.")
+
+	// Save windows size
 	width, height := runtime.WindowGetSize(ctx)
 	a.appConfig.Window.Width = width
 	a.appConfig.Window.Height = height
-	configService := service.Config{}
-	err := configService.UpdateApp(a.appConfig)
+	err := a.configService.UpdateApp(a.appConfig)
 	if err != nil {
 		a.logger.Warn("Failed to update app config.", err)
 	}
-
-	return false
 }
 
 func (a *App) Ready() {
-	if a.cancelWatch != nil {
-		a.cancelWatch()
+	if a.cancelReplayWatcher != nil {
+		a.cancelReplayWatcher()
 	}
 	ctx, cancel := context.WithCancel(context.Background())
-	a.cancelWatch = cancel
+	a.cancelReplayWatcher = cancel
 
 	rw := service.NewReplayWatcher(a.ctx, infra.Config{}, infra.TempArenaInfo{})
 	go rw.Start(ctx)
@@ -75,20 +94,6 @@ func (a *App) IsFinishedPrepare() bool {
 }
 
 func (a *App) Prepare() error {
-	// Read configs
-	configService := service.Config{}
-	userConfig, err := configService.User()
-	if err != nil {
-		a.logger.Info("No user config.")
-	}
-	a.userConfig = userConfig
-
-	appConfig, err := configService.App()
-	if err != nil {
-		a.logger.Info("No app config.")
-	}
-	a.appConfig = appConfig
-
 	// Fetch cachable
 	prepare := service.NewPrepare(
 		PARALLELS,
@@ -100,8 +105,8 @@ func (a *App) Prepare() error {
 	if err := prepare.FetchCachable(); err != nil {
 		return err
 	}
-
 	a.isFinishedPrepare = true
+
 	return nil
 }
 
@@ -109,6 +114,7 @@ func (a *App) Battle() (vo.Battle, error) {
 	if !a.isFinishedPrepare {
 		if err := a.Prepare(); err != nil {
 			a.logger.Error("Failed to prepare", err)
+
 			return vo.Battle{}, err
 		}
 	}
@@ -134,42 +140,41 @@ func (a *App) SelectDirectory() (string, error) {
 	if err != nil {
 		a.logger.Error("Failed to get client installing path.", err)
 	}
+
 	return path, err
 }
 
 func (a *App) UserConfig() (vo.UserConfig, error) {
 	// Note: no logging because this method is called looper
-	configService := service.Config{}
-	return configService.User()
+	return a.configService.User()
 }
 
 func (a *App) ApplyUserConfig(config vo.UserConfig) error {
-	configService := service.Config{}
-
-	if err := configService.UpdateUser(config); err != nil {
+	if err := a.configService.UpdateUser(config); err != nil {
 		a.logger.Error("Failed to apply user config.", err)
+
 		return err
 	}
-
 	a.userConfig = config
+
 	return nil
 }
 
 func (a *App) ManualScreenshot(filename string, base64Data string) error {
-	screenshotService := service.Screenshot{}
-	err := screenshotService.SaveWithDialog(a.ctx, filename, base64Data)
+	err := a.screenshotService.SaveWithDialog(a.ctx, filename, base64Data)
 	if err != nil {
 		a.logger.Error("Failed to save screenshot by manual.", err)
 	}
+
 	return err
 }
 
 func (a *App) AutoScreenshot(filename string, base64Data string) error {
-	screenshotService := service.Screenshot{}
-	err := screenshotService.SaveForAuto(filename, base64Data)
+	err := a.screenshotService.SaveForAuto(filename, base64Data)
 	if err != nil {
 		a.logger.Error("Failed to save screenshot by auto.", err)
 	}
+
 	return err
 }
 
@@ -178,11 +183,12 @@ func (a *App) Cwd() (string, error) {
 	if err != nil {
 		a.logger.Warn("Failed to get cwd.", err)
 	}
-	return cwd, err
+
+	return cwd, failure.Translate(err, apperr.AppCwd)
 }
 
 func (a *App) AppVersion() vo.Version {
-	return a.Version
+	return a.version
 }
 
 func (a *App) OpenDirectory(path string) error {
@@ -190,7 +196,8 @@ func (a *App) OpenDirectory(path string) error {
 	if err != nil {
 		a.logger.Warn("Failed to open directory.", err)
 	}
-	return err
+
+	return failure.Translate(err, apperr.AppOpenDir)
 }
 
 func (a *App) ExcludePlayerIDs() []int {

@@ -7,13 +7,12 @@ import (
 
 const baseURL = "https://asia.wows-numbers.com/"
 
-type NumbersURLGenerator struct {
-}
+type NumbersURLGenerator struct{}
 
 func (n *NumbersURLGenerator) PlayerPage(accountID int, accountName string) string {
-    return baseURL + "player/" + strconv.Itoa(accountID) + "," + accountName
+	return baseURL + "player/" + strconv.Itoa(accountID) + "," + accountName
 }
 
 func (n *NumbersURLGenerator) ShipPage(shipID int, shipName string) string {
-    return baseURL + "ship/" + strconv.Itoa(shipID) + "," + strings.ReplaceAll(shipName, " ", "-")
+	return baseURL + "ship/" + strconv.Itoa(shipID) + "," + strings.ReplaceAll(shipName, " ", "-")
 }

@@ -1,48 +1,55 @@
 package infra
 
 import (
+	"changeme/backend/apperr"
 	"encoding/gob"
 	"os"
 	"path/filepath"
 
-	"github.com/pkg/errors"
+	"github.com/morikuni/failure"
 )
 
-const CACHE_DIRECTORY = "cache"
+const CacheDir string = "cache"
 
 type Cache[T any] struct {
 	Name string
 }
 
-func (c *Cache[T]) Serialize(object T) error {
-	_ = os.Mkdir(CACHE_DIRECTORY, 0755)
+func (c *Cache[T]) Serialize(target T) error {
+	errCode := apperr.CacheSerialize
 
-    filename := c.Name + ".bin"
-    path := filepath.Join(CACHE_DIRECTORY, filename)
-	f, err := os.Create(path)
+	_ = os.Mkdir(CacheDir, 0o755)
+
+	f, err := os.Create(filepath.Join(CacheDir, c.Name+".bin"))
 	if err != nil {
-		return errors.WithStack(err)
+		return failure.Translate(err, errCode)
 	}
 	defer f.Close()
 
 	enc := gob.NewEncoder(f)
-    return errors.WithStack(enc.Encode(object))
+	if err := enc.Encode(target); err != nil {
+		return failure.Translate(err, errCode)
+	}
+
+	return nil
 }
 
 func (c *Cache[T]) Deserialize() (T, error) {
-	var object T
+	errCode := apperr.CacheDeserialize
 
-    filename := c.Name + ".bin"
-    path := filepath.Join(CACHE_DIRECTORY, filename)
-	f, err := os.Open(path)
+	_ = os.Mkdir(CacheDir, 0o755)
+
+	var object T
+	f, err := os.Open(filepath.Join(CacheDir, c.Name+".bin"))
 	if err != nil {
-		return object, errors.WithStack(err)
+		return object, failure.Translate(err, errCode)
 	}
 	defer f.Close()
 
 	dec := gob.NewDecoder(f)
 	if err := dec.Decode(&object); err != nil {
-		return object, errors.WithStack(err)
+		return object, failure.Translate(err, errCode)
 	}
+
 	return object, nil
 }

@@ -18,7 +18,7 @@ type WGAccountList struct {
 	} `json:"error"`
 }
 
-func (w *WGAccountList) AccountIDs() []int {
+func (w WGAccountList) AccountIDs() []int {
 	accountIDs := make([]int, 0)
 	for i := range w.Data {
 		accountID := w.Data[i].AccountID
@@ -26,15 +26,25 @@ func (w *WGAccountList) AccountIDs() []int {
 			accountIDs = append(accountIDs, w.Data[i].AccountID)
 		}
 	}
+
 	return accountIDs
 }
 
-func (w *WGAccountList) AccountID(nickname string) int {
+func (w WGAccountList) AccountID(nickname string) int {
 	for i := range w.Data {
 		item := w.Data[i]
 		if item.NickName == nickname {
 			return item.AccountID
 		}
 	}
+
 	return 0
+}
+
+func (w WGAccountList) GetStatus() string {
+	return w.Status
+}
+
+func (w WGAccountList) GetError() WGError {
+	return WGError(w.Error)
 }

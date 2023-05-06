@@ -10,7 +10,7 @@ type WGEncyclopediaShips struct {
 		Page      int `json:"page"`
 	} `json:"meta"`
 	Data map[int]struct {
-		Tier   uint    `json:"tier"`
+		Tier   uint   `json:"tier"`
 		Type   string `json:"type"`
 		Name   string `json:"name"`
 		Nation string `json:"nation"`
@@ -21,4 +21,12 @@ type WGEncyclopediaShips struct {
 		Field   string `json:"field"`
 		Value   string `json:"value"`
 	} `json:"error"`
+}
+
+func (w WGEncyclopediaShips) GetStatus() string {
+	return w.Status
+}
+
+func (w WGEncyclopediaShips) GetError() WGError {
+	return WGError(w.Error)
 }

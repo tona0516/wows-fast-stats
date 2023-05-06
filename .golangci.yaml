@@ -1,0 +1,31 @@
+# https://golangci-lint.run/usage/linters/
+linters:
+  enable-all: true
+  disable:
+    - scopelint # Deprecated
+    - golint # Deprecated
+    - nosnakecase # Deprecated
+    - ifshort # Deprecated
+    - maligned # Deprecated
+    - varcheck # Deprecated
+    - interfacer # Deprecated
+    - deadcode # Deprecated
+    - exhaustivestruct # Deprecated
+    - structcheck # Deprecated
+    - wrapcheck
+    - forbidigo
+    - funlen
+    - wsl
+    - containedctx
+    - exhaustruct
+    - gomnd
+    - ireturn
+    - tagliatelle
+    - varnamelen
+    - noctx
+    - reassign
+    - gci # Conflict goimports
+    - gofumpt # Conflict goimports
+  fast: false
+issues:
+  fix: true

@@ -13,10 +13,10 @@ type TempArenaInfo struct {
 		ID       int    `json:"id"`
 		Name     string `json:"name"`
 	} `json:"vehicles"`
-    DateTime string `json:"dateTime"`
-    MapId int `json:"mapId"`
-    MatchGroup string `json:"matchGroup"`
-    PlayerName string `json:"playerName"`
+	DateTime   string `json:"dateTime"`
+	MapID      int    `json:"mapId"`
+	MatchGroup string `json:"matchGroup"`
+	PlayerName string `json:"playerName"`
 }
 
 func (t *TempArenaInfo) AccountNames() []string {
@@ -34,28 +34,33 @@ func (t *TempArenaInfo) AccountNames() []string {
 }
 
 func (t *TempArenaInfo) FormattedDateTime() string {
-    datetimeArray := strings.Split(t.DateTime, " ")
-    if (len(datetimeArray) < 2) {
-        return ""
-    }
-    dateArray := strings.Split(datetimeArray[0], ".")
-    if (len(dateArray) < 3) {
-        return ""
-    }
+	datetimeArray := strings.Split(t.DateTime, " ")
+	if len(datetimeArray) < 2 {
+		return ""
+	}
+	dateArray := strings.Split(datetimeArray[0], ".")
+	if len(dateArray) < 3 {
+		return ""
+	}
 
-    return dateArray[2] + "-" + dateArray[1] + "-" + dateArray[0] + " " + datetimeArray[1]
+	return dateArray[2] + "-" + dateArray[1] + "-" + dateArray[0] + " " + datetimeArray[1]
 }
 
 func (t *TempArenaInfo) BattleArena(battleArenas WGBattleArenas) string {
-    return battleArenas.Data[t.MapId].Name
+	return battleArenas.Data[t.MapID].Name
 }
 
 func (t *TempArenaInfo) BattleType(battleTypes WGBattleTypes) string {
-    rawBattleType := battleTypes.Data[strings.ToUpper(t.MatchGroup)].Name
-    return strings.ReplaceAll(rawBattleType, " ", "")
+	rawBattleType := battleTypes.Data[strings.ToUpper(t.MatchGroup)].Name
+
+	return strings.ReplaceAll(rawBattleType, " ", "")
 }
 
 func (t *TempArenaInfo) ToBase64() string {
-    b, _ := json.Marshal(t)
-    return base64.URLEncoding.EncodeToString(b)
+	b, err := json.Marshal(t)
+	if err != nil {
+		return ""
+	}
+
+	return base64.URLEncoding.EncodeToString(b)
 }

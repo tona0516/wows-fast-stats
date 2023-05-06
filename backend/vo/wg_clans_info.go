@@ -12,3 +12,11 @@ type WGClansInfo struct {
 		Value   string `json:"value"`
 	} `json:"error"`
 }
+
+func (w WGClansInfo) GetStatus() string {
+	return w.Status
+}
+
+func (w WGClansInfo) GetError() WGError {
+	return WGError(w.Error)
+}

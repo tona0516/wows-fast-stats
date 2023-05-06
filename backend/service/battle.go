@@ -1,43 +1,50 @@
 package service
 
 import (
+	"sort"
+	"sync"
+
 	"changeme/backend/domain"
 	"changeme/backend/infra"
 	"changeme/backend/vo"
-	"sort"
-	"sync"
 )
 
-type Battle struct{
-    parallels uint
-    userConfig vo.UserConfig
-    wargaming infra.Wargaming
-    tempArenaInfoRepo infra.TempArenaInfo
+type Battle struct {
+	parallels         uint
+	userConfig        vo.UserConfig
+	wargaming         infra.Wargaming
+	tempArenaInfoRepo infra.TempArenaInfo
 }
 
-func NewBattle(parallels uint, userConfig vo.UserConfig, wargaming infra.Wargaming, tempArenaInfoRepo infra.TempArenaInfo) *Battle {
-    return &Battle{
-        parallels: parallels,
-        userConfig: userConfig,
-        wargaming: wargaming,
-        tempArenaInfoRepo: tempArenaInfoRepo,
-    }
+func NewBattle(
+	parallels uint,
+	userConfig vo.UserConfig,
+	wargaming infra.Wargaming,
+	tempArenaInfoRepo infra.TempArenaInfo,
+) *Battle {
+	return &Battle{
+		parallels:         parallels,
+		userConfig:        userConfig,
+		wargaming:         wargaming,
+		tempArenaInfoRepo: tempArenaInfoRepo,
+	}
 }
 
+//nolint:cyclop
 func (b *Battle) Battle() (vo.Battle, vo.TempArenaInfo, error) {
-    var result vo.Battle
-    var tempArenaInfo vo.TempArenaInfo
+	var result vo.Battle
+	var tempArenaInfo vo.TempArenaInfo
 
 	tempArenaInfo, err := b.tempArenaInfoRepo.Get(b.userConfig.InstallPath)
 	if err != nil {
 		return result, tempArenaInfo, err
 	}
 
-    if b.userConfig.SaveTempArenaInfo {
-        if err := b.tempArenaInfoRepo.Save(tempArenaInfo); err != nil {
-            return result, tempArenaInfo, err
-        }
-    }
+	if b.userConfig.SaveTempArenaInfo {
+		if err := b.tempArenaInfoRepo.Save(tempArenaInfo); err != nil {
+			return result, tempArenaInfo, err
+		}
+	}
 
 	accountListResult := make(chan vo.Result[vo.WGAccountList])
 	go b.accountList(tempArenaInfo, accountListResult)
@@ -48,36 +55,36 @@ func (b *Battle) Battle() (vo.Battle, vo.TempArenaInfo, error) {
 	}
 	accountIDs := accountList.Value.AccountIDs()
 
-    accountInfoResult := make(chan vo.Result[vo.WGAccountInfo])
+	accountInfoResult := make(chan vo.Result[vo.WGAccountInfo])
 	shipStatsResult := make(chan vo.Result[map[int]vo.WGShipsStats])
 	clanTagResult := make(chan vo.Result[map[int]string])
 	go b.accountInfo(accountIDs, accountInfoResult)
 	go b.shipStats(accountIDs, shipStatsResult)
 	go b.clanTag(accountIDs, clanTagResult)
 
-    warshipCache := infra.Cache[map[int]vo.Warship]{Name: "warship"}
-    warship, err := warshipCache.Deserialize()
-    if err != nil {
-        return result, tempArenaInfo, err
-    }
+	warshipCache := infra.Cache[map[int]vo.Warship]{Name: "warship"}
+	warship, err := warshipCache.Deserialize()
+	if err != nil {
+		return result, tempArenaInfo, err
+	}
 
-    expectedStatsCache := infra.Cache[vo.NSExpectedStats]{Name: "expectedstats"}
-    expectedStats, err := expectedStatsCache.Deserialize()
-    if err != nil {
-        return result, tempArenaInfo, err
-    }
+	expectedStatsCache := infra.Cache[vo.NSExpectedStats]{Name: "expectedstats"}
+	expectedStats, err := expectedStatsCache.Deserialize()
+	if err != nil {
+		return result, tempArenaInfo, err
+	}
 
-    battleArenasCache := infra.Cache[vo.WGBattleArenas]{Name: "battlearenas"}
-    battleArenas, err := battleArenasCache.Deserialize()
-    if err != nil {
-        return result, tempArenaInfo, err
-    }
+	battleArenasCache := infra.Cache[vo.WGBattleArenas]{Name: "battlearenas"}
+	battleArenas, err := battleArenasCache.Deserialize()
+	if err != nil {
+		return result, tempArenaInfo, err
+	}
 
-    battleTypesCache := infra.Cache[vo.WGBattleTypes]{Name: "battletypes"}
-    battleTypes, err := battleTypesCache.Deserialize()
-    if err != nil {
-        return result, tempArenaInfo, err
-    }
+	battleTypesCache := infra.Cache[vo.WGBattleTypes]{Name: "battletypes"}
+	battleTypes, err := battleTypesCache.Deserialize()
+	if err != nil {
+		return result, tempArenaInfo, err
+	}
 
 	accountInfo := <-accountInfoResult
 	if accountInfo.Error != nil {
@@ -100,8 +107,8 @@ func (b *Battle) Battle() (vo.Battle, vo.TempArenaInfo, error) {
 		shipStats.Value,
 		warship,
 		expectedStats,
-        battleArenas,
-        battleTypes,
+		battleArenas,
+		battleTypes,
 	)
 
 	return result, tempArenaInfo, nil
@@ -115,24 +122,24 @@ func (b *Battle) accountList(tempArenaInfo vo.TempArenaInfo, result chan vo.Resu
 
 func (b *Battle) accountInfo(accountIDs []int, result chan vo.Result[vo.WGAccountInfo]) {
 	accountInfo, err := b.wargaming.AccountInfo(accountIDs)
-    result <- vo.Result[vo.WGAccountInfo]{Value: accountInfo, Error: err}
+	result <- vo.Result[vo.WGAccountInfo]{Value: accountInfo, Error: err}
 }
 
 func (b *Battle) shipStats(accountIDs []int, result chan vo.Result[map[int]vo.WGShipsStats]) {
-    shipStatsMap := make(map[int]vo.WGShipsStats)
-    var mu sync.Mutex
-    err := doParallel(b.parallels, accountIDs, func(accountID int) error {
-        shipStats, err := b.wargaming.ShipsStats(accountID)
-        if err != nil {
-            return err
-        }
+	shipStatsMap := make(map[int]vo.WGShipsStats)
+	var mu sync.Mutex
+	err := doParallel(b.parallels, accountIDs, func(accountID int) error {
+		shipStats, err := b.wargaming.ShipsStats(accountID)
+		if err != nil {
+			return err
+		}
 
-        mu.Lock()
-        shipStatsMap[accountID] = shipStats
-        mu.Unlock()
+		mu.Lock()
+		shipStatsMap[accountID] = shipStats
+		mu.Unlock()
 
-        return nil
-    })
+		return nil
+	})
 
 	result <- vo.Result[map[int]vo.WGShipsStats]{Value: shipStatsMap, Error: err}
 }
@@ -143,6 +150,7 @@ func (b *Battle) clanTag(accountIDs []int, result chan vo.Result[map[int]string]
 	clansAccountInfo, err := b.wargaming.ClansAccountInfo(accountIDs)
 	if err != nil {
 		result <- vo.Result[map[int]string]{Value: clanTagMap, Error: err}
+
 		return
 	}
 
@@ -151,6 +159,7 @@ func (b *Battle) clanTag(accountIDs []int, result chan vo.Result[map[int]string]
 	clansInfo, err := b.wargaming.ClansInfo(clanIDs)
 	if err != nil {
 		result <- vo.Result[map[int]string]{Value: clanTagMap, Error: err}
+
 		return
 	}
 
@@ -172,51 +181,52 @@ func (b *Battle) compose(
 	shipStats map[int]vo.WGShipsStats,
 	warships map[int]vo.Warship,
 	expectedStats vo.NSExpectedStats,
-    battleArenas vo.WGBattleArenas,
-    battleTypes vo.WGBattleTypes,
+	battleArenas vo.WGBattleArenas,
+	battleTypes vo.WGBattleTypes,
 ) vo.Battle {
-    urlGen := domain.NumbersURLGenerator{}
+	urlGen := domain.NumbersURLGenerator{}
 
 	friends := make(vo.Players, 0)
 	enemies := make(vo.Players, 0)
 	rating := domain.Rating{}
 
-    var ownShip string
+	var ownShip string
 
 	for i := range tempArenaInfo.Vehicles {
 		vehicle := tempArenaInfo.Vehicles[i]
 		warship := warships[vehicle.ShipID]
 
 		nickname := vehicle.Name
-        if nickname == tempArenaInfo.PlayerName {
-            ownShip = warship.Name
-        }
+		if nickname == tempArenaInfo.PlayerName {
+			ownShip = warship.Name
+		}
 		accountID := accountList.AccountID(nickname)
 		clan := clanTag[accountID]
 
 		playerAccountInfo := accountInfo.Data[accountID]
-        stats := domain.Stats{
-            Overall: domain.StatsFactor{
-                Battles:         playerAccountInfo.Statistics.Pvp.Battles,
-                SurvivedBattles: playerAccountInfo.Statistics.Pvp.SurvivedBattles,
-                DamageDealt:     playerAccountInfo.Statistics.Pvp.DamageDealt,
-                Frags:           playerAccountInfo.Statistics.Pvp.Frags,
-                Wins:            playerAccountInfo.Statistics.Pvp.Wins,
-                SurvivedWins:    playerAccountInfo.Statistics.Pvp.SurviveWins,
-                Xp: playerAccountInfo.Statistics.Pvp.Xp,
-            },
-        }
-		for _, v:= range shipStats[accountID].Data[accountID] {
+		stats := domain.Stats{
+			Overall: domain.StatsFactor{
+				Battles:         playerAccountInfo.Statistics.Pvp.Battles,
+				SurvivedBattles: playerAccountInfo.Statistics.Pvp.SurvivedBattles,
+				DamageDealt:     playerAccountInfo.Statistics.Pvp.DamageDealt,
+				Frags:           playerAccountInfo.Statistics.Pvp.Frags,
+				Wins:            playerAccountInfo.Statistics.Pvp.Wins,
+				SurvivedWins:    playerAccountInfo.Statistics.Pvp.SurviveWins,
+				Xp:              playerAccountInfo.Statistics.Pvp.Xp,
+			},
+		}
+		for _, v := range shipStats[accountID].Data[accountID] {
 			if v.ShipID == vehicle.ShipID {
-                stats.SetShipStats(domain.StatsFactor{
-                    Battles:         v.Pvp.Battles,
-                    SurvivedBattles: v.Pvp.SurvivedBattles,
-                    DamageDealt:     v.Pvp.DamageDealt,
-                    Frags:           v.Pvp.Frags,
-                    Wins:            v.Pvp.Wins,
-                    SurvivedWins: v.Pvp.SurviveWins,
-                    Xp: v.Pvp.Xp,
-                })
+				stats.SetShipStats(domain.StatsFactor{
+					Battles:         v.Pvp.Battles,
+					SurvivedBattles: v.Pvp.SurvivedBattles,
+					DamageDealt:     v.Pvp.DamageDealt,
+					Frags:           v.Pvp.Frags,
+					Wins:            v.Pvp.Wins,
+					SurvivedWins:    v.Pvp.SurviveWins,
+					Xp:              v.Pvp.Xp,
+				})
+
 				break
 			}
 		}
@@ -225,51 +235,51 @@ func (b *Battle) compose(
 
 		player := vo.Player{
 			ShipInfo: vo.ShipInfo{
-				Name:   warship.Name,
-				Nation: warship.Nation,
-				Tier:   warship.Tier,
-				Type:   warship.Type,
-                StatsURL: urlGen.ShipPage(vehicle.ShipID, warship.Name),
+				Name:     warship.Name,
+				Nation:   warship.Nation,
+				Tier:     warship.Tier,
+				Type:     warship.Type,
+				StatsURL: urlGen.ShipPage(vehicle.ShipID, warship.Name),
 			},
 			ShipStats: vo.ShipStats{
-				Battles:   stats.Ship.Battles,
-				Damage: stats.ShipAvgDamage(),
-				WinRate:   stats.ShipWinRate(),
-                WinSurvivedRate: stats.ShipWinSurvivedRate(),
-                LoseSurvivedRate: stats.ShipLoseSurvivedRate(),
-				KdRate:    stats.ShipKdRate(),
-                Exp: stats.ShipAvgExp(),
+				Battles:          stats.Ship.Battles,
+				Damage:           stats.ShipAvgDamage(),
+				WinRate:          stats.ShipWinRate(),
+				WinSurvivedRate:  stats.ShipWinSurvivedRate(),
+				LoseSurvivedRate: stats.ShipLoseSurvivedRate(),
+				KdRate:           stats.ShipKdRate(),
+				Exp:              stats.ShipAvgExp(),
 				PR: rating.PersonalRating(
-                    domain.RatingFactor{
-                        Damage: stats.ShipAvgDamage(),
-                        Frags: stats.ShipAvgFrags(),
-                        Wins: stats.ShipWinRate(),
-                    },
-                    domain.RatingFactor{
-                        Damage: expected.AverageDamageDealt,
-                        Frags: expected.AverageFrags,
-                        Wins: expected.WinRate,
-                    },
+					domain.RatingFactor{
+						Damage: stats.ShipAvgDamage(),
+						Frags:  stats.ShipAvgFrags(),
+						Wins:   stats.ShipWinRate(),
+					},
+					domain.RatingFactor{
+						Damage: expected.AverageDamageDealt,
+						Frags:  expected.AverageFrags,
+						Wins:   expected.WinRate,
+					},
 				),
 			},
 			PlayerInfo: vo.PlayerInfo{
-                ID: accountID,
-				Name: nickname,
-				Clan: clan,
-                IsHidden: playerAccountInfo.HiddenProfile,
-                StatsURL: urlGen.PlayerPage(accountID, nickname),
+				ID:       accountID,
+				Name:     nickname,
+				Clan:     clan,
+				IsHidden: playerAccountInfo.HiddenProfile,
+				StatsURL: urlGen.PlayerPage(accountID, nickname),
 			},
 			OverallStats: vo.OverallStats{
-				Battles:   stats.Overall.Battles,
-				Damage: stats.OverallAvgDamage(),
-				WinRate:   stats.OverallWinRate(),
-                WinSurvivedRate: stats.OverallWinSurvivedRate(),
-                LoseSurvivedRate: stats.OverallLoseSurvivedRate(),
-				KdRate:    stats.OverallKdRate(),
-                Exp: stats.OverallAvgExp(),
-				AvgTier:   stats.OverallAvgTier(accountID, warships, shipStats),
-                UsingShipTypeRate: stats.OverallUsingShipTypeRate(accountID, warships, shipStats),
-                UsingTierRate: stats.OverallUsingTierRate(accountID, warships, shipStats),
+				Battles:           stats.Overall.Battles,
+				Damage:            stats.OverallAvgDamage(),
+				WinRate:           stats.OverallWinRate(),
+				WinSurvivedRate:   stats.OverallWinSurvivedRate(),
+				LoseSurvivedRate:  stats.OverallLoseSurvivedRate(),
+				KdRate:            stats.OverallKdRate(),
+				Exp:               stats.OverallAvgExp(),
+				AvgTier:           stats.OverallAvgTier(accountID, warships, shipStats),
+				UsingShipTypeRate: stats.OverallUsingShipTypeRate(accountID, warships, shipStats),
+				UsingTierRate:     stats.OverallUsingTierRate(accountID, warships, shipStats),
 			},
 		}
 
@@ -283,25 +293,25 @@ func (b *Battle) compose(
 	sort.Sort(friends)
 	sort.Sort(enemies)
 
-    teams := make([]vo.Team, 0)
-    teams = append(teams, vo.Team{
-        Players: friends,
-        Name: "味方チーム",
-    })
-    teams = append(teams, vo.Team{
-        Players: enemies,
-        Name: "敵チーム",
-    })
+	teams := make([]vo.Team, 0)
+	teams = append(teams, vo.Team{
+		Players: friends,
+		Name:    "味方チーム",
+	})
+	teams = append(teams, vo.Team{
+		Players: enemies,
+		Name:    "敵チーム",
+	})
 
-    battle := vo.Battle {
-        Meta: vo.Meta{
-            Date: tempArenaInfo.FormattedDateTime(),
-            Arena: tempArenaInfo.BattleArena(battleArenas),
-            Type: tempArenaInfo.BattleType(battleTypes),
-            OwnShip: ownShip,
-        },
-        Teams: teams,
-    }
+	battle := vo.Battle{
+		Meta: vo.Meta{
+			Date:    tempArenaInfo.FormattedDateTime(),
+			Arena:   tempArenaInfo.BattleArena(battleArenas),
+			Type:    tempArenaInfo.BattleType(battleTypes),
+			OwnShip: ownShip,
+		},
+		Teams: teams,
+	}
 
-    return battle
+	return battle
 }

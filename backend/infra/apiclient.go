@@ -4,32 +4,34 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
-
-	"github.com/pkg/errors"
+	"net/url"
 )
 
-type ApiClient[T any] struct {
-}
+type APIClient[T any] struct{}
 
-func (c *ApiClient[T]) GetRequest(url string) (T, error) {
+func (c *APIClient[T]) GetRequest(rawurl string) (T, error) {
 	var response T
-	res, err := http.Get(url)
-	if res != nil {
-		defer res.Body.Close()
+
+	u, err := url.Parse(rawurl)
+	if err != nil {
+		return response, err
 	}
 
+	res, err := http.Get(u.String())
 	if err != nil {
-		return response, errors.WithStack(err)
+		return response, err
 	}
+
+	defer res.Body.Close()
 
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
-		return response, errors.WithStack(err)
+		return response, err
 	}
 
 	err = json.Unmarshal(body, &response)
 	if err != nil {
-		return response, errors.WithStack(err)
+		return response, err
 	}
 
 	return response, nil

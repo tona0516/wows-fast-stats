@@ -12,3 +12,11 @@ type WGBattleTypes struct {
 		Value   string `json:"value"`
 	} `json:"error"`
 }
+
+func (w WGBattleTypes) GetStatus() string {
+	return w.Status
+}
+
+func (w WGBattleTypes) GetError() WGError {
+	return WGError(w.Error)
+}

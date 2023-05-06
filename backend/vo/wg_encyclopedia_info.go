@@ -12,3 +12,11 @@ type WGEncyclopediaInfo struct {
 		Value   string `json:"value"`
 	} `json:"error"`
 }
+
+func (w WGEncyclopediaInfo) GetStatus() string {
+	return w.Status
+}
+
+func (w WGEncyclopediaInfo) GetError() WGError {
+	return WGError(w.Error)
+}

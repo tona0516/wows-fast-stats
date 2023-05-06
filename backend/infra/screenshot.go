@@ -1,32 +1,36 @@
 package infra
 
 import (
+	"changeme/backend/apperr"
 	"encoding/base64"
 	"os"
 	"path/filepath"
 
-	"github.com/pkg/errors"
+	"github.com/morikuni/failure"
 )
 
-type Screenshot struct {}
+type Screenshot struct{}
 
 func (s *Screenshot) Save(path string, base64Data string) error {
-    dir := filepath.Dir(path)
-    _ = os.Mkdir(dir, 0755)
+	errCode := apperr.ScreenshotSave
 
-    data, err := base64.StdEncoding.DecodeString(base64Data)
-    if err != nil {
-        return errors.WithStack(err)
-    }
+	dir := filepath.Dir(path)
+	_ = os.Mkdir(dir, 0o755)
 
-    f, err := os.Create(path)
+	data, err := base64.StdEncoding.DecodeString(base64Data)
 	if err != nil {
-		return errors.WithStack(err)
+		return failure.Translate(err, errCode)
+	}
+
+	f, err := os.Create(path)
+	if err != nil {
+		return failure.Translate(err, errCode)
 	}
 	defer f.Close()
 
-	_, err = f.Write(data)
+	if _, err := f.Write(data); err != nil {
+		return failure.Translate(err, errCode)
+	}
 
-	return errors.WithStack(err)
+	return nil
 }
-

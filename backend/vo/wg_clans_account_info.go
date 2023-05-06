@@ -15,19 +15,28 @@ type WGClansAccountInfo struct {
 	} `json:"error"`
 }
 
-func (w *WGClansAccountInfo) ClanIDs() []int {
+func (w WGClansAccountInfo) ClanIDs() []int {
 	clanIDs := make([]int, 0)
 	for i := range w.Data {
 		clanID := w.Data[i].ClanID
-        if clanID == 0 {
-            continue
-        }
+		if clanID == 0 {
+			continue
+		}
 
-        if slices.Contains(clanIDs, clanID) {
-            continue
-        }
+		if slices.Contains(clanIDs, clanID) {
+			continue
+		}
 
-        clanIDs = append(clanIDs, clanID)
+		clanIDs = append(clanIDs, clanID)
 	}
+
 	return clanIDs
+}
+
+func (w WGClansAccountInfo) GetStatus() string {
+	return w.Status
+}
+
+func (w WGClansAccountInfo) GetError() WGError {
+	return WGError(w.Error)
 }

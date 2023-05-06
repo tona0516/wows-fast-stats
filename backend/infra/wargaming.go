@@ -1,26 +1,14 @@
 package infra
 
 import (
+	"changeme/backend/apperr"
 	"changeme/backend/vo"
 	"net/url"
 	"strconv"
 	"strings"
 
-	"github.com/pkg/errors"
+	"github.com/morikuni/failure"
 )
-
-func buildUrl(path string, query map[string]string) *url.URL {
-	u := &url.URL{}
-	u.Scheme = "https"
-	u.Host = "api.worldofwarships.asia"
-	u.Path = path
-	q := u.Query()
-	for key, value := range query {
-		q.Set(key, value)
-	}
-	u.RawQuery = q.Encode()
-	return u
-}
 
 type Wargaming struct {
 	AppID string
@@ -31,34 +19,29 @@ func (w *Wargaming) AccountInfo(accountIDs []int) (vo.WGAccountInfo, error) {
 	for i := range accountIDs {
 		accountIDsString = append(accountIDsString, strconv.Itoa(accountIDs[i]))
 	}
-	u := buildUrl(
+	u := buildURL(
 		"/wows/account/info/",
 		map[string]string{
 			"application_id": w.AppID,
 			"account_id":     strings.Join(accountIDsString, ","),
 			"fields": strings.Join([]string{
-                "hidden_profile",
-                "statistics.pvp.battles",
-                "statistics.pvp.wins",
+				"hidden_profile",
+				"statistics.pvp.battles",
+				"statistics.pvp.wins",
 				"statistics.pvp.frags",
-                "statistics.pvp.damage_dealt",
-                "statistics.pvp.xp",
-                "statistics.pvp.survived_battles",
-                "statistics.pvp.survived_wins",
+				"statistics.pvp.damage_dealt",
+				"statistics.pvp.xp",
+				"statistics.pvp.survived_battles",
+				"statistics.pvp.survived_wins",
 			}, ","),
 		},
 	)
 
-	client := ApiClient[vo.WGAccountInfo]{}
-	res, err := client.GetRequest(u.String())
-	if res.Status == "error" {
-		return res, errors.New(res.Error.Message)
-	}
-	return res, err
+	return request[vo.WGAccountInfo](u, apperr.WGAccountInfo)
 }
 
 func (w *Wargaming) AccountList(accountNames []string) (vo.WGAccountList, error) {
-	u := buildUrl(
+	u := buildURL(
 		"/wows/account/list/",
 		map[string]string{
 			"application_id": w.AppID,
@@ -68,12 +51,7 @@ func (w *Wargaming) AccountList(accountNames []string) (vo.WGAccountList, error)
 		},
 	)
 
-	client := ApiClient[vo.WGAccountList]{}
-	res, err := client.GetRequest(u.String())
-	if res.Status == "error" {
-		return res, errors.New(res.Error.Message)
-	}
-	return res, err
+	return request[vo.WGAccountList](u, apperr.WGAccountList)
 }
 
 func (w *Wargaming) ClansAccountInfo(accountIDs []int) (vo.WGClansAccountInfo, error) {
@@ -82,7 +60,7 @@ func (w *Wargaming) ClansAccountInfo(accountIDs []int) (vo.WGClansAccountInfo, e
 		accountIDsString = append(accountIDsString, strconv.Itoa(accountIDs[i]))
 	}
 
-	u := buildUrl(
+	u := buildURL(
 		"/wows/clans/accountinfo/",
 		map[string]string{
 			"application_id": w.AppID,
@@ -91,12 +69,7 @@ func (w *Wargaming) ClansAccountInfo(accountIDs []int) (vo.WGClansAccountInfo, e
 		},
 	)
 
-	client := ApiClient[vo.WGClansAccountInfo]{}
-	res, err := client.GetRequest(u.String())
-	if res.Status == "error" {
-		return res, errors.New(res.Error.Message)
-	}
-	return res, err
+	return request[vo.WGClansAccountInfo](u, apperr.WGClansAccountInfo)
 }
 
 func (w *Wargaming) ClansInfo(clanIDs []int) (vo.WGClansInfo, error) {
@@ -105,7 +78,7 @@ func (w *Wargaming) ClansInfo(clanIDs []int) (vo.WGClansInfo, error) {
 		clanIDsString = append(clanIDsString, strconv.Itoa(clanIDs[i]))
 	}
 
-	u := buildUrl(
+	u := buildURL(
 		"/wows/clans/info/",
 		map[string]string{
 			"application_id": w.AppID,
@@ -114,16 +87,11 @@ func (w *Wargaming) ClansInfo(clanIDs []int) (vo.WGClansInfo, error) {
 		},
 	)
 
-	client := ApiClient[vo.WGClansInfo]{}
-	res, err := client.GetRequest(u.String())
-	if res.Status == "error" {
-		return res, errors.New(res.Error.Message)
-	}
-	return res, err
+	return request[vo.WGClansInfo](u, apperr.WGClansInfo)
 }
 
 func (w *Wargaming) EncyclopediaShips(pageNo int) (vo.WGEncyclopediaShips, error) {
-	u := buildUrl(
+	u := buildURL(
 		"/wows/encyclopedia/ships/",
 		map[string]string{
 			"application_id": w.AppID,
@@ -138,43 +106,33 @@ func (w *Wargaming) EncyclopediaShips(pageNo int) (vo.WGEncyclopediaShips, error
 		},
 	)
 
-	client := ApiClient[vo.WGEncyclopediaShips]{}
-	res, err := client.GetRequest(u.String())
-	if res.Status == "error" {
-		return res, errors.New(res.Error.Message)
-	}
-	return res, err
+	return request[vo.WGEncyclopediaShips](u, apperr.WGEncyclopediaShips)
 }
 
 func (w *Wargaming) ShipsStats(accountID int) (vo.WGShipsStats, error) {
-	u := buildUrl(
+	u := buildURL(
 		"/wows/ships/stats/",
 		map[string]string{
 			"application_id": w.AppID,
 			"account_id":     strconv.Itoa(accountID),
 			"fields": strings.Join([]string{
 				"ship_id",
-                "pvp.battles",
+				"pvp.battles",
 				"pvp.wins",
-                "pvp.frags",
+				"pvp.frags",
 				"pvp.damage_dealt",
-                "pvp.xp",
+				"pvp.xp",
 				"pvp.survived_battles",
-                "pvp.survived_wins",
+				"pvp.survived_wins",
 			}, ","),
 		},
 	)
 
-	client := ApiClient[vo.WGShipsStats]{}
-	res, err := client.GetRequest(u.String())
-	if res.Status == "error" {
-		return res, errors.New(res.Error.Message)
-	}
-	return res, err
+	return request[vo.WGShipsStats](u, apperr.WGShipsStats)
 }
 
 func (w *Wargaming) EncyclopediaInfo() (vo.WGEncyclopediaInfo, error) {
-	u := buildUrl(
+	u := buildURL(
 		"/wows/encyclopedia/info/",
 		map[string]string{
 			"application_id": w.AppID,
@@ -182,46 +140,58 @@ func (w *Wargaming) EncyclopediaInfo() (vo.WGEncyclopediaInfo, error) {
 		},
 	)
 
-	client := ApiClient[vo.WGEncyclopediaInfo]{}
-	res, err := client.GetRequest(u.String())
-	if res.Status == "error" {
-		return res, errors.New(res.Error.Message)
-	}
-	return res, err
+	return request[vo.WGEncyclopediaInfo](u, apperr.WGEncyclopediaInfo)
 }
 
 func (w *Wargaming) BattleArenas() (vo.WGBattleArenas, error) {
-	u := buildUrl(
+	u := buildURL(
 		"/wows/encyclopedia/battlearenas/",
 		map[string]string{
 			"application_id": w.AppID,
 			"fields":         "name",
-            "language": "ja",
+			"language":       "ja",
 		},
 	)
 
-	client := ApiClient[vo.WGBattleArenas]{}
-	res, err := client.GetRequest(u.String())
-	if res.Status == "error" {
-		return res, errors.New(res.Error.Message)
-	}
-	return res, err
+	return request[vo.WGBattleArenas](u, apperr.WGBattleArenas)
 }
 
 func (w *Wargaming) BattleTypes() (vo.WGBattleTypes, error) {
-	u := buildUrl(
+	u := buildURL(
 		"/wows/encyclopedia/battletypes/",
 		map[string]string{
 			"application_id": w.AppID,
 			"fields":         "name",
-            "language": "ja",
+			"language":       "ja",
 		},
 	)
 
-	client := ApiClient[vo.WGBattleTypes]{}
-	res, err := client.GetRequest(u.String())
-	if res.Status == "error" {
-		return res, errors.New(res.Error.Message)
+	return request[vo.WGBattleTypes](u, apperr.WGBattleTypes)
+}
+
+func buildURL(path string, query map[string]string) *url.URL {
+	u := &url.URL{}
+	u.Scheme = "https"
+	u.Host = "api.worldofwarships.asia"
+	u.Path = path
+	q := u.Query()
+	for key, value := range query {
+		q.Set(key, value)
 	}
+	u.RawQuery = q.Encode()
+
+	return u
+}
+
+func request[T vo.WGResponse](u *url.URL, errCode failure.Code) (T, error) {
+	client := APIClient[T]{}
+	res, err := client.GetRequest(u.String())
+	if err != nil {
+		return res, failure.Translate(err, errCode)
+	}
+	if res.GetStatus() == "error" {
+		return res, failure.New(errCode, failure.Message(res.GetError().Message))
+	}
+
 	return res, err
 }

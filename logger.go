@@ -11,17 +11,17 @@ import (
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 
-const LOG_DIRECTORY = "log"
+const logDir = "log"
 
 type Logger struct {
 	zlog zerolog.Logger
 }
 
 func NewLogger(env vo.Env, version vo.Version) *Logger {
-	_ = os.Mkdir(LOG_DIRECTORY, 0755)
+	_ = os.Mkdir(logDir, 0o755)
 
 	writer := &lumberjack.Logger{
-		Filename: filepath.Join(LOG_DIRECTORY, "app.log"),
+		Filename: filepath.Join(logDir, "app.log"),
 		MaxAge:   7,
 		Compress: true,
 	}
@@ -33,10 +33,12 @@ func NewLogger(env vo.Env, version vo.Version) *Logger {
 		for i := len(file) - 1; i > 0; i-- {
 			if file[i] == '/' {
 				short = file[i+1:]
+
 				break
 			}
 		}
 		file = short
+
 		return file + ":" + strconv.Itoa(line)
 	}
 

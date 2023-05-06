@@ -1,79 +1,84 @@
 package infra
 
 import (
+	"changeme/backend/apperr"
 	"changeme/backend/vo"
 	"encoding/json"
 	"os"
 	"path/filepath"
 
-	"github.com/pkg/errors"
+	"github.com/morikuni/failure"
 )
 
-type Config struct {
-}
+const (
+	dirName  string = "config"
+	userName string = "user.json"
+	appName  string = "app.json"
+)
+
+type Config struct{}
 
 func (c *Config) User() (vo.UserConfig, error) {
-    _ = os.Mkdir("config", 0755)
-
-    // note: set default value
-    config := vo.UserConfig{
-        FontSize: "medium",
-        Displays: vo.Displays{
-            Basic: vo.Basic{
-                IsInAvg: true,
-                PlayerName: true,
-                ShipInfo: true,
-            },
-        },
-    }
-	file, err := os.ReadFile(filepath.Join("config", "user.json"))
-	if err != nil {
-		return config, errors.WithStack(err)
+	// note: set default value
+	config := vo.UserConfig{
+		FontSize: "medium",
+		Displays: vo.Displays{
+			Basic: vo.Basic{
+				IsInAvg:    true,
+				PlayerName: true,
+				ShipInfo:   true,
+			},
+		},
 	}
 
-	err = json.Unmarshal(file, &config)
-    return config, errors.WithStack(err)
+	return read(userName, config)
 }
 
 func (c *Config) UpdateUser(config vo.UserConfig) error {
-    _ = os.Mkdir("config", 0755)
-
-    file, err := os.Create(filepath.Join("config", "user.json"))
-	if err != nil {
-		return errors.WithStack(err)
-	}
-    defer file.Close()
-
-    encoder := json.NewEncoder(file)
-    encoder.SetIndent("", "  ")
-    err = encoder.Encode(config)
-    return errors.WithStack(err)
+	return update(userName, config)
 }
 
 func (c *Config) App() (vo.AppConfig, error) {
-    var config vo.AppConfig
-    _ = os.Mkdir("config", 0755)
-
-	file, err := os.ReadFile(filepath.Join("config", "app.json"))
-	if err != nil {
-		return config, err
-	}
-
-	err = json.Unmarshal(file, &config)
-    return config, errors.WithStack(err)
+	return read(appName, vo.AppConfig{})
 }
 
 func (c *Config) UpdateApp(config vo.AppConfig) error {
-    _ = os.Mkdir("config", 0755)
+	return update(appName, config)
+}
 
-    file, err := os.Create(filepath.Join("config", "app.json"))
+func read[T any](filename string, defaultValue T) (T, error) {
+	errCode := apperr.CfgRead
+
+	_ = os.Mkdir(dirName, 0o755)
+
+	f, err := os.ReadFile(filepath.Join(dirName, filename))
 	if err != nil {
-		return err
+		return defaultValue, failure.Translate(err, errCode)
 	}
-    defer file.Close()
+	if err := json.Unmarshal(f, &defaultValue); err != nil {
+		return defaultValue, failure.Translate(err, errCode)
+	}
 
-    encoder := json.NewEncoder(file)
-    encoder.SetIndent("", "  ")
-    err = encoder.Encode(config)
-    return errors.WithStack(err)
+	return defaultValue, nil
+}
+
+func update[T any](filename string, target T) error {
+	errCode := apperr.CfgUpdate
+
+	_ = os.Mkdir(dirName, 0o755)
+
+	file, err := os.Create(filepath.Join(dirName, filename))
+	if err != nil {
+		return failure.Translate(err, errCode)
+	}
+	defer file.Close()
+
+	encoder := json.NewEncoder(file)
+	encoder.SetIndent("", "  ")
+
+	if err := encoder.Encode(target); err != nil {
+		return failure.Translate(err, errCode)
+	}
+
+	return nil
 }
