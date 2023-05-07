@@ -31,18 +31,17 @@ func NewBattle(
 }
 
 //nolint:cyclop
-func (b *Battle) Battle() (vo.Battle, vo.TempArenaInfo, error) {
+func (b *Battle) Battle() (vo.Battle, error) {
 	var result vo.Battle
-	var tempArenaInfo vo.TempArenaInfo
 
 	tempArenaInfo, err := b.tempArenaInfoRepo.Get(b.userConfig.InstallPath)
 	if err != nil {
-		return result, tempArenaInfo, err
+		return result, err
 	}
 
 	if b.userConfig.SaveTempArenaInfo {
 		if err := b.tempArenaInfoRepo.Save(tempArenaInfo); err != nil {
-			return result, tempArenaInfo, err
+			return result, err
 		}
 	}
 
@@ -51,7 +50,7 @@ func (b *Battle) Battle() (vo.Battle, vo.TempArenaInfo, error) {
 
 	accountList := <-accountListResult
 	if accountList.Error != nil {
-		return result, tempArenaInfo, accountList.Error
+		return result, accountList.Error
 	}
 	accountIDs := accountList.Value.AccountIDs()
 
@@ -65,38 +64,38 @@ func (b *Battle) Battle() (vo.Battle, vo.TempArenaInfo, error) {
 	warshipCache := infra.Cache[map[int]vo.Warship]{Name: "warship"}
 	warship, err := warshipCache.Deserialize()
 	if err != nil {
-		return result, tempArenaInfo, err
+		return result, err
 	}
 
 	expectedStatsCache := infra.Cache[vo.NSExpectedStats]{Name: "expectedstats"}
 	expectedStats, err := expectedStatsCache.Deserialize()
 	if err != nil {
-		return result, tempArenaInfo, err
+		return result, err
 	}
 
 	battleArenasCache := infra.Cache[vo.WGBattleArenas]{Name: "battlearenas"}
 	battleArenas, err := battleArenasCache.Deserialize()
 	if err != nil {
-		return result, tempArenaInfo, err
+		return result, err
 	}
 
 	battleTypesCache := infra.Cache[vo.WGBattleTypes]{Name: "battletypes"}
 	battleTypes, err := battleTypesCache.Deserialize()
 	if err != nil {
-		return result, tempArenaInfo, err
+		return result, err
 	}
 
 	accountInfo := <-accountInfoResult
 	if accountInfo.Error != nil {
-		return result, tempArenaInfo, accountInfo.Error
+		return result, accountInfo.Error
 	}
 	shipStats := <-shipStatsResult
 	if shipStats.Error != nil {
-		return result, tempArenaInfo, shipStats.Error
+		return result, shipStats.Error
 	}
 	clanTag := <-clanTagResult
 	if clanTag.Error != nil {
-		return result, tempArenaInfo, clanTag.Error
+		return result, clanTag.Error
 	}
 
 	result = b.compose(
@@ -111,7 +110,7 @@ func (b *Battle) Battle() (vo.Battle, vo.TempArenaInfo, error) {
 		battleTypes,
 	)
 
-	return result, tempArenaInfo, nil
+	return result, nil
 }
 
 func (b *Battle) accountList(tempArenaInfo vo.TempArenaInfo, result chan vo.Result[(vo.WGAccountList)]) {

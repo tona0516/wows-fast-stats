@@ -1,8 +1,6 @@
 package vo
 
 import (
-	"encoding/base64"
-	"encoding/json"
 	"strings"
 )
 
@@ -54,13 +52,4 @@ func (t *TempArenaInfo) BattleType(battleTypes WGBattleTypes) string {
 	rawBattleType := battleTypes.Data[strings.ToUpper(t.MatchGroup)].Name
 
 	return strings.ReplaceAll(rawBattleType, " ", "")
-}
-
-func (t *TempArenaInfo) ToBase64() string {
-	b, err := json.Marshal(t)
-	if err != nil {
-		return ""
-	}
-
-	return base64.URLEncoding.EncodeToString(b)
 }

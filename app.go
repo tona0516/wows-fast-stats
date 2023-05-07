@@ -126,10 +126,9 @@ func (a *App) Battle() (vo.Battle, error) {
 		infra.TempArenaInfo{},
 	)
 
-	result, tempArenaInfo, err := battle.Battle()
+	result, err := battle.Battle()
 	if err != nil {
 		a.logger.Error("Failed to get battle.", err)
-		a.logger.Info(tempArenaInfo.ToBase64())
 	}
 
 	return result, err
