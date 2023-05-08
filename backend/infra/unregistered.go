@@ -7,7 +7,7 @@ import (
 	"encoding/json"
 	"strings"
 
-	"github.com/morikuni/failure"
+	"github.com/pkg/errors"
 )
 
 //go:embed resource/ships.json
@@ -16,13 +16,13 @@ var shipsByte []byte
 type Unregistered struct{}
 
 func (u *Unregistered) Warship() (map[int]vo.Warship, error) {
-	errCode := apperr.UnregisteredWarship
+	errDetail := apperr.Unreg.Warship
 
 	var ships []unregisteredShip
 	result := make(map[int]vo.Warship, 0)
 
 	if err := json.Unmarshal(shipsByte, &ships); err != nil {
-		return result, failure.Translate(err, errCode)
+		return result, errors.WithStack(errDetail.WithRaw(err))
 	}
 
 	for _, us := range ships {

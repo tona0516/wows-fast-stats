@@ -6,7 +6,7 @@ import (
 	"context"
 	"path/filepath"
 
-	"github.com/morikuni/failure"
+	"github.com/pkg/errors"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
@@ -29,7 +29,7 @@ func (s *Screenshot) SaveWithDialog(ctx context.Context, filename string, base64
 		DefaultFilename: filename,
 	})
 	if err != nil {
-		return failure.Translate(err, apperr.ScreenshotSvSaveDialog)
+		return errors.WithStack(apperr.SrvSs.SaveDialog.WithRaw(err))
 	}
 
 	return s.screenshotRepo.Save(path, base64Data)

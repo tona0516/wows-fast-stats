@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/morikuni/failure"
+	"github.com/pkg/errors"
 )
 
 type Numbers struct{}
@@ -18,47 +18,51 @@ func (n *Numbers) ExpectedStats() (vo.NSExpectedStats, error) {
 
 	body, err := fetch()
 	if err != nil {
-		return result, failure.Translate(err, apperr.NSExpectedStatsReq)
+		return result, err
 	}
 
 	result, err = parse(body)
 	if err != nil {
-		return result, failure.Translate(err, apperr.NSExpectedStatsParse)
+		return result, err
 	}
 
 	return result, nil
 }
 
 func fetch() ([]byte, error) {
+	errDetail := apperr.Ns.Req
+
 	res, err := http.Get("https://api.wows-numbers.com/personal/rating/expected/json/")
 	if err != nil {
-		return []byte{}, err
+		return []byte{}, errors.WithStack(errDetail.WithRaw(err))
 	}
 	defer res.Body.Close()
 
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
-		return []byte{}, err
+		return []byte{}, errors.WithStack(errDetail.WithRaw(err))
 	}
 
 	return body, nil
 }
 
 func parse(body []byte) (vo.NSExpectedStats, error) {
+	errDetail := apperr.Ns.Parse
+
 	var result vo.NSExpectedStats
 
 	depth1 := make(map[string]interface{})
 	if err := json.Unmarshal(body, &depth1); err != nil {
-		return result, failure.Translate(err, apperr.NSExpectedStatsParse)
+		return result, errors.WithStack(errDetail)
 	}
 
 	time, ok := depth1["time"].(float64)
 	if !ok {
-		return result, failure.New(apperr.NSExpectedStatsParse)
+		return result, errors.WithStack(errDetail.WithRaw(apperr.ErrNoTimeKey))
 	}
 	depth2, ok := depth1["data"].(map[string]interface{})
 	if !ok {
-		return result, failure.New(apperr.NSExpectedStatsParse)
+		return result, errors.WithStack(errDetail.WithRaw(apperr.ErrNoDataKey))
 	}
 
 	data := make(map[int]vo.NSExpectedStatsData)

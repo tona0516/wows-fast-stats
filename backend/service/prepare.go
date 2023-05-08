@@ -7,7 +7,7 @@ import (
 	"os"
 	"sync"
 
-	"github.com/morikuni/failure"
+	"github.com/pkg/errors"
 )
 
 type Prepare struct {
@@ -60,7 +60,11 @@ func (p *Prepare) FetchCachable() error {
 }
 
 func (p *Prepare) deleteOldCache() error {
-	return failure.Translate(os.RemoveAll(infra.CacheDir), apperr.PrepareSvDeleteCache)
+	if err := os.RemoveAll(infra.CacheDir); err != nil {
+		return errors.WithStack(apperr.SrvPrep.DeleteCache.WithRaw(err))
+	}
+
+	return nil
 }
 
 func (p *Prepare) warship(result chan error) {

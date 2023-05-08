@@ -7,7 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/morikuni/failure"
+	"github.com/pkg/errors"
 )
 
 const (
@@ -47,29 +47,29 @@ func (c *Config) UpdateApp(config vo.AppConfig) error {
 }
 
 func read[T any](filename string, defaultValue T) (T, error) {
-	errCode := apperr.CfgRead
+	errDetail := apperr.Cfg.Read
 
 	_ = os.Mkdir(dirName, 0o755)
 
 	f, err := os.ReadFile(filepath.Join(dirName, filename))
 	if err != nil {
-		return defaultValue, failure.Translate(err, errCode)
+		return defaultValue, errors.WithStack(errDetail.WithRaw(err))
 	}
 	if err := json.Unmarshal(f, &defaultValue); err != nil {
-		return defaultValue, failure.Translate(err, errCode)
+		return defaultValue, errors.WithStack(errDetail.WithRaw(err))
 	}
 
 	return defaultValue, nil
 }
 
 func update[T any](filename string, target T) error {
-	errCode := apperr.CfgUpdate
+	errDetail := apperr.Cfg.Update
 
 	_ = os.Mkdir(dirName, 0o755)
 
 	file, err := os.Create(filepath.Join(dirName, filename))
 	if err != nil {
-		return failure.Translate(err, errCode)
+		return errors.WithStack(errDetail.WithRaw(err))
 	}
 	defer file.Close()
 
@@ -77,7 +77,7 @@ func update[T any](filename string, target T) error {
 	encoder.SetIndent("", "  ")
 
 	if err := encoder.Encode(target); err != nil {
-		return failure.Translate(err, errCode)
+		return errors.WithStack(errDetail.WithRaw(err))
 	}
 
 	return nil

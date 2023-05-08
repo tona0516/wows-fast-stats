@@ -9,7 +9,7 @@ import (
 	"context"
 	"os"
 
-	"github.com/morikuni/failure"
+	"github.com/pkg/errors"
 	"github.com/skratchdot/open-golang/open"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
@@ -183,7 +183,7 @@ func (a *App) Cwd() (string, error) {
 		a.logger.Warn("Failed to get cwd.", err)
 	}
 
-	return cwd, failure.Translate(err, apperr.AppCwd)
+	return cwd, errors.WithStack(apperr.App.Cwd.WithRaw(err))
 }
 
 func (a *App) AppVersion() vo.Version {
@@ -196,7 +196,7 @@ func (a *App) OpenDirectory(path string) error {
 		a.logger.Warn("Failed to open directory.", err)
 	}
 
-	return failure.Translate(err, apperr.AppOpenDir)
+	return errors.WithStack(apperr.App.OpenDir.WithRaw(err))
 }
 
 func (a *App) ExcludePlayerIDs() []int {

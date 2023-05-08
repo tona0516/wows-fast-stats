@@ -3,11 +3,12 @@ package infra
 import (
 	"changeme/backend/apperr"
 	"changeme/backend/vo"
+	"fmt"
 	"net/url"
 	"strconv"
 	"strings"
 
-	"github.com/morikuni/failure"
+	"github.com/pkg/errors"
 )
 
 type Wargaming struct {
@@ -37,7 +38,7 @@ func (w *Wargaming) AccountInfo(accountIDs []int) (vo.WGAccountInfo, error) {
 		},
 	)
 
-	return request[vo.WGAccountInfo](u, apperr.WGAccountInfo)
+	return request[vo.WGAccountInfo](u, apperr.Wg.AccountInfo)
 }
 
 func (w *Wargaming) AccountList(accountNames []string) (vo.WGAccountList, error) {
@@ -51,7 +52,7 @@ func (w *Wargaming) AccountList(accountNames []string) (vo.WGAccountList, error)
 		},
 	)
 
-	return request[vo.WGAccountList](u, apperr.WGAccountList)
+	return request[vo.WGAccountList](u, apperr.Wg.AccountList)
 }
 
 func (w *Wargaming) ClansAccountInfo(accountIDs []int) (vo.WGClansAccountInfo, error) {
@@ -69,7 +70,7 @@ func (w *Wargaming) ClansAccountInfo(accountIDs []int) (vo.WGClansAccountInfo, e
 		},
 	)
 
-	return request[vo.WGClansAccountInfo](u, apperr.WGClansAccountInfo)
+	return request[vo.WGClansAccountInfo](u, apperr.Wg.ClansAccountInfo)
 }
 
 func (w *Wargaming) ClansInfo(clanIDs []int) (vo.WGClansInfo, error) {
@@ -87,7 +88,7 @@ func (w *Wargaming) ClansInfo(clanIDs []int) (vo.WGClansInfo, error) {
 		},
 	)
 
-	return request[vo.WGClansInfo](u, apperr.WGClansInfo)
+	return request[vo.WGClansInfo](u, apperr.Wg.ClansInfo)
 }
 
 func (w *Wargaming) EncyclopediaShips(pageNo int) (vo.WGEncyclopediaShips, error) {
@@ -106,7 +107,7 @@ func (w *Wargaming) EncyclopediaShips(pageNo int) (vo.WGEncyclopediaShips, error
 		},
 	)
 
-	return request[vo.WGEncyclopediaShips](u, apperr.WGEncyclopediaShips)
+	return request[vo.WGEncyclopediaShips](u, apperr.Wg.EncyclopediaShips)
 }
 
 func (w *Wargaming) ShipsStats(accountID int) (vo.WGShipsStats, error) {
@@ -128,7 +129,7 @@ func (w *Wargaming) ShipsStats(accountID int) (vo.WGShipsStats, error) {
 		},
 	)
 
-	return request[vo.WGShipsStats](u, apperr.WGShipsStats)
+	return request[vo.WGShipsStats](u, apperr.Wg.ShipsStats)
 }
 
 func (w *Wargaming) EncyclopediaInfo() (vo.WGEncyclopediaInfo, error) {
@@ -140,7 +141,7 @@ func (w *Wargaming) EncyclopediaInfo() (vo.WGEncyclopediaInfo, error) {
 		},
 	)
 
-	return request[vo.WGEncyclopediaInfo](u, apperr.WGEncyclopediaInfo)
+	return request[vo.WGEncyclopediaInfo](u, apperr.Wg.EncyclopediaInfo)
 }
 
 func (w *Wargaming) BattleArenas() (vo.WGBattleArenas, error) {
@@ -153,7 +154,7 @@ func (w *Wargaming) BattleArenas() (vo.WGBattleArenas, error) {
 		},
 	)
 
-	return request[vo.WGBattleArenas](u, apperr.WGBattleArenas)
+	return request[vo.WGBattleArenas](u, apperr.Wg.BattleArenas)
 }
 
 func (w *Wargaming) BattleTypes() (vo.WGBattleTypes, error) {
@@ -166,7 +167,7 @@ func (w *Wargaming) BattleTypes() (vo.WGBattleTypes, error) {
 		},
 	)
 
-	return request[vo.WGBattleTypes](u, apperr.WGBattleTypes)
+	return request[vo.WGBattleTypes](u, apperr.Wg.BattleTypes)
 }
 
 func buildURL(path string, query map[string]string) *url.URL {
@@ -183,14 +184,15 @@ func buildURL(path string, query map[string]string) *url.URL {
 	return u
 }
 
-func request[T vo.WGResponse](u *url.URL, errCode failure.Code) (T, error) {
+func request[T vo.WGResponse](u *url.URL, errDetail apperr.AppError) (T, error) {
 	client := APIClient[T]{}
 	res, err := client.GetRequest(u.String())
 	if err != nil {
-		return res, failure.Translate(err, errCode)
+		return res, errors.WithStack(errDetail.WithRaw(err))
 	}
 	if res.GetStatus() == "error" {
-		return res, failure.New(errCode, failure.Message(res.GetError().Message))
+		//nolint:goerr113
+		return res, errors.WithStack(errDetail.WithRaw(fmt.Errorf(res.GetError().Message)))
 	}
 
 	return res, err

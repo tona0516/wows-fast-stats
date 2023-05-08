@@ -6,30 +6,28 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/morikuni/failure"
+	"github.com/pkg/errors"
 )
 
 type Screenshot struct{}
 
 func (s *Screenshot) Save(path string, base64Data string) error {
-	errCode := apperr.ScreenshotSave
-
 	dir := filepath.Dir(path)
 	_ = os.Mkdir(dir, 0o755)
 
 	data, err := base64.StdEncoding.DecodeString(base64Data)
 	if err != nil {
-		return failure.Translate(err, errCode)
+		return errors.WithStack(apperr.Ss.Save.WithRaw(err))
 	}
 
 	f, err := os.Create(path)
 	if err != nil {
-		return failure.Translate(err, errCode)
+		return errors.WithStack(apperr.Ss.Save.WithRaw(err))
 	}
 	defer f.Close()
 
 	if _, err := f.Write(data); err != nil {
-		return failure.Translate(err, errCode)
+		return errors.WithStack(apperr.Ss.Save.WithRaw(err))
 	}
 
 	return nil

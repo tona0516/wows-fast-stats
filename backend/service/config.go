@@ -7,7 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/morikuni/failure"
+	"github.com/pkg/errors"
 	"golang.org/x/exp/slices"
 )
 
@@ -43,26 +43,17 @@ func (c *Config) UpdateApp(config vo.AppConfig) error {
 
 func validate(config vo.UserConfig) error {
 	if _, err := os.Stat(filepath.Join(config.InstallPath, "WorldOfWarships.exe")); err != nil {
-		return failure.New(
-			apperr.CfgSvInvalidInstallPath,
-			failure.Message("選択したフォルダに「WorldOfWarships.exe」が存在しません。"),
-		)
+		return errors.WithStack(apperr.SrvCfg.InvalidInstallPath.WithRaw(apperr.ErrInvalidInstallPath))
 	}
 
 	wargaming := infra.Wargaming{AppID: config.Appid}
 	if _, err := wargaming.EncyclopediaInfo(); err != nil {
-		return failure.New(
-			apperr.CfgSvInvalidAppID,
-			failure.Message("WG APIと通信できません。AppIDが間違っている可能性があります。"),
-		)
+		return errors.WithStack(apperr.SrvCfg.InvalidAppID.WithRaw(apperr.ErrInvalidAppID))
 	}
 
 	// Same value as "font-size": https://developer.mozilla.org/ja/docs/Web/CSS/font-size
 	if !slices.Contains([]string{"x-small", "small", "medium", "large", "x-large"}, config.FontSize) {
-		return failure.New(
-			apperr.CfgSvInvalidFontSize,
-			failure.Message("不正な文字サイズです。"),
-		)
+		return errors.WithStack(apperr.SrvCfg.InvalidFontSize.WithRaw(apperr.ErrInvalidFontSize))
 	}
 
 	return nil

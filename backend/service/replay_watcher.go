@@ -11,7 +11,7 @@ import (
 	"changeme/backend/infra"
 
 	"github.com/fsnotify/fsnotify"
-	"github.com/morikuni/failure"
+	"github.com/pkg/errors"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
@@ -77,7 +77,7 @@ func (w *ReplayWatcher) Start(ctx context.Context) {
 				w.notifyEnd()
 			}
 		case err := <-watcher.Errors:
-			w.notifyError(failure.Translate(err, apperr.ReplayWatchSvWatcherChan))
+			w.notifyError(errors.WithStack(apperr.SrvRw.WatcherChan.WithRaw(err)))
 
 			return
 		}
@@ -106,7 +106,7 @@ func (w *ReplayWatcher) tempArenaInfoHash() (string, error) {
 func (w *ReplayWatcher) genWatcher() (*fsnotify.Watcher, error) {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
-		return watcher, failure.Translate(err, apperr.ReplayWatchSvNewWatcher)
+		return watcher, errors.WithStack(apperr.SrvRw.NewWatcher.WithRaw(err))
 	}
 
 	userConfig, err := w.configRepo.User()
@@ -115,7 +115,7 @@ func (w *ReplayWatcher) genWatcher() (*fsnotify.Watcher, error) {
 	}
 
 	if err := watcher.Add(filepath.Join(userConfig.InstallPath, infra.ReplayDir)); err != nil {
-		return watcher, failure.Translate(err, apperr.ReplayWatchSvWatcherAdd)
+		return watcher, errors.WithStack(apperr.SrvRw.WatcherAdd.WithRaw(err))
 	}
 
 	return watcher, nil
