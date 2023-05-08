@@ -32,9 +32,11 @@ package: build
 .PHONY: lint
 lint:
 	golangci-lint run
+	cd frontend/ && npm run check
 
 .PHONY: fmt
 fmt:
+	golangci-lint run --fix
 	go fmt
 	cd frontend/ && npx prettier --write **/*.{ts,svelte,html,css}
 

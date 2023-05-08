@@ -27,5 +27,3 @@ linters:
     - gci # Conflict goimports
     - gofumpt # Conflict goimports
   fast: false
-issues:
-  fix: true
