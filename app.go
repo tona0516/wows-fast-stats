@@ -89,34 +89,22 @@ func (a *App) Ready() {
 	go rw.Start(ctx)
 }
 
-func (a *App) IsFinishedPrepare() bool {
-	return a.isFinishedPrepare
-}
-
-func (a *App) Prepare() error {
-	// Fetch cachable
-	prepare := service.NewPrepare(
-		PARALLELS,
-		infra.Wargaming{AppID: a.userConfig.Appid},
-		infra.Numbers{},
-		infra.Unregistered{},
-	)
-
-	if err := prepare.FetchCachable(); err != nil {
-		return err
-	}
-	a.isFinishedPrepare = true
-
-	return nil
-}
-
 func (a *App) Battle() (vo.Battle, error) {
 	if !a.isFinishedPrepare {
-		if err := a.Prepare(); err != nil {
+		prepare := service.NewPrepare(
+			PARALLELS,
+			infra.Wargaming{AppID: a.userConfig.Appid},
+			infra.Numbers{},
+			infra.Unregistered{},
+		)
+
+		if err := prepare.FetchCachable(); err != nil {
 			a.logger.Error("Failed to prepare", err)
 
 			return vo.Battle{}, err
 		}
+
+		a.isFinishedPrepare = true
 	}
 
 	battle := service.NewBattle(

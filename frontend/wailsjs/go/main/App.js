@@ -30,20 +30,12 @@ export function ExcludePlayerIDs() {
   return window['go']['main']['App']['ExcludePlayerIDs']();
 }
 
-export function IsFinishedPrepare() {
-  return window['go']['main']['App']['IsFinishedPrepare']();
-}
-
 export function ManualScreenshot(arg1, arg2) {
   return window['go']['main']['App']['ManualScreenshot'](arg1, arg2);
 }
 
 export function OpenDirectory(arg1) {
   return window['go']['main']['App']['OpenDirectory'](arg1);
-}
-
-export function Prepare() {
-  return window['go']['main']['App']['Prepare']();
 }
 
 export function Ready() {

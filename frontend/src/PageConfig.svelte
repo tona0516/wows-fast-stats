@@ -24,7 +24,10 @@ UserConfig().then((config) => {
 function clickApply() {
   ApplyUserConfig(inputConfig)
     .then(() => {
-      dispatch("onUpdateSuccess", { message: "設定を更新しました。" });
+      dispatch("onUpdateSuccess", {
+        message: "設定を更新しました。",
+        config: inputConfig,
+      });
     })
     .catch((error) => {
       dispatch("onUpdateFailure", { message: error });

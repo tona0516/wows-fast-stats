@@ -5,8 +5,6 @@ import {
   ManualScreenshot,
   AutoScreenshot,
   ExcludePlayerIDs,
-  Prepare,
-  IsFinishedPrepare,
   Ready,
 } from "../wailsjs/go/main/App.js";
 import Notification from "./Notification.svelte";
@@ -108,24 +106,6 @@ async function main() {
     return;
   }
 
-  const isFinishedPrepare = await IsFinishedPrepare();
-  if (!isFinishedPrepare) {
-    notification.showToastWithKey(
-      "非プレイヤーデータの取得中...",
-      "info",
-      "prepare"
-    );
-
-    try {
-      await Prepare();
-    } catch (error) {
-      notification.showToastWithKey(error, "error", "error");
-      return;
-    } finally {
-      notification.removeToastWithKey("prepare");
-    }
-  }
-
   Ready();
 }
 
@@ -157,8 +137,11 @@ window.onload = function () {
       <ConfigPage
         on:onUpdateSuccess="{(event) => {
           notification.showToast(event.detail.message, 'success');
-          UserConfig().then((result) => (config = result));
           notification.removeToastWithKey('need_config');
+          config = event.detail.config;
+          if (!battle) {
+            Ready();
+          }
         }}"
         on:onUpdateFailure="{(event) =>
           notification.showToast(event.detail.message, 'error')}"

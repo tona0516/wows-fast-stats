@@ -16,13 +16,9 @@ export function Cwd():Promise<string>;
 
 export function ExcludePlayerIDs():Promise<Array<number>>;
 
-export function IsFinishedPrepare():Promise<boolean>;
-
 export function ManualScreenshot(arg1:string,arg2:string):Promise<void>;
 
 export function OpenDirectory(arg1:string):Promise<void>;
-
-export function Prepare():Promise<void>;
 
 export function Ready():Promise<void>;
 
