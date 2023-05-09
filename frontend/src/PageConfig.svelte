@@ -14,12 +14,7 @@ import { BrowserOpenURL } from "../wailsjs/runtime/runtime.js";
 const dispatch = createEventDispatcher();
 
 let inputConfig: vo.UserConfig = Const.DEFAULT_USER_CONFIG;
-
 let cwd: string;
-
-UserConfig().then((config) => {
-  inputConfig = config;
-});
 
 function clickApply() {
   ApplyUserConfig(inputConfig)
@@ -58,9 +53,16 @@ function toggleAll(e: any) {
   );
 }
 
-Cwd()
-  .then((result) => (cwd = result))
-  .catch((_) => "");
+function main() {
+  UserConfig().then((config) => {
+    inputConfig = config;
+  });
+  Cwd().then((result) => {
+    cwd = result;
+  });
+}
+
+main();
 </script>
 
 <div class="mt-3 form-style">
