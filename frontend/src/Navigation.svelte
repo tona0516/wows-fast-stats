@@ -20,9 +20,6 @@ function onClickMenu(menu: NavigationMenu) {
     case "config":
       currentPage = "config";
       break;
-    case "help":
-      currentPage = "help";
-      break;
     case "appinfo":
       currentPage = "appinfo";
       break;
@@ -72,16 +69,6 @@ function onClickMenu(menu: NavigationMenu) {
         >
           <i class="bi bi-gear"></i>
           設定
-        </button>
-        <button
-          type="button"
-          class="btn btn-sm btn-outline-secondary m-1 {currentPage === 'help' &&
-            'active'}"
-          title="設定"
-          on:click="{() => onClickMenu('help')}"
-        >
-          <i class="bi bi-question-circle"></i>
-          ヘルプ
         </button>
         <button
           type="button"

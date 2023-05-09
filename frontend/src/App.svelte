@@ -17,7 +17,6 @@ import { EventsOn } from "../wailsjs/runtime/runtime.js";
 import AppInfo from "./PageAppInfo.svelte";
 
 import "bootstrap-icons/font/bootstrap-icons.css";
-import PageHelp from "./PageHelp.svelte";
 import type { vo } from "wailsjs/go/models.js";
 import { Average, type AverageFactor } from "./Average.js";
 import Navigation from "./Navigation.svelte";
@@ -166,10 +165,6 @@ window.onload = function () {
         on:onOpenDirectoryFailure="{(event) =>
           notification.showToast(event.detail.message, 'error')}"
       />
-    {/if}
-
-    {#if currentPage === "help"}
-      <PageHelp />
     {/if}
 
     {#if currentPage === "appinfo"}

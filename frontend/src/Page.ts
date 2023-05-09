@@ -1,1 +1,1 @@
-export type Page = "main" | "config" | "help" | "appinfo";
+export type Page = "main" | "config" | "appinfo";

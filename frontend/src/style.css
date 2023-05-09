@@ -148,17 +148,6 @@ body {
   text-align: center;
 }
 
-.help {
-  width: 75%;
-  min-width: 500px;
-  max-width: 800px;
-  margin: auto;
-}
-
-.help-table {
-  table-layout: fixed;
-}
-
 .appinfo {
   text-align: center;
 }

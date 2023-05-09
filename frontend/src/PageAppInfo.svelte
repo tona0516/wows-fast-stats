@@ -19,6 +19,17 @@ AppVersion().then((result) => (version = result));
     リビジョン {version.revision}
   </p>
   <p>
+    <i class="bi bi-question-circle"></i>
+    <!-- svelte-ignore a11y-invalid-attribute -->
+    <a
+      class="td-link"
+      href="#"
+      on:click="{() =>
+        BrowserOpenURL('https://github.com/tona0516/wows-fast-stats/wiki/FAQ')}"
+    >
+      FAQ
+    </a>
+    <br />
     <i class="bi bi-twitter"></i>
     <!-- svelte-ignore a11y-invalid-attribute -->
     <a
