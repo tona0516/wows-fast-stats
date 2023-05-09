@@ -106,7 +106,7 @@ main();
           class="td-link"
           href="#"
           on:click="{() =>
-            BrowserOpenURL('https://developers.wargaming.net/applications/')}"
+            BrowserOpenURL('https://developers.wargaming.net/')}"
           >Developer Room <i class="bi bi-box-arrow-up-right"></i></a
         > で作成したIDを入力してください。
       </p>
