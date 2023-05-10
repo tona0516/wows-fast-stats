@@ -2,7 +2,6 @@
 import type { vo } from "wailsjs/go/models.js";
 import {
   ApplyUserConfig,
-  UserConfig,
   SelectDirectory,
   Cwd,
   OpenDirectory,
@@ -10,6 +9,8 @@ import {
 import { createEventDispatcher } from "svelte";
 import Const from "./Const.js";
 import { BrowserOpenURL } from "../wailsjs/runtime/runtime.js";
+
+export let config: vo.UserConfig;
 
 const dispatch = createEventDispatcher();
 
@@ -54,9 +55,7 @@ function toggleAll(e: any) {
 }
 
 function main() {
-  UserConfig().then((config) => {
-    inputConfig = config;
-  });
+  inputConfig = config;
   Cwd().then((result) => {
     cwd = result;
   });
@@ -79,11 +78,13 @@ main();
           type="text"
           class="form-control"
           id="install-path"
+          style="font-size: {config?.font_size || 'medium'};"
           bind:value="{inputConfig.install_path}"
         />
         <button
           type="button"
           class="btn btn-secondary"
+          style="font-size: {config?.font_size || 'medium'};"
           on:click="{selectDirectory}">選択</button
         >
       </div>
@@ -98,6 +99,7 @@ main();
         type="text"
         class="form-control"
         id="appid"
+        style="font-size: {config?.font_size || 'medium'};"
         bind:value="{inputConfig.appid}"
       />
       <p>
@@ -116,7 +118,11 @@ main();
       <div class="centerize">
         <label for="font-size" class="form-label">文字サイズ</label>
       </div>
-      <select class="form-select" bind:value="{inputConfig.font_size}">
+      <select
+        class="form-select"
+        style="font-size: {config?.font_size || 'medium'};"
+        bind:value="{inputConfig.font_size}"
+      >
         <option value="x-small">極小</option>
         <option value="small">小</option>
         <option value="medium">中</option>
@@ -231,8 +237,11 @@ main();
 
     <div class="centerize">
       <!-- apply -->
-      <button type="button" class="btn btn-primary mb-3" on:click="{clickApply}"
-        >適用</button
+      <button
+        type="button"
+        class="btn btn-primary mb-3"
+        style="font-size: {config?.font_size || 'medium'};"
+        on:click="{clickApply}">適用</button
       >
     </div>
   </form>

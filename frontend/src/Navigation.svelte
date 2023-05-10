@@ -9,6 +9,7 @@ const dispatch = createEventDispatcher();
 type Func = "reload" | "screenshot";
 type NavigationMenu = Page | Func;
 
+export let config: vo.UserConfig;
 export let currentPage: Page = "main";
 export let battle: vo.Battle;
 
@@ -45,6 +46,7 @@ function onClickMenu(menu: NavigationMenu) {
       aria-controls="navbarNavAltMarkup"
       aria-expanded="false"
       aria-label="Toggle navigation"
+      style="font-size: {config?.font_size || 'medium'};"
     >
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -55,6 +57,7 @@ function onClickMenu(menu: NavigationMenu) {
           class="btn btn-sm btn-outline-secondary m-1 {currentPage === 'main' &&
             'active'}"
           title="ホーム"
+          style="font-size: {config?.font_size || 'medium'};"
           on:click="{() => onClickMenu('main')}"
         >
           <i class="bi bi-house"></i>
@@ -65,6 +68,7 @@ function onClickMenu(menu: NavigationMenu) {
           class="btn btn-sm btn-outline-secondary m-1 {currentPage ===
             'config' && 'active'}"
           title="設定"
+          style="font-size: {config?.font_size || 'medium'};"
           on:click="{() => onClickMenu('config')}"
         >
           <i class="bi bi-gear"></i>
@@ -75,6 +79,7 @@ function onClickMenu(menu: NavigationMenu) {
           class="btn btn-sm btn-outline-secondary m-1 {currentPage ===
             'appinfo' && 'active'}"
           title="アプリ情報"
+          style="font-size: {config?.font_size || 'medium'};"
           on:click="{() => onClickMenu('appinfo')}"
         >
           <i class="bi bi-info-circle"></i>
@@ -85,6 +90,7 @@ function onClickMenu(menu: NavigationMenu) {
             type="button"
             class="btn btn-sm btn-outline-success m-1"
             title="リロード"
+            style="font-size: {config?.font_size || 'medium'};"
             on:click="{() => onClickMenu('reload')}"
           >
             <i class="bi bi-arrow-clockwise"></i>
@@ -96,6 +102,7 @@ function onClickMenu(menu: NavigationMenu) {
             class="btn btn-sm btn-outline-success m-1"
             title="スクリーンショット"
             disabled="{battle === undefined}"
+            style="font-size: {config?.font_size || 'medium'};"
             on:click="{() => onClickMenu('screenshot')}"
           >
             <i class="bi bi-camera"></i>

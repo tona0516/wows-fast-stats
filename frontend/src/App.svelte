@@ -122,6 +122,7 @@ window.onload = function () {
 <main>
   <div style="font-size: {config?.font_size || 'medium'};">
     <Navigation
+      bind:config="{config}"
       bind:currentPage="{currentPage}"
       bind:battle="{battle}"
       on:onScreenshot="{manualScreenshot}"
@@ -130,8 +131,8 @@ window.onload = function () {
     {#if currentPage === "main"}
       <div id="mainpage">
         <MainPage
-          bind:battle="{battle}"
           bind:config="{config}"
+          bind:battle="{battle}"
           bind:averageFactors="{averageFactors}"
           bind:excludePlayerIDs="{excludePlayerIDs}"
         />
@@ -140,6 +141,7 @@ window.onload = function () {
 
     {#if currentPage === "config"}
       <ConfigPage
+        bind:config="{config}"
         on:onUpdateSuccess="{(event) => {
           notification.showToast(event.detail.message, 'success');
           notification.removeToastWithKey('need_config');
