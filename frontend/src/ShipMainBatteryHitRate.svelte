@@ -1,0 +1,15 @@
+<script lang="ts">
+import type { vo } from "wailsjs/go/models";
+import type { DisplayPattern } from "./DisplayPattern";
+export let config: vo.UserConfig;
+export let player: vo.Player;
+export let displayPattern: DisplayPattern;
+</script>
+
+{#if config.displays.ship.main_battery_hit_rate}
+  {#if displayPattern === "full" || displayPattern === "nopr"}
+    <td class="td-number">
+      {player.ship_stats.main_battery_hit_rate.toFixed(1)}
+    </td>
+  {/if}
+{/if}

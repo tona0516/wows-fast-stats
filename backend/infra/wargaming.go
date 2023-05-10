@@ -125,6 +125,10 @@ func (w *Wargaming) ShipsStats(accountID int) (vo.WGShipsStats, error) {
 				"pvp.xp",
 				"pvp.survived_battles",
 				"pvp.survived_wins",
+				"pvp.main_battery.hits",
+				"pvp.main_battery.shots",
+				"pvp.torpedoes.hits",
+				"pvp.torpedoes.shots",
 			}, ","),
 		},
 	)

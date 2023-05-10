@@ -12,6 +12,14 @@ type StatsFactor struct {
 	Wins            uint
 	SurvivedWins    uint
 	Xp              uint
+	MainBattery     struct {
+		Hits  uint
+		Shots uint
+	}
+	Torpedoes struct {
+		Hits  uint
+		Shots uint
+	}
 }
 type Stats struct {
 	Ship    StatsFactor
@@ -74,6 +82,22 @@ func (s *Stats) ShipLoseSurvivedRate() float64 {
 	loses := s.Ship.Battles - s.Ship.Wins
 	if loses > 0 {
 		return float64(s.Ship.SurvivedBattles-s.Ship.SurvivedWins) / float64(loses) * 100
+	}
+
+	return 0
+}
+
+func (s *Stats) ShipMainBatteryHitRate() float64 {
+	if s.Ship.MainBattery.Shots > 0 {
+		return float64(s.Ship.MainBattery.Hits) / float64(s.Ship.MainBattery.Shots) * 100
+	}
+
+	return 0
+}
+
+func (s *Stats) ShipTorpedoesHitRate() float64 {
+	if s.Ship.Torpedoes.Shots > 0 {
+		return float64(s.Ship.Torpedoes.Hits) / float64(s.Ship.Torpedoes.Shots) * 100
 	}
 
 	return 0

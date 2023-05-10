@@ -7,24 +7,26 @@ type Basic struct {
 }
 
 type Ship struct {
-	PR               bool `json:"pr"`
-	Damage           bool `json:"damage"`
-	WinRate          bool `json:"win_rate"`
-	KdRate           bool `json:"kd_rate"`
-	WinSurvivedRate  bool `json:"win_survived_rate"`
-	LoseSurvivedRate bool `json:"lose_survived_rate"`
-	Exp              bool `json:"exp"`
-	Battles          bool `json:"battles"`
+	PR                 bool `json:"pr"`
+	Damage             bool `json:"damage"`
+	WinRate            bool `json:"win_rate"`
+	KdRate             bool `json:"kd_rate"`
+	Exp                bool `json:"exp"`
+	Battles            bool `json:"battles"`
+	WinSurvivedRate    bool `json:"win_survived_rate"`
+	LoseSurvivedRate   bool `json:"lose_survived_rate"`
+	MainBatteryHitRate bool `json:"main_battery_hit_rate"`
+	TorpedoesHitRate   bool `json:"torpedoes_hit_rate"`
 }
 
 type Overall struct {
 	Damage            bool `json:"damage"`
 	WinRate           bool `json:"win_rate"`
 	KdRate            bool `json:"kd_rate"`
-	WinSurvivedRate   bool `json:"win_survived_rate"`
-	LoseSurvivedRate  bool `json:"lose_survived_rate"`
 	Exp               bool `json:"exp"`
 	Battles           bool `json:"battles"`
+	WinSurvivedRate   bool `json:"win_survived_rate"`
+	LoseSurvivedRate  bool `json:"lose_survived_rate"`
 	AvgTier           bool `json:"avg_tier"`
 	UsingShipTypeRate bool `json:"using_ship_type_rate"`
 	UsingTierRate     bool `json:"using_tier_rate"`

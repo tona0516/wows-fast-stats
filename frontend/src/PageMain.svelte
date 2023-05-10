@@ -26,6 +26,8 @@ import BasicIsInAvg from "./BasicIsInAvg.svelte";
 import { Average, type AverageFactor } from "./Average";
 import { ExcludePlayerIDs } from "../wailsjs/go/main/App.js";
 import type { DisplayPattern } from "./DisplayPattern";
+import ShipMainBatteryHitRate from "./ShipMainBatteryHitRate.svelte";
+import ShipTorpedoesHitRate from "./ShipTorpedoesHitRate.svelte";
 
 export let battle: vo.Battle;
 export let config: vo.UserConfig = Const.DEFAULT_USER_CONFIG;
@@ -42,19 +44,21 @@ const components = {
     damage: ShipDamage,
     win_rate: ShipWinRate,
     kd_rate: ShipKdRate,
-    win_survived_rate: ShipWinSurvivedRate,
-    lose_survived_rate: ShipLoseSurvivedRate,
     exp: ShipExp,
     battles: ShipBattles,
+    win_survived_rate: ShipWinSurvivedRate,
+    lose_survived_rate: ShipLoseSurvivedRate,
+    main_battery_hit_rate: ShipMainBatteryHitRate,
+    torpedoes_hit_rate: ShipTorpedoesHitRate,
   },
   overall: {
     damage: OverallDamage,
     win_rate: OverallWinRate,
     kd_rate: OverallKdRate,
-    win_survived_rate: OverallWinSurvivedRate,
-    lose_survived_rate: OverallLoseSurvivedRate,
     exp: OverallExp,
     battles: OverallBattles,
+    win_survived_rate: OverallWinSurvivedRate,
+    lose_survived_rate: OverallLoseSurvivedRate,
     avg_tier: OverallAvgTier,
     using_ship_type_rate: OverallShipTypeRate,
     using_tier_rate: OverallTierRate,

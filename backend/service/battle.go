@@ -224,6 +224,14 @@ func (b *Battle) compose(
 					Wins:            v.Pvp.Wins,
 					SurvivedWins:    v.Pvp.SurviveWins,
 					Xp:              v.Pvp.Xp,
+					MainBattery: struct {
+						Hits  uint
+						Shots uint
+					}(v.Pvp.MainBattery),
+					Torpedoes: struct {
+						Hits  uint
+						Shots uint
+					}(v.Pvp.Torpedoes),
 				})
 
 				break
@@ -241,13 +249,15 @@ func (b *Battle) compose(
 				StatsURL: urlGen.ShipPage(vehicle.ShipID, warship.Name),
 			},
 			ShipStats: vo.ShipStats{
-				Battles:          stats.Ship.Battles,
-				Damage:           stats.ShipAvgDamage(),
-				WinRate:          stats.ShipWinRate(),
-				WinSurvivedRate:  stats.ShipWinSurvivedRate(),
-				LoseSurvivedRate: stats.ShipLoseSurvivedRate(),
-				KdRate:           stats.ShipKdRate(),
-				Exp:              stats.ShipAvgExp(),
+				Battles:            stats.Ship.Battles,
+				Damage:             stats.ShipAvgDamage(),
+				WinRate:            stats.ShipWinRate(),
+				WinSurvivedRate:    stats.ShipWinSurvivedRate(),
+				LoseSurvivedRate:   stats.ShipLoseSurvivedRate(),
+				KdRate:             stats.ShipKdRate(),
+				Exp:                stats.ShipAvgExp(),
+				MainBatteryHitRate: stats.ShipMainBatteryHitRate(),
+				TorpedoesHitRate:   stats.ShipTorpedoesHitRate(),
 				PR: rating.PersonalRating(
 					domain.RatingFactor{
 						Damage: stats.ShipAvgDamage(),

@@ -9,14 +9,16 @@ type ShipInfo struct {
 }
 
 type ShipStats struct {
-	Battles          uint    `json:"battles"`
-	Damage           float64 `json:"damage"`
-	WinRate          float64 `json:"win_rate"`
-	WinSurvivedRate  float64 `json:"win_survived_rate"`
-	LoseSurvivedRate float64 `json:"lose_survived_rate"`
-	KdRate           float64 `json:"kd_rate"`
-	Exp              float64 `json:"exp"`
-	PR               float64 `json:"pr"`
+	Battles            uint    `json:"battles"`
+	Damage             float64 `json:"damage"`
+	WinRate            float64 `json:"win_rate"`
+	WinSurvivedRate    float64 `json:"win_survived_rate"`
+	LoseSurvivedRate   float64 `json:"lose_survived_rate"`
+	KdRate             float64 `json:"kd_rate"`
+	Exp                float64 `json:"exp"`
+	MainBatteryHitRate float64 `json:"main_battery_hit_rate"`
+	TorpedoesHitRate   float64 `json:"torpedoes_hit_rate"`
+	PR                 float64 `json:"pr"`
 }
 
 type PlayerInfo struct {
