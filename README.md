@@ -1,16 +1,17 @@
-# README
-
+# wows-fast-stats
 ## About
+This is the fast XVM for World of Warships.
 
-This is the official Wails Svelte-TS template.
+## Run for development
+```
+$ git clone git@github.com:tona0516/wows-fast-stats.git && cd wows-fast-stats/
+$ make setup
+$ make dev
+```
 
-## Live Development
-
-To run in live development mode, run `wails dev` in the project directory. This will run a Vite development
-server that will provide very fast hot reload of your frontend changes. If you want to develop in a browser
-and have access to your Go methods, there is also a dev server that runs on http://localhost:34115. Connect
-to this in your browser, and you can call your Go code from devtools.
-
-## Building
-
-To build a redistributable, production mode package, use `wails build`.
+## Build binary
+```
+$ make build
+$ ls build/bin
+wows-fast-stats-0.3.0.exe*
+```
