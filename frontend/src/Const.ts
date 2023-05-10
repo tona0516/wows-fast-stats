@@ -19,10 +19,8 @@ namespace Const {
         kd_rate: false,
         exp: false,
         battles: true,
-        win_survived_rate: false,
-        lose_survived_rate: false,
-        main_battery_hit_rate: false,
-        torpedoes_hit_rate: false,
+        survived_rate: false,
+        hit_rate: false,
       },
       overall: {
         damage: true,
@@ -30,8 +28,7 @@ namespace Const {
         kd_rate: false,
         exp: false,
         battles: true,
-        win_survived_rate: false,
-        lose_survived_rate: false,
+        survived_rate: false,
         avg_tier: false,
         using_ship_type_rate: false,
         using_tier_rate: false,
@@ -58,15 +55,13 @@ namespace Const {
     damage: { min: "Dmg", full: "ダメージ" },
     win_rate: { min: "勝率", full: "勝率" },
     kd_rate: { min: "K/D", full: "K/D比" },
-    win_survived_rate: { min: "生存率(勝)", full: "勝利生存率" },
-    lose_survived_rate: { min: "生存率(負)", full: "敗北生存率" },
+    survived_rate: { min: "生存率(勝|負)", full: "生存率" },
     exp: { min: "Exp", full: "経験値" },
     battles: { min: "戦闘数", full: "戦闘数" },
     avg_tier: { min: "平均T", full: "平均Tier" },
     using_ship_type_rate: { min: "艦割合", full: "艦種別プレイ割合" },
     using_tier_rate: { min: "T割合", full: "ティア別プレイ割合" },
-    main_battery_hit_rate: { min: "Hit率(主)", full: "主砲命中率" },
-    torpedoes_hit_rate: { min: "Hit率(魚)", full: "魚雷命中率" },
+    hit_rate: { min: "Hit率(主|魚)", full: "命中率" },
   };
 
   export const DIGITS: { [key: string]: number } = {
@@ -74,11 +69,13 @@ namespace Const {
     damage: 0,
     win_rate: 1,
     kd_rate: 1,
-    win_survived_rate: 1,
-    lose_survived_rate: 1,
+    survived_rate: 1,
+    hit_rate: 1,
     exp: 0,
     battles: 0,
     avg_tier: 1,
+    ship_type_rate: 1,
+    tier_rate: 1,
   };
 }
 

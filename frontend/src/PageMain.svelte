@@ -7,15 +7,13 @@ import BasicShipInfo from "./BasicShipInfo.svelte";
 import ShipDamage from "./ShipDamage.svelte";
 import ShipWinRate from "./ShipWinRate.svelte";
 import ShipKdRate from "./ShipKdRate.svelte";
-import ShipWinSurvivedRate from "./ShipWinSurvivedRate.svelte";
-import ShipLoseSurvivedRate from "./ShipLoseSurvivedRate.svelte";
+import ShipSurvivedRate from "./ShipSurvivedRate.svelte";
 import ShipExp from "./ShipExp.svelte";
 import ShipBattles from "./ShipBattles.svelte";
 import OverallDamage from "./OverallDamage.svelte";
 import OverallWinRate from "./OverallWinRate.svelte";
 import OverallKdRate from "./OverallKdRate.svelte";
-import OverallWinSurvivedRate from "./OverallWinSurvivedRate.svelte";
-import OverallLoseSurvivedRate from "./OverallLoseSurvivedRate.svelte";
+import OverallSurvivedRate from "./OverallSurvivedRate.svelte";
 import OverallExp from "./OverallExp.svelte";
 import OverallAvgTier from "./OverallAvgTier.svelte";
 import OverallShipTypeRate from "./OverallShipTypeRate.svelte";
@@ -26,8 +24,7 @@ import BasicIsInAvg from "./BasicIsInAvg.svelte";
 import { Average, type AverageFactor } from "./Average";
 import { ExcludePlayerIDs } from "../wailsjs/go/main/App.js";
 import type { DisplayPattern } from "./DisplayPattern";
-import ShipMainBatteryHitRate from "./ShipMainBatteryHitRate.svelte";
-import ShipTorpedoesHitRate from "./ShipTorpedoesHitRate.svelte";
+import ShipHitRate from "./ShipHitRate.svelte";
 
 export let battle: vo.Battle;
 export let config: vo.UserConfig = Const.DEFAULT_USER_CONFIG;
@@ -46,10 +43,8 @@ const components = {
     kd_rate: ShipKdRate,
     exp: ShipExp,
     battles: ShipBattles,
-    win_survived_rate: ShipWinSurvivedRate,
-    lose_survived_rate: ShipLoseSurvivedRate,
-    main_battery_hit_rate: ShipMainBatteryHitRate,
-    torpedoes_hit_rate: ShipTorpedoesHitRate,
+    survived_rate: ShipSurvivedRate,
+    hit_rate: ShipHitRate,
   },
   overall: {
     damage: OverallDamage,
@@ -57,8 +52,7 @@ const components = {
     kd_rate: OverallKdRate,
     exp: OverallExp,
     battles: OverallBattles,
-    win_survived_rate: OverallWinSurvivedRate,
-    lose_survived_rate: OverallLoseSurvivedRate,
+    survived_rate: OverallSurvivedRate,
     avg_tier: OverallAvgTier,
     using_ship_type_rate: OverallShipTypeRate,
     using_tier_rate: OverallTierRate,

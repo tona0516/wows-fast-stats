@@ -294,8 +294,7 @@ export namespace vo {
 	    kd_rate: boolean;
 	    exp: boolean;
 	    battles: boolean;
-	    win_survived_rate: boolean;
-	    lose_survived_rate: boolean;
+	    survived_rate: boolean;
 	    avg_tier: boolean;
 	    using_ship_type_rate: boolean;
 	    using_tier_rate: boolean;
@@ -311,8 +310,7 @@ export namespace vo {
 	        this.kd_rate = source["kd_rate"];
 	        this.exp = source["exp"];
 	        this.battles = source["battles"];
-	        this.win_survived_rate = source["win_survived_rate"];
-	        this.lose_survived_rate = source["lose_survived_rate"];
+	        this.survived_rate = source["survived_rate"];
 	        this.avg_tier = source["avg_tier"];
 	        this.using_ship_type_rate = source["using_ship_type_rate"];
 	        this.using_tier_rate = source["using_tier_rate"];
@@ -325,10 +323,8 @@ export namespace vo {
 	    kd_rate: boolean;
 	    exp: boolean;
 	    battles: boolean;
-	    win_survived_rate: boolean;
-	    lose_survived_rate: boolean;
-	    main_battery_hit_rate: boolean;
-	    torpedoes_hit_rate: boolean;
+	    survived_rate: boolean;
+	    hit_rate: boolean;
 	
 	    static createFrom(source: any = {}) {
 	        return new Ship(source);
@@ -342,10 +338,8 @@ export namespace vo {
 	        this.kd_rate = source["kd_rate"];
 	        this.exp = source["exp"];
 	        this.battles = source["battles"];
-	        this.win_survived_rate = source["win_survived_rate"];
-	        this.lose_survived_rate = source["lose_survived_rate"];
-	        this.main_battery_hit_rate = source["main_battery_hit_rate"];
-	        this.torpedoes_hit_rate = source["torpedoes_hit_rate"];
+	        this.survived_rate = source["survived_rate"];
+	        this.hit_rate = source["hit_rate"];
 	    }
 	}
 	export class Displays {

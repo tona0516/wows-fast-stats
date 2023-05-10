@@ -1,6 +1,7 @@
 <script lang="ts">
 import type { vo } from "wailsjs/go/models";
 import type { DisplayPattern } from "./DisplayPattern";
+import Const from "./Const";
 export let config: vo.UserConfig;
 export let player: vo.Player;
 export let displayPattern: DisplayPattern;
@@ -12,6 +13,8 @@ const colors: { [key: string]: string } = {
   bb: "#ff9914",
   cv: "#a45aaa",
 };
+
+let digit = Const.DIGITS["ship_type_rate"];
 </script>
 
 {#if config.displays.overall.using_ship_type_rate}
@@ -29,7 +32,7 @@ const colors: { [key: string]: string } = {
           <tr>
             {#each keys as key}
               {@const value =
-                player.overall_stats.using_ship_type_rate[key].toFixed(1)}
+                player.overall_stats.using_ship_type_rate[key].toFixed(digit)}
               <td style="--size: calc({value}/100); --color: {colors[key]};"
                 ><span class="data">{value}</span><span class="tooltip"
                   >{key.toUpperCase()}<br />{value}%</span

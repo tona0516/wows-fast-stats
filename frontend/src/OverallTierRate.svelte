@@ -1,6 +1,7 @@
 <script lang="ts">
 import type { vo } from "wailsjs/go/models";
 import type { DisplayPattern } from "./DisplayPattern";
+import Const from "./Const";
 export let config: vo.UserConfig;
 export let player: vo.Player;
 export let displayPattern: DisplayPattern;
@@ -16,6 +17,8 @@ const texts: { [key: string]: string } = {
   middle: "5~7",
   high: "8~★",
 };
+
+let digit = Const.DIGITS["tier_rate"];
 </script>
 
 <!-- using tier rate -->
@@ -34,7 +37,7 @@ const texts: { [key: string]: string } = {
           <tr>
             {#each keys as key}
               {@const value =
-                player.overall_stats.using_tier_rate[key].toFixed(1)}
+                player.overall_stats.using_tier_rate[key].toFixed(digit)}
               <td style="--size: calc({value}/100); --color: {colors[key]};"
                 ><span class="data">{value}</span><span class="tooltip"
                   >{texts[key]}<br />{value}%</span

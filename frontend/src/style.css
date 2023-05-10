@@ -93,6 +93,10 @@ body {
   text-align: right;
 }
 
+.td-multiple {
+  text-align: center;
+}
+
 .td-graph {
   min-width: 160px;
 }
