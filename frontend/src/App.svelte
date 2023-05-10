@@ -26,6 +26,7 @@ let config: vo.UserConfig;
 let averageFactors: AverageFactor;
 let excludePlayerIDs: number[];
 let notification: Notification;
+let isLoadingScreenshot: boolean;
 
 let firstScreenshot = true;
 async function getScreenshotBase64(): Promise<[string, string]> {
@@ -42,19 +43,29 @@ async function getScreenshotBase64(): Promise<[string, string]> {
   return [filename, base64Data];
 }
 
-async function manualScreenshot() {
-  const [filename, data] = await getScreenshotBase64();
-  try {
-    await ManualScreenshot(filename, data);
-    notification.showToast("スクリーンショットを保存しました。", "success");
-  } catch (error) {
-    // TODO handling based on type
-    const errStr = error as string;
-    if (errStr.includes("Canceled")) {
-      return;
-    }
-    notification.showToast("スクリーンショットの保存に失敗しました。", "error");
-  }
+function manualScreenshot() {
+  isLoadingScreenshot = true;
+  getScreenshotBase64()
+    .then(([filename, data]) => {
+      return ManualScreenshot(filename, data);
+    })
+    .then(() => {
+      notification.showToast("スクリーンショットを保存しました。", "success");
+    })
+    .catch((error) => {
+      // TODO handling based on type
+      const errStr = error as string;
+      if (errStr.includes("Canceled")) {
+        return;
+      }
+      notification.showToast(
+        "スクリーンショットの保存に失敗しました。",
+        "error"
+      );
+    })
+    .finally(() => {
+      isLoadingScreenshot = false;
+    });
 }
 
 async function autoScreenshot() {
@@ -125,6 +136,7 @@ window.onload = function () {
       bind:config="{config}"
       bind:currentPage="{currentPage}"
       bind:battle="{battle}"
+      bind:isLoadingScreenshot="{isLoadingScreenshot}"
       on:onScreenshot="{manualScreenshot}"
     />
 

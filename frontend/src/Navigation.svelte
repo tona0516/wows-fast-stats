@@ -12,6 +12,7 @@ type NavigationMenu = Page | Func;
 export let config: vo.UserConfig;
 export let currentPage: Page = "main";
 export let battle: vo.Battle;
+export let isLoadingScreenshot: boolean = false;
 
 function onClickMenu(menu: NavigationMenu) {
   switch (menu) {
@@ -101,12 +102,20 @@ function onClickMenu(menu: NavigationMenu) {
             type="button"
             class="btn btn-sm btn-outline-success m-1"
             title="スクリーンショット"
-            disabled="{battle === undefined}"
+            disabled="{battle === undefined || isLoadingScreenshot}"
             style="font-size: {config?.font_size || 'medium'};"
             on:click="{() => onClickMenu('screenshot')}"
           >
-            <i class="bi bi-camera"></i>
-            スクリーンショット
+            {#if isLoadingScreenshot}
+              <span
+                class="spinner-border spinner-border-sm"
+                role="status"
+                aria-hidden="true"></span>
+              読み込み中...
+            {:else}
+              <i class="bi bi-camera"></i>
+              スクリーンショット
+            {/if}
           </button>
         {/if}
       </div>
