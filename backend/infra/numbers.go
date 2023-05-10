@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/cenkalti/backoff/v4"
 	"github.com/pkg/errors"
 )
 
@@ -16,7 +17,8 @@ type Numbers struct{}
 func (n *Numbers) ExpectedStats() (vo.NSExpectedStats, error) {
 	var result vo.NSExpectedStats
 
-	body, err := fetch()
+	b := backoff.WithMaxRetries(backoff.NewExponentialBackOff(), 3)
+	body, err := backoff.RetryWithData(fetch, b)
 	if err != nil {
 		return result, err
 	}

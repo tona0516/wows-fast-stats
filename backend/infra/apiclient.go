@@ -5,6 +5,8 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+
+	"github.com/cenkalti/backoff/v4"
 )
 
 type APIClient[T any] struct{}
@@ -17,7 +19,12 @@ func (c *APIClient[T]) GetRequest(rawurl string) (T, error) {
 		return response, err
 	}
 
-	res, err := http.Get(u.String())
+	b := backoff.WithMaxRetries(backoff.NewExponentialBackOff(), 3)
+	operation := func() (*http.Response, error) {
+		return http.Get(u.String())
+	}
+
+	res, err := backoff.RetryWithData(operation, b)
 	if err != nil {
 		return response, err
 	}
