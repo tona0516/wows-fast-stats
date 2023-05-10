@@ -30,8 +30,8 @@ func main() {
 	// Create application with options
 	err := wails.Run(&options.App{
 		Title:  "wows-fast-stats",
-		Width:  1920,
-		Height: 1080,
+		Width:  1280,
+		Height: 720,
 		AssetServer: &assetserver.Options{
 			Assets: assets,
 		},
