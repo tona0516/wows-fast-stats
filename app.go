@@ -24,7 +24,7 @@ type App struct {
 	appConfig           vo.AppConfig
 	excludePlayer       domain.ExcludePlayer
 	isFinishedPrepare   bool
-	logger              Logger
+	logger              infra.Logger
 	cancelReplayWatcher context.CancelFunc
 	configService       service.Config
 	screenshotService   service.Screenshot
@@ -35,7 +35,7 @@ func NewApp(env vo.Env, version vo.Version) *App {
 		env:               env,
 		version:           version,
 		excludePlayer:     *domain.NewExcludePlayer(),
-		logger:            *NewLogger(env, version),
+		logger:            *infra.NewLogger(env, version),
 		configService:     *service.NewConfig(infra.Config{}),
 		screenshotService: *service.NewScreenshot(infra.Screenshot{}),
 	}
@@ -85,7 +85,12 @@ func (a *App) Ready() {
 	ctx, cancel := context.WithCancel(context.Background())
 	a.cancelReplayWatcher = cancel
 
-	rw := service.NewReplayWatcher(a.ctx, infra.Config{}, infra.TempArenaInfo{})
+	rw := service.NewReplayWatcher(
+		a.ctx,
+		infra.Config{},
+		infra.TempArenaInfo{},
+		&a.logger,
+	)
 	go rw.Start(ctx)
 }
 

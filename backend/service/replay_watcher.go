@@ -25,13 +25,20 @@ type ReplayWatcher struct {
 	appCtx     context.Context
 	configRepo infra.Config
 	taiRepo    infra.TempArenaInfo
+	logger     *infra.Logger
 }
 
-func NewReplayWatcher(appCtx context.Context, configRepo infra.Config, taiRepo infra.TempArenaInfo) *ReplayWatcher {
+func NewReplayWatcher(
+	appCtx context.Context,
+	configRepo infra.Config,
+	taiRepo infra.TempArenaInfo,
+	logger *infra.Logger,
+) *ReplayWatcher {
 	return &ReplayWatcher{
 		appCtx:     appCtx,
 		configRepo: configRepo,
 		taiRepo:    taiRepo,
+		logger:     logger,
 	}
 }
 
@@ -46,6 +53,7 @@ func (w *ReplayWatcher) Start(ctx context.Context) {
 
 	watcher, err := w.genWatcher()
 	if err != nil {
+		w.logger.Error("Failed to create ReplayWacher.", err)
 		w.notifyError(err)
 
 		return
@@ -77,6 +85,7 @@ func (w *ReplayWatcher) Start(ctx context.Context) {
 				w.notifyEnd()
 			}
 		case err := <-watcher.Errors:
+			w.logger.Error("ReplayWacher gets error.", err)
 			w.notifyError(errors.WithStack(apperr.SrvRw.WatcherChan.WithRaw(err)))
 
 			return
