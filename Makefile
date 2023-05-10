@@ -21,6 +21,12 @@ build: lint
 	$(eval LD_FLAGS := "-X main.semver=$(SEMVER) -X main.revision=$(REV) -X main.env=production")
 	wails build -ldflags $(LD_FLAGS) -platform windows/amd64 -o $(EXE) -trimpath
 
+.PHONY: build-nolint
+build-nolint:
+	$(eval REV := $(shell git rev-parse --short HEAD))
+	$(eval LD_FLAGS := "-X main.semver=$(SEMVER) -X main.revision=$(REV) -X main.env=production")
+	wails build -ldflags $(LD_FLAGS) -platform windows/amd64 -o $(EXE) -trimpath
+
 .PHONY: package
 package: build
 	rm -rf $(APP) $(ZIP)
