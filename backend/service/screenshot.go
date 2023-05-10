@@ -31,6 +31,9 @@ func (s *Screenshot) SaveWithDialog(ctx context.Context, filename string, base64
 	if err != nil {
 		return errors.WithStack(apperr.SrvSs.SaveDialog.WithRaw(err))
 	}
+	if path == "" {
+		return errors.WithStack(apperr.SrvSs.Canceled)
+	}
 
 	return s.screenshotRepo.Save(path, base64Data)
 }

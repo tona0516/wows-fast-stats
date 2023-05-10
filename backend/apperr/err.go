@@ -83,6 +83,7 @@ type srvrw struct {
 
 type srvss struct {
 	SaveDialog AppError
+	Canceled   AppError
 }
 
 type app struct {

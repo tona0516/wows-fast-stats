@@ -48,6 +48,11 @@ async function manualScreenshot() {
     await ManualScreenshot(filename, data);
     notification.showToast("スクリーンショットを保存しました。", "success");
   } catch (error) {
+    // TODO handling based on type
+    const errStr = error as string;
+    if (errStr.includes("Canceled")) {
+      return;
+    }
     notification.showToast("スクリーンショットの保存に失敗しました。", "error");
   }
 }
