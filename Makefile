@@ -38,7 +38,7 @@ package: build
 .PHONY: lint
 lint:
 	golangci-lint run
-	cd frontend/ && npm run check
+	cd frontend/ && npm ci && npm run check
 
 .PHONY: fmt
 fmt:
