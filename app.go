@@ -132,7 +132,6 @@ func (a *App) SelectDirectory() (string, error) {
 }
 
 func (a *App) UserConfig() (vo.UserConfig, error) {
-	// Note: no logging because this method is called looper
 	return a.configService.User()
 }
 
