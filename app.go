@@ -23,7 +23,7 @@ type App struct {
 	userConfig          vo.UserConfig
 	appConfig           vo.AppConfig
 	excludePlayer       domain.ExcludePlayer
-	isFinishedPrepare   bool
+	isSuccessfulOnce    bool
 	logger              infra.Logger
 	cancelReplayWatcher context.CancelFunc
 	configService       service.Config
@@ -95,23 +95,6 @@ func (a *App) Ready() {
 }
 
 func (a *App) Battle() (vo.Battle, error) {
-	if !a.isFinishedPrepare {
-		prepare := service.NewPrepare(
-			PARALLELS,
-			infra.Wargaming{AppID: a.userConfig.Appid},
-			infra.Numbers{},
-			infra.Unregistered{},
-		)
-
-		if err := prepare.FetchCachable(); err != nil {
-			a.logger.Error("Failed to prepare", err)
-
-			return vo.Battle{}, err
-		}
-
-		a.isFinishedPrepare = true
-	}
-
 	battle := service.NewBattle(
 		PARALLELS,
 		a.userConfig,
@@ -119,12 +102,16 @@ func (a *App) Battle() (vo.Battle, error) {
 		infra.TempArenaInfo{},
 	)
 
-	result, err := battle.Battle()
+	result, err := battle.Battle(a.isSuccessfulOnce)
 	if err != nil {
 		a.logger.Error("Failed to get battle.", err)
+
+		return result, err
 	}
 
-	return result, err
+	a.isSuccessfulOnce = true
+
+	return result, nil
 }
 
 func (a *App) SelectDirectory() (string, error) {

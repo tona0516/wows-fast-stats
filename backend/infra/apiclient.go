@@ -19,7 +19,7 @@ func (c *APIClient[T]) GetRequest(rawurl string) (T, error) {
 		return response, err
 	}
 
-	b := backoff.WithMaxRetries(backoff.NewExponentialBackOff(), 3)
+	b := backoff.WithMaxRetries(backoff.NewExponentialBackOff(), 5)
 	operation := func() (*http.Response, error) {
 		return http.Get(u.String())
 	}

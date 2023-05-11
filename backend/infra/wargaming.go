@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/cenkalti/backoff/v4"
 	"github.com/pkg/errors"
 )
 
@@ -163,7 +164,23 @@ func buildURL(path string, query map[string]string) *url.URL {
 
 func request[T vo.WGResponse](u *url.URL, errDetail apperr.AppError) (T, error) {
 	client := APIClient[T]{}
-	res, err := client.GetRequest(u.String())
+
+	b := backoff.WithMaxRetries(backoff.NewExponentialBackOff(), 5)
+	operation := func() (T, error) {
+		res, err := client.GetRequest(u.String())
+
+		// Note:
+		// https://developers.wargaming.net/documentation/guide/getting-started/#common-errors
+		message := res.GetError().Message
+		if message == "REQUEST_LIMIT_EXCEEDED" || message == "SOURCE_NOT_AVAILABLE" {
+			//nolint:goerr113
+			return res, errDetail.WithRaw(fmt.Errorf(message))
+		}
+
+		return res, backoff.Permanent(err)
+	}
+
+	res, err := backoff.RetryWithData(operation, b)
 	if err != nil {
 		return res, errors.WithStack(errDetail.WithRaw(err))
 	}

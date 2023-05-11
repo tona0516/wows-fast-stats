@@ -31,8 +31,20 @@ func NewBattle(
 }
 
 //nolint:cyclop
-func (b *Battle) Battle() (vo.Battle, error) {
+func (b *Battle) Battle(isSuccessfulOnce bool) (vo.Battle, error) {
 	var result vo.Battle
+
+	prepareResult := make(chan error)
+	if !isSuccessfulOnce {
+		prepare := NewPrepare(
+			b.parallels,
+			infra.Wargaming{AppID: b.userConfig.Appid},
+			infra.Numbers{},
+			infra.Unregistered{},
+		)
+
+		go prepare.FetchCachable(prepareResult)
+	}
 
 	tempArenaInfo, err := b.tempArenaInfoRepo.Get(b.userConfig.InstallPath)
 	if err != nil {
@@ -60,6 +72,13 @@ func (b *Battle) Battle() (vo.Battle, error) {
 	go b.accountInfo(accountIDs, accountInfoResult)
 	go b.shipStats(accountIDs, shipStatsResult)
 	go b.clanTag(accountIDs, clanTagResult)
+
+	if !isSuccessfulOnce {
+		err = <-prepareResult
+		if err != nil {
+			return result, err
+		}
+	}
 
 	warshipCache := infra.Cache[map[int]vo.Warship]{Name: "warship"}
 	warship, err := warshipCache.Deserialize()

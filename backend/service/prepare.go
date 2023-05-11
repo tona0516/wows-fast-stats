@@ -31,9 +31,11 @@ func NewPrepare(
 	}
 }
 
-func (p *Prepare) FetchCachable() error {
+func (p *Prepare) FetchCachable(result chan error) {
 	if err := p.deleteOldCache(); err != nil {
-		return err
+		result <- err
+
+		return
 	}
 
 	fns := [](func(chan error)){
@@ -43,20 +45,23 @@ func (p *Prepare) FetchCachable() error {
 		p.battleTypes,
 	}
 
-	results := make([](*chan error), 0)
+	errs := make([](*chan error), 0)
 	for _, fn := range fns {
-		result := make(chan error)
-		go fn(result)
-		results = append(results, &result)
+		fn := fn
+		err := make(chan error)
+		go fn(err)
+		errs = append(errs, &err)
 	}
 
-	for _, result := range results {
-		if err := <-*result; err != nil {
-			return err
+	for _, err := range errs {
+		if err := <-*err; err != nil {
+			result <- err
+
+			return
 		}
 	}
 
-	return nil
+	result <- nil
 }
 
 func (p *Prepare) deleteOldCache() error {
