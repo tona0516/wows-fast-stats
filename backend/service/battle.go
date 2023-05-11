@@ -203,15 +203,16 @@ func (b *Battle) compose(
 		clan := clanTag[accountID]
 
 		playerAccountInfo := accountInfo.Data[accountID]
+		pvp := playerAccountInfo.Statistics.Pvp
 		stats := domain.Stats{
 			Overall: domain.StatsFactor{
-				Battles:         playerAccountInfo.Statistics.Pvp.Battles,
-				SurvivedBattles: playerAccountInfo.Statistics.Pvp.SurvivedBattles,
-				DamageDealt:     playerAccountInfo.Statistics.Pvp.DamageDealt,
-				Frags:           playerAccountInfo.Statistics.Pvp.Frags,
-				Wins:            playerAccountInfo.Statistics.Pvp.Wins,
-				SurvivedWins:    playerAccountInfo.Statistics.Pvp.SurviveWins,
-				Xp:              playerAccountInfo.Statistics.Pvp.Xp,
+				Battles:         pvp.Battles,
+				SurvivedBattles: pvp.SurvivedBattles,
+				DamageDealt:     pvp.DamageDealt,
+				Frags:           pvp.Frags,
+				Wins:            pvp.Wins,
+				SurvivedWins:    pvp.SurviveWins,
+				Xp:              pvp.Xp,
 			},
 		}
 		for _, v := range shipStats[accountID].Data[accountID] {

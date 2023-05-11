@@ -2,15 +2,12 @@
 import {
   UserConfig,
   Battle,
-  ManualScreenshot,
-  AutoScreenshot,
   ExcludePlayerIDs,
   Ready,
 } from "../wailsjs/go/main/App.js";
 import Notification from "./Notification.svelte";
 import ConfigPage from "./PageConfig.svelte";
 import MainPage from "./PageMain.svelte";
-import { toPng } from "html-to-image";
 import { EventsOn } from "../wailsjs/runtime/runtime.js";
 import AppInfo from "./PageAppInfo.svelte";
 
@@ -19,6 +16,7 @@ import type { vo } from "wailsjs/go/models.js";
 import { Average, type AverageFactor } from "./Average.js";
 import Navigation from "./Navigation.svelte";
 import type { Page } from "./Page.js";
+import { Screenshot } from "./Screenshot.js";
 
 let currentPage: Page;
 let battle: vo.Battle;
@@ -26,52 +24,7 @@ let config: vo.UserConfig;
 let averageFactors: AverageFactor;
 let excludePlayerIDs: number[];
 let notification: Notification;
-let isLoadingScreenshot: boolean;
-
-let firstScreenshot = true;
-async function getScreenshotBase64(): Promise<[string, string]> {
-  // Workaround: first screenshot cann't draw values in table.
-  if (firstScreenshot) {
-    await toPng(document.getElementById("mainpage"));
-    firstScreenshot = false;
-  }
-  const dataUrl = await toPng(document.getElementById("mainpage"));
-  const date = battle.meta.date.replaceAll(":", "-").replaceAll(" ", "-");
-  const ownShip = battle.meta.own_ship.replaceAll(" ", "-");
-  const filename = `${date}_${ownShip}_${battle.meta.arena}_${battle.meta.type}.png`;
-  const base64Data = dataUrl.split(",")[1];
-  return [filename, base64Data];
-}
-
-function manualScreenshot() {
-  isLoadingScreenshot = true;
-  getScreenshotBase64()
-    .then(([filename, data]) => {
-      return ManualScreenshot(filename, data);
-    })
-    .then(() => {
-      notification.showToast("スクリーンショットを保存しました。", "success");
-    })
-    .catch((error) => {
-      // TODO handling based on type
-      const errStr = error as string;
-      if (errStr.includes("Canceled")) {
-        return;
-      }
-      notification.showToast(
-        "スクリーンショットの保存に失敗しました。",
-        "error"
-      );
-    })
-    .finally(() => {
-      isLoadingScreenshot = false;
-    });
-}
-
-async function autoScreenshot() {
-  const [filename, data] = await getScreenshotBase64();
-  await AutoScreenshot(filename, data);
-}
+let isFirstScreenshot: boolean;
 
 EventsOn("BATTLE_START", async () => {
   try {
@@ -89,7 +42,10 @@ EventsOn("BATTLE_START", async () => {
     notification.showToast(`データ取得完了: ${elapsed}秒`, "success");
 
     if (config.save_screenshot) {
-      autoScreenshot();
+      const screenshot = new Screenshot(battle, isFirstScreenshot);
+      screenshot.auto().finally(() => {
+        isFirstScreenshot = false;
+      });
     }
   } catch (error) {
     notification.showToastWithKey(error, "error", "error");
@@ -136,8 +92,11 @@ window.onload = function () {
       bind:config="{config}"
       bind:currentPage="{currentPage}"
       bind:battle="{battle}"
-      bind:isLoadingScreenshot="{isLoadingScreenshot}"
-      on:onScreenshot="{manualScreenshot}"
+      bind:isFirstScreenshot="{isFirstScreenshot}"
+      on:onScreenshotSuccess="{(event) =>
+        notification.showToast(event.detail.message, 'success')}"
+      on:onScreenshotFailure="{(event) =>
+        notification.showToast(event.detail.message, 'error')}"
     />
 
     {#if currentPage === "main"}

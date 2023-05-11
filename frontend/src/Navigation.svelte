@@ -3,6 +3,7 @@ import { createEventDispatcher } from "svelte";
 import { WindowReloadApp } from "../wailsjs/runtime/runtime";
 import type { Page } from "./Page";
 import type { vo } from "wailsjs/go/models";
+import { Screenshot } from "./Screenshot";
 
 const dispatch = createEventDispatcher();
 
@@ -12,7 +13,9 @@ type NavigationMenu = Page | Func;
 export let config: vo.UserConfig;
 export let currentPage: Page = "main";
 export let battle: vo.Battle;
-export let isLoadingScreenshot: boolean = false;
+export let isFirstScreenshot: boolean = true;
+
+let isLoadingScreenshot: boolean = false;
 
 function onClickMenu(menu: NavigationMenu) {
   switch (menu) {
@@ -29,7 +32,27 @@ function onClickMenu(menu: NavigationMenu) {
       WindowReloadApp();
       break;
     case "screenshot":
-      dispatch("onScreenshot");
+      isLoadingScreenshot = true;
+      const screenshot = new Screenshot(battle, isFirstScreenshot);
+      screenshot
+        .manual()
+        .then(() => {
+          dispatch("onScreenshotSuccess", {
+            message: "スクリーンショットを保存しました。",
+          });
+        })
+        .catch((error) => {
+          // TODO handling based on type
+          const errStr = error as string;
+          if (errStr.includes("Canceled")) {
+            return;
+          }
+          dispatch("onScreenshotFailure", { message: error });
+        })
+        .finally(() => {
+          isFirstScreenshot = false;
+          isLoadingScreenshot = false;
+        });
       break;
     default:
       break;
