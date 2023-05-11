@@ -1,16 +1,11 @@
 package vo
 
+import "reflect"
+
 type WGClansInfo struct {
-	Status string `json:"status"`
-	Data   map[int]struct {
-		Tag string `json:"tag"`
-	} `json:"data"`
-	Error struct {
-		Code    int    `json:"code"`
-		Message string `json:"message"`
-		Field   string `json:"field"`
-		Value   string `json:"value"`
-	} `json:"error"`
+	Status string                  `json:"status"`
+	Data   map[int]WGClansInfoData `json:"data"`
+	Error  WGError                 `json:"error"`
 }
 
 func (w WGClansInfo) GetStatus() string {
@@ -18,5 +13,13 @@ func (w WGClansInfo) GetStatus() string {
 }
 
 func (w WGClansInfo) GetError() WGError {
-	return WGError(w.Error)
+	return w.Error
+}
+
+type WGClansInfoData struct {
+	Tag string `json:"tag"`
+}
+
+func (w WGClansInfoData) Field() string {
+	return fieldQuery(reflect.TypeOf(&w).Elem())
 }

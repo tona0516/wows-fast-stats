@@ -1,16 +1,11 @@
 package vo
 
+import "reflect"
+
 type WGBattleTypes struct {
-	Status string `json:"status"`
-	Data   map[string]struct {
-		Name string `json:"Name"`
-	} `json:"data"`
-	Error struct {
-		Code    int    `json:"code"`
-		Message string `json:"message"`
-		Field   string `json:"field"`
-		Value   string `json:"value"`
-	} `json:"error"`
+	Status string                       `json:"status"`
+	Data   map[string]WGBattleTypesData `json:"data"`
+	Error  WGError                      `json:"error"`
 }
 
 func (w WGBattleTypes) GetStatus() string {
@@ -18,5 +13,13 @@ func (w WGBattleTypes) GetStatus() string {
 }
 
 func (w WGBattleTypes) GetError() WGError {
-	return WGError(w.Error)
+	return w.Error
+}
+
+type WGBattleTypesData struct {
+	Name string `json:"name"`
+}
+
+func (w WGBattleTypesData) Field() string {
+	return fieldQuery(reflect.TypeOf(&w).Elem())
 }

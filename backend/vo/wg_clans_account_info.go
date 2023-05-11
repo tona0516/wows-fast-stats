@@ -1,18 +1,15 @@
 package vo
 
-import "golang.org/x/exp/slices"
+import (
+	"reflect"
+
+	"golang.org/x/exp/slices"
+)
 
 type WGClansAccountInfo struct {
-	Status string `json:"status"`
-	Data   map[int]struct {
-		ClanID int `json:"clan_id"`
-	} `json:"data"`
-	Error struct {
-		Code    int    `json:"code"`
-		Message string `json:"message"`
-		Field   string `json:"field"`
-		Value   string `json:"value"`
-	} `json:"error"`
+	Status string                         `json:"status"`
+	Data   map[int]WGClansAccountInfoData `json:"data"`
+	Error  WGError                        `json:"error"`
 }
 
 func (w WGClansAccountInfo) ClanIDs() []int {
@@ -38,5 +35,13 @@ func (w WGClansAccountInfo) GetStatus() string {
 }
 
 func (w WGClansAccountInfo) GetError() WGError {
-	return WGError(w.Error)
+	return w.Error
+}
+
+type WGClansAccountInfoData struct {
+	ClanID int `json:"clan_id"`
+}
+
+func (w WGClansAccountInfoData) Field() string {
+	return fieldQuery(reflect.TypeOf(&w).Elem())
 }

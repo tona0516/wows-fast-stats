@@ -25,16 +25,7 @@ func (w *Wargaming) AccountInfo(accountIDs []int) (vo.WGAccountInfo, error) {
 		map[string]string{
 			"application_id": w.AppID,
 			"account_id":     strings.Join(accountIDsString, ","),
-			"fields": strings.Join([]string{
-				"hidden_profile",
-				"statistics.pvp.battles",
-				"statistics.pvp.wins",
-				"statistics.pvp.frags",
-				"statistics.pvp.damage_dealt",
-				"statistics.pvp.xp",
-				"statistics.pvp.survived_battles",
-				"statistics.pvp.survived_wins",
-			}, ","),
+			"fields":         vo.WGAccountInfoData{}.Field(),
 		},
 	)
 
@@ -47,7 +38,7 @@ func (w *Wargaming) AccountList(accountNames []string) (vo.WGAccountList, error)
 		map[string]string{
 			"application_id": w.AppID,
 			"search":         strings.Join(accountNames, ","),
-			"fields":         strings.Join([]string{"account_id", "nickname"}, ","),
+			"fields":         vo.WGAccountListData{}.Field(),
 			"type":           "exact",
 		},
 	)
@@ -66,7 +57,7 @@ func (w *Wargaming) ClansAccountInfo(accountIDs []int) (vo.WGClansAccountInfo, e
 		map[string]string{
 			"application_id": w.AppID,
 			"account_id":     strings.Join(accountIDsString, ","),
-			"fields":         "clan_id",
+			"fields":         vo.WGClansAccountInfoData{}.Field(),
 		},
 	)
 
@@ -84,7 +75,7 @@ func (w *Wargaming) ClansInfo(clanIDs []int) (vo.WGClansInfo, error) {
 		map[string]string{
 			"application_id": w.AppID,
 			"clan_id":        strings.Join(clanIDsString, ","),
-			"fields":         "tag",
+			"fields":         vo.WGClansInfoData{}.Field(),
 		},
 	)
 
@@ -96,14 +87,9 @@ func (w *Wargaming) EncyclopediaShips(pageNo int) (vo.WGEncyclopediaShips, error
 		"/wows/encyclopedia/ships/",
 		map[string]string{
 			"application_id": w.AppID,
-			"fields": strings.Join([]string{
-				"name",
-				"tier",
-				"type",
-				"nation",
-			}, ","),
-			"language": "en",
-			"page_no":  strconv.Itoa(pageNo),
+			"fields":         vo.WGEncyclopediaShipsData{}.Field(),
+			"language":       "en",
+			"page_no":        strconv.Itoa(pageNo),
 		},
 	)
 
@@ -116,20 +102,7 @@ func (w *Wargaming) ShipsStats(accountID int) (vo.WGShipsStats, error) {
 		map[string]string{
 			"application_id": w.AppID,
 			"account_id":     strconv.Itoa(accountID),
-			"fields": strings.Join([]string{
-				"ship_id",
-				"pvp.battles",
-				"pvp.wins",
-				"pvp.frags",
-				"pvp.damage_dealt",
-				"pvp.xp",
-				"pvp.survived_battles",
-				"pvp.survived_wins",
-				"pvp.main_battery.hits",
-				"pvp.main_battery.shots",
-				"pvp.torpedoes.hits",
-				"pvp.torpedoes.shots",
-			}, ","),
+			"fields":         vo.WGShipsStatsData{}.Field(),
 		},
 	)
 
@@ -141,7 +114,7 @@ func (w *Wargaming) EncyclopediaInfo() (vo.WGEncyclopediaInfo, error) {
 		"/wows/encyclopedia/info/",
 		map[string]string{
 			"application_id": w.AppID,
-			"fields":         "game_version",
+			"fields":         vo.WGEncyclopediaInfoData{}.Field(),
 		},
 	)
 
@@ -153,7 +126,7 @@ func (w *Wargaming) BattleArenas() (vo.WGBattleArenas, error) {
 		"/wows/encyclopedia/battlearenas/",
 		map[string]string{
 			"application_id": w.AppID,
-			"fields":         "name",
+			"fields":         vo.WGBattleArenasData{}.Field(),
 			"language":       "ja",
 		},
 	)
@@ -166,7 +139,7 @@ func (w *Wargaming) BattleTypes() (vo.WGBattleTypes, error) {
 		"/wows/encyclopedia/battletypes/",
 		map[string]string{
 			"application_id": w.AppID,
-			"fields":         "name",
+			"fields":         vo.WGBattleTypesData{}.Field(),
 			"language":       "ja",
 		},
 	)

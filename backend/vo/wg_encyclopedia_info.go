@@ -1,16 +1,11 @@
 package vo
 
+import "reflect"
+
 type WGEncyclopediaInfo struct {
-	Status string `json:"status"`
-	Data   struct {
-		GameVersion string `json:"game_version"`
-	} `json:"data"`
-	Error struct {
-		Code    int    `json:"code"`
-		Message string `json:"message"`
-		Field   string `json:"field"`
-		Value   string `json:"value"`
-	} `json:"error"`
+	Status string                 `json:"status"`
+	Data   WGEncyclopediaInfoData `json:"data"`
+	Error  WGError                `json:"error"`
 }
 
 func (w WGEncyclopediaInfo) GetStatus() string {
@@ -18,5 +13,13 @@ func (w WGEncyclopediaInfo) GetStatus() string {
 }
 
 func (w WGEncyclopediaInfo) GetError() WGError {
-	return WGError(w.Error)
+	return w.Error
+}
+
+type WGEncyclopediaInfoData struct {
+	GameVersion string `json:"game_version"`
+}
+
+func (w WGEncyclopediaInfoData) Field() string {
+	return fieldQuery(reflect.TypeOf(&w).Elem())
 }

@@ -1,10 +1,10 @@
 package vo
 
 type WGError struct {
-	Code    int
-	Message string
-	Field   string
-	Value   string
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+	Field   string `json:"field"`
+	Value   string `json:"value"`
 }
 
 type WGResponse interface {

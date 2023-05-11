@@ -1,21 +1,11 @@
 package vo
 
+import "reflect"
+
 type WGAccountList struct {
-	Status string `json:"status"`
-	Meta   struct {
-		Count  int         `json:"count"`
-		Hidden interface{} `json:"hidden"`
-	} `json:"meta"`
-	Data []struct {
-		NickName  string `json:"nickname"`
-		AccountID int    `json:"account_id"`
-	} `json:"data"`
-	Error struct {
-		Code    int    `json:"code"`
-		Message string `json:"message"`
-		Field   string `json:"field"`
-		Value   string `json:"value"`
-	} `json:"error"`
+	Status string              `json:"status"`
+	Data   []WGAccountListData `json:"data"`
+	Error  WGError             `json:"error"`
 }
 
 func (w WGAccountList) AccountIDs() []int {
@@ -46,5 +36,14 @@ func (w WGAccountList) GetStatus() string {
 }
 
 func (w WGAccountList) GetError() WGError {
-	return WGError(w.Error)
+	return w.Error
+}
+
+type WGAccountListData struct {
+	NickName  string `json:"nickname"`
+	AccountID int    `json:"account_id"`
+}
+
+func (w WGAccountListData) Field() string {
+	return fieldQuery(reflect.TypeOf(&w).Elem())
 }

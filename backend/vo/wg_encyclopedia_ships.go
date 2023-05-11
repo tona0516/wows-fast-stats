@@ -1,5 +1,7 @@
 package vo
 
+import "reflect"
+
 type WGEncyclopediaShips struct {
 	Status string `json:"status"`
 	Meta   struct {
@@ -9,18 +11,8 @@ type WGEncyclopediaShips struct {
 		Limit     int `json:"limit"`
 		Page      int `json:"page"`
 	} `json:"meta"`
-	Data map[int]struct {
-		Tier   uint   `json:"tier"`
-		Type   string `json:"type"`
-		Name   string `json:"name"`
-		Nation string `json:"nation"`
-	} `json:"data"`
-	Error struct {
-		Code    int    `json:"code"`
-		Message string `json:"message"`
-		Field   string `json:"field"`
-		Value   string `json:"value"`
-	} `json:"error"`
+	Data  map[int]WGEncyclopediaShipsData `json:"data"`
+	Error WGError                         `json:"error"`
 }
 
 func (w WGEncyclopediaShips) GetStatus() string {
@@ -28,5 +20,16 @@ func (w WGEncyclopediaShips) GetStatus() string {
 }
 
 func (w WGEncyclopediaShips) GetError() WGError {
-	return WGError(w.Error)
+	return w.Error
+}
+
+type WGEncyclopediaShipsData struct {
+	Tier   uint   `json:"tier"`
+	Type   string `json:"type"`
+	Name   string `json:"name"`
+	Nation string `json:"nation"`
+}
+
+func (w WGEncyclopediaShipsData) Field() string {
+	return fieldQuery(reflect.TypeOf(&w).Elem())
 }
