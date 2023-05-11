@@ -24,6 +24,7 @@ linters:
     - varnamelen
     - noctx
     - reassign
+    - nlreturn
     - gci # Conflict goimports
     - gofumpt # Conflict goimports
   fast: false
