@@ -14,7 +14,8 @@
      */
     "allowJs": true,
     "checkJs": true,
-    "isolatedModules": true
+    "isolatedModules": true,
+    "moduleResolution": "node",
   },
   "include": [
     "src/**/*.d.ts",
