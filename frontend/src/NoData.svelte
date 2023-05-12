@@ -18,7 +18,11 @@ const overallCounts = Object.values(config.displays.overall).filter(
     <td class="no_data omit" colspan="{shipCounts + overallCounts}">PRIVATE</td>
   {:else if displayPattern === "nodata"}
     <td class="no_data omit" colspan="{shipCounts + overallCounts}">N/A</td>
-  {:else if displayPattern === "noshipstats"}
+  {/if}
+{/if}
+
+{#if shipCounts > 0}
+  {#if displayPattern === "noshipstats"}
     <td class="no_data omit" colspan="{shipCounts}">N/A</td>
   {/if}
 {/if}
