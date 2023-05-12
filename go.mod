@@ -10,8 +10,6 @@ require (
 
 require github.com/rs/zerolog v1.29.1
 
-require github.com/fsnotify/fsnotify v1.6.0
-
 require github.com/cenkalti/backoff/v4 v4.2.1
 
 require (

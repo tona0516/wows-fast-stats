@@ -62,10 +62,6 @@ EventsOn("BATTLE_END", () => {
   );
 });
 
-EventsOn("BATTLE_ERROR", (error) => {
-  notification.showToastWithKey(error, "error", "error");
-});
-
 async function main() {
   try {
     config = await UserConfig();

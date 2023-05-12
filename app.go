@@ -89,7 +89,6 @@ func (a *App) Ready() {
 		a.ctx,
 		infra.Config{},
 		infra.TempArenaInfo{},
-		&a.logger,
 	)
 	go rw.Start(ctx)
 }

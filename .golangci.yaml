@@ -25,6 +25,7 @@ linters:
     - noctx
     - reassign
     - nlreturn
+    - contextcheck
     - gci # Conflict goimports
     - gofumpt # Conflict goimports
   fast: false

@@ -4,140 +4,65 @@ import (
 	"context"
 	"crypto/sha256"
 	"fmt"
-	"path/filepath"
-	"strings"
+	"time"
 
-	"changeme/backend/apperr"
 	"changeme/backend/infra"
 
-	"github.com/fsnotify/fsnotify"
-	"github.com/pkg/errors"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 const (
 	EventStart = "BATTLE_START"
 	EventEnd   = "BATTLE_END"
-	EventErr   = "BATTLE_ERROR"
 )
 
 type ReplayWatcher struct {
 	appCtx     context.Context
 	configRepo infra.Config
 	taiRepo    infra.TempArenaInfo
-	logger     *infra.Logger
 }
 
 func NewReplayWatcher(
 	appCtx context.Context,
 	configRepo infra.Config,
 	taiRepo infra.TempArenaInfo,
-	logger *infra.Logger,
 ) *ReplayWatcher {
 	return &ReplayWatcher{
 		appCtx:     appCtx,
 		configRepo: configRepo,
 		taiRepo:    taiRepo,
-		logger:     logger,
 	}
 }
 
-//nolint:cyclop
 func (w *ReplayWatcher) Start(ctx context.Context) {
-	latestHash, err := w.tempArenaInfoHash()
-	if err != nil {
-		w.notifyEnd()
-	} else {
-		w.notifyStart()
-	}
-
-	watcher, err := w.genWatcher()
-	if err != nil {
-		w.logger.Error("Failed to create ReplayWacher.", err)
-		w.notifyError(err)
-
-		return
-	}
-	defer watcher.Close()
+	var latestHash string
 
 	for {
 		select {
 		case <-ctx.Done():
 			return
-		case event := <-watcher.Events:
-			if !strings.HasSuffix(event.Name, infra.TempArenaInfoName) {
+		default:
+			time.Sleep(1 * time.Second)
+
+			userConfig, err := w.configRepo.User()
+			if err != nil {
 				continue
 			}
 
-			if event.Has(fsnotify.Create) || event.Has(fsnotify.Write) {
-				hash, err := w.tempArenaInfoHash()
-				if err != nil {
-					continue
-				}
-				if hash == latestHash {
-					continue
-				}
-				latestHash = hash
-				w.notifyStart()
+			tempArenaInfo, err := w.taiRepo.Get(userConfig.InstallPath)
+			if err != nil {
+				runtime.EventsEmit(w.appCtx, EventEnd)
+				continue
 			}
 
-			if event.Has(fsnotify.Remove) {
-				w.notifyEnd()
-			}
-		case err := <-watcher.Errors:
-			w.logger.Error("ReplayWacher gets error.", err)
-			w.notifyError(errors.WithStack(apperr.SrvRw.WatcherChan.WithRaw(err)))
+			hash := fmt.Sprintf("%x", sha256.Sum256([]byte(fmt.Sprintf("%x", tempArenaInfo))))
 
-			return
+			if hash == latestHash {
+				continue
+			}
+
+			latestHash = hash
+			runtime.EventsEmit(w.appCtx, EventStart)
 		}
 	}
-}
-
-func (w *ReplayWatcher) tempArenaInfoHash() (string, error) {
-	var result string
-
-	userConfig, err := w.configRepo.User()
-	if err != nil {
-		return result, err
-	}
-
-	tempArenaInfo, err := w.taiRepo.Get(userConfig.InstallPath)
-	if err != nil {
-		return result, err
-	}
-
-	md5 := sha256.Sum256([]byte(fmt.Sprintf("%x", tempArenaInfo)))
-	result = fmt.Sprintf("%x", md5)
-
-	return result, nil
-}
-
-func (w *ReplayWatcher) genWatcher() (*fsnotify.Watcher, error) {
-	watcher, err := fsnotify.NewWatcher()
-	if err != nil {
-		return watcher, errors.WithStack(apperr.SrvRw.NewWatcher.WithRaw(err))
-	}
-
-	userConfig, err := w.configRepo.User()
-	if err != nil {
-		return watcher, err
-	}
-
-	if err := watcher.Add(filepath.Join(userConfig.InstallPath, infra.ReplayDir)); err != nil {
-		return watcher, errors.WithStack(apperr.SrvRw.WatcherAdd.WithRaw(err))
-	}
-
-	return watcher, nil
-}
-
-func (w *ReplayWatcher) notifyStart() {
-	runtime.EventsEmit(w.appCtx, EventStart)
-}
-
-func (w *ReplayWatcher) notifyEnd() {
-	runtime.EventsEmit(w.appCtx, EventEnd)
-}
-
-func (w *ReplayWatcher) notifyError(err error) {
-	runtime.EventsEmit(w.appCtx, EventErr, err)
 }
