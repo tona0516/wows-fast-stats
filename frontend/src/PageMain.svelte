@@ -114,7 +114,7 @@ function onCheckPlayer() {
 </script>
 
 {#if battle}
-  <div class="mt-1 mx-4">
+  <div class="m-2">
     <table class="table table-sm table-bordered table-text-color">
       {#each battle.teams as team}
         <thead>
