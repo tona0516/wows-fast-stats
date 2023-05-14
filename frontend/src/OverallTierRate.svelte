@@ -2,7 +2,6 @@
 import type { vo } from "wailsjs/go/models";
 import type { DisplayPattern } from "./DisplayPattern";
 import Const from "./Const";
-import { LogDebug } from "../wailsjs/runtime/runtime";
 export let config: vo.UserConfig;
 export let player: vo.Player;
 export let displayPattern: DisplayPattern;
