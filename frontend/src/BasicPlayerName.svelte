@@ -2,6 +2,7 @@
 import type { vo } from "wailsjs/go/models";
 import { BrowserOpenURL } from "../wailsjs/runtime/runtime";
 import Const from "./Const";
+import TextColor from "./TextColor";
 export let player: vo.Player;
 
 function clanURL(player: vo.Player): string {
@@ -25,7 +26,7 @@ function playerURL(player: vo.Player): string {
 }
 </script>
 
-<td class="td-string omit">
+<td class="td-string omit" id="{TextColor.prBG(player.ship_stats.pr)}">
   {#if player.player_info.id === 0}
     {player.player_info.name}
   {:else}

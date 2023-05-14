@@ -57,23 +57,20 @@ function shipURL(player: vo.Player): string {
 }
 </script>
 
-<td class="td-string" id="{TextColor.shipType(player.ship_info.type)}">
+<td style="width: 1em" id="{TextColor.shipType(player.ship_info.type)}">
+  <img alt="" src="{shipIcon(player.ship_info.type)}" class="ship-icon-scale" />
+</td>
+
+<td class="td-string">
   <!-- svelte-ignore a11y-invalid-attribute -->
   <a
     class="td-link"
     href="#"
     on:click="{() => BrowserOpenURL(shipURL(player))}"
   >
-    <div class="horizontal">
-      <img
-        alt=""
-        src="{shipIcon(player.ship_info.type)}"
-        class="ship-icon-scale"
-      />
-      <div class="omit">
-        {tierString(player.ship_info.tier)}
-        {player.ship_info.name}
-      </div>
+    <div class="omit">
+      {tierString(player.ship_info.tier)}
+      {player.ship_info.name}
     </div>
   </a>
 </td>

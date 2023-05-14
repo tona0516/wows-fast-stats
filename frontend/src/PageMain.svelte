@@ -97,7 +97,7 @@ function onCheckPlayer() {
             <th
               colspan="{Object.values(config.displays.basic).filter(
                 (it) => it === true
-              ).length}">基本情報</th
+              ).length + 1}">基本情報</th
             >
             {#if Object.values(config.displays.ship).filter((it) => it === true).length !== 0}
               <th
@@ -118,7 +118,11 @@ function onCheckPlayer() {
             <th></th>
             {#each Object.keys(components.basic) as k}
               {#if config.displays.basic[k]}
-                <th>{Const.COLUMN_NAMES[k].min}</th>
+                {#if k === "ship_info"}
+                  <th colspan="2">{Const.COLUMN_NAMES[k].min}</th>
+                {:else}
+                  <th>{Const.COLUMN_NAMES[k].min}</th>
+                {/if}
               {/if}
             {/each}
 

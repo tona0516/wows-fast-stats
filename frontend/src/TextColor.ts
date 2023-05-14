@@ -1,6 +1,31 @@
 import { LogDebug } from "../wailsjs/runtime/runtime";
 
 namespace TextColor {
+  export function prBG(value: number): string {
+    switch (true) {
+      case value <= 0:
+        return "";
+      case value < 750:
+        return "bad";
+      case value < 1100:
+        return "below-average";
+      case value < 1350:
+        return "average";
+      case value < 1550:
+        return "good";
+      case value < 1750:
+        return "very-good";
+      case value < 2100:
+        return "great";
+      case value < 2450:
+        return "unicum";
+      case value >= 2450:
+        return "super-unicum";
+      default:
+        return "";
+    }
+  }
+
   export function pr(value: number): string {
     switch (true) {
       case value <= 0:

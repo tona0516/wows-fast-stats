@@ -48,6 +48,38 @@ body {
   text-align: center;
 }
 
+#bad {
+  background-color: #a41200;
+}
+
+#below-average {
+  background-color: #a34a02;
+}
+
+#average {
+  background-color: #a38204;
+}
+
+#good {
+  background-color: #518517;
+}
+
+#very-good {
+  background-color: #2f6f41;
+}
+
+#great {
+  background-color: #04436d;
+}
+
+#unicum {
+  background-color: #232166;
+}
+
+#super-unicum {
+  background-color: #531460;
+}
+
 .bad-text {
   color: #ff382d;
 }
@@ -81,27 +113,27 @@ body {
 }
 
 #clan-text {
-  color: #99cf15;
+  color: #ffffff;
 }
 
 #ss-text {
-  background-color: #16344f;
+  background-color: #233b8b;
 }
 
 #dd-text {
-  background-color: #695b18;
+  background-color: #ccb914;
 }
 
 #cl-text {
-  background-color: #345934;
+  background-color: #27853f;
 }
 
 #bb-text {
-  background-color: #632a31;
+  background-color: #ca1028;
 }
 
 #cv-text {
-  background-color: #4a304b;
+  background-color: #5e2883;
 }
 
 .td-link {
@@ -142,6 +174,8 @@ body {
 .ship-icon-scale {
   height: 0.7em;
   margin-right: 2px;
+  display: flex;
+  align-items: center;
 }
 
 .horizontal {
