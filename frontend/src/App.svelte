@@ -40,6 +40,7 @@ EventsOn("BATTLE_START", async () => {
 
     const elapsed = (new Date().getTime() - start) / 1000;
     notification.showToast(`データ取得完了: ${elapsed}秒`, "success");
+    notification.removeToastWithKey("error");
 
     if (config.save_screenshot) {
       const screenshot = new Screenshot(battle, isFirstScreenshot);
