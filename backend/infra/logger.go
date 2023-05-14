@@ -21,9 +21,9 @@ func NewLogger(env vo.Env, version vo.Version) *Logger {
 	_ = os.Mkdir(logDir, 0o755)
 
 	writer := &lumberjack.Logger{
-		Filename: filepath.Join(logDir, "app.log"),
-		MaxAge:   7,
-		Compress: true,
+		Filename:   filepath.Join(logDir, "app.log"),
+		MaxBackups: 1,
+		Compress:   true,
 	}
 
 	zerolog.ErrorStackMarshaler = pkgerrors.MarshalStack
