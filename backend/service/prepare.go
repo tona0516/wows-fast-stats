@@ -95,7 +95,7 @@ func (p *Prepare) warship(result chan error) {
 			warships[shipID] = vo.Warship{
 				Name:   warship.Name,
 				Tier:   warship.Tier,
-				Type:   warship.Type,
+				Type:   vo.NewShipType(warship.Type),
 				Nation: warship.Nation,
 			}
 			mu.Unlock()

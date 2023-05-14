@@ -1,12 +1,12 @@
 package vo
 
 type ShipInfo struct {
-	ID        int     `json:"id"`
-	Name      string  `json:"name"`
-	Nation    string  `json:"nation"`
-	Tier      uint    `json:"tier"`
-	Type      string  `json:"type"`
-	AvgDamage float64 `json:"avg_damage"`
+	ID        int      `json:"id"`
+	Name      string   `json:"name"`
+	Nation    string   `json:"nation"`
+	Tier      uint     `json:"tier"`
+	Type      ShipType `json:"type"`
+	AvgDamage float64  `json:"avg_damage"`
 }
 
 type ShipStats struct {

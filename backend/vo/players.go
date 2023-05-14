@@ -14,18 +14,8 @@ func (p Players) Less(i, j int) bool {
 	one := p[i].ShipInfo
 	second := p[j].ShipInfo
 
-	shipTypes := shipTypes()
-
 	if one.Type != second.Type {
-		if _, ok := shipTypes[one.Type]; !ok {
-			return true
-		}
-
-		if _, ok := shipTypes[second.Type]; !ok {
-			return false
-		}
-
-		return shipTypes[one.Type] < shipTypes[second.Type]
+		return one.Type.Priority() < second.Type.Priority()
 	}
 
 	if one.Tier != second.Tier {
@@ -37,15 +27,4 @@ func (p Players) Less(i, j int) bool {
 	}
 
 	return one.Name < second.Name
-}
-
-func shipTypes() map[string]int {
-	return map[string]int{
-		"AirCarrier": 0,
-		"Battleship": 1,
-		"Cruiser":    2,
-		"Destroyer":  3,
-		"Submarine":  4,
-		"Auxiliary":  5,
-	}
 }

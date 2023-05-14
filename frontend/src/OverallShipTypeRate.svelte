@@ -22,23 +22,6 @@ const otherColors: { [key: string]: string } = {
   cv: "#CAB2D6",
 };
 
-function convertToKey(shipType: string): string {
-  switch (shipType) {
-    case "AirCarrier":
-      return "cv";
-    case "Battleship":
-      return "bb";
-    case "Cruiser":
-      return "cl";
-    case "Destroyer":
-      return "dd";
-    case "Submarine":
-      return "ss";
-    default:
-      return "";
-  }
-}
-
 let digit = Const.DIGITS["ship_type_rate"];
 </script>
 
@@ -58,7 +41,7 @@ let digit = Const.DIGITS["ship_type_rate"];
             {#each keys as key}
               {@const value =
                 player.overall_stats.using_ship_type_rate[key].toFixed(digit)}
-              {#if key === convertToKey(player.ship_info.type)}
+              {#if key === player.ship_info.type}
                 {@const color = usingShipColors[key]}
                 <td style="--size: calc({value}/100); --color: {color};"
                   ><span class="data">{value}</span><span class="tooltip"

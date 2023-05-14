@@ -220,6 +220,7 @@ func (s *Stats) OverallUsingTierRate(
 	}
 }
 
+//nolint:cyclop
 func (s *Stats) OverallUsingShipTypeRate(
 	accountID int,
 	shipInfo map[int]vo.Warship,
@@ -245,21 +246,25 @@ func (s *Stats) OverallUsingShipTypeRate(
 		shipType := shipInfo[shipID].Type
 
 		switch shipType {
-		case "Submarine":
+		case vo.SS:
 			ss += battles
 			allBattles += battles
-		case "Destroyer":
+		case vo.DD:
 			dd += battles
 			allBattles += battles
-		case "Cruiser":
+		case vo.CL:
 			cl += battles
 			allBattles += battles
-		case "Battleship":
+		case vo.BB:
 			bb += battles
 			allBattles += battles
-		case "AirCarrier":
+		case vo.CV:
 			cv += battles
 			allBattles += battles
+		case vo.AUX:
+			continue
+		case vo.NONE:
+			continue
 		}
 	}
 

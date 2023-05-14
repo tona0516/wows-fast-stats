@@ -34,7 +34,7 @@ func (u *Unregistered) Warship() (map[int]vo.Warship, error) {
 		result[us.ID] = vo.Warship{
 			Name:   us.En,
 			Tier:   us.Level,
-			Type:   us.Species,
+			Type:   vo.NewShipType(us.Species),
 			Nation: nation,
 		}
 	}

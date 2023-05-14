@@ -1,5 +1,3 @@
-import { LogDebug } from "../wailsjs/runtime/runtime";
-
 namespace TextColor {
   export function prBG(value: number): string {
     switch (true) {
@@ -71,23 +69,6 @@ namespace TextColor {
         return "unicum-text";
       case value >= 65:
         return "super-unicum-text";
-      default:
-        return "";
-    }
-  }
-
-  export function shipType(value: string): string {
-    switch (value) {
-      case "AirCarrier":
-        return "cv-text";
-      case "Battleship":
-        return "bb-text";
-      case "Cruiser":
-        return "cl-text";
-      case "Destroyer":
-        return "dd-text";
-      case "Submarine":
-        return "ss-text";
       default:
         return "";
     }

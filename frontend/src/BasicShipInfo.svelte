@@ -31,15 +31,15 @@ function tierString(value: number): string {
 
 function shipIcon(shipType: string): string {
   switch (shipType) {
-    case "AirCarrier":
+    case "cv":
       return iconCV;
-    case "Battleship":
+    case "bb":
       return iconBB;
-    case "Cruiser":
+    case "cl":
       return iconCL;
-    case "Destroyer":
+    case "dd":
       return iconDD;
-    case "Submarine":
+    case "ss":
       return iconSS;
     default:
       return iconNone;
@@ -57,7 +57,7 @@ function shipURL(player: vo.Player): string {
 }
 </script>
 
-<td style="width: 1em" id="{TextColor.shipType(player.ship_info.type)}">
+<td style="width: 1em" id="{player.ship_info.type}-text">
   <img alt="" src="{shipIcon(player.ship_info.type)}" class="ship-icon-scale" />
 </td>
 

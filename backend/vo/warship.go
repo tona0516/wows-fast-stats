@@ -3,6 +3,6 @@ package vo
 type Warship struct {
 	Name   string
 	Tier   uint
-	Type   string
+	Type   ShipType
 	Nation string
 }
