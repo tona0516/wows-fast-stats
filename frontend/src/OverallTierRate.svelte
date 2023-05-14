@@ -7,9 +7,9 @@ export let player: vo.Player;
 export let displayPattern: DisplayPattern;
 
 const colors: { [key: string]: string } = {
-  low: "#f9344c",
-  middle: "#33a65e",
-  high: "#1d86ae",
+  low: "#99CF15",
+  middle: "#007A87",
+  high: "#0F218B",
 };
 
 const texts: { [key: string]: string } = {

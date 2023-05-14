@@ -1,11 +1,12 @@
 package vo
 
 type ShipInfo struct {
-	Name     string `json:"name"`
-	Nation   string `json:"nation"`
-	Tier     uint   `json:"tier"`
-	Type     string `json:"type"`
-	StatsURL string `json:"stats_url"`
+	ID        int     `json:"id"`
+	Name      string  `json:"name"`
+	Nation    string  `json:"nation"`
+	Tier      uint    `json:"tier"`
+	Type      string  `json:"type"`
+	AvgDamage float64 `json:"avg_damage"`
 }
 
 type ShipStats struct {
@@ -24,9 +25,8 @@ type ShipStats struct {
 type PlayerInfo struct {
 	ID       int    `json:"id"`
 	Name     string `json:"name"`
-	Clan     string `json:"clan"`
+	Clan     Clan   `json:"clan"`
 	IsHidden bool   `json:"is_hidden"`
-	StatsURL string `json:"stats_url"`
 }
 
 type OverallStats struct {

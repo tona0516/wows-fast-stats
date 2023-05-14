@@ -2,6 +2,8 @@ import type { vo } from "wailsjs/go/models.js";
 import type { Column } from "./Column";
 
 namespace Const {
+  export const BASE_NUMBERS_URL = "https://asia.wows-numbers.com/";
+
   export const DEFAULT_USER_CONFIG: vo.UserConfig = {
     install_path: "",
     appid: "",

@@ -6,7 +6,9 @@ import iconCL from "./assets/images/icon-cl.png";
 import iconDD from "./assets/images/icon-dd.png";
 import iconSS from "./assets/images/icon-ss.png";
 import iconNone from "./assets/images/icon-none.png";
+import TextColor from "./TextColor";
 import { BrowserOpenURL } from "../wailsjs/runtime/runtime";
+import Const from "./Const";
 export let player: vo.Player;
 
 function tierString(value: number): string {
@@ -43,14 +45,24 @@ function shipIcon(shipType: string): string {
       return iconNone;
   }
 }
+
+function shipURL(player: vo.Player): string {
+  return (
+    Const.BASE_NUMBERS_URL +
+    "ship/" +
+    player.ship_info.id +
+    "," +
+    player.ship_info.name.replaceAll(" ", "-")
+  );
+}
 </script>
 
-<td class="td-string">
+<td class="td-string" id="{TextColor.shipType(player.ship_info.type)}">
   <!-- svelte-ignore a11y-invalid-attribute -->
   <a
     class="td-link"
     href="#"
-    on:click="{() => BrowserOpenURL(player.ship_info.stats_url)}"
+    on:click="{() => BrowserOpenURL(shipURL(player))}"
   >
     <div class="horizontal">
       <img

@@ -79,31 +79,6 @@ function decidePlayerDataPattern(player: vo.Player): DisplayPattern {
   return "full";
 }
 
-function backgroundClass(personalRating: number): string {
-  switch (true) {
-    case personalRating <= 0:
-      return "";
-    case personalRating < 750:
-      return "bad";
-    case personalRating < 1100:
-      return "below-average";
-    case personalRating < 1350:
-      return "average";
-    case personalRating < 1550:
-      return "good";
-    case personalRating < 1750:
-      return "very-good";
-    case personalRating < 2100:
-      return "great";
-    case personalRating < 2450:
-      return "unicum";
-    case personalRating >= 2450:
-      return "super-unicum";
-    default:
-      return "";
-  }
-}
-
 function onCheckPlayer() {
   ExcludePlayerIDs().then((result) => {
     excludePlayerIDs = result;
@@ -163,7 +138,7 @@ function onCheckPlayer() {
         <tbody>
           {#each team.players as player}
             {@const displayPattern = decidePlayerDataPattern(player)}
-            <tr class="{backgroundClass(player.ship_stats.pr)}">
+            <tr>
               <BasicIsInAvg
                 player="{player}"
                 excludePlayerIDs="{excludePlayerIDs}"

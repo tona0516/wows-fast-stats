@@ -68,10 +68,10 @@ func (b *Battle) Battle(isSuccessfulOnce bool) (vo.Battle, error) {
 
 	accountInfoResult := make(chan vo.Result[vo.WGAccountInfo])
 	shipStatsResult := make(chan vo.Result[map[int]vo.WGShipsStats])
-	clanTagResult := make(chan vo.Result[map[int]string])
+	clanResult := make(chan vo.Result[map[int]vo.Clan])
 	go b.accountInfo(accountIDs, accountInfoResult)
 	go b.shipStats(accountIDs, shipStatsResult)
-	go b.clanTag(accountIDs, clanTagResult)
+	go b.clanTag(accountIDs, clanResult)
 
 	if !isSuccessfulOnce {
 		err = <-prepareResult
@@ -112,16 +112,16 @@ func (b *Battle) Battle(isSuccessfulOnce bool) (vo.Battle, error) {
 	if shipStats.Error != nil {
 		return result, shipStats.Error
 	}
-	clanTag := <-clanTagResult
-	if clanTag.Error != nil {
-		return result, clanTag.Error
+	clan := <-clanResult
+	if clan.Error != nil {
+		return result, clan.Error
 	}
 
 	result = b.compose(
 		tempArenaInfo,
 		accountInfo.Value,
 		accountList.Value,
-		clanTag.Value,
+		clan.Value,
 		shipStats.Value,
 		warship,
 		expectedStats,
@@ -162,12 +162,12 @@ func (b *Battle) shipStats(accountIDs []int, result chan vo.Result[map[int]vo.WG
 	result <- vo.Result[map[int]vo.WGShipsStats]{Value: shipStatsMap, Error: err}
 }
 
-func (b *Battle) clanTag(accountIDs []int, result chan vo.Result[map[int]string]) {
-	clanTagMap := make(map[int]string)
+func (b *Battle) clanTag(accountIDs []int, result chan vo.Result[map[int]vo.Clan]) {
+	clanMap := make(map[int]vo.Clan)
 
 	clansAccountInfo, err := b.wargaming.ClansAccountInfo(accountIDs)
 	if err != nil {
-		result <- vo.Result[map[int]string]{Value: clanTagMap, Error: err}
+		result <- vo.Result[map[int]vo.Clan]{Value: clanMap, Error: err}
 
 		return
 	}
@@ -176,7 +176,7 @@ func (b *Battle) clanTag(accountIDs []int, result chan vo.Result[map[int]string]
 
 	clansInfo, err := b.wargaming.ClansInfo(clanIDs)
 	if err != nil {
-		result <- vo.Result[map[int]string]{Value: clanTagMap, Error: err}
+		result <- vo.Result[map[int]vo.Clan]{Value: clanMap, Error: err}
 
 		return
 	}
@@ -185,25 +185,23 @@ func (b *Battle) clanTag(accountIDs []int, result chan vo.Result[map[int]string]
 		accountID := accountIDs[i]
 		clanID := clansAccountInfo.Data[accountID].ClanID
 		clanTag := clansInfo.Data[clanID].Tag
-		clanTagMap[accountID] = clanTag
+		clanMap[accountID] = vo.Clan{Tag: clanTag, ID: clanID}
 	}
 
-	result <- vo.Result[map[int]string]{Value: clanTagMap, Error: nil}
+	result <- vo.Result[map[int]vo.Clan]{Value: clanMap, Error: nil}
 }
 
 func (b *Battle) compose(
 	tempArenaInfo vo.TempArenaInfo,
 	accountInfo vo.WGAccountInfo,
 	accountList vo.WGAccountList,
-	clanTag map[int]string,
+	clan map[int]vo.Clan,
 	shipStats map[int]vo.WGShipsStats,
 	warships map[int]vo.Warship,
 	expectedStats vo.NSExpectedStats,
 	battleArenas vo.WGBattleArenas,
 	battleTypes vo.WGBattleTypes,
 ) vo.Battle {
-	urlGen := domain.NumbersURLGenerator{}
-
 	friends := make(vo.Players, 0)
 	enemies := make(vo.Players, 0)
 	rating := domain.Rating{}
@@ -219,7 +217,7 @@ func (b *Battle) compose(
 			ownShip = warship.Name
 		}
 		accountID := accountList.AccountID(nickname)
-		clan := clanTag[accountID]
+		clan := clan[accountID]
 
 		playerAccountInfo := accountInfo.Data[accountID]
 		pvp := playerAccountInfo.Statistics.Pvp
@@ -262,11 +260,12 @@ func (b *Battle) compose(
 
 		player := vo.Player{
 			ShipInfo: vo.ShipInfo{
-				Name:     warship.Name,
-				Nation:   warship.Nation,
-				Tier:     warship.Tier,
-				Type:     warship.Type,
-				StatsURL: urlGen.ShipPage(vehicle.ShipID, warship.Name),
+				ID:        vehicle.ShipID,
+				Name:      warship.Name,
+				Nation:    warship.Nation,
+				Tier:      warship.Tier,
+				Type:      warship.Type,
+				AvgDamage: expected.AverageDamageDealt,
 			},
 			ShipStats: vo.ShipStats{
 				Battles:            stats.Ship.Battles,
@@ -296,7 +295,6 @@ func (b *Battle) compose(
 				Name:     nickname,
 				Clan:     clan,
 				IsHidden: playerAccountInfo.HiddenProfile,
-				StatsURL: urlGen.PlayerPage(accountID, nickname),
 			},
 			OverallStats: vo.OverallStats{
 				Battles:           stats.Overall.Battles,

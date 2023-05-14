@@ -7,11 +7,11 @@ export let player: vo.Player;
 export let displayPattern: DisplayPattern;
 
 const colors: { [key: string]: string } = {
-  ss: "#386cb0",
-  dd: "#fff231",
-  cl: "#99d02b",
-  bb: "#ff9914",
-  cv: "#a45aaa",
+  ss: "#386CB0",
+  dd: "#FFF231",
+  cl: "#33A65E",
+  bb: "#F9344C",
+  cv: "#A45AAA",
 };
 
 let digit = Const.DIGITS["ship_type_rate"];

@@ -1,15 +1,15 @@
 html {
-  background-color: #212529;
-  color: #f2f2f2;
+  background-color: #2d2c2c;
+  color: #ffffff;
 }
 
 body {
   margin: 0;
-  color: #f2f2f2;
+  color: #ffffff;
   font-family: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
     "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif;
-  background-color: #212529;
+  background-color: #2d2c2c;
 }
 
 @font-face {
@@ -30,7 +30,7 @@ body {
 }
 
 .table-text-color {
-  color: #f2f2f2;
+  color: #ffffff;
 }
 
 .table td {
@@ -48,45 +48,69 @@ body {
   text-align: center;
 }
 
-.bad {
-  background-color: #a41200;
+.bad-text {
+  color: #ff382d;
 }
 
-.below-average {
-  background-color: #a34a02;
+.below-average-text {
+  color: #fd9234;
 }
 
-.average {
-  background-color: #a38204;
+.average-text {
+  color: #ffd351;
 }
 
-.good {
-  background-color: #518517;
+.good-text {
+  color: #57e500;
 }
 
-.very-good {
-  background-color: #2f6f41;
+.very-good-text {
+  color: #44b200;
 }
 
-.great {
-  background-color: #04436d;
+.great-text {
+  color: #02f7da;
 }
 
-.unicum {
-  background-color: #232166;
+.unicum-text {
+  color: #da6ff5;
 }
 
-.super-unicum {
-  background-color: #531460;
+.super-unicum-text {
+  color: #bf15ee;
+}
+
+#clan-text {
+  color: #99cf15;
+}
+
+#ss-text {
+  background-color: #16344f;
+}
+
+#dd-text {
+  background-color: #695b18;
+}
+
+#cl-text {
+  background-color: #345934;
+}
+
+#bb-text {
+  background-color: #632a31;
+}
+
+#cv-text {
+  background-color: #4a304b;
 }
 
 .td-link {
-  color: #f2f2f2;
+  color: #ffffff;
 }
 
 .td-string {
   text-align: left;
-  max-width: 160px;
+  max-width: 180px;
 }
 
 .td-number {
