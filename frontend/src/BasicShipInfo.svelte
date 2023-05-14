@@ -57,7 +57,11 @@ function shipURL(player: vo.Player): string {
 }
 </script>
 
-<td style="width: 1em" id="{player.ship_info.type}-text">
+<td
+  style="width: 1em; background-color: {Const.TYPE_S_COLORS[
+    player.ship_info.type
+  ]}"
+>
   <img alt="" src="{shipIcon(player.ship_info.type)}" class="ship-icon-scale" />
 </td>
 

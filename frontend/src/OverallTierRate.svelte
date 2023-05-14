@@ -2,21 +2,10 @@
 import type { vo } from "wailsjs/go/models";
 import type { DisplayPattern } from "./DisplayPattern";
 import Const from "./Const";
+import { LogDebug } from "../wailsjs/runtime/runtime";
 export let config: vo.UserConfig;
 export let player: vo.Player;
 export let displayPattern: DisplayPattern;
-
-const usingColors: { [key: string]: string } = {
-  low: "#A41200",
-  middle: "#518517",
-  high: "#04436D",
-};
-
-const otherColors: { [key: string]: string } = {
-  low: "#FDCDB7",
-  middle: "#E6F5B0",
-  high: "#B3D7DD",
-};
 
 function convertToKey(tier: number): string {
   if (tier >= 1 && tier <= 4) {
@@ -29,6 +18,12 @@ function convertToKey(tier: number): string {
     return "high";
   }
   return "";
+}
+
+function color(usingTierGroup: string, tierGroup: string): string {
+  return usingTierGroup === tierGroup
+    ? Const.TIER_S_COLORS[tierGroup]
+    : Const.TIER_P_COLORS[tierGroup];
 }
 
 const texts: { [key: string]: string } = {
@@ -57,21 +52,15 @@ let digit = Const.DIGITS["tier_rate"];
             {#each keys as key}
               {@const value =
                 player.overall_stats.using_tier_rate[key].toFixed(digit)}
-              {#if key === convertToKey(player.ship_info.tier)}
-                {@const color = usingColors[key]}
-                <td style="--size: calc({value}/100); --color: {color};"
-                  ><span class="data">{value}</span><span class="tooltip"
-                    >{texts[key]}<br />{value}%</span
-                  ></td
-                >
-              {:else}
-                {@const color = otherColors[key]}
-                <td style="--size: calc({value}/100); --color: {color};"
-                  ><span class="data">{value}</span><span class="tooltip"
-                    >{texts[key]}<br />{value}%</span
-                  ></td
-                >
-              {/if}
+              <td
+                style="--size: calc({value}/100); --color: {color(
+                  convertToKey(player.ship_info.tier),
+                  key
+                )};"
+                ><span class="data">{value}</span><span class="tooltip"
+                  >{texts[key]}<br />{value}%</span
+                ></td
+              >
             {/each}
           </tr>
         </tbody>

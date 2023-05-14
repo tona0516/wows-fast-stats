@@ -26,7 +26,10 @@ function playerURL(player: vo.Player): string {
 }
 </script>
 
-<td class="td-string omit" id="{TextColor.prBG(player.ship_stats.pr)}">
+<td
+  class="td-string omit"
+  style="background-color: {TextColor.prBG(player.ship_stats.pr)}"
+>
   {#if player.player_info.id === 0}
     {player.player_info.name}
   {:else}
@@ -34,7 +37,6 @@ function playerURL(player: vo.Player): string {
     {#if player.player_info.clan.id !== 0}
       <a
         class="td-link"
-        id="clan-text"
         href="#"
         on:click="{() => BrowserOpenURL(clanURL(player))}"
       >

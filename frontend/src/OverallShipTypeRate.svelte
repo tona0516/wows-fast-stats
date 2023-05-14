@@ -6,23 +6,13 @@ export let config: vo.UserConfig;
 export let player: vo.Player;
 export let displayPattern: DisplayPattern;
 
-const usingShipColors: { [key: string]: string } = {
-  ss: "#233B8B",
-  dd: "#CCB914",
-  cl: "#27853F",
-  bb: "#CA1028",
-  cv: "#5E2883",
-};
-
-const otherColors: { [key: string]: string } = {
-  ss: "#B3CDE3",
-  dd: "#FEE6AA",
-  cl: "#CCEBC5",
-  bb: "#FBB4C4",
-  cv: "#CAB2D6",
-};
-
 let digit = Const.DIGITS["ship_type_rate"];
+
+function color(usingShipType: string, shipType: string): string {
+  return usingShipType === shipType
+    ? Const.TYPE_S_COLORS[shipType]
+    : Const.TYPE_P_COLORS[shipType];
+}
 </script>
 
 {#if config.displays.overall.using_ship_type_rate}
@@ -41,21 +31,15 @@ let digit = Const.DIGITS["ship_type_rate"];
             {#each keys as key}
               {@const value =
                 player.overall_stats.using_ship_type_rate[key].toFixed(digit)}
-              {#if key === player.ship_info.type}
-                {@const color = usingShipColors[key]}
-                <td style="--size: calc({value}/100); --color: {color};"
-                  ><span class="data">{value}</span><span class="tooltip"
-                    >{key.toUpperCase()}<br />{value}%</span
-                  ></td
-                >
-              {:else}
-                {@const color = otherColors[key]}
-                <td style="--size: calc({value}/100); --color: {color};"
-                  ><span class="data">{value}</span><span class="tooltip"
-                    >{key.toUpperCase()}<br />{value}%</span
-                  ></td
-                >
-              {/if}
+              <td
+                style="--size: calc({value}/100); --color: {color(
+                  player.ship_info.type,
+                  key
+                )};"
+                ><span class="data">{value}</span><span class="tooltip"
+                  >{key.toUpperCase()}<br />{value}%</span
+                ></td
+              >
             {/each}
           </tr>
         </tbody>

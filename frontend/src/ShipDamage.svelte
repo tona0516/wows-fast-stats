@@ -13,7 +13,8 @@ let digit = Const.DIGITS["damage"];
 {#if config.displays.ship.damage}
   {#if displayPattern === "full" || displayPattern === "nopr"}
     <td
-      class="td-number {TextColor.shipDamage(
+      class="td-number"
+      style="color: {TextColor.shipDamage(
         player.ship_stats.damage,
         player.ship_info.avg_damage
       )}"

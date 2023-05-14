@@ -12,7 +12,10 @@ let digit = Const.DIGITS["win_rate"];
 
 {#if config.displays.ship.win_rate}
   {#if displayPattern === "full" || displayPattern === "nopr"}
-    <td class="td-number {TextColor.winRate(player.ship_stats.win_rate)}">
+    <td
+      class="td-number"
+      style="color: {TextColor.winRate(player.ship_stats.win_rate)}"
+    >
       {player.ship_stats.win_rate.toFixed(digit)}%
     </td>
   {/if}

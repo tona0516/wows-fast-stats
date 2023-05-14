@@ -12,7 +12,10 @@ let digit = Const.DIGITS["pr"];
 
 {#if config.displays.ship.pr}
   {#if displayPattern === "full"}
-    <td class="td-number {TextColor.pr(player.ship_stats.pr)}">
+    <td
+      class="td-number"
+      style="color: {TextColor.prText(player.ship_stats.pr)}"
+    >
       {player.ship_stats.pr.toFixed(digit)}
     </td>
   {:else if displayPattern === "nopr"}

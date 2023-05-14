@@ -1,49 +1,51 @@
+import Const from "./Const";
+
 namespace TextColor {
   export function prBG(value: number): string {
     switch (true) {
       case value <= 0:
         return "";
       case value < 750:
-        return "bad";
+        return Const.PR_BG_COLORS.bad;
       case value < 1100:
-        return "below-average";
+        return Const.PR_BG_COLORS.belowAvg;
       case value < 1350:
-        return "average";
+        return Const.PR_BG_COLORS.avg;
       case value < 1550:
-        return "good";
+        return Const.PR_BG_COLORS.good;
       case value < 1750:
-        return "very-good";
+        return Const.PR_BG_COLORS.veryGood;
       case value < 2100:
-        return "great";
+        return Const.PR_BG_COLORS.great;
       case value < 2450:
-        return "unicum";
+        return Const.PR_BG_COLORS.unicum;
       case value >= 2450:
-        return "super-unicum";
+        return Const.PR_BG_COLORS.superUnicum;
       default:
         return "";
     }
   }
 
-  export function pr(value: number): string {
+  export function prText(value: number): string {
     switch (true) {
       case value <= 0:
         return "";
       case value < 750:
-        return "bad-text";
+        return Const.PR_TEXT_COLORS.bad;
       case value < 1100:
-        return "below-average-text";
+        return Const.PR_TEXT_COLORS.belowAvg;
       case value < 1350:
-        return "average-text";
+        return Const.PR_TEXT_COLORS.avg;
       case value < 1550:
-        return "good-text";
+        return Const.PR_TEXT_COLORS.good;
       case value < 1750:
-        return "very-good-text";
+        return Const.PR_TEXT_COLORS.veryGood;
       case value < 2100:
-        return "great-text";
+        return Const.PR_TEXT_COLORS.great;
       case value < 2450:
-        return "unicum-text";
+        return Const.PR_TEXT_COLORS.unicum;
       case value >= 2450:
-        return "super-unicum-text";
+        return Const.PR_TEXT_COLORS.superUnicum;
       default:
         return "";
     }
@@ -54,21 +56,21 @@ namespace TextColor {
       case value <= 0:
         return "";
       case value < 47:
-        return "bad-text";
+        return Const.PR_TEXT_COLORS.bad;
       case value < 50:
-        return "below-average-text";
+        return Const.PR_TEXT_COLORS.belowAvg;
       case value < 52:
-        return "average-text";
+        return Const.PR_TEXT_COLORS.avg;
       case value < 54:
-        return "good-text";
+        return Const.PR_TEXT_COLORS.good;
       case value < 56:
-        return "very-good-text";
+        return Const.PR_TEXT_COLORS.veryGood;
       case value < 60:
-        return "great-text";
+        return Const.PR_TEXT_COLORS.great;
       case value < 65:
-        return "unicum-text";
+        return Const.PR_TEXT_COLORS.unicum;
       case value >= 65:
-        return "super-unicum-text";
+        return Const.PR_TEXT_COLORS.superUnicum;
       default:
         return "";
     }
@@ -80,21 +82,21 @@ namespace TextColor {
       case ratio === 0:
         return "";
       case ratio < 0.6:
-        return "bad-text";
+        return Const.PR_TEXT_COLORS.bad;
       case ratio < 0.8:
-        return "below-average-text";
+        return Const.PR_TEXT_COLORS.belowAvg;
       case ratio < 1.0:
-        return "average-text";
+        return Const.PR_TEXT_COLORS.avg;
       case ratio < 1.2:
-        return "good-text";
+        return Const.PR_TEXT_COLORS.good;
       case ratio < 1.4:
-        return "very-good-text";
+        return Const.PR_TEXT_COLORS.veryGood;
       case ratio < 1.5:
-        return "great-text";
+        return Const.PR_TEXT_COLORS.great;
       case ratio < 1.6:
-        return "unicum-text";
+        return Const.PR_TEXT_COLORS.unicum;
       case ratio >= 1.6:
-        return "super-unicum-text";
+        return Const.PR_TEXT_COLORS.superUnicum;
       default:
         return "";
     }

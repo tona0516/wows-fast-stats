@@ -79,6 +79,56 @@ namespace Const {
     ship_type_rate: 1,
     tier_rate: 1,
   };
+
+  export const TYPE_S_COLORS = {
+    cv: "#5E2883",
+    bb: "#CA1028",
+    cl: "#27853F",
+    dd: "#D9760F",
+    ss: "#233B8B",
+  };
+
+  export const TYPE_P_COLORS = {
+    cv: "#CAB2D6",
+    bb: "#FBB4C4",
+    cl: "#CCEBC5",
+    dd: "#FEE6AA",
+    ss: "#B3CDE3",
+  };
+
+  export const TIER_S_COLORS = {
+    low: "#8CA113",
+    middle: "#205B85",
+    high: "#990F4F",
+  };
+
+  export const TIER_P_COLORS = {
+    low: "#E6F5B0",
+    middle: "#B3D7DD",
+    high: "#E3ADD5",
+  };
+
+  export const PR_BG_COLORS = {
+    bad: "#a41200",
+    belowAvg: "#a34a02",
+    avg: "#a38204",
+    good: "#518517",
+    veryGood: "#2f6f41",
+    great: "#04436d",
+    unicum: "#232166",
+    superUnicum: "#531460",
+  };
+
+  export const PR_TEXT_COLORS = {
+    bad: "#ff382d",
+    belowAvg: "#fd9234",
+    avg: "#ffd351",
+    good: "#57e500",
+    veryGood: "#44b200",
+    great: "#02f7da",
+    unicum: "#da6ff5",
+    superUnicum: "#bf15ee",
+  };
 }
 
 export default Const;
