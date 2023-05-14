@@ -62,7 +62,7 @@ function shipURL(player: vo.Player): string {
     player.ship_info.type
   ]}"
 >
-  <img alt="" src="{shipIcon(player.ship_info.type)}" class="ship-icon-scale" />
+  <img alt="" src="{shipIcon(player.ship_info.type)}" class="ship-icon" />
 </td>
 
 <td class="td-string">

@@ -30,7 +30,7 @@ function onCheck(e: any) {
 
 <td class="p-0">
   {#if displayPattern === "noshipstats" || displayPattern === "full" || displayPattern === "nopr"}
-    <div class="form-check centerize">
+    <div class="form-check in-avg">
       <input
         class="form-check-input"
         type="checkbox"
