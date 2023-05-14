@@ -1,0 +1,110 @@
+{
+  "vehicles": [
+    {
+      "shipId": 4292818736,
+      "relation": 0,
+      "id": 671254050,
+      "name": "tonango"
+    },
+    {
+      "shipId": 4288591856,
+      "relation": 1,
+      "id": 537474310,
+      "name": "ZT_kon"
+    },
+    {
+      "shipId": 4182685680,
+      "relation": 1,
+      "id": 671525704,
+      "name": "MIN_KTR"
+    },
+    {
+      "shipId": 4076812080,
+      "relation": 1,
+      "id": 537651570,
+      "name": "SABER43"
+    },
+    {
+      "shipId": 3751720752,
+      "relation": 1,
+      "id": 671235031,
+      "name": "Gaowei8623g"
+    },
+    {
+      "shipId": 4286527472,
+      "relation": 1,
+      "id": 671699961,
+      "name": "JIU_2020"
+    },
+    {
+      "shipId": 4183734256,
+      "relation": 1,
+      "id": 537269373,
+      "name": "crazy_wanna"
+    },
+    {
+      "shipId": 4291049456,
+      "relation": 1,
+      "id": 1,
+      "name": "IDS_OP_02_03_AT_TRANSPORT_A_3"
+    },
+    {
+      "shipId": 4291049456,
+      "relation": 1,
+      "id": 2,
+      "name": "IDS_OP_02_03_AT_TRANSPORT_A_1"
+    },
+    {
+      "shipId": 4293146608,
+      "relation": 1,
+      "id": 3,
+      "name": "IDS_OP_02_03_AT_TRANSPORT_A_R"
+    },
+    {
+      "shipId": 4291049456,
+      "relation": 1,
+      "id": 4,
+      "name": "IDS_OP_02_03_AT_TRANSPORT_A_4"
+    },
+    {
+      "shipId": 4291049456,
+      "relation": 1,
+      "id": 5,
+      "name": "IDS_OP_02_03_AT_TRANSPORT_A_2"
+    },
+    {
+      "shipId": 4185798608,
+      "relation": 2,
+      "id": 6,
+      "name": "IDS_OP_02_03_AT_TRANSPORT_E_5"
+    },
+    {
+      "shipId": 4289607664,
+      "relation": 2,
+      "id": 7,
+      "name": "IDS_OP_02_03_AT_ATTAKA_GB_32"
+    },
+    {
+      "shipId": 4289640432,
+      "relation": 2,
+      "id": 8,
+      "name": "IDS_OP_02_03_AT_ATTAKA_US_23"
+    },
+    {
+      "shipId": 4289607664,
+      "relation": 2,
+      "id": 9,
+      "name": "IDS_OP_02_03_AT_ATTAKA_US_51"
+    },
+    {
+      "shipId": 4181702640,
+      "relation": 2,
+      "id": 10,
+      "name": "IDS_OP_02_03_AT_ATTAKA_US_A1"
+    }
+  ],
+  "dateTime": "14.05.2023 10:31:10",
+  "mapId": 42,
+  "matchGroup": "pve",
+  "playerName": "tonango"
+}

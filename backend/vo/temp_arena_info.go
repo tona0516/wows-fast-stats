@@ -21,7 +21,13 @@ func (t *TempArenaInfo) AccountNames() []string {
 	accountNames := make([]string, 0)
 	for i := range t.Vehicles {
 		vehicle := t.Vehicles[i]
+		// Note: Bot name in corp or ramdom battle.
 		if strings.HasPrefix(vehicle.Name, ":") && strings.HasSuffix(vehicle.Name, ":") {
+			continue
+		}
+
+		// Note: Bot name in operation.
+		if strings.HasPrefix(vehicle.Name, "IDS_OP") {
 			continue
 		}
 
