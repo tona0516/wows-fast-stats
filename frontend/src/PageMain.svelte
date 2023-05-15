@@ -31,33 +31,77 @@ export let config: vo.UserConfig = Const.DEFAULT_USER_CONFIG;
 export let averageFactors: AverageFactor;
 export let excludePlayerIDs: number[] = [];
 
-const components = {
-  basic: {
-    player_name: BasicPlayerName,
-    ship_info: BasicShipInfo,
-  },
-  ship: {
-    pr: ShipPr,
-    damage: ShipDamage,
-    win_rate: ShipWinRate,
-    kd_rate: ShipKdRate,
-    exp: ShipExp,
-    battles: ShipBattles,
-    survived_rate: ShipSurvivedRate,
-    hit_rate: ShipHitRate,
-  },
-  overall: {
-    damage: OverallDamage,
-    win_rate: OverallWinRate,
-    kd_rate: OverallKdRate,
-    exp: OverallExp,
-    battles: OverallBattles,
-    survived_rate: OverallSurvivedRate,
-    avg_tier: OverallAvgTier,
-    using_ship_type_rate: OverallShipTypeRate,
-    using_tier_rate: OverallTierRate,
-  },
+type ComponentInfo = {
+  category: "basic" | "ship" | "overall";
+  name: string;
+  component: any;
+  column: number;
 };
+
+const components: ComponentInfo[] = [
+  // basic
+  {
+    category: "basic",
+    name: "player_name",
+    component: BasicPlayerName,
+    column: 1,
+  },
+  { category: "basic", name: "ship_info", component: BasicShipInfo, column: 2 },
+  // ship
+  { category: "ship", name: "pr", component: ShipPr, column: 1 },
+  { category: "ship", name: "damage", component: ShipDamage, column: 1 },
+  { category: "ship", name: "win_rate", component: ShipWinRate, column: 1 },
+  { category: "ship", name: "kd_rate", component: ShipKdRate, column: 1 },
+  { category: "ship", name: "exp", component: ShipExp, column: 1 },
+  { category: "ship", name: "battles", component: ShipBattles, column: 1 },
+  {
+    category: "ship",
+    name: "survived_rate",
+    component: ShipSurvivedRate,
+    column: 1,
+  },
+  { category: "ship", name: "hit_rate", component: ShipHitRate, column: 1 },
+  // overall
+  { category: "overall", name: "damage", component: OverallDamage, column: 1 },
+  {
+    category: "overall",
+    name: "win_rate",
+    component: OverallWinRate,
+    column: 1,
+  },
+  { category: "overall", name: "kd_rate", component: OverallKdRate, column: 1 },
+  { category: "overall", name: "exp", component: OverallExp, column: 1 },
+  {
+    category: "overall",
+    name: "battles",
+    component: OverallBattles,
+    column: 1,
+  },
+  {
+    category: "overall",
+    name: "survived_rate",
+    component: OverallSurvivedRate,
+    column: 1,
+  },
+  {
+    category: "overall",
+    name: "avg_tier",
+    component: OverallAvgTier,
+    column: 1,
+  },
+  {
+    category: "overall",
+    name: "using_ship_type_rate",
+    component: OverallShipTypeRate,
+    column: 1,
+  },
+  {
+    category: "overall",
+    name: "using_tier_rate",
+    component: OverallTierRate,
+    column: 1,
+  },
+];
 
 function decidePlayerDataPattern(player: vo.Player): DisplayPattern {
   if (player.player_info.is_hidden) {
@@ -92,49 +136,38 @@ function onCheckPlayer() {
   <div class="m-2">
     <table class="table table-sm table-bordered table-text-color">
       {#each battle.teams as team}
+        {@const basicColspan = components
+          .filter(
+            (it) => it.category === "basic" && config.displays.basic[it.name]
+          )
+          .reduce((a, it) => a + it.column, 1)}
+        {@const shipColspan = components
+          .filter(
+            (it) => it.category === "ship" && config.displays.ship[it.name]
+          )
+          .reduce((a, it) => a + it.column, 0)}
+        {@const overallColspan = components
+          .filter(
+            (it) =>
+              it.category === "overall" && config.displays.overall[it.name]
+          )
+          .reduce((a, it) => a + it.column, 0)}
         <thead>
           <tr>
-            <th
-              colspan="{Object.values(config.displays.basic).filter(
-                (it) => it === true
-              ).length + 1}">基本情報</th
-            >
-            {#if Object.values(config.displays.ship).filter((it) => it === true).length !== 0}
-              <th
-                colspan="{Object.values(config.displays.ship).filter(
-                  (it) => it === true
-                ).length}">艦成績</th
-              >
+            <th colspan="{basicColspan}">基本情報</th>
+            {#if shipColspan > 0}
+              <th colspan="{shipColspan}">艦成績</th>
             {/if}
-            {#if Object.values(config.displays.overall).filter((it) => it === true).length !== 0}
-              <th
-                colspan="{Object.values(config.displays.overall).filter(
-                  (it) => it === true
-                ).length}">総合成績</th
-              >
+            {#if overallColspan > 0}
+              <th colspan="{overallColspan}">総合成績</th>
             {/if}
           </tr>
           <tr>
             <th></th>
-            {#each Object.keys(components.basic) as k}
-              {#if config.displays.basic[k]}
-                {#if k === "ship_info"}
-                  <th colspan="2">{Const.COLUMN_NAMES[k].min}</th>
-                {:else}
-                  <th>{Const.COLUMN_NAMES[k].min}</th>
-                {/if}
-              {/if}
-            {/each}
 
-            {#each Object.keys(components.ship) as k}
-              {#if config.displays.ship[k]}
-                <th>{Const.COLUMN_NAMES[k].min}</th>
-              {/if}
-            {/each}
-
-            {#each Object.keys(components.overall) as k}
-              {#if config.displays.overall[k]}
-                <th>{Const.COLUMN_NAMES[k].min}</th>
+            {#each components as c}
+              {#if config.displays[c.category][c.name] === true}
+                <th colspan="{c.column}">{Const.COLUMN_NAMES[c.name].min}</th>
               {/if}
             {/each}
           </tr>
@@ -143,38 +176,32 @@ function onCheckPlayer() {
           {#each team.players as player}
             {@const displayPattern = decidePlayerDataPattern(player)}
             <tr>
+              <!-- basics -->
               <BasicIsInAvg
                 player="{player}"
                 excludePlayerIDs="{excludePlayerIDs}"
                 displayPattern="{displayPattern}"
                 on:onCheck="{onCheckPlayer}"
               />
-
-              <!-- basics -->
-              {#each Object.values(components.basic) as _v}
-                <svelte:component this="{_v}" player="{player}" />
+              {#each components.filter((it) => it.category === "basic") as c}
+                <svelte:component this="{c.component}" player="{player}" />
               {/each}
 
-              <NoData config="{config}" displayPattern="{displayPattern}" />
+              <NoData
+                shipColspan="{shipColspan}"
+                overallColspan="{overallColspan}"
+                displayPattern="{displayPattern}"
+              />
 
               <!-- values -->
-              {#each Object.values(components.ship) as _v}
-                <svelte:component
-                  this="{_v}"
-                  config="{config}"
-                  player="{player}"
-                  displayPattern="{displayPattern}"
-                />
-              {/each}
-
-              <!-- values -->
-              {#each Object.values(components.overall) as _v}
-                <svelte:component
-                  this="{_v}"
-                  config="{config}"
-                  player="{player}"
-                  displayPattern="{displayPattern}"
-                />
+              {#each components.filter((it) => it.category === "ship" || it.category === "overall") as c}
+                {#if config.displays[c.category][c.name] === true}
+                  <svelte:component
+                    this="{c.component}"
+                    player="{player}"
+                    displayPattern="{displayPattern}"
+                  />
+                {/if}
               {/each}
             </tr>
           {/each}

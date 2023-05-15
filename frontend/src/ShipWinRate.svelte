@@ -2,21 +2,19 @@
 import type { vo } from "wailsjs/go/models";
 import type { DisplayPattern } from "./DisplayPattern";
 import Const from "./Const";
-import TextColor from "./TextColor";
-export let config: vo.UserConfig;
+import RankConverter from "./RankConverter";
 export let player: vo.Player;
 export let displayPattern: DisplayPattern;
 
 let digit = Const.DIGITS["win_rate"];
+
+$: color = RankConverter.fromWinRate(
+  player.ship_stats.win_rate
+).toTextColorCode();
 </script>
 
-{#if config.displays.ship.win_rate}
-  {#if displayPattern === "full" || displayPattern === "nopr"}
-    <td
-      class="td-number"
-      style="color: {TextColor.winRate(player.ship_stats.win_rate)}"
-    >
-      {player.ship_stats.win_rate.toFixed(digit)}%
-    </td>
-  {/if}
+{#if displayPattern === "full" || displayPattern === "nopr"}
+  <td class="td-number" style="color: {color}">
+    {player.ship_stats.win_rate.toFixed(digit)}%
+  </td>
 {/if}

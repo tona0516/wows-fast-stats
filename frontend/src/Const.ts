@@ -1,5 +1,4 @@
 import type { vo } from "wailsjs/go/models.js";
-import type { Column } from "./Column";
 
 namespace Const {
   export const BASE_NUMBERS_URL = "https://asia.wows-numbers.com/";
@@ -46,7 +45,7 @@ namespace Const {
     },
   };
 
-  export const COLUMN_NAMES: { [key: string]: Column } = {
+  export const COLUMN_NAMES = {
     basic: { min: "基本情報", full: "基本情報" },
     ship_stats: { min: "艦", full: "艦成績" },
     overall_stats: { min: "総合", full: "総合成績" },
@@ -108,7 +107,8 @@ namespace Const {
     high: "#E3ADD5",
   };
 
-  export const PR_BG_COLORS = {
+  export const RANK_BG_COLORS = {
+    "": "#00000000",
     bad: "#a41200",
     belowAvg: "#a34a02",
     avg: "#a38204",
@@ -119,7 +119,8 @@ namespace Const {
     superUnicum: "#531460",
   };
 
-  export const PR_TEXT_COLORS = {
+  export const RANK_TEXT_COLORS = {
+    "": "#00000000",
     bad: "#ff382d",
     belowAvg: "#fd9234",
     avg: "#ffd351",

@@ -48,6 +48,11 @@ body {
   text-align: center;
 }
 
+#td-checkbox {
+  padding: 0;
+  width: 1em;
+}
+
 .td-link {
   color: #ffffff;
 }

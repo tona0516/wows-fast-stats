@@ -6,7 +6,7 @@ import iconCL from "./assets/images/icon-cl.png";
 import iconDD from "./assets/images/icon-dd.png";
 import iconSS from "./assets/images/icon-ss.png";
 import iconNone from "./assets/images/icon-none.png";
-import { BrowserOpenURL } from "../wailsjs/runtime/runtime";
+import { BrowserOpenURL, LogDebug } from "../wailsjs/runtime/runtime";
 import Const from "./Const";
 export let player: vo.Player;
 
@@ -54,13 +54,11 @@ function shipURL(player: vo.Player): string {
     player.ship_info.name.replaceAll(" ", "-")
   );
 }
+
+$: color = Const.TYPE_S_COLORS[player.ship_info.type] ?? "#00000000";
 </script>
 
-<td
-  style="width: 1em; background-color: {Const.TYPE_S_COLORS[
-    player.ship_info.type
-  ]}"
->
+<td style="width: 1em; background-color: {color}">
   <img alt="" src="{shipIcon(player.ship_info.type)}" class="ship-icon" />
 </td>
 

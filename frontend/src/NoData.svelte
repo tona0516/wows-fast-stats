@@ -1,28 +1,22 @@
 <script lang="ts">
-import type { vo } from "wailsjs/go/models";
 import type { DisplayPattern } from "./DisplayPattern";
-export let config: vo.UserConfig;
+export let shipColspan: number;
+export let overallColspan: number;
 export let displayPattern: DisplayPattern;
 
-const shipCounts = Object.values(config.displays.ship).filter(
-  (it) => it === true
-).length;
-
-const overallCounts = Object.values(config.displays.overall).filter(
-  (it) => it === true
-).length;
+$: allColspan = shipColspan + overallColspan;
 </script>
 
-{#if shipCounts + overallCounts > 0}
+{#if allColspan > 0}
   {#if displayPattern === "private"}
-    <td class="no_data omit" colspan="{shipCounts + overallCounts}">PRIVATE</td>
+    <td class="no_data omit" colspan="{allColspan}">PRIVATE</td>
   {:else if displayPattern === "nodata"}
-    <td class="no_data omit" colspan="{shipCounts + overallCounts}">N/A</td>
+    <td class="no_data omit" colspan="{allColspan}">N/A</td>
   {/if}
 {/if}
 
-{#if shipCounts > 0}
+{#if shipColspan > 0}
   {#if displayPattern === "noshipstats"}
-    <td class="no_data omit" colspan="{shipCounts}">N/A</td>
+    <td class="no_data omit" colspan="{shipColspan}">N/A</td>
   {/if}
 {/if}

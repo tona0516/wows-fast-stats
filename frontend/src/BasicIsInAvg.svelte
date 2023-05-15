@@ -15,20 +15,18 @@ $: isChecked = !excludePlayerIDs.includes(player.player_info.id);
 
 const dispatch = createEventDispatcher();
 
-function onCheck(e: any) {
+async function onCheck(e: any) {
   if (e.target.checked) {
-    RemoveExcludePlayerID(player.player_info.id).then(() => {
-      dispatch("onCheck", null);
-    });
+    await RemoveExcludePlayerID(player.player_info.id);
+    dispatch("onCheck", null);
   } else {
-    AddExcludePlayerID(player.player_info.id).then(() => {
-      dispatch("onCheck", null);
-    });
+    await AddExcludePlayerID(player.player_info.id);
+    dispatch("onCheck", null);
   }
 }
 </script>
 
-<td class="p-0">
+<td id="td-checkbox">
   {#if displayPattern === "noshipstats" || displayPattern === "full" || displayPattern === "nopr"}
     <div class="form-check in-avg">
       <input

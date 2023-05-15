@@ -2,7 +2,7 @@
 import type { vo } from "wailsjs/go/models";
 import { BrowserOpenURL } from "../wailsjs/runtime/runtime";
 import Const from "./Const";
-import TextColor from "./TextColor";
+import RankConverter from "./RankConverter";
 export let player: vo.Player;
 
 function clanURL(player: vo.Player): string {
@@ -24,12 +24,11 @@ function playerURL(player: vo.Player): string {
     player.player_info.name
   );
 }
+
+$: color = RankConverter.fromPR(player.ship_stats.pr).toBgColorCode();
 </script>
 
-<td
-  class="td-string omit"
-  style="background-color: {TextColor.prBG(player.ship_stats.pr)}"
->
+<td class="td-string omit" style="background-color: {color}">
   {#if player.player_info.id === 0}
     {player.player_info.name}
   {:else}
