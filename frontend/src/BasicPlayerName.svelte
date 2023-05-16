@@ -2,7 +2,7 @@
 import type { vo } from "wailsjs/go/models";
 import { BrowserOpenURL } from "../wailsjs/runtime/runtime";
 import Const from "./Const";
-import RankConverter from "./RankConverter";
+import { RankConverter } from "./RankConverter";
 export let player: vo.Player;
 
 function clanURL(player: vo.Player): string {

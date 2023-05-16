@@ -6,7 +6,7 @@ import iconCL from "./assets/images/icon-cl.png";
 import iconDD from "./assets/images/icon-dd.png";
 import iconSS from "./assets/images/icon-ss.png";
 import iconNone from "./assets/images/icon-none.png";
-import { BrowserOpenURL, LogDebug } from "../wailsjs/runtime/runtime";
+import { BrowserOpenURL } from "../wailsjs/runtime/runtime";
 import Const from "./Const";
 export let player: vo.Player;
 

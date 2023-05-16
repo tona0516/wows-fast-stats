@@ -21,14 +21,14 @@ import OverallTierRate from "./OverallTierRate.svelte";
 import OverallBattles from "./OverallBattles.svelte";
 import NoData from "./NoData.svelte";
 import BasicIsInAvg from "./BasicIsInAvg.svelte";
-import { Average, type AverageFactor } from "./Average";
+import { Summary, type SummaryResult } from "./Summary";
 import { ExcludePlayerIDs } from "../wailsjs/go/main/App.js";
 import type { DisplayPattern } from "./DisplayPattern";
 import ShipHitRate from "./ShipHitRate.svelte";
 
 export let battle: vo.Battle;
 export let config: vo.UserConfig = Const.DEFAULT_USER_CONFIG;
-export let averageFactors: AverageFactor;
+export let summaryResult: SummaryResult;
 export let excludePlayerIDs: number[] = [];
 
 type ComponentInfo = {
@@ -126,8 +126,8 @@ function decidePlayerDataPattern(player: vo.Player): DisplayPattern {
 function onCheckPlayer() {
   ExcludePlayerIDs().then((result) => {
     excludePlayerIDs = result;
-    const average = new Average(battle);
-    averageFactors = average.calc(result);
+    const summary = new Summary(battle);
+    summaryResult = summary.calc(result);
   });
 }
 </script>
@@ -210,7 +210,7 @@ function onCheckPlayer() {
     </table>
   </div>
 
-  {#if averageFactors}
+  {#if summaryResult}
     <div class="mx-4 d-flex flex-row centerize">
       <table class="mx-2 table table-sm table-text-color w-auto">
         <tbody>
@@ -235,12 +235,12 @@ function onCheckPlayer() {
         <thead>
           <tr>
             <th></th>
-            <th colspan="{averageFactors.shipStatsCount}">艦成績</th>
-            <th colspan="{averageFactors.overallCount}">総合成績</th>
+            <th colspan="{summaryResult.shipStatsCount}">艦成績</th>
+            <th colspan="{summaryResult.overallStatsCount}">総合成績</th>
           </tr>
           <tr>
             <th></th>
-            {#each averageFactors.labels as label}
+            {#each summaryResult.labels as label}
               <th>{label}</th>
             {/each}
           </tr>
@@ -248,21 +248,21 @@ function onCheckPlayer() {
         <tbody>
           <tr>
             <td class="td-string">{battle.teams[0].name}</td>
-            {#each averageFactors.friends as friend}
+            {#each summaryResult.friends as friend}
               <td class="td-number">{friend}</td>
             {/each}
           </tr>
 
           <tr>
             <td class="td-string">{battle.teams[1].name}</td>
-            {#each averageFactors.enemies as enemy}
+            {#each summaryResult.enemies as enemy}
               <td class="td-number">{enemy}</td>
             {/each}
           </tr>
 
           <tr>
             <td class="td-string">差</td>
-            {#each averageFactors.diffs as diff}
+            {#each summaryResult.diffs as diff}
               <td class="td-number {diff.colorClass}">{diff.value}</td>
             {/each}
           </tr>

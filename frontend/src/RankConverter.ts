@@ -16,7 +16,7 @@ type Range = {
   max: number;
 };
 
-export default class RankConverter {
+export class RankConverter {
   rank: Rank;
 
   private constructor(rank: Rank) {

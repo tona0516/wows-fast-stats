@@ -13,7 +13,7 @@ import AppInfo from "./PageAppInfo.svelte";
 
 import "bootstrap-icons/font/bootstrap-icons.css";
 import type { vo } from "wailsjs/go/models.js";
-import { Average, type AverageFactor } from "./Average.js";
+import { Summary, type SummaryResult } from "./Summary.js";
 import Navigation from "./Navigation.svelte";
 import type { Page } from "./Page.js";
 import { Screenshot } from "./Screenshot.js";
@@ -21,7 +21,7 @@ import { Screenshot } from "./Screenshot.js";
 let currentPage: Page;
 let battle: vo.Battle;
 let config: vo.UserConfig;
-let averageFactors: AverageFactor;
+let summaryResult: SummaryResult;
 let excludePlayerIDs: number[];
 let notification: Notification;
 let isFirstScreenshot: boolean;
@@ -35,8 +35,8 @@ EventsOn("BATTLE_START", async () => {
 
     battle = await Battle();
     excludePlayerIDs = await ExcludePlayerIDs();
-    const average = new Average(battle);
-    averageFactors = average.calc(excludePlayerIDs);
+    const summary = new Summary(battle);
+    summaryResult = summary.calc(excludePlayerIDs);
 
     const elapsed = (new Date().getTime() - start) / 1000;
     notification.showToast(`データ取得完了: ${elapsed}秒`, "success");
@@ -101,7 +101,7 @@ window.onload = function () {
         <MainPage
           bind:config="{config}"
           bind:battle="{battle}"
-          bind:averageFactors="{averageFactors}"
+          bind:summaryResult="{summaryResult}"
           bind:excludePlayerIDs="{excludePlayerIDs}"
         />
       </div>

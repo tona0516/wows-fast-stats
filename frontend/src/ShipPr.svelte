@@ -2,7 +2,7 @@
 import type { vo } from "wailsjs/go/models";
 import type { DisplayPattern } from "./DisplayPattern";
 import Const from "./Const";
-import RankConverter from "./RankConverter";
+import { RankConverter } from "./RankConverter";
 export let player: vo.Player;
 export let displayPattern: DisplayPattern;
 
