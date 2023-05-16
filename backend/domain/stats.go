@@ -39,11 +39,12 @@ func (s *Stats) ShipAvgDamage() float64 {
 }
 
 func (s *Stats) ShipKdRate() float64 {
-	if s.Ship.Battles-s.Ship.SurvivedBattles > 0 {
-		return float64(s.Ship.Frags) / float64(s.Ship.Battles-s.Ship.SurvivedBattles)
+	death := s.Ship.Battles - s.Ship.SurvivedBattles
+	if death > 0 {
+		return float64(s.Ship.Frags) / float64(death)
 	}
 
-	return 0
+	return float64(s.Ship.Frags)
 }
 
 func (s *Stats) ShipAvgFrags() float64 {
@@ -112,11 +113,12 @@ func (s *Stats) OverallAvgDamage() float64 {
 }
 
 func (s *Stats) OverallKdRate() float64 {
-	if s.Overall.Battles-s.Overall.SurvivedBattles > 0 {
-		return float64(s.Overall.Frags) / float64(s.Overall.Battles-s.Overall.SurvivedBattles)
+	death := s.Overall.Battles - s.Overall.SurvivedBattles
+	if death > 0 {
+		return float64(s.Overall.Frags) / float64(death)
 	}
 
-	return 0
+	return float64(s.Overall.Frags)
 }
 
 func (s *Stats) OverallAvgExp() float64 {
