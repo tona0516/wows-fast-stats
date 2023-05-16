@@ -115,8 +115,16 @@ const funcs: { title: string; name: Func; iconClass: string }[] = [
               style="font-size: {config?.font_size || 'medium'};"
               on:click="{() => onClickMenu(func.name)}"
             >
-              <i class="{func.iconClass}"></i>
-              {func.title}
+              {#if func.name === "screenshot" && isLoadingScreenshot}
+                <span
+                  class="spinner-border spinner-border-sm"
+                  role="status"
+                  aria-hidden="true"></span>
+                読み込み中...
+              {:else}
+                <i class="{func.iconClass}"></i>
+                {func.title}
+              {/if}
             </button>
           {/each}
         {/if}

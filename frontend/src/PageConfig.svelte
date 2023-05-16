@@ -16,8 +16,10 @@ const dispatch = createEventDispatcher();
 
 let inputConfig: vo.UserConfig = Const.DEFAULT_USER_CONFIG;
 let cwd: string;
+let isLoading = false;
 
 function clickApply() {
+  isLoading = true;
   ApplyUserConfig(inputConfig)
     .then(() => {
       dispatch("onUpdateSuccess", {
@@ -27,6 +29,9 @@ function clickApply() {
     })
     .catch((error) => {
       dispatch("onUpdateFailure", { message: error });
+    })
+    .finally(() => {
+      isLoading = false;
     });
 }
 
@@ -241,8 +246,19 @@ main();
         type="button"
         class="btn btn-primary mb-3"
         style="font-size: {config?.font_size || 'medium'};"
-        on:click="{clickApply}">適用</button
+        disabled="{isLoading}"
+        on:click="{clickApply}"
       >
+        {#if isLoading}
+          <span
+            class="spinner-border spinner-border-sm"
+            role="status"
+            aria-hidden="true"></span>
+          更新中...
+        {:else}
+          適用
+        {/if}
+      </button>
     </div>
   </form>
 </div>
