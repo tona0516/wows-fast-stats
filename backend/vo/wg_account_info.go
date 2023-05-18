@@ -28,7 +28,7 @@ type WGAccountInfoData struct {
 			SurvivedBattles uint `json:"survived_battles"`
 			Xp              uint `json:"xp"`
 		} `json:"pvp"`
-	}
+	} `json:"statistics"`
 }
 
 func (w WGAccountInfoData) Field() string {
