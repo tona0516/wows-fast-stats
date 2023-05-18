@@ -28,22 +28,37 @@ type App struct {
 	cancelReplayWatcher context.CancelFunc
 	configService       service.Config
 	screenshotService   service.Screenshot
+	lock                Lock
 }
 
 func NewApp(env vo.Env, version vo.Version) *App {
+	logger := *infra.NewLogger(env, version)
+
 	return &App{
 		env:               env,
 		version:           version,
 		excludePlayer:     *domain.NewExcludePlayer(),
-		logger:            *infra.NewLogger(env, version),
+		logger:            logger,
 		configService:     *service.NewConfig(infra.Config{}),
 		screenshotService: *service.NewScreenshot(infra.Screenshot{}),
+		lock:              *NewLock(env, logger),
 	}
 }
 
 func (a *App) onStartup(ctx context.Context) {
 	a.logger.Info("start app.")
 	a.ctx = ctx
+
+	if a.lock.Locked() {
+		runtime.WindowHide(ctx)
+		_, _ = runtime.MessageDialog(ctx, runtime.MessageDialogOptions{
+			Type:    runtime.ErrorDialog,
+			Message: "すでにwows-fast-statsが起動中です。",
+		})
+		os.Exit(0)
+	}
+
+	_ = a.lock.Lock()
 
 	// Read configs
 	userConfig, err := a.configService.User()
@@ -76,6 +91,8 @@ func (a *App) onShutdown(ctx context.Context) {
 	if err != nil {
 		a.logger.Warn("Failed to update app config.", err)
 	}
+
+	_ = a.lock.Unlock()
 }
 
 func (a *App) Ready() {
