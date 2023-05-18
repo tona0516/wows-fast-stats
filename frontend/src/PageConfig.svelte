@@ -3,7 +3,6 @@ import type { vo } from "wailsjs/go/models.js";
 import {
   ApplyUserConfig,
   SelectDirectory,
-  Cwd,
   OpenDirectory,
 } from "../wailsjs/go/main/App.js";
 import { createEventDispatcher } from "svelte";
@@ -15,7 +14,6 @@ export let config: vo.UserConfig;
 const dispatch = createEventDispatcher();
 
 let inputConfig: vo.UserConfig = Const.DEFAULT_USER_CONFIG;
-let cwd: string;
 let isLoading = false;
 
 function clickApply() {
@@ -61,9 +59,6 @@ function toggleAll(e: any) {
 
 function main() {
   inputConfig = config;
-  Cwd().then((result) => {
-    cwd = result;
-  });
 }
 
 main();
@@ -209,7 +204,7 @@ main();
           <a
             class="td-link"
             href="#"
-            on:click="{() => openDirectory(cwd + '/screenshot')}"
+            on:click="{() => openDirectory('screenshot/')}"
             ><i class="bi bi-folder2-open"></i> 保存フォルダを開く
           </a>
         </div>
@@ -233,7 +228,7 @@ main();
           <a
             class="td-link"
             href="#"
-            on:click="{() => openDirectory(cwd + '/temp_arena_info')}"
+            on:click="{() => openDirectory('temp_arena_info/')}"
             ><i class="bi bi-folder2-open"></i> 保存フォルダを開く</a
           >
         </div>

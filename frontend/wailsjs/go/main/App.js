@@ -22,10 +22,6 @@ export function Battle() {
   return window['go']['main']['App']['Battle']();
 }
 
-export function Cwd() {
-  return window['go']['main']['App']['Cwd']();
-}
-
 export function ExcludePlayerIDs() {
   return window['go']['main']['App']['ExcludePlayerIDs']();
 }

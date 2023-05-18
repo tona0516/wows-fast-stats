@@ -12,8 +12,6 @@ export function AutoScreenshot(arg1:string,arg2:string):Promise<void>;
 
 export function Battle():Promise<vo.Battle>;
 
-export function Cwd():Promise<string>;
-
 export function ExcludePlayerIDs():Promise<Array<number>>;
 
 export function ManualScreenshot(arg1:string,arg2:string):Promise<void>;

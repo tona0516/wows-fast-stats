@@ -172,15 +172,6 @@ func (a *App) AutoScreenshot(filename string, base64Data string) error {
 	return err
 }
 
-func (a *App) Cwd() (string, error) {
-	cwd, err := os.Getwd()
-	if err != nil {
-		a.logger.Warn("Failed to get cwd.", err)
-	}
-
-	return cwd, errors.WithStack(apperr.App.Cwd.WithRaw(err))
-}
-
 func (a *App) AppVersion() vo.Version {
 	return a.version
 }
@@ -188,10 +179,11 @@ func (a *App) AppVersion() vo.Version {
 func (a *App) OpenDirectory(path string) error {
 	err := open.Run(path)
 	if err != nil {
-		a.logger.Warn("Failed to open directory.", err)
+		a.logger.Warn("Failed to open directory -> "+path, err)
+		return errors.WithStack(apperr.App.OpenDir.WithRaw(err))
 	}
 
-	return errors.WithStack(apperr.App.OpenDir.WithRaw(err))
+	return nil
 }
 
 func (a *App) ExcludePlayerIDs() []int {

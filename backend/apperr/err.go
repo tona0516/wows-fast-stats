@@ -87,7 +87,6 @@ type srvss struct {
 }
 
 type app struct {
-	Cwd     AppError
 	OpenDir AppError
 }
 
