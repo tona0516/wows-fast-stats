@@ -4,6 +4,7 @@ import { WindowReloadApp } from "../wailsjs/runtime/runtime";
 import type { Page } from "./Page";
 import type { vo } from "wailsjs/go/models";
 import { Screenshot } from "./Screenshot";
+import { LogError } from "../wailsjs/go/main/App";
 
 const dispatch = createEventDispatcher();
 
@@ -41,12 +42,12 @@ function onClickMenu(menu: NavigationMenu) {
             message: "スクリーンショットを保存しました。",
           });
         })
-        .catch((error) => {
-          // TODO handling based on type
-          const errStr = error as string;
-          if (errStr.includes("Canceled")) {
+        .catch((error: Error) => {
+          if (error.message.includes("Canceled")) {
             return;
           }
+
+          LogError(error.name + "," + error.message + "," + error.stack);
           dispatch("onScreenshotFailure", { message: error });
         })
         .finally(() => {

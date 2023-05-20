@@ -14,6 +14,8 @@ export function Battle():Promise<vo.Battle>;
 
 export function ExcludePlayerIDs():Promise<Array<number>>;
 
+export function LogError(arg1:string):Promise<void>;
+
 export function ManualScreenshot(arg1:string,arg2:string):Promise<void>;
 
 export function OpenDirectory(arg1:string):Promise<void>;

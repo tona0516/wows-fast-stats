@@ -4,6 +4,7 @@ import {
   Battle,
   ExcludePlayerIDs,
   Ready,
+  LogError,
 } from "../wailsjs/go/main/App.js";
 import Notification from "./Notification.svelte";
 import ConfigPage from "./PageConfig.svelte";
@@ -44,9 +45,18 @@ EventsOn("BATTLE_START", async () => {
 
     if (config.save_screenshot) {
       const screenshot = new Screenshot(battle, isFirstScreenshot);
-      screenshot.auto().finally(() => {
-        isFirstScreenshot = false;
-      });
+      screenshot
+        .auto()
+        .catch((error: Error) => {
+          notification.showToast(
+            "スクリーンショットの自動保存に失敗しました。",
+            "error"
+          );
+          LogError(error.name + "," + error.message + "," + error.stack);
+        })
+        .finally(() => {
+          isFirstScreenshot = false;
+        });
     }
   } catch (error) {
     notification.showToastWithKey(error, "error", "error");

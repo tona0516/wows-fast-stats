@@ -7,6 +7,7 @@ import (
 	"changeme/backend/service"
 	"changeme/backend/vo"
 	"context"
+	"fmt"
 	"os"
 
 	"github.com/pkg/errors"
@@ -196,4 +197,9 @@ func (a *App) AddExcludePlayerID(playerID int) {
 
 func (a *App) RemoveExcludePlayerID(playerID int) {
 	a.excludePlayer.Remove(playerID)
+}
+
+func (a *App) LogError(err string) {
+	//nolint:goerr113
+	a.logger.Error("Error occurred in frontend.", fmt.Errorf("%s", err))
 }

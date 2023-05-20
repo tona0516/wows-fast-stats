@@ -26,6 +26,10 @@ export function ExcludePlayerIDs() {
   return window['go']['main']['App']['ExcludePlayerIDs']();
 }
 
+export function LogError(arg1) {
+  return window['go']['main']['App']['LogError'](arg1);
+}
+
 export function ManualScreenshot(arg1, arg2) {
   return window['go']['main']['App']['ManualScreenshot'](arg1, arg2);
 }
