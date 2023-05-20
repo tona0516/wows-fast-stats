@@ -8,27 +8,20 @@ type WGAccountInfo struct {
 	Error  WGError                   `json:"error"`
 }
 
+type WGAccountInfoData struct {
+	HiddenProfile bool `json:"hidden_profile"`
+	Statistics    struct {
+		Pvp     WGStatsValues `json:"pvp"`
+		PvpSolo WGStatsValues `json:"pvp_solo"`
+	} `json:"statistics"`
+}
+
 func (w WGAccountInfo) GetStatus() string {
 	return w.Status
 }
 
 func (w WGAccountInfo) GetError() WGError {
 	return w.Error
-}
-
-type WGAccountInfoData struct {
-	HiddenProfile bool `json:"hidden_profile"`
-	Statistics    struct {
-		Pvp struct {
-			Wins            uint `json:"wins"`
-			Battles         uint `json:"battles"`
-			DamageDealt     uint `json:"damage_dealt"`
-			Frags           uint `json:"frags"`
-			SurviveWins     uint `json:"survived_wins"`
-			SurvivedBattles uint `json:"survived_battles"`
-			Xp              uint `json:"xp"`
-		} `json:"pvp"`
-	} `json:"statistics"`
 }
 
 func (w WGAccountInfoData) Field() string {
