@@ -10,8 +10,13 @@ dev:
 	$(eval LD_FLAGS := "-X main.semver=$(SEMVER) -X main.revision=$(REV) -X main.env=debug")
 	wails dev -ldflags $(LD_FLAGS)
 
+.PHONY: check-prerequisite
+check-prerequisite:
+	command -v go > /dev/null 2>&1
+	command -v npm > /dev/null 2>&1
+
 .PHONY: setup
-setup:
+setup: check-prerequisite
 	go install github.com/wailsapp/wails/v2/cmd/wails@latest
 	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.52.2
 
