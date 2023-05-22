@@ -58,11 +58,6 @@ body {
   text-align: center;
 }
 
-#td-checkbox {
-  padding: 0;
-  width: 1em;
-}
-
 .td-link {
   color: var(--app-text-color);
 }
@@ -85,6 +80,12 @@ body {
   max-width: 140px;
 }
 
+.td-checkbox {
+  padding: 1px;
+  width: 1em;
+  height: 1em;
+}
+
 .no_data {
   max-width: 0px;
   text-align: center;
@@ -96,12 +97,6 @@ body {
   -webkit-text-overflow: ellipsis;
   -ms-text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.in-avg {
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .ship-icon {

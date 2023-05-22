@@ -26,15 +26,15 @@ async function onCheck(e: any) {
 }
 </script>
 
-<td id="td-checkbox">
-  {#if displayPattern === "noshipstats" || displayPattern === "full" || displayPattern === "nopr"}
-    <div class="form-check in-avg">
-      <input
-        class="form-check-input"
-        type="checkbox"
-        on:click="{onCheck}"
-        checked="{isChecked}"
-      />
-    </div>
-  {/if}
-</td>
+{#if displayPattern === "noshipstats" || displayPattern === "full" || displayPattern === "nopr"}
+  <td class="td-checkbox">
+    <input
+      class="form-check-input"
+      type="checkbox"
+      on:click="{onCheck}"
+      checked="{isChecked}"
+    />
+  </td>
+{:else}
+  <td class="td-checkbox"></td>
+{/if}
