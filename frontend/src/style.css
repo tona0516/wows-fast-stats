@@ -1,15 +1,20 @@
+:root {
+  --app-background-color: #2d2c2c;
+  --app-text-color: #ffffff;
+}
+
 html {
-  background-color: #2d2c2c;
-  color: #ffffff;
+  background-color: var(--app-background-color);
+  color: var(--app-text-color);
 }
 
 body {
   margin: 0;
-  color: #ffffff;
+  color: var(--app-text-color);
   font-family: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
     "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif;
-  background-color: #2d2c2c;
+  background-color: var(--app-background-color);
 }
 
 @font-face {
@@ -24,13 +29,18 @@ body {
   height: 100vh;
 }
 
+#mainpage {
+  background-color: var(--app-background-color);
+  color: var(--app-text-color);
+}
+
 .btn {
   white-space: nowrap;
   text-align: center;
 }
 
 .table-text-color {
-  color: #ffffff;
+  color: var(--app-text-color);
 }
 
 .table td {
@@ -54,7 +64,7 @@ body {
 }
 
 .td-link {
-  color: #ffffff;
+  color: var(--app-text-color);
 }
 
 .td-string {
