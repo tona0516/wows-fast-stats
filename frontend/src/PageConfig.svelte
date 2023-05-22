@@ -58,7 +58,7 @@ function toggleAll(e: any) {
 }
 
 function main() {
-  inputConfig = config;
+  inputConfig = structuredClone(config)
 }
 
 main();
