@@ -153,7 +153,7 @@ func (s *Stats) AvgTier(
 		battles += ship.Pvp.Battles
 	}
 
-	if battles == 0 {
+	if battles < 1 {
 		return 0
 	}
 
@@ -168,7 +168,7 @@ func (s *Stats) UsingTierRate(
 	lowKey := "low"
 	middleKey := "middle"
 	highKey := "high"
-	tierMap := make(map[string]uint)
+	tierMap := make(map[string]float64)
 
 	playerShipStats := shipStats[accountID].Data[accountID]
 	for _, ship := range playerShipStats {
@@ -180,28 +180,30 @@ func (s *Stats) UsingTierRate(
 		shipID := ship.ShipID
 		tier := shipInfo[shipID].Tier
 
+		var key string
 		switch {
 		case tier >= 1 && tier <= 4:
-			tierMap[lowKey] += battles
+			key = lowKey
 		case tier >= 5 && tier <= 7:
-			tierMap[middleKey] += battles
+			key = middleKey
 		case tier >= 8:
-			tierMap[highKey] += battles
+			key = highKey
 		}
+		tierMap[key] += float64(battles)
 	}
 
-	var allBattles uint
+	var allBattles float64
 	for _, v := range tierMap {
 		allBattles += v
 	}
-	if allBattles == 0 {
+	if allBattles < 1 {
 		return vo.TierGroup{}
 	}
 
 	return vo.TierGroup{
-		Low:    float64(tierMap[lowKey]) / float64(allBattles) * 100,
-		Middle: float64(tierMap[middleKey]) / float64(allBattles) * 100,
-		High:   float64(tierMap[highKey]) / float64(allBattles) * 100,
+		Low:    tierMap[lowKey] / allBattles * 100,
+		Middle: tierMap[middleKey] / allBattles * 100,
+		High:   tierMap[highKey] / allBattles * 100,
 	}
 }
 
@@ -210,7 +212,7 @@ func (s *Stats) UsingShipTypeRate(
 	shipInfo map[int]vo.Warship,
 	shipStats map[int]vo.WGShipsStats,
 ) vo.ShipTypeGroup {
-	battlesMap := make(map[vo.ShipType]uint)
+	battlesMap := make(map[vo.ShipType]float64)
 
 	playerShipStats := shipStats[accountID].Data[accountID]
 	for _, ship := range playerShipStats {
@@ -222,23 +224,23 @@ func (s *Stats) UsingShipTypeRate(
 		shipID := ship.ShipID
 		shipType := shipInfo[shipID].Type
 
-		battlesMap[shipType] += battles
+		battlesMap[shipType] += float64(battles)
 	}
 
-	var allBattles uint
+	var allBattles float64
 	for _, v := range battlesMap {
 		allBattles += v
 	}
-	if allBattles == 0 {
+	if allBattles < 1 {
 		return vo.ShipTypeGroup{}
 	}
 
 	return vo.ShipTypeGroup{
-		SS: float64(battlesMap[vo.SS]) / float64(allBattles) * 100,
-		DD: float64(battlesMap[vo.DD]) / float64(allBattles) * 100,
-		CL: float64(battlesMap[vo.CL]) / float64(allBattles) * 100,
-		BB: float64(battlesMap[vo.BB]) / float64(allBattles) * 100,
-		CV: float64(battlesMap[vo.CV]) / float64(allBattles) * 100,
+		SS: battlesMap[vo.SS] / allBattles * 100,
+		DD: battlesMap[vo.DD] / allBattles * 100,
+		CL: battlesMap[vo.CL] / allBattles * 100,
+		BB: battlesMap[vo.BB] / allBattles * 100,
+		CV: battlesMap[vo.CV] / allBattles * 100,
 	}
 }
 

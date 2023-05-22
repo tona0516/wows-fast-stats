@@ -162,7 +162,6 @@ func (b *Battle) clanTag(accountIDs []int, result chan vo.Result[map[int]vo.Clan
 	}
 
 	clanIDs := clansAccountInfo.ClanIDs()
-
 	clansInfo, err := b.wargaming.ClansInfo(clanIDs)
 	if err != nil {
 		result <- vo.Result[map[int]vo.Clan]{Value: clanMap, Error: err}
@@ -170,8 +169,7 @@ func (b *Battle) clanTag(accountIDs []int, result chan vo.Result[map[int]vo.Clan
 		return
 	}
 
-	for i := range accountIDs {
-		accountID := accountIDs[i]
+	for accountID := range accountIDs {
 		clanID := clansAccountInfo.Data[accountID].ClanID
 		clanTag := clansInfo.Data[clanID].Tag
 		clanMap[accountID] = vo.Clan{Tag: clanTag, ID: clanID}
@@ -197,14 +195,22 @@ func (b *Battle) compose(
 	var ownShip string
 
 	for _, vehicle := range tempArenaInfo.Vehicles {
-		warship := warships[vehicle.ShipID]
-
 		nickname := vehicle.Name
+		accountID := accountList.AccountID(nickname)
+		clan := clan[accountID]
+
+		warship, ok := warships[vehicle.ShipID]
+		if !ok {
+			warship = vo.Warship{
+				Name:   "Unknown",
+				Tier:   0,
+				Type:   vo.NONE,
+				Nation: "",
+			}
+		}
 		if nickname == tempArenaInfo.PlayerName {
 			ownShip = warship.Name
 		}
-		accountID := accountList.AccountID(nickname)
-		clan := clan[accountID]
 
 		stats := domain.Stats{
 			AccountInfo: accountInfo.Data[accountID],
@@ -268,15 +274,16 @@ func (b *Battle) compose(
 	sort.Sort(friends)
 	sort.Sort(enemies)
 
-	teams := make([]vo.Team, 0)
-	teams = append(teams, vo.Team{
-		Players: friends,
-		Name:    "味方チーム",
-	})
-	teams = append(teams, vo.Team{
-		Players: enemies,
-		Name:    "敵チーム",
-	})
+	teams := []vo.Team{
+		{
+			Players: friends,
+			Name:    "味方チーム",
+		},
+		{
+			Players: enemies,
+			Name:    "敵チーム",
+		},
+	}
 
 	battle := vo.Battle{
 		Meta: vo.Meta{
