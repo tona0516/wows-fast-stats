@@ -169,7 +169,7 @@ func (b *Battle) clanTag(accountIDs []int, result chan vo.Result[map[int]vo.Clan
 		return
 	}
 
-	for accountID := range accountIDs {
+	for _, accountID := range accountIDs {
 		clanID := clansAccountInfo.Data[accountID].ClanID
 		clanTag := clansInfo.Data[clanID].Tag
 		clanMap[accountID] = vo.Clan{Tag: clanTag, ID: clanID}
