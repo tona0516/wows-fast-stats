@@ -76,8 +76,8 @@ body {
 }
 
 .td-graph {
-  min-width: 140px;
-  max-width: 140px;
+  min-width: 6em;
+  max-width: 6em;
 }
 
 .td-checkbox {
