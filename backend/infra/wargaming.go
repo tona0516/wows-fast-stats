@@ -27,7 +27,7 @@ func (w *Wargaming) AccountInfo(accountIDs []int) (vo.WGAccountInfo, error) {
 			"application_id": w.AppID,
 			"account_id":     strings.Join(accountIDsString, ","),
 			"fields":         vo.WGAccountInfoData{}.Field(),
-			"extra":          "statistics.pvp_solo",
+			// "extra":          "statistics.pvp_solo",
 		},
 	)
 
@@ -105,7 +105,7 @@ func (w *Wargaming) ShipsStats(accountID int) (vo.WGShipsStats, error) {
 			"application_id": w.AppID,
 			"account_id":     strconv.Itoa(accountID),
 			"fields":         vo.WGShipsStatsData{}.Field(),
-			"extra":          "pvp_solo",
+			// "extra":          "pvp_solo",
 		},
 	)
 
