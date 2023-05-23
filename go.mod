@@ -12,6 +12,8 @@ require github.com/rs/zerolog v1.29.1
 
 require github.com/cenkalti/backoff/v4 v4.2.1
 
+require github.com/mitchellh/go-ps v1.0.0
+
 require (
 	github.com/bep/debounce v1.2.1 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
