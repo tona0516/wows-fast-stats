@@ -28,4 +28,6 @@ linters:
     - contextcheck
     - gci # Conflict goimports
     - gofumpt # Conflict goimports
+    - testpackage
+    - godox
   fast: false

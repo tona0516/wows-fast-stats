@@ -2,37 +2,39 @@ package vo
 
 import (
 	"strings"
+
+	"github.com/samber/lo"
 )
 
 type TempArenaInfo struct {
-	Vehicles []struct {
-		ShipID   int    `json:"shipId"`
-		Relation int    `json:"relation"`
-		ID       int    `json:"id"`
-		Name     string `json:"name"`
-	} `json:"vehicles"`
-	DateTime   string `json:"dateTime"`
-	MapID      int    `json:"mapId"`
-	MatchGroup string `json:"matchGroup"`
-	PlayerName string `json:"playerName"`
+	Vehicles   []Vehicle `json:"vehicles"`
+	DateTime   string    `json:"dateTime"`
+	MapID      int       `json:"mapId"`
+	MatchGroup string    `json:"matchGroup"`
+	PlayerName string    `json:"playerName"`
+}
+
+type Vehicle struct {
+	ShipID   int    `json:"shipId"`
+	Relation int    `json:"relation"`
+	ID       int    `json:"id"`
+	Name     string `json:"name"`
 }
 
 func (t *TempArenaInfo) AccountNames() []string {
-	accountNames := make([]string, 0)
-	for i := range t.Vehicles {
-		vehicle := t.Vehicles[i]
+	accountNames := lo.FilterMap(t.Vehicles, func(vehicle Vehicle, _ int) (string, bool) {
 		// Note: Bot name in corp or ramdom battle.
 		if strings.HasPrefix(vehicle.Name, ":") && strings.HasSuffix(vehicle.Name, ":") {
-			continue
+			return "", false
 		}
 
 		// Note: Bot name in operation.
 		if strings.HasPrefix(vehicle.Name, "IDS_OP") {
-			continue
+			return "", false
 		}
 
-		accountNames = append(accountNames, vehicle.Name)
-	}
+		return vehicle.Name, true
+	})
 
 	return accountNames
 }
@@ -56,6 +58,5 @@ func (t *TempArenaInfo) BattleArena(battleArenas WGBattleArenas) string {
 
 func (t *TempArenaInfo) BattleType(battleTypes WGBattleTypes) string {
 	rawBattleType := battleTypes.Data[strings.ToUpper(t.MatchGroup)].Name
-
 	return strings.ReplaceAll(rawBattleType, " ", "")
 }

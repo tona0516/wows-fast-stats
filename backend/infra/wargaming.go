@@ -16,6 +16,16 @@ type Wargaming struct {
 	AppID string
 }
 
+func NewWargaming(appid string) *Wargaming {
+	return &Wargaming{
+		AppID: appid,
+	}
+}
+
+func (w *Wargaming) SetAppID(appid string) {
+	w.AppID = appid
+}
+
 func (w *Wargaming) AccountInfo(accountIDs []int) (vo.WGAccountInfo, error) {
 	accountIDsString := make([]string, 0)
 	for i := range accountIDs {

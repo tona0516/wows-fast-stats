@@ -14,6 +14,7 @@ type Battle struct {
 	userConfig        vo.UserConfig
 	wargaming         infra.Wargaming
 	tempArenaInfoRepo infra.TempArenaInfo
+	caches            infra.Caches
 }
 
 func NewBattle(
@@ -21,12 +22,14 @@ func NewBattle(
 	userConfig vo.UserConfig,
 	wargaming infra.Wargaming,
 	tempArenaInfoRepo infra.TempArenaInfo,
+	caches infra.Caches,
 ) *Battle {
 	return &Battle{
 		parallels:         parallels,
 		userConfig:        userConfig,
 		wargaming:         wargaming,
 		tempArenaInfoRepo: tempArenaInfoRepo,
+		caches:            caches,
 	}
 }
 
@@ -38,9 +41,10 @@ func (b *Battle) Battle(isSuccessfulOnce bool) (vo.Battle, error) {
 	if !isSuccessfulOnce {
 		prepare := NewPrepare(
 			b.parallels,
-			infra.Wargaming{AppID: b.userConfig.Appid},
-			infra.Numbers{},
-			infra.Unregistered{},
+			infra.NewWargaming(b.userConfig.Appid),
+			infra.NewNumbers("https://api.wows-numbers.com/personal/rating/expected/json/"),
+			new(infra.Unregistered),
+			b.caches,
 		)
 
 		go prepare.FetchCachable(prepareResult)
@@ -81,20 +85,16 @@ func (b *Battle) Battle(isSuccessfulOnce bool) (vo.Battle, error) {
 
 	errs := make([]error, 0)
 
-	warshipCache := infra.Cache[map[int]vo.Warship]{Name: "warship"}
-	warship, err := warshipCache.Deserialize()
+	warship, err := b.caches.Warship.Deserialize()
 	errs = append(errs, err)
 
-	expectedStatsCache := infra.Cache[vo.NSExpectedStats]{Name: "expectedstats"}
-	expectedStats, err := expectedStatsCache.Deserialize()
+	expectedStats, err := b.caches.ExpectedStats.Deserialize()
 	errs = append(errs, err)
 
-	battleArenasCache := infra.Cache[vo.WGBattleArenas]{Name: "battlearenas"}
-	battleArenas, err := battleArenasCache.Deserialize()
+	battleArenas, err := b.caches.BattleArenas.Deserialize()
 	errs = append(errs, err)
 
-	battleTypesCache := infra.Cache[vo.WGBattleTypes]{Name: "battletypes"}
-	battleTypes, err := battleTypesCache.Deserialize()
+	battleTypes, err := b.caches.BattleTypes.Deserialize()
 	errs = append(errs, err)
 
 	accountInfo := <-accountInfoResult

@@ -38,8 +38,8 @@ func NewApp(env vo.Env, version vo.Version) *App {
 		version:           version,
 		excludePlayer:     *domain.NewExcludePlayer(),
 		logger:            logger,
-		configService:     *service.NewConfig(infra.Config{}),
-		screenshotService: *service.NewScreenshot(infra.Screenshot{}),
+		configService:     *service.NewConfig(new(infra.Config), new(infra.Wargaming)),
+		screenshotService: *service.NewScreenshot(new(infra.Screenshot), runtime.SaveFileDialog),
 	}
 }
 
@@ -89,8 +89,9 @@ func (a *App) Ready() {
 
 	rw := service.NewReplayWatcher(
 		a.ctx,
-		infra.Config{},
-		infra.TempArenaInfo{},
+		new(infra.Config),
+		new(infra.TempArenaInfo),
+		runtime.EventsEmit,
 	)
 	go rw.Start(ctx)
 }
@@ -101,6 +102,7 @@ func (a *App) Battle() (vo.Battle, error) {
 		a.userConfig,
 		infra.Wargaming{AppID: a.userConfig.Appid},
 		infra.TempArenaInfo{},
+		*infra.NewCaches("cache"),
 	)
 
 	result, err := battle.Battle(a.isSuccessfulOnce)

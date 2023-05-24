@@ -34,21 +34,20 @@ func fieldsRecursive(parentNames []string, t reflect.Type, result *[]string) {
 }
 
 func toSnakeCase(s string) string {
-	b := &strings.Builder{}
-	for i, r := range s {
-		if i == 0 {
-			b.WriteRune(unicode.ToLower(r))
+	runes := []rune(s)
+	result := make([]rune, 0)
 
+	for i, r := range runes {
+		if !unicode.IsUpper(r) {
+			result = append(result, r)
 			continue
 		}
-		if unicode.IsUpper(r) {
-			b.WriteRune('_')
-			b.WriteRune(unicode.ToLower(r))
 
-			continue
+		if i > 0 && unicode.IsLower(runes[i-1]) {
+			result = append(result, '_')
 		}
-		b.WriteRune(r)
+		result = append(result, unicode.ToLower(r))
 	}
 
-	return b.String()
+	return string(result)
 }

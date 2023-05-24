@@ -12,12 +12,17 @@ import (
 )
 
 type Config struct {
-	configRepo infra.Config
+	configRepo    infra.ConfigInterface
+	wargamingRepo infra.WargamingInterface
 }
 
-func NewConfig(configRepo infra.Config) *Config {
+func NewConfig(
+	configRepo infra.ConfigInterface,
+	wargamingRepo infra.WargamingInterface,
+) *Config {
 	return &Config{
-		configRepo: configRepo,
+		configRepo:    configRepo,
+		wargamingRepo: wargamingRepo,
 	}
 }
 
@@ -26,7 +31,7 @@ func (c *Config) User() (vo.UserConfig, error) {
 }
 
 func (c *Config) UpdateUser(config vo.UserConfig) error {
-	if err := validate(config); err != nil {
+	if err := c.validate(config); err != nil {
 		return err
 	}
 
@@ -41,13 +46,13 @@ func (c *Config) UpdateApp(config vo.AppConfig) error {
 	return c.configRepo.UpdateApp(config)
 }
 
-func validate(config vo.UserConfig) error {
+func (c *Config) validate(config vo.UserConfig) error {
 	if _, err := os.Stat(filepath.Join(config.InstallPath, "WorldOfWarships.exe")); err != nil {
 		return errors.WithStack(apperr.SrvCfg.InvalidInstallPath.WithRaw(apperr.ErrInvalidInstallPath))
 	}
 
-	wargaming := infra.Wargaming{AppID: config.Appid}
-	if _, err := wargaming.EncyclopediaInfo(); err != nil {
+	c.wargamingRepo.SetAppID(config.Appid)
+	if _, err := c.wargamingRepo.EncyclopediaInfo(); err != nil {
 		return errors.WithStack(apperr.SrvCfg.InvalidAppID.WithRaw(apperr.ErrInvalidAppID))
 	}
 

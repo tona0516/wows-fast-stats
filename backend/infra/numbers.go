@@ -12,13 +12,21 @@ import (
 	"github.com/pkg/errors"
 )
 
-type Numbers struct{}
+type Numbers struct {
+	URL string
+}
+
+func NewNumbers(url string) *Numbers {
+	return &Numbers{
+		URL: url,
+	}
+}
 
 func (n *Numbers) ExpectedStats() (vo.NSExpectedStats, error) {
 	var result vo.NSExpectedStats
 
 	b := backoff.WithMaxRetries(backoff.NewExponentialBackOff(), 3)
-	body, err := backoff.RetryWithData(fetch, b)
+	body, err := backoff.RetryWithData(n.fetch, b)
 	if err != nil {
 		return result, err
 	}
@@ -31,45 +39,45 @@ func (n *Numbers) ExpectedStats() (vo.NSExpectedStats, error) {
 	return result, nil
 }
 
-func fetch() ([]byte, error) {
-	errDetail := apperr.Ns.Req
+func (n *Numbers) fetch() ([]byte, error) {
+	e := apperr.Ns.Req
 
-	res, err := http.Get("https://api.wows-numbers.com/personal/rating/expected/json/")
+	res, err := http.Get(n.URL)
 	if err != nil {
-		return []byte{}, errors.WithStack(errDetail.WithRaw(err))
+		return []byte{}, errors.WithStack(e.WithRaw(err))
 	}
 	defer res.Body.Close()
 
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
-		return []byte{}, errors.WithStack(errDetail.WithRaw(err))
+		return []byte{}, errors.WithStack(e.WithRaw(err))
 	}
 
 	return body, nil
 }
 
 func parse(body []byte) (vo.NSExpectedStats, error) {
-	errDetail := apperr.Ns.Parse
+	e := apperr.Ns.Parse
 
 	var result vo.NSExpectedStats
 
 	depth1 := make(map[string]interface{})
 	if err := json.Unmarshal(body, &depth1); err != nil {
-		return result, errors.WithStack(errDetail)
+		return result, errors.WithStack(e)
 	}
 
 	time, ok := depth1["time"].(float64)
 	if !ok {
-		return result, errors.WithStack(errDetail.WithRaw(apperr.ErrNoTimeKey))
+		return result, errors.WithStack(e.WithRaw(apperr.ErrNoTimeKey))
 	}
 	depth2, ok := depth1["data"].(map[string]interface{})
 	if !ok {
-		return result, errors.WithStack(errDetail.WithRaw(apperr.ErrNoDataKey))
+		return result, errors.WithStack(e.WithRaw(apperr.ErrNoDataKey))
 	}
 
 	data := make(map[int]vo.NSExpectedStatsData)
 	for key, value := range depth2 {
-		keyInt, err := strconv.Atoi(key)
+		shipID, err := strconv.Atoi(key)
 		if err != nil {
 			continue
 		}
@@ -79,25 +87,25 @@ func parse(body []byte) (vo.NSExpectedStats, error) {
 			continue
 		}
 
-		avgDmg, ok := valueMap["average_damage_dealt"].(float64)
+		damage, ok := valueMap["average_damage_dealt"].(float64)
 		if !ok {
 			continue
 		}
 
-		avgFlgs, ok := valueMap["average_frags"].(float64)
+		frags, ok := valueMap["average_frags"].(float64)
 		if !ok {
 			continue
 		}
 
-		winRate, ok := valueMap["win_rate"].(float64)
+		wr, ok := valueMap["win_rate"].(float64)
 		if !ok {
 			continue
 		}
 
-		data[keyInt] = vo.NSExpectedStatsData{
-			AverageDamageDealt: avgDmg,
-			AverageFrags:       avgFlgs,
-			WinRate:            winRate,
+		data[shipID] = vo.NSExpectedStatsData{
+			AverageDamageDealt: damage,
+			AverageFrags:       frags,
+			WinRate:            wr,
 		}
 	}
 

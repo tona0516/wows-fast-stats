@@ -11,9 +11,9 @@ import (
 )
 
 const (
-	dirName  string = "config"
-	userName string = "user.json"
-	appName  string = "app.json"
+	ConfigDirName  string = "config"
+	ConfigUserName string = "user.json"
+	ConfigAppName  string = "app.json"
 )
 
 type Config struct{}
@@ -31,27 +31,27 @@ func (c *Config) User() (vo.UserConfig, error) {
 		},
 	}
 
-	return read(userName, config)
+	return read(ConfigUserName, config)
 }
 
 func (c *Config) UpdateUser(config vo.UserConfig) error {
-	return update(userName, config)
+	return update(ConfigUserName, config)
 }
 
 func (c *Config) App() (vo.AppConfig, error) {
-	return read(appName, vo.AppConfig{})
+	return read(ConfigAppName, vo.AppConfig{})
 }
 
 func (c *Config) UpdateApp(config vo.AppConfig) error {
-	return update(appName, config)
+	return update(ConfigAppName, config)
 }
 
 func read[T any](filename string, defaultValue T) (T, error) {
 	errDetail := apperr.Cfg.Read
 
-	_ = os.Mkdir(dirName, 0o755)
+	_ = os.Mkdir(ConfigDirName, 0o755)
 
-	f, err := os.ReadFile(filepath.Join(dirName, filename))
+	f, err := os.ReadFile(filepath.Join(ConfigDirName, filename))
 	if err != nil {
 		return defaultValue, errors.WithStack(errDetail.WithRaw(err))
 	}
@@ -65,9 +65,9 @@ func read[T any](filename string, defaultValue T) (T, error) {
 func update[T any](filename string, target T) error {
 	errDetail := apperr.Cfg.Update
 
-	_ = os.Mkdir(dirName, 0o755)
+	_ = os.Mkdir(ConfigDirName, 0o755)
 
-	file, err := os.Create(filepath.Join(dirName, filename))
+	file, err := os.Create(filepath.Join(ConfigDirName, filename))
 	if err != nil {
 		return errors.WithStack(errDetail.WithRaw(err))
 	}

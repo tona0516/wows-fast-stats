@@ -11,12 +11,17 @@ import (
 )
 
 type Screenshot struct {
-	screenshotRepo infra.Screenshot
+	screenshotRepo     infra.ScreenshotInterface
+	saveFileDialogFunc func(ctx context.Context, dialogOptions runtime.SaveDialogOptions) (string, error)
 }
 
-func NewScreenshot(screenshotRepo infra.Screenshot) *Screenshot {
+func NewScreenshot(
+	screenshotRepo infra.ScreenshotInterface,
+	saveFileDialogFunc func(ctx context.Context, dialogOptions runtime.SaveDialogOptions) (string, error),
+) *Screenshot {
 	return &Screenshot{
-		screenshotRepo: screenshotRepo,
+		screenshotRepo:     screenshotRepo,
+		saveFileDialogFunc: saveFileDialogFunc,
 	}
 }
 
@@ -25,7 +30,7 @@ func (s *Screenshot) SaveForAuto(filename string, base64Data string) error {
 }
 
 func (s *Screenshot) SaveWithDialog(ctx context.Context, filename string, base64Data string) error {
-	path, err := runtime.SaveFileDialog(ctx, runtime.SaveDialogOptions{
+	path, err := s.saveFileDialogFunc(ctx, runtime.SaveDialogOptions{
 		DefaultFilename: filename,
 	})
 	if err != nil {

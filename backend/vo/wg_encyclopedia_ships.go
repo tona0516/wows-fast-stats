@@ -5,10 +5,7 @@ import "reflect"
 type WGEncyclopediaShips struct {
 	Status string `json:"status"`
 	Meta   struct {
-		Count     int `json:"count"`
 		PageTotal int `json:"page_total"`
-		Total     int `json:"total"`
-		Limit     int `json:"limit"`
 		Page      int `json:"page"`
 	} `json:"meta"`
 	Data  map[int]WGEncyclopediaShipsData `json:"data"`

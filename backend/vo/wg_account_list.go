@@ -1,6 +1,11 @@
 package vo
 
-import "reflect"
+import (
+	"reflect"
+	"sort"
+
+	"github.com/samber/lo"
+)
 
 type WGAccountList struct {
 	Status string              `json:"status"`
@@ -9,26 +14,19 @@ type WGAccountList struct {
 }
 
 func (w WGAccountList) AccountIDs() []int {
-	accountIDs := make([]int, 0)
-	for i := range w.Data {
-		accountID := w.Data[i].AccountID
-		if accountID != 0 {
-			accountIDs = append(accountIDs, w.Data[i].AccountID)
-		}
-	}
-
+	accountIDs := lo.FilterMap(w.Data, func(account WGAccountListData, _ int) (int, bool) {
+		return account.AccountID, account.AccountID != 0
+	})
+	accountIDs = lo.Uniq(accountIDs)
+	sort.Ints(accountIDs)
 	return accountIDs
 }
 
 func (w WGAccountList) AccountID(nickname string) int {
-	for i := range w.Data {
-		item := w.Data[i]
-		if item.NickName == nickname {
-			return item.AccountID
-		}
-	}
-
-	return 0
+	account, _ := lo.Find(w.Data, func(account WGAccountListData) bool {
+		return account.NickName == nickname
+	})
+	return account.AccountID
 }
 
 func (w WGAccountList) GetStatus() string {

@@ -7,8 +7,6 @@ import (
 	"time"
 
 	"changeme/backend/infra"
-
-	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 const (
@@ -17,20 +15,23 @@ const (
 )
 
 type ReplayWatcher struct {
-	appCtx     context.Context
-	configRepo infra.Config
-	taiRepo    infra.TempArenaInfo
+	appCtx         context.Context
+	configRepo     infra.ConfigInterface
+	taiRepo        infra.TempArenaInfoInterface
+	eventsEmitFunc func(ctx context.Context, eventName string, optionalData ...interface{})
 }
 
 func NewReplayWatcher(
 	appCtx context.Context,
-	configRepo infra.Config,
-	taiRepo infra.TempArenaInfo,
+	configRepo infra.ConfigInterface,
+	taiRepo infra.TempArenaInfoInterface,
+	eventsEmitFunc func(ctx context.Context, eventName string, optionalData ...interface{}),
 ) *ReplayWatcher {
 	return &ReplayWatcher{
-		appCtx:     appCtx,
-		configRepo: configRepo,
-		taiRepo:    taiRepo,
+		appCtx:         appCtx,
+		configRepo:     configRepo,
+		taiRepo:        taiRepo,
+		eventsEmitFunc: eventsEmitFunc,
 	}
 }
 
@@ -51,7 +52,7 @@ func (w *ReplayWatcher) Start(ctx context.Context) {
 
 			tempArenaInfo, err := w.taiRepo.Get(userConfig.InstallPath)
 			if err != nil {
-				runtime.EventsEmit(w.appCtx, EventEnd)
+				w.eventsEmitFunc(w.appCtx, EventEnd)
 				continue
 			}
 
@@ -62,7 +63,7 @@ func (w *ReplayWatcher) Start(ctx context.Context) {
 			}
 
 			latestHash = hash
-			runtime.EventsEmit(w.appCtx, EventStart)
+			w.eventsEmitFunc(w.appCtx, EventStart)
 		}
 	}
 }

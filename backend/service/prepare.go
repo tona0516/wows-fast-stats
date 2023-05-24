@@ -12,22 +12,25 @@ import (
 
 type Prepare struct {
 	parallels    uint
-	wargaming    infra.Wargaming
-	numbers      infra.Numbers
-	unregistered infra.Unregistered
+	wargaming    infra.WargamingInterface
+	numbers      infra.NumbersInterface
+	unregistered infra.UnregisteredInterface
+	caches       infra.Caches
 }
 
 func NewPrepare(
 	parallels uint,
-	wargaming infra.Wargaming,
-	numbers infra.Numbers,
-	unregistered infra.Unregistered,
+	wargaming infra.WargamingInterface,
+	numbers infra.NumbersInterface,
+	unregistered infra.UnregisteredInterface,
+	caches infra.Caches,
 ) *Prepare {
 	return &Prepare{
 		parallels:    parallels,
 		wargaming:    wargaming,
 		numbers:      numbers,
 		unregistered: unregistered,
+		caches:       caches,
 	}
 }
 
@@ -65,7 +68,7 @@ func (p *Prepare) FetchCachable(result chan error) {
 }
 
 func (p *Prepare) deleteOldCache() error {
-	if err := os.RemoveAll(infra.CacheDir); err != nil {
+	if err := os.RemoveAll(p.caches.Dir); err != nil {
 		return errors.WithStack(apperr.SrvPrep.DeleteCache.WithRaw(err))
 	}
 
@@ -121,8 +124,7 @@ func (p *Prepare) warship(result chan error) {
 		}
 	}
 
-	cache := infra.Cache[map[int]vo.Warship]{Name: "warship"}
-	result <- cache.Serialize(warships)
+	result <- p.caches.Warship.Serialize(warships)
 }
 
 func (p *Prepare) expectedStats(result chan error) {
@@ -133,8 +135,7 @@ func (p *Prepare) expectedStats(result chan error) {
 		return
 	}
 
-	cache := infra.Cache[vo.NSExpectedStats]{Name: "expectedstats"}
-	result <- cache.Serialize(expectedStats)
+	result <- p.caches.ExpectedStats.Serialize(expectedStats)
 }
 
 func (p *Prepare) battleArenas(result chan error) {
@@ -145,8 +146,7 @@ func (p *Prepare) battleArenas(result chan error) {
 		return
 	}
 
-	cache := infra.Cache[vo.WGBattleArenas]{Name: "battlearenas"}
-	result <- cache.Serialize(battleArenas)
+	result <- p.caches.BattleArenas.Serialize(battleArenas)
 }
 
 func (p *Prepare) battleTypes(result chan error) {
@@ -157,7 +157,5 @@ func (p *Prepare) battleTypes(result chan error) {
 		return
 	}
 
-	cache := infra.Cache[vo.WGBattleTypes]{Name: "battletypes"}
-
-	result <- cache.Serialize(battleTypes)
+	result <- p.caches.BattleTypes.Serialize(battleTypes)
 }

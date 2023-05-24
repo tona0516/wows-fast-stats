@@ -2,6 +2,17 @@ package vo
 
 type ShipType string
 
+//nolint:gochecknoglobals
+var shipTypePriority = map[ShipType]int{
+	CV:   0,
+	BB:   1,
+	CL:   2,
+	DD:   3,
+	SS:   4,
+	AUX:  5,
+	NONE: 999,
+}
+
 func NewShipType(raw string) ShipType {
 	switch raw {
 	case "AirCarrier":
@@ -22,21 +33,8 @@ func NewShipType(raw string) ShipType {
 }
 
 func (s ShipType) Priority() int {
-	switch s {
-	case CV:
-		return 0
-	case BB:
-		return 1
-	case CL:
-		return 2
-	case DD:
-		return 3
-	case SS:
-		return 4
-	case AUX:
-		return 5
-	case NONE:
-		return 999
+	if priority, ok := shipTypePriority[s]; ok {
+		return priority
 	}
 
 	return 999

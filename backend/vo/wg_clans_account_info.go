@@ -2,8 +2,9 @@ package vo
 
 import (
 	"reflect"
+	"sort"
 
-	"golang.org/x/exp/slices"
+	"github.com/samber/lo"
 )
 
 type WGClansAccountInfo struct {
@@ -13,20 +14,12 @@ type WGClansAccountInfo struct {
 }
 
 func (w WGClansAccountInfo) ClanIDs() []int {
-	clanIDs := make([]int, 0)
-	for i := range w.Data {
-		clanID := w.Data[i].ClanID
-		if clanID == 0 {
-			continue
-		}
-
-		if slices.Contains(clanIDs, clanID) {
-			continue
-		}
-
-		clanIDs = append(clanIDs, clanID)
-	}
-
+	clansAccounts := lo.Values(w.Data)
+	clanIDs := lo.FilterMap(clansAccounts, func(clansAccount WGClansAccountInfoData, _ int) (int, bool) {
+		return clansAccount.ClanID, clansAccount.ClanID != 0
+	})
+	clanIDs = lo.Uniq(clanIDs)
+	sort.Ints(clanIDs)
 	return clanIDs
 }
 
