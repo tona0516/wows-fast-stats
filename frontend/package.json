@@ -23,6 +23,8 @@
     "vite": "^3.0.0"
   },
   "dependencies": {
+    "@types/clone": "^2.1.1",
+    "clone": "^2.1.2",
     "html-to-image": "^1.11.11",
     "svelte-toasts": "^1.1.2"
   }

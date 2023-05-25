@@ -8,6 +8,7 @@ import {
 import { createEventDispatcher } from "svelte";
 import Const from "./Const.js";
 import { BrowserOpenURL } from "../wailsjs/runtime/runtime.js";
+import clone from "clone";
 
 export let config: vo.UserConfig;
 
@@ -58,7 +59,7 @@ function toggleAll(e: any) {
 }
 
 function main() {
-  inputConfig = structuredClone(config);
+  inputConfig = clone(config);
 }
 
 main();
