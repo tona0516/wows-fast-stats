@@ -15,6 +15,10 @@ var shipsByte []byte
 
 type Unregistered struct{}
 
+func NewUnregistered() *Unregistered {
+	return &Unregistered{}
+}
+
 func (u *Unregistered) Warship() (map[int]vo.Warship, error) {
 	errDetail := apperr.Unreg.Warship
 

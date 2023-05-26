@@ -18,6 +18,10 @@ const (
 
 type Config struct{}
 
+func NewConfig() *Config {
+	return &Config{}
+}
+
 func (c *Config) User() (vo.UserConfig, error) {
 	// note: set default value
 	config := vo.UserConfig{

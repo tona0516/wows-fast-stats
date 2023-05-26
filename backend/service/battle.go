@@ -11,51 +11,44 @@ import (
 
 type Battle struct {
 	parallels         uint
-	userConfig        vo.UserConfig
-	wargaming         infra.Wargaming
-	tempArenaInfoRepo infra.TempArenaInfo
+	wargaming         infra.WargamingInterface
+	tempArenaInfoRepo infra.TempArenaInfoInterface
 	caches            infra.Caches
+	prepare           Prepare
 }
 
 func NewBattle(
 	parallels uint,
-	userConfig vo.UserConfig,
-	wargaming infra.Wargaming,
-	tempArenaInfoRepo infra.TempArenaInfo,
+	wargaming infra.WargamingInterface,
+	tempArenaInfoRepo infra.TempArenaInfoInterface,
 	caches infra.Caches,
+	prepare Prepare,
 ) *Battle {
 	return &Battle{
 		parallels:         parallels,
-		userConfig:        userConfig,
 		wargaming:         wargaming,
 		tempArenaInfoRepo: tempArenaInfoRepo,
 		caches:            caches,
+		prepare:           prepare,
 	}
 }
 
-func (b *Battle) Battle(isSuccessfulOnce bool) (vo.Battle, error) {
+func (b *Battle) Battle(userConfig vo.UserConfig, needPrepare bool) (vo.Battle, error) {
+	b.wargaming.SetAppID(userConfig.Appid)
 	var result vo.Battle
 
 	// Fetch cachable data
 	prepareResult := make(chan error)
-	if !isSuccessfulOnce {
-		prepare := NewPrepare(
-			b.parallels,
-			infra.NewWargaming(b.userConfig.Appid),
-			infra.NewNumbers("https://api.wows-numbers.com/personal/rating/expected/json/"),
-			new(infra.Unregistered),
-			b.caches,
-		)
-
-		go prepare.FetchCachable(prepareResult)
+	if needPrepare {
+		go b.prepare.FetchCachable(userConfig, prepareResult)
 	}
 
 	// Get tempArenaInfo.json
-	tempArenaInfo, err := b.tempArenaInfoRepo.Get(b.userConfig.InstallPath)
+	tempArenaInfo, err := b.tempArenaInfoRepo.Get(userConfig.InstallPath)
 	if err != nil {
 		return result, err
 	}
-	if b.userConfig.SaveTempArenaInfo {
+	if userConfig.SaveTempArenaInfo {
 		if err := b.tempArenaInfoRepo.Save(tempArenaInfo); err != nil {
 			return result, err
 		}
@@ -77,7 +70,7 @@ func (b *Battle) Battle(isSuccessfulOnce bool) (vo.Battle, error) {
 	go b.shipStats(accountIDs, shipStatsResult)
 	go b.clanTag(accountIDs, clanResult)
 
-	if !isSuccessfulOnce {
+	if needPrepare {
 		if err = <-prepareResult; err != nil {
 			return result, err
 		}

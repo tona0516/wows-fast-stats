@@ -34,7 +34,9 @@ func NewPrepare(
 	}
 }
 
-func (p *Prepare) FetchCachable(result chan error) {
+func (p *Prepare) FetchCachable(userConfig vo.UserConfig, result chan error) {
+	p.wargaming.SetAppID(userConfig.Appid)
+
 	if err := p.deleteOldCache(); err != nil {
 		result <- err
 

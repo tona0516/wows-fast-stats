@@ -20,6 +20,10 @@ const (
 
 type TempArenaInfo struct{}
 
+func NewTempArenaInfo() *TempArenaInfo {
+	return &TempArenaInfo{}
+}
+
 func (t *TempArenaInfo) Get(installPath string) (vo.TempArenaInfo, error) {
 	errDetail := apperr.Tai.Get
 

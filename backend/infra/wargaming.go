@@ -16,10 +16,8 @@ type Wargaming struct {
 	AppID string
 }
 
-func NewWargaming(appid string) *Wargaming {
-	return &Wargaming{
-		AppID: appid,
-	}
+func NewWargaming() *Wargaming {
+	return &Wargaming{}
 }
 
 func (w *Wargaming) SetAppID(appid string) {

@@ -15,27 +15,24 @@ const (
 )
 
 type ReplayWatcher struct {
-	appCtx         context.Context
 	configRepo     infra.ConfigInterface
 	taiRepo        infra.TempArenaInfoInterface
 	eventsEmitFunc func(ctx context.Context, eventName string, optionalData ...interface{})
 }
 
 func NewReplayWatcher(
-	appCtx context.Context,
 	configRepo infra.ConfigInterface,
 	taiRepo infra.TempArenaInfoInterface,
 	eventsEmitFunc func(ctx context.Context, eventName string, optionalData ...interface{}),
 ) *ReplayWatcher {
 	return &ReplayWatcher{
-		appCtx:         appCtx,
 		configRepo:     configRepo,
 		taiRepo:        taiRepo,
 		eventsEmitFunc: eventsEmitFunc,
 	}
 }
 
-func (w *ReplayWatcher) Start(ctx context.Context) {
+func (w *ReplayWatcher) Start(appCtx context.Context, ctx context.Context) {
 	var latestHash string
 
 	for {
@@ -52,7 +49,7 @@ func (w *ReplayWatcher) Start(ctx context.Context) {
 
 			tempArenaInfo, err := w.taiRepo.Get(userConfig.InstallPath)
 			if err != nil {
-				w.eventsEmitFunc(w.appCtx, EventEnd)
+				w.eventsEmitFunc(appCtx, EventEnd)
 				continue
 			}
 
@@ -63,7 +60,7 @@ func (w *ReplayWatcher) Start(ctx context.Context) {
 			}
 
 			latestHash = hash
-			w.eventsEmitFunc(w.appCtx, EventStart)
+			w.eventsEmitFunc(appCtx, EventStart)
 		}
 	}
 }

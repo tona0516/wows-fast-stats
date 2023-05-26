@@ -19,27 +19,38 @@ const PARALLELS = 5
 type App struct {
 	version             vo.Version
 	env                 vo.Env
-	ctx                 context.Context
-	userConfig          vo.UserConfig
-	appConfig           vo.AppConfig
-	excludePlayer       mapset.Set[int]
-	isSuccessfulOnce    bool
-	logger              infra.Logger
 	cancelReplayWatcher context.CancelFunc
 	configService       service.Config
 	screenshotService   service.Screenshot
+	replayWatcher       service.ReplayWatcher
+	prepareService      service.Prepare
+	battleService       service.Battle
+	logger              infra.Logger
+	ctx                 context.Context
+	excludePlayer       mapset.Set[int]
+	needPrepare         bool
 }
 
-func NewApp(env vo.Env, version vo.Version) *App {
-	logger := *infra.NewLogger(env, version)
-
+func NewApp(
+	env vo.Env,
+	version vo.Version,
+	configService service.Config,
+	screenshotService service.Screenshot,
+	replayWatcher service.ReplayWatcher,
+	prepareService service.Prepare,
+	battleService service.Battle,
+	logger infra.Logger,
+) *App {
 	return &App{
 		env:               env,
 		version:           version,
-		excludePlayer:     mapset.NewSet[int](),
+		configService:     configService,
+		screenshotService: screenshotService,
+		replayWatcher:     replayWatcher,
+		prepareService:    prepareService,
+		battleService:     battleService,
 		logger:            logger,
-		configService:     *service.NewConfig(new(infra.Config), new(infra.Wargaming)),
-		screenshotService: *service.NewScreenshot(new(infra.Screenshot), runtime.SaveFileDialog),
+		excludePlayer:     mapset.NewSet[int](),
 	}
 }
 
@@ -47,35 +58,29 @@ func (a *App) onStartup(ctx context.Context) {
 	a.logger.Info("start app.")
 	a.ctx = ctx
 
-	// Read configs
-	userConfig, err := a.configService.User()
-	if err != nil {
-		a.logger.Info("No user config.")
-	}
-	a.userConfig = userConfig
-
 	appConfig, err := a.configService.App()
-	if err != nil {
-		a.logger.Info("No app config.")
-	}
-	a.appConfig = appConfig
-
-	// Set window size
-	window := a.appConfig.Window
-	if window.Width > 0 && window.Height > 0 {
-		runtime.WindowSetSize(ctx, window.Width, window.Height)
+	if err == nil {
+		// Set window size
+		window := appConfig.Window
+		if window.Width > 0 && window.Height > 0 {
+			runtime.WindowSetSize(ctx, window.Width, window.Height)
+		}
 	}
 }
 
 func (a *App) onShutdown(ctx context.Context) {
 	a.logger.Info("shutdown app.")
 
+	appConfig, err := a.configService.App()
+	if err != nil {
+		a.logger.Info("No app config.")
+	}
+
 	// Save windows size
 	width, height := runtime.WindowGetSize(ctx)
-	a.appConfig.Window.Width = width
-	a.appConfig.Window.Height = height
-	err := a.configService.UpdateApp(a.appConfig)
-	if err != nil {
+	appConfig.Window.Width = width
+	appConfig.Window.Height = height
+	if err := a.configService.UpdateApp(appConfig); err != nil {
 		a.logger.Warn("Failed to update app config.", err)
 	}
 }
@@ -87,32 +92,23 @@ func (a *App) Ready() {
 	ctx, cancel := context.WithCancel(context.Background())
 	a.cancelReplayWatcher = cancel
 
-	rw := service.NewReplayWatcher(
-		a.ctx,
-		new(infra.Config),
-		new(infra.TempArenaInfo),
-		runtime.EventsEmit,
-	)
-	go rw.Start(ctx)
+	go a.replayWatcher.Start(a.ctx, ctx)
 }
 
 func (a *App) Battle() (vo.Battle, error) {
-	battle := service.NewBattle(
-		PARALLELS,
-		a.userConfig,
-		infra.Wargaming{AppID: a.userConfig.Appid},
-		infra.TempArenaInfo{},
-		*infra.NewCaches("cache"),
-	)
+	var result vo.Battle
 
-	result, err := battle.Battle(a.isSuccessfulOnce)
+	userConfig, err := a.configService.User()
 	if err != nil {
-		a.logger.Error("Failed to get battle.", err)
-
 		return result, err
 	}
 
-	a.isSuccessfulOnce = true
+	result, err = a.battleService.Battle(userConfig, a.needPrepare)
+	if err != nil {
+		a.logger.Error("Failed to get battle.", err)
+		return result, err
+	}
+	a.needPrepare = false
 
 	return result, nil
 }
@@ -131,14 +127,12 @@ func (a *App) UserConfig() (vo.UserConfig, error) {
 }
 
 func (a *App) ApplyUserConfig(config vo.UserConfig) error {
-	if err := a.configService.UpdateUser(config); err != nil {
+	err := a.configService.UpdateUser(config)
+	if err != nil {
 		a.logger.Error("Failed to apply user config.", err)
-
-		return err
 	}
-	a.userConfig = config
 
-	return nil
+	return err
 }
 
 func (a *App) ManualScreenshot(filename string, base64Data string) error {

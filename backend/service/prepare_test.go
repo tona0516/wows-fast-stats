@@ -16,6 +16,7 @@ import (
 //nolint:paralleltest
 func TestPrepare_FetchCachable_Success(t *testing.T) {
 	mockWargamingRepo := &mockWargamingRepo{}
+	mockWargamingRepo.On("SetAppID", "").Return()
 	mockWargamingRepo.On("EncyclopediaShips", 1).Return(vo.WGEncyclopediaShips{
 		Status: "ok",
 		Meta: struct {
@@ -82,7 +83,7 @@ func TestPrepare_FetchCachable_Success(t *testing.T) {
 	)
 
 	errChan := make(chan error)
-	go prepare.FetchCachable(errChan)
+	go prepare.FetchCachable(vo.UserConfig{}, errChan)
 	err := <-errChan
 
 	assert.NoError(t, err)
@@ -102,6 +103,7 @@ func TestPrepare_FetchCachable_Success(t *testing.T) {
 //nolint:paralleltest
 func TestPrepare_FetchCachable_Failure(t *testing.T) {
 	mockWargamingRepo := &mockWargamingRepo{}
+	mockWargamingRepo.On("SetAppID", "").Return()
 	mockWargamingRepo.On("EncyclopediaShips", 1).Return(vo.WGEncyclopediaShips{
 		Status: "ok",
 		Meta: struct {
@@ -165,7 +167,7 @@ func TestPrepare_FetchCachable_Failure(t *testing.T) {
 	)
 
 	errChan := make(chan error)
-	go prepare.FetchCachable(errChan)
+	go prepare.FetchCachable(vo.UserConfig{}, errChan)
 	err := <-errChan
 
 	assert.EqualError(t, err, expectedErr.Error())

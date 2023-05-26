@@ -11,6 +11,10 @@ import (
 
 type Screenshot struct{}
 
+func NewScreenshot() *Screenshot {
+	return &Screenshot{}
+}
+
 func (s *Screenshot) Save(path string, base64Data string) error {
 	dir := filepath.Dir(path)
 	_ = os.Mkdir(dir, 0o755)

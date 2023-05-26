@@ -36,10 +36,10 @@ func TestReplayWatcher_Start_Once_BattleStart(t *testing.T) {
 		events = append(events, eventName)
 	}
 
-	watcher := NewReplayWatcher(ctx, mockConfigRepo, mockTaiRepo, emitFunc)
+	watcher := NewReplayWatcher(mockConfigRepo, mockTaiRepo, emitFunc)
 
 	// Startメソッドをゴルーチンで非同期に実行する
-	go watcher.Start(ctx)
+	go watcher.Start(ctx, ctx)
 
 	// 2秒待ってEventStartが発行されたことを検証する
 	time.Sleep(2 * time.Second)
@@ -77,10 +77,10 @@ func TestReplayWatcher_Start_BattleEnd(t *testing.T) {
 		events = append(events, eventName)
 	}
 
-	watcher := NewReplayWatcher(ctx, mockConfigRepo, mockTaiRepo, emitFunc)
+	watcher := NewReplayWatcher(mockConfigRepo, mockTaiRepo, emitFunc)
 
 	// Startメソッドをゴルーチンで非同期に実行する
-	go watcher.Start(ctx)
+	go watcher.Start(ctx, ctx)
 
 	// 2秒待ってEventEndが発行されたことを検証する
 	time.Sleep(2 * time.Second)
@@ -117,10 +117,10 @@ func TestReplayWatcher_Start_Cancel(t *testing.T) {
 		events = append(events, eventName)
 	}
 
-	watcher := NewReplayWatcher(ctx, mockConfigRepo, mockTaiRepo, emitFunc)
+	watcher := NewReplayWatcher(mockConfigRepo, mockTaiRepo, emitFunc)
 
 	// Startメソッドをゴルーチンで非同期に実行する
-	go watcher.Start(ctx)
+	go watcher.Start(ctx, ctx)
 
 	// キャンセルしてイベントが発行されなかったことを検証する
 	cancel()
