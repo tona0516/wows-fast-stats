@@ -2,13 +2,13 @@ package main
 
 import (
 	"changeme/backend/apperr"
-	"changeme/backend/domain"
 	"changeme/backend/infra"
 	"changeme/backend/service"
 	"changeme/backend/vo"
 	"context"
 	"fmt"
 
+	mapset "github.com/deckarep/golang-set/v2"
 	"github.com/pkg/errors"
 	"github.com/skratchdot/open-golang/open"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
@@ -22,7 +22,7 @@ type App struct {
 	ctx                 context.Context
 	userConfig          vo.UserConfig
 	appConfig           vo.AppConfig
-	excludePlayer       domain.ExcludePlayer
+	excludePlayer       mapset.Set[int]
 	isSuccessfulOnce    bool
 	logger              infra.Logger
 	cancelReplayWatcher context.CancelFunc
@@ -36,7 +36,7 @@ func NewApp(env vo.Env, version vo.Version) *App {
 	return &App{
 		env:               env,
 		version:           version,
-		excludePlayer:     *domain.NewExcludePlayer(),
+		excludePlayer:     mapset.NewSet[int](),
 		logger:            logger,
 		configService:     *service.NewConfig(new(infra.Config), new(infra.Wargaming)),
 		screenshotService: *service.NewScreenshot(new(infra.Screenshot), runtime.SaveFileDialog),
@@ -174,7 +174,7 @@ func (a *App) OpenDirectory(path string) error {
 }
 
 func (a *App) ExcludePlayerIDs() []int {
-	return a.excludePlayer.Get()
+	return a.excludePlayer.ToSlice()
 }
 
 func (a *App) AddExcludePlayerID(playerID int) {
