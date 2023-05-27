@@ -21,7 +21,7 @@ setup: check-prerequisite
 	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.52.2
 
 .PHONY: build
-build: lint
+build: lint test
 	$(eval REV := $(shell git rev-parse --short HEAD))
 	$(eval LD_FLAGS := "-X main.semver=$(SEMVER) -X main.revision=$(REV) -X main.env=production")
 	wails build -ldflags $(LD_FLAGS) -platform windows/amd64 -o $(EXE) -trimpath
@@ -50,6 +50,10 @@ fmt:
 	golangci-lint run --fix
 	go fmt
 	cd frontend/ && npx prettier --write **/*.{ts,svelte,html,css}
+
+.PHONY: test
+test:
+	go test ./...
 
 .PHONY: put-temp-arema-info
 put-temp-arema-info:
