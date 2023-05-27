@@ -23,12 +23,10 @@ type App struct {
 	configService       service.Config
 	screenshotService   service.Screenshot
 	replayWatcher       service.ReplayWatcher
-	prepareService      service.Prepare
 	battleService       service.Battle
 	logger              infra.Logger
 	ctx                 context.Context
 	excludePlayer       mapset.Set[int]
-	needPrepare         bool
 }
 
 func NewApp(
@@ -37,7 +35,6 @@ func NewApp(
 	configService service.Config,
 	screenshotService service.Screenshot,
 	replayWatcher service.ReplayWatcher,
-	prepareService service.Prepare,
 	battleService service.Battle,
 	logger infra.Logger,
 ) *App {
@@ -47,7 +44,6 @@ func NewApp(
 		configService:     configService,
 		screenshotService: screenshotService,
 		replayWatcher:     replayWatcher,
-		prepareService:    prepareService,
 		battleService:     battleService,
 		logger:            logger,
 		excludePlayer:     mapset.NewSet[int](),
@@ -103,12 +99,11 @@ func (a *App) Battle() (vo.Battle, error) {
 		return result, err
 	}
 
-	result, err = a.battleService.Battle(userConfig, a.needPrepare)
+	result, err = a.battleService.Battle(userConfig)
 	if err != nil {
 		a.logger.Error("Failed to get battle.", err)
 		return result, err
 	}
-	a.needPrepare = false
 
 	return result, nil
 }

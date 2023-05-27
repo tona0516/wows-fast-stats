@@ -61,15 +61,13 @@ func initApp() *App {
 	configRepo := infra.NewConfig()
 	screenshotRepo := infra.NewScreenshot()
 	unregisteredRepo := infra.NewUnregistered()
-	caches := infra.NewCaches("cache")
 	logger := infra.NewLogger(vo.Env{Str: env}, vo.Version{Semver: semver, Revision: revision})
 
 	// service
 	var parallels uint = 5
 	configService := service.NewConfig(configRepo, wargamingRepo)
 	screenshotService := service.NewScreenshot(screenshotRepo, runtime.SaveFileDialog)
-	prepareService := service.NewPrepare(parallels, wargamingRepo, numbersRepo, unregisteredRepo, *caches)
-	battleService := service.NewBattle(parallels, wargamingRepo, tempArenaInfoRepo, *caches, *prepareService)
+	battleService := service.NewBattle(parallels, wargamingRepo, tempArenaInfoRepo, numbersRepo, unregisteredRepo)
 	replayWatcher := service.NewReplayWatcher(configRepo, tempArenaInfoRepo, runtime.EventsEmit)
 
 	return NewApp(
@@ -78,7 +76,6 @@ func initApp() *App {
 		*configService,
 		*screenshotService,
 		*replayWatcher,
-		*prepareService,
 		*battleService,
 		*logger,
 	)

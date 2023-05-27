@@ -109,20 +109,24 @@ func (m *mockWargamingRepo) BattleTypes() (vo.WGBattleTypes, error) {
 	return args.Get(0).(vo.WGBattleTypes), args.Error(1)
 }
 
+//nolint:unused
 type mockNumbersRepo struct {
 	mock.Mock
 }
 
+//nolint:unused
 func (m *mockNumbersRepo) ExpectedStats() (vo.NSExpectedStats, error) {
 	args := m.Called()
 	//nolint:forcetypeassert
 	return args.Get(0).(vo.NSExpectedStats), args.Error(1)
 }
 
+//nolint:unused
 type mockUnregisteredRepo struct {
 	mock.Mock
 }
 
+//nolint:unused
 func (m *mockUnregisteredRepo) Warship() (map[int]vo.Warship, error) {
 	args := m.Called()
 	//nolint:forcetypeassert
