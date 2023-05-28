@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 
 	"github.com/pkg/errors"
-	"golang.org/x/exp/slices"
+	"github.com/samber/lo"
 )
 
 type Config struct {
@@ -57,7 +57,7 @@ func (c *Config) validate(config vo.UserConfig) error {
 	}
 
 	// Same value as "font-size": https://developer.mozilla.org/ja/docs/Web/CSS/font-size
-	if !slices.Contains([]string{"x-small", "small", "medium", "large", "x-large"}, config.FontSize) {
+	if !lo.Contains([]string{"x-small", "small", "medium", "large", "x-large"}, config.FontSize) {
 		return errors.WithStack(apperr.SrvCfg.InvalidFontSize.WithRaw(apperr.ErrInvalidFontSize))
 	}
 

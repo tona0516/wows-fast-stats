@@ -5,7 +5,7 @@ go 1.18
 require (
 	github.com/skratchdot/open-golang v0.0.0-20200116055534-eef842397966
 	github.com/wailsapp/wails/v2 v2.5.1
-	golang.org/x/exp v0.0.0-20230425010034-47ecfdc1ba53
+	golang.org/x/exp v0.0.0-20230425010034-47ecfdc1ba53 // indirect
 )
 
 require github.com/rs/zerolog v1.29.1
