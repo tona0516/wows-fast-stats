@@ -2,8 +2,6 @@ package vo
 
 import (
 	"strings"
-
-	"github.com/samber/lo"
 )
 
 type TempArenaInfo struct {
@@ -22,19 +20,20 @@ type Vehicle struct {
 }
 
 func (t *TempArenaInfo) AccountNames() []string {
-	accountNames := lo.FilterMap(t.Vehicles, func(vehicle Vehicle, _ int) (string, bool) {
+	accountNames := make([]string, 0)
+	for _, v := range t.Vehicles {
 		// Note: Bot name in corp or ramdom battle.
-		if strings.HasPrefix(vehicle.Name, ":") && strings.HasSuffix(vehicle.Name, ":") {
-			return "", false
+		if strings.HasPrefix(v.Name, ":") && strings.HasSuffix(v.Name, ":") {
+			continue
 		}
 
 		// Note: Bot name in operation.
-		if strings.HasPrefix(vehicle.Name, "IDS_OP") {
-			return "", false
+		if strings.HasPrefix(v.Name, "IDS_OP") {
+			continue
 		}
 
-		return vehicle.Name, true
-	})
+		accountNames = append(accountNames, v.Name)
+	}
 
 	return accountNames
 }

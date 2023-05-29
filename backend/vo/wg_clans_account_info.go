@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"sort"
 
-	"github.com/samber/lo"
+	"golang.org/x/exp/slices"
 )
 
 type WGClansAccountInfo struct {
@@ -14,11 +14,12 @@ type WGClansAccountInfo struct {
 }
 
 func (w WGClansAccountInfo) ClanIDs() []int {
-	clansAccounts := lo.Values(w.Data)
-	clanIDs := lo.FilterMap(clansAccounts, func(clansAccount WGClansAccountInfoData, _ int) (int, bool) {
-		return clansAccount.ClanID, clansAccount.ClanID != 0
-	})
-	clanIDs = lo.Uniq(clanIDs)
+	clanIDs := make([]int, 0)
+	for _, v := range w.Data {
+		if v.ClanID != 0 && !slices.Contains(clanIDs, v.ClanID) {
+			clanIDs = append(clanIDs, v.ClanID)
+		}
+	}
 	sort.Ints(clanIDs)
 	return clanIDs
 }

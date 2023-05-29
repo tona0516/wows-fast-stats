@@ -8,7 +8,6 @@ import (
 	"path/filepath"
 
 	"github.com/pkg/errors"
-	"github.com/samber/lo"
 )
 
 type Config struct {
@@ -57,7 +56,15 @@ func (c *Config) validate(config vo.UserConfig) error {
 	}
 
 	// Same value as "font-size": https://developer.mozilla.org/ja/docs/Web/CSS/font-size
-	if !lo.Contains([]string{"x-small", "small", "medium", "large", "x-large"}, config.FontSize) {
+	var validFontSize bool
+	fontSizes := []string{"x-small", "small", "medium", "large", "x-large"}
+	for _, v := range fontSizes {
+		if v == config.FontSize {
+			validFontSize = true
+			break
+		}
+	}
+	if !validFontSize {
 		return errors.WithStack(apperr.SrvCfg.InvalidFontSize.WithRaw(apperr.ErrInvalidFontSize))
 	}
 

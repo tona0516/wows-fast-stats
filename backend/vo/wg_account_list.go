@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"sort"
 
-	"github.com/samber/lo"
+	"golang.org/x/exp/slices"
 )
 
 type WGAccountList struct {
@@ -14,19 +14,25 @@ type WGAccountList struct {
 }
 
 func (w WGAccountList) AccountIDs() []int {
-	accountIDs := lo.FilterMap(w.Data, func(account WGAccountListData, _ int) (int, bool) {
-		return account.AccountID, account.AccountID != 0
-	})
-	accountIDs = lo.Uniq(accountIDs)
+	accountIDs := make([]int, 0)
+	for _, v := range w.Data {
+		if v.AccountID != 0 && !slices.Contains(accountIDs, v.AccountID) {
+			accountIDs = append(accountIDs, v.AccountID)
+		}
+	}
+
 	sort.Ints(accountIDs)
 	return accountIDs
 }
 
 func (w WGAccountList) AccountID(nickname string) int {
-	account, _ := lo.Find(w.Data, func(account WGAccountListData) bool {
-		return account.NickName == nickname
-	})
-	return account.AccountID
+	for _, v := range w.Data {
+		if v.NickName == nickname {
+			return v.AccountID
+		}
+	}
+
+	return 0
 }
 
 func (w WGAccountList) GetStatus() string {

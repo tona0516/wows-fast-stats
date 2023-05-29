@@ -9,7 +9,6 @@ import (
 
 	"github.com/cenkalti/backoff/v4"
 	"github.com/pkg/errors"
-	"github.com/samber/lo"
 )
 
 type Wargaming struct {
@@ -47,15 +46,16 @@ func (w *Wargaming) SetAppID(appid string) {
 }
 
 func (w *Wargaming) AccountInfo(accountIDs []int) (vo.WGAccountInfo, error) {
-	accountIDString := strings.Join(lo.Map(accountIDs, func(it int, _ int) string {
-		return strconv.Itoa(it)
-	}), ",")
+	strAccountIDs := make([]string, len(accountIDs))
+	for i, v := range accountIDs {
+		strAccountIDs[i] = strconv.Itoa(v)
+	}
 
 	return request(
 		w.accountInfoClient,
 		map[string]string{
 			"application_id": w.AppID,
-			"account_id":     accountIDString,
+			"account_id":     strings.Join(strAccountIDs, ","),
 			"fields":         vo.WGAccountInfoData{}.Field(),
 			// "extra":          "statistics.pvp_solo",
 		},
@@ -77,15 +77,16 @@ func (w *Wargaming) AccountList(accountNames []string) (vo.WGAccountList, error)
 }
 
 func (w *Wargaming) ClansAccountInfo(accountIDs []int) (vo.WGClansAccountInfo, error) {
-	accountIDString := strings.Join(lo.Map(accountIDs, func(it int, _ int) string {
-		return strconv.Itoa(it)
-	}), ",")
+	strAccountIDs := make([]string, len(accountIDs))
+	for i, v := range accountIDs {
+		strAccountIDs[i] = strconv.Itoa(v)
+	}
 
 	return request(
 		w.clansAccountInfoClient,
 		map[string]string{
 			"application_id": w.AppID,
-			"account_id":     accountIDString,
+			"account_id":     strings.Join(strAccountIDs, ","),
 			"fields":         vo.WGClansAccountInfoData{}.Field(),
 		},
 		apperr.Wg.ClansAccountInfo,
@@ -93,15 +94,16 @@ func (w *Wargaming) ClansAccountInfo(accountIDs []int) (vo.WGClansAccountInfo, e
 }
 
 func (w *Wargaming) ClansInfo(clanIDs []int) (vo.WGClansInfo, error) {
-	clanIDString := strings.Join(lo.Map(clanIDs, func(it int, _ int) string {
-		return strconv.Itoa(it)
-	}), ",")
+	strClanIDs := make([]string, len(clanIDs))
+	for i, v := range clanIDs {
+		strClanIDs[i] = strconv.Itoa(v)
+	}
 
 	return request(
 		w.clansInfoClient,
 		map[string]string{
 			"application_id": w.AppID,
-			"clan_id":        clanIDString,
+			"clan_id":        strings.Join(strClanIDs, ","),
 			"fields":         vo.WGClansInfoData{}.Field(),
 		},
 		apperr.Wg.ClansInfo,

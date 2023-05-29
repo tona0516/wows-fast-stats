@@ -9,7 +9,6 @@ import (
 
 func TestWGClansAccountInfo_ClanIDs(t *testing.T) {
 	t.Parallel()
-	assert := assert.New(t)
 
 	w := vo.WGClansAccountInfo{
 		Data: map[int]vo.WGClansAccountInfoData{
@@ -24,5 +23,5 @@ func TestWGClansAccountInfo_ClanIDs(t *testing.T) {
 	expectedIDs := []int{123, 456, 789}
 	actualIDs := w.ClanIDs()
 
-	assert.Equal(actualIDs, expectedIDs, "should be equal")
+	assert.Equal(t, expectedIDs, actualIDs, "should be equal")
 }
