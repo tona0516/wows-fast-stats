@@ -10,7 +10,6 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/suite"
 )
 
 const (
@@ -18,21 +17,15 @@ const (
 	GameExeName        = "WorldOfWarships.exe"
 )
 
-type ConfigServiceSuite struct {
-	suite.Suite
-}
-
-func (suite *ConfigServiceSuite) SetupSuite() {
+//nolint:paralleltest
+func TestConfig_UpdateUser_正常系(t *testing.T) {
 	gameExePath := filepath.Join(DefaulfInstallPath, GameExeName)
-	_ = os.MkdirAll(DefaulfInstallPath, fs.ModePerm)
-	_ = os.WriteFile(gameExePath, []byte{}, fs.ModePerm)
-}
+	err := os.MkdirAll(DefaulfInstallPath, fs.ModePerm)
+	assert.NoError(t, err)
+	err = os.WriteFile(gameExePath, []byte{}, fs.ModePerm)
+	assert.NoError(t, err)
+	defer os.RemoveAll(DefaulfInstallPath)
 
-func (suite *ConfigServiceSuite) TearDownSuite() {
-	_ = os.RemoveAll(DefaulfInstallPath)
-}
-
-func (suite *ConfigServiceSuite) TestConfig_UpdateUser() {
 	// テストデータ
 	config := vo.UserConfig{
 		InstallPath: "install_path_test",
@@ -45,20 +38,28 @@ func (suite *ConfigServiceSuite) TestConfig_UpdateUser() {
 	mockConfigRepo.On("UpdateUser", config).Return(nil)
 	mockWargamingRepo := &mockWargamingRepo{}
 	mockWargamingRepo.On("SetAppID", config.Appid).Return()
-	mockWargamingRepo.On("EncyclopediaInfo").Return(vo.WGEncyclopediaInfo{}, nil)
+	mockWargamingRepo.On("EncycInfo").Return(vo.WGEncycInfo{}, nil)
 
 	// テスト実行
 	c := NewConfig(mockConfigRepo, mockWargamingRepo)
-	err := c.UpdateUser(config)
+	err = c.UpdateUser(config)
 
-	// 結果の検証
-	assert.NoError(suite.T(), err)
-	mockWargamingRepo.AssertCalled(suite.T(), "SetAppID", config.Appid)
-	mockWargamingRepo.AssertCalled(suite.T(), "EncyclopediaInfo")
-	mockConfigRepo.AssertCalled(suite.T(), "UpdateUser", config)
+	// アサーション
+	assert.NoError(t, err)
+	mockWargamingRepo.AssertCalled(t, "SetAppID", config.Appid)
+	mockWargamingRepo.AssertCalled(t, "EncycInfo")
+	mockConfigRepo.AssertCalled(t, "UpdateUser", config)
 }
 
-func (suite *ConfigServiceSuite) TestConfig_UpdateUser_InvalidInstallPath() {
+//nolint:paralleltest
+func TestConfig_UpdateUser_異常系_不正なインストールパス(t *testing.T) {
+	gameExePath := filepath.Join(DefaulfInstallPath, GameExeName)
+	err := os.MkdirAll(DefaulfInstallPath, fs.ModePerm)
+	assert.NoError(t, err)
+	err = os.WriteFile(gameExePath, []byte{}, fs.ModePerm)
+	assert.NoError(t, err)
+	defer os.RemoveAll(DefaulfInstallPath)
+
 	// テストデータ
 	config := vo.UserConfig{
 		InstallPath: "invalid/path",
@@ -71,15 +72,23 @@ func (suite *ConfigServiceSuite) TestConfig_UpdateUser_InvalidInstallPath() {
 
 	// テスト実行
 	c := NewConfig(mockConfigRepo, nil)
-	err := c.UpdateUser(config)
+	err = c.UpdateUser(config)
 
-	// 結果の検証
+	// アサーション
 	expectedErr := errors.WithStack(apperr.SrvCfg.InvalidInstallPath.WithRaw(apperr.ErrInvalidInstallPath))
-	assert.EqualError(suite.T(), err, expectedErr.Error())
-	mockConfigRepo.AssertNotCalled(suite.T(), "UpdateUser")
+	assert.EqualError(t, err, expectedErr.Error())
+	mockConfigRepo.AssertNotCalled(t, "UpdateUser")
 }
 
-func (suite *ConfigServiceSuite) TestConfig_UpdateUser_InvalidAppID() {
+//nolint:paralleltest
+func TestConfig_UpdateUser_異常系_不正なAppID(t *testing.T) {
+	gameExePath := filepath.Join(DefaulfInstallPath, GameExeName)
+	err := os.MkdirAll(DefaulfInstallPath, fs.ModePerm)
+	assert.NoError(t, err)
+	err = os.WriteFile(gameExePath, []byte{}, fs.ModePerm)
+	assert.NoError(t, err)
+	defer os.RemoveAll(DefaulfInstallPath)
+
 	// テストデータ
 	config := vo.UserConfig{
 		InstallPath: "install_path_test",
@@ -92,20 +101,28 @@ func (suite *ConfigServiceSuite) TestConfig_UpdateUser_InvalidAppID() {
 	mockWargamingRepo := &mockWargamingRepo{}
 	mockWargamingRepo.On("SetAppID", config.Appid)
 	expectedErr := errors.WithStack(apperr.SrvCfg.InvalidAppID.WithRaw(apperr.ErrInvalidAppID))
-	mockWargamingRepo.On("EncyclopediaInfo").Return(vo.WGEncyclopediaInfo{}, expectedErr)
+	mockWargamingRepo.On("EncycInfo").Return(vo.WGEncycInfo{}, expectedErr)
 
 	// テスト実行
 	c := NewConfig(mockConfigRepo, mockWargamingRepo)
-	err := c.UpdateUser(config)
+	err = c.UpdateUser(config)
 
-	// 結果の検証
-	assert.EqualError(suite.T(), err, expectedErr.Error())
-	mockWargamingRepo.AssertCalled(suite.T(), "SetAppID", config.Appid)
-	mockWargamingRepo.AssertCalled(suite.T(), "EncyclopediaInfo")
-	mockConfigRepo.AssertNotCalled(suite.T(), "UpdateUser")
+	// アサーション
+	assert.EqualError(t, err, expectedErr.Error())
+	mockWargamingRepo.AssertCalled(t, "SetAppID", config.Appid)
+	mockWargamingRepo.AssertCalled(t, "EncycInfo")
+	mockConfigRepo.AssertNotCalled(t, "UpdateUser")
 }
 
-func (suite *ConfigServiceSuite) TestConfig_UpdateUser_InvalidFontSize() {
+//nolint:paralleltest
+func TestConfig_UpdateUser_異常系_不正なフォントサイズ(t *testing.T) {
+	gameExePath := filepath.Join(DefaulfInstallPath, GameExeName)
+	err := os.MkdirAll(DefaulfInstallPath, fs.ModePerm)
+	assert.NoError(t, err)
+	err = os.WriteFile(gameExePath, []byte{}, fs.ModePerm)
+	assert.NoError(t, err)
+	defer os.RemoveAll(DefaulfInstallPath)
+
 	// テストデータ
 	config := vo.UserConfig{
 		InstallPath: "install_path_test",
@@ -117,21 +134,16 @@ func (suite *ConfigServiceSuite) TestConfig_UpdateUser_InvalidFontSize() {
 	mockConfigRepo := &mockConfigRepo{}
 	mockWargamingRepo := &mockWargamingRepo{}
 	mockWargamingRepo.On("SetAppID", config.Appid)
-	mockWargamingRepo.On("EncyclopediaInfo").Return(vo.WGEncyclopediaInfo{}, nil)
+	mockWargamingRepo.On("EncycInfo").Return(vo.WGEncycInfo{}, nil)
 
 	// テスト実行
 	c := NewConfig(mockConfigRepo, mockWargamingRepo)
-	err := c.UpdateUser(config)
+	err = c.UpdateUser(config)
 
-	// 結果の検証
+	// アサーション
 	expectedErr := errors.WithStack(apperr.SrvCfg.InvalidFontSize.WithRaw(apperr.ErrInvalidFontSize))
-	assert.EqualError(suite.T(), err, expectedErr.Error())
-	mockWargamingRepo.AssertCalled(suite.T(), "SetAppID", config.Appid)
-	mockWargamingRepo.AssertCalled(suite.T(), "EncyclopediaInfo")
-	mockConfigRepo.AssertNotCalled(suite.T(), "UpdateUser")
-}
-
-//nolint:paralleltest
-func TestConfigServiceSuite(t *testing.T) {
-	suite.Run(t, new(ConfigServiceSuite))
+	assert.EqualError(t, err, expectedErr.Error())
+	mockWargamingRepo.AssertCalled(t, "SetAppID", config.Appid)
+	mockWargamingRepo.AssertCalled(t, "EncycInfo")
+	mockConfigRepo.AssertNotCalled(t, "UpdateUser")
 }

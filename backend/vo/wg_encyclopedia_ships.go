@@ -2,7 +2,7 @@ package vo
 
 import "reflect"
 
-type WGEncyclopediaShips struct {
+type WGEncycShips struct {
 	Status string `json:"status"`
 	Meta   struct {
 		PageTotal int `json:"page_total"`
@@ -12,11 +12,11 @@ type WGEncyclopediaShips struct {
 	Error WGError                         `json:"error"`
 }
 
-func (w WGEncyclopediaShips) GetStatus() string {
+func (w WGEncycShips) GetStatus() string {
 	return w.Status
 }
 
-func (w WGEncyclopediaShips) GetError() WGError {
+func (w WGEncycShips) GetError() WGError {
 	return w.Error
 }
 

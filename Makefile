@@ -53,7 +53,7 @@ fmt:
 
 .PHONY: test
 test:
-	go test ./...
+	go test -cover ./...
 
 .PHONY: put-temp-arema-info
 put-temp-arema-info:

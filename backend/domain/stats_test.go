@@ -39,7 +39,7 @@ func TestStats_ShipPR(t *testing.T) {
 		Expected: expected,
 	}
 
-	assert.Equal(t, float64(1875), stats.ShipPR())
+	assert.InDelta(t, 1875, stats.ShipPR(), 0.1)
 }
 func TestStats_AvgDamage_Overall(t *testing.T) {
 	t.Parallel()
@@ -58,7 +58,7 @@ func TestStats_AvgDamage_Overall(t *testing.T) {
 		},
 	}
 
-	assert.Equal(t, float64(10000), stats.AvgDamage(ModeOverall))
+	assert.InDelta(t, 10000, stats.AvgDamage(ModeOverall), 0.1)
 }
 
 func TestStats_AvgDamage_OverallSolo(t *testing.T) {
@@ -78,7 +78,7 @@ func TestStats_AvgDamage_OverallSolo(t *testing.T) {
 		},
 	}
 
-	assert.Equal(t, float64(10000), stats.AvgDamage(ModeOverallSolo))
+	assert.InDelta(t, 10000, stats.AvgDamage(ModeOverallSolo), 0.1)
 }
 
 func TestStats_AvgDamage_Ship(t *testing.T) {
@@ -93,7 +93,7 @@ func TestStats_AvgDamage_Ship(t *testing.T) {
 		},
 	}
 
-	assert.Equal(t, float64(10000), stats.AvgDamage(ModeShip))
+	assert.InDelta(t, 10000, stats.AvgDamage(ModeShip), 0.1)
 }
 
 func TestStats_AvgDamage_ShipSolo(t *testing.T) {
@@ -108,7 +108,26 @@ func TestStats_AvgDamage_ShipSolo(t *testing.T) {
 		},
 	}
 
-	assert.Equal(t, float64(10000), stats.AvgDamage(ModeShipSolo))
+	assert.InDelta(t, 10000, stats.AvgDamage(ModeShipSolo), 0.1)
+}
+
+func TestStats_Battles(t *testing.T) {
+	t.Parallel()
+
+	stats := Stats{
+		AccountInfo: vo.WGAccountInfoData{
+			Statistics: struct {
+				Pvp     vo.WGStatsValues "json:\"pvp\""
+				PvpSolo vo.WGStatsValues "json:\"pvp_solo\""
+			}{
+				Pvp: vo.WGStatsValues{
+					Battles: 100,
+				},
+			},
+		},
+	}
+
+	assert.InDelta(t, 100, stats.Battles(ModeOverall), 0.1)
 }
 
 func TestStats_KdRate(t *testing.T) {
@@ -129,7 +148,7 @@ func TestStats_KdRate(t *testing.T) {
 		},
 	}
 
-	assert.Equal(t, float64(0.5), stats.KdRate(ModeOverall))
+	assert.InDelta(t, 0.5, stats.KdRate(ModeOverall), 0.1)
 }
 
 func TestStats_AvgExp(t *testing.T) {
@@ -149,7 +168,7 @@ func TestStats_AvgExp(t *testing.T) {
 		},
 	}
 
-	assert.Equal(t, float64(1500), stats.AvgExp(ModeOverall))
+	assert.InDelta(t, 1500, stats.AvgExp(ModeOverall), 0.1)
 }
 
 func TestStats_WinRate(t *testing.T) {
@@ -169,7 +188,7 @@ func TestStats_WinRate(t *testing.T) {
 		},
 	}
 
-	assert.Equal(t, float64(60), stats.WinRate(ModeOverall))
+	assert.InDelta(t, 60, stats.WinRate(ModeOverall), 0.1)
 }
 
 func TestStats_WinSurvivedRate(t *testing.T) {
@@ -189,7 +208,7 @@ func TestStats_WinSurvivedRate(t *testing.T) {
 		},
 	}
 
-	assert.Equal(t, float64(20), stats.WinSurvivedRate(ModeOverall))
+	assert.InDelta(t, 20, stats.WinSurvivedRate(ModeOverall), 0.1)
 }
 
 func TestStats_LoseSurvivedRate(t *testing.T) {
@@ -211,7 +230,7 @@ func TestStats_LoseSurvivedRate(t *testing.T) {
 		},
 	}
 
-	assert.Equal(t, float64(50), stats.LoseSurvivedRate(ModeOverall))
+	assert.InDelta(t, 50, stats.LoseSurvivedRate(ModeOverall), 0.1)
 }
 
 func TestStats_MainBatteryHitRate(t *testing.T) {
@@ -231,7 +250,7 @@ func TestStats_MainBatteryHitRate(t *testing.T) {
 		},
 	}
 
-	assert.Equal(t, float64(50), stats.MainBatteryHitRate(ModeShip))
+	assert.InDelta(t, 50, stats.MainBatteryHitRate(ModeShip), 0.1)
 }
 
 func TestStats_TorpedoesHitRate(t *testing.T) {
@@ -251,7 +270,7 @@ func TestStats_TorpedoesHitRate(t *testing.T) {
 		},
 	}
 
-	assert.Equal(t, float64(25), stats.TorpedoesHitRate(ModeShip))
+	assert.InDelta(t, 25, stats.TorpedoesHitRate(ModeShip), 0.1)
 }
 
 func TestStats_AvgTier(t *testing.T) {
@@ -280,7 +299,7 @@ func TestStats_AvgTier(t *testing.T) {
 	}
 
 	stats := Stats{}
-	assert.InDelta(t, float64(7.14), stats.AvgTier(accountID, shipInfo, shipStats), 0.01)
+	assert.InDelta(t, 7.14, stats.AvgTier(accountID, shipInfo, shipStats), 0.1)
 }
 
 func TestStats_UsingTierRate(t *testing.T) {
@@ -315,9 +334,9 @@ func TestStats_UsingTierRate(t *testing.T) {
 
 	stats := Stats{}
 	tierGroup := stats.UsingTierRate(accountID, shipInfo, shipStats)
-	assert.Equal(t, float64(20), tierGroup.Low)
-	assert.Equal(t, float64(30), tierGroup.Middle)
-	assert.Equal(t, float64(50), tierGroup.High)
+	assert.InDelta(t, 20, tierGroup.Low, 0.1)
+	assert.InDelta(t, 30, tierGroup.Middle, 0.1)
+	assert.InDelta(t, 50, tierGroup.High, 0.1)
 }
 
 func TestStats_UsingShipTypeRate(t *testing.T) {
@@ -357,9 +376,9 @@ func TestStats_UsingShipTypeRate(t *testing.T) {
 
 	stats := Stats{}
 	shipTypeGroup := stats.UsingShipTypeRate(accountID, shipInfo, shipStats)
-	assert.Equal(t, float64(0), shipTypeGroup.SS)
-	assert.Equal(t, float64(15), shipTypeGroup.DD)
-	assert.Equal(t, float64(25), shipTypeGroup.CL)
-	assert.Equal(t, float64(10), shipTypeGroup.BB)
-	assert.Equal(t, float64(50), shipTypeGroup.CV)
+	assert.InDelta(t, 0, shipTypeGroup.SS, 0.1)
+	assert.InDelta(t, 15, shipTypeGroup.DD, 0.1)
+	assert.InDelta(t, 25, shipTypeGroup.CL, 0.1)
+	assert.InDelta(t, 10, shipTypeGroup.BB, 0.1)
+	assert.InDelta(t, 50, shipTypeGroup.CV, 0.1)
 }

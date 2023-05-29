@@ -1,0 +1,26 @@
+{
+	"matchGroup": "pvp",
+	"mapId": 10,
+	"vehicles": [
+		{
+			"shipId": 1,
+			"relation": 0,
+			"id": 100,
+			"name": "player_1"
+		},
+		{
+			"shipId": 2,
+			"relation": 1,
+			"id": 200,
+			"name": "player_2"
+		},
+		{
+			"shipId": 3,
+			"relation": 2,
+			"id": 300,
+			"name": "player_3"
+		}
+	],
+	"dateTime": "22.05.2023 12:34:56",
+	"playerName": "player_1"
+}

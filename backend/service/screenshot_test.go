@@ -7,7 +7,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
@@ -16,16 +15,7 @@ const (
 	base64Data = "abc123"
 )
 
-type mockScreenshotRepo struct {
-	mock.Mock
-}
-
-func (m *mockScreenshotRepo) Save(path string, base64Data string) error {
-	args := m.Called(path, base64Data)
-	return args.Error(0)
-}
-
-func TestScreenshot_SaveForAuto_Success(t *testing.T) {
+func TestScreenshot_SaveForAuto_正常系(t *testing.T) {
 	t.Parallel()
 
 	// 期待されるメソッド呼び出しと戻り値の設定
@@ -45,7 +35,7 @@ func TestScreenshot_SaveForAuto_Success(t *testing.T) {
 	assert.NoError(t, err)
 }
 
-func TestScreenshot_SaveWithDialog_Success(t *testing.T) {
+func TestScreenshot_SaveWithDialog_正常系(t *testing.T) {
 	t.Parallel()
 
 	// 期待されるメソッド呼び出しと戻り値の設定
@@ -65,7 +55,7 @@ func TestScreenshot_SaveWithDialog_Success(t *testing.T) {
 	assert.NoError(t, err)
 }
 
-func TestScreenshot_SaveWithDialog_Failure_Error(t *testing.T) {
+func TestScreenshot_SaveWithDialog_異常系(t *testing.T) {
 	t.Parallel()
 
 	// Screenshot インスタンスの作成
@@ -83,7 +73,7 @@ func TestScreenshot_SaveWithDialog_Failure_Error(t *testing.T) {
 	mockRepo.AssertNotCalled(t, "Save")
 }
 
-func TestScreenshot_SaveWithDialog_Failure_Cancel(t *testing.T) {
+func TestScreenshot_SaveWithDialog_異常系_キャンセル(t *testing.T) {
 	t.Parallel()
 
 	// Screenshot インスタンスの作成

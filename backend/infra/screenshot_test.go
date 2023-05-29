@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestScreenshot_Save_Success(t *testing.T) {
+func TestScreenshot_Save_正常系(t *testing.T) {
 	t.Parallel()
 
 	// テストデータの作成
@@ -16,20 +16,17 @@ func TestScreenshot_Save_Success(t *testing.T) {
 	base64Data := "SGVsbG8sIHdvcmxkIQ=="
 	path := "screenshot_test/screenshot.png"
 
-	// Saveメソッドの呼び出し
-	screenshot := Screenshot{}
-	err := screenshot.Save(path, base64Data)
+	// テストで生成したディレクトリを削除
 	defer os.RemoveAll(filepath.Dir(path))
 
-	// エラーの確認
+	// テスト
+	screenshot := Screenshot{}
+	err := screenshot.Save(path, base64Data)
+
+	// アサーション
 	assert.NoError(t, err)
 	assert.FileExists(t, path)
-
-	// ファイルの内容の確認
 	content, err := os.ReadFile(path)
 	assert.NoError(t, err)
 	assert.Equal(t, content, []byte(rawData))
-
-	// ファイルの削除
-	os.Remove("screenshot.png")
 }

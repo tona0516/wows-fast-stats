@@ -52,7 +52,7 @@ func (c *Config) validate(config vo.UserConfig) error {
 	}
 
 	c.wargamingRepo.SetAppID(config.Appid)
-	if _, err := c.wargamingRepo.EncyclopediaInfo(); err != nil {
+	if _, err := c.wargamingRepo.EncycInfo(); err != nil {
 		return errors.WithStack(apperr.SrvCfg.InvalidAppID.WithRaw(apperr.ErrInvalidAppID))
 	}
 

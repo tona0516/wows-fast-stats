@@ -79,10 +79,10 @@ func (m *mockWargamingRepo) ClansInfo(clanIDs []int) (vo.WGClansInfo, error) {
 	return args.Get(0).(vo.WGClansInfo), args.Error(1)
 }
 
-func (m *mockWargamingRepo) EncyclopediaShips(pageNo int) (vo.WGEncyclopediaShips, error) {
+func (m *mockWargamingRepo) EncycShips(pageNo int) (vo.WGEncycShips, error) {
 	args := m.Called(pageNo)
 	//nolint:forcetypeassert
-	return args.Get(0).(vo.WGEncyclopediaShips), args.Error(1)
+	return args.Get(0).(vo.WGEncycShips), args.Error(1)
 }
 
 func (m *mockWargamingRepo) ShipsStats(accountID int) (vo.WGShipsStats, error) {
@@ -91,10 +91,10 @@ func (m *mockWargamingRepo) ShipsStats(accountID int) (vo.WGShipsStats, error) {
 	return args.Get(0).(vo.WGShipsStats), args.Error(1)
 }
 
-func (m *mockWargamingRepo) EncyclopediaInfo() (vo.WGEncyclopediaInfo, error) {
+func (m *mockWargamingRepo) EncycInfo() (vo.WGEncycInfo, error) {
 	args := m.Called()
 	//nolint:forcetypeassert
-	return args.Get(0).(vo.WGEncyclopediaInfo), args.Error(1)
+	return args.Get(0).(vo.WGEncycInfo), args.Error(1)
 }
 
 func (m *mockWargamingRepo) BattleArenas() (vo.WGBattleArenas, error) {
@@ -127,4 +127,13 @@ func (m *mockUnregisteredRepo) Warship() (map[int]vo.Warship, error) {
 	args := m.Called()
 	//nolint:forcetypeassert
 	return args.Get(0).(map[int]vo.Warship), args.Error(1)
+}
+
+type mockScreenshotRepo struct {
+	mock.Mock
+}
+
+func (m *mockScreenshotRepo) Save(path string, base64Data string) error {
+	args := m.Called(path, base64Data)
+	return args.Error(0)
 }

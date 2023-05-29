@@ -9,17 +9,30 @@ import (
 	"github.com/cenkalti/backoff/v4"
 )
 
-type APIClient[T any] struct{}
+type APIClient[T any] struct {
+	baseURL string
+}
 
-func (c *APIClient[T]) GetRequest(rawurl string) (T, error) {
+func NewAPIClient[T any](baseURL string) *APIClient[T] {
+	return &APIClient[T]{baseURL: baseURL}
+}
+
+func (c *APIClient[T]) GetRequest(query map[string]string) (T, error) {
 	var response T
 
-	u, err := url.Parse(rawurl)
+	// build URL
+	u, err := url.Parse(c.baseURL)
 	if err != nil {
 		return response, err
 	}
+	q := u.Query()
+	for k, v := range query {
+		q.Add(k, v)
+	}
+	u.RawQuery = q.Encode()
 
-	b := backoff.WithMaxRetries(backoff.NewExponentialBackOff(), 5)
+	// request
+	b := backoff.WithMaxRetries(backoff.NewExponentialBackOff(), 3)
 	operation := func() (*http.Response, error) {
 		return http.Get(u.String())
 	}
@@ -36,6 +49,7 @@ func (c *APIClient[T]) GetRequest(rawurl string) (T, error) {
 		return response, err
 	}
 
+	// serialize
 	err = json.Unmarshal(body, &response)
 	if err != nil {
 		return response, err

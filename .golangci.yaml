@@ -30,4 +30,5 @@ linters:
     - gofumpt # Conflict goimports
     - testpackage
     - godox
+    - asciicheck
   fast: false

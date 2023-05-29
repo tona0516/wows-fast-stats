@@ -12,8 +12,10 @@ import (
 
 //nolint:paralleltest
 func TestConfig_User(t *testing.T) {
-	// テスト用のユーザー設定
-	userConfig := vo.UserConfig{
+	// テストで生成したディレクトリを削除
+	defer os.RemoveAll(ConfigDirName)
+
+	expected := vo.UserConfig{
 		FontSize: "large",
 		Displays: vo.Displays{
 			Basic: vo.Basic{
@@ -24,20 +26,16 @@ func TestConfig_User(t *testing.T) {
 		},
 	}
 
-	// テスト用のディレクトリと設定ファイルの作成
-	err := os.Mkdir(ConfigDirName, 0755)
-	assert.NoError(t, err)
-	defer os.RemoveAll(ConfigDirName)
+	config := NewConfig()
 
 	// 書き込み：正常系
-	config := &Config{}
-	err = config.UpdateUser(userConfig)
+	err := config.UpdateUser(expected)
 	assert.NoError(t, err)
 
 	// 取得：正常系
-	loadedConfig, err := config.User()
+	actual, err := config.User()
 	assert.NoError(t, err)
-	assert.Equal(t, userConfig, loadedConfig)
+	assert.Equal(t, expected, actual)
 
 	// 取得：異常系 存在しない場合
 	err = os.Remove(filepath.Join(ConfigDirName, ConfigUserName))
@@ -48,28 +46,27 @@ func TestConfig_User(t *testing.T) {
 
 //nolint:paralleltest
 func TestConfig_App(t *testing.T) {
+	// テストで生成したディレクトリを削除
+	defer os.RemoveAll(ConfigDirName)
+
 	// テスト用のアプリケーション設定
-	appConfig := vo.AppConfig{
+	expected := vo.AppConfig{
 		Window: vo.WindowConfig{
 			Width:  100,
 			Height: 100,
 		},
 	}
 
-	// テスト用のディレクトリと設定ファイルの作成
-	err := os.Mkdir(ConfigDirName, 0755)
-	assert.NoError(t, err)
-	defer os.RemoveAll(ConfigDirName)
+	config := NewConfig()
 
 	// 書き込み：正常系
-	config := &Config{}
-	err = config.UpdateApp(appConfig)
+	err := config.UpdateApp(expected)
 	assert.NoError(t, err)
 
 	// 取得：正常系
-	loadedConfig, err := config.App()
+	actual, err := config.App()
 	assert.NoError(t, err)
-	assert.Equal(t, appConfig, loadedConfig)
+	assert.Equal(t, expected, actual)
 
 	// 取得：異常系 存在しない場合
 	err = os.Remove(filepath.Join(ConfigDirName, ConfigAppName))

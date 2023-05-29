@@ -55,7 +55,9 @@ func main() {
 
 func initApp() *App {
 	// infra
-	wargamingRepo := infra.NewWargaming()
+	wargamingRepo := infra.NewWargaming(vo.WGConfig{
+		BaseURL: "https://api.worldofwarships.asia",
+	})
 	numbersRepo := infra.NewNumbers("https://api.wows-numbers.com/personal/rating/expected/json/")
 	tempArenaInfoRepo := infra.NewTempArenaInfo()
 	configRepo := infra.NewConfig()

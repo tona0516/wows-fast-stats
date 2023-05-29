@@ -11,7 +11,7 @@ import (
 func TestUnregistered_Warship(t *testing.T) {
 	t.Parallel()
 
-	// テスト用の ships.json データ
+	// テスト用ships.json
 	mockShipsJSON := `[
 		{"id": 1, "en": "Ship 1", "level": 11, "nation": "United_Kingdom", "species": "AirCarrier"},
         {"id": 2, "en": "Ship 2", "level": 10, "nation": "USA", "species": "Battleship"},
@@ -20,19 +20,14 @@ func TestUnregistered_Warship(t *testing.T) {
         {"id": 5, "en": "Ship 5", "level": 7, "nation": "Commonwealth", "species": "Submarine"},
         {"id": 6, "en": "Ship 6", "level": 6, "nation": "Events", "species": "Auxiliary"}
 	]`
-
-	// ships.json のバイト配列を設定
 	shipsByte = []byte(mockShipsJSON)
 
-	// テスト対象のインスタンスを作成
-	unregistered := &Unregistered{}
+	// テスト
+	unregistered := NewUnregistered()
+	actual, err := unregistered.Warship()
 
-	// Warship メソッドを実行して結果を取得
-	ships, err := unregistered.Warship()
-	assert.NoError(t, err)
-
-	// 期待される結果
-	expectedShips := map[int]vo.Warship{
+	// アサーション
+	expected := map[int]vo.Warship{
 		1: {
 			Name:   "Ship 1",
 			Tier:   11,
@@ -70,7 +65,6 @@ func TestUnregistered_Warship(t *testing.T) {
 			Nation: "events",
 		},
 	}
-
-	// 結果の比較
-	assert.Equal(t, expectedShips, ships)
+	assert.NoError(t, err)
+	assert.Equal(t, expected, actual)
 }

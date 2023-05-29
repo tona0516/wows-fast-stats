@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestReplayWatcher_Start_Once_BattleStart(t *testing.T) {
+func TestReplayWatcher_Start_戦闘開始(t *testing.T) {
 	t.Parallel()
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -21,7 +21,6 @@ func TestReplayWatcher_Start_Once_BattleStart(t *testing.T) {
 		Appid:       "abc123",
 		FontSize:    "medium",
 	}
-	// defer os.RemoveAll("install_path_test")
 
 	mockConfigRepo := &mockConfigRepo{}
 	mockConfigRepo.On("User").Return(config, nil)
@@ -51,7 +50,7 @@ func TestReplayWatcher_Start_Once_BattleStart(t *testing.T) {
 	assert.Empty(t, events)
 }
 
-func TestReplayWatcher_Start_BattleEnd(t *testing.T) {
+func TestReplayWatcher_Start_戦闘終了(t *testing.T) {
 	t.Parallel()
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -92,7 +91,7 @@ func TestReplayWatcher_Start_BattleEnd(t *testing.T) {
 	assert.Contains(t, events, EventEnd)
 }
 
-func TestReplayWatcher_Start_Cancel(t *testing.T) {
+func TestReplayWatcher_Start_キャンセル(t *testing.T) {
 	t.Parallel()
 
 	ctx, cancel := context.WithCancel(context.Background())

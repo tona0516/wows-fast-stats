@@ -2,17 +2,17 @@ package vo
 
 import "reflect"
 
-type WGEncyclopediaInfo struct {
+type WGEncycInfo struct {
 	Status string                 `json:"status"`
 	Data   WGEncyclopediaInfoData `json:"data"`
 	Error  WGError                `json:"error"`
 }
 
-func (w WGEncyclopediaInfo) GetStatus() string {
+func (w WGEncycInfo) GetStatus() string {
 	return w.Status
 }
 
-func (w WGEncyclopediaInfo) GetError() WGError {
+func (w WGEncycInfo) GetError() WGError {
 	return w.Error
 }
 

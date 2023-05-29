@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestUtil_DoParallel_Success(t *testing.T) {
+func TestUtil_DoParallel_正常系(t *testing.T) {
 	t.Parallel()
 
 	// テストデータ
@@ -25,7 +25,7 @@ func TestUtil_DoParallel_Success(t *testing.T) {
 	assert.Nil(t, err)
 }
 
-func TestUtil_DoParallel_Failure(t *testing.T) {
+func TestUtil_DoParallel_異常系(t *testing.T) {
 	t.Parallel()
 
 	// テストデータ

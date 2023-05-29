@@ -23,7 +23,7 @@ func initMocksForBattle() (*mockWargamingRepo, *mockNumbersRepo, *mockUnregister
 		},
 	}
 	mockWargamingRepo.On("AccountList", mock.Anything).Return(accountList, nil)
-	mockWargamingRepo.On("EncyclopediaShips", mock.Anything).Return(vo.WGEncyclopediaShips{}, nil)
+	mockWargamingRepo.On("EncycShips", mock.Anything).Return(vo.WGEncycShips{}, nil)
 	mockWargamingRepo.On("BattleArenas").Return(vo.WGBattleArenas{}, nil)
 	mockWargamingRepo.On("BattleTypes").Return(vo.WGBattleTypes{}, nil)
 	mockWargamingRepo.On("AccountInfo", mock.Anything).Return(vo.WGAccountInfo{}, nil)
@@ -41,18 +41,21 @@ func initMocksForBattle() (*mockWargamingRepo, *mockNumbersRepo, *mockUnregister
 	return mockWargamingRepo, mockNumbersRepo, mockUnregisteredRepo, mockTempArenaInfoRepo
 }
 
-func TestBattle_Success_1st(t *testing.T) {
+func TestBattle_Battle_正常系_初回(t *testing.T) {
 	t.Parallel()
 
 	mockWargamingRepo, mockNumbersRepo, mockUnregisteredRepo, mockTempArenaInfoRepo := initMocksForBattle()
 
+	// テスト
 	b := NewBattle(5, mockWargamingRepo, mockTempArenaInfoRepo, mockNumbersRepo, mockUnregisteredRepo)
 	_, err := b.Battle(vo.UserConfig{})
+
+	// アサーション
 	assert.NoError(t, err)
 
 	mockWargamingRepo.AssertCalled(t, "SetAppID", mock.Anything)
 	mockWargamingRepo.AssertCalled(t, "AccountList", mock.Anything)
-	mockWargamingRepo.AssertCalled(t, "EncyclopediaShips", mock.Anything)
+	mockWargamingRepo.AssertCalled(t, "EncycShips", mock.Anything)
 	mockWargamingRepo.AssertCalled(t, "BattleArenas")
 	mockWargamingRepo.AssertCalled(t, "BattleTypes")
 	mockWargamingRepo.AssertCalled(t, "AccountInfo", mock.Anything)
@@ -68,19 +71,22 @@ func TestBattle_Success_1st(t *testing.T) {
 	mockTempArenaInfoRepo.AssertNotCalled(t, "Save", mock.Anything)
 }
 
-func TestBattle_Success_2ndOrLater(t *testing.T) {
+func TestBattle_Battle_正常系_2回目以降(t *testing.T) {
 	t.Parallel()
 
 	mockWargamingRepo, mockNumbersRepo, mockUnregisteredRepo, mockTempArenaInfoRepo := initMocksForBattle()
 
+	// テスト
 	b := NewBattle(5, mockWargamingRepo, mockTempArenaInfoRepo, mockNumbersRepo, mockUnregisteredRepo)
 	b.isFirstBattle = false
 	_, err := b.Battle(vo.UserConfig{})
+
+	// アサーション
 	assert.NoError(t, err)
 
 	mockWargamingRepo.AssertCalled(t, "SetAppID", mock.Anything)
 	mockWargamingRepo.AssertCalled(t, "AccountList", mock.Anything)
-	mockWargamingRepo.AssertNotCalled(t, "EncyclopediaShips", mock.Anything)
+	mockWargamingRepo.AssertNotCalled(t, "EncycShips", mock.Anything)
 	mockWargamingRepo.AssertNotCalled(t, "BattleArenas")
 	mockWargamingRepo.AssertNotCalled(t, "BattleTypes")
 	mockWargamingRepo.AssertCalled(t, "AccountInfo", mock.Anything)
@@ -96,7 +102,7 @@ func TestBattle_Success_2ndOrLater(t *testing.T) {
 	mockTempArenaInfoRepo.AssertNotCalled(t, "Save", mock.Anything)
 }
 
-func TestBattle_Failure(t *testing.T) {
+func TestBattle_Battle_異常系(t *testing.T) {
 	t.Parallel()
 
 	mockWargamingRepo, mockNumbersRepo, mockUnregisteredRepo, _ := initMocksForBattle()
@@ -105,14 +111,17 @@ func TestBattle_Failure(t *testing.T) {
 	mockTempArenaInfoRepo.On("Get", mock.Anything).Return(vo.TempArenaInfo{}, expectedError)
 	mockTempArenaInfoRepo.On("Save", mock.Anything).Return(nil)
 
+	// テスト
 	b := NewBattle(5, mockWargamingRepo, mockTempArenaInfoRepo, mockNumbersRepo, mockUnregisteredRepo)
 	b.isFirstBattle = false
 	_, err := b.Battle(vo.UserConfig{})
+
+	// アサーション
 	assert.EqualError(t, err, expectedError.Error())
 
 	mockWargamingRepo.AssertCalled(t, "SetAppID", mock.Anything)
 	mockWargamingRepo.AssertNotCalled(t, "AccountList", mock.Anything)
-	mockWargamingRepo.AssertNotCalled(t, "EncyclopediaShips", mock.Anything)
+	mockWargamingRepo.AssertNotCalled(t, "EncycShips", mock.Anything)
 	mockWargamingRepo.AssertNotCalled(t, "BattleArenas")
 	mockWargamingRepo.AssertNotCalled(t, "BattleTypes")
 	mockWargamingRepo.AssertNotCalled(t, "AccountInfo", mock.Anything)

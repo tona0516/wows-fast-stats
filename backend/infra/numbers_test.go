@@ -13,7 +13,7 @@ import (
 func TestNumbers_ExpectedStats(t *testing.T) {
 	t.Parallel()
 
-	// テスト用のレスポンスデータ
+	// モック
 	mockResponse := []byte(`{
         "time": 1621699200,
         "data": {
@@ -22,8 +22,6 @@ func TestNumbers_ExpectedStats(t *testing.T) {
             "9012": []
         }
     }`)
-
-	// テスト用の HTTP サーバーを作成し、モックのレスポンスを返すように設定
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
@@ -31,15 +29,13 @@ func TestNumbers_ExpectedStats(t *testing.T) {
 	}))
 	defer server.Close()
 
-	// テスト対象のインスタンスを作成
+	// テスト
 	numbers := NewNumbers(server.URL)
-
-	// ExpectedStats メソッドを実行して結果を取得
-	expectedStats, err := numbers.ExpectedStats()
+	actual, err := numbers.ExpectedStats()
 	assert.NoError(t, err)
 
-	// 期待される結果
-	expectedResult := vo.NSExpectedStats{
+	// アサーション
+	expected := vo.NSExpectedStats{
 		Time: 1621699200,
 		Data: map[int]vo.NSExpectedStatsData{
 			1234: {
@@ -54,7 +50,5 @@ func TestNumbers_ExpectedStats(t *testing.T) {
 			},
 		},
 	}
-
-	// 結果の比較
-	assert.Equal(t, expectedResult, expectedStats)
+	assert.Equal(t, expected, actual)
 }
