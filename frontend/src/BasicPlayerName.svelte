@@ -3,7 +3,14 @@ import type { vo } from "wailsjs/go/models";
 import { BrowserOpenURL } from "../wailsjs/runtime/runtime";
 import Const from "./Const";
 import { RankConverter } from "./RankConverter";
+import { createEventDispatcher } from "svelte";
+import clone from "clone";
+import { alertPlayers } from "./stores.js";
+
 export let player: vo.Player;
+export let config: vo.UserConfig;
+
+const dispatch = createEventDispatcher();
 
 function clanURL(player: vo.Player): string {
   return (
@@ -25,6 +32,17 @@ function playerURL(player: vo.Player): string {
   );
 }
 
+let alertPlayer: vo.AlertPlayer;
+alertPlayers.subscribe((it) => {
+  for (const p of it) {
+    if (player.player_info.id === p.account_id) {
+      alertPlayer = p;
+      return;
+    }
+  }
+  alertPlayer = undefined;
+});
+
 $: color = RankConverter.fromPR(player.ship_stats.pr).toBgColorCode();
 </script>
 
@@ -32,23 +50,81 @@ $: color = RankConverter.fromPR(player.ship_stats.pr).toBgColorCode();
   {#if player.player_info.id === 0}
     {player.player_info.name}
   {:else}
-    <!-- svelte-ignore a11y-invalid-attribute -->
-    {#if player.player_info.clan.id !== 0}
-      <a
-        class="td-link"
-        href="#"
-        on:click="{() => BrowserOpenURL(clanURL(player))}"
-      >
-        [{player.player_info.clan.tag}]
-      </a>
+    {#if alertPlayer}
+      <i class="bi {alertPlayer.pattern}"></i>
     {/if}
+
     <!-- svelte-ignore a11y-invalid-attribute -->
     <a
-      class="td-link"
+      class="td-link dropdown-toggle"
       href="#"
-      on:click="{() => BrowserOpenURL(playerURL(player))}"
+      id="dropdownMenuLink"
+      data-bs-toggle="dropdown"
     >
-      {player.player_info.name}
+      {#if player.player_info.clan.id !== 0}
+        [{player.player_info.clan.tag}] {player.player_info.name}
+      {:else}
+        {player.player_info.name}
+      {/if}
     </a>
+
+    <ul
+      class="dropdown-menu"
+      aria-labelledby="dropdownMenuLink"
+      style="font-size: {config?.font_size || 'medium'};"
+    >
+      {#if player.player_info.clan.id !== 0}
+        <!-- svelte-ignore a11y-invalid-attribute -->
+        <li>
+          <a
+            class="dropdown-item"
+            href="#"
+            on:click="{() => BrowserOpenURL(clanURL(player))}"
+            >クラン詳細(WoWS Stats & Numbers)</a
+          >
+        </li>
+      {/if}
+      <!-- svelte-ignore a11y-invalid-attribute -->
+      <li>
+        <a
+          class="dropdown-item"
+          href="#"
+          on:click="{() => BrowserOpenURL(playerURL(player))}"
+          >プレイヤー詳細(WoWS Stats & Numbers)</a
+        >
+      </li>
+      <!-- svelte-ignore a11y-invalid-attribute -->
+      <li>
+        {#if alertPlayer}
+          <a
+            class="dropdown-item"
+            href="#"
+            on:click="{() =>
+              dispatch('RemoveAlertPlayer', { target: clone(alertPlayer) })}"
+            >プレイヤーリストから削除する</a
+          >
+        {:else}
+          <a
+            class="dropdown-item"
+            href="#"
+            on:click="{() => {
+              dispatch('UpdateAlertPlayer', {
+                target: {
+                  account_id: player.player_info.id,
+                  name: player.player_info.name,
+                  pattern: 'bi-check-circle-fill',
+                  message: '',
+                },
+              });
+            }}">プレイヤーリストへ追加する</a
+          >
+        {/if}
+      </li>
+      {#if alertPlayer}
+        <li>
+          <div class="dropdown-item">メモ: {alertPlayer.message}</div>
+        </li>
+      {/if}
+    </ul>
   {/if}
 </td>

@@ -29,6 +29,9 @@ function onClickMenu(menu: NavigationMenu) {
     case "appinfo":
       currentPage = "appinfo";
       break;
+    case "alert_player":
+      currentPage = "alert_player";
+      break;
     case "reload":
       WindowReloadApp();
       break;
@@ -64,6 +67,11 @@ const pages: { title: string; name: Page; iconClass: string }[] = [
   { title: "ホーム", name: "main", iconClass: "bi bi-house" },
   { title: "設定", name: "config", iconClass: "bi bi-gear" },
   { title: "アプリ情報", name: "appinfo", iconClass: "bi bi-info-circle" },
+  {
+    title: "プレイヤーリスト",
+    name: "alert_player",
+    iconClass: "bi bi-person-lines-fill",
+  },
 ];
 
 const funcs: { title: string; name: Func; iconClass: string }[] = [

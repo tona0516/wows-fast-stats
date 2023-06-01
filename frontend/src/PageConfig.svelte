@@ -14,7 +14,7 @@ export let config: vo.UserConfig;
 
 const dispatch = createEventDispatcher();
 
-let inputConfig: vo.UserConfig = Const.DEFAULT_USER_CONFIG;
+let inputConfig: vo.UserConfig;
 let isLoading = false;
 
 function clickApply() {
@@ -109,7 +109,7 @@ main();
           class="td-link"
           href="#"
           on:click="{() => BrowserOpenURL('https://developers.wargaming.net/')}"
-          >Developer Room <i class="bi bi-box-arrow-up-right"></i></a
+          >Developer Room</a
         > で作成したIDを入力してください。
       </p>
     </div>

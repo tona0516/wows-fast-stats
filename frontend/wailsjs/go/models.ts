@@ -1,5 +1,23 @@
 export namespace vo {
 	
+	export class AlertPlayer {
+	    account_id: number;
+	    name: string;
+	    pattern: string;
+	    message: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new AlertPlayer(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.account_id = source["account_id"];
+	        this.name = source["name"];
+	        this.pattern = source["pattern"];
+	        this.message = source["message"];
+	    }
+	}
 	export class Basic {
 	    is_in_avg: boolean;
 	    player_name: boolean;
@@ -474,6 +492,73 @@ export namespace vo {
 	        this.revision = source["revision"];
 	    }
 	}
+	export class WGError {
+	    code: number;
+	    message: string;
+	    field: string;
+	    value: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new WGError(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.code = source["code"];
+	        this.message = source["message"];
+	        this.field = source["field"];
+	        this.value = source["value"];
+	    }
+	}
+	export class WGAccountListData {
+	    nickname: string;
+	    account_id: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new WGAccountListData(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.nickname = source["nickname"];
+	        this.account_id = source["account_id"];
+	    }
+	}
+	export class WGAccountList {
+	    status: string;
+	    data: WGAccountListData[];
+	    error: WGError;
+	
+	    static createFrom(source: any = {}) {
+	        return new WGAccountList(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.status = source["status"];
+	        this.data = this.convertValues(source["data"], WGAccountListData);
+	        this.error = this.convertValues(source["error"], WGError);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	
 
 }
 

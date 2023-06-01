@@ -10,12 +10,12 @@
     "check": "svelte-check --tsconfig ./tsconfig.json"
   },
   "devDependencies": {
+    "@smui/dialog": "^7.0.0-beta.8",
     "@sveltejs/vite-plugin-svelte": "^1.0.1",
     "@tsconfig/svelte": "^3.0.0",
     "bootstrap-icons": "^1.10.5",
     "prettier": "^2.8.7",
     "prettier-plugin-svelte": "^2.10.0",
-    "svelte": "^3.49.0",
     "svelte-check": "^2.8.0",
     "svelte-preprocess": "^4.10.7",
     "tslib": "^2.4.0",
@@ -26,6 +26,10 @@
     "@types/clone": "^2.1.1",
     "clone": "^2.1.2",
     "html-to-image": "^1.11.11",
-    "svelte-toasts": "^1.1.2"
+    "simple-svelte-autocomplete": "^2.5.2",
+    "svelecte": "^3.16.1",
+    "svelte": "^3.59.1",
+    "svelte-toasts": "^1.1.2",
+    "sveltestrap": "^5.10.0"
   }
 }

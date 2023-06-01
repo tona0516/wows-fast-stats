@@ -76,6 +76,18 @@ func (w *Wargaming) AccountList(accountNames []string) (vo.WGAccountList, error)
 	)
 }
 
+func (w *Wargaming) AccountListForSearch(prefix string) (vo.WGAccountList, error) {
+	return request(
+		w.accountListClient,
+		map[string]string{
+			"application_id": w.AppID,
+			"search":         prefix,
+			"fields":         vo.WGAccountListData{}.Field(),
+		},
+		apperr.Wg.AccountList,
+	)
+}
+
 func (w *Wargaming) ClansAccountInfo(accountIDs []int) (vo.WGClansAccountInfo, error) {
 	strAccountIDs := make([]string, len(accountIDs))
 	for i, v := range accountIDs {

@@ -31,4 +31,5 @@ linters:
     - testpackage
     - godox
     - asciicheck
+    - interfacebloat
   fast: false

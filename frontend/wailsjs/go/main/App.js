@@ -6,6 +6,14 @@ export function AddExcludePlayerID(arg1) {
   return window['go']['main']['App']['AddExcludePlayerID'](arg1);
 }
 
+export function AlertPatterns() {
+  return window['go']['main']['App']['AlertPatterns']();
+}
+
+export function AlertPlayers() {
+  return window['go']['main']['App']['AlertPlayers']();
+}
+
 export function AppVersion() {
   return window['go']['main']['App']['AppVersion']();
 }
@@ -42,12 +50,24 @@ export function Ready() {
   return window['go']['main']['App']['Ready']();
 }
 
+export function RemoveAlertPlayer(arg1) {
+  return window['go']['main']['App']['RemoveAlertPlayer'](arg1);
+}
+
 export function RemoveExcludePlayerID(arg1) {
   return window['go']['main']['App']['RemoveExcludePlayerID'](arg1);
 }
 
+export function SearchPlayer(arg1) {
+  return window['go']['main']['App']['SearchPlayer'](arg1);
+}
+
 export function SelectDirectory() {
   return window['go']['main']['App']['SelectDirectory']();
+}
+
+export function UpdateAlertPlayer(arg1) {
+  return window['go']['main']['App']['UpdateAlertPlayer'](arg1);
 }
 
 export function UserConfig() {

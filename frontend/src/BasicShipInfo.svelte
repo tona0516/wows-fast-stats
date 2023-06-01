@@ -62,16 +62,12 @@ $: color = Const.TYPE_S_COLORS[player.ship_info.type] ?? "#00000000";
   <img alt="" src="{shipIcon(player.ship_info.type)}" class="ship-icon" />
 </td>
 
-<td class="td-string">
+<td class="td-string omit">
   <!-- svelte-ignore a11y-invalid-attribute -->
   <a
     class="td-link"
     href="#"
     on:click="{() => BrowserOpenURL(shipURL(player))}"
-  >
-    <div class="omit">
-      {tierString(player.ship_info.tier)}
-      {player.ship_info.name}
-    </div>
+  >{tierString(player.ship_info.tier)} {player.ship_info.name}
   </a>
 </td>

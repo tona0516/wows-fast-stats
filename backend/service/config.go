@@ -45,6 +45,22 @@ func (c *Config) UpdateApp(config vo.AppConfig) error {
 	return c.configRepo.UpdateApp(config)
 }
 
+func (c *Config) AlertPlayers() ([]vo.AlertPlayer, error) {
+	return c.configRepo.AlertPlayers()
+}
+
+func (c *Config) UpdateAlertPlayer(player vo.AlertPlayer) error {
+	return c.configRepo.UpdateAlertPlayer(player)
+}
+
+func (c *Config) RemoveAlertPlayer(accountID int) error {
+	return c.configRepo.RemoveAlertPlayer(accountID)
+}
+
+func (c *Config) SearchPlayer(prefix string) (vo.WGAccountList, error) {
+	return c.wargamingRepo.AccountListForSearch(prefix)
+}
+
 func (c *Config) validate(config vo.UserConfig) error {
 	if _, err := os.Stat(filepath.Join(config.InstallPath, "WorldOfWarships.exe")); err != nil {
 		return errors.WithStack(apperr.SrvCfg.InvalidInstallPath.WithRaw(apperr.ErrInvalidInstallPath))

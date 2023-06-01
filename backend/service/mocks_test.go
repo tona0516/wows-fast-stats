@@ -32,6 +32,22 @@ func (m *mockConfigRepo) UpdateApp(config vo.AppConfig) error {
 	return args.Error(0)
 }
 
+func (m *mockConfigRepo) AlertPlayers() ([]vo.AlertPlayer, error) {
+	args := m.Called()
+	//nolint:forcetypeassert
+	return args.Get(0).([]vo.AlertPlayer), args.Error(1)
+}
+
+func (m *mockConfigRepo) UpdateAlertPlayer(player vo.AlertPlayer) error {
+	args := m.Called(player)
+	return args.Error(0)
+}
+
+func (m *mockConfigRepo) RemoveAlertPlayer(accountID int) error {
+	args := m.Called(accountID)
+	return args.Error(0)
+}
+
 type mockTempArenaInfoRepo struct {
 	mock.Mock
 }
@@ -63,6 +79,12 @@ func (m *mockWargamingRepo) AccountInfo(accountIDs []int) (vo.WGAccountInfo, err
 
 func (m *mockWargamingRepo) AccountList(accountNames []string) (vo.WGAccountList, error) {
 	args := m.Called(accountNames)
+	//nolint:forcetypeassert
+	return args.Get(0).(vo.WGAccountList), args.Error(1)
+}
+
+func (m *mockWargamingRepo) AccountListForSearch(prefix string) (vo.WGAccountList, error) {
+	args := m.Called(prefix)
 	//nolint:forcetypeassert
 	return args.Get(0).(vo.WGAccountList), args.Error(1)
 }

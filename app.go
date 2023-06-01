@@ -174,6 +174,26 @@ func (a *App) RemoveExcludePlayerID(playerID int) {
 	a.excludePlayer.Remove(playerID)
 }
 
+func (a *App) AlertPlayers() ([]vo.AlertPlayer, error) {
+	return a.configService.AlertPlayers()
+}
+
+func (a *App) UpdateAlertPlayer(player vo.AlertPlayer) error {
+	return a.configService.UpdateAlertPlayer(player)
+}
+
+func (a *App) RemoveAlertPlayer(accountID int) error {
+	return a.configService.RemoveAlertPlayer(accountID)
+}
+
+func (a *App) SearchPlayer(prefix string) (vo.WGAccountList, error) {
+	return a.configService.SearchPlayer(prefix)
+}
+
+func (a *App) AlertPatterns() []string {
+	return vo.AlertPatterns
+}
+
 func (a *App) LogError(err string) {
 	//nolint:goerr113
 	a.logger.Error("Error occurred in frontend.", fmt.Errorf("%s", err))

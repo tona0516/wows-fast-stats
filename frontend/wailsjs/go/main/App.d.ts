@@ -4,6 +4,10 @@ import {vo} from '../models';
 
 export function AddExcludePlayerID(arg1:number):Promise<void>;
 
+export function AlertPatterns():Promise<Array<string>>;
+
+export function AlertPlayers():Promise<Array<vo.AlertPlayer>>;
+
 export function AppVersion():Promise<vo.Version>;
 
 export function ApplyUserConfig(arg1:vo.UserConfig):Promise<void>;
@@ -22,8 +26,14 @@ export function OpenDirectory(arg1:string):Promise<void>;
 
 export function Ready():Promise<void>;
 
+export function RemoveAlertPlayer(arg1:number):Promise<void>;
+
 export function RemoveExcludePlayerID(arg1:number):Promise<void>;
 
+export function SearchPlayer(arg1:string):Promise<vo.WGAccountList>;
+
 export function SelectDirectory():Promise<string>;
+
+export function UpdateAlertPlayer(arg1:vo.AlertPlayer):Promise<void>;
 
 export function UserConfig():Promise<vo.UserConfig>;

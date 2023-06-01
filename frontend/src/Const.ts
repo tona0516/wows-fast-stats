@@ -1,49 +1,7 @@
-import type { vo } from "wailsjs/go/models.js";
+import type { vo } from "wailsjs/go/models";
 
 namespace Const {
   export const BASE_NUMBERS_URL = "https://asia.wows-numbers.com/";
-
-  export const DEFAULT_USER_CONFIG: vo.UserConfig = {
-    install_path: "",
-    appid: "",
-    font_size: "medium",
-    displays: {
-      basic: {
-        is_in_avg: true,
-        player_name: true,
-        ship_info: true,
-      },
-      ship: {
-        pr: true,
-        damage: true,
-        win_rate: true,
-        kd_rate: false,
-        exp: false,
-        battles: true,
-        survived_rate: false,
-        hit_rate: false,
-      },
-      overall: {
-        damage: true,
-        win_rate: true,
-        kd_rate: false,
-        exp: false,
-        battles: true,
-        survived_rate: false,
-        avg_tier: false,
-        using_ship_type_rate: false,
-        using_tier_rate: false,
-      },
-      convertValues: function (_a: any, _classs: any, _asMap?: boolean) {
-        throw new Error("Function not implemented.");
-      },
-    },
-    save_screenshot: false,
-    save_temp_arena_info: false,
-    convertValues: function (_a: any, _classs: any, _asMap?: boolean) {
-      throw new Error("Function not implemented.");
-    },
-  };
 
   export const COLUMN_NAMES = {
     basic: { min: "基本情報", full: "基本情報" },
@@ -129,6 +87,15 @@ namespace Const {
     great: "#02f7da",
     unicum: "#da6ff5",
     superUnicum: "#bf15ee",
+  };
+
+  export const MAX_MEMO_LENGTH = 100;
+
+  export const DEFAULT_ALERT_PLAYER: vo.AlertPlayer = {
+    account_id: 0,
+    name: "",
+    pattern: "bi-check-circle-fill",
+    message: "",
   };
 }
 
