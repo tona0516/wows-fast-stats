@@ -141,7 +141,7 @@ func (w *Wargaming) EncycShips(pageNo int) (vo.WGEncycShips, error) {
 		map[string]string{
 			"application_id": w.AppID,
 			"fields":         vo.WGEncyclopediaShipsData{}.Field(),
-			"language":       "en",
+			"language":       "ja",
 			"page_no":        strconv.Itoa(pageNo),
 		},
 		apperr.Wg.EncyclopediaShips,
