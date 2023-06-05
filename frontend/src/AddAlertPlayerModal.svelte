@@ -18,7 +18,7 @@ const dispatch = createEventDispatcher();
 let open = false;
 
 let alertPatterns: string[] = [];
-let target: vo.AlertPlayer;
+let target: vo.AlertPlayer = clone(Const.DEFAULT_ALERT_PLAYER);
 let searchResult: vo.WGAccountListData;
 
 async function search(input: string) {
