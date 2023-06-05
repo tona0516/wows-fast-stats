@@ -2,15 +2,28 @@
 import type { vo } from "wailsjs/go/models";
 import type { DisplayPattern } from "./DisplayPattern";
 import Const from "./Const";
+import type { StatsPattern } from "./StatsPattern";
+import { values } from "./util";
+import type { StatsCategory } from "./StatsCategory";
 
 export let player: vo.Player;
 export let displayPattern: DisplayPattern;
+export let statsPattern: StatsPattern;
+export let statsCatetory: StatsCategory;
 
-let digit = Const.DIGITS["kd_rate"];
+const digit = Const.DIGITS["kd_rate"];
+
+$: value = values(
+  player,
+  displayPattern,
+  statsPattern,
+  statsCatetory,
+  "kd_rate"
+);
 </script>
 
-{#if displayPattern === "full" || displayPattern === "nopr" || displayPattern === "noshipstats"}
+{#if value !== undefined}
   <td class="td-number">
-    {player.overall_stats.kd_rate.toFixed(digit)}
+    {value.toFixed(digit)}
   </td>
 {/if}

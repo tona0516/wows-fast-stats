@@ -2,17 +2,35 @@
 import type { vo } from "wailsjs/go/models";
 import type { DisplayPattern } from "./DisplayPattern";
 import Const from "./Const";
+import { values } from "./util";
+import type { StatsPattern } from "./StatsPattern";
+import type { StatsCategory } from "./StatsCategory";
 
 export let player: vo.Player;
 export let displayPattern: DisplayPattern;
+export let statsPattern: StatsPattern;
+export let statsCatetory: StatsCategory;
 
-let digit = Const.DIGITS["survived_rate"];
+const digit = Const.DIGITS["survived_rate"];
+
+$: win = values(
+  player,
+  displayPattern,
+  statsPattern,
+  statsCatetory,
+  "win_survived_rate"
+);
+$: lose = values(
+  player,
+  displayPattern,
+  statsPattern,
+  statsCatetory,
+  "lose_survived_rate"
+);
 </script>
 
-{#if displayPattern === "full" || displayPattern === "nopr" || displayPattern === "noshipstats"}
+{#if win !== undefined && lose !== undefined}
   <td class="td-multiple">
-    {player.overall_stats.win_survived_rate.toFixed(digit)}% | {player.overall_stats.lose_survived_rate.toFixed(
-      digit
-    )}%
+    {win.toFixed(digit)}% | {lose.toFixed(digit)}%
   </td>
 {/if}

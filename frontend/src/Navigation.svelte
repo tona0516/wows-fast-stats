@@ -3,7 +3,7 @@ import { createEventDispatcher } from "svelte";
 import { WindowReloadApp } from "../wailsjs/runtime/runtime";
 import type { Page } from "./Page";
 import { Screenshot } from "./Screenshot";
-import { LogError } from "../wailsjs/go/main/App";
+import { ApplyUserConfig, LogError } from "../wailsjs/go/main/App";
 import { get } from "svelte/store";
 import {
   storedBattle,
@@ -11,6 +11,7 @@ import {
   storedIsFirstScreenshot,
   storedUserConfig,
 } from "./stores";
+import clone from "clone";
 
 const dispatch = createEventDispatcher();
 
@@ -30,6 +31,7 @@ let userConfig = get(storedUserConfig);
 storedUserConfig.subscribe((it) => (userConfig = it));
 
 let isLoadingScreenshot: boolean = false;
+let selectedStatsPattern: string;
 
 function onClickMenu(menu: NavigationMenu) {
   switch (menu) {
@@ -54,7 +56,7 @@ function onClickMenu(menu: NavigationMenu) {
       screenshot
         .manual()
         .then(() => {
-          dispatch("onScreenshotSuccess", {
+          dispatch("Success", {
             message: "スクリーンショットを保存しました。",
           });
         })
@@ -64,7 +66,7 @@ function onClickMenu(menu: NavigationMenu) {
           }
 
           LogError(error.name + "," + error.message + "," + error.stack);
-          dispatch("onScreenshotFailure", { message: error });
+          dispatch("Failure", { message: error });
         })
         .finally(() => {
           storedIsFirstScreenshot.set(false);
@@ -73,6 +75,21 @@ function onClickMenu(menu: NavigationMenu) {
       break;
     default:
       break;
+  }
+}
+
+async function onStatsPatternChanged() {
+  try {
+    const config = clone(userConfig);
+    config.stats_pattern = selectedStatsPattern;
+
+    await ApplyUserConfig(config);
+    storedUserConfig.set(config);
+
+    dispatch("ChangeStatsPattern");
+  } catch (error) {
+    dispatch("Failure", { message: error });
+    return;
   }
 }
 
@@ -94,6 +111,12 @@ const funcs: { title: string; name: Func; iconClass: string }[] = [
     name: "screenshot",
     iconClass: "bi bi-camera",
   },
+];
+
+// TODO get from backend
+const statsPattern: { titile: string; pattern: string }[] = [
+  { titile: "ランダム戦", pattern: "pvp_all" },
+  { titile: "ランダム戦(ソロ)", pattern: "pvp_solo" },
 ];
 </script>
 
@@ -149,6 +172,20 @@ const funcs: { title: string; name: Func; iconClass: string }[] = [
               {/if}
             </button>
           {/each}
+          <select
+            class="form-select form-select-sm m-1"
+            style="font-size: {userConfig.font_size};"
+            bind:value="{selectedStatsPattern}"
+            on:change="{onStatsPatternChanged}"
+          >
+            {#each statsPattern as sp}
+              {#if sp.pattern === userConfig.stats_pattern}
+                <option selected value="{sp.pattern}">{sp.titile}</option>
+              {:else}
+                <option value="{sp.pattern}">{sp.titile}</option>
+              {/if}
+            {/each}
+          </select>
         {/if}
       </div>
     </div>

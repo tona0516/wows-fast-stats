@@ -30,7 +30,7 @@ async function onCheck(e: any) {
 }
 </script>
 
-{#if displayPattern === "noshipstats" || displayPattern === "full" || displayPattern === "nopr"}
+{#if displayPattern === "noshipstats" || displayPattern === "full"}
   <td class="td-checkbox">
     <input
       class="form-check-input"

@@ -48,6 +48,7 @@ var defaultUserConfig vo.UserConfig = vo.UserConfig{
 			UsingTierRate:     false,
 		},
 	},
+	StatsPattern: vo.StatsPatternPvPAll,
 }
 
 type Config struct{}

@@ -43,8 +43,10 @@ type OverallStats struct {
 }
 
 type Player struct {
-	ShipInfo     ShipInfo     `json:"ship_info"`
-	ShipStats    ShipStats    `json:"ship_stats"`
-	PlayerInfo   PlayerInfo   `json:"player_info"`
-	OverallStats OverallStats `json:"overall_stats"`
+	ShipInfo         ShipInfo     `json:"ship_info"`
+	ShipStats        ShipStats    `json:"ship_stats"`
+	ShipStatsSolo    ShipStats    `json:"ship_stats_solo"`
+	PlayerInfo       PlayerInfo   `json:"player_info"`
+	OverallStats     OverallStats `json:"overall_stats"`
+	OverallStatsSolo OverallStats `json:"overall_stats_solo"`
 }

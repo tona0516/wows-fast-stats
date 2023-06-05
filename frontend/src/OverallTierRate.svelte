@@ -2,9 +2,14 @@
 import type { vo } from "wailsjs/go/models";
 import type { DisplayPattern } from "./DisplayPattern";
 import Const from "./Const";
+import type { StatsPattern } from "./StatsPattern";
+import { values } from "./util";
+import type { StatsCategory } from "./StatsCategory";
 
 export let player: vo.Player;
 export let displayPattern: DisplayPattern;
+export let statsPattern: StatsPattern;
+export let statsCatetory: StatsCategory;
 
 function convertToKey(tier: number): string {
   if (tier >= 1 && tier <= 4) {
@@ -31,12 +36,20 @@ const texts: { [key: string]: string } = {
   high: "8~★",
 };
 
-let digit = Const.DIGITS["tier_rate"];
+const digit = Const.DIGITS["tier_rate"];
+
+$: tierGroup = values(
+  player,
+  displayPattern,
+  statsPattern,
+  statsCatetory,
+  "using_tier_rate"
+);
 </script>
 
 <!-- using tier rate -->
-{#if displayPattern === "full" || displayPattern === "nopr" || displayPattern === "noshipstats"}
-  {@const keys = Object.keys(player.overall_stats.using_tier_rate)}
+{#if tierGroup !== undefined}
+  {@const keys = Object.keys(tierGroup)}
 
   <td class="td-graph">
     <table class="charts-css bar hide-data stacked">
@@ -48,8 +61,7 @@ let digit = Const.DIGITS["tier_rate"];
       <tbody>
         <tr>
           {#each keys as key}
-            {@const value =
-              player.overall_stats.using_tier_rate[key].toFixed(digit)}
+            {@const value = tierGroup[key].toFixed(digit)}
             <td
               style="--size: calc({value}/100); --color: {color(
                 convertToKey(player.ship_info.tier),

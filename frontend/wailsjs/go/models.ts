@@ -223,8 +223,10 @@ export namespace vo {
 	export class Player {
 	    ship_info: ShipInfo;
 	    ship_stats: ShipStats;
+	    ship_stats_solo: ShipStats;
 	    player_info: PlayerInfo;
 	    overall_stats: OverallStats;
+	    overall_stats_solo: OverallStats;
 	
 	    static createFrom(source: any = {}) {
 	        return new Player(source);
@@ -234,8 +236,10 @@ export namespace vo {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.ship_info = this.convertValues(source["ship_info"], ShipInfo);
 	        this.ship_stats = this.convertValues(source["ship_stats"], ShipStats);
+	        this.ship_stats_solo = this.convertValues(source["ship_stats_solo"], ShipStats);
 	        this.player_info = this.convertValues(source["player_info"], PlayerInfo);
 	        this.overall_stats = this.convertValues(source["overall_stats"], OverallStats);
+	        this.overall_stats_solo = this.convertValues(source["overall_stats_solo"], OverallStats);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -445,6 +449,7 @@ export namespace vo {
 	    displays: Displays;
 	    save_screenshot: boolean;
 	    save_temp_arena_info: boolean;
+	    stats_pattern: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new UserConfig(source);
@@ -458,6 +463,7 @@ export namespace vo {
 	        this.displays = this.convertValues(source["displays"], Displays);
 	        this.save_screenshot = source["save_screenshot"];
 	        this.save_temp_arena_info = source["save_temp_arena_info"];
+	        this.stats_pattern = source["stats_pattern"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

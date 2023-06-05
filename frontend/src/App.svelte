@@ -14,7 +14,6 @@ import { EventsOn, LogDebug } from "../wailsjs/runtime/runtime.js";
 import AppInfo from "./PageAppInfo.svelte";
 
 import "bootstrap-icons/font/bootstrap-icons.css";
-import { Summary } from "./Summary.js";
 import Navigation from "./Navigation.svelte";
 import { Screenshot } from "./Screenshot.js";
 import AlertPlayer from "./PageAlertPlayer.svelte";
@@ -32,6 +31,8 @@ import {
   storedUserConfig,
 } from "./stores.js";
 import type { vo } from "wailsjs/go/models.js";
+import { summary } from "./util.js";
+import type { StatsPattern } from "./StatsPattern.js";
 
 let notification: Notification;
 let addAlertPlayerModal: AddAlertPlayerModal;
@@ -125,10 +126,14 @@ async function onFailureAlertPlayerModal(event: CustomEvent<any>) {
 
 async function recalculate(battle: vo.Battle) {
   const excludePlayerIDs = await ExcludePlayerIDs();
-  const summary = new Summary(battle);
-  const summaryResult = summary.calc(excludePlayerIDs);
-
   storedExcludePlayerIDs.set(excludePlayerIDs);
+
+  // TODO Refactoring (without "as")
+  const summaryResult = summary(
+    battle,
+    excludePlayerIDs,
+    userConfig.stats_pattern as StatsPattern
+  );
   storedSummaryResult.set(summaryResult);
 }
 
@@ -187,10 +192,11 @@ window.onload = function () {
     />
 
     <Navigation
-      on:onScreenshotSuccess="{(event) =>
+      on:Success="{(event) =>
         notification.showToast(event.detail.message, 'success')}"
-      on:onScreenshotFailure="{(event) =>
+      on:Failure="{(event) =>
         notification.showToast(event.detail.message, 'error')}"
+      on:ChangeStatsPattern="{() => recalculate(battle)}"
     />
 
     {#if currentPage === "main"}

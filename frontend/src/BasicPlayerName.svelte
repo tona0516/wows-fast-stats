@@ -7,8 +7,13 @@ import { createEventDispatcher } from "svelte";
 import clone from "clone";
 import { storedAlertPlayers, storedUserConfig } from "./stores";
 import { get } from "svelte/store";
+import type { StatsPattern } from "./StatsPattern";
+import { values } from "./util";
+import type { DisplayPattern } from "./DisplayPattern";
 
 export let player: vo.Player;
+export let displayPattern: DisplayPattern;
+export let statsPattern: StatsPattern;
 
 let alertPlayers = get(storedAlertPlayers);
 storedAlertPlayers.subscribe((it) => (alertPlayers = it));
@@ -41,7 +46,8 @@ function playerURL(player: vo.Player): string {
 $: alertPlayer = alertPlayers.find(
   (it) => it.account_id === player.player_info.id
 );
-$: color = RankConverter.fromPR(player.ship_stats.pr).toBgColorCode();
+$: pr = values(player, displayPattern, statsPattern, "ship", "pr");
+$: color = RankConverter.fromPR(pr).toBgColorCode();
 </script>
 
 <td class="td-string omit" style="background-color: {color}">

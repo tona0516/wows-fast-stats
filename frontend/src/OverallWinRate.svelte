@@ -3,19 +3,29 @@ import type { vo } from "wailsjs/go/models";
 import type { DisplayPattern } from "./DisplayPattern";
 import Const from "./Const";
 import { RankConverter } from "./RankConverter";
+import type { StatsPattern } from "./StatsPattern";
+import { values } from "./util";
+import type { StatsCategory } from "./StatsCategory";
 
 export let player: vo.Player;
 export let displayPattern: DisplayPattern;
+export let statsPattern: StatsPattern;
+export let statsCatetory: StatsCategory;
 
-let digit = Const.DIGITS["win_rate"];
+const digit = Const.DIGITS["win_rate"];
 
-$: color = RankConverter.fromWinRate(
-  player.overall_stats.win_rate
-).toTextColorCode();
+$: color = RankConverter.fromWinRate(value).toTextColorCode();
+$: value = values(
+  player,
+  displayPattern,
+  statsPattern,
+  statsCatetory,
+  "win_rate"
+);
 </script>
 
-{#if displayPattern === "full" || displayPattern === "nopr" || displayPattern === "noshipstats"}
+{#if value !== undefined}
   <td class="td-number" style="color: {color}">
-    {player.overall_stats.win_rate.toFixed(digit)}%
+    {value.toFixed(digit)}%
   </td>
 {/if}

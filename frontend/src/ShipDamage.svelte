@@ -3,20 +3,32 @@ import type { vo } from "wailsjs/go/models";
 import type { DisplayPattern } from "./DisplayPattern";
 import Const from "./Const";
 import { RankConverter } from "./RankConverter";
+import type { StatsPattern } from "./StatsPattern";
+import { values } from "./util";
+import type { StatsCategory } from "./StatsCategory";
 
 export let player: vo.Player;
 export let displayPattern: DisplayPattern;
+export let statsPattern: StatsPattern;
+export let statsCatetory: StatsCategory;
 
-let digit = Const.DIGITS["damage"];
+const digit = Const.DIGITS["damage"];
 
 $: color = RankConverter.fromDamage(
-  player.ship_stats.damage,
+  value,
   player.ship_info.avg_damage
 ).toTextColorCode();
+$: value = values(
+  player,
+  displayPattern,
+  statsPattern,
+  statsCatetory,
+  "damage"
+);
 </script>
 
-{#if displayPattern === "full" || displayPattern === "nopr"}
+{#if value !== undefined}
   <td class="td-number" style="color: {color}">
-    {player.ship_stats.damage.toFixed(digit)}
+    {value.toFixed(digit)}
   </td>
 {/if}

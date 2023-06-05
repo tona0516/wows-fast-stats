@@ -23,15 +23,16 @@ func (s *Stats) SetShipStats(shipStats vo.WGShipsStatsData) {
 	s.ShipsStats = shipStats
 }
 
-func (s *Stats) ShipPR() float64 {
+func (s *Stats) ShipPR(mode StatsMode) float64 {
 	rating := Rating{}
+	values := statsValuesFrom(mode, s.ShipsStats)
+	battles := values.Battles
 
-	battles := s.ShipsStats.Pvp.Battles
 	return rating.PersonalRating(
 		RatingFactor{
-			AvgDamage: avgDamage(s.ShipsStats.Pvp.DamageDealt, battles),
-			AvgFrags:  avgFrags(s.ShipsStats.Pvp.Frags, battles),
-			WinRate:   winRate(s.ShipsStats.Pvp.Wins, battles),
+			AvgDamage: avgDamage(values.DamageDealt, battles),
+			AvgFrags:  avgFrags(values.Frags, battles),
+			WinRate:   winRate(values.Wins, battles),
 		},
 		RatingFactor{
 			AvgDamage: s.Expected.AverageDamageDealt,
@@ -139,6 +140,7 @@ func (s *Stats) TorpedoesHitRate(mode StatsMode) float64 {
 }
 
 func (s *Stats) AvgTier(
+	mode StatsMode,
 	accountID int,
 	shipInfo map[int]vo.Warship,
 	shipStats map[int]vo.WGShipsStats,
@@ -147,10 +149,11 @@ func (s *Stats) AvgTier(
 	var battles uint
 	playerShipStats := shipStats[accountID].Data[accountID]
 	for _, ship := range playerShipStats {
+		values := statsValuesFrom(mode, ship)
 		shipID := ship.ShipID
 		tier := shipInfo[shipID].Tier
-		sum += ship.Pvp.Battles * tier
-		battles += ship.Pvp.Battles
+		sum += values.Battles * tier
+		battles += values.Battles
 	}
 
 	if battles < 1 {
@@ -161,6 +164,7 @@ func (s *Stats) AvgTier(
 }
 
 func (s *Stats) UsingTierRate(
+	mode StatsMode,
 	accountID int,
 	shipInfo map[int]vo.Warship,
 	shipStats map[int]vo.WGShipsStats,
@@ -172,7 +176,8 @@ func (s *Stats) UsingTierRate(
 
 	playerShipStats := shipStats[accountID].Data[accountID]
 	for _, ship := range playerShipStats {
-		battles := ship.Pvp.Battles
+		values := statsValuesFrom(mode, ship)
+		battles := values.Battles
 		if battles == 0 {
 			continue
 		}
@@ -208,6 +213,7 @@ func (s *Stats) UsingTierRate(
 }
 
 func (s *Stats) UsingShipTypeRate(
+	mode StatsMode,
 	accountID int,
 	shipInfo map[int]vo.Warship,
 	shipStats map[int]vo.WGShipsStats,
@@ -216,7 +222,8 @@ func (s *Stats) UsingShipTypeRate(
 
 	playerShipStats := shipStats[accountID].Data[accountID]
 	for _, ship := range playerShipStats {
-		battles := ship.Pvp.Battles
+		values := statsValuesFrom(mode, ship)
+		battles := values.Battles
 		if battles == 0 {
 			continue
 		}
@@ -254,6 +261,21 @@ func (s *Stats) statsValues(mode StatsMode) vo.WGStatsValues {
 		return s.AccountInfo.Statistics.Pvp
 	case ModeOverallSolo:
 		return s.AccountInfo.Statistics.PvpSolo
+	}
+
+	return vo.WGStatsValues{}
+}
+
+func statsValuesFrom(mode StatsMode, s vo.WGShipsStatsData) vo.WGStatsValues {
+	switch mode {
+	case ModeShip:
+		return s.Pvp
+	case ModeShipSolo:
+		return s.PvpSolo
+	case ModeOverall:
+		return s.Pvp
+	case ModeOverallSolo:
+		return s.PvpSolo
 	}
 
 	return vo.WGStatsValues{}

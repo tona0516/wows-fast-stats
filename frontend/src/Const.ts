@@ -6,7 +6,9 @@ namespace Const {
   export const COLUMN_NAMES = {
     basic: { min: "基本情報", full: "基本情報" },
     ship_stats: { min: "艦", full: "艦成績" },
+    ship_stats_solo: { min: "艦", full: "艦成績" },
     overall_stats: { min: "総合", full: "総合成績" },
+    overall_stats_solo: { min: "総合", full: "総合成績" },
     is_in_avg: { min: "", full: "" },
     player_name: { min: "プレイヤー", full: "プレイヤー" },
     ship_info: { min: "艦", full: "艦情報" },

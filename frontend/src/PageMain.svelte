@@ -25,6 +25,8 @@ import type { DisplayPattern } from "./DisplayPattern";
 import ShipHitRate from "./ShipHitRate.svelte";
 import { storedBattle, storedSummaryResult, storedUserConfig } from "./stores";
 import { get } from "svelte/store";
+import type { StatsCategory } from "./StatsCategory";
+import { LogDebug } from "../wailsjs/runtime/runtime";
 
 let battle = get(storedBattle);
 storedBattle.subscribe((it) => (battle = it));
@@ -33,10 +35,12 @@ let userConfig = get(storedUserConfig);
 storedUserConfig.subscribe((it) => (userConfig = it));
 
 let summaryResult = get(storedSummaryResult);
-storedSummaryResult.subscribe((it) => (summaryResult = it));
+storedSummaryResult.subscribe((it) => {
+  summaryResult = it;
+});
 
 type ComponentInfo = {
-  category: "basic" | "ship" | "overall";
+  category: StatsCategory;
   name: string;
   component: any;
   column: number;
@@ -107,21 +111,30 @@ const components: ComponentInfo[] = [
   },
 ];
 
-function decidePlayerDataPattern(player: vo.Player): DisplayPattern {
+function decidePlayerDataPattern(
+  player: vo.Player,
+  statsPattern: string
+): DisplayPattern {
   if (player.player_info.is_hidden) {
     return "private";
   }
 
-  if (player.player_info.id === 0 || player.overall_stats.battles == 0) {
+  const isNoOverallBattle =
+    (statsPattern === "pvp_all" && player.overall_stats.battles === 0) ||
+    (userConfig.stats_pattern === "pvp_solo" &&
+      player.overall_stats_solo.battles === 0);
+
+  if (player.player_info.id === 0 || isNoOverallBattle) {
     return "nodata";
   }
 
-  if (player.ship_stats.battles === 0) {
-    return "noshipstats";
-  }
+  const isNoShipBattle =
+    (statsPattern === "pvp_all" && player.ship_stats.battles === 0) ||
+    (userConfig.stats_pattern === "pvp_solo" &&
+      player.ship_stats_solo.battles === 0);
 
-  if (player.ship_stats.pr === -1) {
-    return "nopr";
+  if (isNoShipBattle) {
+    return "noshipstats";
   }
 
   return "full";
@@ -171,7 +184,10 @@ function decidePlayerDataPattern(player: vo.Player): DisplayPattern {
         </thead>
         <tbody>
           {#each team.players as player}
-            {@const displayPattern = decidePlayerDataPattern(player)}
+            {@const displayPattern = decidePlayerDataPattern(
+              player,
+              userConfig.stats_pattern
+            )}
             <tr>
               <!-- basics -->
               <BasicIsInAvg
@@ -183,7 +199,8 @@ function decidePlayerDataPattern(player: vo.Player): DisplayPattern {
                 <svelte:component
                   this="{c.component}"
                   player="{player}"
-                  config="{userConfig}"
+                  displayPattern="{displayPattern}"
+                  statsPattern="{userConfig.stats_pattern}"
                   on:UpdateAlertPlayer
                   on:RemoveAlertPlayer
                 />
@@ -202,6 +219,8 @@ function decidePlayerDataPattern(player: vo.Player): DisplayPattern {
                     this="{c.component}"
                     player="{player}"
                     displayPattern="{displayPattern}"
+                    statsPattern="{userConfig.stats_pattern}"
+                    statsCatetory="{c.category}"
                   />
                 {/if}
               {/each}

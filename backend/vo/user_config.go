@@ -35,11 +35,19 @@ type Displays struct {
 	Overall Overall `json:"overall"`
 }
 
+type StatsPattern string
+
+const (
+	StatsPatternPvPAll  = "pvp_all"
+	StatsPatternPvPSolo = "pvp_solo"
+)
+
 type UserConfig struct {
-	InstallPath       string   `json:"install_path"`
-	Appid             string   `json:"appid"`
-	FontSize          string   `json:"font_size"`
-	Displays          Displays `json:"displays"`
-	SaveScreenshot    bool     `json:"save_screenshot"`
-	SaveTempArenaInfo bool     `json:"save_temp_arena_info"`
+	InstallPath       string       `json:"install_path"`
+	Appid             string       `json:"appid"`
+	FontSize          string       `json:"font_size"`
+	Displays          Displays     `json:"displays"`
+	SaveScreenshot    bool         `json:"save_screenshot"`
+	SaveTempArenaInfo bool         `json:"save_temp_arena_info"`
+	StatsPattern      StatsPattern `json:"stats_pattern"`
 }
