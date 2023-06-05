@@ -2,35 +2,48 @@
 import { createEventDispatcher } from "svelte";
 import { WindowReloadApp } from "../wailsjs/runtime/runtime";
 import type { Page } from "./Page";
-import type { vo } from "wailsjs/go/models";
 import { Screenshot } from "./Screenshot";
 import { LogError } from "../wailsjs/go/main/App";
+import { get } from "svelte/store";
+import {
+  storedBattle,
+  storedCurrentPage,
+  storedIsFirstScreenshot,
+  storedUserConfig,
+} from "./stores";
 
 const dispatch = createEventDispatcher();
 
 type Func = "reload" | "screenshot";
 type NavigationMenu = Page | Func;
 
-export let config: vo.UserConfig;
-export let currentPage: Page = "main";
-export let battle: vo.Battle;
-export let isFirstScreenshot: boolean = true;
+let battle = get(storedBattle);
+storedBattle.subscribe((it) => (battle = it));
+
+let currentPage = get(storedCurrentPage);
+storedCurrentPage.subscribe((it) => (currentPage = it));
+
+let isFirstScreenshot = get(storedIsFirstScreenshot);
+storedIsFirstScreenshot.subscribe((it) => (isFirstScreenshot = it));
+
+let userConfig = get(storedUserConfig);
+storedUserConfig.subscribe((it) => (userConfig = it));
 
 let isLoadingScreenshot: boolean = false;
 
 function onClickMenu(menu: NavigationMenu) {
   switch (menu) {
     case "main":
-      currentPage = "main";
+      storedCurrentPage.set("main");
       break;
     case "config":
-      currentPage = "config";
+      storedCurrentPage.set("config");
       break;
     case "appinfo":
-      currentPage = "appinfo";
+      storedCurrentPage.set("appinfo");
       break;
     case "alert_player":
-      currentPage = "alert_player";
+      storedCurrentPage.set("alert_player");
       break;
     case "reload":
       WindowReloadApp();
@@ -54,7 +67,7 @@ function onClickMenu(menu: NavigationMenu) {
           dispatch("onScreenshotFailure", { message: error });
         })
         .finally(() => {
-          isFirstScreenshot = false;
+          storedIsFirstScreenshot.set(false);
           isLoadingScreenshot = false;
         });
       break;
@@ -94,7 +107,7 @@ const funcs: { title: string; name: Func; iconClass: string }[] = [
       aria-controls="navbarNavAltMarkup"
       aria-expanded="false"
       aria-label="Toggle navigation"
-      style="font-size: {config?.font_size || 'medium'};"
+      style="font-size: {userConfig.font_size};"
     >
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -106,7 +119,7 @@ const funcs: { title: string; name: Func; iconClass: string }[] = [
             class="btn btn-sm btn-outline-secondary m-1 {currentPage ===
               page.name && 'active'}"
             title="{page.title}"
-            style="font-size: {config?.font_size || 'medium'};"
+            style="font-size: {userConfig.font_size};"
             on:click="{() => onClickMenu(page.name)}"
           >
             <i class="{page.iconClass}"></i>
@@ -121,7 +134,7 @@ const funcs: { title: string; name: Func; iconClass: string }[] = [
               title="{func.title}"
               disabled="{func.name === 'screenshot' &&
                 (battle === undefined || isLoadingScreenshot)}"
-              style="font-size: {config?.font_size || 'medium'};"
+              style="font-size: {userConfig.font_size};"
               on:click="{() => onClickMenu(func.name)}"
             >
               {#if func.name === "screenshot" && isLoadingScreenshot}

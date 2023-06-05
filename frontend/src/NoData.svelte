@@ -1,5 +1,6 @@
 <script lang="ts">
 import type { DisplayPattern } from "./DisplayPattern";
+
 export let shipColspan: number;
 export let overallColspan: number;
 export let displayPattern: DisplayPattern;

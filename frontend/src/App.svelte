@@ -12,73 +12,83 @@ import ConfigPage from "./PageConfig.svelte";
 import MainPage from "./PageMain.svelte";
 import { EventsOn, LogDebug } from "../wailsjs/runtime/runtime.js";
 import AppInfo from "./PageAppInfo.svelte";
-import { alertPlayers } from "./stores.js";
 
 import "bootstrap-icons/font/bootstrap-icons.css";
-import type { vo } from "wailsjs/go/models.js";
-import { Summary, type SummaryResult } from "./Summary.js";
+import { Summary } from "./Summary.js";
 import Navigation from "./Navigation.svelte";
-import type { Page } from "./Page.js";
 import { Screenshot } from "./Screenshot.js";
 import AlertPlayer from "./PageAlertPlayer.svelte";
 import AddAlertPlayerModal from "./AddAlertPlayerModal.svelte";
 import RemoveAlertPlayerModal from "./RemoveAlertPlayerModal.svelte";
 import UpdateAlertPlayerModal from "./UpdateAlertPlayerModal.svelte";
+import { get } from "svelte/store";
+import {
+  storedAlertPlayers,
+  storedBattle,
+  storedCurrentPage,
+  storedExcludePlayerIDs,
+  storedIsFirstScreenshot,
+  storedSummaryResult,
+  storedUserConfig,
+} from "./stores.js";
+import type { vo } from "wailsjs/go/models.js";
 
-let currentPage: Page;
-let battle: vo.Battle;
-let config: vo.UserConfig;
-let summaryResult: SummaryResult;
-let excludePlayerIDs: number[];
 let notification: Notification;
-let isFirstScreenshot: boolean;
-
 let addAlertPlayerModal: AddAlertPlayerModal;
 let updateAlertPlayerModal: UpdateAlertPlayerModal;
 let removeAlertPlayerModal: RemoveAlertPlayerModal;
 
+let battle = get(storedBattle);
+storedBattle.subscribe((it) => (battle = it));
+
+let userConfig = get(storedUserConfig);
+storedUserConfig.subscribe((it) => (userConfig = it));
+
+let isFirstScreenshot = get(storedIsFirstScreenshot);
+storedIsFirstScreenshot.subscribe((it) => (isFirstScreenshot = it));
+
+let currentPage = get(storedCurrentPage);
+storedCurrentPage.subscribe((it) => (currentPage = it));
+
 EventsOn("BATTLE_START", async () => {
   LogDebug("BATTLE_START");
+
   try {
     notification.removeToastWithKey("not_in_battle");
     notification.showToastWithKey("戦闘データの取得中...", "info", "battle");
 
     const start = new Date().getTime();
 
-    battle = await Battle();
-    excludePlayerIDs = await ExcludePlayerIDs();
-    const summary = new Summary(battle);
-    summaryResult = summary.calc(excludePlayerIDs);
-    alertPlayers.set(await getAlertPlayers());
+    const battle = await Battle();
+    storedBattle.set(battle);
+    recalculate(battle);
 
     const elapsed = (new Date().getTime() - start) / 1000;
     notification.showToast(`データ取得完了: ${elapsed}秒`, "success");
     notification.removeToastWithKey("error");
-
-    if (config.save_screenshot) {
-      const screenshot = new Screenshot(battle, isFirstScreenshot);
-      screenshot
-        .auto()
-        .catch((error: Error) => {
-          notification.showToast(
-            "スクリーンショットの自動保存に失敗しました。",
-            "error"
-          );
-          LogError(error.name + "," + error.message + "," + error.stack);
-        })
-        .finally(() => {
-          isFirstScreenshot = false;
-        });
-    }
+    notification.removeToastWithKey("battle");
   } catch (error) {
     notification.showToastWithKey(error, "error", "error");
-  } finally {
-    notification.removeToastWithKey("battle");
+  }
+
+  if (userConfig.save_screenshot) {
+    try {
+      const screenshot = new Screenshot(battle, isFirstScreenshot);
+      screenshot.auto();
+      storedIsFirstScreenshot.set(false);
+    } catch (error) {
+      notification.showToast(
+        "スクリーンショットの自動保存に失敗しました。",
+        "error"
+      );
+      LogError(error.name + "," + error.message + "," + error.stack);
+    }
   }
 });
 
 EventsOn("BATTLE_END", () => {
   LogDebug("BATTLE_END");
+
   notification.showToastWithKey(
     "戦闘中ではありません。開始時に自動的にリロードします。",
     "info",
@@ -101,33 +111,50 @@ async function showRemoveAlertPlayerModal(event: CustomEvent<any>) {
 }
 
 async function onSuccessAlertPlayerModal() {
-  alertPlayers.set(await getAlertPlayers());
+  try {
+    const players = await AlertPlayers();
+    storedAlertPlayers.set(players);
+  } catch (error) {
+    notification.showToast(error, "error");
+  }
 }
 
 async function onFailureAlertPlayerModal(event: CustomEvent<any>) {
   notification.showToast(event.detail.message, "error");
 }
 
-async function getAlertPlayers(): Promise<vo.AlertPlayer[]> {
-  try {
-    return await AlertPlayers();
-  } catch (error) {
-    LogError(error);
-    return [];
-  }
+async function recalculate(battle: vo.Battle) {
+  const excludePlayerIDs = await ExcludePlayerIDs();
+  const summary = new Summary(battle);
+  const summaryResult = summary.calc(excludePlayerIDs);
+
+  storedExcludePlayerIDs.set(excludePlayerIDs);
+  storedSummaryResult.set(summaryResult);
 }
 
 async function main() {
-  alertPlayers.set(await getAlertPlayers());
+  try {
+    const players = await AlertPlayers();
+    storedAlertPlayers.set(players);
+  } catch (error) {
+    notification.showToast(error, "error");
+    return;
+  }
 
   try {
-    config = await UserConfig();
+    const config = await UserConfig();
+    storedUserConfig.set(config);
+
+    if (!config.appid) {
+      notification.showToastWithKey(
+        "未設定の状態のため開始できません。「設定」から入力してください。",
+        "info",
+        "need_config"
+      );
+      return;
+    }
   } catch (error) {
-    notification.showToastWithKey(
-      "未設定の状態のため開始できません。「設定」から入力してください。",
-      "info",
-      "need_config"
-    );
+    notification.showToast(error, "error");
     return;
   }
 
@@ -140,7 +167,7 @@ window.onload = function () {
 </script>
 
 <main>
-  <div style="font-size: {config?.font_size || 'medium'};">
+  <div style="font-size: {userConfig.font_size};">
     <AddAlertPlayerModal
       bind:this="{addAlertPlayerModal}"
       on:Success="{onSuccessAlertPlayerModal}"
@@ -160,10 +187,6 @@ window.onload = function () {
     />
 
     <Navigation
-      bind:config="{config}"
-      bind:currentPage="{currentPage}"
-      bind:battle="{battle}"
-      bind:isFirstScreenshot="{isFirstScreenshot}"
       on:onScreenshotSuccess="{(event) =>
         notification.showToast(event.detail.message, 'success')}"
       on:onScreenshotFailure="{(event) =>
@@ -173,27 +196,23 @@ window.onload = function () {
     {#if currentPage === "main"}
       <div id="mainpage">
         <MainPage
-          bind:config="{config}"
-          bind:battle="{battle}"
-          bind:summaryResult="{summaryResult}"
-          bind:excludePlayerIDs="{excludePlayerIDs}"
           on:UpdateAlertPlayer="{(event) => showUpdateAlertPlayerModal(event)}"
           on:RemoveAlertPlayer="{(event) => showRemoveAlertPlayerModal(event)}"
+          on:CheckPlayer="{() => recalculate(battle)}"
         />
       </div>
     {/if}
 
     {#if currentPage === "config"}
       <ConfigPage
-        bind:config="{config}"
-        on:onUpdateSuccess="{(event) => {
+        on:UpdateSuccess="{(event) => {
           notification.showToast(event.detail.message, 'success');
           notification.removeToastWithKey('need_config');
-          config = event.detail.config;
+          if (!battle) {
+            Ready();
+          }
         }}"
-        on:onUpdateFailure="{(event) =>
-          notification.showToast(event.detail.message, 'error')}"
-        on:onOpenDirectoryFailure="{(event) =>
+        on:Failure="{(event) =>
           notification.showToast(event.detail.message, 'error')}"
       />
     {/if}

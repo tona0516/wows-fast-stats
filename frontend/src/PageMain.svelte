@@ -21,15 +21,19 @@ import OverallTierRate from "./OverallTierRate.svelte";
 import OverallBattles from "./OverallBattles.svelte";
 import NoData from "./NoData.svelte";
 import BasicIsInAvg from "./BasicIsInAvg.svelte";
-import { Summary, type SummaryResult } from "./Summary";
-import { ExcludePlayerIDs } from "../wailsjs/go/main/App.js";
 import type { DisplayPattern } from "./DisplayPattern";
 import ShipHitRate from "./ShipHitRate.svelte";
+import { storedBattle, storedSummaryResult, storedUserConfig } from "./stores";
+import { get } from "svelte/store";
 
-export let battle: vo.Battle;
-export let config: vo.UserConfig;
-export let summaryResult: SummaryResult;
-export let excludePlayerIDs: number[] = [];
+let battle = get(storedBattle);
+storedBattle.subscribe((it) => (battle = it));
+
+let userConfig = get(storedUserConfig);
+storedUserConfig.subscribe((it) => (userConfig = it));
+
+let summaryResult = get(storedSummaryResult);
+storedSummaryResult.subscribe((it) => (summaryResult = it));
 
 type ComponentInfo = {
   category: "basic" | "ship" | "overall";
@@ -122,14 +126,6 @@ function decidePlayerDataPattern(player: vo.Player): DisplayPattern {
 
   return "full";
 }
-
-function onCheckPlayer() {
-  ExcludePlayerIDs().then((result) => {
-    excludePlayerIDs = result;
-    const summary = new Summary(battle);
-    summaryResult = summary.calc(result);
-  });
-}
 </script>
 
 {#if battle}
@@ -138,18 +134,19 @@ function onCheckPlayer() {
       {#each battle.teams as team}
         {@const basicColspan = components
           .filter(
-            (it) => it.category === "basic" && config.displays.basic[it.name]
+            (it) =>
+              it.category === "basic" && userConfig.displays.basic[it.name]
           )
           .reduce((a, it) => a + it.column, 1)}
         {@const shipColspan = components
           .filter(
-            (it) => it.category === "ship" && config.displays.ship[it.name]
+            (it) => it.category === "ship" && userConfig.displays.ship[it.name]
           )
           .reduce((a, it) => a + it.column, 0)}
         {@const overallColspan = components
           .filter(
             (it) =>
-              it.category === "overall" && config.displays.overall[it.name]
+              it.category === "overall" && userConfig.displays.overall[it.name]
           )
           .reduce((a, it) => a + it.column, 0)}
         <thead>
@@ -166,7 +163,7 @@ function onCheckPlayer() {
             <th></th>
 
             {#each components as c}
-              {#if config.displays[c.category][c.name] === true}
+              {#if userConfig.displays[c.category][c.name] === true}
                 <th colspan="{c.column}">{Const.COLUMN_NAMES[c.name].min}</th>
               {/if}
             {/each}
@@ -179,15 +176,14 @@ function onCheckPlayer() {
               <!-- basics -->
               <BasicIsInAvg
                 player="{player}"
-                excludePlayerIDs="{excludePlayerIDs}"
                 displayPattern="{displayPattern}"
-                on:onCheck="{onCheckPlayer}"
+                on:CheckPlayer
               />
               {#each components.filter((it) => it.category === "basic") as c}
                 <svelte:component
                   this="{c.component}"
                   player="{player}"
-                  config="{config}"
+                  config="{userConfig}"
                   on:UpdateAlertPlayer
                   on:RemoveAlertPlayer
                 />
@@ -201,7 +197,7 @@ function onCheckPlayer() {
 
               <!-- values -->
               {#each components.filter((it) => it.category === "ship" || it.category === "overall") as c}
-                {#if config.displays[c.category][c.name] === true}
+                {#if userConfig.displays[c.category][c.name] === true}
                   <svelte:component
                     this="{c.component}"
                     player="{player}"

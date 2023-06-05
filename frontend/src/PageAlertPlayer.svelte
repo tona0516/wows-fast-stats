@@ -1,19 +1,26 @@
 <script lang="ts">
 import { createEventDispatcher } from "svelte";
-import type { vo } from "wailsjs/go/models";
 import clone from "clone";
-import { alertPlayers } from "./stores.js";
+import { storedAlertPlayers } from "./stores.js";
+import { get } from "svelte/store";
 
 const dispatch = createEventDispatcher();
 
-let players: vo.AlertPlayer[];
-alertPlayers.subscribe((it) => (players = it));
+let alertPlayers = get(storedAlertPlayers);
+storedAlertPlayers.subscribe((it) => (alertPlayers = it));
 </script>
 
 <div class="mt-3 alert-player">
+  <div class="alert alert-primary form-style" role="alert">
+    <p>
+      <i class="bi bi-info-circle-fill"></i> プレイヤー検出機能(Beta)
+    </p>
+    ・リストに追加されたプレイヤーにアイコン表示<br />
+    ・マッチのプレイヤー名クリックからも追加・削除可能
+  </div>
   <!-- alert players -->
   <div class="m-2">
-    {#if players.length === 0}
+    {#if alertPlayers.length === 0}
       <p>プレイヤーリストがありません</p>
     {:else}
       <div class="d-flex flex-row centerize">
@@ -28,7 +35,7 @@ alertPlayers.subscribe((it) => (players = it));
             </tr>
           </thead>
           <tbody>
-            {#each players as player}
+            {#each alertPlayers as player}
               <tr>
                 <td>{player.name}</td>
                 <td><i class="bi {player.pattern}"></i></td>

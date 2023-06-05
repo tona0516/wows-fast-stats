@@ -5,10 +5,16 @@ import Const from "./Const";
 import { RankConverter } from "./RankConverter";
 import { createEventDispatcher } from "svelte";
 import clone from "clone";
-import { alertPlayers } from "./stores.js";
+import { storedAlertPlayers, storedUserConfig } from "./stores";
+import { get } from "svelte/store";
 
 export let player: vo.Player;
-export let config: vo.UserConfig;
+
+let alertPlayers = get(storedAlertPlayers);
+storedAlertPlayers.subscribe((it) => (alertPlayers = it));
+
+let userConfig = get(storedUserConfig);
+storedUserConfig.subscribe((it) => (userConfig = it));
 
 const dispatch = createEventDispatcher();
 
@@ -32,17 +38,9 @@ function playerURL(player: vo.Player): string {
   );
 }
 
-let alertPlayer: vo.AlertPlayer;
-alertPlayers.subscribe((it) => {
-  for (const p of it) {
-    if (player.player_info.id === p.account_id) {
-      alertPlayer = p;
-      return;
-    }
-  }
-  alertPlayer = undefined;
-});
-
+$: alertPlayer = alertPlayers.find(
+  (it) => it.account_id === player.player_info.id
+);
 $: color = RankConverter.fromPR(player.ship_stats.pr).toBgColorCode();
 </script>
 
@@ -71,7 +69,7 @@ $: color = RankConverter.fromPR(player.ship_stats.pr).toBgColorCode();
     <ul
       class="dropdown-menu"
       aria-labelledby="dropdownMenuLink"
-      style="font-size: {config?.font_size || 'medium'};"
+      style="font-size: {userConfig.font_size};"
     >
       {#if player.player_info.clan.id !== 0}
         <!-- svelte-ignore a11y-invalid-attribute -->

@@ -2,6 +2,7 @@
 import type { vo } from "wailsjs/go/models";
 import type { DisplayPattern } from "./DisplayPattern";
 import Const from "./Const";
+
 export let player: vo.Player;
 export let displayPattern: DisplayPattern;
 

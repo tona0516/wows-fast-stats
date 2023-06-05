@@ -8,6 +8,7 @@ import iconSS from "./assets/images/icon-ss.png";
 import iconNone from "./assets/images/icon-none.png";
 import { BrowserOpenURL } from "../wailsjs/runtime/runtime";
 import Const from "./Const";
+
 export let player: vo.Player;
 
 function tierString(value: number): string {

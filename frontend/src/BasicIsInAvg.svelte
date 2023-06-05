@@ -6,23 +6,27 @@ import {
 } from "../wailsjs/go/main/App.js";
 import { createEventDispatcher } from "svelte";
 import type { DisplayPattern } from "./DisplayPattern.js";
+import { storedExcludePlayerIDs } from "./stores.js";
+import { get } from "svelte/store";
 
 export let player: vo.Player;
-export let excludePlayerIDs: number[];
 export let displayPattern: DisplayPattern;
+
+let excludePlayerIDs = get(storedExcludePlayerIDs);
+storedExcludePlayerIDs.subscribe((it) => (excludePlayerIDs = it));
 
 $: isChecked = !excludePlayerIDs.includes(player.player_info.id);
 
 const dispatch = createEventDispatcher();
 
 async function onCheck(e: any) {
+  const accountID = player.player_info.id;
   if (e.target.checked) {
-    await RemoveExcludePlayerID(player.player_info.id);
-    dispatch("onCheck", null);
+    await RemoveExcludePlayerID(accountID);
   } else {
-    await AddExcludePlayerID(player.player_info.id);
-    dispatch("onCheck", null);
+    await AddExcludePlayerID(accountID);
   }
+  dispatch("CheckPlayer");
 }
 </script>
 

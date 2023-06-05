@@ -46,6 +46,9 @@ func (w *ReplayWatcher) Start(appCtx context.Context, ctx context.Context) {
 			if err != nil {
 				continue
 			}
+			if userConfig.Appid == "" {
+				continue
+			}
 
 			tempArenaInfo, err := w.taiRepo.Get(userConfig.InstallPath)
 			if err != nil {
