@@ -23,7 +23,6 @@ import { Screenshot } from "./Screenshot.js";
 import AlertPlayer from "./PageAlertPlayer.svelte";
 import AddAlertPlayerModal from "./AddAlertPlayerModal.svelte";
 import RemoveAlertPlayerModal from "./RemoveAlertPlayerModal.svelte";
-import type PageAlertPlayer from "./PageAlertPlayer.svelte";
 import UpdateAlertPlayerModal from "./UpdateAlertPlayerModal.svelte";
 
 let currentPage: Page;
@@ -33,7 +32,6 @@ let summaryResult: SummaryResult;
 let excludePlayerIDs: number[];
 let notification: Notification;
 let isFirstScreenshot: boolean;
-let pageAlertPlayer: PageAlertPlayer;
 
 let addAlertPlayerModal: AddAlertPlayerModal;
 let updateAlertPlayerModal: UpdateAlertPlayerModal;
@@ -206,7 +204,6 @@ window.onload = function () {
 
     {#if currentPage === "alert_player"}
       <AlertPlayer
-        bind:this="{pageAlertPlayer}"
         on:AddAlertPlayer="{(event) => showAddAlertPlayerModal(event)}"
         on:UpdateAlertPlayer="{(event) => showUpdateAlertPlayerModal(event)}"
         on:RemoveAlertPlayer="{(event) => showRemoveAlertPlayerModal(event)}"

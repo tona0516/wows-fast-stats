@@ -25,14 +25,11 @@ import { Summary, type SummaryResult } from "./Summary";
 import { ExcludePlayerIDs } from "../wailsjs/go/main/App.js";
 import type { DisplayPattern } from "./DisplayPattern";
 import ShipHitRate from "./ShipHitRate.svelte";
-import { createEventDispatcher } from "svelte";
 
 export let battle: vo.Battle;
 export let config: vo.UserConfig;
 export let summaryResult: SummaryResult;
 export let excludePlayerIDs: number[] = [];
-
-const dispatch = createEventDispatcher();
 
 type ComponentInfo = {
   category: "basic" | "ship" | "overall";

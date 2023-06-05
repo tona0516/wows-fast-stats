@@ -1,6 +1,5 @@
 <script lang="ts">
 import { createEventDispatcher } from "svelte";
-import { AlertPlayers } from "../wailsjs/go/main/App.js";
 import type { vo } from "wailsjs/go/models";
 import clone from "clone";
 import { alertPlayers } from "./stores.js";
