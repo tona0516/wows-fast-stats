@@ -1,5 +1,5 @@
 DIR := test_install_dir/replays/
-SEMVER := 0.4.3
+SEMVER := 0.5.0
 APP := wows-fast-stats
 EXE := $(APP)-$(SEMVER).exe
 ZIP := $(APP).zip
