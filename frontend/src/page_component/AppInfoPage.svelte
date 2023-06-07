@@ -1,11 +1,7 @@
 <script lang="ts">
-import { AppVersion } from "../wailsjs/go/main/App";
-import { BrowserOpenURL } from "../wailsjs/runtime/runtime";
-import iconApp from "./assets/images/appicon.png";
-import type { vo } from "wailsjs/go/models";
-
-let version: vo.Version = { semver: "", revision: "" };
-AppVersion().then((result) => (version = result));
+import { AppVersion } from "../../wailsjs/go/main/App";
+import { BrowserOpenURL } from "../../wailsjs/runtime/runtime";
+import iconApp from "../assets/images/appicon.png";
 </script>
 
 <div class="mt-3 appinfo">
@@ -14,9 +10,11 @@ AppVersion().then((result) => (version = result));
   <p>
     wows-fast-stats
     <br />
-    バージョン {version.semver}
-    <br />
-    リビジョン {version.revision}
+    {#await AppVersion() then version}
+      バージョン {version.semver}
+      <br />
+      リビジョン {version.revision}
+    {/await}
   </p>
   <p>
     <i class="bi bi-question-circle"></i>

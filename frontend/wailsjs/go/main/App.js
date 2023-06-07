@@ -34,6 +34,10 @@ export function ExcludePlayerIDs() {
   return window['go']['main']['App']['ExcludePlayerIDs']();
 }
 
+export function FontSizes() {
+  return window['go']['main']['App']['FontSizes']();
+}
+
 export function LogError(arg1) {
   return window['go']['main']['App']['LogError'](arg1);
 }
@@ -64,6 +68,10 @@ export function SearchPlayer(arg1) {
 
 export function SelectDirectory() {
   return window['go']['main']['App']['SelectDirectory']();
+}
+
+export function StatsPatterns() {
+  return window['go']['main']['App']['StatsPatterns']();
 }
 
 export function UpdateAlertPlayer(arg1) {

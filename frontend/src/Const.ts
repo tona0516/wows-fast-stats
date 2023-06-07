@@ -1,14 +1,15 @@
-import type { vo } from "wailsjs/go/models";
+import type { vo } from "../wailsjs/go/models";
+import { Func, Page } from "./enums";
 
-namespace Const {
+export namespace Const {
   export const BASE_NUMBERS_URL = "https://asia.wows-numbers.com/";
 
   export const COLUMN_NAMES = {
+    // categoty
     basic: { min: "基本情報", full: "基本情報" },
-    ship_stats: { min: "艦", full: "艦成績" },
-    ship_stats_solo: { min: "艦", full: "艦成績" },
-    overall_stats: { min: "総合", full: "総合成績" },
-    overall_stats_solo: { min: "総合", full: "総合成績" },
+    ship: { min: "艦成績", full: "艦成績" },
+    overall: { min: "総合成績", full: "総合成績" },
+    // value
     is_in_avg: { min: "", full: "" },
     player_name: { min: "プレイヤー", full: "プレイヤー" },
     ship_info: { min: "艦", full: "艦情報" },
@@ -25,7 +26,7 @@ namespace Const {
     hit_rate: { min: "Hit率(主|魚)", full: "命中率" },
   };
 
-  export const DIGITS: { [key: string]: number } = {
+  export const DIGITS = {
     pr: 0,
     damage: 0,
     win_rate: 1,
@@ -35,8 +36,8 @@ namespace Const {
     exp: 0,
     battles: 0,
     avg_tier: 1,
-    ship_type_rate: 1,
-    tier_rate: 1,
+    using_ship_type_rate: 1,
+    using_tier_rate: 1,
   };
 
   export const TYPE_S_COLORS = {
@@ -68,7 +69,6 @@ namespace Const {
   };
 
   export const RANK_BG_COLORS = {
-    "": "#00000000",
     bad: "#a41200",
     belowAvg: "#a34a02",
     avg: "#a38204",
@@ -80,7 +80,6 @@ namespace Const {
   };
 
   export const RANK_TEXT_COLORS = {
-    "": "#00000000",
     bad: "#ff382d",
     belowAvg: "#fd9234",
     avg: "#ffd351",
@@ -99,6 +98,53 @@ namespace Const {
     pattern: "bi-check-circle-fill",
     message: "",
   };
-}
 
-export default Const;
+  export const PAGES: { title: string; name: Page; iconClass: string }[] = [
+    {
+      title: "ホーム",
+      name: Page.Main,
+      iconClass: "bi bi-house",
+    },
+    {
+      title: "設定",
+      name: Page.Config,
+      iconClass: "bi bi-gear",
+    },
+    {
+      title: "アプリ情報",
+      name: Page.AppInfo,
+      iconClass: "bi bi-info-circle",
+    },
+    {
+      title: "プレイヤーリスト",
+      name: Page.AlertPlayer,
+      iconClass: "bi bi-person-lines-fill",
+    },
+  ];
+
+  export const FUNCS: { title: string; name: Func; iconClass: string }[] = [
+    {
+      title: "リロード",
+      name: Func.Reload,
+      iconClass: "bi bi-arrow-clockwise",
+    },
+    {
+      title: "スクリーンショット",
+      name: Func.Screenshot,
+      iconClass: "bi bi-camera",
+    },
+  ];
+
+  export const FONT_SIZE = {
+    "x-small": "極小",
+    small: "小",
+    medium: "中",
+    large: "大",
+    "x-large": "極大",
+  };
+
+  export const STATS_PATTERN = {
+    pvp_solo: "ランダム戦(ソロ)",
+    pvp_all: "ランダム戦",
+  };
+}

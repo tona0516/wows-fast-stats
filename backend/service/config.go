@@ -73,8 +73,7 @@ func (c *Config) validate(config vo.UserConfig) error {
 
 	// Same value as "font-size": https://developer.mozilla.org/ja/docs/Web/CSS/font-size
 	var validFontSize bool
-	fontSizes := []string{"x-small", "small", "medium", "large", "x-large"}
-	for _, v := range fontSizes {
+	for _, v := range vo.FontSizes {
 		if v == config.FontSize {
 			validFontSize = true
 			break

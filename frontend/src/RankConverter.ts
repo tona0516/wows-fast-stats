@@ -1,98 +1,94 @@
-import Const from "./Const";
+import { Const } from "./Const";
+import { SkillLevel } from "./enums";
 
-type Rank =
-  | ""
-  | "bad"
-  | "belowAvg"
-  | "avg"
-  | "good"
-  | "veryGood"
-  | "great"
-  | "unicum"
-  | "superUnicum";
+const skillLevels = Object.values(SkillLevel);
 
-type Range = {
-  rank: Rank;
+interface Range {
+  skillLevel: SkillLevel;
   max: number;
-};
+}
 
-export class RankConverter {
-  rank: Rank;
+class Ranges {
+  values: Array<Range>;
 
-  private constructor(rank: Rank) {
-    this.rank = rank;
-  }
-
-  static fromPR(value: number): RankConverter {
-    const ranges: Range[] = [
-      { rank: "bad", max: 750 },
-      { rank: "belowAvg", max: 1100 },
-      { rank: "avg", max: 1350 },
-      { rank: "good", max: 1550 },
-      { rank: "veryGood", max: 1750 },
-      { rank: "great", max: 2100 },
-      { rank: "unicum", max: 2450 },
-      { rank: "superUnicum", max: Number.MAX_VALUE },
-    ];
-
-    for (const range of ranges) {
-      if (value > 0 && value < range.max) {
-        return new RankConverter(range.rank);
-      }
+  constructor(maxs: number[]) {
+    if (maxs.length !== skillLevels.length) {
+      throw Error("Lengths of maxs and skillLevels do not match");
     }
 
-    return new RankConverter("");
+    this.values = new Array(skillLevels.length);
+    for (let i = 0; i < this.values.length; i++) {
+      this.values[i] = { skillLevel: skillLevels[i], max: maxs[i] };
+    }
+  }
+}
+
+const prRange = new Ranges([
+  750,
+  1100,
+  1350,
+  1550,
+  1750,
+  2100,
+  2450,
+  Number.MAX_VALUE,
+]);
+
+const damageRatioRange = new Ranges([
+  0.6,
+  0.8,
+  1.0,
+  1.2,
+  1.4,
+  1.5,
+  1.6,
+  Number.MAX_VALUE,
+]);
+
+const winRateRange = new Ranges([47, 50, 52, 54, 56, 60, 65, Number.MAX_VALUE]);
+
+export class SkillLevelConverter {
+  skillLevel?: SkillLevel;
+
+  private constructor(skillLevel?: SkillLevel) {
+    this.skillLevel = skillLevel;
   }
 
-  static fromDamage(value: number, expected: number): RankConverter {
+  static fromPR(value: number): SkillLevelConverter {
+    const range = prRange.values.find((it) => value > 0 && value < it.max);
+    return range
+      ? new SkillLevelConverter(range.skillLevel)
+      : new SkillLevelConverter();
+  }
+
+  static fromDamage(value: number, expected: number): SkillLevelConverter {
     const ratio = value / expected ?? 0;
-
-    const ranges: Range[] = [
-      { rank: "bad", max: 0.6 },
-      { rank: "belowAvg", max: 0.8 },
-      { rank: "avg", max: 1.0 },
-      { rank: "good", max: 1.2 },
-      { rank: "veryGood", max: 1.4 },
-      { rank: "great", max: 1.5 },
-      { rank: "unicum", max: 1.6 },
-      { rank: "superUnicum", max: Number.MAX_VALUE },
-    ];
-
-    for (const range of ranges) {
-      if (ratio < range.max) {
-        return new RankConverter(range.rank);
-      }
-    }
-
-    return new RankConverter("");
+    const range = damageRatioRange.values.find((it) => ratio < it.max);
+    return range
+      ? new SkillLevelConverter(range.skillLevel)
+      : new SkillLevelConverter();
   }
 
-  static fromWinRate(value: number): RankConverter {
-    const ranges: Range[] = [
-      { rank: "bad", max: 47 },
-      { rank: "belowAvg", max: 50 },
-      { rank: "avg", max: 52 },
-      { rank: "good", max: 54 },
-      { rank: "veryGood", max: 56 },
-      { rank: "great", max: 60 },
-      { rank: "unicum", max: 65 },
-      { rank: "superUnicum", max: Number.MAX_VALUE },
-    ];
-
-    for (const range of ranges) {
-      if (value < range.max) {
-        return new RankConverter(range.rank);
-      }
-    }
-
-    return new RankConverter("");
+  static fromWinRate(value: number): SkillLevelConverter {
+    const range = winRateRange.values.find((it) => value < it.max);
+    return range
+      ? new SkillLevelConverter(range.skillLevel)
+      : new SkillLevelConverter();
   }
 
   toTextColorCode(): string {
-    return Const.RANK_TEXT_COLORS[this.rank];
+    if (this.skillLevel) {
+      return Const.RANK_TEXT_COLORS[this.skillLevel];
+    }
+
+    return "";
   }
 
   toBgColorCode(): string {
-    return Const.RANK_BG_COLORS[this.rank];
+    if (this.skillLevel) {
+      return Const.RANK_BG_COLORS[this.skillLevel];
+    }
+
+    return "";
   }
 }

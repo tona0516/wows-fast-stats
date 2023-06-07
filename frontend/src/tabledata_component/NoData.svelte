@@ -1,5 +1,5 @@
 <script lang="ts">
-import type { DisplayPattern } from "./DisplayPattern";
+import type { DisplayPattern } from "../enums";
 
 export let shipColspan: number;
 export let overallColspan: number;

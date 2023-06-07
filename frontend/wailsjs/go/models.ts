@@ -118,6 +118,90 @@ export namespace vo {
 		    return a;
 		}
 	}
+	export class ShipStats {
+	    battles: number;
+	    damage: number;
+	    win_rate: number;
+	    win_survived_rate: number;
+	    lose_survived_rate: number;
+	    kd_rate: number;
+	    exp: number;
+	    main_battery_hit_rate: number;
+	    torpedoes_hit_rate: number;
+	    pr: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new ShipStats(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.battles = source["battles"];
+	        this.damage = source["damage"];
+	        this.win_rate = source["win_rate"];
+	        this.win_survived_rate = source["win_survived_rate"];
+	        this.lose_survived_rate = source["lose_survived_rate"];
+	        this.kd_rate = source["kd_rate"];
+	        this.exp = source["exp"];
+	        this.main_battery_hit_rate = source["main_battery_hit_rate"];
+	        this.torpedoes_hit_rate = source["torpedoes_hit_rate"];
+	        this.pr = source["pr"];
+	    }
+	}
+	export class PlayerStats {
+	    ship: ShipStats;
+	    overall: OverallStats;
+	
+	    static createFrom(source: any = {}) {
+	        return new PlayerStats(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.ship = this.convertValues(source["ship"], ShipStats);
+	        this.overall = this.convertValues(source["overall"], OverallStats);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class ShipInfo {
+	    id: number;
+	    name: string;
+	    nation: string;
+	    tier: number;
+	    type: string;
+	    avg_damage: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new ShipInfo(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.id = source["id"];
+	        this.name = source["name"];
+	        this.nation = source["nation"];
+	        this.tier = source["tier"];
+	        this.type = source["type"];
+	        this.avg_damage = source["avg_damage"];
+	    }
+	}
 	export class Clan {
 	    tag: string;
 	    id: number;
@@ -168,65 +252,11 @@ export namespace vo {
 		    return a;
 		}
 	}
-	export class ShipStats {
-	    battles: number;
-	    damage: number;
-	    win_rate: number;
-	    win_survived_rate: number;
-	    lose_survived_rate: number;
-	    kd_rate: number;
-	    exp: number;
-	    main_battery_hit_rate: number;
-	    torpedoes_hit_rate: number;
-	    pr: number;
-	
-	    static createFrom(source: any = {}) {
-	        return new ShipStats(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.battles = source["battles"];
-	        this.damage = source["damage"];
-	        this.win_rate = source["win_rate"];
-	        this.win_survived_rate = source["win_survived_rate"];
-	        this.lose_survived_rate = source["lose_survived_rate"];
-	        this.kd_rate = source["kd_rate"];
-	        this.exp = source["exp"];
-	        this.main_battery_hit_rate = source["main_battery_hit_rate"];
-	        this.torpedoes_hit_rate = source["torpedoes_hit_rate"];
-	        this.pr = source["pr"];
-	    }
-	}
-	export class ShipInfo {
-	    id: number;
-	    name: string;
-	    nation: string;
-	    tier: number;
-	    type: string;
-	    avg_damage: number;
-	
-	    static createFrom(source: any = {}) {
-	        return new ShipInfo(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.id = source["id"];
-	        this.name = source["name"];
-	        this.nation = source["nation"];
-	        this.tier = source["tier"];
-	        this.type = source["type"];
-	        this.avg_damage = source["avg_damage"];
-	    }
-	}
 	export class Player {
-	    ship_info: ShipInfo;
-	    ship_stats: ShipStats;
-	    ship_stats_solo: ShipStats;
 	    player_info: PlayerInfo;
-	    overall_stats: OverallStats;
-	    overall_stats_solo: OverallStats;
+	    ship_info: ShipInfo;
+	    pvp_solo: PlayerStats;
+	    pvp_all: PlayerStats;
 	
 	    static createFrom(source: any = {}) {
 	        return new Player(source);
@@ -234,12 +264,10 @@ export namespace vo {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.ship_info = this.convertValues(source["ship_info"], ShipInfo);
-	        this.ship_stats = this.convertValues(source["ship_stats"], ShipStats);
-	        this.ship_stats_solo = this.convertValues(source["ship_stats_solo"], ShipStats);
 	        this.player_info = this.convertValues(source["player_info"], PlayerInfo);
-	        this.overall_stats = this.convertValues(source["overall_stats"], OverallStats);
-	        this.overall_stats_solo = this.convertValues(source["overall_stats_solo"], OverallStats);
+	        this.ship_info = this.convertValues(source["ship_info"], ShipInfo);
+	        this.pvp_solo = this.convertValues(source["pvp_solo"], PlayerStats);
+	        this.pvp_all = this.convertValues(source["pvp_all"], PlayerStats);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -431,6 +459,7 @@ export namespace vo {
 		    return a;
 		}
 	}
+	
 	
 	
 	

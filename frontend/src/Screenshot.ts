@@ -1,6 +1,6 @@
-import { ManualScreenshot, AutoScreenshot } from "../wailsjs/go/main/App";
-import type { vo } from "wailsjs/go/models";
 import * as htmlToImage from "html-to-image";
+import { AutoScreenshot, ManualScreenshot } from "../wailsjs/go/main/App";
+import type { vo } from "../wailsjs/go/models";
 
 export class Screenshot {
   isFirst: boolean;

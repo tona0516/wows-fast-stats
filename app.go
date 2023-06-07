@@ -198,3 +198,11 @@ func (a *App) LogError(err string) {
 	//nolint:goerr113
 	a.logger.Error("Error occurred in frontend.", fmt.Errorf("%s", err))
 }
+
+func (a *App) FontSizes() []string {
+	return vo.FontSizes
+}
+
+func (a *App) StatsPatterns() []string {
+	return vo.StatsPatterns
+}

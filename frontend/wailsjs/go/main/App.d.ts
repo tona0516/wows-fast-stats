@@ -18,6 +18,8 @@ export function Battle():Promise<vo.Battle>;
 
 export function ExcludePlayerIDs():Promise<Array<number>>;
 
+export function FontSizes():Promise<Array<string>>;
+
 export function LogError(arg1:string):Promise<void>;
 
 export function ManualScreenshot(arg1:string,arg2:string):Promise<void>;
@@ -33,6 +35,8 @@ export function RemoveExcludePlayerID(arg1:number):Promise<void>;
 export function SearchPlayer(arg1:string):Promise<vo.WGAccountList>;
 
 export function SelectDirectory():Promise<string>;
+
+export function StatsPatterns():Promise<Array<string>>;
 
 export function UpdateAlertPlayer(arg1:vo.AlertPlayer):Promise<void>;
 

@@ -1,7 +1,7 @@
 <script lang="ts">
 import { createEventDispatcher } from "svelte";
 import clone from "clone";
-import { storedAlertPlayers } from "./stores.js";
+import { storedAlertPlayers } from "../stores.js";
 import { get } from "svelte/store";
 
 const dispatch = createEventDispatcher();

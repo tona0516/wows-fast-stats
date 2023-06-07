@@ -35,13 +35,6 @@ type Displays struct {
 	Overall Overall `json:"overall"`
 }
 
-type StatsPattern string
-
-const (
-	StatsPatternPvPAll  = "pvp_all"
-	StatsPatternPvPSolo = "pvp_solo"
-)
-
 type UserConfig struct {
 	InstallPath       string       `json:"install_path"`
 	Appid             string       `json:"appid"`

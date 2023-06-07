@@ -1,38 +1,36 @@
 <script lang="ts">
+import { get } from "svelte/store";
+import AddAlertPlayerModal from "./other_component/AddAlertPlayerModal.svelte";
+import { Screenshot } from "./Screenshot";
 import {
-  UserConfig,
+  storedBattle,
+  storedUserConfig,
+  storedIsFirstScreenshot,
+  storedCurrentPage,
+  storedAlertPlayers,
+  storedExcludePlayerIDs,
+  storedSummaryResult,
+} from "./stores";
+import { summary } from "./util";
+import {
+  AlertPlayers,
   Battle,
   ExcludePlayerIDs,
-  Ready,
   LogError,
-  AlertPlayers,
-} from "../wailsjs/go/main/App.js";
-import Notification from "./Notification.svelte";
-import ConfigPage from "./PageConfig.svelte";
-import MainPage from "./PageMain.svelte";
-import { EventsOn, LogDebug } from "../wailsjs/runtime/runtime.js";
-import AppInfo from "./PageAppInfo.svelte";
-
-import "bootstrap-icons/font/bootstrap-icons.css";
-import Navigation from "./Navigation.svelte";
-import { Screenshot } from "./Screenshot.js";
-import AlertPlayer from "./PageAlertPlayer.svelte";
-import AddAlertPlayerModal from "./AddAlertPlayerModal.svelte";
-import RemoveAlertPlayerModal from "./RemoveAlertPlayerModal.svelte";
-import UpdateAlertPlayerModal from "./UpdateAlertPlayerModal.svelte";
-import { get } from "svelte/store";
-import {
-  storedAlertPlayers,
-  storedBattle,
-  storedCurrentPage,
-  storedExcludePlayerIDs,
-  storedIsFirstScreenshot,
-  storedSummaryResult,
-  storedUserConfig,
-} from "./stores.js";
-import type { vo } from "wailsjs/go/models.js";
-import { summary } from "./util.js";
-import type { StatsPattern } from "./StatsPattern.js";
+  Ready,
+  UserConfig,
+} from "../wailsjs/go/main/App";
+import { EventsOn, LogDebug } from "../wailsjs/runtime/runtime";
+import type { vo } from "../wailsjs/go/models";
+import MainPage from "./page_component/MainPage.svelte";
+import ConfigPage from "./page_component/ConfigPage.svelte";
+import AppInfoPage from "./page_component/AppInfoPage.svelte";
+import AlertPlayerPage from "./page_component/AlertPlayerPage.svelte";
+import UpdateAlertPlayerModal from "./other_component/UpdateAlertPlayerModal.svelte";
+import RemoveAlertPlayerModal from "./other_component/RemoveAlertPlayerModal.svelte";
+import Notification from "./other_component/Notification.svelte";
+import Navigation from "./other_component/Navigation.svelte";
+import { Page } from "./enums";
 
 let notification: Notification;
 let addAlertPlayerModal: AddAlertPlayerModal;
@@ -132,7 +130,7 @@ async function recalculate(battle: vo.Battle) {
   const summaryResult = summary(
     battle,
     excludePlayerIDs,
-    userConfig.stats_pattern as StatsPattern
+    userConfig.stats_pattern
   );
   storedSummaryResult.set(summaryResult);
 }
@@ -146,21 +144,22 @@ async function main() {
     return;
   }
 
+  let config: vo.UserConfig
   try {
-    const config = await UserConfig();
+    config = await UserConfig();
     storedUserConfig.set(config);
+  } catch (error) {
+    notification.showToast(error, "error");
+    return;
+  }
 
-    if (!config.appid) {
+  if (!config.appid) {
       notification.showToastWithKey(
         "未設定の状態のため開始できません。「設定」から入力してください。",
         "info",
         "need_config"
       );
       return;
-    }
-  } catch (error) {
-    notification.showToast(error, "error");
-    return;
   }
 
   Ready();
@@ -199,7 +198,7 @@ window.onload = function () {
       on:ChangeStatsPattern="{() => recalculate(battle)}"
     />
 
-    {#if currentPage === "main"}
+    {#if currentPage === Page.Main}
       <div id="mainpage">
         <MainPage
           on:UpdateAlertPlayer="{(event) => showUpdateAlertPlayerModal(event)}"
@@ -209,7 +208,7 @@ window.onload = function () {
       </div>
     {/if}
 
-    {#if currentPage === "config"}
+    {#if currentPage === Page.Config}
       <ConfigPage
         on:UpdateSuccess="{(event) => {
           notification.showToast(event.detail.message, 'success');
@@ -223,12 +222,12 @@ window.onload = function () {
       />
     {/if}
 
-    {#if currentPage === "appinfo"}
-      <AppInfo />
+    {#if currentPage === Page.AppInfo}
+      <AppInfoPage />
     {/if}
 
-    {#if currentPage === "alert_player"}
-      <AlertPlayer
+    {#if currentPage === Page.AlertPlayer}
+      <AlertPlayerPage
         on:AddAlertPlayer="{(event) => showAddAlertPlayerModal(event)}"
         on:UpdateAlertPlayer="{(event) => showUpdateAlertPlayerModal(event)}"
         on:RemoveAlertPlayer="{(event) => showRemoveAlertPlayerModal(event)}"

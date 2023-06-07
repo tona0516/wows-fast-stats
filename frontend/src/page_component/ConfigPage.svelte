@@ -1,15 +1,16 @@
 <script lang="ts">
+import clone from "clone";
+import { createEventDispatcher } from "svelte";
+import { get } from "svelte/store";
 import {
   ApplyUserConfig,
-  SelectDirectory,
+  FontSizes,
   OpenDirectory,
-} from "../wailsjs/go/main/App.js";
-import { createEventDispatcher } from "svelte";
-import Const from "./Const.js";
-import { BrowserOpenURL } from "../wailsjs/runtime/runtime.js";
-import clone from "clone";
-import { storedUserConfig } from "./stores.js";
-import { get } from "svelte/store";
+  SelectDirectory,
+} from "../../wailsjs/go/main/App";
+import { BrowserOpenURL } from "../../wailsjs/runtime/runtime";
+import { storedUserConfig } from "../stores";
+import { Const } from "../Const";
 
 const dispatch = createEventDispatcher();
 
@@ -124,11 +125,11 @@ function toggleAll(e: any) {
         style="font-size: {userConfig.font_size};"
         bind:value="{inputUserConfig.font_size}"
       >
-        <option value="x-small">極小</option>
-        <option value="small">小</option>
-        <option value="medium">中</option>
-        <option value="large">大</option>
-        <option value="x-large">極大</option>
+        {#await FontSizes() then fontSizes}
+          {#each fontSizes as fs}
+            <option value="{fs}">{Const.FONT_SIZE[fs]}</option>
+          {/each}
+        {/await}
       </select>
     </div>
 

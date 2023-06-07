@@ -1,6 +1,6 @@
 import { writable, type Writable } from "svelte/store";
-import type { vo } from "wailsjs/go/models";
-import type { Page } from "./Page";
+import type { vo } from "../wailsjs/go/models";
+import type { Page } from "./enums";
 import type { SummaryResult } from "./util";
 
 export const storedBattle = writable(undefined) as Writable<vo.Battle>;

@@ -296,6 +296,12 @@ func (b *Battle) compose(
 		}
 
 		player := vo.Player{
+			PlayerInfo: vo.PlayerInfo{
+				ID:       accountID,
+				Name:     nickname,
+				Clan:     clan,
+				IsHidden: stats.AccountInfo.HiddenProfile,
+			},
 			ShipInfo: vo.ShipInfo{
 				ID:        vehicle.ShipID,
 				Name:      warship.Name,
@@ -304,60 +310,8 @@ func (b *Battle) compose(
 				Type:      warship.Type,
 				AvgDamage: stats.Expected.AverageDamageDealt,
 			},
-			ShipStats: vo.ShipStats{
-				Battles:            stats.Battles(domain.ModeShip),
-				Damage:             stats.AvgDamage(domain.ModeShip),
-				WinRate:            stats.WinRate(domain.ModeShip),
-				WinSurvivedRate:    stats.WinSurvivedRate(domain.ModeShip),
-				LoseSurvivedRate:   stats.LoseSurvivedRate(domain.ModeShip),
-				KdRate:             stats.KdRate(domain.ModeShip),
-				Exp:                stats.AvgExp(domain.ModeShip),
-				MainBatteryHitRate: stats.MainBatteryHitRate(domain.ModeShip),
-				TorpedoesHitRate:   stats.TorpedoesHitRate(domain.ModeShip),
-				PR:                 stats.ShipPR(domain.ModeShip),
-			},
-			ShipStatsSolo: vo.ShipStats{
-				Battles:            stats.Battles(domain.ModeShipSolo),
-				Damage:             stats.AvgDamage(domain.ModeShipSolo),
-				WinRate:            stats.WinRate(domain.ModeShipSolo),
-				WinSurvivedRate:    stats.WinSurvivedRate(domain.ModeShipSolo),
-				LoseSurvivedRate:   stats.LoseSurvivedRate(domain.ModeShipSolo),
-				KdRate:             stats.KdRate(domain.ModeShipSolo),
-				Exp:                stats.AvgExp(domain.ModeShipSolo),
-				MainBatteryHitRate: stats.MainBatteryHitRate(domain.ModeShipSolo),
-				TorpedoesHitRate:   stats.TorpedoesHitRate(domain.ModeShipSolo),
-				PR:                 stats.ShipPR(domain.ModeShipSolo),
-			},
-			PlayerInfo: vo.PlayerInfo{
-				ID:       accountID,
-				Name:     nickname,
-				Clan:     clan,
-				IsHidden: stats.AccountInfo.HiddenProfile,
-			},
-			OverallStats: vo.OverallStats{
-				Battles:           stats.Battles(domain.ModeOverall),
-				Damage:            stats.AvgDamage(domain.ModeOverall),
-				WinRate:           stats.WinRate(domain.ModeOverall),
-				WinSurvivedRate:   stats.WinSurvivedRate(domain.ModeOverall),
-				LoseSurvivedRate:  stats.LoseSurvivedRate(domain.ModeOverall),
-				KdRate:            stats.KdRate(domain.ModeOverall),
-				Exp:               stats.AvgExp(domain.ModeOverall),
-				AvgTier:           stats.AvgTier(domain.ModeOverall, accountID, warships, shipStats),
-				UsingShipTypeRate: stats.UsingShipTypeRate(domain.ModeOverall, accountID, warships, shipStats),
-				UsingTierRate:     stats.UsingTierRate(domain.ModeOverall, accountID, warships, shipStats),
-			},
-			OverallStatsSolo: vo.OverallStats{
-				Battles:           stats.Battles(domain.ModeOverallSolo),
-				Damage:            stats.AvgDamage(domain.ModeOverallSolo),
-				WinRate:           stats.WinRate(domain.ModeOverallSolo),
-				WinSurvivedRate:   stats.WinSurvivedRate(domain.ModeOverallSolo),
-				LoseSurvivedRate:  stats.LoseSurvivedRate(domain.ModeOverallSolo),
-				KdRate:            stats.KdRate(domain.ModeOverallSolo),
-				Exp:               stats.AvgExp(domain.ModeOverallSolo),
-				AvgTier:           stats.AvgTier(domain.ModeOverallSolo, accountID, warships, shipStats),
-				UsingShipTypeRate: stats.UsingShipTypeRate(domain.ModeOverallSolo, accountID, warships, shipStats),
-				UsingTierRate:     stats.UsingTierRate(domain.ModeOverallSolo, accountID, warships, shipStats),
-			},
+			PvPSolo: playerStats(vo.StatsPatternPvPSolo, stats, accountID, warships, shipStats),
+			PvPAll:  playerStats(vo.StatsPatternPvPAll, stats, accountID, warships, shipStats),
 		}
 
 		if vehicle.Relation == 0 || vehicle.Relation == 1 {
@@ -392,4 +346,52 @@ func (b *Battle) compose(
 	}
 
 	return battle
+}
+
+func playerStats(
+	statsPattern vo.StatsPattern,
+	stats domain.Stats,
+	accountID int,
+	warships map[int]vo.Warship,
+	shipStats map[int]vo.WGShipsStats,
+) vo.PlayerStats {
+	var modeShip domain.StatsMode
+	var modeOverall domain.StatsMode
+
+	if statsPattern == vo.StatsPatternPvPSolo {
+		modeShip = domain.ModeShipSolo
+		modeOverall = domain.ModeOverallSolo
+	}
+
+	if statsPattern == vo.StatsPatternPvPAll {
+		modeShip = domain.ModeShip
+		modeOverall = domain.ModeOverall
+	}
+
+	return vo.PlayerStats{
+		ShipStats: vo.ShipStats{
+			Battles:            stats.Battles(modeShip),
+			Damage:             stats.AvgDamage(modeShip),
+			WinRate:            stats.WinRate(modeShip),
+			WinSurvivedRate:    stats.WinSurvivedRate(modeShip),
+			LoseSurvivedRate:   stats.LoseSurvivedRate(modeShip),
+			KdRate:             stats.KdRate(modeShip),
+			Exp:                stats.AvgExp(modeShip),
+			MainBatteryHitRate: stats.MainBatteryHitRate(modeShip),
+			TorpedoesHitRate:   stats.TorpedoesHitRate(modeShip),
+			PR:                 stats.ShipPR(modeShip),
+		},
+		OverallStats: vo.OverallStats{
+			Battles:           stats.Battles(modeOverall),
+			Damage:            stats.AvgDamage(modeOverall),
+			WinRate:           stats.WinRate(modeOverall),
+			WinSurvivedRate:   stats.WinSurvivedRate(modeOverall),
+			LoseSurvivedRate:  stats.LoseSurvivedRate(modeOverall),
+			KdRate:            stats.KdRate(modeOverall),
+			Exp:               stats.AvgExp(modeOverall),
+			AvgTier:           stats.AvgTier(modeOverall, accountID, warships, shipStats),
+			UsingShipTypeRate: stats.UsingShipTypeRate(modeOverall, accountID, warships, shipStats),
+			UsingTierRate:     stats.UsingTierRate(modeOverall, accountID, warships, shipStats),
+		},
+	}
 }

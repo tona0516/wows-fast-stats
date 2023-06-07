@@ -1,5 +1,12 @@
 package vo
 
+type PlayerInfo struct {
+	ID       int    `json:"id"`
+	Name     string `json:"name"`
+	Clan     Clan   `json:"clan"`
+	IsHidden bool   `json:"is_hidden"`
+}
+
 type ShipInfo struct {
 	ID        int      `json:"id"`
 	Name      string   `json:"name"`
@@ -7,6 +14,11 @@ type ShipInfo struct {
 	Tier      uint     `json:"tier"`
 	Type      ShipType `json:"type"`
 	AvgDamage float64  `json:"avg_damage"`
+}
+
+type PlayerStats struct {
+	ShipStats    ShipStats    `json:"ship"`
+	OverallStats OverallStats `json:"overall"`
 }
 
 type ShipStats struct {
@@ -20,13 +32,6 @@ type ShipStats struct {
 	MainBatteryHitRate float64 `json:"main_battery_hit_rate"`
 	TorpedoesHitRate   float64 `json:"torpedoes_hit_rate"`
 	PR                 float64 `json:"pr"`
-}
-
-type PlayerInfo struct {
-	ID       int    `json:"id"`
-	Name     string `json:"name"`
-	Clan     Clan   `json:"clan"`
-	IsHidden bool   `json:"is_hidden"`
 }
 
 type OverallStats struct {
@@ -43,10 +48,8 @@ type OverallStats struct {
 }
 
 type Player struct {
-	ShipInfo         ShipInfo     `json:"ship_info"`
-	ShipStats        ShipStats    `json:"ship_stats"`
-	ShipStatsSolo    ShipStats    `json:"ship_stats_solo"`
-	PlayerInfo       PlayerInfo   `json:"player_info"`
-	OverallStats     OverallStats `json:"overall_stats"`
-	OverallStatsSolo OverallStats `json:"overall_stats_solo"`
+	PlayerInfo PlayerInfo  `json:"player_info"`
+	ShipInfo   ShipInfo    `json:"ship_info"`
+	PvPSolo    PlayerStats `json:"pvp_solo"`
+	PvPAll     PlayerStats `json:"pvp_all"`
 }

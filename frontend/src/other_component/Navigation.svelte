@@ -1,22 +1,20 @@
 <script lang="ts">
+import clone from "clone";
 import { createEventDispatcher } from "svelte";
-import { WindowReloadApp } from "../wailsjs/runtime/runtime";
-import type { Page } from "./Page";
-import { Screenshot } from "./Screenshot";
-import { ApplyUserConfig, LogError } from "../wailsjs/go/main/App";
 import { get } from "svelte/store";
+import { ApplyUserConfig, StatsPatterns } from "../../wailsjs/go/main/App";
+import { WindowReloadApp, LogError } from "../../wailsjs/runtime/runtime";
+import { Screenshot } from "../Screenshot";
 import {
   storedBattle,
   storedCurrentPage,
   storedIsFirstScreenshot,
   storedUserConfig,
-} from "./stores";
-import clone from "clone";
+} from "../stores";
+import { Func, Page } from "../enums";
+import { Const } from "../Const";
 
 const dispatch = createEventDispatcher();
-
-type Func = "reload" | "screenshot";
-type NavigationMenu = Page | Func;
 
 let battle = get(storedBattle);
 storedBattle.subscribe((it) => (battle = it));
@@ -33,48 +31,45 @@ storedUserConfig.subscribe((it) => (userConfig = it));
 let isLoadingScreenshot: boolean = false;
 let selectedStatsPattern: string;
 
-function onClickMenu(menu: NavigationMenu) {
-  switch (menu) {
-    case "main":
-      storedCurrentPage.set("main");
-      break;
-    case "config":
-      storedCurrentPage.set("config");
-      break;
-    case "appinfo":
-      storedCurrentPage.set("appinfo");
-      break;
-    case "alert_player":
-      storedCurrentPage.set("alert_player");
-      break;
-    case "reload":
-      WindowReloadApp();
-      break;
-    case "screenshot":
-      isLoadingScreenshot = true;
-      const screenshot = new Screenshot(battle, isFirstScreenshot);
-      screenshot
-        .manual()
-        .then(() => {
-          dispatch("Success", {
-            message: "スクリーンショットを保存しました。",
-          });
-        })
-        .catch((error: Error) => {
-          if (error.message.includes("Canceled")) {
-            return;
-          }
+function onSwitchPage(page: Page) {
+  storedCurrentPage.set(page);
+}
 
-          LogError(error.name + "," + error.message + "," + error.stack);
-          dispatch("Failure", { message: error });
-        })
-        .finally(() => {
-          storedIsFirstScreenshot.set(false);
-          isLoadingScreenshot = false;
-        });
+async function onClickFunc(func: Func) {
+  switch (func) {
+    case Func.Reload:
+      reload();
+      break;
+    case Func.Screenshot:
+      await screenshot();
       break;
     default:
       break;
+  }
+}
+
+function reload() {
+  WindowReloadApp();
+}
+
+async function screenshot() {
+  try {
+    isLoadingScreenshot = true;
+    const screenshot = new Screenshot(battle, isFirstScreenshot);
+    await screenshot.manual();
+    dispatch("Success", {
+      message: "スクリーンショットを保存しました。",
+    });
+  } catch (error) {
+    if (error.message.includes("Canceled")) {
+      return;
+    }
+
+    LogError(error.name + "," + error.message + "," + error.stack);
+    dispatch("Failure", { message: error });
+  } finally {
+    storedIsFirstScreenshot.set(false);
+    isLoadingScreenshot = false;
   }
 }
 
@@ -92,32 +87,6 @@ async function onStatsPatternChanged() {
     return;
   }
 }
-
-const pages: { title: string; name: Page; iconClass: string }[] = [
-  { title: "ホーム", name: "main", iconClass: "bi bi-house" },
-  { title: "設定", name: "config", iconClass: "bi bi-gear" },
-  { title: "アプリ情報", name: "appinfo", iconClass: "bi bi-info-circle" },
-  {
-    title: "プレイヤーリスト",
-    name: "alert_player",
-    iconClass: "bi bi-person-lines-fill",
-  },
-];
-
-const funcs: { title: string; name: Func; iconClass: string }[] = [
-  { title: "リロード", name: "reload", iconClass: "bi bi-arrow-clockwise" },
-  {
-    title: "スクリーンショット",
-    name: "screenshot",
-    iconClass: "bi bi-camera",
-  },
-];
-
-// TODO get from backend
-const statsPattern: { titile: string; pattern: string }[] = [
-  { titile: "ランダム戦", pattern: "pvp_all" },
-  { titile: "ランダム戦(ソロ)", pattern: "pvp_solo" },
-];
 </script>
 
 <nav class="navbar navbar-expand-sm navbar-light bg-light">
@@ -136,31 +105,31 @@ const statsPattern: { titile: string; pattern: string }[] = [
     </button>
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
       <div class="navbar-nav">
-        {#each pages as page}
+        {#each Const.PAGES as page}
           <button
             type="button"
             class="btn btn-sm btn-outline-secondary m-1 {currentPage ===
               page.name && 'active'}"
             title="{page.title}"
             style="font-size: {userConfig.font_size};"
-            on:click="{() => onClickMenu(page.name)}"
+            on:click="{() => onSwitchPage(page.name)}"
           >
             <i class="{page.iconClass}"></i>
             {page.title}
           </button>
         {/each}
-        {#if currentPage == "main"}
-          {#each funcs as func}
+        {#if currentPage == Page.Main}
+          {#each Const.FUNCS as func}
             <button
               type="button"
               class="btn btn-sm btn-outline-success m-1"
               title="{func.title}"
-              disabled="{func.name === 'screenshot' &&
+              disabled="{func.name === Func.Screenshot &&
                 (battle === undefined || isLoadingScreenshot)}"
               style="font-size: {userConfig.font_size};"
-              on:click="{() => onClickMenu(func.name)}"
+              on:click="{() => onClickFunc(func.name)}"
             >
-              {#if func.name === "screenshot" && isLoadingScreenshot}
+              {#if func.name === Func.Screenshot && isLoadingScreenshot}
                 <span
                   class="spinner-border spinner-border-sm"
                   role="status"
@@ -178,13 +147,15 @@ const statsPattern: { titile: string; pattern: string }[] = [
             bind:value="{selectedStatsPattern}"
             on:change="{onStatsPatternChanged}"
           >
-            {#each statsPattern as sp}
-              {#if sp.pattern === userConfig.stats_pattern}
-                <option selected value="{sp.pattern}">{sp.titile}</option>
-              {:else}
-                <option value="{sp.pattern}">{sp.titile}</option>
-              {/if}
-            {/each}
+            {#await StatsPatterns() then statsPatterns}
+              {#each statsPatterns as sp}
+                {@const label = Const.STATS_PATTERN[sp]}
+                <option
+                  selected="{sp === userConfig.stats_pattern}"
+                  value="{sp}">{label}</option
+                >
+              {/each}
+            {/await}
           </select>
         {/if}
       </div>

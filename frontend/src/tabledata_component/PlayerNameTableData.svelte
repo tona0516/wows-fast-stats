@@ -1,19 +1,16 @@
 <script lang="ts">
-import type { vo } from "wailsjs/go/models";
-import { BrowserOpenURL } from "../wailsjs/runtime/runtime";
-import Const from "./Const";
-import { RankConverter } from "./RankConverter";
-import { createEventDispatcher } from "svelte";
 import clone from "clone";
-import { storedAlertPlayers, storedUserConfig } from "./stores";
+import { createEventDispatcher } from "svelte";
 import { get } from "svelte/store";
-import type { StatsPattern } from "./StatsPattern";
-import { values } from "./util";
-import type { DisplayPattern } from "./DisplayPattern";
+import type { vo } from "../../wailsjs/go/models";
+import { BrowserOpenURL } from "../../wailsjs/runtime/runtime";
+import { SkillLevelConverter } from "../RankConverter";
+import { storedAlertPlayers, storedUserConfig } from "../stores";
+import { clanURL, playerURL, values } from "../util";
+import { StatsCategory } from "../enums";
 
 export let player: vo.Player;
-export let displayPattern: DisplayPattern;
-export let statsPattern: StatsPattern;
+export let statsPattern: string;
 
 let alertPlayers = get(storedAlertPlayers);
 storedAlertPlayers.subscribe((it) => (alertPlayers = it));
@@ -23,36 +20,23 @@ storedUserConfig.subscribe((it) => (userConfig = it));
 
 const dispatch = createEventDispatcher();
 
-function clanURL(player: vo.Player): string {
-  return (
-    Const.BASE_NUMBERS_URL +
-    "clan/" +
-    player.player_info.clan.id +
-    "," +
-    player.player_info.clan.tag
-  );
-}
-
-function playerURL(player: vo.Player): string {
-  return (
-    Const.BASE_NUMBERS_URL +
-    "player/" +
-    player.player_info.id +
-    "," +
-    player.player_info.name
-  );
-}
-
 $: alertPlayer = alertPlayers.find(
   (it) => it.account_id === player.player_info.id
 );
-$: pr = values(player, displayPattern, statsPattern, "ship", "pr");
-$: color = RankConverter.fromPR(pr).toBgColorCode();
+$: pr = values(player, statsPattern, StatsCategory.Ship, "pr");
+$: color = SkillLevelConverter.fromPR(pr).toBgColorCode();
+$: playerLabel = isBelongToClan()
+  ? `[${player.player_info.clan.tag}] ${player.player_info.name}`
+  : player.player_info.name;
+
+function isBelongToClan(): boolean {
+  return player.player_info.clan.id !== 0;
+}
 </script>
 
 <td class="td-string omit" style="background-color: {color}">
   {#if player.player_info.id === 0}
-    {player.player_info.name}
+    {playerLabel}
   {:else}
     {#if alertPlayer}
       <i class="bi {alertPlayer.pattern}"></i>
@@ -65,11 +49,7 @@ $: color = RankConverter.fromPR(pr).toBgColorCode();
       id="dropdownMenuLink"
       data-bs-toggle="dropdown"
     >
-      {#if player.player_info.clan.id !== 0}
-        [{player.player_info.clan.tag}] {player.player_info.name}
-      {:else}
-        {player.player_info.name}
-      {/if}
+      {playerLabel}
     </a>
 
     <ul
@@ -77,7 +57,7 @@ $: color = RankConverter.fromPR(pr).toBgColorCode();
       aria-labelledby="dropdownMenuLink"
       style="font-size: {userConfig.font_size};"
     >
-      {#if player.player_info.clan.id !== 0}
+      {#if isBelongToClan()}
         <!-- svelte-ignore a11y-invalid-attribute -->
         <li>
           <a

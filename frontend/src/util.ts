@@ -1,48 +1,44 @@
-import type { vo } from "wailsjs/go/models";
-import type { DisplayPattern } from "./DisplayPattern";
-import type { StatsPattern } from "./StatsPattern";
-import Const from "./Const";
-import type { StatsCategory } from "./StatsCategory";
+import type { vo } from "../wailsjs/go/models";
+import { Const } from "./Const";
+import { DisplayPattern, StatsCategory } from "./enums";
+import { SkillLevelConverter } from "./RankConverter";
+
+export function colors(
+  key: string,
+  value: number,
+  player: vo.Player,
+  statsCategory: StatsCategory
+): string {
+  switch (key) {
+    case "pr":
+      return SkillLevelConverter.fromPR(value).toTextColorCode();
+    case "damage":
+      if (statsCategory === StatsCategory.Ship) {
+        return SkillLevelConverter.fromDamage(
+          value,
+          player.ship_info.avg_damage
+        ).toTextColorCode();
+      }
+      return "";
+    case "win_rate":
+      return SkillLevelConverter.fromWinRate(value).toTextColorCode();
+    default:
+      return "";
+  }
+}
 
 export function values(
   player: vo.Player,
-  displayPattern: DisplayPattern,
-  statsPattern: StatsPattern,
+  statsPattern: string,
   statsCategory: StatsCategory,
   key: string
 ): any {
-  if (statsCategory === "ship") {
-    if (displayPattern === "full") {
-      if (statsPattern === "pvp_solo") {
-        return player.ship_stats_solo[key];
-      }
-      if (statsPattern === "pvp_all") {
-        return player.ship_stats[key];
-      }
-    }
-
-    return undefined;
-  }
-
-  if (statsCategory === "overall") {
-    if (["full", "noshipstats"].includes(displayPattern)) {
-      if (statsPattern === "pvp_solo") {
-        return player.overall_stats_solo[key];
-      }
-      if (statsPattern === "pvp_all") {
-        return player.overall_stats[key];
-      }
-    }
-
-    return undefined;
-  }
-
-  return undefined;
+  return player[statsPattern][statsCategory][key];
 }
 
-export class SummaryResult {
-  shipStatsCount: number;
-  overallStatsCount: number;
+export interface SummaryResult {
+  shipColspan: number;
+  overallColspan: number;
   labels: string[];
   friends: string[];
   enemies: string[];
@@ -52,32 +48,41 @@ export class SummaryResult {
 export function summary(
   battle: vo.Battle,
   excludes: number[],
-  statsPattern: StatsPattern
+  statsPattern: string
 ): SummaryResult {
-  const filteredFriends = battle.teams[0].players.filter(
-    (it) => !excludes.includes(it.player_info.id)
-  );
-  const filteredEnemies = battle.teams[1].players.filter(
-    (it) => !excludes.includes(it.player_info.id)
-  );
-
-  const keys = [
-    { statsKey: toStatsKey("ship", statsPattern), valueKey: "pr" },
-    { statsKey: toStatsKey("ship", statsPattern), valueKey: "damage" },
-    { statsKey: toStatsKey("ship", statsPattern), valueKey: "win_rate" },
-    { statsKey: toStatsKey("ship", statsPattern), valueKey: "kd_rate" },
-    { statsKey: toStatsKey("overall", statsPattern), valueKey: "damage" },
-    { statsKey: toStatsKey("overall", statsPattern), valueKey: "win_rate" },
-    { statsKey: toStatsKey("overall", statsPattern), valueKey: "kd_rate" },
+  const items: { category: StatsCategory; key: string }[] = [
+    { category: StatsCategory.Ship, key: "pr" },
+    { category: StatsCategory.Ship, key: "damage" },
+    { category: StatsCategory.Ship, key: "win_rate" },
+    { category: StatsCategory.Ship, key: "kd_rate" },
+    { category: StatsCategory.Overall, key: "damage" },
+    { category: StatsCategory.Overall, key: "win_rate" },
+    { category: StatsCategory.Overall, key: "kd_rate" },
   ];
+
+  const [shipColspan, overallColspan] = ["ship", "overall"].map((category) => {
+    return items.filter((it) => it.category === category).length;
+  });
 
   const labels: string[] = [];
   const friends: string[] = [];
   const enemies: string[] = [];
   const diffs: { value: string; colorClass: string }[] = [];
-  keys.forEach((it) => {
-    const friendMean = mean(filteredFriends, it.statsKey, it.valueKey);
-    const enemyMean = mean(filteredEnemies, it.statsKey, it.valueKey);
+  items.forEach((it) => {
+    const [filteredFriends, filteredEnemies] = [0, 1].map((i) => {
+      return battle.teams[i].players.filter(
+        (p) =>
+          p.player_info.id !== 0 &&
+          !excludes.includes(p.player_info.id) &&
+          values(p, statsPattern, it.category, "battles") > 0
+      );
+    });
+
+    const [friendMean, enemyMean] = [filteredFriends, filteredEnemies].map(
+      (team) => {
+        return mean(team, it.category, statsPattern, it.key);
+      }
+    );
 
     const diff = friendMean - enemyMean;
     let sign = diff > 0 ? "+" : "";
@@ -88,9 +93,9 @@ export function summary(
       colorClass = "lower";
     }
 
-    const digit = Const.DIGITS[it.valueKey];
+    const digit = Const.DIGITS[it.key];
 
-    labels.push(Const.COLUMN_NAMES[it.valueKey].min);
+    labels.push(Const.COLUMN_NAMES[it.key].min);
     friends.push(friendMean.toFixed(digit));
     enemies.push(enemyMean.toFixed(digit));
     diffs.push({
@@ -100,9 +105,8 @@ export function summary(
   });
 
   return {
-    shipStatsCount: keys.filter((it) => it.statsKey.startsWith("ship")).length,
-    overallStatsCount: keys.filter((it) => it.statsKey.startsWith("overall"))
-      .length,
+    shipColspan: shipColspan,
+    overallColspan: overallColspan,
     labels: labels,
     friends: friends,
     enemies: enemies,
@@ -110,44 +114,91 @@ export function summary(
   };
 }
 
-// TODO Refactoring
-function toStatsKey(
-  statsCategory: StatsCategory,
-  statsPattern: StatsPattern
-): string {
-  if (statsCategory === "ship" && statsPattern === "pvp_all") {
-    return "ship_stats";
-  }
-  if (statsCategory === "ship" && statsPattern === "pvp_solo") {
-    return "ship_stats_solo";
-  }
-  if (statsCategory === "overall" && statsPattern === "pvp_all") {
-    return "overall_stats";
-  }
-  if (statsCategory === "overall" && statsPattern === "pvp_solo") {
-    return "overall_stats_solo";
+export function clanURL(player: vo.Player): string {
+  return (
+    Const.BASE_NUMBERS_URL +
+    "clan/" +
+    player.player_info.clan.id +
+    "," +
+    player.player_info.clan.tag
+  );
+}
+
+export function playerURL(player: vo.Player): string {
+  return (
+    Const.BASE_NUMBERS_URL +
+    "player/" +
+    player.player_info.id +
+    "," +
+    player.player_info.name
+  );
+}
+
+export function shipURL(player: vo.Player): string {
+  return (
+    Const.BASE_NUMBERS_URL +
+    "ship/" +
+    player.ship_info.id +
+    "," +
+    player.ship_info.name.replaceAll(" ", "-")
+  );
+}
+
+export function tierString(value: number): string {
+  if (value === 11) return "★";
+
+  const decimal = [10, 9, 5, 4, 1];
+  const romanNumeral = ["X", "IX", "V", "IV", "I"];
+
+  let romanized = "";
+
+  for (var i = 0; i < decimal.length; i++) {
+    while (decimal[i] <= value) {
+      romanized += romanNumeral[i];
+      value -= decimal[i];
+    }
   }
 
-  return undefined;
+  return romanized;
+}
+
+export function decideDisplayPattern(
+  player: vo.Player,
+  statsPattern: string
+): DisplayPattern {
+  if (player.player_info.is_hidden) {
+    return DisplayPattern.Private;
+  }
+
+  if (
+    player.player_info.id === 0 ||
+    player[statsPattern].overall.battles === 0
+  ) {
+    return DisplayPattern.NoData;
+  }
+
+  if (player[statsPattern].ship.battles === 0) {
+    return DisplayPattern.NoShipStats;
+  }
+
+  return DisplayPattern.Full;
 }
 
 function mean(
   players: vo.Player[],
-  statsKey: string,
-  valueKey: string
+  statsCategory: StatsCategory,
+  statsPattern: string,
+  key: string
 ): number {
   let values: number[] = [];
+
   // Note: PR is -1 when expected values can't retrieve.
-  if (valueKey == "pr") {
+  if (key == "pr") {
     values = players
-      .filter(
-        (it) => it[statsKey]["battles"] !== 0 && it[statsKey][valueKey] >= 0
-      )
-      .map((it) => it[statsKey][valueKey] as number);
+      .filter((it) => it[statsPattern][statsCategory][key] !== -1)
+      .map((it) => it[statsPattern][statsCategory][key]);
   } else {
-    values = players
-      .filter((it) => it[statsKey]["battles"] !== 0)
-      .map((it) => it[statsKey][valueKey] as number);
+    values = players.map((it) => it[statsPattern][statsCategory][key]);
   }
 
   if (values.length === 0) {
