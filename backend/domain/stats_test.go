@@ -47,8 +47,8 @@ func TestStats_AvgDamage_Overall(t *testing.T) {
 	stats := Stats{
 		AccountInfo: vo.WGAccountInfoData{
 			Statistics: struct {
-				Pvp     vo.WGStatsValues "json:\"pvp\""
-				PvpSolo vo.WGStatsValues "json:\"pvp_solo\""
+				Pvp     vo.WGStatsValues `json:"pvp"`
+				PvpSolo vo.WGStatsValues `json:"pvp_solo"`
 			}{
 				Pvp: vo.WGStatsValues{
 					Battles:     100,
@@ -67,8 +67,8 @@ func TestStats_AvgDamage_OverallSolo(t *testing.T) {
 	stats := Stats{
 		AccountInfo: vo.WGAccountInfoData{
 			Statistics: struct {
-				Pvp     vo.WGStatsValues "json:\"pvp\""
-				PvpSolo vo.WGStatsValues "json:\"pvp_solo\""
+				Pvp     vo.WGStatsValues `json:"pvp"`
+				PvpSolo vo.WGStatsValues `json:"pvp_solo"`
 			}{
 				PvpSolo: vo.WGStatsValues{
 					Battles:     100,
@@ -117,8 +117,8 @@ func TestStats_Battles(t *testing.T) {
 	stats := Stats{
 		AccountInfo: vo.WGAccountInfoData{
 			Statistics: struct {
-				Pvp     vo.WGStatsValues "json:\"pvp\""
-				PvpSolo vo.WGStatsValues "json:\"pvp_solo\""
+				Pvp     vo.WGStatsValues `json:"pvp"`
+				PvpSolo vo.WGStatsValues `json:"pvp_solo"`
 			}{
 				Pvp: vo.WGStatsValues{
 					Battles: 100,
@@ -136,8 +136,8 @@ func TestStats_KdRate(t *testing.T) {
 	stats := Stats{
 		AccountInfo: vo.WGAccountInfoData{
 			Statistics: struct {
-				Pvp     vo.WGStatsValues "json:\"pvp\""
-				PvpSolo vo.WGStatsValues "json:\"pvp_solo\""
+				Pvp     vo.WGStatsValues `json:"pvp"`
+				PvpSolo vo.WGStatsValues `json:"pvp_solo"`
 			}{
 				Pvp: vo.WGStatsValues{
 					Battles:         100,
@@ -157,8 +157,8 @@ func TestStats_AvgExp(t *testing.T) {
 	stats := Stats{
 		AccountInfo: vo.WGAccountInfoData{
 			Statistics: struct {
-				Pvp     vo.WGStatsValues "json:\"pvp\""
-				PvpSolo vo.WGStatsValues "json:\"pvp_solo\""
+				Pvp     vo.WGStatsValues `json:"pvp"`
+				PvpSolo vo.WGStatsValues `json:"pvp_solo"`
 			}{
 				Pvp: vo.WGStatsValues{
 					Battles: 100,
@@ -177,8 +177,8 @@ func TestStats_WinRate(t *testing.T) {
 	stats := Stats{
 		AccountInfo: vo.WGAccountInfoData{
 			Statistics: struct {
-				Pvp     vo.WGStatsValues "json:\"pvp\""
-				PvpSolo vo.WGStatsValues "json:\"pvp_solo\""
+				Pvp     vo.WGStatsValues `json:"pvp"`
+				PvpSolo vo.WGStatsValues `json:"pvp_solo"`
 			}{
 				Pvp: vo.WGStatsValues{
 					Battles: 100,
@@ -197,8 +197,8 @@ func TestStats_WinSurvivedRate(t *testing.T) {
 	stats := Stats{
 		AccountInfo: vo.WGAccountInfoData{
 			Statistics: struct {
-				Pvp     vo.WGStatsValues "json:\"pvp\""
-				PvpSolo vo.WGStatsValues "json:\"pvp_solo\""
+				Pvp     vo.WGStatsValues `json:"pvp"`
+				PvpSolo vo.WGStatsValues `json:"pvp_solo"`
 			}{
 				Pvp: vo.WGStatsValues{
 					Wins:         100,
@@ -217,8 +217,8 @@ func TestStats_LoseSurvivedRate(t *testing.T) {
 	stats := Stats{
 		AccountInfo: vo.WGAccountInfoData{
 			Statistics: struct {
-				Pvp     vo.WGStatsValues "json:\"pvp\""
-				PvpSolo vo.WGStatsValues "json:\"pvp_solo\""
+				Pvp     vo.WGStatsValues `json:"pvp"`
+				PvpSolo vo.WGStatsValues `json:"pvp_solo"`
 			}{
 				Pvp: vo.WGStatsValues{
 					Battles:         100,
@@ -240,8 +240,8 @@ func TestStats_MainBatteryHitRate(t *testing.T) {
 		ShipsStats: vo.WGShipsStatsData{
 			Pvp: vo.WGStatsValues{
 				MainBattery: struct {
-					Hits  uint "json:\"hits\""
-					Shots uint "json:\"shots\""
+					Hits  uint `json:"hits"`
+					Shots uint `json:"shots"`
 				}{
 					Hits:  100,
 					Shots: 200,
@@ -260,8 +260,8 @@ func TestStats_TorpedoesHitRate(t *testing.T) {
 		ShipsStats: vo.WGShipsStatsData{
 			Pvp: vo.WGStatsValues{
 				Torpedoes: struct {
-					Hits  uint "json:\"hits\""
-					Shots uint "json:\"shots\""
+					Hits  uint `json:"hits"`
+					Shots uint `json:"shots"`
 				}{
 					Hits:  10,
 					Shots: 40,

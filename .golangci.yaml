@@ -32,4 +32,6 @@ linters:
     - godox
     - asciicheck
     - interfacebloat
+    - depguard
+    - gosmopolitan
   fast: false

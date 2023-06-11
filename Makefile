@@ -18,7 +18,7 @@ check-prerequisite:
 .PHONY: setup
 setup: check-prerequisite
 	go install github.com/wailsapp/wails/v2/cmd/wails@latest
-	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.52.2
+	go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 
 .PHONY: build
 build: lint test
