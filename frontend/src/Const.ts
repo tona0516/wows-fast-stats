@@ -14,18 +14,18 @@ export namespace Const {
     player_name: { min: "プレイヤー", full: "プレイヤー" },
     ship_info: { min: "艦", full: "艦情報" },
     pr: { min: "PR", full: "Personal Rating" },
-    damage: { min: "Dmg", full: "ダメージ" },
+    damage: { min: "Dmg", full: "平均ダメージ" },
     win_rate: { min: "勝率", full: "勝率" },
     kd_rate: { min: "K/D", full: "K/D比" },
     kill: { min: "キル", full: "平均キル" },
     death: { min: "デス", full: "平均デス" },
-    survived_rate: { min: "生存率(勝|負)", full: "生存率" },
-    exp: { min: "Exp", full: "経験値" },
+    survived_rate: { min: "生存率(勝|負)", full: "生存率 (勝利|敗北)" },
+    exp: { min: "Exp", full: "平均取得経験値" },
     battles: { min: "戦闘数", full: "戦闘数" },
     avg_tier: { min: "平均T", full: "平均Tier" },
     using_ship_type_rate: { min: "艦割合", full: "艦種別プレイ割合" },
     using_tier_rate: { min: "T割合", full: "ティア別プレイ割合" },
-    hit_rate: { min: "Hit率(主|魚)", full: "命中率" },
+    hit_rate: { min: "Hit率(主|魚)", full: "命中率 (主砲|魚雷)" },
   };
 
   export const DIGITS = {
