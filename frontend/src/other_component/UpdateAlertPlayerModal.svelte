@@ -89,6 +89,6 @@ function validate(player: vo.AlertPlayer): boolean {
   </ModalBody>
   <ModalFooter style="background-color: #2d2c2c;">
     <Button color="secondary" on:click="{toggle}">キャンセル</Button>
-    <Button color="primary" on:click="{() => update(target)}">追加</Button>
+    <Button color="primary" on:click="{() => update(target)}">更新</Button>
   </ModalFooter>
 </Modal>

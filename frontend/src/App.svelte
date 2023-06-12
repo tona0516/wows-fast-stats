@@ -32,6 +32,8 @@ import Notification from "./other_component/Notification.svelte";
 import Navigation from "./other_component/Navigation.svelte";
 import { Page } from "./enums";
 
+import "bootstrap-icons/font/bootstrap-icons.css";
+
 let notification: Notification;
 let addAlertPlayerModal: AddAlertPlayerModal;
 let updateAlertPlayerModal: UpdateAlertPlayerModal;

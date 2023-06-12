@@ -1,13 +1,18 @@
 <script lang="ts">
 import { createEventDispatcher } from "svelte";
 import clone from "clone";
-import { storedAlertPlayers } from "../stores.js";
+import { storedAlertPlayers, storedUserConfig } from "../stores.js";
 import { get } from "svelte/store";
 
 const dispatch = createEventDispatcher();
 
 let alertPlayers = get(storedAlertPlayers);
 storedAlertPlayers.subscribe((it) => (alertPlayers = it));
+
+let userConfig = get(storedUserConfig);
+storedUserConfig.subscribe((it) => {
+  userConfig = it;
+});
 </script>
 
 <div class="mt-3 alert-player">
@@ -44,6 +49,7 @@ storedAlertPlayers.subscribe((it) => (alertPlayers = it));
                   <button
                     type="button"
                     class="my-1 btn btn-sm btn-success"
+                    style="font-size: {userConfig.font_size};"
                     on:click="{() => {
                       const target = clone(player);
                       dispatch('UpdateAlertPlayer', { target: target });
@@ -54,6 +60,7 @@ storedAlertPlayers.subscribe((it) => (alertPlayers = it));
                   <button
                     type="button"
                     class="my-1 btn btn-sm btn-danger"
+                    style="font-size: {userConfig.font_size};"
                     on:click="{() => {
                       const target = clone(player);
                       dispatch('RemoveAlertPlayer', { target: target });
@@ -72,6 +79,7 @@ storedAlertPlayers.subscribe((it) => (alertPlayers = it));
   <button
     type="button"
     class="btn btn-sm btn-primary"
+    style="font-size: {userConfig.font_size};"
     on:click="{() => dispatch('AddAlertPlayer')}"
   >
     追加
