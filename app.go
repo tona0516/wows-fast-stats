@@ -14,6 +14,8 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
+const PARALLELS = 5
+
 type App struct {
 	version             vo.Version
 	env                 vo.Env
@@ -49,7 +51,7 @@ func NewApp(
 }
 
 func (a *App) onStartup(ctx context.Context) {
-	a.logger.Info("start app.")
+	a.logger.Debug("start app.")
 	a.ctx = ctx
 
 	appConfig, err := a.configService.App()
@@ -63,7 +65,7 @@ func (a *App) onStartup(ctx context.Context) {
 }
 
 func (a *App) onShutdown(ctx context.Context) {
-	a.logger.Info("shutdown app.")
+	a.logger.Debug("shutdown app.")
 
 	appConfig, err := a.configService.App()
 	if err != nil {
