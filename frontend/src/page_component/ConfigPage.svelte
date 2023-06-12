@@ -127,7 +127,9 @@ function toggleAll(e: any) {
       >
         {#await FontSizes() then fontSizes}
           {#each fontSizes as fs}
-            <option value="{fs}">{Const.FONT_SIZE[fs]}</option>
+            <option selected="{fs === userConfig.font_size}" value="{fs}"
+              >{Const.FONT_SIZE[fs]}</option
+            >
           {/each}
         {/await}
       </select>
