@@ -151,6 +151,46 @@ func TestStats_KdRate(t *testing.T) {
 	assert.InDelta(t, 0.5, stats.KdRate(ModeOverall), 0.1)
 }
 
+func TestStats_AvgKill(t *testing.T) {
+	t.Parallel()
+
+	stats := Stats{
+		AccountInfo: vo.WGAccountInfoData{
+			Statistics: struct {
+				Pvp     vo.WGStatsValues `json:"pvp"`
+				PvpSolo vo.WGStatsValues `json:"pvp_solo"`
+			}{
+				Pvp: vo.WGStatsValues{
+					Battles: 100,
+					Frags:   30,
+				},
+			},
+		},
+	}
+
+	assert.InDelta(t, 0.3, stats.AvgKill(ModeOverall), 0.1)
+}
+
+func TestStats_AvgDeath(t *testing.T) {
+	t.Parallel()
+
+	stats := Stats{
+		AccountInfo: vo.WGAccountInfoData{
+			Statistics: struct {
+				Pvp     vo.WGStatsValues `json:"pvp"`
+				PvpSolo vo.WGStatsValues `json:"pvp_solo"`
+			}{
+				Pvp: vo.WGStatsValues{
+					Battles:         100,
+					SurvivedBattles: 30,
+				},
+			},
+		},
+	}
+
+	assert.InDelta(t, 0.7, stats.AvgDeath(ModeOverall), 0.1)
+}
+
 func TestStats_AvgExp(t *testing.T) {
 	t.Parallel()
 

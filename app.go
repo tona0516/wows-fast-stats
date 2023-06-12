@@ -14,8 +14,6 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
-const PARALLELS = 5
-
 type App struct {
 	version             vo.Version
 	env                 vo.Env

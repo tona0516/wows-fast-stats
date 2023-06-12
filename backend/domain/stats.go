@@ -31,7 +31,7 @@ func (s *Stats) ShipPR(mode StatsMode) float64 {
 	return rating.PersonalRating(
 		RatingFactor{
 			AvgDamage: avgDamage(values.DamageDealt, battles),
-			AvgFrags:  avgFrags(values.Frags, battles),
+			AvgFrags:  avgKill(values.Frags, battles),
 			WinRate:   winRate(values.Wins, battles),
 		},
 		RatingFactor{
@@ -57,15 +57,24 @@ func (s *Stats) AvgDamage(mode StatsMode) float64 {
 func (s *Stats) KdRate(mode StatsMode) float64 {
 	values := s.statsValues(mode)
 	frags := values.Frags
-	battles := values.Battles
-	survivedBattles := values.SurvivedBattles
 
-	death := battles - survivedBattles
+	death := values.Battles - values.SurvivedBattles
 	if death < 1 {
 		return float64(frags)
 	}
 
 	return float64(frags) / float64(death)
+}
+
+func (s *Stats) AvgKill(mode StatsMode) float64 {
+	values := s.statsValues(mode)
+	return avgKill(values.Frags, values.Battles)
+}
+
+func (s *Stats) AvgDeath(mode StatsMode) float64 {
+	values := s.statsValues(mode)
+	death := values.Battles - values.SurvivedBattles
+	return avgDeath(death, values.Battles)
 }
 
 func (s *Stats) AvgExp(mode StatsMode) float64 {
@@ -289,12 +298,20 @@ func avgDamage(damageDealt uint, battles uint) float64 {
 	return float64(damageDealt) / float64(battles)
 }
 
-func avgFrags(frags uint, battles uint) float64 {
+func avgKill(frags uint, battles uint) float64 {
 	if battles < 1 {
 		return 0
 	}
 
 	return float64(frags) / float64(battles)
+}
+
+func avgDeath(death uint, battles uint) float64 {
+	if battles < 1 {
+		return 0
+	}
+
+	return float64(death) / float64(battles)
 }
 
 func winRate(wins uint, battles uint) float64 {
