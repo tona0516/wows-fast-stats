@@ -55,7 +55,7 @@ export class SkillLevelConverter {
   }
 
   static fromPR(value: number): SkillLevelConverter {
-    const range = prRange.values.find((it) => value > 0 && value < it.max);
+    const range = prRange.values.find((it) => value >= 0 && value < it.max);
     return range
       ? new SkillLevelConverter(range.skillLevel)
       : new SkillLevelConverter();
