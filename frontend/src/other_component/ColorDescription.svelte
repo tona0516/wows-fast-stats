@@ -9,7 +9,7 @@ const prColors: {
   minDamage: number;
   maxDamage: number;
   minWin: number;
-  maxWin;
+  maxWin: number;
 }[] = [
   {
     label: "Bad",
@@ -131,6 +131,7 @@ const prColors: {
 
 <ul>
   <li>
+    <!-- svelte-ignore a11y-invalid-attribute -->
     <a
       class="td-link"
       href="#"
@@ -140,6 +141,7 @@ const prColors: {
     >
   </li>
   <li>
+    <!-- svelte-ignore a11y-invalid-attribute -->
     <a
       class="td-link"
       href="#"
