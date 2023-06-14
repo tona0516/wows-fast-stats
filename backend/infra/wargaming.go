@@ -9,11 +9,11 @@ import (
 
 	"github.com/cenkalti/backoff/v4"
 	"github.com/pkg/errors"
+	"golang.org/x/exp/slices"
 )
 
 type Wargaming struct {
-	config vo.WGConfig
-	AppID  string
+	AppID string
 
 	accountInfoClient      APIClientInterface[vo.WGAccountInfo]
 	accountListClient      APIClientInterface[vo.WGAccountList]
@@ -26,18 +26,17 @@ type Wargaming struct {
 	battleTypesClient      APIClientInterface[vo.WGBattleTypes]
 }
 
-func NewWargaming(config vo.WGConfig) *Wargaming {
+func NewWargaming(config vo.WGConfig, logger LoggerInterface) *Wargaming {
 	return &Wargaming{
-		config:                 config,
-		accountInfoClient:      NewAPIClient[vo.WGAccountInfo](config.BaseURL + "/wows/account/info/"),
-		accountListClient:      NewAPIClient[vo.WGAccountList](config.BaseURL + "/wows/account/list/"),
-		clansAccountInfoClient: NewAPIClient[vo.WGClansAccountInfo](config.BaseURL + "/wows/clans/accountinfo/"),
-		clansInfoClient:        NewAPIClient[vo.WGClansInfo](config.BaseURL + "/wows/clans/info/"),
-		shipsStatsClient:       NewAPIClient[vo.WGShipsStats](config.BaseURL + "/wows/ships/stats/"),
-		encycShipsClient:       NewAPIClient[vo.WGEncycShips](config.BaseURL + "/wows/encyclopedia/ships/"),
-		encycInfoClient:        NewAPIClient[vo.WGEncycInfo](config.BaseURL + "/wows/encyclopedia/info/"),
-		battleArenasClient:     NewAPIClient[vo.WGBattleArenas](config.BaseURL + "/wows/encyclopedia/battlearenas/"),
-		battleTypesClient:      NewAPIClient[vo.WGBattleTypes](config.BaseURL + "/wows/encyclopedia/battletypes/"),
+		accountInfoClient:      NewAPIClient[vo.WGAccountInfo](config.BaseURL+"/wows/account/info/", logger),
+		accountListClient:      NewAPIClient[vo.WGAccountList](config.BaseURL+"/wows/account/list/", logger),
+		clansAccountInfoClient: NewAPIClient[vo.WGClansAccountInfo](config.BaseURL+"/wows/clans/accountinfo/", logger),
+		clansInfoClient:        NewAPIClient[vo.WGClansInfo](config.BaseURL+"/wows/clans/info/", logger),
+		shipsStatsClient:       NewAPIClient[vo.WGShipsStats](config.BaseURL+"/wows/ships/stats/", logger),
+		encycShipsClient:       NewAPIClient[vo.WGEncycShips](config.BaseURL+"/wows/encyclopedia/ships/", logger),
+		encycInfoClient:        NewAPIClient[vo.WGEncycInfo](config.BaseURL+"/wows/encyclopedia/info/", logger),
+		battleArenasClient:     NewAPIClient[vo.WGBattleArenas](config.BaseURL+"/wows/encyclopedia/battlearenas/", logger),
+		battleTypesClient:      NewAPIClient[vo.WGBattleTypes](config.BaseURL+"/wows/encyclopedia/battletypes/", logger),
 	}
 }
 
@@ -195,7 +194,7 @@ func request[T vo.WGResponse](
 		// Note:
 		// https://developers.wargaming.net/documentation/guide/getting-started/#common-errors
 		message := res.GetError().Message
-		if message == "REQUEST_LIMIT_EXCEEDED" || message == "SOURCE_NOT_AVAILABLE" {
+		if slices.Contains([]string{"REQUEST_LIMIT_EXCEEDED", "SOURCE_NOT_AVAILABLE"}, message) {
 			//nolint:goerr113
 			return res, fmt.Errorf(message)
 		}

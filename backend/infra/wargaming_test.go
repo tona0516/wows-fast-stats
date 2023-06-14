@@ -12,7 +12,7 @@ import (
 func TestWargaming_AccountInfo(t *testing.T) {
 	t.Parallel()
 
-	wargaming := NewWargaming(vo.WGConfig{})
+	wargaming := NewWargaming(vo.WGConfig{}, &mockLogger{})
 	wargaming.SetAppID("your-app-id")
 
 	mockAPIClient := &mockAPIClient[vo.WGAccountInfo]{}
@@ -28,7 +28,7 @@ func TestWargaming_AccountInfo(t *testing.T) {
 func TestWargaming_AccountList(t *testing.T) {
 	t.Parallel()
 
-	wargaming := NewWargaming(vo.WGConfig{})
+	wargaming := NewWargaming(vo.WGConfig{}, &mockLogger{})
 	wargaming.SetAppID("your-app-id")
 
 	mockAPIClient := &mockAPIClient[vo.WGAccountList]{}
@@ -44,7 +44,7 @@ func TestWargaming_AccountList(t *testing.T) {
 func TestWargaming_ClansAccountInfo(t *testing.T) {
 	t.Parallel()
 
-	wargaming := NewWargaming(vo.WGConfig{})
+	wargaming := NewWargaming(vo.WGConfig{}, &mockLogger{})
 	wargaming.SetAppID("your-app-id")
 
 	mockAPIClient := &mockAPIClient[vo.WGClansAccountInfo]{}
@@ -60,7 +60,7 @@ func TestWargaming_ClansAccountInfo(t *testing.T) {
 func TestWargaming_ClansInfo(t *testing.T) {
 	t.Parallel()
 
-	wargaming := NewWargaming(vo.WGConfig{})
+	wargaming := NewWargaming(vo.WGConfig{}, &mockLogger{})
 	wargaming.SetAppID("your-app-id")
 
 	mockAPIClient := &mockAPIClient[vo.WGClansInfo]{}
@@ -76,7 +76,7 @@ func TestWargaming_ClansInfo(t *testing.T) {
 func TestWargaming_ShipsStats(t *testing.T) {
 	t.Parallel()
 
-	wargaming := NewWargaming(vo.WGConfig{})
+	wargaming := NewWargaming(vo.WGConfig{}, &mockLogger{})
 	wargaming.SetAppID("your-app-id")
 
 	mockAPIClient := &mockAPIClient[vo.WGShipsStats]{}
@@ -92,7 +92,7 @@ func TestWargaming_ShipsStats(t *testing.T) {
 func TestWargaming_EncycShips(t *testing.T) {
 	t.Parallel()
 
-	wargaming := NewWargaming(vo.WGConfig{})
+	wargaming := NewWargaming(vo.WGConfig{}, &mockLogger{})
 	wargaming.SetAppID("your-app-id")
 
 	mockAPIClient := &mockAPIClient[vo.WGEncycShips]{}
@@ -108,7 +108,7 @@ func TestWargaming_EncycShips(t *testing.T) {
 func TestWargaming_EncycInfo(t *testing.T) {
 	t.Parallel()
 
-	wargaming := NewWargaming(vo.WGConfig{})
+	wargaming := NewWargaming(vo.WGConfig{}, &mockLogger{})
 	wargaming.SetAppID("your-app-id")
 
 	mockAPIClient := &mockAPIClient[vo.WGEncycInfo]{}
@@ -124,7 +124,7 @@ func TestWargaming_EncycInfo(t *testing.T) {
 func TestWargaming_BattleArena(t *testing.T) {
 	t.Parallel()
 
-	wargaming := NewWargaming(vo.WGConfig{})
+	wargaming := NewWargaming(vo.WGConfig{}, &mockLogger{})
 	wargaming.SetAppID("your-app-id")
 
 	mockAPIClient := &mockAPIClient[vo.WGBattleArenas]{}
@@ -140,7 +140,7 @@ func TestWargaming_BattleArena(t *testing.T) {
 func TestWargaming_BattleTypes(t *testing.T) {
 	t.Parallel()
 
-	wargaming := NewWargaming(vo.WGConfig{})
+	wargaming := NewWargaming(vo.WGConfig{}, &mockLogger{})
 	wargaming.SetAppID("your-app-id")
 
 	mockAPIClient := &mockAPIClient[vo.WGBattleTypes]{}
@@ -156,7 +156,7 @@ func TestWargaming_BattleTypes(t *testing.T) {
 func TestWargaming_AccountInfo_異常系_リトライなし(t *testing.T) {
 	t.Parallel()
 
-	wargaming := NewWargaming(vo.WGConfig{})
+	wargaming := NewWargaming(vo.WGConfig{}, &mockLogger{})
 	wargaming.SetAppID("your-app-id")
 
 	mockAPIClient := &mockAPIClient[vo.WGAccountInfo]{}
@@ -178,7 +178,7 @@ func TestWargaming_AccountInfo_異常系_リトライなし(t *testing.T) {
 func TestWargaming_AccountInfo_正常系_最大リトライ(t *testing.T) {
 	t.Parallel()
 
-	wargaming := NewWargaming(vo.WGConfig{})
+	wargaming := NewWargaming(vo.WGConfig{}, &mockLogger{})
 	wargaming.SetAppID("your-app-id")
 
 	messages := []string{
@@ -208,7 +208,7 @@ func TestWargaming_AccountInfo_正常系_最大リトライ(t *testing.T) {
 func TestWargaming_AccountInfo_異常系_最大リトライ(t *testing.T) {
 	t.Parallel()
 
-	wargaming := NewWargaming(vo.WGConfig{})
+	wargaming := NewWargaming(vo.WGConfig{}, &mockLogger{})
 	wargaming.SetAppID("your-app-id")
 
 	messages := []string{

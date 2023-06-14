@@ -24,7 +24,7 @@ type App struct {
 	screenshotService   service.Screenshot
 	replayWatcher       service.ReplayWatcher
 	battleService       service.Battle
-	logger              infra.Logger
+	logger              infra.LoggerInterface
 	ctx                 context.Context
 	excludePlayer       mapset.Set[int]
 }
@@ -36,7 +36,7 @@ func NewApp(
 	screenshotService service.Screenshot,
 	replayWatcher service.ReplayWatcher,
 	battleService service.Battle,
-	logger infra.Logger,
+	logger infra.LoggerInterface,
 ) *App {
 	return &App{
 		env:               env,

@@ -55,15 +55,15 @@ func main() {
 
 func initApp() *App {
 	// infra
+	logger := infra.NewLogger(vo.Env{Str: env}, vo.Version{Semver: semver, Revision: revision})
 	wargamingRepo := infra.NewWargaming(vo.WGConfig{
 		BaseURL: "https://api.worldofwarships.asia",
-	})
+	}, logger)
 	numbersRepo := infra.NewNumbers("https://api.wows-numbers.com/personal/rating/expected/json/")
 	tempArenaInfoRepo := infra.NewTempArenaInfo()
 	configRepo := infra.NewConfig()
 	screenshotRepo := infra.NewScreenshot()
 	unregisteredRepo := infra.NewUnregistered()
-	logger := infra.NewLogger(vo.Env{Str: env}, vo.Version{Semver: semver, Revision: revision})
 
 	// service
 	var parallels uint = 5
@@ -79,7 +79,7 @@ func initApp() *App {
 		*screenshotService,
 		*replayWatcher,
 		*battleService,
-		*logger,
+		logger,
 	)
 }
 

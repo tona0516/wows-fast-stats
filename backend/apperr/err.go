@@ -65,6 +65,13 @@ type unreg struct {
 	Warship AppError
 }
 
+type ac struct {
+	Parse     AppError
+	Retry     AppError
+	Read      AppError
+	Unmarshal AppError
+}
+
 type srvcfg struct {
 	InvalidInstallPath AppError
 	InvalidAppID       AppError
@@ -134,6 +141,7 @@ var (
 	Ss      = newDetailStruct[ss]("I", 500)
 	Tai     = newDetailStruct[tai]("I", 600)
 	Unreg   = newDetailStruct[unreg]("I", 700)
+	Ac      = newDetailStruct[ac]("I", 800)
 	SrvCfg  = newDetailStruct[srvcfg]("S", 100)
 	SrvPrep = newDetailStruct[srvprep]("S", 200)
 	SrvRw   = newDetailStruct[srvrw]("S", 300)
