@@ -34,6 +34,15 @@ import { Page } from "./enums";
 
 import "bootstrap-icons/font/bootstrap-icons.css";
 
+const TOAST_NEED_CONFIG = "need_config";
+const TOAST_WAIT = "wait";
+const TOAST_FETCHING = "fetching";
+const TOAST_ERROR = "error";
+
+// Note: see replay_watcher.go
+const EVENT_BATTLE_START = "BATTLE_START"
+const EVENT_BATTLE_END = "BATTLE_END"
+
 let notification: Notification;
 let addAlertPlayerModal: AddAlertPlayerModal;
 let updateAlertPlayerModal: UpdateAlertPlayerModal;
@@ -51,25 +60,26 @@ storedIsFirstScreenshot.subscribe((it) => (isFirstScreenshot = it));
 let currentPage = get(storedCurrentPage);
 storedCurrentPage.subscribe((it) => (currentPage = it));
 
-EventsOn("BATTLE_START", async () => {
-  LogDebug("BATTLE_START");
+EventsOn(EVENT_BATTLE_START, async () => {
+  LogDebug(EVENT_BATTLE_START);
 
   try {
-    notification.removeToastWithKey("not_in_battle");
-    notification.showToastWithKey("戦闘データの取得中...", "info", "battle");
+    notification.removeToastWithKey(TOAST_WAIT);
+    notification.showToastWithKey("戦闘データの取得中...", "info", TOAST_FETCHING);
 
     const start = new Date().getTime();
 
     const battle = await Battle();
     storedBattle.set(battle);
-    recalculate(battle);
+    updateSummary(battle);
 
     const elapsed = (new Date().getTime() - start) / 1000;
     notification.showToast(`データ取得完了: ${elapsed}秒`, "success");
-    notification.removeToastWithKey("error");
-    notification.removeToastWithKey("battle");
+    notification.removeToastWithKey(TOAST_ERROR);
   } catch (error) {
-    notification.showToastWithKey(error, "error", "error");
+    notification.showToastWithKey(error, "error", TOAST_ERROR);
+  } finally {
+    notification.removeToastWithKey(TOAST_FETCHING);
   }
 
   if (userConfig.save_screenshot) {
@@ -87,13 +97,13 @@ EventsOn("BATTLE_START", async () => {
   }
 });
 
-EventsOn("BATTLE_END", () => {
-  LogDebug("BATTLE_END");
+EventsOn(EVENT_BATTLE_END, () => {
+  LogDebug(EVENT_BATTLE_END);
 
   notification.showToastWithKey(
     "戦闘中ではありません。開始時に自動的にリロードします。",
     "info",
-    "not_in_battle"
+    TOAST_WAIT
   );
 });
 
@@ -124,7 +134,7 @@ async function onFailureAlertPlayerModal(event: CustomEvent<any>) {
   notification.showToast(event.detail.message, "error");
 }
 
-async function recalculate(battle: vo.Battle) {
+async function updateSummary(battle: vo.Battle) {
   const excludePlayerIDs = await ExcludePlayerIDs();
   storedExcludePlayerIDs.set(excludePlayerIDs);
 
@@ -159,7 +169,7 @@ async function main() {
       notification.showToastWithKey(
         "未設定の状態のため開始できません。「設定」から入力してください。",
         "info",
-        "need_config"
+        TOAST_NEED_CONFIG
       );
       return;
   }
@@ -197,7 +207,7 @@ window.onload = function () {
         notification.showToast(event.detail.message, 'success')}"
       on:Failure="{(event) =>
         notification.showToast(event.detail.message, 'error')}"
-      on:ChangeStatsPattern="{() => recalculate(battle)}"
+      on:ChangeStatsPattern="{() => updateSummary(battle)}"
     />
 
     {#if currentPage === Page.Main}
@@ -205,7 +215,7 @@ window.onload = function () {
         <MainPage
           on:UpdateAlertPlayer="{(event) => showUpdateAlertPlayerModal(event)}"
           on:RemoveAlertPlayer="{(event) => showRemoveAlertPlayerModal(event)}"
-          on:CheckPlayer="{() => recalculate(battle)}"
+          on:CheckPlayer="{() => updateSummary(battle)}"
         />
       </div>
     {/if}
