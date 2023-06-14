@@ -26,6 +26,7 @@ export namespace Const {
     using_ship_type_rate: { min: "艦割合", full: "艦種別プレイ割合" },
     using_tier_rate: { min: "T割合", full: "ティア別プレイ割合" },
     hit_rate: { min: "Hit率(主|魚)", full: "命中率 (主砲|魚雷)" },
+    planes_killed: { min: "撃墜", full: "平均撃墜数" },
   };
 
   export const DIGITS = {
@@ -37,6 +38,7 @@ export namespace Const {
     death: 2,
     survived_rate: 1,
     hit_rate: 1,
+    planes_killed: 1,
     exp: 0,
     battles: 0,
     avg_tier: 2,

@@ -16,4 +16,5 @@ type WGStatsValues struct {
 		Hits  uint `json:"hits"`
 		Shots uint `json:"shots"`
 	} `json:"torpedoes"`
+	PlanesKilled uint `json:"planes_killed"`
 }

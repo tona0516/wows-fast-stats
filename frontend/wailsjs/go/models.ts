@@ -134,6 +134,7 @@ export namespace vo {
 	    exp: number;
 	    main_battery_hit_rate: number;
 	    torpedoes_hit_rate: number;
+	    planes_killed: number;
 	    pr: number;
 	
 	    static createFrom(source: any = {}) {
@@ -153,6 +154,7 @@ export namespace vo {
 	        this.exp = source["exp"];
 	        this.main_battery_hit_rate = source["main_battery_hit_rate"];
 	        this.torpedoes_hit_rate = source["torpedoes_hit_rate"];
+	        this.planes_killed = source["planes_killed"];
 	        this.pr = source["pr"];
 	    }
 	}
@@ -422,6 +424,7 @@ export namespace vo {
 	    battles: boolean;
 	    survived_rate: boolean;
 	    hit_rate: boolean;
+	    planes_killed: boolean;
 	
 	    static createFrom(source: any = {}) {
 	        return new Ship(source);
@@ -439,6 +442,7 @@ export namespace vo {
 	        this.battles = source["battles"];
 	        this.survived_rate = source["survived_rate"];
 	        this.hit_rate = source["hit_rate"];
+	        this.planes_killed = source["planes_killed"];
 	    }
 	}
 	export class Displays {

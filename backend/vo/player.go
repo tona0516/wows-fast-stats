@@ -33,6 +33,7 @@ type ShipStats struct {
 	Exp                float64 `json:"exp"`
 	MainBatteryHitRate float64 `json:"main_battery_hit_rate"`
 	TorpedoesHitRate   float64 `json:"torpedoes_hit_rate"`
+	PlanesKilled       float64 `json:"planes_killed"`
 	PR                 float64 `json:"pr"`
 }
 

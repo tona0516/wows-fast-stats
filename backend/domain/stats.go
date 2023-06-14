@@ -148,6 +148,18 @@ func (s *Stats) TorpedoesHitRate(mode StatsMode) float64 {
 	return float64(hits) / float64(shots) * 100
 }
 
+func (s *Stats) PlanesKilled(mode StatsMode) float64 {
+	values := s.statsValues(mode)
+	killed := values.PlanesKilled
+	battles := values.Battles
+
+	if battles < 1 {
+		return 0
+	}
+
+	return float64(killed) / float64(battles)
+}
+
 func (s *Stats) AvgTier(
 	mode StatsMode,
 	accountID int,

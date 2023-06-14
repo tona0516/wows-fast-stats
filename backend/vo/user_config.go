@@ -17,6 +17,7 @@ type Ship struct {
 	Battles      bool `json:"battles"`
 	SurvivedRate bool `json:"survived_rate"`
 	HitRate      bool `json:"hit_rate"`
+	PlanesKilled bool `json:"planes_killed"`
 }
 
 type Overall struct {

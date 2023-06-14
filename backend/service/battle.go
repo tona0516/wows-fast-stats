@@ -381,6 +381,7 @@ func playerStats(
 			Exp:                stats.AvgExp(modeShip),
 			MainBatteryHitRate: stats.MainBatteryHitRate(modeShip),
 			TorpedoesHitRate:   stats.TorpedoesHitRate(modeShip),
+			PlanesKilled:       stats.PlanesKilled(modeShip),
 			PR:                 stats.ShipPR(modeShip),
 		},
 		OverallStats: vo.OverallStats{

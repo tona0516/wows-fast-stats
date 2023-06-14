@@ -313,6 +313,21 @@ func TestStats_TorpedoesHitRate(t *testing.T) {
 	assert.InDelta(t, 25, stats.TorpedoesHitRate(ModeShip), 0.1)
 }
 
+func TestStats_PlanesKilled(t *testing.T) {
+	t.Parallel()
+
+	stats := Stats{
+		ShipsStats: vo.WGShipsStatsData{
+			Pvp: vo.WGStatsValues{
+				PlanesKilled: 334,
+				Battles:      10,
+			},
+		},
+	}
+
+	assert.InDelta(t, 33.4, stats.PlanesKilled(ModeShip), 0.1)
+}
+
 func TestStats_AvgTier(t *testing.T) {
 	t.Parallel()
 
