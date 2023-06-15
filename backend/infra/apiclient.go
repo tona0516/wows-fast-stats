@@ -1,12 +1,14 @@
 package infra
 
 import (
+	"bytes"
 	"changeme/backend/apperr"
 	"encoding/json"
-	"fmt"
 	"io"
+	"mime/multipart"
 	"net/http"
 	"net/url"
+	"os"
 
 	"unsafe"
 
@@ -16,28 +18,32 @@ import (
 
 type APIClient[T any] struct {
 	baseURL string
-	logger  LoggerInterface
+}
+
+type APIResponse[T any] struct {
+	StatusCode int
+	Body       T
+	BodyString string
+}
+
+type Form struct {
+	name    string
+	content string
+	isFile  bool
 }
 
 func NewAPIClient[T any](
 	baseURL string,
-	logger LoggerInterface,
 ) *APIClient[T] {
-	return &APIClient[T]{
-		baseURL: baseURL,
-		logger:  logger,
-	}
+	return &APIClient[T]{baseURL: baseURL}
 }
 
-func (c *APIClient[T]) GetRequest(query map[string]string) (T, error) {
-	var response T
-	var statusCode int
-	var bodyString string
+func (c *APIClient[T]) GetRequest(query map[string]string) (APIResponse[T], error) {
+	var response APIResponse[T]
 
 	// build URL
 	u, err := url.Parse(c.baseURL)
 	if err != nil {
-		c.logError(c.baseURL, statusCode, bodyString, err)
 		return response, errors.WithStack(apperr.Ac.Parse.WithRaw(err))
 	}
 	q := u.Query()
@@ -54,32 +60,97 @@ func (c *APIClient[T]) GetRequest(query map[string]string) (T, error) {
 
 	res, err := backoff.RetryWithData(operation, b)
 	if err != nil {
-		c.logError(u.String(), statusCode, bodyString, err)
 		return response, errors.WithStack(apperr.Ac.Retry.WithRaw(err))
 	}
 
-	statusCode = res.StatusCode
+	response.StatusCode = res.StatusCode
 
 	defer res.Body.Close()
 
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
-		c.logError(u.String(), statusCode, bodyString, err)
 		return response, errors.WithStack(apperr.Ac.Read.WithRaw(err))
 	}
 
-	bodyString = *(*string)(unsafe.Pointer(&body))
+	response.BodyString = *(*string)(unsafe.Pointer(&body))
 
 	// serialize
-	err = json.Unmarshal(body, &response)
+	err = json.Unmarshal(body, &response.Body)
 	if err != nil {
-		c.logError(u.String(), statusCode, bodyString, err)
 		return response, errors.WithStack(apperr.Ac.Unmarshal.WithRaw(err))
 	}
 
 	return response, nil
 }
 
-func (c *APIClient[T]) logError(url string, statusCode int, responseBody string, err error) {
-	c.logger.Error(fmt.Sprintf("URL: %s, STATUS_CODE: %d RESPONSE: %s", url, statusCode, responseBody), err)
+//nolint:cyclop
+func (c *APIClient[T]) PostMultipartFormData(forms []Form) (APIResponse[T], error) {
+	var response APIResponse[T]
+
+	// build URL
+	u, err := url.Parse(c.baseURL)
+	if err != nil {
+		return response, errors.WithStack(apperr.Ac.Parse.WithRaw(err))
+	}
+
+	// build request
+	requestBody := &bytes.Buffer{}
+	mw := multipart.NewWriter(requestBody)
+
+	for _, form := range forms {
+		//nolint:nestif
+		if form.isFile {
+			f, err := os.Open(form.content)
+			if err != nil {
+				return response, err
+			}
+
+			fw, err := mw.CreateFormFile(form.name, form.content)
+			if err != nil {
+				return response, err
+			}
+
+			_, err = io.Copy(fw, f)
+			if err != nil {
+				return response, err
+			}
+		} else {
+			if err := mw.WriteField(form.name, form.content); err != nil {
+				return response, err
+			}
+		}
+	}
+
+	// note: Close()で書き込まれる
+	mw.Close()
+
+	// request
+	b := backoff.WithMaxRetries(backoff.NewExponentialBackOff(), 3)
+	operation := func() (*http.Response, error) {
+		return http.Post(u.String(), mw.FormDataContentType(), requestBody)
+	}
+
+	res, err := backoff.RetryWithData(operation, b)
+	if err != nil {
+		return response, errors.WithStack(apperr.Ac.Retry.WithRaw(err))
+	}
+
+	response.StatusCode = res.StatusCode
+
+	defer res.Body.Close()
+
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		return response, errors.WithStack(apperr.Ac.Read.WithRaw(err))
+	}
+
+	response.BodyString = *(*string)(unsafe.Pointer(&body))
+
+	// serialize
+	err = json.Unmarshal(body, &response.Body)
+	if err != nil {
+		return response, errors.WithStack(apperr.Ac.Unmarshal.WithRaw(err))
+	}
+
+	return response, nil
 }

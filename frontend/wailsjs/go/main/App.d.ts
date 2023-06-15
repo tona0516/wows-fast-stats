@@ -20,7 +20,7 @@ export function ExcludePlayerIDs():Promise<Array<number>>;
 
 export function FontSizes():Promise<Array<string>>;
 
-export function LogError(arg1:string):Promise<void>;
+export function LogErrorForFrontend(arg1:string):Promise<void>;
 
 export function ManualScreenshot(arg1:string,arg2:string):Promise<void>;
 

@@ -9,3 +9,4 @@ log/
 test_install_dir/replays/tempArenaInfo.json
 wows-fast-stats.zip
 .DS_Store
+discord_webhook_url

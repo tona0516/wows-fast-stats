@@ -17,7 +17,10 @@ type Logger struct {
 	zlog zerolog.Logger
 }
 
-func NewLogger(env vo.Env, version vo.Version) *Logger {
+func NewLogger(
+	env vo.Env,
+	version vo.Version,
+) *Logger {
 	_ = os.Mkdir(logDir, 0o755)
 
 	writer := &lumberjack.Logger{

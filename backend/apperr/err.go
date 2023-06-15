@@ -72,14 +72,14 @@ type ac struct {
 	Unmarshal AppError
 }
 
+type dc struct {
+	Upload AppError
+}
+
 type srvcfg struct {
 	InvalidInstallPath AppError
 	InvalidAppID       AppError
 	InvalidFontSize    AppError
-	NoUserConfig       AppError
-	InvalidPlayerName  AppError
-	InvalidPattern     AppError
-	MessageTooLong     AppError
 }
 
 type srvprep struct {
@@ -138,6 +138,7 @@ var (
 	Tai     = newDetailStruct[tai]("I", 600)
 	Unreg   = newDetailStruct[unreg]("I", 700)
 	Ac      = newDetailStruct[ac]("I", 800)
+	Dc      = newDetailStruct[dc]("I", 900)
 	SrvCfg  = newDetailStruct[srvcfg]("S", 100)
 	SrvPrep = newDetailStruct[srvprep]("S", 200)
 	SrvRw   = newDetailStruct[srvrw]("S", 300)

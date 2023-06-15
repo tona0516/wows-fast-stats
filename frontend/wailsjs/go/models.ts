@@ -499,6 +499,7 @@ export namespace vo {
 	    save_screenshot: boolean;
 	    save_temp_arena_info: boolean;
 	    stats_pattern: string;
+	    send_report: boolean;
 	
 	    static createFrom(source: any = {}) {
 	        return new UserConfig(source);
@@ -513,6 +514,7 @@ export namespace vo {
 	        this.save_screenshot = source["save_screenshot"];
 	        this.save_temp_arena_info = source["save_temp_arena_info"];
 	        this.stats_pattern = source["stats_pattern"];
+	        this.send_report = source["send_report"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

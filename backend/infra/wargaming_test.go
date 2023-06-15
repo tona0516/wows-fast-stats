@@ -12,11 +12,11 @@ import (
 func TestWargaming_AccountInfo(t *testing.T) {
 	t.Parallel()
 
-	wargaming := NewWargaming(vo.WGConfig{}, &mockLogger{})
+	wargaming := NewWargaming(vo.WGConfig{})
 	wargaming.SetAppID("your-app-id")
 
 	mockAPIClient := &mockAPIClient[vo.WGAccountInfo]{}
-	mockAPIClient.On("GetRequest", mock.Anything).Return(vo.WGAccountInfo{}, nil)
+	mockAPIClient.On("GetRequest", mock.Anything).Return(APIResponse[vo.WGAccountInfo]{}, nil)
 	wargaming.accountInfoClient = mockAPIClient
 
 	result, err := wargaming.AccountInfo([]int{123, 456})
@@ -28,11 +28,11 @@ func TestWargaming_AccountInfo(t *testing.T) {
 func TestWargaming_AccountList(t *testing.T) {
 	t.Parallel()
 
-	wargaming := NewWargaming(vo.WGConfig{}, &mockLogger{})
+	wargaming := NewWargaming(vo.WGConfig{})
 	wargaming.SetAppID("your-app-id")
 
 	mockAPIClient := &mockAPIClient[vo.WGAccountList]{}
-	mockAPIClient.On("GetRequest", mock.Anything).Return(vo.WGAccountList{}, nil)
+	mockAPIClient.On("GetRequest", mock.Anything).Return(APIResponse[vo.WGAccountList]{}, nil)
 	wargaming.accountListClient = mockAPIClient
 
 	result, err := wargaming.AccountList([]string{"player_1", "player_2"})
@@ -44,11 +44,11 @@ func TestWargaming_AccountList(t *testing.T) {
 func TestWargaming_ClansAccountInfo(t *testing.T) {
 	t.Parallel()
 
-	wargaming := NewWargaming(vo.WGConfig{}, &mockLogger{})
+	wargaming := NewWargaming(vo.WGConfig{})
 	wargaming.SetAppID("your-app-id")
 
 	mockAPIClient := &mockAPIClient[vo.WGClansAccountInfo]{}
-	mockAPIClient.On("GetRequest", mock.Anything).Return(vo.WGClansAccountInfo{}, nil)
+	mockAPIClient.On("GetRequest", mock.Anything).Return(APIResponse[vo.WGClansAccountInfo]{}, nil)
 	wargaming.clansAccountInfoClient = mockAPIClient
 
 	result, err := wargaming.ClansAccountInfo([]int{123, 456})
@@ -60,11 +60,11 @@ func TestWargaming_ClansAccountInfo(t *testing.T) {
 func TestWargaming_ClansInfo(t *testing.T) {
 	t.Parallel()
 
-	wargaming := NewWargaming(vo.WGConfig{}, &mockLogger{})
+	wargaming := NewWargaming(vo.WGConfig{})
 	wargaming.SetAppID("your-app-id")
 
 	mockAPIClient := &mockAPIClient[vo.WGClansInfo]{}
-	mockAPIClient.On("GetRequest", mock.Anything).Return(vo.WGClansInfo{}, nil)
+	mockAPIClient.On("GetRequest", mock.Anything).Return(APIResponse[vo.WGClansInfo]{}, nil)
 	wargaming.clansInfoClient = mockAPIClient
 
 	result, err := wargaming.ClansInfo([]int{123, 456})
@@ -76,11 +76,11 @@ func TestWargaming_ClansInfo(t *testing.T) {
 func TestWargaming_ShipsStats(t *testing.T) {
 	t.Parallel()
 
-	wargaming := NewWargaming(vo.WGConfig{}, &mockLogger{})
+	wargaming := NewWargaming(vo.WGConfig{})
 	wargaming.SetAppID("your-app-id")
 
 	mockAPIClient := &mockAPIClient[vo.WGShipsStats]{}
-	mockAPIClient.On("GetRequest", mock.Anything).Return(vo.WGShipsStats{}, nil)
+	mockAPIClient.On("GetRequest", mock.Anything).Return(APIResponse[vo.WGShipsStats]{}, nil)
 	wargaming.shipsStatsClient = mockAPIClient
 
 	result, err := wargaming.ShipsStats(123)
@@ -92,11 +92,11 @@ func TestWargaming_ShipsStats(t *testing.T) {
 func TestWargaming_EncycShips(t *testing.T) {
 	t.Parallel()
 
-	wargaming := NewWargaming(vo.WGConfig{}, &mockLogger{})
+	wargaming := NewWargaming(vo.WGConfig{})
 	wargaming.SetAppID("your-app-id")
 
 	mockAPIClient := &mockAPIClient[vo.WGEncycShips]{}
-	mockAPIClient.On("GetRequest", mock.Anything).Return(vo.WGEncycShips{}, nil)
+	mockAPIClient.On("GetRequest", mock.Anything).Return(APIResponse[vo.WGEncycShips]{}, nil)
 	wargaming.encycShipsClient = mockAPIClient
 
 	result, err := wargaming.EncycShips(1)
@@ -108,11 +108,11 @@ func TestWargaming_EncycShips(t *testing.T) {
 func TestWargaming_EncycInfo(t *testing.T) {
 	t.Parallel()
 
-	wargaming := NewWargaming(vo.WGConfig{}, &mockLogger{})
+	wargaming := NewWargaming(vo.WGConfig{})
 	wargaming.SetAppID("your-app-id")
 
 	mockAPIClient := &mockAPIClient[vo.WGEncycInfo]{}
-	mockAPIClient.On("GetRequest", mock.Anything).Return(vo.WGEncycInfo{}, nil)
+	mockAPIClient.On("GetRequest", mock.Anything).Return(APIResponse[vo.WGEncycInfo]{}, nil)
 	wargaming.encycInfoClient = mockAPIClient
 
 	result, err := wargaming.EncycInfo()
@@ -124,11 +124,11 @@ func TestWargaming_EncycInfo(t *testing.T) {
 func TestWargaming_BattleArena(t *testing.T) {
 	t.Parallel()
 
-	wargaming := NewWargaming(vo.WGConfig{}, &mockLogger{})
+	wargaming := NewWargaming(vo.WGConfig{})
 	wargaming.SetAppID("your-app-id")
 
 	mockAPIClient := &mockAPIClient[vo.WGBattleArenas]{}
-	mockAPIClient.On("GetRequest", mock.Anything).Return(vo.WGBattleArenas{}, nil)
+	mockAPIClient.On("GetRequest", mock.Anything).Return(APIResponse[vo.WGBattleArenas]{}, nil)
 	wargaming.battleArenasClient = mockAPIClient
 
 	result, err := wargaming.BattleArenas()
@@ -140,11 +140,11 @@ func TestWargaming_BattleArena(t *testing.T) {
 func TestWargaming_BattleTypes(t *testing.T) {
 	t.Parallel()
 
-	wargaming := NewWargaming(vo.WGConfig{}, &mockLogger{})
+	wargaming := NewWargaming(vo.WGConfig{})
 	wargaming.SetAppID("your-app-id")
 
 	mockAPIClient := &mockAPIClient[vo.WGBattleTypes]{}
-	mockAPIClient.On("GetRequest", mock.Anything).Return(vo.WGBattleTypes{}, nil)
+	mockAPIClient.On("GetRequest", mock.Anything).Return(APIResponse[vo.WGBattleTypes]{}, nil)
 	wargaming.battleTypesClient = mockAPIClient
 
 	result, err := wargaming.BattleTypes()
@@ -156,29 +156,30 @@ func TestWargaming_BattleTypes(t *testing.T) {
 func TestWargaming_AccountInfo_異常系_リトライなし(t *testing.T) {
 	t.Parallel()
 
-	wargaming := NewWargaming(vo.WGConfig{}, &mockLogger{})
+	wargaming := NewWargaming(vo.WGConfig{})
 	wargaming.SetAppID("your-app-id")
 
 	mockAPIClient := &mockAPIClient[vo.WGAccountInfo]{}
-	response := vo.WGAccountInfo{
+	response := APIResponse[vo.WGAccountInfo]{Body: vo.WGAccountInfo{
 		Status: "error",
 		Error: vo.WGError{
 			Message: "INVALID_APPLICATION_ID",
 		},
+	},
 	}
 	mockAPIClient.On("GetRequest", mock.Anything).Return(response, nil)
 	wargaming.accountInfoClient = mockAPIClient
 
 	_, err := wargaming.AccountInfo([]int{123, 456})
 
-	assert.EqualError(t, err, fmt.Sprintf("I100 AccountInfo %s", response.Error.Message))
+	assert.EqualError(t, err, fmt.Sprintf("I100 AccountInfo %s", response.Body.Error.Message))
 	mockAPIClient.AssertNumberOfCalls(t, "GetRequest", 1)
 }
 
 func TestWargaming_AccountInfo_正常系_最大リトライ(t *testing.T) {
 	t.Parallel()
 
-	wargaming := NewWargaming(vo.WGConfig{}, &mockLogger{})
+	wargaming := NewWargaming(vo.WGConfig{})
 	wargaming.SetAppID("your-app-id")
 
 	messages := []string{
@@ -188,12 +189,12 @@ func TestWargaming_AccountInfo_正常系_最大リトライ(t *testing.T) {
 
 	for _, v := range messages {
 		mockAPIClient := &mockAPIClient[vo.WGAccountInfo]{}
-		errorResponse := vo.WGAccountInfo{
-			Error: vo.WGError{
-				Message: v,
-			},
+		errorResponse := APIResponse[vo.WGAccountInfo]{
+			Body: vo.WGAccountInfo{Error: vo.WGError{Message: v}},
 		}
-		successResponse := vo.WGAccountInfo{}
+		successResponse := APIResponse[vo.WGAccountInfo]{
+			Body: vo.WGAccountInfo{},
+		}
 		mockAPIClient.On("GetRequest", mock.Anything).Return(errorResponse, nil).Times(3)
 		mockAPIClient.On("GetRequest", mock.Anything).Return(successResponse, nil)
 		wargaming.accountInfoClient = mockAPIClient
@@ -208,7 +209,7 @@ func TestWargaming_AccountInfo_正常系_最大リトライ(t *testing.T) {
 func TestWargaming_AccountInfo_異常系_最大リトライ(t *testing.T) {
 	t.Parallel()
 
-	wargaming := NewWargaming(vo.WGConfig{}, &mockLogger{})
+	wargaming := NewWargaming(vo.WGConfig{})
 	wargaming.SetAppID("your-app-id")
 
 	messages := []string{
@@ -218,9 +219,11 @@ func TestWargaming_AccountInfo_異常系_最大リトライ(t *testing.T) {
 
 	for _, v := range messages {
 		mockAPIClient := &mockAPIClient[vo.WGAccountInfo]{}
-		response := vo.WGAccountInfo{
-			Error: vo.WGError{
-				Message: v,
+		response := APIResponse[vo.WGAccountInfo]{
+			Body: vo.WGAccountInfo{
+				Error: vo.WGError{
+					Message: v,
+				},
 			},
 		}
 		mockAPIClient.On("GetRequest", mock.Anything).Return(response, nil)

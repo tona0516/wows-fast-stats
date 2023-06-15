@@ -3,11 +3,12 @@ SEMVER := 0.5.1
 APP := wows-fast-stats
 EXE := $(APP)-$(SEMVER).exe
 ZIP := $(APP).zip
+DISCORD_WEBHOOK_URL := $(shell cat discord_webhook_url)
 
 .PHONY: dev
 dev:
 	$(eval REV := $(shell git rev-parse --short HEAD))
-	$(eval LD_FLAGS := "-X main.semver=$(SEMVER) -X main.revision=$(REV) -X main.env=debug")
+	$(eval LD_FLAGS := "-X main.semver=$(SEMVER) -X main.revision=$(REV) -X main.env=debug -X main.discordWebhookURL=$(DISCORD_WEBHOOK_URL)")
 	wails dev -ldflags $(LD_FLAGS)
 
 .PHONY: check-prerequisite
@@ -23,13 +24,13 @@ setup: check-prerequisite
 .PHONY: build
 build: lint test
 	$(eval REV := $(shell git rev-parse --short HEAD))
-	$(eval LD_FLAGS := "-X main.semver=$(SEMVER) -X main.revision=$(REV) -X main.env=production")
+	$(eval LD_FLAGS := "-X main.semver=$(SEMVER) -X main.revision=$(REV) -X main.env=production -X main.discordWebhookURL=$(DISCORD_WEBHOOK_URL)")
 	wails build -ldflags $(LD_FLAGS) -platform windows/amd64 -o $(EXE) -trimpath
 
 .PHONY: build-nolint
 build-nolint:
 	$(eval REV := $(shell git rev-parse --short HEAD))
-	$(eval LD_FLAGS := "-X main.semver=$(SEMVER) -X main.revision=$(REV) -X main.env=production")
+	$(eval LD_FLAGS := "-X main.semver=$(SEMVER) -X main.revision=$(REV) -X main.env=production -X main.discordWebhookURL=$(DISCORD_WEBHOOK_URL)")
 	wails build -ldflags $(LD_FLAGS) -platform windows/amd64 -o $(EXE) -trimpath
 
 .PHONY: package

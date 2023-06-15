@@ -27,18 +27,19 @@ var defaultUserConfig vo.UserConfig = vo.UserConfig{
 			ShipInfo:   true,
 		},
 		Ship: vo.Ship{
-			PR:           true,
-			Damage:       true,
-			WinRate:      true,
-			Battles:      true,
+			PR:      true,
+			Damage:  true,
+			WinRate: true,
+			Battles: true,
 		},
 		Overall: vo.Overall{
-			Damage:            true,
-			WinRate:           true,
-			Battles:           true,
+			Damage:  true,
+			WinRate: true,
+			Battles: true,
 		},
 	},
 	StatsPattern: vo.StatsPatternPvPAll,
+	SendReport:   true,
 }
 
 type Config struct{}

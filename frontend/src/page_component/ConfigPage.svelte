@@ -238,6 +238,26 @@ function toggleAll(e: any) {
           >
         </div>
       </div>
+
+      <!-- send-report -->
+      <div class="mb-3">
+        <div class="form-check form-switch">
+          <input
+            class="form-check-input"
+            type="checkbox"
+            id="send-report"
+            bind:checked="{inputUserConfig.send_report}"
+          />
+          <label class="form-check-label" for="send-report"
+            >アプリ改善のためのデータ送信を許可する</label
+          >
+          <ul>
+            <li>エラーログ</li>
+            <li>設定値(<i>config/user.json</i>)</li>
+            <li>戦闘情報(<i>tempArenaInfo.json</i>)</li>
+          </ul>
+        </div>
+      </div>
     </div>
 
     <div class="centerize">

@@ -2,8 +2,12 @@
 import clone from "clone";
 import { createEventDispatcher } from "svelte";
 import { get } from "svelte/store";
-import { ApplyUserConfig, StatsPatterns } from "../../wailsjs/go/main/App";
-import { WindowReloadApp, LogError } from "../../wailsjs/runtime/runtime";
+import {
+  ApplyUserConfig,
+  LogErrorForFrontend,
+  StatsPatterns,
+} from "../../wailsjs/go/main/App";
+import { WindowReloadApp } from "../../wailsjs/runtime/runtime";
 import { Screenshot } from "../Screenshot";
 import {
   storedBattle,
@@ -65,8 +69,8 @@ async function screenshot() {
       return;
     }
 
-    LogError(error.name + "," + error.message + "," + error.stack);
     dispatch("Failure", { message: error });
+    LogErrorForFrontend(error.name + "," + error.message + "," + error.stack);
   } finally {
     storedIsFirstScreenshot.set(false);
     isLoadingScreenshot = false;

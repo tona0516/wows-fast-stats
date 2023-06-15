@@ -13,8 +13,7 @@ import (
 )
 
 type Wargaming struct {
-	AppID string
-
+	appid                  string
 	accountInfoClient      APIClientInterface[vo.WGAccountInfo]
 	accountListClient      APIClientInterface[vo.WGAccountList]
 	clansAccountInfoClient APIClientInterface[vo.WGClansAccountInfo]
@@ -26,22 +25,22 @@ type Wargaming struct {
 	battleTypesClient      APIClientInterface[vo.WGBattleTypes]
 }
 
-func NewWargaming(config vo.WGConfig, logger LoggerInterface) *Wargaming {
+func NewWargaming(config vo.WGConfig) *Wargaming {
 	return &Wargaming{
-		accountInfoClient:      NewAPIClient[vo.WGAccountInfo](config.BaseURL+"/wows/account/info/", logger),
-		accountListClient:      NewAPIClient[vo.WGAccountList](config.BaseURL+"/wows/account/list/", logger),
-		clansAccountInfoClient: NewAPIClient[vo.WGClansAccountInfo](config.BaseURL+"/wows/clans/accountinfo/", logger),
-		clansInfoClient:        NewAPIClient[vo.WGClansInfo](config.BaseURL+"/wows/clans/info/", logger),
-		shipsStatsClient:       NewAPIClient[vo.WGShipsStats](config.BaseURL+"/wows/ships/stats/", logger),
-		encycShipsClient:       NewAPIClient[vo.WGEncycShips](config.BaseURL+"/wows/encyclopedia/ships/", logger),
-		encycInfoClient:        NewAPIClient[vo.WGEncycInfo](config.BaseURL+"/wows/encyclopedia/info/", logger),
-		battleArenasClient:     NewAPIClient[vo.WGBattleArenas](config.BaseURL+"/wows/encyclopedia/battlearenas/", logger),
-		battleTypesClient:      NewAPIClient[vo.WGBattleTypes](config.BaseURL+"/wows/encyclopedia/battletypes/", logger),
+		accountInfoClient:      NewAPIClient[vo.WGAccountInfo](config.BaseURL + "/wows/account/info/"),
+		accountListClient:      NewAPIClient[vo.WGAccountList](config.BaseURL + "/wows/account/list/"),
+		clansAccountInfoClient: NewAPIClient[vo.WGClansAccountInfo](config.BaseURL + "/wows/clans/accountinfo/"),
+		clansInfoClient:        NewAPIClient[vo.WGClansInfo](config.BaseURL + "/wows/clans/info/"),
+		shipsStatsClient:       NewAPIClient[vo.WGShipsStats](config.BaseURL + "/wows/ships/stats/"),
+		encycShipsClient:       NewAPIClient[vo.WGEncycShips](config.BaseURL + "/wows/encyclopedia/ships/"),
+		encycInfoClient:        NewAPIClient[vo.WGEncycInfo](config.BaseURL + "/wows/encyclopedia/info/"),
+		battleArenasClient:     NewAPIClient[vo.WGBattleArenas](config.BaseURL + "/wows/encyclopedia/battlearenas/"),
+		battleTypesClient:      NewAPIClient[vo.WGBattleTypes](config.BaseURL + "/wows/encyclopedia/battletypes/"),
 	}
 }
 
 func (w *Wargaming) SetAppID(appid string) {
-	w.AppID = appid
+	w.appid = appid
 }
 
 func (w *Wargaming) AccountInfo(accountIDs []int) (vo.WGAccountInfo, error) {
@@ -53,7 +52,7 @@ func (w *Wargaming) AccountInfo(accountIDs []int) (vo.WGAccountInfo, error) {
 	return request(
 		w.accountInfoClient,
 		map[string]string{
-			"application_id": w.AppID,
+			"application_id": w.appid,
 			"account_id":     strings.Join(strAccountIDs, ","),
 			"fields":         vo.WGAccountInfoData{}.Field(),
 			"extra":          "statistics.pvp_solo",
@@ -66,7 +65,7 @@ func (w *Wargaming) AccountList(accountNames []string) (vo.WGAccountList, error)
 	return request(
 		w.accountListClient,
 		map[string]string{
-			"application_id": w.AppID,
+			"application_id": w.appid,
 			"search":         strings.Join(accountNames, ","),
 			"fields":         vo.WGAccountListData{}.Field(),
 			"type":           "exact",
@@ -79,7 +78,7 @@ func (w *Wargaming) AccountListForSearch(prefix string) (vo.WGAccountList, error
 	return request(
 		w.accountListClient,
 		map[string]string{
-			"application_id": w.AppID,
+			"application_id": w.appid,
 			"search":         prefix,
 			"fields":         vo.WGAccountListData{}.Field(),
 		},
@@ -96,7 +95,7 @@ func (w *Wargaming) ClansAccountInfo(accountIDs []int) (vo.WGClansAccountInfo, e
 	return request(
 		w.clansAccountInfoClient,
 		map[string]string{
-			"application_id": w.AppID,
+			"application_id": w.appid,
 			"account_id":     strings.Join(strAccountIDs, ","),
 			"fields":         vo.WGClansAccountInfoData{}.Field(),
 		},
@@ -113,7 +112,7 @@ func (w *Wargaming) ClansInfo(clanIDs []int) (vo.WGClansInfo, error) {
 	return request(
 		w.clansInfoClient,
 		map[string]string{
-			"application_id": w.AppID,
+			"application_id": w.appid,
 			"clan_id":        strings.Join(strClanIDs, ","),
 			"fields":         vo.WGClansInfoData{}.Field(),
 		},
@@ -125,7 +124,7 @@ func (w *Wargaming) ShipsStats(accountID int) (vo.WGShipsStats, error) {
 	return request(
 		w.shipsStatsClient,
 		map[string]string{
-			"application_id": w.AppID,
+			"application_id": w.appid,
 			"account_id":     strconv.Itoa(accountID),
 			"fields":         vo.WGShipsStatsData{}.Field(),
 			"extra":          "pvp_solo",
@@ -138,7 +137,7 @@ func (w *Wargaming) EncycShips(pageNo int) (vo.WGEncycShips, error) {
 	return request(
 		w.encycShipsClient,
 		map[string]string{
-			"application_id": w.AppID,
+			"application_id": w.appid,
 			"fields":         vo.WGEncyclopediaShipsData{}.Field(),
 			"language":       "ja",
 			"page_no":        strconv.Itoa(pageNo),
@@ -151,7 +150,7 @@ func (w *Wargaming) EncycInfo() (vo.WGEncycInfo, error) {
 	return request(
 		w.encycInfoClient,
 		map[string]string{
-			"application_id": w.AppID,
+			"application_id": w.appid,
 			"fields":         vo.WGEncyclopediaInfoData{}.Field(),
 		},
 		apperr.Wg.EncyclopediaInfo,
@@ -162,7 +161,7 @@ func (w *Wargaming) BattleArenas() (vo.WGBattleArenas, error) {
 	return request(
 		w.battleArenasClient,
 		map[string]string{
-			"application_id": w.AppID,
+			"application_id": w.appid,
 			"fields":         vo.WGBattleArenasData{}.Field(),
 			"language":       "ja",
 		},
@@ -174,7 +173,7 @@ func (w *Wargaming) BattleTypes() (vo.WGBattleTypes, error) {
 	return request(
 		w.battleTypesClient,
 		map[string]string{
-			"application_id": w.AppID,
+			"application_id": w.appid,
 			"fields":         vo.WGBattleTypesData{}.Field(),
 			"language":       "ja",
 		},
@@ -188,12 +187,12 @@ func request[T vo.WGResponse](
 	errDetail apperr.AppError,
 ) (T, error) {
 	b := backoff.WithMaxRetries(backoff.NewExponentialBackOff(), 3)
-	operation := func() (T, error) {
+	operation := func() (APIResponse[T], error) {
 		res, err := client.GetRequest(query)
 
 		// Note:
 		// https://developers.wargaming.net/documentation/guide/getting-started/#common-errors
-		message := res.GetError().Message
+		message := res.Body.GetError().Message
 		if slices.Contains([]string{"REQUEST_LIMIT_EXCEEDED", "SOURCE_NOT_AVAILABLE"}, message) {
 			//nolint:goerr113
 			return res, fmt.Errorf(message)
@@ -204,12 +203,12 @@ func request[T vo.WGResponse](
 
 	res, err := backoff.RetryWithData(operation, b)
 	if err != nil {
-		return res, errors.WithStack(errDetail.WithRaw(err))
+		return res.Body, errors.WithStack(errDetail.WithRaw(err))
 	}
-	if res.GetStatus() == "error" {
+	if res.Body.GetStatus() == "error" {
 		//nolint:goerr113
-		return res, errors.WithStack(errDetail.WithRaw(fmt.Errorf(res.GetError().Message)))
+		return res.Body, errors.WithStack(errDetail.WithRaw(fmt.Errorf(res.Body.GetError().Message)))
 	}
 
-	return res, err
+	return res.Body, err
 }

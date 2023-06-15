@@ -20,9 +20,10 @@ var assets embed.FS
 
 //nolint:gochecknoglobals
 var (
-	semver   string
-	revision string
-	env      string
+	semver            string
+	revision          string
+	env               string
+	discordWebhookURL string
 )
 
 func main() {
@@ -56,9 +57,8 @@ func main() {
 func initApp() *App {
 	// infra
 	logger := infra.NewLogger(vo.Env{Str: env}, vo.Version{Semver: semver, Revision: revision})
-	wargamingRepo := infra.NewWargaming(vo.WGConfig{
-		BaseURL: "https://api.worldofwarships.asia",
-	}, logger)
+	discordRepo := infra.NewDiscord(discordWebhookURL)
+	wargamingRepo := infra.NewWargaming(vo.WGConfig{BaseURL: "https://api.worldofwarships.asia"})
 	numbersRepo := infra.NewNumbers("https://api.wows-numbers.com/personal/rating/expected/json/")
 	tempArenaInfoRepo := infra.NewTempArenaInfo()
 	configRepo := infra.NewConfig()
@@ -71,6 +71,7 @@ func initApp() *App {
 	screenshotService := service.NewScreenshot(screenshotRepo, runtime.SaveFileDialog)
 	battleService := service.NewBattle(parallels, wargamingRepo, tempArenaInfoRepo, numbersRepo, unregisteredRepo)
 	replayWatcher := service.NewReplayWatcher(configRepo, tempArenaInfoRepo, runtime.EventsEmit)
+	reportService := service.NewReport(discordRepo, configRepo, tempArenaInfoRepo)
 
 	return NewApp(
 		vo.Env{Str: env},
@@ -79,6 +80,7 @@ func initApp() *App {
 		*screenshotService,
 		*replayWatcher,
 		*battleService,
+		*reportService,
 		logger,
 	)
 }
@@ -87,21 +89,23 @@ func isAlreadyRunning() bool {
 	ownPid := os.Getpid()
 	ownPidInfo, err := ps.FindProcess(ownPid)
 	if err != nil {
-		// Note: for availability.
+		// Note: 可用性のためfalseを返す
 		return false
 	}
 
 	processes, err := ps.Processes()
 	if err != nil {
-		// Note: for availability.
+		// Note: 可用性のためfalseを返す
 		return false
 	}
 
+	isRunning := false
 	for _, p := range processes {
 		if p.Pid() != ownPid && p.Executable() == ownPidInfo.Executable() {
-			return true
+			isRunning = true
+			break
 		}
 	}
 
-	return false
+	return isRunning
 }

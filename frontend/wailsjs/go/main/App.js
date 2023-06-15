@@ -38,8 +38,8 @@ export function FontSizes() {
   return window['go']['main']['App']['FontSizes']();
 }
 
-export function LogError(arg1) {
-  return window['go']['main']['App']['LogError'](arg1);
+export function LogErrorForFrontend(arg1) {
+  return window['go']['main']['App']['LogErrorForFrontend'](arg1);
 }
 
 export function ManualScreenshot(arg1, arg2) {

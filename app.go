@@ -7,6 +7,7 @@ import (
 	"changeme/backend/vo"
 	"context"
 	"fmt"
+	"strconv"
 
 	mapset "github.com/deckarep/golang-set/v2"
 	"github.com/pkg/errors"
@@ -17,6 +18,7 @@ import (
 const PARALLELS = 5
 
 type App struct {
+	ctx                 context.Context
 	version             vo.Version
 	env                 vo.Env
 	cancelReplayWatcher context.CancelFunc
@@ -24,8 +26,8 @@ type App struct {
 	screenshotService   service.Screenshot
 	replayWatcher       service.ReplayWatcher
 	battleService       service.Battle
+	reportService       service.Report
 	logger              infra.LoggerInterface
-	ctx                 context.Context
 	excludePlayer       mapset.Set[int]
 }
 
@@ -36,6 +38,7 @@ func NewApp(
 	screenshotService service.Screenshot,
 	replayWatcher service.ReplayWatcher,
 	battleService service.Battle,
+	reportService service.Report,
 	logger infra.LoggerInterface,
 ) *App {
 	return &App{
@@ -45,13 +48,14 @@ func NewApp(
 		screenshotService: screenshotService,
 		replayWatcher:     replayWatcher,
 		battleService:     battleService,
+		reportService:     reportService,
 		logger:            logger,
 		excludePlayer:     mapset.NewSet[int](),
 	}
 }
 
 func (a *App) onStartup(ctx context.Context) {
-	a.logger.Debug("start app.")
+	a.logger.Debug("onStartup() called")
 	a.ctx = ctx
 
 	appConfig, err := a.configService.App()
@@ -65,19 +69,15 @@ func (a *App) onStartup(ctx context.Context) {
 }
 
 func (a *App) onShutdown(ctx context.Context) {
-	a.logger.Debug("shutdown app.")
-
-	appConfig, err := a.configService.App()
-	if err != nil {
-		a.logger.Info("No app config.")
-	}
+	a.logger.Debug("onShutdown() called")
 
 	// Save windows size
+	appConfig, _ := a.configService.App()
 	width, height := runtime.WindowGetSize(ctx)
 	appConfig.Window.Width = width
 	appConfig.Window.Height = height
 	if err := a.configService.UpdateApp(appConfig); err != nil {
-		a.logger.Warn("Failed to update app config.", err)
+		a.logger.Warn("Failed to update AppConfig", err)
 	}
 }
 
@@ -96,12 +96,18 @@ func (a *App) Battle() (vo.Battle, error) {
 
 	userConfig, err := a.configService.User()
 	if err != nil {
+		a.logger.Error("Failed to get UserConfig", err)
 		return result, err
 	}
 
 	result, err = a.battleService.Battle(userConfig)
 	if err != nil {
-		a.logger.Error("Failed to get battle.", err)
+		a.logger.Error("Failed to fetch Battle", err)
+
+		if err := a.reportService.Send(err); err != nil {
+			a.logger.Warn("Failed to send Report", err)
+		}
+
 		return result, err
 	}
 
@@ -111,20 +117,25 @@ func (a *App) Battle() (vo.Battle, error) {
 func (a *App) SelectDirectory() (string, error) {
 	path, err := runtime.OpenDirectoryDialog(a.ctx, runtime.OpenDialogOptions{})
 	if err != nil {
-		a.logger.Error("Failed to get client installing path.", err)
+		a.logger.Warn("Failed to get directory, path:"+path, err)
 	}
 
 	return path, err
 }
 
 func (a *App) UserConfig() (vo.UserConfig, error) {
-	return a.configService.User()
+	config, err := a.configService.User()
+	if err != nil {
+		a.logger.Warn("Failed to get UserConfig", err)
+	}
+
+	return config, err
 }
 
 func (a *App) ApplyUserConfig(config vo.UserConfig) error {
 	err := a.configService.UpdateUser(config)
 	if err != nil {
-		a.logger.Error("Failed to apply user config.", err)
+		a.logger.Warn("Failed to update UserConfig", err)
 	}
 
 	return err
@@ -132,8 +143,8 @@ func (a *App) ApplyUserConfig(config vo.UserConfig) error {
 
 func (a *App) ManualScreenshot(filename string, base64Data string) error {
 	err := a.screenshotService.SaveWithDialog(a.ctx, filename, base64Data)
-	if err != nil {
-		a.logger.Error("Failed to save screenshot by manual.", err)
+	if err != nil && !errors.Is(err, apperr.SrvSs.Canceled) {
+		a.logger.Warn("Failed to save screenshot, filename:"+filename+" base64Data:"+base64Data, err)
 	}
 
 	return err
@@ -142,7 +153,7 @@ func (a *App) ManualScreenshot(filename string, base64Data string) error {
 func (a *App) AutoScreenshot(filename string, base64Data string) error {
 	err := a.screenshotService.SaveForAuto(filename, base64Data)
 	if err != nil {
-		a.logger.Error("Failed to save screenshot by auto.", err)
+		a.logger.Warn("Failed to save screenshot, filename:"+filename+" base64Data:"+base64Data, err)
 	}
 
 	return err
@@ -155,8 +166,9 @@ func (a *App) AppVersion() vo.Version {
 func (a *App) OpenDirectory(path string) error {
 	err := open.Run(path)
 	if err != nil {
-		a.logger.Warn("Failed to open directory -> "+path, err)
-		return errors.WithStack(apperr.App.OpenDir.WithRaw(err))
+		wraped := errors.WithStack(apperr.App.OpenDir.WithRaw(err))
+		a.logger.Warn("Failed to open directory, path:"+path, wraped)
+		return wraped
 	}
 
 	return nil
@@ -175,28 +187,48 @@ func (a *App) RemoveExcludePlayerID(playerID int) {
 }
 
 func (a *App) AlertPlayers() ([]vo.AlertPlayer, error) {
-	return a.configService.AlertPlayers()
+	players, err := a.configService.AlertPlayers()
+	if err != nil {
+		a.logger.Warn("Failed to get AlertPlayers", err)
+	}
+
+	return players, err
 }
 
 func (a *App) UpdateAlertPlayer(player vo.AlertPlayer) error {
-	return a.configService.UpdateAlertPlayer(player)
+	err := a.configService.UpdateAlertPlayer(player)
+	if err != nil {
+		a.logger.Warn("Failed to update AlertPlayer, player.Name:"+player.Name, err)
+	}
+
+	return err
 }
 
 func (a *App) RemoveAlertPlayer(accountID int) error {
-	return a.configService.RemoveAlertPlayer(accountID)
+	err := a.configService.RemoveAlertPlayer(accountID)
+	if err != nil {
+		a.logger.Warn("Failed to remove AlertPlayer, accountID:"+strconv.Itoa(accountID), err)
+	}
+
+	return err
 }
 
 func (a *App) SearchPlayer(prefix string) (vo.WGAccountList, error) {
-	return a.configService.SearchPlayer(prefix)
+	accountList, err := a.configService.SearchPlayer(prefix)
+	if err != nil {
+		a.logger.Warn("Failed to search player, prefix:"+prefix, err)
+	}
+
+	return accountList, err
 }
 
 func (a *App) AlertPatterns() []string {
 	return vo.AlertPatterns
 }
 
-func (a *App) LogError(err string) {
+func (a *App) LogErrorForFrontend(err string) {
 	//nolint:goerr113
-	a.logger.Error("Error occurred in frontend.", fmt.Errorf("%s", err))
+	a.logger.Warn("Error has occurred in frontend", fmt.Errorf("%s", err))
 }
 
 func (a *App) FontSizes() []string {

@@ -16,7 +16,7 @@ import {
   AlertPlayers,
   Battle,
   ExcludePlayerIDs,
-  LogError,
+  LogErrorForFrontend,
   Ready,
   UserConfig,
 } from "../wailsjs/go/main/App";
@@ -92,7 +92,7 @@ EventsOn(EVENT_BATTLE_START, async () => {
         "スクリーンショットの自動保存に失敗しました。",
         "error"
       );
-      LogError(error.name + "," + error.message + "," + error.stack);
+      LogErrorForFrontend(error.name + "," + error.message + "," + error.stack);
     }
   }
 });
