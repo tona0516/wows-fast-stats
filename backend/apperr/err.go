@@ -126,10 +126,6 @@ var (
 	ErrInvalidInstallPath = fmt.Errorf("選択したフォルダに「WorldOfWarships.exe」が存在しません。")
 	ErrInvalidAppID       = fmt.Errorf("WG APIと通信できません。AppIDが間違っている可能性があります。")
 	ErrInvalidFontSize    = fmt.Errorf("不正な文字サイズです。")
-	ErrNoUserConfig       = fmt.Errorf("未設定の状態のため登録できません。「設定」から入力してください。")
-	ErrInvalidPlayerName  = fmt.Errorf("存在しないプレイヤー名です。")
-	ErrInvalidPattern     = fmt.Errorf("不正なパターンです。")
-	ErrMessageTooLong     = fmt.Errorf("メモの文字数が140文字を超えています。")
 )
 
 //nolint:gochecknoglobals
