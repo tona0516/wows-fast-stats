@@ -28,6 +28,10 @@ func (s *Stats) ShipPR(mode StatsMode) float64 {
 	values := statsValuesFrom(mode, s.ShipsStats)
 	battles := values.Battles
 
+	if battles < 1 {
+		return -1
+	}
+
 	return rating.PersonalRating(
 		RatingFactor{
 			AvgDamage: avgDamage(values.DamageDealt, battles),

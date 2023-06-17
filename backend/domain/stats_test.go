@@ -40,6 +40,20 @@ func TestStats_ShipPR(t *testing.T) {
 	}
 
 	assert.InDelta(t, 1875, stats.ShipPR(ModeShip), 0.1)
+
+	stats = Stats{
+		ShipsStats: vo.WGShipsStatsData{
+			Pvp: vo.WGStatsValues{
+				Battles:     0,
+				DamageDealt: 1000000,
+				Frags:       200,
+				Wins:        60,
+			},
+		},
+		Expected: expected,
+	}
+
+	assert.Equal(t, float64(-1), stats.ShipPR(ModeShip))
 }
 func TestStats_AvgDamage_Overall(t *testing.T) {
 	t.Parallel()
