@@ -38,6 +38,7 @@ const shipComponents = new ComponentList(StatsCategory.Ship, [
   new ComponenInfo("win_rate", GenericTableData, { unit: "%" }),
   new ComponenInfo("kd_rate", GenericTableData),
   new ComponenInfo("kill", GenericTableData),
+  new ComponenInfo("planes_killed", GenericTableData),
   new ComponenInfo("exp", GenericTableData),
   new ComponenInfo("battles", GenericTableData),
   new ComponenInfo("survived_rate", PairTableData, {
@@ -50,7 +51,6 @@ const shipComponents = new ComponentList(StatsCategory.Ship, [
     key1: "main_battery_hit_rate",
     key2: "torpedoes_hit_rate",
   }),
-  new ComponenInfo("planes_killed", GenericTableData),
 ]);
 
 const overallComponents = new ComponentList(StatsCategory.Overall, [

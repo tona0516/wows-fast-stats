@@ -413,11 +413,11 @@ export namespace vo {
 	    win_rate: boolean;
 	    kd_rate: boolean;
 	    kill: boolean;
+	    planes_killed: boolean;
 	    exp: boolean;
 	    battles: boolean;
 	    survived_rate: boolean;
 	    hit_rate: boolean;
-	    planes_killed: boolean;
 	
 	    static createFrom(source: any = {}) {
 	        return new Ship(source);
@@ -430,11 +430,11 @@ export namespace vo {
 	        this.win_rate = source["win_rate"];
 	        this.kd_rate = source["kd_rate"];
 	        this.kill = source["kill"];
+	        this.planes_killed = source["planes_killed"];
 	        this.exp = source["exp"];
 	        this.battles = source["battles"];
 	        this.survived_rate = source["survived_rate"];
 	        this.hit_rate = source["hit_rate"];
-	        this.planes_killed = source["planes_killed"];
 	    }
 	}
 	export class Displays {
