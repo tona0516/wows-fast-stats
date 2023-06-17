@@ -71,12 +71,6 @@ func (s *Stats) AvgKill(mode StatsMode) float64 {
 	return avgKill(values.Frags, values.Battles)
 }
 
-func (s *Stats) AvgDeath(mode StatsMode) float64 {
-	values := s.statsValues(mode)
-	death := values.Battles - values.SurvivedBattles
-	return avgDeath(death, values.Battles)
-}
-
 func (s *Stats) AvgExp(mode StatsMode) float64 {
 	values := s.statsValues(mode)
 	xp := values.Xp
@@ -316,14 +310,6 @@ func avgKill(frags uint, battles uint) float64 {
 	}
 
 	return float64(frags) / float64(battles)
-}
-
-func avgDeath(death uint, battles uint) float64 {
-	if battles < 1 {
-		return 0
-	}
-
-	return float64(death) / float64(battles)
 }
 
 func winRate(wins uint, battles uint) float64 {

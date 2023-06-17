@@ -78,7 +78,6 @@ export namespace vo {
 	    lose_survived_rate: number;
 	    kd_rate: number;
 	    kill: number;
-	    death: number;
 	    exp: number;
 	    avg_tier: number;
 	    using_ship_type_rate: ShipTypeGroup;
@@ -97,7 +96,6 @@ export namespace vo {
 	        this.lose_survived_rate = source["lose_survived_rate"];
 	        this.kd_rate = source["kd_rate"];
 	        this.kill = source["kill"];
-	        this.death = source["death"];
 	        this.exp = source["exp"];
 	        this.avg_tier = source["avg_tier"];
 	        this.using_ship_type_rate = this.convertValues(source["using_ship_type_rate"], ShipTypeGroup);
@@ -130,7 +128,6 @@ export namespace vo {
 	    lose_survived_rate: number;
 	    kd_rate: number;
 	    kill: number;
-	    death: number;
 	    exp: number;
 	    main_battery_hit_rate: number;
 	    torpedoes_hit_rate: number;
@@ -150,7 +147,6 @@ export namespace vo {
 	        this.lose_survived_rate = source["lose_survived_rate"];
 	        this.kd_rate = source["kd_rate"];
 	        this.kill = source["kill"];
-	        this.death = source["death"];
 	        this.exp = source["exp"];
 	        this.main_battery_hit_rate = source["main_battery_hit_rate"];
 	        this.torpedoes_hit_rate = source["torpedoes_hit_rate"];
@@ -386,7 +382,6 @@ export namespace vo {
 	    win_rate: boolean;
 	    kd_rate: boolean;
 	    kill: boolean;
-	    death: boolean;
 	    exp: boolean;
 	    battles: boolean;
 	    survived_rate: boolean;
@@ -404,7 +399,6 @@ export namespace vo {
 	        this.win_rate = source["win_rate"];
 	        this.kd_rate = source["kd_rate"];
 	        this.kill = source["kill"];
-	        this.death = source["death"];
 	        this.exp = source["exp"];
 	        this.battles = source["battles"];
 	        this.survived_rate = source["survived_rate"];
@@ -419,7 +413,6 @@ export namespace vo {
 	    win_rate: boolean;
 	    kd_rate: boolean;
 	    kill: boolean;
-	    death: boolean;
 	    exp: boolean;
 	    battles: boolean;
 	    survived_rate: boolean;
@@ -437,7 +430,6 @@ export namespace vo {
 	        this.win_rate = source["win_rate"];
 	        this.kd_rate = source["kd_rate"];
 	        this.kill = source["kill"];
-	        this.death = source["death"];
 	        this.exp = source["exp"];
 	        this.battles = source["battles"];
 	        this.survived_rate = source["survived_rate"];

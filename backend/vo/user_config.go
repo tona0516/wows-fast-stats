@@ -12,7 +12,6 @@ type Ship struct {
 	WinRate      bool `json:"win_rate"`
 	KdRate       bool `json:"kd_rate"`
 	Kill         bool `json:"kill"`
-	Death        bool `json:"death"`
 	Exp          bool `json:"exp"`
 	Battles      bool `json:"battles"`
 	SurvivedRate bool `json:"survived_rate"`
@@ -25,7 +24,6 @@ type Overall struct {
 	WinRate           bool `json:"win_rate"`
 	KdRate            bool `json:"kd_rate"`
 	Kill              bool `json:"kill"`
-	Death             bool `json:"death"`
 	Exp               bool `json:"exp"`
 	Battles           bool `json:"battles"`
 	SurvivedRate      bool `json:"survived_rate"`

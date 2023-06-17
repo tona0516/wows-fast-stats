@@ -29,7 +29,6 @@ type ShipStats struct {
 	LoseSurvivedRate   float64 `json:"lose_survived_rate"`
 	KdRate             float64 `json:"kd_rate"`
 	Kill               float64 `json:"kill"`
-	Death              float64 `json:"death"`
 	Exp                float64 `json:"exp"`
 	MainBatteryHitRate float64 `json:"main_battery_hit_rate"`
 	TorpedoesHitRate   float64 `json:"torpedoes_hit_rate"`
@@ -45,7 +44,6 @@ type OverallStats struct {
 	LoseSurvivedRate  float64       `json:"lose_survived_rate"`
 	KdRate            float64       `json:"kd_rate"`
 	Kill              float64       `json:"kill"`
-	Death             float64       `json:"death"`
 	Exp               float64       `json:"exp"`
 	AvgTier           float64       `json:"avg_tier"`
 	UsingShipTypeRate ShipTypeGroup `json:"using_ship_type_rate"`

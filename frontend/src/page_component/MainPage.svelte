@@ -37,7 +37,6 @@ const shipComponents = new ComponentList(StatsCategory.Ship, [
   new ComponenInfo("win_rate", GenericTableData, { unit: "%" }),
   new ComponenInfo("kd_rate", GenericTableData),
   new ComponenInfo("kill", GenericTableData),
-  new ComponenInfo("death", GenericTableData),
   new ComponenInfo("exp", GenericTableData),
   new ComponenInfo("battles", GenericTableData),
   new ComponenInfo("survived_rate", PairTableData, {
