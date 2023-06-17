@@ -86,7 +86,7 @@ const prColors: {
 ];
 </script>
 
-<h5 class="text-center">各項目の配色</h5>
+<h6 class="text-center">各項目の配色</h6>
 
 <table class="table table-sm table-text-color w-auto">
   <thead>
