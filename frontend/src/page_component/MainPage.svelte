@@ -13,6 +13,7 @@ import { decideDisplayPattern } from "../util";
 import { ComponenInfo, ComponentList } from "../ComponentList";
 import { StatsCategory } from "../enums";
 import ColorDescription from "../other_component/ColorDescription.svelte";
+import Ofuse from "../other_component/Ofuse.svelte";
 
 let battle = get(storedBattle);
 storedBattle.subscribe((it) => (battle = it));
@@ -235,10 +236,16 @@ const overallComponents = new ComponentList(StatsCategory.Overall, [
       </table>
     </div>
   {/if}
-
-  <div class="m-3 centerize">
-    <div>
-      <ColorDescription />
-    </div>
-  </div>
 {/if}
+
+<div class="m-2 centerize">
+  <div>
+    <ColorDescription />
+  </div>
+</div>
+
+<div class="m-2 centerize">
+  <div>
+    <Ofuse />
+  </div>
+</div>
