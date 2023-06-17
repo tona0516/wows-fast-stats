@@ -178,62 +178,70 @@ const overallComponents = new ComponentList(StatsCategory.Overall, [
 
   {#if summaryResult}
     <div class="mx-4 d-flex flex-row centerize">
-      <table class="mx-2 table table-sm table-text-color w-auto">
-        <tbody>
-          <tr>
-            <td class="td-string">日時</td>
-            <td class="td-string">{battle.meta.date}</td>
-          </tr>
+      <div class="mx-2">
+        <h6 class="text-center">戦闘情報</h6>
 
-          <tr>
-            <td class="td-string">戦闘タイプ</td>
-            <td class="td-string">{battle.meta.type}</td>
-          </tr>
+        <table class="table table-sm table-text-color w-auto">
+          <tbody>
+            <tr>
+              <td class="td-string">日時</td>
+              <td class="td-string">{battle.meta.date}</td>
+            </tr>
 
-          <tr>
-            <td class="td-string">マップ</td>
-            <td class="td-string">{battle.meta.arena}</td>
-          </tr>
-        </tbody>
-      </table>
+            <tr>
+              <td class="td-string">戦闘タイプ</td>
+              <td class="td-string">{battle.meta.type}</td>
+            </tr>
 
-      <table class="mx-2 table table-sm table-text-color w-auto">
-        <thead>
-          <tr>
-            <th></th>
-            <th colspan="{summaryResult.shipColspan}">艦成績</th>
-            <th colspan="{summaryResult.overallColspan}">総合成績</th>
-          </tr>
-          <tr>
-            <th></th>
-            {#each summaryResult.labels as label}
-              <th>{label}</th>
-            {/each}
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="td-string">{battle.teams[0].name}</td>
-            {#each summaryResult.friends as friend}
-              <td class="td-number">{friend}</td>
-            {/each}
-          </tr>
+            <tr>
+              <td class="td-string">マップ</td>
+              <td class="td-string">{battle.meta.arena}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-          <tr>
-            <td class="td-string">{battle.teams[1].name}</td>
-            {#each summaryResult.enemies as enemy}
-              <td class="td-number">{enemy}</td>
-            {/each}
-          </tr>
+      <div class="mx-2">
+        <h6 class="text-center">チーム平均</h6>
 
-          <tr>
-            <td class="td-string">差</td>
-            {#each summaryResult.diffs as diff}
-              <td class="td-number {diff.colorClass}">{diff.value}</td>
-            {/each}
-          </tr>
-        </tbody>
-      </table>
+        <table class="table table-sm table-text-color w-auto">
+          <thead>
+            <tr>
+              <th></th>
+              <th colspan="{summaryResult.shipColspan}">艦成績</th>
+              <th colspan="{summaryResult.overallColspan}">総合成績</th>
+            </tr>
+            <tr>
+              <th></th>
+              {#each summaryResult.labels as label}
+                <th>{label}</th>
+              {/each}
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="td-string">{battle.teams[0].name}</td>
+              {#each summaryResult.friends as friend}
+                <td class="td-number">{friend}</td>
+              {/each}
+            </tr>
+
+            <tr>
+              <td class="td-string">{battle.teams[1].name}</td>
+              {#each summaryResult.enemies as enemy}
+                <td class="td-number">{enemy}</td>
+              {/each}
+            </tr>
+
+            <tr>
+              <td class="td-string">差</td>
+              {#each summaryResult.diffs as diff}
+                <td class="td-number {diff.colorClass}">{diff.value}</td>
+              {/each}
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   {/if}
 {/if}
