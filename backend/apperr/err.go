@@ -123,6 +123,7 @@ func newDetailStruct[T any](codePrefix string, codeStart int) T {
 var (
 	ErrNoTimeKey          = fmt.Errorf("no time key")
 	ErrNoDataKey          = fmt.Errorf("no data key")
+	ErrNoTempArenaInfo    = fmt.Errorf("no tempArenaInfo.json")
 	ErrInvalidInstallPath = fmt.Errorf("選択したフォルダに「WorldOfWarships.exe」が存在しません。")
 	ErrInvalidAppID       = fmt.Errorf("WG APIと通信できません。AppIDが間違っている可能性があります。")
 	ErrInvalidFontSize    = fmt.Errorf("不正な文字サイズです。")
