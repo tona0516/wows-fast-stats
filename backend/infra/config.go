@@ -3,7 +3,6 @@ package infra
 import (
 	"changeme/backend/apperr"
 	"changeme/backend/vo"
-	"encoding/json"
 	"os"
 	"path/filepath"
 
@@ -114,43 +113,24 @@ func (c *Config) RemoveAlertPlayer(accountID int) error {
 }
 
 func read[T any](filename string, defaultValue T) (T, error) {
-	errDetail := apperr.Cfg.Read
-
-	_ = os.Mkdir(ConfigDirName, 0o755)
-
 	path := filepath.Join(ConfigDirName, filename)
-	if _, err := os.Stat(path); err != nil {
-		//nolint:nilerr
-		return defaultValue, nil
-	}
-
-	f, err := os.ReadFile(path)
+	result, err := readJSON[T](path)
 	if err != nil {
-		return defaultValue, errors.WithStack(errDetail.WithRaw(err))
-	}
-	if err := json.Unmarshal(f, &defaultValue); err != nil {
-		return defaultValue, errors.WithStack(errDetail.WithRaw(err))
+		if errors.Is(err, os.ErrNotExist) {
+			return defaultValue, nil
+		}
+
+		return defaultValue, errors.WithStack(apperr.Cfg.Read.WithRaw(err))
 	}
 
-	return defaultValue, nil
+	return result, nil
 }
 
 func update[T any](filename string, target T) error {
-	errDetail := apperr.Cfg.Update
-
-	_ = os.Mkdir(ConfigDirName, 0o755)
-
-	file, err := os.Create(filepath.Join(ConfigDirName, filename))
+	path := filepath.Join(ConfigDirName, filename)
+	err := writeJSON(path, target)
 	if err != nil {
-		return errors.WithStack(errDetail.WithRaw(err))
-	}
-	defer file.Close()
-
-	encoder := json.NewEncoder(file)
-	encoder.SetIndent("", "  ")
-
-	if err := encoder.Encode(target); err != nil {
-		return errors.WithStack(errDetail.WithRaw(err))
+		return errors.WithStack(apperr.Cfg.Update.WithRaw(err))
 	}
 
 	return nil

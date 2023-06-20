@@ -3,7 +3,6 @@ package infra
 import (
 	"changeme/backend/apperr"
 	"changeme/backend/vo"
-	"encoding/json"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -69,41 +68,29 @@ func (t *TempArenaInfo) Save(tempArenaInfo vo.TempArenaInfo) error {
 	if err != nil {
 		return errors.WithStack(errDetail.WithRaw(err))
 	}
-	file, err := os.Create(filepath.Join(tempArenaInfoDir, "tempArenaInfo_"+strconv.FormatInt(date.Unix(), 10)+".json"))
+
+	path := filepath.Join(tempArenaInfoDir, "tempArenaInfo_"+strconv.FormatInt(date.Unix(), 10)+".json")
+	err = writeJSON(path, tempArenaInfo)
 	if err != nil {
-		return errors.WithStack(errDetail.WithRaw(err))
-	}
-	defer file.Close()
-
-	encoder := json.NewEncoder(file)
-	encoder.SetIndent("", "  ")
-
-	if err := encoder.Encode(tempArenaInfo); err != nil {
 		return errors.WithStack(errDetail.WithRaw(err))
 	}
 
 	return nil
 }
 
-//nolint:cyclop
 func decideTempArenaInfo(paths []string) (vo.TempArenaInfo, error) {
 	errDetail := apperr.Tai.Get
-	var tempArenaInfo vo.TempArenaInfo
 
 	size := len(paths)
 
 	if size == 0 {
-		return tempArenaInfo, errors.WithStack(errDetail.WithRaw(apperr.ErrNoTempArenaInfo))
+		return vo.TempArenaInfo{}, errors.WithStack(errDetail.WithRaw(apperr.ErrNoTempArenaInfo))
 	}
 
 	if size == 1 {
-		data, err := os.ReadFile(paths[0])
+		tempArenaInfo, err := readJSON[vo.TempArenaInfo](paths[0])
 		if err != nil {
-			return tempArenaInfo, errors.WithStack(errDetail.WithRaw(err))
-		}
-
-		if err := json.Unmarshal(data, &tempArenaInfo); err != nil {
-			return tempArenaInfo, errors.WithStack(errDetail.WithRaw(err))
+			return vo.TempArenaInfo{}, errors.WithStack(errDetail.WithRaw(err))
 		}
 
 		return tempArenaInfo, nil
@@ -112,13 +99,8 @@ func decideTempArenaInfo(paths []string) (vo.TempArenaInfo, error) {
 	var latest *vo.TempArenaInfo
 	var latestDate time.Time
 	for _, path := range paths {
-		data, err := os.ReadFile(path)
+		tempArenaInfo, err := readJSON[vo.TempArenaInfo](path)
 		if err != nil {
-			continue
-		}
-
-		var tempArenaInfo vo.TempArenaInfo
-		if err := json.Unmarshal(data, &tempArenaInfo); err != nil {
 			continue
 		}
 
