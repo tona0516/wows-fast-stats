@@ -70,7 +70,7 @@ func initApp() *App {
 	configService := service.NewConfig(configRepo, wargamingRepo)
 	screenshotService := service.NewScreenshot(screenshotRepo, runtime.SaveFileDialog)
 	battleService := service.NewBattle(parallels, wargamingRepo, tempArenaInfoRepo, numbersRepo, unregisteredRepo)
-	replayWatcher := service.NewReplayWatcher(configRepo, tempArenaInfoRepo, runtime.EventsEmit)
+	watcherService := service.NewWatcher(configRepo, tempArenaInfoRepo, runtime.EventsEmit)
 	reportService := service.NewReport(discordRepo, configRepo, tempArenaInfoRepo)
 
 	return NewApp(
@@ -78,7 +78,7 @@ func initApp() *App {
 		vo.Version{Semver: semver, Revision: revision},
 		*configService,
 		*screenshotService,
-		*replayWatcher,
+		*watcherService,
 		*battleService,
 		*reportService,
 		logger,

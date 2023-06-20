@@ -39,7 +39,7 @@ const TOAST_WAIT = "wait";
 const TOAST_FETCHING = "fetching";
 const TOAST_ERROR = "error";
 
-// Note: see replay_watcher.go
+// Note: see watcher.go
 const EVENT_BATTLE_START = "BATTLE_START"
 const EVENT_BATTLE_END = "BATTLE_END"
 

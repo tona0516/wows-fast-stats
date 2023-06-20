@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestReplayWatcher_Start_戦闘開始(t *testing.T) {
+func TestWatcher_Start_戦闘開始(t *testing.T) {
 	t.Parallel()
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -35,7 +35,7 @@ func TestReplayWatcher_Start_戦闘開始(t *testing.T) {
 		events = append(events, eventName)
 	}
 
-	watcher := NewReplayWatcher(mockConfigRepo, mockTaiRepo, emitFunc)
+	watcher := NewWatcher(mockConfigRepo, mockTaiRepo, emitFunc)
 
 	// Startメソッドをゴルーチンで非同期に実行する
 	go watcher.Start(ctx, ctx)
@@ -50,7 +50,7 @@ func TestReplayWatcher_Start_戦闘開始(t *testing.T) {
 	assert.Empty(t, events)
 }
 
-func TestReplayWatcher_Start_戦闘終了(t *testing.T) {
+func TestWatcher_Start_戦闘終了(t *testing.T) {
 	t.Parallel()
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -76,7 +76,7 @@ func TestReplayWatcher_Start_戦闘終了(t *testing.T) {
 		events = append(events, eventName)
 	}
 
-	watcher := NewReplayWatcher(mockConfigRepo, mockTaiRepo, emitFunc)
+	watcher := NewWatcher(mockConfigRepo, mockTaiRepo, emitFunc)
 
 	// Startメソッドをゴルーチンで非同期に実行する
 	go watcher.Start(ctx, ctx)
@@ -91,7 +91,7 @@ func TestReplayWatcher_Start_戦闘終了(t *testing.T) {
 	assert.Contains(t, events, EventEnd)
 }
 
-func TestReplayWatcher_Start_キャンセル(t *testing.T) {
+func TestWatcher_Start_キャンセル(t *testing.T) {
 	t.Parallel()
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -116,7 +116,7 @@ func TestReplayWatcher_Start_キャンセル(t *testing.T) {
 		events = append(events, eventName)
 	}
 
-	watcher := NewReplayWatcher(mockConfigRepo, mockTaiRepo, emitFunc)
+	watcher := NewWatcher(mockConfigRepo, mockTaiRepo, emitFunc)
 
 	// Startメソッドをゴルーチンで非同期に実行する
 	go watcher.Start(ctx, ctx)

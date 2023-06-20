@@ -14,25 +14,25 @@ const (
 	EventEnd   = "BATTLE_END"
 )
 
-type ReplayWatcher struct {
+type Watcher struct {
 	configRepo     infra.ConfigInterface
 	taiRepo        infra.TempArenaInfoInterface
 	eventsEmitFunc func(ctx context.Context, eventName string, optionalData ...interface{})
 }
 
-func NewReplayWatcher(
+func NewWatcher(
 	configRepo infra.ConfigInterface,
 	taiRepo infra.TempArenaInfoInterface,
 	eventsEmitFunc func(ctx context.Context, eventName string, optionalData ...interface{}),
-) *ReplayWatcher {
-	return &ReplayWatcher{
+) *Watcher {
+	return &Watcher{
 		configRepo:     configRepo,
 		taiRepo:        taiRepo,
 		eventsEmitFunc: eventsEmitFunc,
 	}
 }
 
-func (w *ReplayWatcher) Start(appCtx context.Context, ctx context.Context) {
+func (w *Watcher) Start(appCtx context.Context, ctx context.Context) {
 	var latestHash string
 
 	for {

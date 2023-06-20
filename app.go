@@ -18,17 +18,17 @@ import (
 const PARALLELS = 5
 
 type App struct {
-	ctx                 context.Context
-	version             vo.Version
-	env                 vo.Env
-	cancelReplayWatcher context.CancelFunc
-	configService       service.Config
-	screenshotService   service.Screenshot
-	replayWatcher       service.ReplayWatcher
-	battleService       service.Battle
-	reportService       service.Report
-	logger              infra.LoggerInterface
-	excludePlayer       mapset.Set[int]
+	ctx               context.Context
+	version           vo.Version
+	env               vo.Env
+	cancelWatcher     context.CancelFunc
+	configService     service.Config
+	screenshotService service.Screenshot
+	watcherService    service.Watcher
+	battleService     service.Battle
+	reportService     service.Report
+	logger            infra.LoggerInterface
+	excludePlayer     mapset.Set[int]
 }
 
 func NewApp(
@@ -36,7 +36,7 @@ func NewApp(
 	version vo.Version,
 	configService service.Config,
 	screenshotService service.Screenshot,
-	replayWatcher service.ReplayWatcher,
+	watcherService service.Watcher,
 	battleService service.Battle,
 	reportService service.Report,
 	logger infra.LoggerInterface,
@@ -46,7 +46,7 @@ func NewApp(
 		version:           version,
 		configService:     configService,
 		screenshotService: screenshotService,
-		replayWatcher:     replayWatcher,
+		watcherService:    watcherService,
 		battleService:     battleService,
 		reportService:     reportService,
 		logger:            logger,
@@ -82,13 +82,13 @@ func (a *App) onShutdown(ctx context.Context) {
 }
 
 func (a *App) Ready() {
-	if a.cancelReplayWatcher != nil {
-		a.cancelReplayWatcher()
+	if a.cancelWatcher != nil {
+		a.cancelWatcher()
 	}
 	ctx, cancel := context.WithCancel(context.Background())
-	a.cancelReplayWatcher = cancel
+	a.cancelWatcher = cancel
 
-	go a.replayWatcher.Start(a.ctx, ctx)
+	go a.watcherService.Start(a.ctx, ctx)
 }
 
 func (a *App) Battle() (vo.Battle, error) {
