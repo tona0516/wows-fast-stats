@@ -120,7 +120,7 @@ func read[T any](filename string, defaultValue T) (T, error) {
 			return defaultValue, nil
 		}
 
-		return defaultValue, errors.WithStack(apperr.Cfg.Read.WithRaw(err))
+		return defaultValue, apperr.New(apperr.ReadFile, err)
 	}
 
 	return result, nil
@@ -130,7 +130,7 @@ func update[T any](filename string, target T) error {
 	path := filepath.Join(ConfigDirName, filename)
 	err := writeJSON(path, target)
 	if err != nil {
-		return errors.WithStack(apperr.Cfg.Update.WithRaw(err))
+		return apperr.New(apperr.WriteFile, err)
 	}
 
 	return nil

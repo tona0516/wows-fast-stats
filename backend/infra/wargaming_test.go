@@ -1,10 +1,11 @@
 package infra
 
 import (
+	"changeme/backend/apperr"
 	"changeme/backend/vo"
-	"fmt"
 	"testing"
 
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -159,11 +160,12 @@ func TestWargaming_AccountInfo_異常系_リトライなし(t *testing.T) {
 	wargaming := NewWargaming(vo.WGConfig{})
 	wargaming.SetAppID("your-app-id")
 
+	message := "INVALID_APPLICATION_ID"
 	mockAPIClient := &mockAPIClient[vo.WGAccountInfo]{}
 	response := APIResponse[vo.WGAccountInfo]{Body: vo.WGAccountInfo{
 		Status: "error",
 		Error: vo.WGError{
-			Message: "INVALID_APPLICATION_ID",
+			Message: message,
 		},
 	},
 	}
@@ -172,7 +174,7 @@ func TestWargaming_AccountInfo_異常系_リトライなし(t *testing.T) {
 
 	_, err := wargaming.AccountInfo([]int{123, 456})
 
-	assert.EqualError(t, err, fmt.Sprintf("I100 AccountInfo %s", response.Body.Error.Message))
+	assert.EqualError(t, err, apperr.New(apperr.WargamingAPIError, errors.New(message)).Error())
 	mockAPIClient.AssertNumberOfCalls(t, "GetRequest", 1)
 }
 
@@ -217,12 +219,12 @@ func TestWargaming_AccountInfo_異常系_最大リトライ(t *testing.T) {
 		"SOURCE_NOT_AVAILABLE",
 	}
 
-	for _, v := range messages {
+	for _, message := range messages {
 		mockAPIClient := &mockAPIClient[vo.WGAccountInfo]{}
 		response := APIResponse[vo.WGAccountInfo]{
 			Body: vo.WGAccountInfo{
 				Error: vo.WGError{
-					Message: v,
+					Message: message,
 				},
 			},
 		}
@@ -231,7 +233,7 @@ func TestWargaming_AccountInfo_異常系_最大リトライ(t *testing.T) {
 
 		_, err := wargaming.AccountInfo([]int{123, 456})
 
-		assert.EqualError(t, err, fmt.Sprintf("I100 AccountInfo %s", v))
+		assert.EqualError(t, err, apperr.New(apperr.WargamingAPITemporaryUnavaillalble, errors.New(message)).Error())
 		mockAPIClient.AssertNumberOfCalls(t, "GetRequest", 4)
 	}
 }

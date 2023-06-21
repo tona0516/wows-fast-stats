@@ -5,8 +5,6 @@ import (
 	"encoding/base64"
 	"os"
 	"path/filepath"
-
-	"github.com/pkg/errors"
 )
 
 type Screenshot struct{}
@@ -21,17 +19,17 @@ func (s *Screenshot) Save(path string, base64Data string) error {
 
 	data, err := base64.StdEncoding.DecodeString(base64Data)
 	if err != nil {
-		return errors.WithStack(apperr.Ss.Save.WithRaw(err))
+		return apperr.New(apperr.DecodeBase64, err)
 	}
 
 	f, err := os.Create(path)
 	if err != nil {
-		return errors.WithStack(apperr.Ss.Save.WithRaw(err))
+		return apperr.New(apperr.WriteFile, err)
 	}
 	defer f.Close()
 
 	if _, err := f.Write(data); err != nil {
-		return errors.WithStack(apperr.Ss.Save.WithRaw(err))
+		return apperr.New(apperr.WriteFile, err)
 	}
 
 	return nil

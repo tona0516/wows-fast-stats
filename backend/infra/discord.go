@@ -37,24 +37,22 @@ func (d *Discord) Upload(text string) (APIResponse[any], error) {
 		_ = os.Remove(zipName)
 	}()
 	if err != nil {
-		return response, errors.WithStack(apperr.Dc.Upload.WithRaw(err))
+		return response, apperr.New(apperr.WriteFile, err)
 	}
 
-	// make content
 	zw := zip.NewWriter(file)
 	fw, err := zw.Create(textName)
 	if err != nil {
-		return response, errors.WithStack(apperr.Dc.Upload.WithRaw(err))
+		return response, apperr.New(apperr.WriteFile, err)
 	}
 
 	_, err = fw.Write([]byte(text))
 	if err != nil {
-		return response, errors.WithStack(apperr.Dc.Upload.WithRaw(err))
+		return response, apperr.New(apperr.WriteFile, err)
 	}
 
-	// write zip
 	if err := zw.Close(); err != nil {
-		return response, errors.WithStack(apperr.Dc.Upload.WithRaw(err))
+		return response, apperr.New(apperr.WriteFile, err)
 	}
 
 	// upload zip
@@ -67,15 +65,15 @@ func (d *Discord) Upload(text string) (APIResponse[any], error) {
 
 	response, err = d.apiClient.PostMultipartFormData(forms)
 	if err != nil {
-		return response, errors.WithStack(apperr.Dc.Upload.WithRaw(err))
+		return response, err
 	}
 
 	if response.StatusCode != http.StatusOK {
-		message := "request error, status_code: " +
+		message := "status_code: " +
 			strconv.Itoa(response.StatusCode) +
 			" response_body: " +
 			response.BodyString
-		return response, errors.New(message)
+		return response, apperr.New(apperr.DiscordAPIError, errors.New(message))
 	}
 
 	return response, nil

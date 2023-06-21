@@ -6,8 +6,6 @@ import (
 	"changeme/backend/vo"
 	"os"
 	"path/filepath"
-
-	"github.com/pkg/errors"
 )
 
 type Config struct {
@@ -63,12 +61,12 @@ func (c *Config) SearchPlayer(prefix string) (vo.WGAccountList, error) {
 
 func (c *Config) validate(config vo.UserConfig) error {
 	if _, err := os.Stat(filepath.Join(config.InstallPath, "WorldOfWarships.exe")); err != nil {
-		return errors.WithStack(apperr.SrvCfg.InvalidInstallPath.WithRaw(apperr.ErrInvalidInstallPath))
+		return apperr.New(apperr.ValidateInvalidInstallPath, err)
 	}
 
 	c.wargamingRepo.SetAppID(config.Appid)
 	if _, err := c.wargamingRepo.EncycInfo(); err != nil {
-		return errors.WithStack(apperr.SrvCfg.InvalidAppID.WithRaw(apperr.ErrInvalidAppID))
+		return apperr.New(apperr.ValidateInvalidAppID, err)
 	}
 
 	// Same value as "font-size": https://developer.mozilla.org/ja/docs/Web/CSS/font-size
@@ -80,7 +78,7 @@ func (c *Config) validate(config vo.UserConfig) error {
 		}
 	}
 	if !validFontSize {
-		return errors.WithStack(apperr.SrvCfg.InvalidFontSize.WithRaw(apperr.ErrInvalidFontSize))
+		return apperr.New(apperr.ValidateInvalidFontSize, nil)
 	}
 
 	return nil

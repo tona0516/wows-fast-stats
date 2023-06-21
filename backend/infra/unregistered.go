@@ -6,8 +6,6 @@ import (
 	_ "embed"
 	"encoding/json"
 	"strings"
-
-	"github.com/pkg/errors"
 )
 
 //go:embed resource/ships.json
@@ -20,13 +18,11 @@ func NewUnregistered() *Unregistered {
 }
 
 func (u *Unregistered) Warship() (map[int]vo.Warship, error) {
-	errDetail := apperr.Unreg.Warship
-
 	var ships []unregisteredShip
 	result := make(map[int]vo.Warship, 0)
 
 	if err := json.Unmarshal(shipsByte, &ships); err != nil {
-		return result, errors.WithStack(errDetail.WithRaw(err))
+		return result, apperr.New(apperr.ReadFile, err)
 	}
 
 	for _, us := range ships {

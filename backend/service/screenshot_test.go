@@ -1,11 +1,12 @@
 package service
 
 import (
+	"changeme/backend/apperr"
 	"context"
-	"fmt"
 	"path/filepath"
 	"testing"
 
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
@@ -14,6 +15,8 @@ const (
 	filename   = "example.png"
 	base64Data = "abc123"
 )
+
+var errShowDialog = errors.New("file dialog error")
 
 func TestScreenshot_SaveForAuto_正常系(t *testing.T) {
 	t.Parallel()
@@ -61,15 +64,14 @@ func TestScreenshot_SaveWithDialog_異常系(t *testing.T) {
 	// Screenshot インスタンスの作成
 	mockRepo := &mockScreenshotRepo{}
 	s := NewScreenshot(mockRepo, func(_ context.Context, _ runtime.SaveDialogOptions) (string, error) {
-		//nolint:goerr113
-		return "", fmt.Errorf("file dialog error")
+		return "", errShowDialog
 	})
 
 	// テスト実行
 	err := s.SaveWithDialog(context.Background(), filename, base64Data)
 
 	// 結果の検証
-	assert.EqualError(t, err, "S400 SaveDialog file dialog error")
+	assert.EqualError(t, err, apperr.New(apperr.ShowDialog, errShowDialog).Error())
 	mockRepo.AssertNotCalled(t, "Save")
 }
 
@@ -86,6 +88,6 @@ func TestScreenshot_SaveWithDialog_異常系_キャンセル(t *testing.T) {
 	err := s.SaveWithDialog(context.Background(), filename, base64Data)
 
 	// 結果の検証
-	assert.EqualError(t, err, "S401 Canceled")
+	assert.EqualError(t, err, apperr.UserCanceled.String())
 	mockRepo.AssertNotCalled(t, "Save")
 }

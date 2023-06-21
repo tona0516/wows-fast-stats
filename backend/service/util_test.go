@@ -1,9 +1,9 @@
 package service
 
 import (
-	"errors"
 	"testing"
 
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -34,7 +34,6 @@ func TestUtil_DoParallel_異常系(t *testing.T) {
 	// テスト用の関数
 	fn := func(value int) error {
 		if value == 3 {
-			//nolint:goerr113
 			return errors.New("error occurred")
 		}
 		return nil

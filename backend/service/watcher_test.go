@@ -3,10 +3,10 @@ package service
 import (
 	"changeme/backend/vo"
 	"context"
-	"fmt"
 	"testing"
 	"time"
 
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -65,8 +65,8 @@ func TestWatcher_Start_戦闘終了(t *testing.T) {
 	mockConfigRepo := &mockConfigRepo{}
 	mockConfigRepo.On("User").Return(config, nil)
 	mockTaiRepo := &mockTempArenaInfoRepo{}
-	//nolint:goerr113
-	mockTaiRepo.On("Get", config.InstallPath).Return(vo.TempArenaInfo{}, fmt.Errorf("not exists"))
+
+	mockTaiRepo.On("Get", config.InstallPath).Return(vo.TempArenaInfo{}, errors.New("not exists"))
 
 	// イベントが発行されたかどうかを検証するための変数
 	var events []string

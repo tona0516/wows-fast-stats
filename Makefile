@@ -1,15 +1,19 @@
-DIR := test_install_dir/replays/
-SEMVER := 0.6.1
 APP := wows-fast-stats
+SEMVER := 0.6.1
+REVISION := $(shell git rev-parse --short HEAD)
 EXE := $(APP)-$(SEMVER).exe
 ZIP := $(APP).zip
 DISCORD_WEBHOOK_URL := $(shell cat discord_webhook_url)
 
+LDFLAGS_COMMON := -X main.semver=$(SEMVER) -X main.revision=$(REVISION) -X main.discordWebhookURL=$(DISCORD_WEBHOOK_URL)
+LDFLAGS_DEV := -X main.env=debug $(LDFLAGS_COMMON)
+LDFLAGS_PROD := -X main.env=production $(LDFLAGS_COMMON)
+
+TEST_DIR := test_install_dir/replays/
+
 .PHONY: dev
-dev:
-	$(eval REV := $(shell git rev-parse --short HEAD))
-	$(eval LD_FLAGS := "-X main.semver=$(SEMVER) -X main.revision=$(REV) -X main.env=debug -X main.discordWebhookURL=$(DISCORD_WEBHOOK_URL)")
-	wails dev -ldflags $(LD_FLAGS)
+dev: gen
+	wails dev -ldflags "$(LDFLAGS_DEV)"
 
 .PHONY: check-prerequisite
 check-prerequisite:
@@ -20,18 +24,15 @@ check-prerequisite:
 setup: check-prerequisite
 	go install github.com/wailsapp/wails/v2/cmd/wails@latest
 	go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+	go install golang.org/x/tools/cmd/stringer@latest
 
 .PHONY: build
-build: lint test
-	$(eval REV := $(shell git rev-parse --short HEAD))
-	$(eval LD_FLAGS := "-X main.semver=$(SEMVER) -X main.revision=$(REV) -X main.env=production -X main.discordWebhookURL=$(DISCORD_WEBHOOK_URL)")
-	wails build -ldflags $(LD_FLAGS) -platform windows/amd64 -o $(EXE) -trimpath
+build: gen lint test
+	wails build -ldflags "$(LDFLAGS_PROD)" -platform windows/amd64 -o $(EXE) -trimpath
 
 .PHONY: build-nolint
-build-nolint:
-	$(eval REV := $(shell git rev-parse --short HEAD))
-	$(eval LD_FLAGS := "-X main.semver=$(SEMVER) -X main.revision=$(REV) -X main.env=production -X main.discordWebhookURL=$(DISCORD_WEBHOOK_URL)")
-	wails build -ldflags $(LD_FLAGS) -platform windows/amd64 -o $(EXE) -trimpath
+build-nolint: gen
+	wails build -ldflags "$(LDFLAGS_PROD)" -platform windows/amd64 -o $(EXE) -trimpath
 
 .PHONY: package
 package: build
@@ -40,6 +41,10 @@ package: build
 	cp build/bin/$(EXE) $(APP)
 	zip -r $(ZIP) $(APP)
 	rm -rf $(APP)
+
+.PHONY: gen
+gen:
+	go generate ./...
 
 .PHONY: lint
 lint:
@@ -59,4 +64,4 @@ test:
 .PHONY: put-temp-arema-info
 put-temp-arema-info:
 	$(eval TEMP_ARENA_INFO := $(shell ls test_install_dir/replays | fzf))
-	cp $(DIR)$(TEMP_ARENA_INFO) $(DIR)tempArenaInfo.json
+	cp $(TEST_DIR)$(TEMP_ARENA_INFO) $(TEST_DIR)tempArenaInfo.json

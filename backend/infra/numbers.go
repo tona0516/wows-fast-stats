@@ -12,6 +12,11 @@ import (
 	"github.com/pkg/errors"
 )
 
+var (
+	errNoTimeKey = errors.New("no time key")
+	errNoDataKey = errors.New("no data key")
+)
+
 type Numbers struct {
 	URL string
 }
@@ -40,39 +45,35 @@ func (n *Numbers) ExpectedStats() (vo.NSExpectedStats, error) {
 }
 
 func (n *Numbers) fetch() ([]byte, error) {
-	e := apperr.Ns.Req
-
 	res, err := http.Get(n.URL)
 	if err != nil {
-		return []byte{}, errors.WithStack(e.WithRaw(err))
+		return []byte{}, apperr.New(apperr.HTTPRequest, err)
 	}
 	defer res.Body.Close()
 
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
-		return []byte{}, errors.WithStack(e.WithRaw(err))
+		return []byte{}, apperr.New(apperr.HTTPRequest, err)
 	}
 
 	return body, nil
 }
 
 func parse(body []byte) (vo.NSExpectedStats, error) {
-	e := apperr.Ns.Parse
-
 	var result vo.NSExpectedStats
 
 	depth1 := make(map[string]interface{})
 	if err := json.Unmarshal(body, &depth1); err != nil {
-		return result, errors.WithStack(e)
+		return result, apperr.New(apperr.NumbersAPIParse, err)
 	}
 
 	time, ok := depth1["time"].(float64)
 	if !ok {
-		return result, errors.WithStack(e.WithRaw(apperr.ErrNoTimeKey))
+		return result, apperr.New(apperr.NumbersAPIParse, errNoTimeKey)
 	}
 	depth2, ok := depth1["data"].(map[string]interface{})
 	if !ok {
-		return result, errors.WithStack(e.WithRaw(apperr.ErrNoDataKey))
+		return result, apperr.New(apperr.NumbersAPIParse, errNoDataKey)
 	}
 
 	data := make(map[int]vo.NSExpectedStatsData)

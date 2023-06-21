@@ -95,7 +95,7 @@ function toggleAll(e: any) {
     <!-- appid -->
     <div class="mb-3">
       <div class="centerize">
-        <label for="appid" class="form-label">AppID</label>
+        <label for="appid" class="form-label">アプリケーションID</label>
       </div>
       <input
         type="text"

@@ -3,7 +3,6 @@ package infra
 import (
 	"changeme/backend/apperr"
 	"changeme/backend/vo"
-	"fmt"
 	"strconv"
 	"strings"
 
@@ -57,7 +56,6 @@ func (w *Wargaming) AccountInfo(accountIDs []int) (vo.WGAccountInfo, error) {
 			"fields":         vo.WGAccountInfoData{}.Field(),
 			"extra":          "statistics.pvp_solo",
 		},
-		apperr.Wg.AccountInfo,
 	)
 }
 
@@ -70,7 +68,6 @@ func (w *Wargaming) AccountList(accountNames []string) (vo.WGAccountList, error)
 			"fields":         vo.WGAccountListData{}.Field(),
 			"type":           "exact",
 		},
-		apperr.Wg.AccountList,
 	)
 }
 
@@ -82,7 +79,6 @@ func (w *Wargaming) AccountListForSearch(prefix string) (vo.WGAccountList, error
 			"search":         prefix,
 			"fields":         vo.WGAccountListData{}.Field(),
 		},
-		apperr.Wg.AccountList,
 	)
 }
 
@@ -99,7 +95,6 @@ func (w *Wargaming) ClansAccountInfo(accountIDs []int) (vo.WGClansAccountInfo, e
 			"account_id":     strings.Join(strAccountIDs, ","),
 			"fields":         vo.WGClansAccountInfoData{}.Field(),
 		},
-		apperr.Wg.ClansAccountInfo,
 	)
 }
 
@@ -116,7 +111,6 @@ func (w *Wargaming) ClansInfo(clanIDs []int) (vo.WGClansInfo, error) {
 			"clan_id":        strings.Join(strClanIDs, ","),
 			"fields":         vo.WGClansInfoData{}.Field(),
 		},
-		apperr.Wg.ClansInfo,
 	)
 }
 
@@ -129,7 +123,6 @@ func (w *Wargaming) ShipsStats(accountID int) (vo.WGShipsStats, error) {
 			"fields":         vo.WGShipsStatsData{}.Field(),
 			"extra":          "pvp_solo",
 		},
-		apperr.Wg.ShipsStats,
 	)
 }
 
@@ -142,7 +135,6 @@ func (w *Wargaming) EncycShips(pageNo int) (vo.WGEncycShips, error) {
 			"language":       "ja",
 			"page_no":        strconv.Itoa(pageNo),
 		},
-		apperr.Wg.EncyclopediaShips,
 	)
 }
 
@@ -153,7 +145,6 @@ func (w *Wargaming) EncycInfo() (vo.WGEncycInfo, error) {
 			"application_id": w.appid,
 			"fields":         vo.WGEncyclopediaInfoData{}.Field(),
 		},
-		apperr.Wg.EncyclopediaInfo,
 	)
 }
 
@@ -165,7 +156,6 @@ func (w *Wargaming) BattleArenas() (vo.WGBattleArenas, error) {
 			"fields":         vo.WGBattleArenasData{}.Field(),
 			"language":       "ja",
 		},
-		apperr.Wg.BattleArenas,
 	)
 }
 
@@ -177,14 +167,12 @@ func (w *Wargaming) BattleTypes() (vo.WGBattleTypes, error) {
 			"fields":         vo.WGBattleTypesData{}.Field(),
 			"language":       "ja",
 		},
-		apperr.Wg.BattleTypes,
 	)
 }
 
 func request[T vo.WGResponse](
 	client APIClientInterface[T],
 	query map[string]string,
-	errDetail apperr.AppError,
 ) (T, error) {
 	b := backoff.WithMaxRetries(backoff.NewExponentialBackOff(), 3)
 	operation := func() (APIResponse[T], error) {
@@ -194,8 +182,7 @@ func request[T vo.WGResponse](
 		// https://developers.wargaming.net/documentation/guide/getting-started/#common-errors
 		message := res.Body.GetError().Message
 		if slices.Contains([]string{"REQUEST_LIMIT_EXCEEDED", "SOURCE_NOT_AVAILABLE"}, message) {
-			//nolint:goerr113
-			return res, fmt.Errorf(message)
+			return res, apperr.New(apperr.WargamingAPITemporaryUnavaillalble, errors.New(message))
 		}
 
 		return res, backoff.Permanent(err)
@@ -203,11 +190,11 @@ func request[T vo.WGResponse](
 
 	res, err := backoff.RetryWithData(operation, b)
 	if err != nil {
-		return res.Body, errors.WithStack(errDetail.WithRaw(err))
+		return res.Body, err
 	}
+
 	if res.Body.GetStatus() == "error" {
-		//nolint:goerr113
-		return res.Body, errors.WithStack(errDetail.WithRaw(fmt.Errorf(res.Body.GetError().Message)))
+		return res.Body, apperr.New(apperr.WargamingAPIError, errors.New(res.Body.GetError().Message))
 	}
 
 	return res.Body, err

@@ -13,7 +13,6 @@ import (
 	"unsafe"
 
 	"github.com/cenkalti/backoff/v4"
-	"github.com/pkg/errors"
 )
 
 type APIClient[T any] struct {
@@ -44,7 +43,7 @@ func (c *APIClient[T]) GetRequest(query map[string]string) (APIResponse[T], erro
 	// build URL
 	u, err := url.Parse(c.baseURL)
 	if err != nil {
-		return response, errors.WithStack(apperr.Ac.Parse.WithRaw(err))
+		return response, apperr.New(apperr.HTTPRequest, err)
 	}
 	q := u.Query()
 	for k, v := range query {
@@ -60,7 +59,7 @@ func (c *APIClient[T]) GetRequest(query map[string]string) (APIResponse[T], erro
 
 	res, err := backoff.RetryWithData(operation, b)
 	if err != nil {
-		return response, errors.WithStack(apperr.Ac.Retry.WithRaw(err))
+		return response, apperr.New(apperr.HTTPRequest, err)
 	}
 
 	response.StatusCode = res.StatusCode
@@ -69,7 +68,7 @@ func (c *APIClient[T]) GetRequest(query map[string]string) (APIResponse[T], erro
 
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
-		return response, errors.WithStack(apperr.Ac.Read.WithRaw(err))
+		return response, apperr.New(apperr.HTTPRequest, err)
 	}
 
 	response.BodyString = *(*string)(unsafe.Pointer(&body))
@@ -77,7 +76,7 @@ func (c *APIClient[T]) GetRequest(query map[string]string) (APIResponse[T], erro
 	// serialize
 	err = json.Unmarshal(body, &response.Body)
 	if err != nil {
-		return response, errors.WithStack(apperr.Ac.Unmarshal.WithRaw(err))
+		return response, apperr.New(apperr.HTTPRequest, err)
 	}
 
 	return response, nil
@@ -90,7 +89,7 @@ func (c *APIClient[T]) PostMultipartFormData(forms []Form) (APIResponse[T], erro
 	// build URL
 	u, err := url.Parse(c.baseURL)
 	if err != nil {
-		return response, errors.WithStack(apperr.Ac.Parse.WithRaw(err))
+		return response, apperr.New(apperr.HTTPRequest, err)
 	}
 
 	// build request
@@ -132,7 +131,7 @@ func (c *APIClient[T]) PostMultipartFormData(forms []Form) (APIResponse[T], erro
 
 	res, err := backoff.RetryWithData(operation, b)
 	if err != nil {
-		return response, errors.WithStack(apperr.Ac.Retry.WithRaw(err))
+		return response, apperr.New(apperr.HTTPRequest, err)
 	}
 
 	response.StatusCode = res.StatusCode
@@ -141,7 +140,7 @@ func (c *APIClient[T]) PostMultipartFormData(forms []Form) (APIResponse[T], erro
 
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
-		return response, errors.WithStack(apperr.Ac.Read.WithRaw(err))
+		return response, apperr.New(apperr.HTTPRequest, err)
 	}
 
 	response.BodyString = *(*string)(unsafe.Pointer(&body))
@@ -149,7 +148,7 @@ func (c *APIClient[T]) PostMultipartFormData(forms []Form) (APIResponse[T], erro
 	// serialize
 	err = json.Unmarshal(body, &response.Body)
 	if err != nil {
-		return response, errors.WithStack(apperr.Ac.Unmarshal.WithRaw(err))
+		return response, apperr.New(apperr.HTTPRequest, err)
 	}
 
 	return response, nil

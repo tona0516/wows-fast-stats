@@ -6,7 +6,6 @@ import (
 	"changeme/backend/service"
 	"changeme/backend/vo"
 	"context"
-	"fmt"
 	"strconv"
 
 	mapset "github.com/deckarep/golang-set/v2"
@@ -97,7 +96,7 @@ func (a *App) Battle() (vo.Battle, error) {
 	userConfig, err := a.configService.User()
 	if err != nil {
 		a.logger.Error("Failed to get UserConfig", err)
-		return result, err
+		return result, apperr.ToFrontendError(err)
 	}
 
 	result, err = a.battleService.Battle(userConfig)
@@ -108,7 +107,7 @@ func (a *App) Battle() (vo.Battle, error) {
 			a.logger.Warn("Failed to send Report", err)
 		}
 
-		return result, err
+		return result, apperr.ToFrontendError(err)
 	}
 
 	return result, nil
@@ -120,7 +119,7 @@ func (a *App) SelectDirectory() (string, error) {
 		a.logger.Warn("Failed to get directory, path:"+path, err)
 	}
 
-	return path, err
+	return path, apperr.ToFrontendError(err)
 }
 
 func (a *App) UserConfig() (vo.UserConfig, error) {
@@ -129,7 +128,7 @@ func (a *App) UserConfig() (vo.UserConfig, error) {
 		a.logger.Warn("Failed to get UserConfig", err)
 	}
 
-	return config, err
+	return config, apperr.ToFrontendError(err)
 }
 
 func (a *App) ApplyUserConfig(config vo.UserConfig) error {
@@ -138,16 +137,16 @@ func (a *App) ApplyUserConfig(config vo.UserConfig) error {
 		a.logger.Warn("Failed to update UserConfig", err)
 	}
 
-	return err
+	return apperr.ToFrontendError(err)
 }
 
 func (a *App) ManualScreenshot(filename string, base64Data string) error {
 	err := a.screenshotService.SaveWithDialog(a.ctx, filename, base64Data)
-	if err != nil && !errors.Is(err, apperr.SrvSs.Canceled) {
+	if err != nil {
 		a.logger.Warn("Failed to save screenshot, filename:"+filename+" base64Data:"+base64Data, err)
 	}
 
-	return err
+	return apperr.ToFrontendError(err)
 }
 
 func (a *App) AutoScreenshot(filename string, base64Data string) error {
@@ -156,7 +155,7 @@ func (a *App) AutoScreenshot(filename string, base64Data string) error {
 		a.logger.Warn("Failed to save screenshot, filename:"+filename+" base64Data:"+base64Data, err)
 	}
 
-	return err
+	return apperr.ToFrontendError(err)
 }
 
 func (a *App) AppVersion() vo.Version {
@@ -166,9 +165,9 @@ func (a *App) AppVersion() vo.Version {
 func (a *App) OpenDirectory(path string) error {
 	err := open.Run(path)
 	if err != nil {
-		wraped := errors.WithStack(apperr.App.OpenDir.WithRaw(err))
+		wraped := apperr.New(apperr.OpenDirectory, err)
 		a.logger.Warn("Failed to open directory, path:"+path, wraped)
-		return wraped
+		return apperr.ToFrontendError(wraped)
 	}
 
 	return nil
@@ -192,7 +191,7 @@ func (a *App) AlertPlayers() ([]vo.AlertPlayer, error) {
 		a.logger.Warn("Failed to get AlertPlayers", err)
 	}
 
-	return players, err
+	return players, apperr.ToFrontendError(err)
 }
 
 func (a *App) UpdateAlertPlayer(player vo.AlertPlayer) error {
@@ -201,7 +200,7 @@ func (a *App) UpdateAlertPlayer(player vo.AlertPlayer) error {
 		a.logger.Warn("Failed to update AlertPlayer, player.Name:"+player.Name, err)
 	}
 
-	return err
+	return apperr.ToFrontendError(err)
 }
 
 func (a *App) RemoveAlertPlayer(accountID int) error {
@@ -210,7 +209,7 @@ func (a *App) RemoveAlertPlayer(accountID int) error {
 		a.logger.Warn("Failed to remove AlertPlayer, accountID:"+strconv.Itoa(accountID), err)
 	}
 
-	return err
+	return apperr.ToFrontendError(err)
 }
 
 func (a *App) SearchPlayer(prefix string) (vo.WGAccountList, error) {
@@ -219,7 +218,7 @@ func (a *App) SearchPlayer(prefix string) (vo.WGAccountList, error) {
 		a.logger.Warn("Failed to search player, prefix:"+prefix, err)
 	}
 
-	return accountList, err
+	return accountList, apperr.ToFrontendError(err)
 }
 
 func (a *App) AlertPatterns() []string {
@@ -227,8 +226,7 @@ func (a *App) AlertPatterns() []string {
 }
 
 func (a *App) LogErrorForFrontend(err string) {
-	//nolint:goerr113
-	a.logger.Warn("Error has occurred in frontend", fmt.Errorf("%s", err))
+	a.logger.Warn("Error has occurred in frontend", apperr.New(apperr.FrontendError, errors.New(err)))
 }
 
 func (a *App) FontSizes() []string {

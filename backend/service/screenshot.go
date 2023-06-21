@@ -6,7 +6,6 @@ import (
 	"context"
 	"path/filepath"
 
-	"github.com/pkg/errors"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
@@ -34,10 +33,10 @@ func (s *Screenshot) SaveWithDialog(ctx context.Context, filename string, base64
 		DefaultFilename: filename,
 	})
 	if err != nil {
-		return errors.WithStack(apperr.SrvSs.SaveDialog.WithRaw(err))
+		return apperr.New(apperr.ShowDialog, err)
 	}
 	if path == "" {
-		return errors.WithStack(apperr.SrvSs.Canceled)
+		return apperr.New(apperr.UserCanceled, nil)
 	}
 
 	return s.screenshotRepo.Save(path, base64Data)
