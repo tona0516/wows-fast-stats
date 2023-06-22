@@ -1,7 +1,7 @@
 package service
 
 import (
-	"changeme/backend/vo"
+	"wfs/backend/vo"
 
 	"github.com/stretchr/testify/mock"
 )

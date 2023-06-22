@@ -1,12 +1,12 @@
 package main
 
 import (
-	"changeme/backend/infra"
-	"changeme/backend/service"
-	"changeme/backend/vo"
 	"embed"
 	"fmt"
 	"os"
+	"wfs/backend/infra"
+	"wfs/backend/service"
+	"wfs/backend/vo"
 
 	"github.com/mitchellh/go-ps"
 	"github.com/wailsapp/wails/v2"

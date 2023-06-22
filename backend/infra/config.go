@@ -1,10 +1,10 @@
 package infra
 
 import (
-	"changeme/backend/apperr"
-	"changeme/backend/vo"
 	"os"
 	"path/filepath"
+	"wfs/backend/apperr"
+	"wfs/backend/vo"
 
 	"github.com/pkg/errors"
 )

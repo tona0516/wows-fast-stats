@@ -1,7 +1,7 @@
 package domain
 
 import (
-	"changeme/backend/vo"
+	"wfs/backend/vo"
 )
 
 type StatsMode string

@@ -1,10 +1,10 @@
 package service
 
 import (
-	"changeme/backend/apperr"
-	"changeme/backend/infra"
 	"context"
 	"path/filepath"
+	"wfs/backend/apperr"
+	"wfs/backend/infra"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )

@@ -4,9 +4,9 @@ import (
 	"sort"
 	"sync"
 
-	"changeme/backend/domain"
-	"changeme/backend/infra"
-	"changeme/backend/vo"
+	"wfs/backend/domain"
+	"wfs/backend/infra"
+	"wfs/backend/vo"
 )
 
 type Battle struct {

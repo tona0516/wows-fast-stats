@@ -1,6 +1,6 @@
 package infra
 
-import "changeme/backend/vo"
+import "wfs/backend/vo"
 
 type UnregisteredInterface interface {
 	Warship() (map[int]vo.Warship, error)

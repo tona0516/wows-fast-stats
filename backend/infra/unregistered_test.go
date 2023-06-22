@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"changeme/backend/vo"
+	"wfs/backend/vo"
 )
 
 func TestUnregistered_Warship(t *testing.T) {

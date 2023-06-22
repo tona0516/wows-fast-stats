@@ -1,11 +1,11 @@
 package service
 
 import (
-	"changeme/backend/apperr"
-	"changeme/backend/infra"
-	"changeme/backend/vo"
 	"os"
 	"path/filepath"
+	"wfs/backend/apperr"
+	"wfs/backend/infra"
+	"wfs/backend/vo"
 )
 
 type Config struct {

@@ -1,12 +1,12 @@
 package service
 
 import (
-	"changeme/backend/apperr"
-	"changeme/backend/vo"
 	"io/fs"
 	"os"
 	"path/filepath"
 	"testing"
+	"wfs/backend/apperr"
+	"wfs/backend/vo"
 
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"

@@ -1,9 +1,9 @@
 package service
 
 import (
-	"changeme/backend/apperr"
-	"changeme/backend/vo"
 	"testing"
+	"wfs/backend/apperr"
+	"wfs/backend/vo"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"

@@ -1,10 +1,10 @@
 package infra
 
 import (
-	"changeme/backend/vo"
 	"os"
 	"path/filepath"
 	"testing"
+	"wfs/backend/vo"
 
 	"github.com/stretchr/testify/assert"
 )

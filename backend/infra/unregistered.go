@@ -1,11 +1,11 @@
 package infra
 
 import (
-	"changeme/backend/apperr"
-	"changeme/backend/vo"
 	_ "embed"
 	"encoding/json"
 	"strings"
+	"wfs/backend/apperr"
+	"wfs/backend/vo"
 )
 
 //go:embed resource/ships.json

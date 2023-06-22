@@ -7,7 +7,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"changeme/backend/vo"
+	"wfs/backend/vo"
 )
 
 func TestNumbers_ExpectedStats(t *testing.T) {

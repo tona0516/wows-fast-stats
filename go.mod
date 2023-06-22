@@ -1,4 +1,4 @@
-module changeme
+module wfs
 
 go 1.20
 

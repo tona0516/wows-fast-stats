@@ -1,8 +1,8 @@
 package vo_test
 
 import (
-	"changeme/backend/vo"
 	"testing"
+	"wfs/backend/vo"
 
 	"github.com/stretchr/testify/assert"
 )
