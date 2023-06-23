@@ -7,21 +7,26 @@ export function colors(
   key: string,
   value: number,
   player: vo.Player,
-  statsCategory: StatsCategory
+  statsCategory: StatsCategory,
+  skillColor: vo.SkillColor
 ): string {
   switch (key) {
     case "pr":
-      return SkillLevelConverter.fromPR(value).toTextColorCode();
+      return SkillLevelConverter.fromPR(value, skillColor).toTextColorCode();
     case "damage":
       if (statsCategory === StatsCategory.Ship) {
         return SkillLevelConverter.fromDamage(
           value,
-          player.ship_info.avg_damage
+          player.ship_info.avg_damage,
+          skillColor
         ).toTextColorCode();
       }
       return "";
     case "win_rate":
-      return SkillLevelConverter.fromWinRate(value).toTextColorCode();
+      return SkillLevelConverter.fromWinRate(
+        value,
+        skillColor
+      ).toTextColorCode();
     default:
       return "";
   }
@@ -48,7 +53,7 @@ export interface SummaryResult {
 export function summary(
   battle: vo.Battle,
   excludes: number[],
-  statsPattern: string
+  userConfig: vo.UserConfig,
 ): SummaryResult {
   const items: { category: StatsCategory; key: string }[] = [
     { category: StatsCategory.Ship, key: "pr" },
@@ -60,7 +65,7 @@ export function summary(
     { category: StatsCategory.Overall, key: "kd_rate" },
   ];
 
-  const [shipColspan, overallColspan] = ["ship", "overall"].map((category) => {
+  const [shipColspan, overallColspan] = [StatsCategory.Ship, StatsCategory.Overall].map((category) => {
     return items.filter((it) => it.category === category).length;
   });
 
@@ -74,13 +79,13 @@ export function summary(
         (p) =>
           p.player_info.id !== 0 &&
           !excludes.includes(p.player_info.id) &&
-          values(p, statsPattern, it.category, "battles") > 0
+          values(p, userConfig.stats_pattern, it.category, "battles") > 0
       );
     });
 
     const [friendMean, enemyMean] = [filteredFriends, filteredEnemies].map(
       (team) => {
-        return mean(team, it.category, statsPattern, it.key);
+        return mean(team, it.category, userConfig.stats_pattern, it.key);
       }
     );
 
@@ -93,7 +98,7 @@ export function summary(
       colorClass = "lower";
     }
 
-    const digit = Const.DIGITS[it.key];
+    const digit = userConfig.custom_digit[it.key];
 
     labels.push(Const.COLUMN_NAMES[it.key].min);
     friends.push(friendMean.toFixed(digit));

@@ -43,7 +43,7 @@ func TestConfig_User(t *testing.T) {
 
 	actual, err = config.User()
 	assert.NoError(t, err)
-	assert.Equal(t, defaultUserConfig, actual)
+	assert.Equal(t, DefaultUserConfig, actual)
 }
 
 //nolint:paralleltest

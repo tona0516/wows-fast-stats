@@ -105,15 +105,11 @@ body {
   align-items: center;
 }
 
-.horizontal {
-  display: flex;
-  align-items: center;
-}
-
 .form-style {
   width: 75%;
-  max-width: 600px;
+  max-width: 800px;
   margin: auto;
+  text-align: left;
 }
 
 .higher {
@@ -124,14 +120,9 @@ body {
   color: #fc4e32;
 }
 
-.form-style {
-  text-align: left;
-}
-
 .centerize {
   display: flex;
   justify-content: center;
-  align-items: center;
 }
 
 .text-center {

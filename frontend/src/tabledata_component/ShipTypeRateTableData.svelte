@@ -10,18 +10,13 @@ export let player: vo.Player;
 export let statsPattern: string;
 export let statsCatetory: StatsCategory;
 export let key: string;
-
-const digit = Const.DIGITS[key];
-
-function toColor(ownShipType: string, shipTypeKey: string): string {
-  return ownShipType === shipTypeKey
-    ? Const.TYPE_S_COLORS[shipTypeKey]
-    : Const.TYPE_P_COLORS[shipTypeKey];
-}
+export let customColor: vo.CustomColor;
+export let customDigit: vo.CustomDigit;
 
 function derive(
   player: vo.Player,
-  shipTypeGroup: { [key: string]: number }
+  shipTypeGroup: { [key: string]: number },
+  customColor: vo.CustomColor
 ): StackedBarGraphParam[] {
   if (shipTypeGroup === undefined) {
     return [];
@@ -29,8 +24,11 @@ function derive(
 
   return Object.keys(shipTypeGroup).map((key) => {
     return {
-      label: key,
-      color: toColor(player.ship_info.type, key),
+      label: Const.SHIP_TYPE_LABELS[key] ?? "",
+      color:
+        key === player.ship_info.type
+          ? customColor.ship_type.own[key]
+          : customColor.ship_type.other[key],
       value: shipTypeGroup[key],
     };
   });
@@ -40,7 +38,9 @@ $: shipTypeGroup = values(player, statsPattern, statsCatetory, key) as {
   [key: string]: number;
 };
 
-$: params = derive(player, shipTypeGroup);
+$: params = derive(player, shipTypeGroup, customColor);
+
+$: digit = customDigit[key];
 </script>
 
 <td class="td-graph">

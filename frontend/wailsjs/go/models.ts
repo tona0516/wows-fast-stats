@@ -377,6 +377,234 @@ export namespace vo {
 		}
 	}
 	
+	export class ShipTypeColorCode {
+	    ss: string;
+	    dd: string;
+	    cl: string;
+	    bb: string;
+	    cv: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new ShipTypeColorCode(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.ss = source["ss"];
+	        this.dd = source["dd"];
+	        this.cl = source["cl"];
+	        this.bb = source["bb"];
+	        this.cv = source["cv"];
+	    }
+	}
+	export class ShipTypeColor {
+	    own: ShipTypeColorCode;
+	    other: ShipTypeColorCode;
+	
+	    static createFrom(source: any = {}) {
+	        return new ShipTypeColor(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.own = this.convertValues(source["own"], ShipTypeColorCode);
+	        this.other = this.convertValues(source["other"], ShipTypeColorCode);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class TierColorCode {
+	    low: string;
+	    middle: string;
+	    high: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new TierColorCode(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.low = source["low"];
+	        this.middle = source["middle"];
+	        this.high = source["high"];
+	    }
+	}
+	export class TierColor {
+	    own: TierColorCode;
+	    other: TierColorCode;
+	
+	    static createFrom(source: any = {}) {
+	        return new TierColor(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.own = this.convertValues(source["own"], TierColorCode);
+	        this.other = this.convertValues(source["other"], TierColorCode);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class SkillColorCode {
+	    bad: string;
+	    below_avg: string;
+	    avg: string;
+	    good: string;
+	    very_good: string;
+	    great: string;
+	    unicum: string;
+	    super_unicum: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new SkillColorCode(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.bad = source["bad"];
+	        this.below_avg = source["below_avg"];
+	        this.avg = source["avg"];
+	        this.good = source["good"];
+	        this.very_good = source["very_good"];
+	        this.great = source["great"];
+	        this.unicum = source["unicum"];
+	        this.super_unicum = source["super_unicum"];
+	    }
+	}
+	export class SkillColor {
+	    text: SkillColorCode;
+	    background: SkillColorCode;
+	
+	    static createFrom(source: any = {}) {
+	        return new SkillColor(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.text = this.convertValues(source["text"], SkillColorCode);
+	        this.background = this.convertValues(source["background"], SkillColorCode);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class CustomColor {
+	    skill: SkillColor;
+	    tier: TierColor;
+	    ship_type: ShipTypeColor;
+	
+	    static createFrom(source: any = {}) {
+	        return new CustomColor(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.skill = this.convertValues(source["skill"], SkillColor);
+	        this.tier = this.convertValues(source["tier"], TierColor);
+	        this.ship_type = this.convertValues(source["ship_type"], ShipTypeColor);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class CustomDigit {
+	    pr: number;
+	    damage: number;
+	    win_rate: number;
+	    kd_rate: number;
+	    kill: number;
+	    planes_killed: number;
+	    exp: number;
+	    battles: number;
+	    survived_rate: number;
+	    hit_rate: number;
+	    avg_tier: number;
+	    using_ship_type_rate: number;
+	    using_tier_rate: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new CustomDigit(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.pr = source["pr"];
+	        this.damage = source["damage"];
+	        this.win_rate = source["win_rate"];
+	        this.kd_rate = source["kd_rate"];
+	        this.kill = source["kill"];
+	        this.planes_killed = source["planes_killed"];
+	        this.exp = source["exp"];
+	        this.battles = source["battles"];
+	        this.survived_rate = source["survived_rate"];
+	        this.hit_rate = source["hit_rate"];
+	        this.avg_tier = source["avg_tier"];
+	        this.using_ship_type_rate = source["using_ship_type_rate"];
+	        this.using_tier_rate = source["using_tier_rate"];
+	    }
+	}
 	export class Overall {
 	    damage: boolean;
 	    win_rate: boolean;
@@ -483,15 +711,23 @@ export namespace vo {
 	
 	
 	
+	
+	
+	
+	
+	
+	
 	export class UserConfig {
 	    install_path: string;
 	    appid: string;
 	    font_size: string;
-	    displays: Displays;
 	    save_screenshot: boolean;
 	    save_temp_arena_info: boolean;
-	    stats_pattern: string;
 	    send_report: boolean;
+	    stats_pattern: string;
+	    displays: Displays;
+	    custom_color: CustomColor;
+	    custom_digit: CustomDigit;
 	
 	    static createFrom(source: any = {}) {
 	        return new UserConfig(source);
@@ -502,11 +738,13 @@ export namespace vo {
 	        this.install_path = source["install_path"];
 	        this.appid = source["appid"];
 	        this.font_size = source["font_size"];
-	        this.displays = this.convertValues(source["displays"], Displays);
 	        this.save_screenshot = source["save_screenshot"];
 	        this.save_temp_arena_info = source["save_temp_arena_info"];
-	        this.stats_pattern = source["stats_pattern"];
 	        this.send_report = source["send_report"];
+	        this.stats_pattern = source["stats_pattern"];
+	        this.displays = this.convertValues(source["displays"], Displays);
+	        this.custom_color = this.convertValues(source["custom_color"], CustomColor);
+	        this.custom_digit = this.convertValues(source["custom_digit"], CustomDigit);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

@@ -1,22 +1,16 @@
 <script lang="ts">
 import clone from "clone";
 import { createEventDispatcher } from "svelte";
-import { get } from "svelte/store";
 import type { vo } from "../../wailsjs/go/models";
 import { BrowserOpenURL } from "../../wailsjs/runtime/runtime";
 import { SkillLevelConverter } from "../RankConverter";
-import { storedAlertPlayers, storedUserConfig } from "../stores";
 import { clanURL, playerURL, values } from "../util";
 import { StatsCategory } from "../enums";
 
 export let player: vo.Player;
+export let userConfig: vo.UserConfig;
 export let statsPattern: string;
-
-let alertPlayers = get(storedAlertPlayers);
-storedAlertPlayers.subscribe((it) => (alertPlayers = it));
-
-let userConfig = get(storedUserConfig);
-storedUserConfig.subscribe((it) => (userConfig = it));
+export let alertPlayers: vo.AlertPlayer[];
 
 const dispatch = createEventDispatcher();
 
@@ -24,7 +18,10 @@ $: alertPlayer = alertPlayers.find(
   (it) => it.account_id === player.player_info.id
 );
 $: pr = values(player, statsPattern, StatsCategory.Ship, "pr");
-$: color = SkillLevelConverter.fromPR(pr).toBgColorCode();
+$: color = SkillLevelConverter.fromPR(
+  pr,
+  userConfig.custom_color.skill
+).toBgColorCode();
 $: playerLabel = isBelongToClan()
   ? `[${player.player_info.clan.tag}] ${player.player_info.name}`
   : player.player_info.name;

@@ -31,11 +31,11 @@ export enum StatsCategory {
 
 export enum SkillLevel {
   Bad = "bad",
-  BelowAvg = "belowAvg",
+  BelowAvg = "below_avg",
   Avg = "avg",
   Good = "good",
-  VeryGood = "veryGood",
+  VeryGood = "very_good",
   Great = "great",
   Unicum = "unicum",
-  SuperUnicum = "superUnicum",
+  SuperUnicum = "super_unicum",
 }

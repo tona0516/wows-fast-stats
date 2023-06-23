@@ -28,70 +28,29 @@ export namespace Const {
     hit_rate: { min: "Hit率(主|魚)", full: "命中率 (主砲|魚雷)" },
   };
 
-  export const DIGITS = {
-    pr: 0,
-    damage: 0,
-    win_rate: 1,
-    kd_rate: 2,
-    kill: 2,
-    survived_rate: 1,
-    hit_rate: 1,
-    planes_killed: 1,
-    exp: 0,
-    battles: 0,
-    avg_tier: 2,
-    using_ship_type_rate: 1,
-    using_tier_rate: 1,
+  export const SKILL_LEVEL_LABELS = {
+    bad: "Bad",
+    below_avg: "Below Average",
+    avg: "Average",
+    good: "Good",
+    very_good: "Very Good",
+    great: "Great",
+    unicum: "Unicum",
+    super_unicum: "Super Unicum",
   };
 
-  export const TYPE_S_COLORS = {
-    cv: "#5E2883",
-    bb: "#CA1028",
-    cl: "#27853F",
-    dd: "#D9760F",
-    ss: "#233B8B",
+  export const SHIP_TYPE_LABELS = {
+    ss: "潜水艦",
+    dd: "駆逐艦",
+    cl: "巡洋艦",
+    bb: "戦艦",
+    cv: "空母",
   };
 
-  export const TYPE_P_COLORS = {
-    cv: "#CAB2D6",
-    bb: "#FBB4C4",
-    cl: "#CCEBC5",
-    dd: "#FEE6AA",
-    ss: "#B3CDE3",
-  };
-
-  export const TIER_S_COLORS = {
-    low: "#8CA113",
-    middle: "#205B85",
-    high: "#990F4F",
-  };
-
-  export const TIER_P_COLORS = {
-    low: "#E6F5B0",
-    middle: "#B3D7DD",
-    high: "#E3ADD5",
-  };
-
-  export const RANK_BG_COLORS = {
-    bad: "#a41200",
-    belowAvg: "#a34a02",
-    avg: "#a38204",
-    good: "#518517",
-    veryGood: "#2f6f41",
-    great: "#04436d",
-    unicum: "#232166",
-    superUnicum: "#531460",
-  };
-
-  export const RANK_TEXT_COLORS = {
-    bad: "#ff382d",
-    belowAvg: "#fd9234",
-    avg: "#ffd351",
-    good: "#57e500",
-    veryGood: "#44b200",
-    great: "#02f7da",
-    unicum: "#da6ff5",
-    superUnicum: "#bf15ee",
+  export const TIER_GROUP_LABELS = {
+    low: "1~4",
+    middle: "5~7",
+    high: "8~★",
   };
 
   export const MAX_MEMO_LENGTH = 100;

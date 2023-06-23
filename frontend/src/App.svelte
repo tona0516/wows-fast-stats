@@ -138,11 +138,10 @@ async function updateSummary(battle: vo.Battle) {
   const excludePlayerIDs = await ExcludePlayerIDs();
   storedExcludePlayerIDs.set(excludePlayerIDs);
 
-  // TODO Refactoring (without "as")
   const summaryResult = summary(
     battle,
     excludePlayerIDs,
-    userConfig.stats_pattern
+    userConfig,
   );
   storedSummaryResult.set(summaryResult);
 }

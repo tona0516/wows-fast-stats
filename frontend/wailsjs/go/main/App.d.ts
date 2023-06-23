@@ -16,6 +16,8 @@ export function AutoScreenshot(arg1:string,arg2:string):Promise<void>;
 
 export function Battle():Promise<vo.Battle>;
 
+export function DefaultUserConfig():Promise<vo.UserConfig>;
+
 export function ExcludePlayerIDs():Promise<Array<number>>;
 
 export function FontSizes():Promise<Array<string>>;
@@ -31,6 +33,8 @@ export function Ready():Promise<void>;
 export function RemoveAlertPlayer(arg1:number):Promise<void>;
 
 export function RemoveExcludePlayerID(arg1:number):Promise<void>;
+
+export function SampleTeams():Promise<Array<vo.Team>>;
 
 export function SearchPlayer(arg1:string):Promise<vo.WGAccountList>;
 

@@ -7,10 +7,10 @@ import iconDD from "../assets/images/icon-dd.png";
 import iconSS from "../assets/images/icon-ss.png";
 import iconNone from "../assets/images/icon-none.png";
 import type { vo } from "../../wailsjs/go/models";
-import { Const } from "../Const";
 import { shipURL, tierString } from "../util";
 
 export let player: vo.Player;
+export let userConfig: vo.UserConfig;
 
 function shipIcon(shipType: string): string {
   switch (shipType) {
@@ -29,7 +29,8 @@ function shipIcon(shipType: string): string {
   }
 }
 
-$: color = Const.TYPE_S_COLORS[player.ship_info.type] ?? "#00000000";
+$: color =
+  userConfig.custom_color.ship_type.own[player.ship_info.type] ?? "#00000000";
 </script>
 
 <td style="width: 1em; background-color: {color}">

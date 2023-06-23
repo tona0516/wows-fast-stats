@@ -6,19 +6,17 @@ import (
 	"path/filepath"
 )
 
-func readJSON[T any](path string) (T, error) {
-	var result T
-
+func readJSON[T any](path string, defaultValue T) (T, error) {
 	f, err := os.ReadFile(path)
 	if err != nil {
-		return result, err
+		return defaultValue, err
 	}
 
-	if err := json.Unmarshal(f, &result); err != nil {
-		return result, err
+	if err := json.Unmarshal(f, &defaultValue); err != nil {
+		return defaultValue, err
 	}
 
-	return result, nil
+	return defaultValue, nil
 }
 
 func writeJSON[T any](path string, target T) error {

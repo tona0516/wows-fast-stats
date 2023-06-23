@@ -9,8 +9,6 @@ export const storedSummaryResult = writable(
 ) as Writable<SummaryResult>;
 export const storedExcludePlayerIDs = writable([]) as Writable<number[]>;
 export const storedCurrentPage = writable("main") as Writable<Page>;
-export const storedUserConfig = writable({
-  font_size: "medium",
-}) as Writable<vo.UserConfig>;
+export const storedUserConfig = writable({}) as Writable<vo.UserConfig>;
 export const storedAlertPlayers = writable([]) as Writable<vo.AlertPlayer[]>;
 export const storedIsFirstScreenshot = writable(true) as Writable<boolean>;

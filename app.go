@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 	"wfs/backend/apperr"
 	"wfs/backend/infra"
@@ -113,6 +114,137 @@ func (a *App) Battle() (vo.Battle, error) {
 	return result, nil
 }
 
+func (a *App) SampleTeams() []vo.Team {
+	players := make([]vo.Player, 8)
+
+	tiers := []uint{
+		11,
+		10,
+		9,
+		8,
+		7,
+		6,
+		5,
+		4,
+	}
+
+	shipTypes := []vo.ShipType{
+		vo.CV,
+		vo.BB,
+		vo.BB,
+		vo.CL,
+		vo.CL,
+		vo.DD,
+		vo.DD,
+		vo.SS,
+	}
+
+	prs := []float64{
+		0,
+		750,
+		1100,
+		1350,
+		1550,
+		1750,
+		2100,
+		2450,
+	}
+
+	damageRatios := []float64{
+		0,
+		0.6,
+		0.8,
+		1.0,
+		1.2,
+		1.4,
+		1.5,
+		1.6,
+	}
+
+	winRates := []float64{
+		0,
+		47,
+		50,
+		52,
+		54,
+		56,
+		60,
+		65,
+	}
+
+	for i := range players {
+		playerInfo := vo.PlayerInfo{
+			ID:   1,
+			Name: fmt.Sprintf("player_name%d", i+1),
+			Clan: vo.Clan{
+				Tag: "TEST",
+			},
+		}
+		shipInfo := vo.ShipInfo{
+			Name:      "Test Ship",
+			Nation:    "japan",
+			Tier:      tiers[i],
+			Type:      shipTypes[i],
+			AvgDamage: 10000,
+		}
+		shipStats := vo.ShipStats{
+			Battles:            10,
+			Damage:             10000 * damageRatios[i],
+			WinRate:            winRates[i],
+			WinSurvivedRate:    50,
+			LoseSurvivedRate:   50,
+			KdRate:             1,
+			Kill:               1,
+			Exp:                1000,
+			MainBatteryHitRate: 50,
+			TorpedoesHitRate:   5,
+			PlanesKilled:       5,
+			PR:                 prs[i],
+		}
+		overallStats := vo.OverallStats{
+			Battles:          10,
+			Damage:           10000 * damageRatios[i],
+			WinRate:          winRates[i],
+			WinSurvivedRate:  50,
+			LoseSurvivedRate: 50,
+			KdRate:           1,
+			Kill:             1,
+			Exp:              1000,
+			AvgTier:          5,
+			UsingShipTypeRate: vo.ShipTypeGroup{
+				SS: 20,
+				DD: 20,
+				CL: 20,
+				BB: 20,
+				CV: 20,
+			},
+			UsingTierRate: vo.TierGroup{
+				Low:    33.3,
+				Middle: 33.3,
+				High:   33.4,
+			},
+		}
+		players[i] = vo.Player{
+			PlayerInfo: playerInfo,
+			ShipInfo:   shipInfo,
+			PvPSolo: vo.PlayerStats{
+				ShipStats:    shipStats,
+				OverallStats: overallStats,
+			},
+			PvPAll: vo.PlayerStats{
+				ShipStats:    shipStats,
+				OverallStats: overallStats,
+			},
+		}
+	}
+
+	return []vo.Team{
+		{
+			Players: players,
+		},
+	}
+}
+
 func (a *App) SelectDirectory() (string, error) {
 	path, err := runtime.OpenDirectoryDialog(a.ctx, runtime.OpenDialogOptions{})
 	if err != nil {
@@ -120,6 +252,10 @@ func (a *App) SelectDirectory() (string, error) {
 	}
 
 	return path, apperr.ToFrontendError(err)
+}
+
+func (a *App) DefaultUserConfig() vo.UserConfig {
+	return infra.DefaultUserConfig
 }
 
 func (a *App) UserConfig() (vo.UserConfig, error) {

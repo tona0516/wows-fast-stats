@@ -1,4 +1,4 @@
-import { Const } from "./Const";
+import type { vo } from "../wailsjs/go/models";
 import { SkillLevel } from "./enums";
 
 const skillLevels = Object.values(SkillLevel);
@@ -48,47 +48,48 @@ const damageRatioRange = new Ranges([
 const winRateRange = new Ranges([47, 50, 52, 54, 56, 60, 65, Number.MAX_VALUE]);
 
 export class SkillLevelConverter {
+  skillColor: vo.SkillColor;
   skillLevel?: SkillLevel;
 
-  private constructor(skillLevel?: SkillLevel) {
+  private constructor(skillColor: vo.SkillColor, skillLevel?: SkillLevel) {
+    this.skillColor = skillColor;
     this.skillLevel = skillLevel;
   }
 
-  static fromPR(value: number): SkillLevelConverter {
+  static fromPR(value: number, skillColor: vo.SkillColor): SkillLevelConverter {
     const range = prRange.values.find((it) => value >= 0 && value < it.max);
     return range
-      ? new SkillLevelConverter(range.skillLevel)
-      : new SkillLevelConverter();
+      ? new SkillLevelConverter(skillColor, range.skillLevel)
+      : new SkillLevelConverter(skillColor);
   }
 
-  static fromDamage(value: number, expected: number): SkillLevelConverter {
+  static fromDamage(
+    value: number,
+    expected: number,
+    skillColor: vo.SkillColor
+  ): SkillLevelConverter {
     const ratio = value / expected ?? 0;
     const range = damageRatioRange.values.find((it) => ratio < it.max);
     return range
-      ? new SkillLevelConverter(range.skillLevel)
-      : new SkillLevelConverter();
+      ? new SkillLevelConverter(skillColor, range.skillLevel)
+      : new SkillLevelConverter(skillColor);
   }
 
-  static fromWinRate(value: number): SkillLevelConverter {
+  static fromWinRate(
+    value: number,
+    skillColor: vo.SkillColor
+  ): SkillLevelConverter {
     const range = winRateRange.values.find((it) => value < it.max);
     return range
-      ? new SkillLevelConverter(range.skillLevel)
-      : new SkillLevelConverter();
+      ? new SkillLevelConverter(skillColor, range.skillLevel)
+      : new SkillLevelConverter(skillColor);
   }
 
   toTextColorCode(): string {
-    if (this.skillLevel) {
-      return Const.RANK_TEXT_COLORS[this.skillLevel];
-    }
-
-    return "";
+    return this.skillColor.text[this.skillLevel] ?? "";
   }
 
   toBgColorCode(): string {
-    if (this.skillLevel) {
-      return Const.RANK_BG_COLORS[this.skillLevel];
-    }
-
-    return "";
+    return this.skillColor.background[this.skillLevel] ?? "";
   }
 }

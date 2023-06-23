@@ -10,25 +10,8 @@ export let player: vo.Player;
 export let statsPattern: string;
 export let statsCatetory: StatsCategory;
 export let key: string;
-
-function toColor(ownTierGroupKey: string, tierGroupKey: string): string {
-  return ownTierGroupKey === tierGroupKey
-    ? Const.TIER_S_COLORS[tierGroupKey]
-    : Const.TIER_P_COLORS[tierGroupKey];
-}
-
-function toLabel(tierGroupKey: string) {
-  switch (tierGroupKey) {
-    case "low":
-      return "1~4";
-    case "middle":
-      return "5~7";
-    case "high":
-      return "8~★";
-    default:
-      return "";
-  }
-}
+export let customColor: vo.CustomColor;
+export let customDigit: vo.CustomDigit;
 
 function toTierGroupKey(tier: number): string {
   if (tier >= 1 && tier <= 4) {
@@ -45,7 +28,8 @@ function toTierGroupKey(tier: number): string {
 
 function derive(
   player: vo.Player,
-  tierGroup: { [key: string]: number }
+  tierGroup: { [key: string]: number },
+  customColor: vo.CustomColor
 ): StackedBarGraphParam[] {
   if (tierGroup === undefined) {
     return [];
@@ -54,20 +38,23 @@ function derive(
   return Object.keys(tierGroup).map((key) => {
     const ownTierGroup = toTierGroupKey(player.ship_info.tier);
     return {
-      label: toLabel(key),
-      color: toColor(ownTierGroup, key),
+      label: Const.TIER_GROUP_LABELS[key] ?? "",
+      color:
+        key === ownTierGroup
+          ? customColor.tier.own[key]
+          : customColor.tier.other[key],
       value: tierGroup[key],
     };
   });
 }
 
-const digit = Const.DIGITS[key];
-
 $: tierGroup = values(player, statsPattern, statsCatetory, key) as {
   [key: string]: number;
 };
 
-$: params = derive(player, tierGroup);
+$: params = derive(player, tierGroup, customColor);
+
+$: digit = customDigit[key];
 </script>
 
 <td class="td-graph">

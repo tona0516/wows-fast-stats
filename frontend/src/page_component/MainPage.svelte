@@ -1,19 +1,14 @@
 <script lang="ts">
 import { get } from "svelte/store";
-import { storedBattle, storedUserConfig, storedSummaryResult } from "../stores";
-import AvgCheckboxTableData from "../tabledata_component/AvgCheckboxTableData.svelte";
-import PlayerNameTableData from "../tabledata_component/PlayerNameTableData.svelte";
-import ShipInfoTableData from "../tabledata_component/ShipInfoTableData.svelte";
-import GenericTableData from "../tabledata_component/GenericTableData.svelte";
-import PairTableData from "../tabledata_component/PairTableData.svelte";
-import ShipTypeRateTableData from "../tabledata_component/ShipTypeRateTableData.svelte";
-import TierRateTableData from "../tabledata_component/TierRateTableData.svelte";
-import NoData from "../tabledata_component/NoData.svelte";
-import { decideDisplayPattern } from "../util";
-import { ComponenInfo, ComponentList } from "../ComponentList";
-import { StatsCategory } from "../enums";
+import {
+  storedBattle,
+  storedUserConfig,
+  storedSummaryResult,
+  storedAlertPlayers,
+} from "../stores";
 import ColorDescription from "../other_component/ColorDescription.svelte";
 import Ofuse from "../other_component/Ofuse.svelte";
+import StatisticsTable from "../other_component/StatisticsTable.svelte";
 
 let battle = get(storedBattle);
 storedBattle.subscribe((it) => (battle = it));
@@ -21,159 +16,25 @@ storedBattle.subscribe((it) => (battle = it));
 let userConfig = get(storedUserConfig);
 storedUserConfig.subscribe((it) => (userConfig = it));
 
+let alertPlayers = get(storedAlertPlayers);
+storedAlertPlayers.subscribe((it) => (alertPlayers = it));
+
 let summaryResult = get(storedSummaryResult);
 storedSummaryResult.subscribe((it) => {
   summaryResult = it;
 });
-
-const basicComponents = new ComponentList(StatsCategory.Basic, [
-  new ComponenInfo("is_in_avg", AvgCheckboxTableData),
-  new ComponenInfo("player_name", PlayerNameTableData),
-  new ComponenInfo("ship_info", ShipInfoTableData, { column: 2 }),
-]);
-
-const shipComponents = new ComponentList(StatsCategory.Ship, [
-  new ComponenInfo("pr", GenericTableData),
-  new ComponenInfo("damage", GenericTableData),
-  new ComponenInfo("win_rate", GenericTableData, { unit: "%" }),
-  new ComponenInfo("kd_rate", GenericTableData),
-  new ComponenInfo("kill", GenericTableData),
-  new ComponenInfo("planes_killed", GenericTableData),
-  new ComponenInfo("exp", GenericTableData),
-  new ComponenInfo("battles", GenericTableData),
-  new ComponenInfo("survived_rate", PairTableData, {
-    unit: "%",
-    key1: "win_survived_rate",
-    key2: "lose_survived_rate",
-  }),
-  new ComponenInfo("hit_rate", PairTableData, {
-    unit: "%",
-    key1: "main_battery_hit_rate",
-    key2: "torpedoes_hit_rate",
-  }),
-]);
-
-const overallComponents = new ComponentList(StatsCategory.Overall, [
-  new ComponenInfo("damage", GenericTableData),
-  new ComponenInfo("win_rate", GenericTableData, { unit: "%" }),
-  new ComponenInfo("kd_rate", GenericTableData),
-  new ComponenInfo("kill", GenericTableData),
-  new ComponenInfo("death", GenericTableData),
-  new ComponenInfo("exp", GenericTableData),
-  new ComponenInfo("battles", GenericTableData),
-  new ComponenInfo("survived_rate", PairTableData, {
-    unit: "%",
-    key1: "win_survived_rate",
-    key2: "lose_survived_rate",
-  }),
-  new ComponenInfo("avg_tier", GenericTableData),
-  new ComponenInfo("using_ship_type_rate", ShipTypeRateTableData),
-  new ComponenInfo("using_tier_rate", TierRateTableData),
-]);
 </script>
 
 {#if battle}
   <div class="m-2">
-    <table class="table table-sm table-bordered table-text-color">
-      {#each battle.teams as team}
-        {@const displays = userConfig.displays}
-        {@const basicColspan = basicComponents.columnCount(displays)}
-        {@const shipColspan = shipComponents.columnCount(displays)}
-        {@const overallColspan = overallComponents.columnCount(displays)}
-
-        <thead>
-          <tr>
-            {#if basicColspan > 0}
-              <th colspan="{basicColspan}">{basicComponents.minColumnName()}</th
-              >
-            {/if}
-            {#if shipColspan > 0}
-              <th colspan="{shipColspan}">{shipComponents.minColumnName()}</th>
-            {/if}
-            {#if overallColspan > 0}
-              <th colspan="{overallColspan}"
-                >{overallComponents.minColumnName()}</th
-              >
-            {/if}
-          </tr>
-          <tr>
-            <!-- basic -->
-            {#each basicComponents.list as c}
-              {#if c.shouldShowColumn(displays, basicComponents.category)}
-                <th colspan="{c.option.column}">{c.minColumnName()}</th>
-              {/if}
-            {/each}
-
-            <!-- ship -->
-            {#each shipComponents.list as c}
-              {#if c.shouldShowColumn(displays, shipComponents.category)}
-                <th colspan="{c.option.column}">{c.minColumnName()}</th>
-              {/if}
-            {/each}
-
-            <!-- overall -->
-            {#each overallComponents.list as c}
-              {#if c.shouldShowColumn(displays, overallComponents.category)}
-                <th colspan="{c.option.column}">{c.minColumnName()}</th>
-              {/if}
-            {/each}
-          </tr>
-        </thead>
-        <tbody>
-          {#each team.players as player}
-            {@const statsPattern = userConfig.stats_pattern}
-            {@const displayPattern = decideDisplayPattern(player, statsPattern)}
-            <tr>
-              <!-- basic -->
-              {#each basicComponents.list as c}
-                <svelte:component
-                  this="{c.component}"
-                  player="{player}"
-                  statsPattern="{statsPattern}"
-                  on:UpdateAlertPlayer
-                  on:RemoveAlertPlayer
-                  on:CheckPlayer
-                />
-              {/each}
-
-              <NoData
-                shipColspan="{shipColspan}"
-                overallColspan="{overallColspan}"
-                displayPattern="{displayPattern}"
-              />
-
-              <!-- ship -->
-              {#each shipComponents.list as c}
-                {#if c.shouldShowValue(displays, shipComponents.category, displayPattern)}
-                  <svelte:component
-                    this="{c.component}"
-                    player="{player}"
-                    statsPattern="{statsPattern}"
-                    statsCatetory="{shipComponents.category}"
-                    key="{c.key}"
-                    option="{c.option}"
-                  />
-                {/if}
-              {/each}
-
-              <!-- overall -->
-              {#each overallComponents.list as c}
-                {#if c.shouldShowValue(displays, overallComponents.category, displayPattern)}
-                  <svelte:component
-                    this="{c.component}"
-                    player="{player}"
-                    statsPattern="{statsPattern}"
-                    statsCatetory="{overallComponents.category}"
-                    key="{c.key}"
-                    option="{c.option}"
-                  />
-                {/if}
-              {/each}
-            </tr>
-          {/each}
-        </tbody>
-      {/each}
-    </table>
+    <StatisticsTable
+      teams="{battle.teams}"
+      userConfig="{userConfig}"
+      alertPlayers="{alertPlayers}"
+      on:UpdateAlertPlayer
+      on:RemoveAlertPlayer
+      on:CheckPlayer
+    />
   </div>
 
   {#if summaryResult}

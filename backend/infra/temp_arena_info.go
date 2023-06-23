@@ -85,7 +85,7 @@ func decideTempArenaInfo(paths []string) (vo.TempArenaInfo, error) {
 	}
 
 	if size == 1 {
-		tempArenaInfo, err := readJSON[vo.TempArenaInfo](paths[0])
+		tempArenaInfo, err := readJSON(paths[0], vo.TempArenaInfo{})
 		if err != nil {
 			return vo.TempArenaInfo{}, apperr.New(apperr.ReadFile, err)
 		}
@@ -96,7 +96,7 @@ func decideTempArenaInfo(paths []string) (vo.TempArenaInfo, error) {
 	var latest *vo.TempArenaInfo
 	var latestDate time.Time
 	for _, path := range paths {
-		tempArenaInfo, err := readJSON[vo.TempArenaInfo](path)
+		tempArenaInfo, err := readJSON(path, vo.TempArenaInfo{})
 		if err != nil {
 			continue
 		}
