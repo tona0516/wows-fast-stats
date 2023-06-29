@@ -17,7 +17,7 @@ import {
 } from "../stores";
 import { Func, Page } from "../enums";
 import { Const } from "../Const";
-import { Button, FormGroup, Input, Spinner } from "sveltestrap";
+import { Button, Spinner } from "sveltestrap";
 
 const dispatch = createEventDispatcher();
 

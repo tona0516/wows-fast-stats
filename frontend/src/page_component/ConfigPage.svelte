@@ -120,6 +120,7 @@ main();
       bind:value="{inputUserConfig.appid}"
     />
     <div>
+      <!-- svelte-ignore a11y-invalid-attribute -->
       <a
         class="td-link"
         href="#"
@@ -431,6 +432,7 @@ main();
           label="自動でスクリーンショットを保存する"
           bind:checked="{inputUserConfig.save_screenshot}"
         />
+        <!-- svelte-ignore a11y-invalid-attribute -->
         <a
           class="td-link"
           href="#"
@@ -444,6 +446,7 @@ main();
           label="【開発用】自動で戦闘情報(tempArenaInfo.json)を保存する"
           bind:checked="{inputUserConfig.save_temp_arena_info}"
         />
+        <!-- svelte-ignore a11y-invalid-attribute -->
         <a
           class="td-link"
           href="#"

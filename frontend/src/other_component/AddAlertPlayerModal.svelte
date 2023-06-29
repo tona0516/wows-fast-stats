@@ -10,7 +10,6 @@ import {
   FormGroup,
   Label,
   Input,
-  Icon,
 } from "sveltestrap";
 import {
   SearchPlayer,
