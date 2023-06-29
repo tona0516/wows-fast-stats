@@ -7,9 +7,9 @@ let userConfig = get(storedUserConfig);
 storedUserConfig.subscribe((it) => (userConfig = it));
 </script>
 
-<span class="text-center"> 気に入ってもらえたらカンパお願いします🙏 </span>
+<div class="center">
+  <span> 気に入ってもらえたらカンパお願いします🙏 </span>
 
-<div class="centerize">
   <button
     type="button"
     class="btn btn-sm btn-primary m-1 mb-4"

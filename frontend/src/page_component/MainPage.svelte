@@ -38,34 +38,34 @@ storedSummaryResult.subscribe((it) => {
   </div>
 
   {#if summaryResult}
-    <div class="mx-4 d-flex flex-row centerize">
-      <div class="mx-2">
-        <h6 class="text-center">戦闘情報</h6>
+    <div class="d-flex justify-content-center">
+      <div class="center mx-2">
+        <h6>戦闘情報</h6>
 
-        <table class="table table-sm table-text-color w-auto">
+        <table class="table table-sm table-text-color w-auto td-multiple">
           <tbody>
             <tr>
-              <td class="td-string">日時</td>
-              <td class="td-string">{battle.meta.date}</td>
+              <td>日時</td>
+              <td>{battle.meta.date}</td>
             </tr>
 
             <tr>
-              <td class="td-string">戦闘タイプ</td>
-              <td class="td-string">{battle.meta.type}</td>
+              <td>戦闘タイプ</td>
+              <td>{battle.meta.type}</td>
             </tr>
 
             <tr>
-              <td class="td-string">マップ</td>
-              <td class="td-string">{battle.meta.arena}</td>
+              <td>マップ</td>
+              <td>{battle.meta.arena}</td>
             </tr>
           </tbody>
         </table>
       </div>
 
-      <div class="mx-2">
-        <h6 class="text-center">チーム平均</h6>
+      <div class="center mx-2">
+        <h6>チーム平均</h6>
 
-        <table class="table table-sm table-text-color w-auto">
+        <table class="table table-sm table-text-color w-auto td-multiple">
           <thead>
             <tr>
               <th></th>
@@ -81,23 +81,23 @@ storedSummaryResult.subscribe((it) => {
           </thead>
           <tbody>
             <tr>
-              <td class="td-string">{battle.teams[0].name}</td>
+              <td>{battle.teams[0].name}</td>
               {#each summaryResult.friends as friend}
-                <td class="td-number">{friend}</td>
+                <td>{friend}</td>
               {/each}
             </tr>
 
             <tr>
-              <td class="td-string">{battle.teams[1].name}</td>
+              <td>{battle.teams[1].name}</td>
               {#each summaryResult.enemies as enemy}
-                <td class="td-number">{enemy}</td>
+                <td>{enemy}</td>
               {/each}
             </tr>
 
             <tr>
-              <td class="td-string">差</td>
+              <td>差</td>
               {#each summaryResult.diffs as diff}
-                <td class="td-number {diff.colorClass}">{diff.value}</td>
+                <td class="{diff.colorClass}">{diff.value}</td>
               {/each}
             </tr>
           </tbody>
@@ -107,14 +107,6 @@ storedSummaryResult.subscribe((it) => {
   {/if}
 {/if}
 
-<div class="m-2 centerize">
-  <div>
-    <ColorDescription />
-  </div>
-</div>
+<ColorDescription />
 
-<div class="m-2 centerize">
-  <div>
-    <Ofuse />
-  </div>
-</div>
+<Ofuse />

@@ -13,11 +13,16 @@ import {
 import { BrowserOpenURL } from "../../wailsjs/runtime/runtime";
 import { storedUserConfig } from "../stores";
 import { Const } from "../Const";
-import ColorPicker from "svelte-awesome-color-picker";
 import type { vo } from "../../wailsjs/go/models";
 import StatisticsTable from "../other_component/StatisticsTable.svelte";
+import { Badge, Button, FormGroup, Input, Label } from "sveltestrap";
 
 const dispatch = createEventDispatcher();
+
+const displayColumns = ["項目", "艦成績", "総合成績", "小数点以下の桁数"];
+const skillColorColumns = ["スキル", "文字色", "背景色"];
+const tierColorColumns = ["Tier", "使用艦", "非使用艦"];
+const shipTypeColorColumns = ["艦種", "使用艦", "非使用艦"];
 
 let userConfig = get(storedUserConfig);
 let inputUserConfig = get(storedUserConfig);
@@ -54,9 +59,9 @@ async function openDirectory(path: string) {
 
 async function selectDirectory() {
   try {
-    const selected = await SelectDirectory();
-    if (!selected) return;
-    inputUserConfig.install_path = selected;
+    const path = await SelectDirectory();
+    if (!path) return;
+    inputUserConfig.install_path = path;
   } catch (error) {
     dispatch("Failure", { message: error });
   }
@@ -84,485 +89,399 @@ async function main() {
 main();
 </script>
 
-<div class="mt-3">
-  <form>
-    <!-- install path -->
-    <div class="mb-2 form-style">
-      <h6 class="text-center">
-        World of Warshipsインストールフォルダ <span class="badge bg-danger"
-          >必須</span
-        >
-      </h6>
-
-      <div class="centerize">
-        <input
-          type="text"
-          class="form-control"
-          style="font-size: {userConfig.font_size};"
-          bind:value="{inputUserConfig.install_path}"
-        />
-        <button
-          type="button"
-          class="btn btn-secondary"
-          style="font-size: {userConfig.font_size};"
-          on:click="{selectDirectory}">選択</button
-        >
-      </div>
-    </div>
-
-    <!-- appid -->
-    <div class="mb-2 form-style">
-      <h6 class="text-center">
-        アプリケーションID <span class="badge bg-danger">必須</span>
-      </h6>
-
-      <input
+<div class="m-3 center">
+  <!-- install path -->
+  <FormGroup class="center">
+    <Label
+      >World of Warshipsインストールフォルダ <Badge color="danger">必須</Badge>
+    </Label>
+    <div class="d-flex justify-content-center">
+      <Input
         type="text"
-        class="form-control"
+        class="text-form"
         style="font-size: {userConfig.font_size};"
-        bind:value="{inputUserConfig.appid}"
+        bind:value="{inputUserConfig.install_path}"
       />
-      <div class="centerize">
-        <!-- svelte-ignore a11y-invalid-attribute -->
-        <a
-          class="td-link"
-          href="#"
-          on:click="{() => BrowserOpenURL('https://developers.wargaming.net/')}"
-          >Developer Room</a
-        > で作成したIDを入力してください。
-      </div>
-    </div>
-
-    <!-- font-size -->
-    <div class="mb-2 form-style">
-      <h6 class="text-center">文字サイズ</h6>
-
-      <select
-        class="form-select"
+      <Button
+        color="secondary"
         style="font-size: {userConfig.font_size};"
-        bind:value="{inputUserConfig.font_size}"
+        on:click="{selectDirectory}">選択</Button
       >
-        {#await FontSizes() then fontSizes}
-          {#each fontSizes as fs}
-            <option selected="{fs === userConfig.font_size}" value="{fs}"
-              >{Const.FONT_SIZE[fs]}</option
-            >
+    </div>
+  </FormGroup>
+
+  <!-- appid -->
+  <FormGroup class="center">
+    <Label>アプリケーションID <Badge color="danger">必須</Badge></Label>
+    <Input
+      type="text"
+      class="text-form"
+      style="font-size: {userConfig.font_size};"
+      bind:value="{inputUserConfig.appid}"
+    />
+    <div>
+      <a
+        class="td-link"
+        href="#"
+        on:click="{() => BrowserOpenURL('https://developers.wargaming.net/')}"
+        >Developer Room</a
+      >で作成したIDを入力してください。
+    </div>
+  </FormGroup>
+
+  <!-- font-size -->
+  <FormGroup class="center">
+    <Label>文字サイズ</Label>
+    <Input
+      type="select"
+      class="w-auto"
+      style="font-size: {userConfig.font_size};"
+      bind:value="{inputUserConfig.font_size}"
+    >
+      {#await FontSizes() then fontSizes}
+        {#each fontSizes as fs}
+          <option selected="{fs === userConfig.font_size}" value="{fs}"
+            >{Const.FONT_SIZE[fs]}</option
+          >
+        {/each}
+      {/await}
+    </Input>
+  </FormGroup>
+
+  <!-- display values -->
+  <FormGroup class="center">
+    <Label>表示項目</Label>
+    <Input
+      type="switch"
+      style="font-size: {userConfig.font_size};"
+      on:change="{toggleAll}"
+      checked="{Object.values(inputUserConfig.displays.ship).filter((it) => !it)
+        .length === 0 &&
+        Object.values(inputUserConfig.displays.overall).filter((it) => !it)
+          .length === 0}"
+      label="全選択"
+    />
+
+    <table class="table table-sm table-text-color w-auto td-multiple">
+      <thead>
+        <tr>
+          {#each displayColumns as columns}
+            <th>{columns}</th>
           {/each}
-        {/await}
-      </select>
+        </tr>
+      </thead>
+      <tbody>
+        {#each displayKeys as key}
+          <tr>
+            <td>
+              {Const.COLUMN_NAMES[key].full}
+            </td>
+
+            <td>
+              {#if inputUserConfig.displays.ship[key] !== undefined}
+                <Input
+                  type="switch"
+                  class="center"
+                  bind:checked="{inputUserConfig.displays.ship[key]}"
+                />
+              {/if}
+            </td>
+
+            <td>
+              {#if inputUserConfig.displays.overall[key] !== undefined}
+                <Input
+                  type="switch"
+                  class="center"
+                  bind:checked="{inputUserConfig.displays.overall[key]}"
+                />
+              {/if}
+            </td>
+
+            <td>
+              {#if inputUserConfig.custom_digit[key] !== undefined}
+                <Input
+                  type="select"
+                  class="p-1 m-1"
+                  style="font-size: {userConfig.font_size};"
+                  bind:value="{inputUserConfig.custom_digit[key]}"
+                >
+                  {#each [0, 1, 2] as digit}
+                    <option
+                      selected="{digit === inputUserConfig.custom_digit[key]}"
+                      value="{digit}">{digit}</option
+                    >
+                  {/each}
+                </Input>
+              {/if}
+            </td>
+          </tr>
+        {/each}
+      </tbody>
+    </table>
+  </FormGroup>
+
+  <!-- skill color -->
+  <FormGroup class="center">
+    <Label>スキル別カラー</Label>
+    <table class="table table-sm table-text-color w-auto td-multiple">
+      <thead>
+        <tr>
+          {#each skillColorColumns as column}
+            <th>{column}</th>
+          {/each}
+        </tr>
+      </thead>
+      <tbody>
+        {#each Object.keys(inputUserConfig.custom_color.skill.text) as key}
+          <tr>
+            <td>
+              {Const.SKILL_LEVEL_LABELS[key]}
+            </td>
+            <td>
+              <div class="d-flex justify-content-center">
+                <Input
+                  type="color"
+                  class="m-1"
+                  bind:value="{inputUserConfig.custom_color.skill.text[key]}"
+                />
+                <Button
+                  size="sm"
+                  color="success"
+                  class="m-1"
+                  style="font-size: {userConfig.font_size};"
+                  on:click="{() => {
+                    inputUserConfig.custom_color.skill.text[key] =
+                      defaultUserConfig.custom_color.skill.text[key];
+                  }}">デフォルト色に戻す</Button
+                >
+              </div>
+            </td>
+
+            <td>
+              <div class="d-flex justify-content-center">
+                <Input
+                  type="color"
+                  class="m-1"
+                  bind:value="{inputUserConfig.custom_color.skill.background[
+                    key
+                  ]}"
+                />
+                <Button
+                  size="sm"
+                  color="success"
+                  class="m-1"
+                  style="font-size: {userConfig.font_size};"
+                  on:click="{() => {
+                    inputUserConfig.custom_color.skill.background[key] =
+                      defaultUserConfig.custom_color.skill.background[key];
+                  }}">デフォルト色に戻す</Button
+                >
+              </div>
+            </td>
+          </tr>
+        {/each}
+      </tbody>
+    </table>
+  </FormGroup>
+
+  <!-- tier group color -->
+  <FormGroup class="center">
+    <Label>ティア別カラー</Label>
+    <table class="table table-sm table-text-color w-auto td-multiple">
+      <thead>
+        <tr>
+          {#each tierColorColumns as column}
+            <th>{column}</th>
+          {/each}
+        </tr>
+      </thead>
+      <tbody>
+        {#each Object.keys(inputUserConfig.custom_color.tier.own) as key}
+          <tr>
+            <td>
+              {Const.TIER_GROUP_LABELS[key]}
+            </td>
+            <td>
+              <div class="d-flex justify-content-center">
+                <Input
+                  type="color"
+                  class="m-1"
+                  bind:value="{inputUserConfig.custom_color.tier.own[key]}"
+                />
+                <Button
+                  size="sm"
+                  color="success"
+                  class="m-1"
+                  style="font-size: {userConfig.font_size};"
+                  on:click="{() => {
+                    inputUserConfig.custom_color.tier.own[key] =
+                      defaultUserConfig.custom_color.tier.own[key];
+                  }}">デフォルト色に戻す</Button
+                >
+              </div>
+            </td>
+
+            <td>
+              <div class="d-flex justify-content-center">
+                <Input
+                  type="color"
+                  class="m-1"
+                  bind:value="{inputUserConfig.custom_color.tier.other[key]}"
+                />
+                <Button
+                  size="sm"
+                  color="success"
+                  class="m-1"
+                  style="font-size: {userConfig.font_size};"
+                  on:click="{() => {
+                    inputUserConfig.custom_color.tier.other[key] =
+                      defaultUserConfig.custom_color.tier.other[key];
+                  }}">デフォルト色に戻す</Button
+                >
+              </div>
+            </td>
+          </tr>
+        {/each}
+      </tbody>
+    </table>
+  </FormGroup>
+
+  <!-- ship type color -->
+  <FormGroup class="center">
+    <Label>艦種別カラー</Label>
+    <table class="table table-sm table-text-color w-auto td-multiple">
+      <thead>
+        <tr>
+          {#each shipTypeColorColumns as column}
+            <th>{column}</th>
+          {/each}
+        </tr>
+      </thead>
+      <tbody>
+        {#each Object.keys(inputUserConfig.custom_color.ship_type.own) as key}
+          <tr>
+            <td>
+              {Const.SHIP_TYPE_LABELS[key]}
+            </td>
+            <td>
+              <div class="d-flex justify-content-center">
+                <Input
+                  type="color"
+                  class="m-1"
+                  bind:value="{inputUserConfig.custom_color.ship_type.own[key]}"
+                />
+                <Button
+                  size="sm"
+                  color="success"
+                  class="m-1"
+                  style="font-size: {userConfig.font_size};"
+                  on:click="{() => {
+                    inputUserConfig.custom_color.ship_type.own[key] =
+                      defaultUserConfig.custom_color.ship_type.own[key];
+                  }}">デフォルト色に戻す</Button
+                >
+              </div>
+            </td>
+
+            <td>
+              <div class="d-flex justify-content-center">
+                <Input
+                  type="color"
+                  class="m-1"
+                  bind:value="{inputUserConfig.custom_color.ship_type.other[
+                    key
+                  ]}"
+                />
+                <Button
+                  size="sm"
+                  color="success"
+                  class="m-1"
+                  style="font-size: {userConfig.font_size};"
+                  on:click="{() => {
+                    inputUserConfig.custom_color.ship_type.other[key] =
+                      defaultUserConfig.custom_color.ship_type.other[key];
+                  }}">デフォルト色に戻す</Button
+                >
+              </div>
+            </td>
+          </tr>
+        {/each}
+      </tbody>
+    </table>
+  </FormGroup>
+
+  <div class="center">
+    <p>プレビュー</p>
+
+    <div style="font-size: {inputUserConfig.font_size};">
+      <StatisticsTable
+        teams="{sampleTeams}"
+        userConfig="{inputUserConfig}"
+        alertPlayers="{[]}"
+      />
     </div>
+  </div>
 
-    <!-- display values -->
-    <div class="mb-2 form-style">
-      <h6 class="text-center">表示項目</h6>
-
-      <div class="centerize">
-        <div class="form-check form-switch">
-          <input
-            class="form-check-input"
-            type="checkbox"
-            id="select-all"
-            on:change="{toggleAll}"
-            checked="{Object.values(inputUserConfig.displays.ship).filter(
-              (it) => !it
-            ).length === 0 &&
-              Object.values(inputUserConfig.displays.overall).filter(
-                (it) => !it
-              ).length === 0}"
-          />
-          <label class="form-check-label" for="select-all">全選択</label>
-        </div>
-      </div>
-
-      <div class="centerize">
-        <table class="table table-sm table-text-color w-auto">
-          <thead>
-            <tr>
-              <th>項目</th>
-              <th>艦成績</th>
-              <th>総合成績</th>
-              <th>小数点以下の桁数</th>
-            </tr>
-          </thead>
-          <tbody>
-            {#each displayKeys as key}
-              <tr>
-                <td>
-                  <div class="centerize">
-                    {Const.COLUMN_NAMES[key].full}
-                  </div>
-                </td>
-
-                <td>
-                  <div class="centerize">
-                    {#if inputUserConfig.displays.ship[key] !== undefined}
-                      <div class="form-check form-switch my-1">
-                        <input
-                          class="form-check-input"
-                          type="checkbox"
-                          bind:checked="{inputUserConfig.displays.ship[key]}"
-                        />
-                      </div>
-                    {/if}
-                  </div>
-                </td>
-
-                <td>
-                  <div class="centerize">
-                    {#if inputUserConfig.displays.overall[key] !== undefined}
-                      <div class="form-check form-switch my-1">
-                        <input
-                          class="form-check-input"
-                          type="checkbox"
-                          bind:checked="{inputUserConfig.displays.overall[key]}"
-                        />
-                      </div>
-                    {/if}
-                  </div>
-                </td>
-
-                <td>
-                  <div class="centerize">
-                    {#if inputUserConfig.custom_digit[key] !== undefined}
-                      <div class="my-1">
-                        <select
-                          class="form-select"
-                          style="font-size: {userConfig.font_size};"
-                          bind:value="{inputUserConfig.custom_digit[key]}"
-                        >
-                          {#each [0, 1, 2] as digit}
-                            <option
-                              selected="{digit ===
-                                inputUserConfig.custom_digit[key]}"
-                              value="{digit}">{digit}</option
-                            >
-                          {/each}
-                        </select>
-                      </div>
-                    {/if}
-                  </div>
-                </td>
-              </tr>
-            {/each}
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- custom color -->
-    <div class="mb-2 form-style">
-      <!-- skill color -->
-      <h6 class="text-center">スキル別カラー</h6>
-      <div class="centerize">
-        <table class="table table-sm table-text-color w-auto">
-          <thead>
-            <tr>
-              <th>スキル</th>
-              <th>文字色</th>
-              <th>背景色</th>
-            </tr>
-          </thead>
-          <tbody>
-            {#each Object.keys(inputUserConfig.custom_color.skill.text) as key}
-              <tr>
-                <td>
-                  <div class="centerize">
-                    {Const.SKILL_LEVEL_LABELS[key]}
-                  </div>
-                </td>
-                <td>
-                  <div class="centerize my-1">
-                    <ColorPicker
-                      label="{inputUserConfig.custom_color.skill.text[key]}"
-                      isAlpha="{false}"
-                      canChangeMode="{false}"
-                      bind:hex="{inputUserConfig.custom_color.skill.text[key]}"
-                    />
-                    <div class="mx-2">
-                      <button
-                        type="button"
-                        class="btn btn-sm btn-success"
-                        style="font-size: {userConfig.font_size};"
-                        on:click="{() => {
-                          inputUserConfig.custom_color.skill.text[key] =
-                            defaultUserConfig.custom_color.skill.text[key];
-                        }}">デフォルト値をセット</button
-                      >
-                    </div>
-                  </div>
-                </td>
-
-                <td>
-                  <div class="centerize my-1">
-                    <ColorPicker
-                      label="{inputUserConfig.custom_color.skill.background[
-                        key
-                      ]}"
-                      isAlpha="{false}"
-                      canChangeMode="{false}"
-                      bind:hex="{inputUserConfig.custom_color.skill.background[
-                        key
-                      ]}"
-                    />
-                    <div class="mx-2">
-                      <button
-                        type="button"
-                        class="btn btn-sm btn-success"
-                        style="font-size: {userConfig.font_size};"
-                        on:click="{() => {
-                          inputUserConfig.custom_color.skill.background[key] =
-                            defaultUserConfig.custom_color.skill.background[
-                              key
-                            ];
-                        }}">デフォルト値をセット</button
-                      >
-                    </div>
-                  </div>
-                </td>
-              </tr>
-            {/each}
-          </tbody>
-        </table>
-      </div>
-
-      <!-- tier group color -->
-      <h6 class="text-center">Tier別カラー</h6>
-      <div class="centerize">
-        <table class="table table-sm table-text-color w-auto">
-          <thead>
-            <tr>
-              <th>Tier</th>
-              <th>使用艦</th>
-              <th>非使用艦</th>
-            </tr>
-          </thead>
-          <tbody>
-            {#each Object.keys(inputUserConfig.custom_color.tier.own) as key}
-              <tr>
-                <td>
-                  <div class="centerize">
-                    {Const.TIER_GROUP_LABELS[key]}
-                  </div>
-                </td>
-                <td>
-                  <div class="centerize my-1">
-                    <ColorPicker
-                      label="{inputUserConfig.custom_color.tier.own[key]}"
-                      isAlpha="{false}"
-                      canChangeMode="{false}"
-                      bind:hex="{inputUserConfig.custom_color.tier.own[key]}"
-                    />
-                    <div class="mx-2">
-                      <button
-                        type="button"
-                        class="btn btn-sm btn-success"
-                        style="font-size: {userConfig.font_size};"
-                        on:click="{() => {
-                          inputUserConfig.custom_color.tier.own[key] =
-                            defaultUserConfig.custom_color.tier.own[key];
-                        }}">デフォルト値をセット</button
-                      >
-                    </div>
-                  </div>
-                </td>
-
-                <td>
-                  <div class="centerize my-1">
-                    <ColorPicker
-                      label="{inputUserConfig.custom_color.tier.other[key]}"
-                      isAlpha="{false}"
-                      canChangeMode="{false}"
-                      bind:hex="{inputUserConfig.custom_color.tier.other[key]}"
-                    />
-                    <div class="mx-2">
-                      <button
-                        type="button"
-                        class="btn btn-sm btn-success"
-                        style="font-size: {userConfig.font_size};"
-                        on:click="{() => {
-                          inputUserConfig.custom_color.tier.other[key] =
-                            defaultUserConfig.custom_color.tier.other[key];
-                        }}">デフォルト値をセット</button
-                      >
-                    </div>
-                  </div>
-                </td>
-              </tr>
-            {/each}
-          </tbody>
-        </table>
-      </div>
-
-      <!-- ship type color -->
-      <h6 class="text-center">艦別カラー</h6>
-      <div class="centerize">
-        <table class="table table-sm table-text-color w-auto">
-          <thead>
-            <tr>
-              <th>艦種</th>
-              <th>使用艦</th>
-              <th>非使用艦</th>
-            </tr>
-          </thead>
-          <tbody>
-            {#each Object.keys(inputUserConfig.custom_color.ship_type.own) as key}
-              <tr>
-                <td>
-                  <div class="centerize">
-                    {Const.SHIP_TYPE_LABELS[key]}
-                  </div>
-                </td>
-                <td>
-                  <div class="centerize my-1">
-                    <ColorPicker
-                      label="{inputUserConfig.custom_color.ship_type.own[key]}"
-                      isAlpha="{false}"
-                      canChangeMode="{false}"
-                      bind:hex="{inputUserConfig.custom_color.ship_type.own[
-                        key
-                      ]}"
-                    />
-                    <div class="mx-2">
-                      <button
-                        type="button"
-                        class="btn btn-sm btn-success"
-                        style="font-size: {userConfig.font_size};"
-                        on:click="{() => {
-                          inputUserConfig.custom_color.ship_type.own[key] =
-                            defaultUserConfig.custom_color.ship_type.own[key];
-                        }}">デフォルト値をセット</button
-                      >
-                    </div>
-                  </div>
-                </td>
-
-                <td>
-                  <div class="centerize my-1">
-                    <ColorPicker
-                      label="{inputUserConfig.custom_color.ship_type.other[
-                        key
-                      ]}"
-                      isAlpha="{false}"
-                      canChangeMode="{false}"
-                      bind:hex="{inputUserConfig.custom_color.ship_type.other[
-                        key
-                      ]}"
-                    />
-                    <div class="mx-2">
-                      <button
-                        type="button"
-                        class="btn btn-sm btn-success"
-                        style="font-size: {userConfig.font_size};"
-                        on:click="{() => {
-                          inputUserConfig.custom_color.ship_type.other[key] =
-                            defaultUserConfig.custom_color.ship_type.other[key];
-                        }}">デフォルト値をセット</button
-                      >
-                    </div>
-                  </div>
-                </td>
-              </tr>
-            {/each}
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <div class="m-2">
-      <h6 class="text-center">プレビュー</h6>
-
-      <div style="font-size: {inputUserConfig.font_size};">
-        <StatisticsTable
-          teams="{sampleTeams}"
-          userConfig="{inputUserConfig}"
-          alertPlayers="{[]}"
-        />
-      </div>
-    </div>
-
-    <div class="mb-2 form-style">
-      <h6 class="text-center">その他</h6>
-
-      <!-- save-screenshot -->
-      <div class="form-check form-switch">
-        <input
-          class="form-check-input"
-          type="checkbox"
-          id="save-scrrenshot"
+  <FormGroup class="center">
+    <Label>その他</Label>
+    <ul>
+      <li class="my-1">
+        <Input
+          type="switch"
+          label="自動でスクリーンショットを保存する"
           bind:checked="{inputUserConfig.save_screenshot}"
         />
-        <label class="form-check-label" for="save-scrrenshot"
-          >自動でスクリーンショットを保存する</label
-        >
-        <br />
-        <!-- svelte-ignore a11y-invalid-attribute -->
         <a
           class="td-link"
           href="#"
           on:click="{() => openDirectory('screenshot/')}"
           ><i class="bi bi-folder2-open"></i> 保存フォルダを開く
         </a>
-      </div>
-
-      <!-- save-temp-arena-info -->
-      <div class="form-check form-switch">
-        <input
-          class="form-check-input"
-          type="checkbox"
-          id="save-temp-arena-info"
+      </li>
+      <li class="my-1">
+        <Input
+          type="switch"
+          label="【開発用】自動で戦闘情報(tempArenaInfo.json)を保存する"
           bind:checked="{inputUserConfig.save_temp_arena_info}"
         />
-        <label class="form-check-label" for="save-temp-arena-info"
-          >【開発用】自動で戦闘情報(<i>tempArenaInfo.json</i>)を保存する</label
-        >
-        <br />
-        <!-- svelte-ignore a11y-invalid-attribute -->
         <a
           class="td-link"
           href="#"
           on:click="{() => openDirectory('temp_arena_info/')}"
-          ><i class="bi bi-folder2-open"></i> 保存フォルダを開く</a
-        >
-      </div>
-
-      <!-- send-report -->
-      <div class="form-check form-switch">
-        <input
-          class="form-check-input"
-          type="checkbox"
-          id="send-report"
+          ><i class="bi bi-folder2-open"></i> 保存フォルダを開く
+        </a>
+      </li>
+      <li class="my-1">
+        <Input
+          type="switch"
+          label="アプリ改善のためのデータ送信を許可する"
           bind:checked="{inputUserConfig.send_report}"
         />
-        <label class="form-check-label" for="send-report"
-          >アプリ改善のためのデータ送信を許可する</label
-        >
         <ul>
           <li>エラーログ</li>
-          <li>設定値(<i>config/user.json</i>)</li>
-          <li>戦闘情報(<i>tempArenaInfo.json</i>)</li>
+          <li>設定値(config/user.json)</li>
+          <li>戦闘情報(tempArenaInfo.json)</li>
         </ul>
-      </div>
-    </div>
+      </li>
+    </ul>
+  </FormGroup>
 
-    <div class="centerize">
-      <!-- apply -->
-      <button
-        type="button"
-        class="btn btn-primary mb-3"
-        style="font-size: {userConfig.font_size};"
-        disabled="{isLoading}"
-        on:click="{clickApply}"
-      >
-        {#if isLoading}
-          <span
-            class="spinner-border spinner-border-sm"
-            role="status"
-            aria-hidden="true"></span>
-          更新中...
-        {:else}
-          適用
-        {/if}
-      </button>
-    </div>
-  </form>
+  <!-- apply -->
+  <button
+    type="button"
+    class="btn btn-primary mb-3"
+    style="font-size: {userConfig.font_size};"
+    disabled="{isLoading}"
+    on:click="{clickApply}"
+  >
+    {#if isLoading}
+      <span
+        class="spinner-border spinner-border-sm"
+        role="status"
+        aria-hidden="true"></span>
+      更新中...
+    {:else}
+      適用
+    {/if}
+  </button>
 </div>

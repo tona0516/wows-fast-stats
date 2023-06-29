@@ -53,7 +53,7 @@ export interface SummaryResult {
 export function summary(
   battle: vo.Battle,
   excludes: number[],
-  userConfig: vo.UserConfig,
+  userConfig: vo.UserConfig
 ): SummaryResult {
   const items: { category: StatsCategory; key: string }[] = [
     { category: StatsCategory.Ship, key: "pr" },
@@ -65,7 +65,10 @@ export function summary(
     { category: StatsCategory.Overall, key: "kd_rate" },
   ];
 
-  const [shipColspan, overallColspan] = [StatsCategory.Ship, StatsCategory.Overall].map((category) => {
+  const [shipColspan, overallColspan] = [
+    StatsCategory.Ship,
+    StatsCategory.Overall,
+  ].map((category) => {
     return items.filter((it) => it.category === category).length;
   });
 

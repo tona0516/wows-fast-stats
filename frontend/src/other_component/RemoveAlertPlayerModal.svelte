@@ -26,13 +26,15 @@ async function remove(accountID: number) {
 </script>
 
 <Modal isOpen="{open}" toggle="{toggle}">
-  <ModalBody style="background-color: #2d2c2c;">
+  <ModalBody class="modal-color">
     「{target.name}」を削除しますか？
   </ModalBody>
-  <ModalFooter style="background-color: #2d2c2c;">
-    <Button color="secondary" on:click="{toggle}">キャンセル</Button>
-    <Button color="danger" on:click="{() => remove(target.account_id)}"
-      >追加</Button
+  <ModalFooter class="modal-color">
+    <Button size="sm" color="secondary" on:click="{toggle}">キャンセル</Button>
+    <Button
+      size="sm"
+      color="danger"
+      on:click="{() => remove(target.account_id)}">削除</Button
     >
   </ModalFooter>
 </Modal>

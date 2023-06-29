@@ -2,7 +2,16 @@
 import Svelecte from "svelecte";
 import clone from "clone";
 import { createEventDispatcher } from "svelte";
-import { Modal, ModalBody, ModalFooter, Button } from "sveltestrap";
+import {
+  Modal,
+  ModalBody,
+  ModalFooter,
+  Button,
+  FormGroup,
+  Label,
+  Input,
+  Icon,
+} from "sveltestrap";
 import {
   SearchPlayer,
   AlertPatterns,
@@ -62,9 +71,9 @@ function validate(player: vo.AlertPlayer): boolean {
 </script>
 
 <Modal isOpen="{open}" toggle="{toggle}" on:open="{onOpen}">
-  <ModalBody style="background-color: #2d2c2c;">
-    <div class="m-1">
-      <label for="player" class="col-form-label">プレイヤー名:</label>
+  <ModalBody class="modal-color">
+    <FormGroup>
+      <Label>プレイヤー名</Label>
       <Svelecte
         style="color: #2d2c2c;"
         valueAsObject
@@ -75,43 +84,45 @@ function validate(player: vo.AlertPlayer): boolean {
         labelField="nickname"
         bind:value="{searchResult}"
       />
-    </div>
+    </FormGroup>
 
-    <div class="m-1">
-      <div class="form-group">
-        <label for="pattern" class="col-form-label">アイコン:</label>
-        <div>
-          {#each alertPatterns as pattern}
-            <div class="form-check form-check-inline">
-              <input
-                class="form-check-input"
-                type="radio"
-                bind:group="{target.pattern}"
-                value="{pattern}"
-              />
-              <label class="form-check-label" for="icon">
-                <i class="bi {pattern}"></i>
-              </label>
-            </div>
-          {/each}
-        </div>
+    <FormGroup>
+      <Label>アイコン</Label>
+      <!-- TODO migrate sveltestrap -->
+      <div>
+        {#each alertPatterns as pattern}
+          <div class="form-check form-check-inline">
+            <input
+              class="form-check-input"
+              type="radio"
+              bind:group="{target.pattern}"
+              value="{pattern}"
+            />
+            <label class="form-check-label" for="icon">
+              <i class="bi {pattern}"></i>
+            </label>
+          </div>
+        {/each}
       </div>
-    </div>
+    </FormGroup>
 
-    <div class="m-1">
-      <label for="message" class="col-form-label">メモ(任意):</label>
-      <textarea
-        class="form-control"
-        id="message"
+    <FormGroup>
+      <Label>メモ(任意)</Label>
+      <Input
+        type="textarea"
         maxlength="{Const.MAX_MEMO_LENGTH}"
-        bind:value="{target.message}"></textarea>
+        bind:value="{target.message}"
+      />
       <span>{target.message.length}/{Const.MAX_MEMO_LENGTH}</span>
-    </div>
+    </FormGroup>
   </ModalBody>
-  <ModalFooter style="background-color: #2d2c2c;">
-    <Button color="secondary" on:click="{toggle}">キャンセル</Button>
-    <Button color="primary" on:click="{() => add(target, searchResult)}"
-      >追加</Button
+
+  <ModalFooter class="modal-color">
+    <Button size="sm" color="secondary" on:click="{toggle}">キャンセル</Button>
+    <Button
+      size="sm"
+      color="primary"
+      on:click="{() => add(target, searchResult)}">追加</Button
     >
   </ModalFooter>
 </Modal>

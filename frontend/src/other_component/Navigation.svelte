@@ -17,6 +17,7 @@ import {
 } from "../stores";
 import { Func, Page } from "../enums";
 import { Const } from "../Const";
+import { Button, FormGroup, Input, Spinner } from "sveltestrap";
 
 const dispatch = createEventDispatcher();
 
@@ -110,23 +111,26 @@ async function onStatsPatternChanged() {
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
       <div class="navbar-nav">
         {#each Const.PAGES as page}
-          <button
-            type="button"
-            class="btn btn-sm btn-outline-secondary m-1 {currentPage ===
-              page.name && 'active'}"
+          <Button
+            size="sm"
+            color="secondary"
+            outline
+            class="m-1 {currentPage === page.name && 'active'}"
             title="{page.title}"
             style="font-size: {userConfig.font_size};"
             on:click="{() => onSwitchPage(page.name)}"
           >
             <i class="{page.iconClass}"></i>
             {page.title}
-          </button>
+          </Button>
         {/each}
         {#if currentPage == Page.Main}
           {#each Const.FUNCS as func}
-            <button
-              type="button"
-              class="btn btn-sm btn-outline-success m-1"
+            <Button
+              size="sm"
+              color="success"
+              outline
+              class="m-1"
               title="{func.title}"
               disabled="{func.name === Func.Screenshot &&
                 (battle === undefined || isLoadingScreenshot)}"
@@ -134,17 +138,14 @@ async function onStatsPatternChanged() {
               on:click="{() => onClickFunc(func.name)}"
             >
               {#if func.name === Func.Screenshot && isLoadingScreenshot}
-                <span
-                  class="spinner-border spinner-border-sm"
-                  role="status"
-                  aria-hidden="true"></span>
-                読み込み中...
+                <Spinner size="sm" type="border" /> 読み込み中
               {:else}
                 <i class="{func.iconClass}"></i>
                 {func.title}
               {/if}
-            </button>
+            </Button>
           {/each}
+
           <select
             class="form-select form-select-sm m-1"
             style="font-size: {userConfig.font_size};"
