@@ -1,5 +1,5 @@
 APP := wows-fast-stats
-SEMVER := 0.6.1
+SEMVER := 0.7.0
 REVISION := $(shell git rev-parse --short HEAD)
 EXE := $(APP)-$(SEMVER).exe
 ZIP := $(APP).zip
