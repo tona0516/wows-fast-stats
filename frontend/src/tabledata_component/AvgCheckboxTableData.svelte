@@ -1,6 +1,5 @@
 <script lang="ts">
 import { createEventDispatcher } from "svelte";
-import { get } from "svelte/store";
 import {
   RemoveExcludePlayerID,
   AddExcludePlayerID,
@@ -10,10 +9,7 @@ import { storedExcludePlayerIDs } from "../stores";
 
 export let player: vo.Player;
 
-let excludePlayerIDs = get(storedExcludePlayerIDs);
-storedExcludePlayerIDs.subscribe((it) => (excludePlayerIDs = it));
-
-$: isChecked = !excludePlayerIDs.includes(player.player_info.id);
+$: isChecked = !$storedExcludePlayerIDs.includes(player.player_info.id);
 
 const dispatch = createEventDispatcher();
 

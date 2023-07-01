@@ -2,19 +2,10 @@
 import { createEventDispatcher } from "svelte";
 import clone from "clone";
 import { storedAlertPlayers, storedUserConfig } from "../stores.js";
-import { get } from "svelte/store";
 import type { vo } from "../../wailsjs/go/models.js";
 import { Button } from "sveltestrap";
 
 const dispatch = createEventDispatcher();
-
-let alertPlayers = get(storedAlertPlayers);
-storedAlertPlayers.subscribe((it) => (alertPlayers = it));
-
-let userConfig = get(storedUserConfig);
-storedUserConfig.subscribe((it) => {
-  userConfig = it;
-});
 
 const alertPlayerColumns = ["プレイヤー名", "アイコン", "メモ", "操作"];
 
@@ -47,7 +38,7 @@ function onClickRemove(player: vo.AlertPlayer) {
 
   <!-- alert players -->
   <div class="m-2">
-    {#if alertPlayers.length === 0}
+    {#if $storedAlertPlayers.length === 0}
       <p>プレイヤーリストがありません</p>
     {:else}
       <table class="table table-sm table-text-color w-auto td-multiple">
@@ -59,7 +50,7 @@ function onClickRemove(player: vo.AlertPlayer) {
           </tr>
         </thead>
         <tbody>
-          {#each alertPlayers as player}
+          {#each $storedAlertPlayers as player}
             <tr>
               <td>{player.name}</td>
               <td><i class="bi {player.pattern}"></i></td>
@@ -69,14 +60,14 @@ function onClickRemove(player: vo.AlertPlayer) {
                   class="m-1"
                   size="sm"
                   color="success"
-                  style="font-size: {userConfig.font_size};"
+                  style="font-size: {$storedUserConfig.font_size};"
                   on:click="{() => onClickEdit(player)}">編集</Button
                 >
                 <Button
                   class="m-1"
                   size="sm"
                   color="danger"
-                  style="font-size: {userConfig.font_size};"
+                  style="font-size: {$storedUserConfig.font_size};"
                   on:click="{() => onClickRemove(player)}">削除</Button
                 >
               </td>
@@ -92,7 +83,7 @@ function onClickRemove(player: vo.AlertPlayer) {
     class="m-1"
     size="sm"
     color="primary"
-    style="font-size: {userConfig.font_size};"
+    style="font-size: {$storedUserConfig.font_size};"
     on:click="{onClickAdd}">追加</Button
   >
 </div>

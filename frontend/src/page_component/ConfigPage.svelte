@@ -24,10 +24,8 @@ const skillColorColumns = ["スキル", "文字色", "背景色"];
 const tierColorColumns = ["Tier", "使用艦", "非使用艦"];
 const shipTypeColorColumns = ["艦種", "使用艦", "非使用艦"];
 
-let userConfig = get(storedUserConfig);
 let inputUserConfig = get(storedUserConfig);
 storedUserConfig.subscribe((it) => {
-  userConfig = it;
   inputUserConfig = clone(it);
 });
 
@@ -81,8 +79,8 @@ function toggleAll(e: any) {
 async function main() {
   defaultUserConfig = await DefaultUserConfig();
   sampleTeams = await SampleTeams();
-  const shipKeys = Object.keys(userConfig.displays.ship);
-  const overallKeys = Object.keys(userConfig.displays.overall);
+  const shipKeys = Object.keys($storedUserConfig.displays.ship);
+  const overallKeys = Object.keys($storedUserConfig.displays.overall);
   displayKeys = Array.from(new Set([...shipKeys, ...overallKeys]));
 }
 
@@ -99,12 +97,12 @@ main();
       <Input
         type="text"
         class="text-form"
-        style="font-size: {userConfig.font_size};"
+        style="font-size: {$storedUserConfig.font_size};"
         bind:value="{inputUserConfig.install_path}"
       />
       <Button
         color="secondary"
-        style="font-size: {userConfig.font_size};"
+        style="font-size: {$storedUserConfig.font_size};"
         on:click="{selectDirectory}">選択</Button
       >
     </div>
@@ -116,7 +114,7 @@ main();
     <Input
       type="text"
       class="text-form"
-      style="font-size: {userConfig.font_size};"
+      style="font-size: {$storedUserConfig.font_size};"
       bind:value="{inputUserConfig.appid}"
     />
     <div>
@@ -136,12 +134,12 @@ main();
     <Input
       type="select"
       class="w-auto"
-      style="font-size: {userConfig.font_size};"
+      style="font-size: {$storedUserConfig.font_size};"
       bind:value="{inputUserConfig.font_size}"
     >
       {#await FontSizes() then fontSizes}
         {#each fontSizes as fs}
-          <option selected="{fs === userConfig.font_size}" value="{fs}"
+          <option selected="{fs === $storedUserConfig.font_size}" value="{fs}"
             >{Const.FONT_SIZE[fs]}</option
           >
         {/each}
@@ -154,7 +152,7 @@ main();
     <Label>表示項目</Label>
     <Input
       type="switch"
-      style="font-size: {userConfig.font_size};"
+      style="font-size: {$storedUserConfig.font_size};"
       on:change="{toggleAll}"
       checked="{Object.values(inputUserConfig.displays.ship).filter((it) => !it)
         .length === 0 &&
@@ -203,7 +201,7 @@ main();
                 <Input
                   type="select"
                   class="p-1 m-1"
-                  style="font-size: {userConfig.font_size};"
+                  style="font-size: {$storedUserConfig.font_size};"
                   bind:value="{inputUserConfig.custom_digit[key]}"
                 >
                   {#each [0, 1, 2] as digit}
@@ -249,7 +247,7 @@ main();
                   size="sm"
                   color="success"
                   class="m-1"
-                  style="font-size: {userConfig.font_size};"
+                  style="font-size: {$storedUserConfig.font_size};"
                   on:click="{() => {
                     inputUserConfig.custom_color.skill.text[key] =
                       defaultUserConfig.custom_color.skill.text[key];
@@ -271,7 +269,7 @@ main();
                   size="sm"
                   color="success"
                   class="m-1"
-                  style="font-size: {userConfig.font_size};"
+                  style="font-size: {$storedUserConfig.font_size};"
                   on:click="{() => {
                     inputUserConfig.custom_color.skill.background[key] =
                       defaultUserConfig.custom_color.skill.background[key];
@@ -313,7 +311,7 @@ main();
                   size="sm"
                   color="success"
                   class="m-1"
-                  style="font-size: {userConfig.font_size};"
+                  style="font-size: {$storedUserConfig.font_size};"
                   on:click="{() => {
                     inputUserConfig.custom_color.tier.own[key] =
                       defaultUserConfig.custom_color.tier.own[key];
@@ -333,7 +331,7 @@ main();
                   size="sm"
                   color="success"
                   class="m-1"
-                  style="font-size: {userConfig.font_size};"
+                  style="font-size: {$storedUserConfig.font_size};"
                   on:click="{() => {
                     inputUserConfig.custom_color.tier.other[key] =
                       defaultUserConfig.custom_color.tier.other[key];
@@ -375,7 +373,7 @@ main();
                   size="sm"
                   color="success"
                   class="m-1"
-                  style="font-size: {userConfig.font_size};"
+                  style="font-size: {$storedUserConfig.font_size};"
                   on:click="{() => {
                     inputUserConfig.custom_color.ship_type.own[key] =
                       defaultUserConfig.custom_color.ship_type.own[key];
@@ -397,7 +395,7 @@ main();
                   size="sm"
                   color="success"
                   class="m-1"
-                  style="font-size: {userConfig.font_size};"
+                  style="font-size: {$storedUserConfig.font_size};"
                   on:click="{() => {
                     inputUserConfig.custom_color.ship_type.other[key] =
                       defaultUserConfig.custom_color.ship_type.other[key];
@@ -473,7 +471,7 @@ main();
   <button
     type="button"
     class="btn btn-primary mb-3"
-    style="font-size: {userConfig.font_size};"
+    style="font-size: {$storedUserConfig.font_size};"
     disabled="{isLoading}"
     on:click="{clickApply}"
   >

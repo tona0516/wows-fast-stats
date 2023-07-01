@@ -1,12 +1,8 @@
 <script lang="ts">
-import { get } from "svelte/store";
 import { BrowserOpenURL } from "../../wailsjs/runtime/runtime";
 import { SkillLevelConverter } from "../RankConverter";
 import { storedUserConfig } from "../stores";
 import { Const } from "../Const";
-
-let userConfig = get(storedUserConfig);
-storedUserConfig.subscribe((it) => (userConfig = it));
 
 const prColors: {
   label: string;
@@ -93,7 +89,7 @@ const prColors: {
 </script>
 
 <div class="center">
-  {#if userConfig.custom_color}
+  {#if $storedUserConfig.custom_color}
     <h6>スキル別配色</h6>
 
     <table class="table table-sm table-text-color w-auto td-multiple">
@@ -110,26 +106,26 @@ const prColors: {
             <td
               style="background-color: {SkillLevelConverter.fromPR(
                 v.minPR,
-                userConfig.custom_color.skill
+                $storedUserConfig.custom_color.skill
               ).toBgColorCode()};">player_name</td
             >
             <td
               style="color: {SkillLevelConverter.fromPR(
                 v.minPR,
-                userConfig.custom_color.skill
+                $storedUserConfig.custom_color.skill
               ).toTextColorCode()};">{v.minPR} ~ {v.maxPR}</td
             >
             <td
               style="color: {SkillLevelConverter.fromDamage(
                 v.minDamage,
                 1.0,
-                userConfig.custom_color.skill
+                $storedUserConfig.custom_color.skill
               ).toTextColorCode()};">{v.minDamage}倍 ~ {v.maxDamage}倍</td
             >
             <td
               style="color: {SkillLevelConverter.fromWinRate(
                 v.minWin,
-                userConfig.custom_color.skill
+                $storedUserConfig.custom_color.skill
               ).toTextColorCode()};">{v.minWin}% ~ {v.maxWin}%</td
             >
           </tr>

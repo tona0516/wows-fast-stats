@@ -1,5 +1,4 @@
 <script lang="ts">
-import { get } from "svelte/store";
 import AddAlertPlayerModal from "./other_component/AddAlertPlayerModal.svelte";
 import { Screenshot } from "./Screenshot";
 import {
@@ -48,18 +47,6 @@ let addAlertPlayerModal: AddAlertPlayerModal;
 let updateAlertPlayerModal: UpdateAlertPlayerModal;
 let removeAlertPlayerModal: RemoveAlertPlayerModal;
 
-let battle = get(storedBattle);
-storedBattle.subscribe((it) => (battle = it));
-
-let userConfig = get(storedUserConfig);
-storedUserConfig.subscribe((it) => (userConfig = it));
-
-let isFirstScreenshot = get(storedIsFirstScreenshot);
-storedIsFirstScreenshot.subscribe((it) => (isFirstScreenshot = it));
-
-let currentPage = get(storedCurrentPage);
-storedCurrentPage.subscribe((it) => (currentPage = it));
-
 EventsOn(EVENT_BATTLE_START, async () => {
   LogDebug(EVENT_BATTLE_START);
 
@@ -82,9 +69,9 @@ EventsOn(EVENT_BATTLE_START, async () => {
     notification.removeToastWithKey(TOAST_FETCHING);
   }
 
-  if (userConfig.save_screenshot) {
+  if ($storedUserConfig.save_screenshot) {
     try {
-      const screenshot = new Screenshot(battle, isFirstScreenshot);
+      const screenshot = new Screenshot($storedBattle, $storedIsFirstScreenshot);
       screenshot.auto();
       storedIsFirstScreenshot.set(false);
     } catch (error) {
@@ -141,7 +128,7 @@ async function updateSummary(battle: vo.Battle) {
   const summaryResult = summary(
     battle,
     excludePlayerIDs,
-    userConfig,
+    $storedUserConfig,
   );
   storedSummaryResult.set(summaryResult);
 }
@@ -182,7 +169,7 @@ window.onload = function () {
 </script>
 
 <main>
-  <div style="font-size: {userConfig.font_size};">
+  <div style="font-size: {$storedUserConfig.font_size};">
     <AddAlertPlayerModal
       bind:this="{addAlertPlayerModal}"
       on:Success="{onSuccessAlertPlayerModal}"
@@ -206,25 +193,25 @@ window.onload = function () {
         notification.showToast(event.detail.message, 'success')}"
       on:Failure="{(event) =>
         notification.showToast(event.detail.message, 'error')}"
-      on:ChangeStatsPattern="{() => updateSummary(battle)}"
+      on:ChangeStatsPattern="{() => updateSummary($storedBattle)}"
     />
 
-    {#if currentPage === Page.Main}
+    {#if $storedCurrentPage === Page.Main}
       <div id="mainpage">
         <MainPage
           on:UpdateAlertPlayer="{(event) => showUpdateAlertPlayerModal(event)}"
           on:RemoveAlertPlayer="{(event) => showRemoveAlertPlayerModal(event)}"
-          on:CheckPlayer="{() => updateSummary(battle)}"
+          on:CheckPlayer="{() => updateSummary($storedBattle)}"
         />
       </div>
     {/if}
 
-    {#if currentPage === Page.Config}
+    {#if $storedCurrentPage === Page.Config}
       <ConfigPage
         on:UpdateSuccess="{(event) => {
           notification.showToast(event.detail.message, 'success');
           notification.removeToastWithKey('need_config');
-          if (!battle) {
+          if (!$storedBattle) {
             Ready();
           }
         }}"
@@ -233,11 +220,11 @@ window.onload = function () {
       />
     {/if}
 
-    {#if currentPage === Page.AppInfo}
+    {#if $storedCurrentPage === Page.AppInfo}
       <AppInfoPage />
     {/if}
 
-    {#if currentPage === Page.AlertPlayer}
+    {#if $storedCurrentPage === Page.AlertPlayer}
       <AlertPlayerPage
         on:AddAlertPlayer="{(event) => showAddAlertPlayerModal(event)}"
         on:UpdateAlertPlayer="{(event) => showUpdateAlertPlayerModal(event)}"
