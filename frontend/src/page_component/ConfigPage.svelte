@@ -421,6 +421,41 @@ main();
     </div>
   </div>
 
+  <!-- team average -->
+  {#if defaultUserConfig}
+    <FormGroup class="center">
+      <Label>チーム平均に含める最小戦闘数(艦戦績)</Label>
+      <Input
+        type="range"
+        min="{defaultUserConfig.team_average.min_ship_battles}"
+        max="{100}"
+        step="{1}"
+        class="text-form"
+        style="font-size: {$storedUserConfig.font_size};"
+        bind:value="{inputUserConfig.team_average.min_ship_battles}"
+      />
+      <div>
+        {inputUserConfig.team_average.min_ship_battles}
+      </div>
+    </FormGroup>
+
+    <FormGroup class="center">
+      <Label>チーム平均に含める最小戦闘数(総合成績)</Label>
+      <Input
+        type="range"
+        min="{defaultUserConfig.team_average.min_overall_battles}"
+        max="{10000}"
+        step="{100}"
+        class="text-form"
+        style="font-size: {$storedUserConfig.font_size};"
+        bind:value="{inputUserConfig.team_average.min_overall_battles}"
+      />
+      <div>
+        {inputUserConfig.team_average.min_overall_battles}
+      </div>
+    </FormGroup>
+  {/if}
+
   <FormGroup class="center">
     <Label>その他</Label>
     <ul>

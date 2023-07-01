@@ -106,6 +106,10 @@ var DefaultUserConfig vo.UserConfig = vo.UserConfig{
 		UsingShipTypeRate: 1,
 		UsingTierRate:     1,
 	},
+	TeamAverage: vo.TeamAverage{
+		MinShipBattles:    1,
+		MinOverallBattles: 100,
+	},
 }
 
 type Config struct{}

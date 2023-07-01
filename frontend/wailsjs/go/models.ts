@@ -714,6 +714,20 @@ export namespace vo {
 	
 	
 	
+	export class TeamAverage {
+	    min_ship_battles: number;
+	    min_overall_battles: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new TeamAverage(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.min_ship_battles = source["min_ship_battles"];
+	        this.min_overall_battles = source["min_overall_battles"];
+	    }
+	}
 	
 	
 	
@@ -728,6 +742,7 @@ export namespace vo {
 	    displays: Displays;
 	    custom_color: CustomColor;
 	    custom_digit: CustomDigit;
+	    team_average: TeamAverage;
 	
 	    static createFrom(source: any = {}) {
 	        return new UserConfig(source);
@@ -745,6 +760,7 @@ export namespace vo {
 	        this.displays = this.convertValues(source["displays"], Displays);
 	        this.custom_color = this.convertValues(source["custom_color"], CustomColor);
 	        this.custom_digit = this.convertValues(source["custom_digit"], CustomDigit);
+	        this.team_average = this.convertValues(source["team_average"], TeamAverage);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

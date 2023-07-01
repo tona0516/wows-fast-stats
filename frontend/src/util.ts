@@ -78,11 +78,19 @@ export function summary(
   const diffs: { value: string; colorClass: string }[] = [];
   items.forEach((it) => {
     const [filteredFriends, filteredEnemies] = [0, 1].map((i) => {
+      let minBattle = 1;
+      if (it.category === "ship") {
+        minBattle = userConfig.team_average.min_ship_battles;
+      } else if (it.category === "overall") {
+        minBattle = userConfig.team_average.min_overall_battles;
+      }
+
       return battle.teams[i].players.filter(
         (p) =>
           p.player_info.id !== 0 &&
           !excludes.includes(p.player_info.id) &&
-          values(p, userConfig.stats_pattern, it.category, "battles") > 0
+          values(p, userConfig.stats_pattern, it.category, "battles") >=
+            minBattle
       );
     });
 

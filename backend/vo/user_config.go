@@ -11,6 +11,7 @@ type UserConfig struct {
 	Displays          Displays     `json:"displays"`
 	CustomColor       CustomColor  `json:"custom_color"`
 	CustomDigit       CustomDigit  `json:"custom_digit"`
+	TeamAverage       TeamAverage  `json:"team_average"`
 }
 
 type Displays struct {
@@ -111,4 +112,9 @@ type CustomDigit struct {
 	AvgTier           uint `json:"avg_tier"`
 	UsingShipTypeRate uint `json:"using_ship_type_rate"`
 	UsingTierRate     uint `json:"using_tier_rate"`
+}
+
+type TeamAverage struct {
+	MinShipBattles    uint `json:"min_ship_battles"`
+	MinOverallBattles uint `json:"min_overall_battles"`
 }
