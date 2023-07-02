@@ -18,6 +18,10 @@ export function AppVersion() {
   return window['go']['main']['App']['AppVersion']();
 }
 
+export function ApplyRequiredUserConfig(arg1, arg2) {
+  return window['go']['main']['App']['ApplyRequiredUserConfig'](arg1, arg2);
+}
+
 export function ApplyUserConfig(arg1) {
   return window['go']['main']['App']['ApplyUserConfig'](arg1);
 }

@@ -735,14 +735,14 @@ export namespace vo {
 	    install_path: string;
 	    appid: string;
 	    font_size: string;
-	    save_screenshot: boolean;
-	    save_temp_arena_info: boolean;
-	    send_report: boolean;
-	    stats_pattern: string;
 	    displays: Displays;
 	    custom_color: CustomColor;
 	    custom_digit: CustomDigit;
 	    team_average: TeamAverage;
+	    save_screenshot: boolean;
+	    save_temp_arena_info: boolean;
+	    send_report: boolean;
+	    stats_pattern: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new UserConfig(source);
@@ -753,14 +753,14 @@ export namespace vo {
 	        this.install_path = source["install_path"];
 	        this.appid = source["appid"];
 	        this.font_size = source["font_size"];
-	        this.save_screenshot = source["save_screenshot"];
-	        this.save_temp_arena_info = source["save_temp_arena_info"];
-	        this.send_report = source["send_report"];
-	        this.stats_pattern = source["stats_pattern"];
 	        this.displays = this.convertValues(source["displays"], Displays);
 	        this.custom_color = this.convertValues(source["custom_color"], CustomColor);
 	        this.custom_digit = this.convertValues(source["custom_digit"], CustomDigit);
 	        this.team_average = this.convertValues(source["team_average"], TeamAverage);
+	        this.save_screenshot = source["save_screenshot"];
+	        this.save_temp_arena_info = source["save_temp_arena_info"];
+	        this.send_report = source["send_report"];
+	        this.stats_pattern = source["stats_pattern"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -780,6 +780,20 @@ export namespace vo {
 		    }
 		    return a;
 		}
+	}
+	export class ValidatedResult {
+	    install_path: string;
+	    appid: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new ValidatedResult(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.install_path = source["install_path"];
+	        this.appid = source["appid"];
+	    }
 	}
 	export class Version {
 	    semver: string;

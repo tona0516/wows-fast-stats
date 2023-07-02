@@ -10,6 +10,8 @@ export function AlertPlayers():Promise<Array<vo.AlertPlayer>>;
 
 export function AppVersion():Promise<vo.Version>;
 
+export function ApplyRequiredUserConfig(arg1:string,arg2:string):Promise<vo.ValidatedResult>;
+
 export function ApplyUserConfig(arg1:vo.UserConfig):Promise<void>;
 
 export function AutoScreenshot(arg1:string,arg2:string):Promise<void>;

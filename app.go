@@ -268,12 +268,24 @@ func (a *App) UserConfig() (vo.UserConfig, error) {
 }
 
 func (a *App) ApplyUserConfig(config vo.UserConfig) error {
-	err := a.configService.UpdateUser(config)
+	err := a.configService.UpdateOptional(config)
 	if err != nil {
 		a.logger.Warn("Failed to update UserConfig", err)
 	}
 
 	return apperr.ToFrontendError(err)
+}
+
+func (a *App) ApplyRequiredUserConfig(
+	installPath string,
+	appid string,
+) (vo.ValidatedResult, error) {
+	validatedResult, err := a.configService.UpdateRequired(installPath, appid)
+	if err != nil {
+		a.logger.Warn("Failed to update UserConfig for required", err)
+	}
+
+	return validatedResult, apperr.ToFrontendError(err)
 }
 
 func (a *App) ManualScreenshot(filename string, base64Data string) error {

@@ -1,17 +1,21 @@
 package vo
 
 type UserConfig struct {
-	InstallPath       string       `json:"install_path"`
-	Appid             string       `json:"appid"`
-	FontSize          string       `json:"font_size"`
+	// required
+	InstallPath string `json:"install_path"`
+	Appid       string `json:"appid"`
+	// display
+	FontSize    string      `json:"font_size"`
+	Displays    Displays    `json:"displays"`
+	CustomColor CustomColor `json:"custom_color"`
+	CustomDigit CustomDigit `json:"custom_digit"`
+	// team summary
+	TeamAverage TeamAverage `json:"team_average"`
+	// other
 	SaveScreenshot    bool         `json:"save_screenshot"`
 	SaveTempArenaInfo bool         `json:"save_temp_arena_info"`
 	SendReport        bool         `json:"send_report"`
 	StatsPattern      StatsPattern `json:"stats_pattern"`
-	Displays          Displays     `json:"displays"`
-	CustomColor       CustomColor  `json:"custom_color"`
-	CustomDigit       CustomDigit  `json:"custom_digit"`
-	TeamAverage       TeamAverage  `json:"team_average"`
 }
 
 type Displays struct {

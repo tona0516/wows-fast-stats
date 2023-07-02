@@ -1,12 +1,15 @@
 package service
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"wfs/backend/apperr"
 	"wfs/backend/infra"
 	"wfs/backend/vo"
 )
+
+const GameExeName = "WorldOfWarships.exe"
 
 type Config struct {
 	configRepo    infra.ConfigInterface
@@ -27,11 +30,38 @@ func (c *Config) User() (vo.UserConfig, error) {
 	return c.configRepo.User()
 }
 
-func (c *Config) UpdateUser(config vo.UserConfig) error {
-	if err := c.validate(config); err != nil {
-		return err
+func (c *Config) UpdateRequired(
+	installPath string,
+	appid string,
+) (vo.ValidatedResult, error) {
+	// validate
+	validatedResult := c.validateRequired(installPath, appid)
+	if !validatedResult.Valid() {
+		return validatedResult, nil
 	}
 
+	// Note: overerite only required setting
+	config, err := c.configRepo.User()
+	if err != nil {
+		return validatedResult, err
+	}
+	config.InstallPath = installPath
+	config.Appid = appid
+
+	// write
+	return validatedResult, c.configRepo.UpdateUser(config)
+}
+
+func (c *Config) UpdateOptional(config vo.UserConfig) error {
+	// Note: exclulde required setting
+	saved, err := c.configRepo.User()
+	if err != nil {
+		return err
+	}
+	config.InstallPath = saved.InstallPath
+	config.Appid = saved.Appid
+
+	// write
 	return c.configRepo.UpdateUser(config)
 }
 
@@ -59,27 +89,20 @@ func (c *Config) SearchPlayer(prefix string) (vo.WGAccountList, error) {
 	return c.wargamingRepo.AccountListForSearch(prefix)
 }
 
-func (c *Config) validate(config vo.UserConfig) error {
-	if _, err := os.Stat(filepath.Join(config.InstallPath, "WorldOfWarships.exe")); err != nil {
-		return apperr.New(apperr.ValidateInvalidInstallPath, err)
+func (c *Config) validateRequired(
+	installPath string,
+	appid string,
+) vo.ValidatedResult {
+	result := vo.ValidatedResult{}
+
+	if _, err := os.Stat(filepath.Join(installPath, GameExeName)); err != nil {
+		result.InstallPath = apperr.ErrInvalidInstallPath.Error()
 	}
 
-	c.wargamingRepo.SetAppID(config.Appid)
+	c.wargamingRepo.SetAppID(appid)
 	if _, err := c.wargamingRepo.EncycInfo(); err != nil {
-		return apperr.New(apperr.ValidateInvalidAppID, err)
+		result.AppID = fmt.Sprintf("%s(%s)", apperr.ErrInvalidAppID, err.Error())
 	}
 
-	// Same value as "font-size": https://developer.mozilla.org/ja/docs/Web/CSS/font-size
-	var validFontSize bool
-	for _, v := range vo.FontSizes {
-		if v == config.FontSize {
-			validFontSize = true
-			break
-		}
-	}
-	if !validFontSize {
-		return apperr.New(apperr.ValidateInvalidFontSize, nil)
-	}
-
-	return nil
+	return result
 }

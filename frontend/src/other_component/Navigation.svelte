@@ -81,7 +81,7 @@ async function onStatsPatternChanged() {
 }
 </script>
 
-<nav class="navbar navbar-expand-sm navbar-light bg-light p-1">
+<nav class="navbar navbar-expand-sm sticky-top navbar-light bg-light p-1">
   <div class="container-fluid">
     <button
       class="navbar-toggler m-1"

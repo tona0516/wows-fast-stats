@@ -3,47 +3,81 @@ import clone from "clone";
 import { createEventDispatcher } from "svelte";
 import { get } from "svelte/store";
 import {
+  ApplyRequiredUserConfig,
   ApplyUserConfig,
   DefaultUserConfig,
   FontSizes,
   OpenDirectory,
   SampleTeams,
   SelectDirectory,
+  UserConfig,
 } from "../../wailsjs/go/main/App";
-import { BrowserOpenURL } from "../../wailsjs/runtime/runtime";
+import { BrowserOpenURL, LogDebug } from "../../wailsjs/runtime/runtime";
 import { storedUserConfig } from "../stores";
 import { Const } from "../Const";
 import type { vo } from "../../wailsjs/go/models";
 import StatisticsTable from "../other_component/StatisticsTable.svelte";
-import { Badge, Button, FormGroup, Input, Label } from "sveltestrap";
+import {
+  Alert,
+  Badge,
+  Button,
+  FormGroup,
+  Input,
+  Label,
+  TabContent,
+  TabPane,
+} from "sveltestrap";
+import ConfirmModal from "../other_component/ConfirmModal.svelte";
 
 const dispatch = createEventDispatcher();
-
-const displayColumns = ["項目", "艦成績", "総合成績", "小数点以下の桁数"];
-const skillColorColumns = ["スキル", "文字色", "背景色"];
-const tierColorColumns = ["Tier", "使用艦", "非使用艦"];
-const shipTypeColorColumns = ["艦種", "使用艦", "非使用艦"];
 
 let inputUserConfig = get(storedUserConfig);
 storedUserConfig.subscribe((it) => {
   inputUserConfig = clone(it);
 });
-
-let isLoading = false;
 let defaultUserConfig: vo.UserConfig;
+let isLoading = false;
 let sampleTeams: vo.Team[] = [];
 let displayKeys: string[] = [];
+let resetDisplaySettingConfirmModal: ConfirmModal;
+let validatedResult: vo.ValidatedResult;
 
 async function clickApply() {
   isLoading = true;
   try {
-    await ApplyUserConfig(inputUserConfig);
-    storedUserConfig.set(inputUserConfig);
-    dispatch("UpdateSuccess", { message: "設定を更新しました。" });
+    validatedResult = await ApplyRequiredUserConfig(
+      inputUserConfig.install_path,
+      inputUserConfig.appid
+    );
+
+    const errorTexts = Object.values(validatedResult);
+    const isValid =
+      errorTexts.filter((it) => it == "").length === errorTexts.length;
+    if (isValid) {
+      const latest = await UserConfig();
+      storedUserConfig.set(latest);
+      dispatch("UpdateSuccess", { message: "設定を更新しました。" });
+    }
   } catch (error) {
+    inputUserConfig = get(storedUserConfig);
     dispatch("Failure", { message: error });
   } finally {
     isLoading = false;
+  }
+}
+
+async function silentApply() {
+  LogDebug("silentApply");
+  // Note: for the following sveltestrap bug
+  // https://github.com/bestguy/sveltestrap/issues/461
+  await new Promise((resolve) => setTimeout(resolve, 100));
+
+  try {
+    await ApplyUserConfig(inputUserConfig);
+    const latest = await UserConfig();
+    storedUserConfig.set(latest);
+  } catch (error) {
+    inputUserConfig = get(storedUserConfig);
   }
 }
 
@@ -65,7 +99,7 @@ async function selectDirectory() {
   }
 }
 
-function toggleAll(e: any) {
+async function toggleAll(e: any) {
   const isSelectAll: boolean = e.target.checked;
 
   Object.keys(inputUserConfig.displays.ship).forEach(
@@ -74,6 +108,17 @@ function toggleAll(e: any) {
   Object.keys(inputUserConfig.displays.overall).forEach(
     (key) => (inputUserConfig.displays.overall[key] = isSelectAll)
   );
+
+  await silentApply();
+}
+
+async function clickResetDisplaySetting() {
+  inputUserConfig.font_size = defaultUserConfig.font_size;
+  inputUserConfig.displays = defaultUserConfig.displays;
+  inputUserConfig.custom_color = defaultUserConfig.custom_color;
+  inputUserConfig.custom_digit = defaultUserConfig.custom_digit;
+
+  await silentApply();
 }
 
 async function main() {
@@ -87,437 +132,422 @@ async function main() {
 main();
 </script>
 
-<div class="m-3 center">
-  <!-- install path -->
-  <FormGroup class="center">
-    <Label
-      >World of Warshipsインストールフォルダ <Badge color="danger">必須</Badge>
-    </Label>
-    <div class="d-flex justify-content-center">
-      <Input
-        type="text"
-        class="text-form"
-        style="font-size: {$storedUserConfig.font_size};"
-        bind:value="{inputUserConfig.install_path}"
-      />
-      <Button
-        color="secondary"
-        style="font-size: {$storedUserConfig.font_size};"
-        on:click="{selectDirectory}">選択</Button
-      >
-    </div>
-  </FormGroup>
+<ConfirmModal
+  message="表示設定をリセットしますか？"
+  on:onConfirmed="{clickResetDisplaySetting}"
+  bind:this="{resetDisplaySettingConfirmModal}"
+/>
 
-  <!-- appid -->
-  <FormGroup class="center">
-    <Label>アプリケーションID <Badge color="danger">必須</Badge></Label>
-    <Input
-      type="text"
-      class="text-form"
-      style="font-size: {$storedUserConfig.font_size};"
-      bind:value="{inputUserConfig.appid}"
-    />
-    <div>
-      <!-- svelte-ignore a11y-invalid-attribute -->
-      <a
-        class="td-link"
-        href="#"
-        on:click="{() => BrowserOpenURL('https://developers.wargaming.net/')}"
-        >Developer Room</a
-      >で作成したIDを入力してください。
-    </div>
-  </FormGroup>
-
-  <!-- font-size -->
-  <FormGroup class="center">
-    <Label>文字サイズ</Label>
-    <Input
-      type="select"
-      class="w-auto"
-      style="font-size: {$storedUserConfig.font_size};"
-      bind:value="{inputUserConfig.font_size}"
-    >
-      {#await FontSizes() then fontSizes}
-        {#each fontSizes as fs}
-          <option selected="{fs === $storedUserConfig.font_size}" value="{fs}"
-            >{Const.FONT_SIZE[fs]}</option
+<div class="m-3">
+  <TabContent>
+    <TabPane class="py-3 center" tabId="required" tab="必須設定" active>
+      <!-- install path -->
+      <FormGroup class="center">
+        <Label
+          >World of Warshipsインストールフォルダ <Badge color="danger"
+            >必須</Badge
           >
-        {/each}
-      {/await}
-    </Input>
-  </FormGroup>
+        </Label>
+        <div class="d-flex justify-content-center">
+          <Input
+            type="text"
+            class="text-form w-auto"
+            style="font-size: {$storedUserConfig.font_size};"
+            bind:value="{inputUserConfig.install_path}"
+          />
+          <Button
+            color="secondary"
+            style="font-size: {$storedUserConfig.font_size};"
+            on:click="{selectDirectory}">選択</Button
+          >
+        </div>
 
-  <!-- display values -->
-  <FormGroup class="center">
-    <Label>表示項目</Label>
-    <Input
-      type="switch"
-      style="font-size: {$storedUserConfig.font_size};"
-      on:change="{toggleAll}"
-      checked="{Object.values(inputUserConfig.displays.ship).filter((it) => !it)
-        .length === 0 &&
-        Object.values(inputUserConfig.displays.overall).filter((it) => !it)
-          .length === 0}"
-      label="全選択"
-    />
+        {#if validatedResult?.install_path}
+          <Alert color="danger" class="m-1">
+            {validatedResult?.install_path}
+          </Alert>
+        {/if}
+      </FormGroup>
 
-    <table class="table table-sm table-text-color w-auto td-multiple">
-      <thead>
-        <tr>
-          {#each displayColumns as columns}
-            <th>{columns}</th>
-          {/each}
-        </tr>
-      </thead>
-      <tbody>
-        {#each displayKeys as key}
-          <tr>
-            <td>
-              {Const.COLUMN_NAMES[key].full}
-            </td>
+      <!-- appid -->
+      <FormGroup class="center">
+        <Label>アプリケーションID <Badge color="danger">必須</Badge></Label>
+        <Input
+          type="text"
+          class="text-form w-auto"
+          style="font-size: {$storedUserConfig.font_size};"
+          bind:value="{inputUserConfig.appid}"
+        />
+        <div>
+          <!-- svelte-ignore a11y-invalid-attribute -->
+          <a
+            class="td-link"
+            href="#"
+            on:click="{() =>
+              BrowserOpenURL('https://developers.wargaming.net/')}"
+            >Developer Room</a
+          >で作成したIDを入力してください。
+        </div>
 
-            <td>
-              {#if inputUserConfig.displays.ship[key] !== undefined}
-                <Input
-                  type="switch"
-                  class="center"
-                  bind:checked="{inputUserConfig.displays.ship[key]}"
-                />
-              {/if}
-            </td>
+        {#if validatedResult?.appid}
+          <Alert color="danger" class="m-1">
+            {validatedResult?.appid}
+          </Alert>
+        {/if}
+      </FormGroup>
 
-            <td>
-              {#if inputUserConfig.displays.overall[key] !== undefined}
-                <Input
-                  type="switch"
-                  class="center"
-                  bind:checked="{inputUserConfig.displays.overall[key]}"
-                />
-              {/if}
-            </td>
+      <!-- apply -->
+      <FormGroup class="center">
+        <Button
+          color="primary"
+          style="font-size: {$storedUserConfig.font_size};"
+          disabled="{isLoading}"
+          on:click="{clickApply}"
+        >
+          {#if isLoading}
+            <span
+              class="spinner-border spinner-border-sm"
+              role="status"
+              aria-hidden="true"></span>
+            更新中...
+          {:else}
+            保存
+          {/if}
+        </Button>
+      </FormGroup>
+    </TabPane>
 
-            <td>
-              {#if inputUserConfig.custom_digit[key] !== undefined}
-                <Input
-                  type="select"
-                  class="p-1 m-1"
-                  style="font-size: {$storedUserConfig.font_size};"
-                  bind:value="{inputUserConfig.custom_digit[key]}"
-                >
-                  {#each [0, 1, 2] as digit}
-                    <option
-                      selected="{digit === inputUserConfig.custom_digit[key]}"
-                      value="{digit}">{digit}</option
+    <TabPane class="py-3 center" tabId="display" tab="表示設定">
+      <!-- font-size -->
+      <FormGroup class="center">
+        <Label>文字サイズ</Label>
+        <Input
+          type="select"
+          class="w-auto"
+          style="font-size: {$storedUserConfig.font_size};"
+          bind:value="{inputUserConfig.font_size}"
+          on:change="{silentApply}"
+        >
+          {#await FontSizes() then fontSizes}
+            {#each fontSizes as fs}
+              <option
+                selected="{fs === $storedUserConfig.font_size}"
+                value="{fs}">{Const.FONT_SIZE[fs]}</option
+              >
+            {/each}
+          {/await}
+        </Input>
+      </FormGroup>
+
+      <!-- display values -->
+      <FormGroup class="center">
+        <Label>表示項目</Label>
+        <Input
+          type="switch"
+          style="font-size: {$storedUserConfig.font_size};"
+          on:change="{toggleAll}"
+          checked="{Object.values(inputUserConfig.displays.ship).filter(
+            (it) => !it
+          ).length === 0 &&
+            Object.values(inputUserConfig.displays.overall).filter((it) => !it)
+              .length === 0}"
+          label="全選択"
+        />
+
+        <table class="table table-sm table-text-color w-auto td-multiple">
+          <thead>
+            <tr>
+              {#each ["項目", "艦成績", "総合成績", "小数点以下の桁数"] as columns}
+                <th>{columns}</th>
+              {/each}
+            </tr>
+          </thead>
+          <tbody>
+            {#each displayKeys as key}
+              <tr>
+                <td>
+                  {Const.COLUMN_NAMES[key].full}
+                </td>
+
+                <td>
+                  {#if inputUserConfig.displays.ship[key] !== undefined}
+                    <Input
+                      type="switch"
+                      class="center"
+                      bind:checked="{inputUserConfig.displays.ship[key]}"
+                      on:change="{silentApply}"
+                    />
+                  {/if}
+                </td>
+
+                <td>
+                  {#if inputUserConfig.displays.overall[key] !== undefined}
+                    <Input
+                      type="switch"
+                      class="center"
+                      bind:checked="{inputUserConfig.displays.overall[key]}"
+                      on:change="{silentApply}"
+                    />
+                  {/if}
+                </td>
+
+                <td>
+                  {#if inputUserConfig.custom_digit[key] !== undefined}
+                    <Input
+                      type="select"
+                      class="p-1 m-1"
+                      style="font-size: {$storedUserConfig.font_size};"
+                      bind:value="{inputUserConfig.custom_digit[key]}"
+                      on:change="{silentApply}"
                     >
-                  {/each}
-                </Input>
-              {/if}
-            </td>
-          </tr>
-        {/each}
-      </tbody>
-    </table>
-  </FormGroup>
+                      {#each [0, 1, 2] as digit}
+                        <option
+                          selected="{digit ===
+                            inputUserConfig.custom_digit[key]}"
+                          value="{digit}">{digit}</option
+                        >
+                      {/each}
+                    </Input>
+                  {/if}
+                </td>
+              </tr>
+            {/each}
+          </tbody>
+        </table>
+      </FormGroup>
 
-  <!-- skill color -->
-  <FormGroup class="center">
-    <Label>スキル別カラー</Label>
-    <table class="table table-sm table-text-color w-auto td-multiple">
-      <thead>
-        <tr>
-          {#each skillColorColumns as column}
-            <th>{column}</th>
-          {/each}
-        </tr>
-      </thead>
-      <tbody>
-        {#each Object.keys(inputUserConfig.custom_color.skill.text) as key}
-          <tr>
-            <td>
-              {Const.SKILL_LEVEL_LABELS[key]}
-            </td>
-            <td>
-              <div class="d-flex justify-content-center">
-                <Input
-                  type="color"
-                  class="m-1"
-                  bind:value="{inputUserConfig.custom_color.skill.text[key]}"
-                />
-                <Button
-                  size="sm"
-                  color="success"
-                  class="m-1"
-                  style="font-size: {$storedUserConfig.font_size};"
-                  on:click="{() => {
-                    inputUserConfig.custom_color.skill.text[key] =
-                      defaultUserConfig.custom_color.skill.text[key];
-                  }}">デフォルト色に戻す</Button
-                >
-              </div>
-            </td>
+      <!-- skill color -->
+      <FormGroup class="center">
+        <Label>スキル別カラー</Label>
+        <table class="table table-sm table-text-color w-auto td-multiple">
+          <thead>
+            <tr>
+              {#each ["スキル", "文字色", "背景色"] as column}
+                <th>{column}</th>
+              {/each}
+            </tr>
+          </thead>
+          <tbody>
+            {#each Object.keys(inputUserConfig.custom_color.skill.text) as key}
+              <tr>
+                <td>
+                  {Const.SKILL_LEVEL_LABELS[key]}
+                </td>
+                <td>
+                  <Input
+                    type="color"
+                    class="m-1"
+                    bind:value="{inputUserConfig.custom_color.skill.text[key]}"
+                    on:input="{silentApply}"
+                  />
+                </td>
 
-            <td>
-              <div class="d-flex justify-content-center">
-                <Input
-                  type="color"
-                  class="m-1"
-                  bind:value="{inputUserConfig.custom_color.skill.background[
-                    key
-                  ]}"
-                />
-                <Button
-                  size="sm"
-                  color="success"
-                  class="m-1"
-                  style="font-size: {$storedUserConfig.font_size};"
-                  on:click="{() => {
-                    inputUserConfig.custom_color.skill.background[key] =
-                      defaultUserConfig.custom_color.skill.background[key];
-                  }}">デフォルト色に戻す</Button
-                >
-              </div>
-            </td>
-          </tr>
-        {/each}
-      </tbody>
-    </table>
-  </FormGroup>
+                <td>
+                  <Input
+                    type="color"
+                    class="m-1"
+                    bind:value="{inputUserConfig.custom_color.skill.background[
+                      key
+                    ]}"
+                    on:input="{silentApply}"
+                  />
+                </td>
+              </tr>
+            {/each}
+          </tbody>
+        </table>
+      </FormGroup>
 
-  <!-- tier group color -->
-  <FormGroup class="center">
-    <Label>ティア別カラー</Label>
-    <table class="table table-sm table-text-color w-auto td-multiple">
-      <thead>
-        <tr>
-          {#each tierColorColumns as column}
-            <th>{column}</th>
-          {/each}
-        </tr>
-      </thead>
-      <tbody>
-        {#each Object.keys(inputUserConfig.custom_color.tier.own) as key}
-          <tr>
-            <td>
-              {Const.TIER_GROUP_LABELS[key]}
-            </td>
-            <td>
-              <div class="d-flex justify-content-center">
-                <Input
-                  type="color"
-                  class="m-1"
-                  bind:value="{inputUserConfig.custom_color.tier.own[key]}"
-                />
-                <Button
-                  size="sm"
-                  color="success"
-                  class="m-1"
-                  style="font-size: {$storedUserConfig.font_size};"
-                  on:click="{() => {
-                    inputUserConfig.custom_color.tier.own[key] =
-                      defaultUserConfig.custom_color.tier.own[key];
-                  }}">デフォルト色に戻す</Button
-                >
-              </div>
-            </td>
+      <!-- tier group color -->
+      <FormGroup class="center">
+        <Label>ティア別カラー</Label>
+        <table class="table table-sm table-text-color w-auto td-multiple">
+          <thead>
+            <tr>
+              {#each ["Tier", "使用艦", "非使用艦"] as column}
+                <th>{column}</th>
+              {/each}
+            </tr>
+          </thead>
+          <tbody>
+            {#each Object.keys(inputUserConfig.custom_color.tier.own) as key}
+              <tr>
+                <td>
+                  {Const.TIER_GROUP_LABELS[key]}
+                </td>
+                <td>
+                  <Input
+                    type="color"
+                    class="m-1"
+                    bind:value="{inputUserConfig.custom_color.tier.own[key]}"
+                    on:input="{silentApply}"
+                  />
+                </td>
 
-            <td>
-              <div class="d-flex justify-content-center">
-                <Input
-                  type="color"
-                  class="m-1"
-                  bind:value="{inputUserConfig.custom_color.tier.other[key]}"
-                />
-                <Button
-                  size="sm"
-                  color="success"
-                  class="m-1"
-                  style="font-size: {$storedUserConfig.font_size};"
-                  on:click="{() => {
-                    inputUserConfig.custom_color.tier.other[key] =
-                      defaultUserConfig.custom_color.tier.other[key];
-                  }}">デフォルト色に戻す</Button
-                >
-              </div>
-            </td>
-          </tr>
-        {/each}
-      </tbody>
-    </table>
-  </FormGroup>
+                <td>
+                  <Input
+                    type="color"
+                    class="m-1"
+                    bind:value="{inputUserConfig.custom_color.tier.other[key]}"
+                    on:input="{silentApply}"
+                  />
+                </td>
+              </tr>
+            {/each}
+          </tbody>
+        </table>
+      </FormGroup>
 
-  <!-- ship type color -->
-  <FormGroup class="center">
-    <Label>艦種別カラー</Label>
-    <table class="table table-sm table-text-color w-auto td-multiple">
-      <thead>
-        <tr>
-          {#each shipTypeColorColumns as column}
-            <th>{column}</th>
-          {/each}
-        </tr>
-      </thead>
-      <tbody>
-        {#each Object.keys(inputUserConfig.custom_color.ship_type.own) as key}
-          <tr>
-            <td>
-              {Const.SHIP_TYPE_LABELS[key]}
-            </td>
-            <td>
-              <div class="d-flex justify-content-center">
-                <Input
-                  type="color"
-                  class="m-1"
-                  bind:value="{inputUserConfig.custom_color.ship_type.own[key]}"
-                />
-                <Button
-                  size="sm"
-                  color="success"
-                  class="m-1"
-                  style="font-size: {$storedUserConfig.font_size};"
-                  on:click="{() => {
-                    inputUserConfig.custom_color.ship_type.own[key] =
-                      defaultUserConfig.custom_color.ship_type.own[key];
-                  }}">デフォルト色に戻す</Button
-                >
-              </div>
-            </td>
+      <!-- ship type color -->
+      <FormGroup class="center">
+        <Label>艦種別カラー</Label>
+        <table class="table table-sm table-text-color w-auto td-multiple">
+          <thead>
+            <tr>
+              {#each ["艦種", "使用艦", "非使用艦"] as column}
+                <th>{column}</th>
+              {/each}
+            </tr>
+          </thead>
+          <tbody>
+            {#each Object.keys(inputUserConfig.custom_color.ship_type.own) as key}
+              <tr>
+                <td>
+                  {Const.SHIP_TYPE_LABELS[key]}
+                </td>
+                <td>
+                  <Input
+                    type="color"
+                    class="m-1"
+                    bind:value="{inputUserConfig.custom_color.ship_type.own[
+                      key
+                    ]}"
+                    on:input="{silentApply}"
+                  />
+                </td>
 
-            <td>
-              <div class="d-flex justify-content-center">
-                <Input
-                  type="color"
-                  class="m-1"
-                  bind:value="{inputUserConfig.custom_color.ship_type.other[
-                    key
-                  ]}"
-                />
-                <Button
-                  size="sm"
-                  color="success"
-                  class="m-1"
-                  style="font-size: {$storedUserConfig.font_size};"
-                  on:click="{() => {
-                    inputUserConfig.custom_color.ship_type.other[key] =
-                      defaultUserConfig.custom_color.ship_type.other[key];
-                  }}">デフォルト色に戻す</Button
-                >
-              </div>
-            </td>
-          </tr>
-        {/each}
-      </tbody>
-    </table>
-  </FormGroup>
+                <td>
+                  <Input
+                    type="color"
+                    class="m-1"
+                    bind:value="{inputUserConfig.custom_color.ship_type.other[
+                      key
+                    ]}"
+                    on:input="{silentApply}"
+                  />
+                </td>
+              </tr>
+            {/each}
+          </tbody>
+        </table>
+      </FormGroup>
 
-  <div class="center">
-    <p>プレビュー</p>
+      <div class="center">
+        <p>プレビュー</p>
 
-    <div style="font-size: {inputUserConfig.font_size};">
-      <StatisticsTable
-        teams="{sampleTeams}"
-        userConfig="{inputUserConfig}"
-        alertPlayers="{[]}"
-      />
-    </div>
-  </div>
+        <div style="font-size: {inputUserConfig.font_size};">
+          <StatisticsTable
+            teams="{sampleTeams}"
+            userConfig="{inputUserConfig}"
+            alertPlayers="{[]}"
+          />
+        </div>
 
-  <!-- team average -->
-  {#if defaultUserConfig}
-    <FormGroup class="center">
-      <Label>チーム平均に含める最小戦闘数(艦戦績)</Label>
-      <Input
-        type="range"
-        min="{defaultUserConfig.team_average.min_ship_battles}"
-        max="{100}"
-        step="{1}"
-        class="text-form"
-        style="font-size: {$storedUserConfig.font_size};"
-        bind:value="{inputUserConfig.team_average.min_ship_battles}"
-      />
-      <div>
-        {inputUserConfig.team_average.min_ship_battles}
+        <Button
+          size="sm"
+          color="warning"
+          style="font-size: {$storedUserConfig.font_size};"
+          on:click="{resetDisplaySettingConfirmModal.toggle}">リセット</Button
+        >
       </div>
-    </FormGroup>
+    </TabPane>
+    <TabPane class="py-3 center" tabId="team-summary" tab="チームサマリー設定">
+      <!-- team average -->
+      {#if defaultUserConfig?.team_average}
+        {@const teamAvg = defaultUserConfig.team_average}
+        <FormGroup class="center">
+          <Label>チーム平均に含める最小戦闘数(艦戦績)</Label>
+          <Input
+            type="range"
+            min="{teamAvg.min_ship_battles}"
+            max="{100}"
+            step="{1}"
+            class="text-form w-auto"
+            style="font-size: {$storedUserConfig.font_size};"
+            bind:value="{inputUserConfig.team_average.min_ship_battles}"
+            on:change="{silentApply}"
+          />
+          <div>
+            {inputUserConfig.team_average.min_ship_battles}
+          </div>
+        </FormGroup>
 
-    <FormGroup class="center">
-      <Label>チーム平均に含める最小戦闘数(総合成績)</Label>
-      <Input
-        type="range"
-        min="{defaultUserConfig.team_average.min_overall_battles}"
-        max="{10000}"
-        step="{100}"
-        class="text-form"
-        style="font-size: {$storedUserConfig.font_size};"
-        bind:value="{inputUserConfig.team_average.min_overall_battles}"
-      />
-      <div>
-        {inputUserConfig.team_average.min_overall_battles}
-      </div>
-    </FormGroup>
-  {/if}
-
-  <FormGroup class="center">
-    <Label>その他</Label>
-    <ul>
-      <li class="my-1">
-        <Input
-          type="switch"
-          label="自動でスクリーンショットを保存する"
-          bind:checked="{inputUserConfig.save_screenshot}"
-        />
-        <!-- svelte-ignore a11y-invalid-attribute -->
-        <a
-          class="td-link"
-          href="#"
-          on:click="{() => openDirectory('screenshot/')}"
-          ><i class="bi bi-folder2-open"></i> 保存フォルダを開く
-        </a>
-      </li>
-      <li class="my-1">
-        <Input
-          type="switch"
-          label="【開発用】自動で戦闘情報(tempArenaInfo.json)を保存する"
-          bind:checked="{inputUserConfig.save_temp_arena_info}"
-        />
-        <!-- svelte-ignore a11y-invalid-attribute -->
-        <a
-          class="td-link"
-          href="#"
-          on:click="{() => openDirectory('temp_arena_info/')}"
-          ><i class="bi bi-folder2-open"></i> 保存フォルダを開く
-        </a>
-      </li>
-      <li class="my-1">
-        <Input
-          type="switch"
-          label="アプリ改善のためのデータ送信を許可する"
-          bind:checked="{inputUserConfig.send_report}"
-        />
+        <FormGroup class="center">
+          <Label>チーム平均に含める最小戦闘数(総合成績)</Label>
+          <Input
+            type="range"
+            min="{teamAvg.min_overall_battles}"
+            max="{10000}"
+            step="{100}"
+            class="text-form w-auto"
+            style="font-size: {$storedUserConfig.font_size};"
+            bind:value="{inputUserConfig.team_average.min_overall_battles}"
+            on:change="{silentApply}"
+          />
+          <div>
+            {inputUserConfig.team_average.min_overall_battles}
+          </div>
+        </FormGroup>
+      {/if}
+    </TabPane>
+    <TabPane class="py-3 center" tabId="other" tab="その他設定">
+      <FormGroup class="center">
         <ul>
-          <li>エラーログ</li>
-          <li>設定値(config/user.json)</li>
-          <li>戦闘情報(tempArenaInfo.json)</li>
+          <li class="mb-3">
+            <Input
+              type="switch"
+              label="自動でスクリーンショットを保存する"
+              bind:checked="{inputUserConfig.save_screenshot}"
+              on:change="{silentApply}"
+            />
+            <!-- svelte-ignore a11y-invalid-attribute -->
+            <a
+              class="td-link"
+              href="#"
+              on:click="{() => openDirectory('screenshot/')}"
+              ><i class="bi bi-folder2-open"></i> 保存フォルダを開く
+            </a>
+          </li>
+          <li class="mb-3">
+            <Input
+              type="switch"
+              label="【開発用】自動で戦闘情報(tempArenaInfo.json)を保存する"
+              bind:checked="{inputUserConfig.save_temp_arena_info}"
+              on:change="{silentApply}"
+            />
+            <!-- svelte-ignore a11y-invalid-attribute -->
+            <a
+              class="td-link"
+              href="#"
+              on:click="{() => openDirectory('temp_arena_info/')}"
+              ><i class="bi bi-folder2-open"></i> 保存フォルダを開く
+            </a>
+          </li>
+          <li class="mb-3">
+            <Input
+              type="switch"
+              label="アプリ改善のためのデータ送信を許可する"
+              bind:checked="{inputUserConfig.send_report}"
+              on:change="{silentApply}"
+            />
+            <ul>
+              <li>エラーログ</li>
+              <li>設定値(config/user.json)</li>
+              <li>戦闘情報(tempArenaInfo.json)</li>
+            </ul>
+          </li>
         </ul>
-      </li>
-    </ul>
-  </FormGroup>
-
-  <!-- apply -->
-  <button
-    type="button"
-    class="btn btn-primary mb-3"
-    style="font-size: {$storedUserConfig.font_size};"
-    disabled="{isLoading}"
-    on:click="{clickApply}"
-  >
-    {#if isLoading}
-      <span
-        class="spinner-border spinner-border-sm"
-        role="status"
-        aria-hidden="true"></span>
-      更新中...
-    {:else}
-      適用
-    {/if}
-  </button>
+      </FormGroup>
+    </TabPane>
+  </TabContent>
 </div>

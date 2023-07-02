@@ -1,11 +1,13 @@
 package service
 
 import (
+	"fmt"
 	"io/fs"
 	"os"
 	"path/filepath"
 	"testing"
 	"wfs/backend/apperr"
+	"wfs/backend/infra"
 	"wfs/backend/vo"
 
 	"github.com/pkg/errors"
@@ -13,145 +15,145 @@ import (
 )
 
 const (
-	DefaulfInstallPath = "install_path_test"
-	GameExeName        = "WorldOfWarships.exe"
+	DefaultInstallPath = "install_path_test"
+	DefaultAppID       = "abc123"
 )
 
-var (
-	errWargaming          = apperr.New(apperr.WargamingAPIError, errors.New("INVALID_APPLICATION_ID"))
-	errInvalidInstallPath = apperr.New(
-		apperr.ValidateInvalidInstallPath,
-		errors.New("stat invalid/path/WorldOfWarships.exe: no such file or directory"),
-	)
-	errInvalidAppID    = apperr.New(apperr.ValidateInvalidAppID, errWargaming)
-	errInvalidFontSize = apperr.New(apperr.ValidateInvalidFontSize, nil)
-)
+var errWargaming = apperr.New(apperr.WargamingAPIError, errors.New("INVALID_APPLICATION_ID"))
 
 //nolint:paralleltest
-func TestConfig_UpdateUser_正常系(t *testing.T) {
-	gameExePath := filepath.Join(DefaulfInstallPath, GameExeName)
-	err := os.MkdirAll(DefaulfInstallPath, fs.ModePerm)
+func TestConfig_UpdateRequired_正常系(t *testing.T) {
+	err := createGameClientPath()
 	assert.NoError(t, err)
-	err = os.WriteFile(gameExePath, []byte{}, fs.ModePerm)
-	assert.NoError(t, err)
-	defer os.RemoveAll(DefaulfInstallPath)
+	defer os.RemoveAll(DefaultInstallPath)
 
 	// テストデータ
-	config := vo.UserConfig{
-		InstallPath: "install_path_test",
-		Appid:       "abc123",
-		FontSize:    "medium",
-	}
+	config := createInputConfig()
 
 	// モックの設定
 	mockConfigRepo := &mockConfigRepo{}
 	mockConfigRepo.On("UpdateUser", config).Return(nil)
+	mockConfigRepo.On("User").Return(infra.DefaultUserConfig, nil)
 	mockWargamingRepo := &mockWargamingRepo{}
 	mockWargamingRepo.On("SetAppID", config.Appid).Return()
 	mockWargamingRepo.On("EncycInfo").Return(vo.WGEncycInfo{}, nil)
 
 	// テスト実行
 	c := NewConfig(mockConfigRepo, mockWargamingRepo)
-	err = c.UpdateUser(config)
+	actual, err := c.UpdateRequired(config.InstallPath, config.Appid)
 
 	// アサーション
+	assert.Equal(t, vo.ValidatedResult{}, actual)
 	assert.NoError(t, err)
 	mockWargamingRepo.AssertCalled(t, "SetAppID", config.Appid)
 	mockWargamingRepo.AssertCalled(t, "EncycInfo")
+	mockConfigRepo.AssertCalled(t, "User")
 	mockConfigRepo.AssertCalled(t, "UpdateUser", config)
 }
 
 //nolint:paralleltest
-func TestConfig_UpdateUser_異常系_不正なインストールパス(t *testing.T) {
+func TestConfig_UpdateRequired_異常系_不正なインストールパス(t *testing.T) {
 	err := createGameClientPath()
 	assert.NoError(t, err)
-	defer os.RemoveAll(DefaulfInstallPath)
+	defer os.RemoveAll(DefaultInstallPath)
 
 	// テストデータ
-	config := vo.UserConfig{
-		InstallPath: "invalid/path",
-		Appid:       "abc123",
-		FontSize:    "medium",
-	}
-
-	// モックの設定
-	mockConfigRepo := &mockConfigRepo{}
-
-	// テスト実行
-	c := NewConfig(mockConfigRepo, nil)
-	err = c.UpdateUser(config)
-
-	// アサーション
-	assert.EqualError(t, err, errInvalidInstallPath.Error())
-	mockConfigRepo.AssertNotCalled(t, "UpdateUser")
-}
-
-//nolint:paralleltest
-func TestConfig_UpdateUser_異常系_不正なAppID(t *testing.T) {
-	err := createGameClientPath()
-	assert.NoError(t, err)
-	defer os.RemoveAll(DefaulfInstallPath)
-
-	// テストデータ
-	config := vo.UserConfig{
-		InstallPath: "install_path_test",
-		Appid:       "invalidappid",
-		FontSize:    "medium",
-	}
+	config := infra.DefaultUserConfig
+	config.InstallPath = "invalid/path" // Note: 不正なパス
+	config.Appid = "abc123"
 
 	// モックの設定
 	mockConfigRepo := &mockConfigRepo{}
 	mockWargamingRepo := &mockWargamingRepo{}
-	mockWargamingRepo.On("SetAppID", config.Appid)
-	mockWargamingRepo.On("EncycInfo").Return(vo.WGEncycInfo{}, errWargaming)
-
-	// テスト実行
-	c := NewConfig(mockConfigRepo, mockWargamingRepo)
-	err = c.UpdateUser(config)
-
-	// アサーション
-	assert.EqualError(t, err, errInvalidAppID.Error())
-	mockWargamingRepo.AssertCalled(t, "SetAppID", config.Appid)
-	mockWargamingRepo.AssertCalled(t, "EncycInfo")
-	mockConfigRepo.AssertNotCalled(t, "UpdateUser")
-}
-
-//nolint:paralleltest
-func TestConfig_UpdateUser_異常系_不正なフォントサイズ(t *testing.T) {
-	err := createGameClientPath()
-	assert.NoError(t, err)
-	defer os.RemoveAll(DefaulfInstallPath)
-
-	// テストデータ
-	config := vo.UserConfig{
-		InstallPath: "install_path_test",
-		Appid:       "abc123",
-		FontSize:    "invalid",
-	}
-
-	// モックの設定
-	mockConfigRepo := &mockConfigRepo{}
-	mockWargamingRepo := &mockWargamingRepo{}
-	mockWargamingRepo.On("SetAppID", config.Appid)
+	mockWargamingRepo.On("SetAppID", config.Appid).Return()
 	mockWargamingRepo.On("EncycInfo").Return(vo.WGEncycInfo{}, nil)
 
 	// テスト実行
 	c := NewConfig(mockConfigRepo, mockWargamingRepo)
-	err = c.UpdateUser(config)
+	actual, err := c.UpdateRequired(config.InstallPath, config.Appid)
 
 	// アサーション
-	assert.EqualError(t, err, errInvalidFontSize.Error())
+	assert.Equal(t, vo.ValidatedResult{InstallPath: apperr.ErrInvalidInstallPath.Error()}, actual)
+	assert.NoError(t, err)
 	mockWargamingRepo.AssertCalled(t, "SetAppID", config.Appid)
 	mockWargamingRepo.AssertCalled(t, "EncycInfo")
-	mockConfigRepo.AssertNotCalled(t, "UpdateUser")
+	mockConfigRepo.AssertNotCalled(t, "UpdateUser", config)
+}
+
+//nolint:paralleltest
+func TestConfig_UpdateRequired_異常系_不正なAppID(t *testing.T) {
+	err := createGameClientPath()
+	assert.NoError(t, err)
+	defer os.RemoveAll(DefaultInstallPath)
+
+	// テストデータ
+	config := createInputConfig()
+
+	// モックの設定
+	mockConfigRepo := &mockConfigRepo{}
+	mockWargamingRepo := &mockWargamingRepo{}
+	mockWargamingRepo.On("SetAppID", config.Appid).Return()
+	mockWargamingRepo.On("EncycInfo").Return(vo.WGEncycInfo{}, errWargaming) // Note: WG APIでエラー
+
+	// テスト実行
+	c := NewConfig(mockConfigRepo, mockWargamingRepo)
+	actual, err := c.UpdateRequired(config.InstallPath, config.Appid)
+
+	// アサーション
+	assert.Equal(t, vo.ValidatedResult{AppID: fmt.Sprintf("%s(%s)", apperr.ErrInvalidAppID, errWargaming)}, actual)
+	assert.NoError(t, err)
+	mockWargamingRepo.AssertCalled(t, "SetAppID", config.Appid)
+	mockWargamingRepo.AssertCalled(t, "EncycInfo")
+	mockConfigRepo.AssertNotCalled(t, "UpdateUser", config)
+}
+
+//nolint:paralleltest
+func TestConfig_UpdateOptional_正常系(t *testing.T) {
+	err := createGameClientPath()
+	assert.NoError(t, err)
+	defer os.RemoveAll(DefaultInstallPath)
+
+	// テストデータ
+	config := createInputConfig()
+	config.FontSize = "small"
+
+	// モックの設定
+	mockConfigRepo := &mockConfigRepo{}
+	// Note: requiredな値を与えてもこれらの値はUpdateUserでは含まれない
+	actualWritten := infra.DefaultUserConfig
+	actualWritten.FontSize = "small"
+	mockConfigRepo.On("UpdateUser", actualWritten).Return(nil)
+	mockConfigRepo.On("User").Return(infra.DefaultUserConfig, nil)
+	mockWargamingRepo := &mockWargamingRepo{}
+	mockWargamingRepo.On("SetAppID", config.Appid).Return()
+	mockWargamingRepo.On("EncycInfo").Return(vo.WGEncycInfo{}, nil)
+
+	// テスト実行
+	c := NewConfig(mockConfigRepo, mockWargamingRepo)
+	err = c.UpdateOptional(config)
+
+	// アサーション
+	assert.NoError(t, err)
+	mockConfigRepo.AssertCalled(t, "User")
+	mockConfigRepo.AssertCalled(t, "UpdateUser", actualWritten)
+	mockWargamingRepo.AssertNotCalled(t, "SetAppID", config.Appid)
+	mockWargamingRepo.AssertNotCalled(t, "EncycInfo")
+}
+
+func createInputConfig() vo.UserConfig {
+	config := infra.DefaultUserConfig
+	config.InstallPath = "install_path_test"
+	config.Appid = "abc123"
+
+	return config
 }
 
 func createGameClientPath() error {
-	if err := os.MkdirAll(DefaulfInstallPath, fs.ModePerm); err != nil {
+	if err := os.MkdirAll(DefaultInstallPath, fs.ModePerm); err != nil {
 		return err
 	}
 
-	gameExePath := filepath.Join(DefaulfInstallPath, GameExeName)
+	gameExePath := filepath.Join(DefaultInstallPath, GameExeName)
 
 	return os.WriteFile(gameExePath, []byte{}, fs.ModePerm)
 }
