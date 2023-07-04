@@ -16,18 +16,15 @@ func _() {
 	_ = x[WriteFile-5]
 	_ = x[DecodeBase64-6]
 	_ = x[DiscordAPIError-7]
-	_ = x[ValidateInvalidInstallPath-8]
-	_ = x[ValidateInvalidAppID-9]
-	_ = x[ValidateInvalidFontSize-10]
-	_ = x[ShowDialog-11]
-	_ = x[UserCanceled-12]
-	_ = x[OpenDirectory-13]
-	_ = x[FrontendError-14]
+	_ = x[ShowDialog-8]
+	_ = x[UserCanceled-9]
+	_ = x[OpenDirectory-10]
+	_ = x[FrontendError-11]
 }
 
-const _AppErrorName_name = "HTTPRequestWargamingAPITemporaryUnavaillalbleWargamingAPIErrorNumbersAPIParseReadFileWriteFileDecodeBase64DiscordAPIErrorValidateInvalidInstallPathValidateInvalidAppIDValidateInvalidFontSizeShowDialogUserCanceledOpenDirectoryFrontendError"
+const _AppErrorName_name = "HTTPRequestWargamingAPITemporaryUnavaillalbleWargamingAPIErrorNumbersAPIParseReadFileWriteFileDecodeBase64DiscordAPIErrorShowDialogUserCanceledOpenDirectoryFrontendError"
 
-var _AppErrorName_index = [...]uint8{0, 11, 45, 62, 77, 85, 94, 106, 121, 147, 167, 190, 200, 212, 225, 238}
+var _AppErrorName_index = [...]uint8{0, 11, 45, 62, 77, 85, 94, 106, 121, 131, 143, 156, 169}
 
 func (i AppErrorName) String() string {
 	if i < 0 || i >= AppErrorName(len(_AppErrorName_index)-1) {

@@ -32,25 +32,21 @@ func (e AppError) Error() string {
 func ToFrontendError(err error) error {
 	var appError AppError
 	if !errors.As(err, &appError) {
-		return err
+		return errors.Wrap(err, ErrUnexpected.Error())
 	}
 
 	//nolint:exhaustive
 	switch appError.Name {
 	case WargamingAPITemporaryUnavaillalble:
 		return ErrWargamingAPITemporaryUnavaillalble
-	case ValidateInvalidInstallPath:
-		return ErrInvalidInstallPath
-	case ValidateInvalidAppID:
-		return ErrInvalidAppID
-	case ValidateInvalidFontSize:
-		return ErrInvalidFontSize
+	case WargamingAPIError:
+		return ErrWargamingAPI
 	case OpenDirectory:
 		return ErrOpenDirectory
 	case UserCanceled:
 		return nil
 	default:
-		return err
+		return errors.Wrap(err, ErrUnexpected.Error())
 	}
 }
 
@@ -66,9 +62,6 @@ const (
 	WriteFile
 	DecodeBase64
 	DiscordAPIError
-	ValidateInvalidInstallPath
-	ValidateInvalidAppID
-	ValidateInvalidFontSize
 	ShowDialog
 	UserCanceled
 	OpenDirectory
@@ -77,9 +70,9 @@ const (
 
 var (
 	ErrWargamingAPITemporaryUnavaillalble = errors.New("WG APIが一時的に利用できません。リロードしてください。")
+	ErrWargamingAPI                       = errors.New("WG APIが利用できません。再起動するか、設定を見直してください。")
 	ErrInvalidInstallPath                 = errors.New("選択したフォルダに「WorldOfWarships.exe」が存在しません。")
 	ErrInvalidAppID                       = errors.New("WG APIと通信できません。アプリケーションIDが間違っている可能性があります。")
-	ErrInvalidFontSize                    = errors.New("不正な文字サイズです。")
 	ErrOpenDirectory                      = errors.New("フォルダが開けません。存在しない可能性があります。")
 	ErrUnexpected                         = errors.New("予期しないエラーが発生しました。再起動してください。")
 )
