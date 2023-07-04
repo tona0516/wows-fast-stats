@@ -487,8 +487,8 @@ main();
           <Input
             type="range"
             min="{teamAvg.min_overall_battles}"
-            max="{10000}"
-            step="{100}"
+            max="{3000}"
+            step="{10}"
             class="text-form w-auto"
             style="font-size: {$storedUserConfig.font_size};"
             bind:value="{inputUserConfig.team_average.min_overall_battles}"

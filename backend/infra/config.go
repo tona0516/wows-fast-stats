@@ -108,7 +108,7 @@ var DefaultUserConfig vo.UserConfig = vo.UserConfig{
 	},
 	TeamAverage: vo.TeamAverage{
 		MinShipBattles:    1,
-		MinOverallBattles: 100,
+		MinOverallBattles: 10,
 	},
 }
 
