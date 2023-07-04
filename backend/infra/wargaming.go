@@ -104,6 +104,10 @@ func (w *Wargaming) ClansInfo(clanIDs []int) (vo.WGClansInfo, error) {
 		strClanIDs[i] = strconv.Itoa(v)
 	}
 
+	if len(strClanIDs) == 0 {
+		return vo.WGClansInfo{}, nil
+	}
+
 	return request(
 		w.clansInfoClient,
 		map[string]string{
