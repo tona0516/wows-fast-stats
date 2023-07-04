@@ -1,6 +1,7 @@
 package infra
 
 import (
+	"fmt"
 	"testing"
 	"wfs/backend/apperr"
 	"wfs/backend/vo"
@@ -162,19 +163,27 @@ func TestWargaming_AccountInfo_異常系_リトライなし(t *testing.T) {
 
 	message := "INVALID_APPLICATION_ID"
 	mockAPIClient := &mockAPIClient[vo.WGAccountInfo]{}
-	response := APIResponse[vo.WGAccountInfo]{Body: vo.WGAccountInfo{
-		Status: "error",
-		Error: vo.WGError{
-			Message: message,
+
+	response := APIResponse[vo.WGAccountInfo]{
+		Body: vo.WGAccountInfo{
+			Status: "error",
+			Error:  vo.WGError{Message: message},
 		},
-	},
+		BodyString: `{
+            \"status\":\"error\",
+            \"error\":{
+                \"field\":null,
+                \"message\":\"INVALID_APPLICATION_ID\",
+                \"code\":407,\"value\":null
+            }
+        }`,
 	}
 	mockAPIClient.On("GetRequest", mock.Anything).Return(response, nil)
 	wargaming.accountInfoClient = mockAPIClient
 
 	_, err := wargaming.AccountInfo([]int{123, 456})
 
-	assert.EqualError(t, err, apperr.New(apperr.WargamingAPIError, errors.New(message)).Error())
+	assert.EqualError(t, err, apperr.New(apperr.WargamingAPIError, errors.New(response.BodyString)).Error())
 	mockAPIClient.AssertNumberOfCalls(t, "GetRequest", 1)
 }
 
@@ -227,13 +236,24 @@ func TestWargaming_AccountInfo_異常系_最大リトライ(t *testing.T) {
 					Message: message,
 				},
 			},
+			BodyString: fmt.Sprintf(`{
+                \"status\":\"error\",
+                \"error\":{
+                    \"field\":null,
+                    \"message\":\"%s\",
+                    \"code\":407,\"value\":null
+                }
+            }`, message),
 		}
 		mockAPIClient.On("GetRequest", mock.Anything).Return(response, nil)
 		wargaming.accountInfoClient = mockAPIClient
 
 		_, err := wargaming.AccountInfo([]int{123, 456})
 
-		assert.EqualError(t, err, apperr.New(apperr.WargamingAPITemporaryUnavaillalble, errors.New(message)).Error())
+		assert.EqualError(t, err, apperr.New(
+			apperr.WargamingAPITemporaryUnavaillalble,
+			errors.New(response.BodyString),
+		).Error())
 		mockAPIClient.AssertNumberOfCalls(t, "GetRequest", 4)
 	}
 }

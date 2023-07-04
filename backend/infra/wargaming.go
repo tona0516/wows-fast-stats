@@ -186,7 +186,7 @@ func request[T vo.WGResponse](
 		// https://developers.wargaming.net/documentation/guide/getting-started/#common-errors
 		message := res.Body.GetError().Message
 		if slices.Contains([]string{"REQUEST_LIMIT_EXCEEDED", "SOURCE_NOT_AVAILABLE"}, message) {
-			return res, apperr.New(apperr.WargamingAPITemporaryUnavaillalble, errors.New(message))
+			return res, apperr.New(apperr.WargamingAPITemporaryUnavaillalble, errors.New(res.BodyString))
 		}
 
 		return res, backoff.Permanent(err)
@@ -198,7 +198,7 @@ func request[T vo.WGResponse](
 	}
 
 	if res.Body.GetStatus() == "error" {
-		return res.Body, apperr.New(apperr.WargamingAPIError, errors.New(res.Body.GetError().Message))
+		return res.Body, apperr.New(apperr.WargamingAPIError, errors.New(res.BodyString))
 	}
 
 	return res.Body, err
