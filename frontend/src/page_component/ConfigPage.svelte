@@ -541,6 +541,7 @@ main();
               on:change="{silentApply}"
             />
             <ul>
+              <li>アプリバージョン</li>
               <li>エラーログ</li>
               <li>設定値(config/user.json)</li>
               <li>戦闘情報(tempArenaInfo.json)</li>

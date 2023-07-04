@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strings"
 	"wfs/backend/infra"
+	"wfs/backend/vo"
 )
 
 type Report struct {
@@ -26,7 +27,7 @@ func NewReport(
 	}
 }
 
-func (r *Report) Send(content error) error {
+func (r *Report) Send(version vo.Version, content error) error {
 	// get UserConfig
 	userConfig, err := r.configRepo.User()
 	if err != nil {
@@ -46,6 +47,10 @@ func (r *Report) Send(content error) error {
 
 	// make content
 	targets := []string{
+		"Semver:",
+		fmt.Sprintf("%+v\n", version.Semver),
+		"Revision:",
+		fmt.Sprintf("%+v\n", version.Revision),
 		"Error:",
 		fmt.Sprintf("%+v\n", content),
 		"UserConfig:",

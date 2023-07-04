@@ -104,7 +104,7 @@ func (a *App) Battle() (vo.Battle, error) {
 	if err != nil {
 		a.logger.Error("Failed to fetch Battle", err)
 
-		if err := a.reportService.Send(err); err != nil {
+		if err := a.reportService.Send(a.version, err); err != nil {
 			a.logger.Warn("Failed to send Report", err)
 		}
 
