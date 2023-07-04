@@ -47,6 +47,12 @@ let addAlertPlayerModal: AddAlertPlayerModal;
 let updateAlertPlayerModal: UpdateAlertPlayerModal;
 let removeAlertPlayerModal: RemoveAlertPlayerModal;
 
+$: storedSummaryResult.set(summary(
+    $storedBattle,
+    $storedExcludePlayerIDs,
+    $storedUserConfig,
+))
+
 EventsOn(EVENT_BATTLE_START, async () => {
   LogDebug(EVENT_BATTLE_START);
 
@@ -56,9 +62,8 @@ EventsOn(EVENT_BATTLE_START, async () => {
 
     const start = new Date().getTime();
 
-    const battle = await Battle();
-    storedBattle.set(battle);
-    updateSummary(battle);
+    storedBattle.set(await Battle());
+    storedExcludePlayerIDs.set(await ExcludePlayerIDs());
 
     const elapsed = (new Date().getTime() - start) / 1000;
     notification.showToast(`データ取得完了: ${elapsed}秒`, "success");
@@ -121,18 +126,6 @@ async function onFailureAlertPlayerModal(event: CustomEvent<any>) {
   notification.showToast(event.detail.message, "error");
 }
 
-async function updateSummary(battle: vo.Battle) {
-  const excludePlayerIDs = await ExcludePlayerIDs();
-  storedExcludePlayerIDs.set(excludePlayerIDs);
-
-  const summaryResult = summary(
-    battle,
-    excludePlayerIDs,
-    $storedUserConfig,
-  );
-  storedSummaryResult.set(summaryResult);
-}
-
 async function main() {
   try {
     const players = await AlertPlayers();
@@ -193,7 +186,6 @@ window.onload = function () {
         notification.showToast(event.detail.message, 'success')}"
       on:Failure="{(event) =>
         notification.showToast(event.detail.message, 'error')}"
-      on:ChangeStatsPattern="{() => updateSummary($storedBattle)}"
     />
 
     {#if $storedCurrentPage === Page.Main}
@@ -201,7 +193,7 @@ window.onload = function () {
         <MainPage
           on:UpdateAlertPlayer="{(event) => showUpdateAlertPlayerModal(event)}"
           on:RemoveAlertPlayer="{(event) => showRemoveAlertPlayerModal(event)}"
-          on:CheckPlayer="{() => updateSummary($storedBattle)}"
+          on:CheckPlayer="{async () => storedExcludePlayerIDs.set(await ExcludePlayerIDs())}"
         />
       </div>
     {/if}

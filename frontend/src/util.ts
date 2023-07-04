@@ -55,6 +55,10 @@ export function summary(
   excludes: number[],
   userConfig: vo.UserConfig
 ): SummaryResult {
+  if (!battle) {
+    return undefined;
+  }
+
   const items: { category: StatsCategory; key: string }[] = [
     { category: StatsCategory.Ship, key: "pr" },
     { category: StatsCategory.Ship, key: "damage" },

@@ -72,8 +72,6 @@ async function onStatsPatternChanged() {
 
     await ApplyUserConfig(config);
     storedUserConfig.set(config);
-
-    dispatch("ChangeStatsPattern");
   } catch (error) {
     dispatch("Failure", { message: error });
     return;
