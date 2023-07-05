@@ -138,21 +138,9 @@ func (b *Battle) Battle(userConfig vo.UserConfig) (vo.Battle, error) {
 func (b *Battle) fetchWarship(result chan vo.Result[map[int]vo.Warship]) {
 	warships := make(map[int]vo.Warship, 0)
 
-	res, err := b.wargaming.EncycShips(1)
-	if err != nil {
-		result <- vo.Result[map[int]vo.Warship]{Value: warships, Error: err}
-		return
-	}
-
 	var mu sync.Mutex
-	pages := makeRange(1, res.Meta.PageTotal)
-	err = doParallel(b.parallels, pages, func(page int) error {
-		encyclopediaShips, err := b.wargaming.EncycShips(page)
-		if err != nil {
-			return err
-		}
-
-		for shipID, warship := range encyclopediaShips.Data {
+	addToResult := func(data map[int]vo.WGEncyclopediaShipsData) {
+		for shipID, warship := range data {
 			mu.Lock()
 			warships[shipID] = vo.Warship{
 				Name:   warship.Name,
@@ -162,7 +150,24 @@ func (b *Battle) fetchWarship(result chan vo.Result[map[int]vo.Warship]) {
 			}
 			mu.Unlock()
 		}
+	}
 
+	first := 1
+	res, err := b.wargaming.EncycShips(first)
+	if err != nil {
+		result <- vo.Result[map[int]vo.Warship]{Value: warships, Error: err}
+		return
+	}
+	addToResult(res.Data)
+
+	pages := makeRange(first+1, res.Meta.PageTotal+1)
+	err = doParallel(b.parallels, pages, func(page int) error {
+		res, err := b.wargaming.EncycShips(page)
+		if err != nil {
+			return err
+		}
+
+		addToResult(res.Data)
 		return nil
 	})
 	if err != nil {
