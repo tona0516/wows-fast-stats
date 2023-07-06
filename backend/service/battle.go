@@ -155,7 +155,7 @@ func (b *Battle) fetchWarship(result chan vo.Result[map[int]vo.Warship]) {
 	first := 1
 	res, err := b.wargaming.EncycShips(first)
 	if err != nil {
-		result <- vo.Result[map[int]vo.Warship]{Value: warships, Error: err}
+		result <- vo.Result[map[int]vo.Warship]{Error: err}
 		return
 	}
 	addToResult(res.Data)
@@ -171,13 +171,13 @@ func (b *Battle) fetchWarship(result chan vo.Result[map[int]vo.Warship]) {
 		return nil
 	})
 	if err != nil {
-		result <- vo.Result[map[int]vo.Warship]{Value: warships, Error: err}
+		result <- vo.Result[map[int]vo.Warship]{Error: err}
 		return
 	}
 
 	unregisteredShipInfo, err := b.unregistered.Warship()
 	if err != nil {
-		result <- vo.Result[map[int]vo.Warship]{Value: warships, Error: err}
+		result <- vo.Result[map[int]vo.Warship]{Error: err}
 		return
 	}
 	for k, v := range unregisteredShipInfo {
@@ -186,7 +186,7 @@ func (b *Battle) fetchWarship(result chan vo.Result[map[int]vo.Warship]) {
 		}
 	}
 
-	result <- vo.Result[map[int]vo.Warship]{Value: warships, Error: nil}
+	result <- vo.Result[map[int]vo.Warship]{Value: warships}
 }
 
 func (b *Battle) fetchExpectedStats(result chan vo.Result[vo.NSExpectedStats]) {
@@ -233,7 +233,7 @@ func (b *Battle) clanTag(accountIDs []int, result chan vo.Result[map[int]vo.Clan
 
 	clansAccountInfo, err := b.wargaming.ClansAccountInfo(accountIDs)
 	if err != nil {
-		result <- vo.Result[map[int]vo.Clan]{Value: clanMap, Error: err}
+		result <- vo.Result[map[int]vo.Clan]{Error: err}
 
 		return
 	}
@@ -241,7 +241,7 @@ func (b *Battle) clanTag(accountIDs []int, result chan vo.Result[map[int]vo.Clan
 	clanIDs := clansAccountInfo.ClanIDs()
 	clansInfo, err := b.wargaming.ClansInfo(clanIDs)
 	if err != nil {
-		result <- vo.Result[map[int]vo.Clan]{Value: clanMap, Error: err}
+		result <- vo.Result[map[int]vo.Clan]{Error: err}
 
 		return
 	}
@@ -252,7 +252,7 @@ func (b *Battle) clanTag(accountIDs []int, result chan vo.Result[map[int]vo.Clan
 		clanMap[accountID] = vo.Clan{Tag: clanTag, ID: clanID}
 	}
 
-	result <- vo.Result[map[int]vo.Clan]{Value: clanMap, Error: nil}
+	result <- vo.Result[map[int]vo.Clan]{Value: clanMap}
 }
 
 func (b *Battle) compose(
