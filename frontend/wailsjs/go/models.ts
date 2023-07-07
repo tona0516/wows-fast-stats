@@ -327,7 +327,7 @@ export namespace vo {
 		}
 	}
 	export class Meta {
-	    date: string;
+	    unixtime: number;
 	    arena: string;
 	    type: string;
 	    own_ship: string;
@@ -338,7 +338,7 @@ export namespace vo {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.date = source["date"];
+	        this.unixtime = source["unixtime"];
 	        this.arena = source["arena"];
 	        this.type = source["type"];
 	        this.own_ship = source["own_ship"];

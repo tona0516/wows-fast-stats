@@ -2,6 +2,7 @@ package vo
 
 import (
 	"strings"
+	"time"
 )
 
 type TempArenaInfo struct {
@@ -38,17 +39,13 @@ func (t *TempArenaInfo) AccountNames() []string {
 	return accountNames
 }
 
-func (t *TempArenaInfo) FormattedDateTime() string {
-	datetimeArray := strings.Split(t.DateTime, " ")
-	if len(datetimeArray) < 2 {
-		return ""
-	}
-	dateArray := strings.Split(datetimeArray[0], ".")
-	if len(dateArray) < 3 {
-		return ""
+func (t *TempArenaInfo) Unixtime() int64 {
+	date, err := time.ParseInLocation("02.01.2006 15:04:05", t.DateTime, time.Local)
+	if err != nil {
+		return 0
 	}
 
-	return dateArray[2] + "-" + dateArray[1] + "-" + dateArray[0] + " " + datetimeArray[1]
+	return date.Unix()
 }
 
 func (t *TempArenaInfo) BattleArena(battleArenas WGBattleArenas) string {

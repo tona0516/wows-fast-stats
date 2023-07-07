@@ -5,7 +5,6 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
-	"time"
 	"wfs/backend/apperr"
 	"wfs/backend/vo"
 
@@ -62,15 +61,9 @@ func (t *TempArenaInfo) Get(installPath string) (vo.TempArenaInfo, error) {
 
 func (t *TempArenaInfo) Save(tempArenaInfo vo.TempArenaInfo) error {
 	_ = os.Mkdir(tempArenaInfoDir, 0o755)
+	path := filepath.Join(tempArenaInfoDir, "tempArenaInfo_"+strconv.FormatInt(tempArenaInfo.Unixtime(), 10)+".json")
 
-	date, err := time.Parse("2006-01-02 15:04:05", tempArenaInfo.FormattedDateTime())
-	if err != nil {
-		return apperr.New(apperr.WriteFile, err)
-	}
-
-	path := filepath.Join(tempArenaInfoDir, "tempArenaInfo_"+strconv.FormatInt(date.Unix(), 10)+".json")
-	err = writeJSON(path, tempArenaInfo)
-	if err != nil {
+	if err := writeJSON(path, tempArenaInfo); err != nil {
 		return apperr.New(apperr.WriteFile, err)
 	}
 
@@ -94,21 +87,18 @@ func decideTempArenaInfo(paths []string) (vo.TempArenaInfo, error) {
 	}
 
 	var latest *vo.TempArenaInfo
-	var latestDate time.Time
+	var latestUnixtime int64
 	for _, path := range paths {
 		tempArenaInfo, err := readJSON(path, vo.TempArenaInfo{})
 		if err != nil {
 			continue
 		}
 
-		date, err := time.Parse("2006-01-02 15:04:05", tempArenaInfo.FormattedDateTime())
-		if err != nil {
-			continue
-		}
+		unixtime := tempArenaInfo.Unixtime()
 
-		if date.After(latestDate) {
+		if unixtime > latestUnixtime {
 			latest = &tempArenaInfo
-			latestDate = date
+			latestUnixtime = unixtime
 		}
 	}
 

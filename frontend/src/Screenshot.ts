@@ -1,6 +1,7 @@
 import * as htmlToImage from "html-to-image";
 import { AutoScreenshot, ManualScreenshot } from "../wailsjs/go/main/App";
 import type { vo } from "../wailsjs/go/models";
+import { toDateForFilename } from "./util";
 
 export class Screenshot {
   isFirst: boolean;
@@ -18,9 +19,7 @@ export class Screenshot {
       await htmlToImage.toPng(mainPageElem);
     }
     const dataUrl = await htmlToImage.toPng(mainPageElem);
-    const date = this.battle.meta.date
-      .replaceAll(":", "-")
-      .replaceAll(" ", "-");
+    const date = toDateForFilename(this.battle.meta.unixtime);
     const ownShip = this.battle.meta.own_ship.replaceAll(" ", "-");
     const filename = `${date}_${ownShip}_${this.battle.meta.arena}_${this.battle.meta.type}.png`;
     const base64Data = dataUrl.split(",")[1];

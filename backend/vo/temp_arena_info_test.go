@@ -25,16 +25,16 @@ func TestTempArenaInfo_AccountNames(t *testing.T) {
 	assert.ElementsMatch(t, expectedNames, actualNames)
 }
 
-func TestTempArenaInfo_FormattedDateTime(t *testing.T) {
+func TestTempArenaInfo_Unixtime(t *testing.T) {
 	t.Parallel()
 	info := &TempArenaInfo{
 		DateTime: "22.05.2023 12:34:56",
 	}
 
-	expectedFormattedDateTime := "2023-05-22 12:34:56"
-	actualFormattedDateTime := info.FormattedDateTime()
+	var expected int64 = 1684726496 // 2023-05-22 12:34:56
+	actual := info.Unixtime()
 
-	assert.Equal(t, expectedFormattedDateTime, actualFormattedDateTime)
+	assert.Equal(t, expected, actual)
 }
 
 func TestTempArenaInfo_BattleArena(t *testing.T) {

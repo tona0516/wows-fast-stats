@@ -342,10 +342,10 @@ func (b *Battle) compose(
 
 	battle := vo.Battle{
 		Meta: vo.Meta{
-			Date:    tempArenaInfo.FormattedDateTime(),
-			Arena:   tempArenaInfo.BattleArena(battleArenas),
-			Type:    tempArenaInfo.BattleType(battleTypes),
-			OwnShip: ownShip,
+			Unixtime: tempArenaInfo.Unixtime(),
+			Arena:    tempArenaInfo.BattleArena(battleArenas),
+			Type:     tempArenaInfo.BattleType(battleTypes),
+			OwnShip:  ownShip,
 		},
 		Teams: teams,
 	}

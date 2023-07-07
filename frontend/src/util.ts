@@ -1,3 +1,4 @@
+import { format, fromUnixTime } from "date-fns";
 import type { vo } from "../wailsjs/go/models";
 import { Const } from "./Const";
 import { DisplayPattern, StatsCategory } from "./enums";
@@ -202,6 +203,14 @@ export function decideDisplayPattern(
   }
 
   return DisplayPattern.Full;
+}
+
+export function toDateForDisplay(unixtime: number): string {
+  return format(fromUnixTime(unixtime), "yyyy/MM/dd HH:mm:ss");
+}
+
+export function toDateForFilename(unixtime: number): string {
+  return format(fromUnixTime(unixtime), "yyyy-MM-dd-HH-mm-ss");
 }
 
 function mean(

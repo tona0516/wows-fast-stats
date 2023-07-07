@@ -8,6 +8,7 @@ import {
 import ColorDescription from "../other_component/ColorDescription.svelte";
 import Ofuse from "../other_component/Ofuse.svelte";
 import StatisticsTable from "../other_component/StatisticsTable.svelte";
+import { toDateForDisplay } from "../util";
 </script>
 
 {#if $storedBattle}
@@ -31,7 +32,7 @@ import StatisticsTable from "../other_component/StatisticsTable.svelte";
           <tbody>
             <tr>
               <td>日時</td>
-              <td>{$storedBattle.meta.date}</td>
+              <td>{toDateForDisplay($storedBattle.meta.unixtime)}</td>
             </tr>
 
             <tr>
