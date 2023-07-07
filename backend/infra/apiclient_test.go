@@ -1,5 +1,3 @@
-// TODO backoff tests
-
 package infra
 
 import (
