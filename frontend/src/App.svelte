@@ -17,7 +17,7 @@ import {
   ExcludePlayerIDs,
   LogErrorForFrontend,
   Ready,
-  Updatable,
+  LatestRelease,
   UserConfig,
 } from "../wailsjs/go/main/App";
 import { BrowserOpenURL, EventsOn, LogDebug } from "../wailsjs/runtime/runtime";
@@ -30,18 +30,9 @@ import UpdateAlertPlayerModal from "./other_component/UpdateAlertPlayerModal.sve
 import RemoveAlertPlayerModal from "./other_component/RemoveAlertPlayerModal.svelte";
 import Notification from "./other_component/Notification.svelte";
 import Navigation from "./other_component/Navigation.svelte";
-import { Page } from "./enums";
+import { AppEvent, Page, ToastKey } from "./enums";
 
 import "bootstrap-icons/font/bootstrap-icons.css";
-
-const TOAST_NEED_CONFIG = "need_config";
-const TOAST_WAIT = "wait";
-const TOAST_FETCHING = "fetching";
-const TOAST_ERROR = "error";
-
-// Note: see watcher.go
-const EVENT_BATTLE_START = "BATTLE_START";
-const EVENT_BATTLE_END = "BATTLE_END";
 
 let notification: Notification;
 let addAlertPlayerModal: AddAlertPlayerModal;
@@ -52,15 +43,15 @@ $: storedSummaryResult.set(
   summary($storedBattle, $storedExcludePlayerIDs, $storedUserConfig)
 );
 
-EventsOn(EVENT_BATTLE_START, async () => {
-  LogDebug(EVENT_BATTLE_START);
+EventsOn(AppEvent.battleStart, async () => {
+  LogDebug(AppEvent.battleStart);
 
   try {
-    notification.removeToastWithKey(TOAST_WAIT);
+    notification.removeToastWithKey(ToastKey.wait);
     notification.showToastWithKey(
       "戦闘データの取得中...",
       "info",
-      TOAST_FETCHING
+      ToastKey.fetching
     );
 
     const start = new Date().getTime();
@@ -70,11 +61,11 @@ EventsOn(EVENT_BATTLE_START, async () => {
 
     const elapsed = (new Date().getTime() - start) / 1000;
     notification.showToast(`データ取得完了: ${elapsed}秒`, "success");
-    notification.removeToastWithKey(TOAST_ERROR);
+    notification.removeToastWithKey(ToastKey.error);
   } catch (error) {
-    notification.showToastWithKey(error, "error", TOAST_ERROR);
+    notification.showToastWithKey(error, "error", ToastKey.error);
   } finally {
-    notification.removeToastWithKey(TOAST_FETCHING);
+    notification.removeToastWithKey(ToastKey.fetching);
   }
 
   if ($storedUserConfig.save_screenshot) {
@@ -95,13 +86,13 @@ EventsOn(EVENT_BATTLE_START, async () => {
   }
 });
 
-EventsOn(EVENT_BATTLE_END, () => {
-  LogDebug(EVENT_BATTLE_END);
+EventsOn(AppEvent.battleEnd, () => {
+  LogDebug(AppEvent.battleEnd);
 
   notification.showToastWithKey(
     "戦闘中ではありません。開始時に自動的にリロードします。",
     "info",
-    TOAST_WAIT
+    ToastKey.wait
   );
 });
 
@@ -150,27 +141,29 @@ async function main() {
     return;
   }
 
-  try {
-    const latestRelease = await Updatable();
-    if (config.notify_updatable && latestRelease.updatable) {
-      notification.showToastWithKey(
-        "新しいバージョンがあります: " +
-          latestRelease.tag_name +
-          "(クリックで開く)",
-        "warning",
-        "updatable",
-        () => BrowserOpenURL(latestRelease.html_url)
-      );
+  if (config.notify_updatable) {
+    try {
+      const latestRelease = await LatestRelease();
+      if (latestRelease.updatable) {
+        notification.showToastWithKey(
+          "新しいバージョンがあります: " +
+            latestRelease.tag_name +
+            "(クリックで開く)",
+          "warning",
+          ToastKey.updatable,
+          () => BrowserOpenURL(latestRelease.html_url)
+        );
+      }
+    } catch (error) {
+      notification.showToast(error, "error");
     }
-  } catch (error) {
-    notification.showToast(error, "error");
   }
 
   if (!config.appid) {
     notification.showToastWithKey(
       "未設定の状態のため開始できません。「設定」から入力してください。",
       "info",
-      TOAST_NEED_CONFIG
+      ToastKey.needConfig
     );
     return;
   }
@@ -225,7 +218,7 @@ window.onload = function () {
       <ConfigPage
         on:UpdateSuccess="{(event) => {
           notification.showToast(event.detail.message, 'success');
-          notification.removeToastWithKey('need_config');
+          notification.removeToastWithKey(ToastKey.needConfig);
           if (!$storedBattle) {
             Ready();
           }

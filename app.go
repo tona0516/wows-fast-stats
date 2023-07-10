@@ -388,6 +388,6 @@ func (a *App) StatsPatterns() []string {
 	return vo.StatsPatterns
 }
 
-func (a *App) Updatable() (vo.GHLatestRelease, error) {
+func (a *App) LatestRelease() (vo.GHLatestRelease, error) {
 	return a.updaterService.Updatable()
 }

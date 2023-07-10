@@ -24,6 +24,8 @@ export function ExcludePlayerIDs():Promise<Array<number>>;
 
 export function FontSizes():Promise<Array<string>>;
 
+export function LatestRelease():Promise<vo.GHLatestRelease>;
+
 export function LogErrorForFrontend(arg1:string):Promise<void>;
 
 export function ManualScreenshot(arg1:string,arg2:string):Promise<void>;
@@ -43,8 +45,6 @@ export function SearchPlayer(arg1:string):Promise<vo.WGAccountList>;
 export function SelectDirectory():Promise<string>;
 
 export function StatsPatterns():Promise<Array<string>>;
-
-export function Updatable():Promise<vo.GHLatestRelease>;
 
 export function UpdateAlertPlayer(arg1:vo.AlertPlayer):Promise<void>;
 

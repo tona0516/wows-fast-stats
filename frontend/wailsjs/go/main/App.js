@@ -46,6 +46,10 @@ export function FontSizes() {
   return window['go']['main']['App']['FontSizes']();
 }
 
+export function LatestRelease() {
+  return window['go']['main']['App']['LatestRelease']();
+}
+
 export function LogErrorForFrontend(arg1) {
   return window['go']['main']['App']['LogErrorForFrontend'](arg1);
 }
@@ -84,10 +88,6 @@ export function SelectDirectory() {
 
 export function StatsPatterns() {
   return window['go']['main']['App']['StatsPatterns']();
-}
-
-export function Updatable() {
-  return window['go']['main']['App']['Updatable']();
 }
 
 export function UpdateAlertPlayer(arg1) {

@@ -39,3 +39,17 @@ export enum SkillLevel {
   Unicum = "unicum",
   SuperUnicum = "super_unicum",
 }
+
+export enum ToastKey {
+  needConfig = "need_config",
+  wait = "wait",
+  fetching = "fetching",
+  updatable = "updatable",
+  error = "error",
+}
+
+// Note: see watcher.go
+export enum AppEvent {
+  battleStart = "BATTLE_START",
+  battleEnd = "BATTLE_END",
+}
