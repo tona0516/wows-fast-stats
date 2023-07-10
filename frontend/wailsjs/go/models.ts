@@ -699,6 +699,22 @@ export namespace vo {
 		    return a;
 		}
 	}
+	export class GHLatestRelease {
+	    tag_name: string;
+	    html_url: string;
+	    updatable: boolean;
+	
+	    static createFrom(source: any = {}) {
+	        return new GHLatestRelease(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.tag_name = source["tag_name"];
+	        this.html_url = source["html_url"];
+	        this.updatable = source["updatable"];
+	    }
+	}
 	
 	
 	
@@ -742,6 +758,7 @@ export namespace vo {
 	    save_screenshot: boolean;
 	    save_temp_arena_info: boolean;
 	    send_report: boolean;
+	    notify_updatable: boolean;
 	    stats_pattern: string;
 	
 	    static createFrom(source: any = {}) {
@@ -760,6 +777,7 @@ export namespace vo {
 	        this.save_screenshot = source["save_screenshot"];
 	        this.save_temp_arena_info = source["save_temp_arena_info"];
 	        this.send_report = source["send_report"];
+	        this.notify_updatable = source["notify_updatable"];
 	        this.stats_pattern = source["stats_pattern"];
 	    }
 	

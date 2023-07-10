@@ -159,3 +159,13 @@ func (m *mockScreenshotRepo) Save(path string, base64Data string) error {
 	args := m.Called(path, base64Data)
 	return args.Error(0)
 }
+
+type mockGithubRepo struct {
+	mock.Mock
+}
+
+func (m *mockGithubRepo) LatestRelease() (vo.GHLatestRelease, error) {
+	args := m.Called()
+	//nolint:forcetypeassert
+	return args.Get(0).(vo.GHLatestRelease), args.Error(1)
+}

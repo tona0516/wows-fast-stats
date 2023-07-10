@@ -15,6 +15,7 @@ type UserConfig struct {
 	SaveScreenshot    bool         `json:"save_screenshot"`
 	SaveTempArenaInfo bool         `json:"save_temp_arena_info"`
 	SendReport        bool         `json:"send_report"`
+	NotifyUpdatable   bool         `json:"notify_updatable"`
 	StatsPattern      StatsPattern `json:"stats_pattern"`
 }
 

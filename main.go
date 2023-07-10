@@ -55,8 +55,10 @@ func main() {
 }
 
 func initApp() *App {
+	version := vo.Version{Semver: semver, Revision: revision}
+
 	// infra
-	logger := infra.NewLogger(vo.Env{Str: env}, vo.Version{Semver: semver, Revision: revision})
+	logger := infra.NewLogger(vo.Env{Str: env}, version)
 	discordRepo := infra.NewDiscord(discordWebhookURL)
 	wargamingRepo := infra.NewWargaming(vo.WGConfig{BaseURL: "https://api.worldofwarships.asia"})
 	numbersRepo := infra.NewNumbers("https://api.wows-numbers.com/personal/rating/expected/json/")
@@ -64,6 +66,7 @@ func initApp() *App {
 	configRepo := infra.NewConfig()
 	screenshotRepo := infra.NewScreenshot()
 	unregisteredRepo := infra.NewUnregistered()
+	githubRepo := infra.NewGithub(vo.GHConfig{BaseURL: "https://api.github.com"})
 
 	// service
 	var parallels uint = 5
@@ -72,6 +75,7 @@ func initApp() *App {
 	battleService := service.NewBattle(parallels, wargamingRepo, tempArenaInfoRepo, numbersRepo, unregisteredRepo)
 	watcherService := service.NewWatcher(configRepo, tempArenaInfoRepo, runtime.EventsEmit)
 	reportService := service.NewReport(discordRepo, configRepo, tempArenaInfoRepo)
+	updaterService := service.NewUpdater(version, githubRepo)
 
 	return NewApp(
 		vo.Env{Str: env},
@@ -81,6 +85,7 @@ func initApp() *App {
 		*watcherService,
 		*battleService,
 		*reportService,
+		*updaterService,
 		logger,
 	)
 }

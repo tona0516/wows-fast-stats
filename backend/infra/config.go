@@ -18,9 +18,10 @@ const (
 
 //nolint:gochecknoglobals
 var DefaultUserConfig vo.UserConfig = vo.UserConfig{
-	FontSize:     "medium",
-	SendReport:   true,
-	StatsPattern: vo.StatsPatternPvPAll,
+	FontSize:        "medium",
+	SendReport:      true,
+	NotifyUpdatable: true,
+	StatsPattern:    vo.StatsPatternPvPAll,
 	Displays: vo.Displays{
 		Basic: vo.Basic{
 			IsInAvg:    true,

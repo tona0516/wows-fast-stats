@@ -27,6 +27,7 @@ type App struct {
 	watcherService    service.Watcher
 	battleService     service.Battle
 	reportService     service.Report
+	updaterService    service.Updater
 	logger            infra.LoggerInterface
 	excludePlayer     mapset.Set[int]
 }
@@ -39,6 +40,7 @@ func NewApp(
 	watcherService service.Watcher,
 	battleService service.Battle,
 	reportService service.Report,
+	updaterService service.Updater,
 	logger infra.LoggerInterface,
 ) *App {
 	return &App{
@@ -49,6 +51,7 @@ func NewApp(
 		watcherService:    watcherService,
 		battleService:     battleService,
 		reportService:     reportService,
+		updaterService:    updaterService,
 		logger:            logger,
 		excludePlayer:     mapset.NewSet[int](),
 	}
@@ -383,4 +386,8 @@ func (a *App) FontSizes() []string {
 
 func (a *App) StatsPatterns() []string {
 	return vo.StatsPatterns
+}
+
+func (a *App) Updatable() (vo.GHLatestRelease, error) {
+	return a.updaterService.Updatable()
 }

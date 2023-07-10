@@ -17,9 +17,10 @@ import {
   ExcludePlayerIDs,
   LogErrorForFrontend,
   Ready,
+  Updatable,
   UserConfig,
 } from "../wailsjs/go/main/App";
-import { EventsOn, LogDebug } from "../wailsjs/runtime/runtime";
+import { BrowserOpenURL, EventsOn, LogDebug } from "../wailsjs/runtime/runtime";
 import type { vo } from "../wailsjs/go/models";
 import MainPage from "./page_component/MainPage.svelte";
 import ConfigPage from "./page_component/ConfigPage.svelte";
@@ -142,6 +143,20 @@ async function main() {
   } catch (error) {
     notification.showToast(error, "error");
     return;
+  }
+
+  try {
+    const latestRelease = await Updatable()
+    if (config.notify_updatable && latestRelease.updatable) {
+        notification.showToastWithKey(
+          "新しいバージョンがあります: " + latestRelease.tag_name + "(クリックで開く)",
+          "warning",
+          "updatable",
+          () => BrowserOpenURL(latestRelease.html_url)
+        )
+    }
+  } catch (error) {
+    notification.showToast(error, "error");
   }
 
   if (!config.appid) {

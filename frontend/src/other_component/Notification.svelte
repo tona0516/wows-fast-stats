@@ -26,10 +26,15 @@ export function showToast(message: string, type: ToastType) {
 export function showToastWithKey(
   message: string,
   type: ToastType,
-  key: string
+  key: string,
+  onClick: () => void = null
 ) {
   if (toastDict[key]) {
     return;
+  }
+
+  if (!onClick) {
+    onClick = () => {};
   }
 
   const toast = toasts.add({
@@ -38,6 +43,7 @@ export function showToastWithKey(
     placement: PLACEMENT,
     type: type,
     theme: THEME,
+    onClick: onClick,
   });
   toastDict[key] = toast;
   return;

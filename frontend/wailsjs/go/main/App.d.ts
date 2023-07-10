@@ -44,6 +44,8 @@ export function SelectDirectory():Promise<string>;
 
 export function StatsPatterns():Promise<Array<string>>;
 
+export function Updatable():Promise<vo.GHLatestRelease>;
+
 export function UpdateAlertPlayer(arg1:vo.AlertPlayer):Promise<void>;
 
 export function UserConfig():Promise<vo.UserConfig>;

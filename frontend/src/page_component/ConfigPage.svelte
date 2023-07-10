@@ -547,6 +547,14 @@ main();
               <li>戦闘情報(tempArenaInfo.json)</li>
             </ul>
           </li>
+          <li class="mb-3">
+            <Input
+              type="switch"
+              label="新しいバージョンがある場合に通知する"
+              bind:checked="{inputUserConfig.notify_updatable}"
+              on:change="{silentApply}"
+            />
+          </li>
         </ul>
       </FormGroup>
     </TabPane>

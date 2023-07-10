@@ -86,6 +86,10 @@ export function StatsPatterns() {
   return window['go']['main']['App']['StatsPatterns']();
 }
 
+export function Updatable() {
+  return window['go']['main']['App']['Updatable']();
+}
+
 export function UpdateAlertPlayer(arg1) {
   return window['go']['main']['App']['UpdateAlertPlayer'](arg1);
 }
