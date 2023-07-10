@@ -55,7 +55,7 @@ lint:
 fmt:
 	golangci-lint run --fix
 	go fmt
-	cd frontend/ && npx prettier --write src/**/*.{ts,svelte,css} index.html
+	cd frontend/ && npx prettier --write "src/**/*.{ts,svelte,css}" index.html
 
 .PHONY: test
 test:

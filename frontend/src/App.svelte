@@ -40,26 +40,28 @@ const TOAST_FETCHING = "fetching";
 const TOAST_ERROR = "error";
 
 // Note: see watcher.go
-const EVENT_BATTLE_START = "BATTLE_START"
-const EVENT_BATTLE_END = "BATTLE_END"
+const EVENT_BATTLE_START = "BATTLE_START";
+const EVENT_BATTLE_END = "BATTLE_END";
 
 let notification: Notification;
 let addAlertPlayerModal: AddAlertPlayerModal;
 let updateAlertPlayerModal: UpdateAlertPlayerModal;
 let removeAlertPlayerModal: RemoveAlertPlayerModal;
 
-$: storedSummaryResult.set(summary(
-    $storedBattle,
-    $storedExcludePlayerIDs,
-    $storedUserConfig,
-))
+$: storedSummaryResult.set(
+  summary($storedBattle, $storedExcludePlayerIDs, $storedUserConfig)
+);
 
 EventsOn(EVENT_BATTLE_START, async () => {
   LogDebug(EVENT_BATTLE_START);
 
   try {
     notification.removeToastWithKey(TOAST_WAIT);
-    notification.showToastWithKey("戦闘データの取得中...", "info", TOAST_FETCHING);
+    notification.showToastWithKey(
+      "戦闘データの取得中...",
+      "info",
+      TOAST_FETCHING
+    );
 
     const start = new Date().getTime();
 
@@ -77,7 +79,10 @@ EventsOn(EVENT_BATTLE_START, async () => {
 
   if ($storedUserConfig.save_screenshot) {
     try {
-      const screenshot = new Screenshot($storedBattle, $storedIsFirstScreenshot);
+      const screenshot = new Screenshot(
+        $storedBattle,
+        $storedIsFirstScreenshot
+      );
       screenshot.auto();
       storedIsFirstScreenshot.set(false);
     } catch (error) {
@@ -136,7 +141,7 @@ async function main() {
     return;
   }
 
-  let config: vo.UserConfig
+  let config: vo.UserConfig;
   try {
     config = await UserConfig();
     storedUserConfig.set(config);
@@ -146,26 +151,28 @@ async function main() {
   }
 
   try {
-    const latestRelease = await Updatable()
+    const latestRelease = await Updatable();
     if (config.notify_updatable && latestRelease.updatable) {
-        notification.showToastWithKey(
-          "新しいバージョンがあります: " + latestRelease.tag_name + "(クリックで開く)",
-          "warning",
-          "updatable",
-          () => BrowserOpenURL(latestRelease.html_url)
-        )
+      notification.showToastWithKey(
+        "新しいバージョンがあります: " +
+          latestRelease.tag_name +
+          "(クリックで開く)",
+        "warning",
+        "updatable",
+        () => BrowserOpenURL(latestRelease.html_url)
+      );
     }
   } catch (error) {
     notification.showToast(error, "error");
   }
 
   if (!config.appid) {
-      notification.showToastWithKey(
-        "未設定の状態のため開始できません。「設定」から入力してください。",
-        "info",
-        TOAST_NEED_CONFIG
-      );
-      return;
+    notification.showToastWithKey(
+      "未設定の状態のため開始できません。「設定」から入力してください。",
+      "info",
+      TOAST_NEED_CONFIG
+    );
+    return;
   }
 
   Ready();
@@ -208,7 +215,8 @@ window.onload = function () {
         <MainPage
           on:UpdateAlertPlayer="{(event) => showUpdateAlertPlayerModal(event)}"
           on:RemoveAlertPlayer="{(event) => showRemoveAlertPlayerModal(event)}"
-          on:CheckPlayer="{async () => storedExcludePlayerIDs.set(await ExcludePlayerIDs())}"
+          on:CheckPlayer="{async () =>
+            storedExcludePlayerIDs.set(await ExcludePlayerIDs())}"
         />
       </div>
     {/if}
