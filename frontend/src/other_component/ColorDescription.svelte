@@ -88,7 +88,7 @@ const prColors: {
 ];
 </script>
 
-<div class="center">
+<div class="center m-2">
   {#if $storedUserConfig.custom_color}
     <h6>スキル別配色</h6>
 
