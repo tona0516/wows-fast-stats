@@ -6,6 +6,7 @@ import { BrowserOpenURL } from "../../wailsjs/runtime/runtime";
 import { SkillLevelConverter } from "../RankConverter";
 import { clanURL, playerURL, values } from "../util";
 import { StatsCategory } from "../enums";
+import { storedUserConfig } from "../stores";
 
 export let player: vo.Player;
 export let userConfig: vo.UserConfig;
@@ -52,7 +53,7 @@ function isBelongToClan(): boolean {
     <ul
       class="dropdown-menu"
       aria-labelledby="dropdownMenuLink"
-      style="font-size: {userConfig.font_size};"
+      style="font-size: {$storedUserConfig.font_size};"
     >
       {#if isBelongToClan()}
         <!-- svelte-ignore a11y-invalid-attribute -->
