@@ -10,12 +10,12 @@ export interface ComponentOption {
 }
 
 export class ComponenInfo {
-  key: string;
+  columnKey: string;
   component: any;
   option: ComponentOption;
 
   constructor(key: string, component: any, option: ComponentOption = {}) {
-    this.key = key;
+    this.columnKey = key;
     this.component = component;
     this.option = option;
     option.column ??= 1;
@@ -25,11 +25,11 @@ export class ComponenInfo {
   }
 
   minColumnName(): string {
-    return Const.COLUMN_NAMES[this.key].min;
+    return Const.COLUMN_NAMES[this.columnKey].min;
   }
 
   shouldShowColumn(displays: vo.Displays, category: StatsCategory): boolean {
-    return displays[category][this.key] === true;
+    return displays[category][this.columnKey] === true;
   }
 
   shouldShowValue(

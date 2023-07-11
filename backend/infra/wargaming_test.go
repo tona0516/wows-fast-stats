@@ -107,22 +107,6 @@ func TestWargaming_EncycShips(t *testing.T) {
 	assert.Equal(t, vo.WGEncycShips{}, result)
 }
 
-func TestWargaming_EncycInfo(t *testing.T) {
-	t.Parallel()
-
-	wargaming := NewWargaming(vo.WGConfig{})
-	wargaming.SetAppID("your-app-id")
-
-	mockAPIClient := &mockAPIClient[vo.WGEncycInfo]{}
-	mockAPIClient.On("GetRequest", mock.Anything).Return(APIResponse[vo.WGEncycInfo]{}, nil)
-	wargaming.encycInfoClient = mockAPIClient
-
-	result, err := wargaming.EncycInfo()
-
-	assert.NoError(t, err)
-	assert.Equal(t, vo.WGEncycInfo{}, result)
-}
-
 func TestWargaming_BattleArena(t *testing.T) {
 	t.Parallel()
 
@@ -153,6 +137,20 @@ func TestWargaming_BattleTypes(t *testing.T) {
 
 	assert.NoError(t, err)
 	assert.Equal(t, vo.WGBattleTypes{}, result)
+}
+
+func TestWargaming_Test(t *testing.T) {
+	t.Parallel()
+
+	wargaming := NewWargaming(vo.WGConfig{})
+
+	mockAPIClient := &mockAPIClient[vo.WGEncycInfo]{}
+	mockAPIClient.On("GetRequest", mock.Anything).Return(APIResponse[vo.WGEncycInfo]{}, nil)
+	wargaming.encycInfoClient = mockAPIClient
+
+	valid, err := wargaming.Test("hoge")
+	assert.True(t, valid)
+	assert.NoError(t, err)
 }
 
 func TestWargaming_AccountInfo_異常系_リトライなし(t *testing.T) {

@@ -11,7 +11,7 @@ type WargamingInterface interface {
 	ClansInfo(clanIDs []int) (vo.WGClansInfo, error)
 	EncycShips(pageNo int) (vo.WGEncycShips, error)
 	ShipsStats(accountID int) (vo.WGShipsStats, error)
-	EncycInfo() (vo.WGEncycInfo, error)
 	BattleArenas() (vo.WGBattleArenas, error)
 	BattleTypes() (vo.WGBattleTypes, error)
+	Test(appid string) (bool, error)
 }

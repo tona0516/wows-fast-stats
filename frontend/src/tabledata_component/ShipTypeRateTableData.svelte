@@ -1,48 +1,58 @@
 <script lang="ts">
 import type { vo } from "../../wailsjs/go/models";
 import { Const } from "../Const";
-import type { StackedBarGraphParam } from "../StackedBarGraphParam";
-import StackedBarGraph from "../other_component/StackedBarGraph.svelte";
+import type { StackedBarGraphParam } from "../other_component/stacked_bar/StackedBarGraphParam";
+import StackedBarGraph from "../other_component/stacked_bar/StackedBarGraph.svelte";
 import type { StatsCategory } from "../enums";
 import { values } from "../util";
 
 export let player: vo.Player;
 export let statsPattern: string;
 export let statsCatetory: StatsCategory;
-export let key: string;
+export let columnKey: string;
 export let customColor: vo.CustomColor;
 export let customDigit: vo.CustomDigit;
 
-function derive(
+function toParam(
   player: vo.Player,
   shipTypeGroup: { [key: string]: number },
-  customColor: vo.CustomColor
-): StackedBarGraphParam[] {
+  customColor: vo.CustomColor,
+  customDigit: vo.CustomDigit
+): StackedBarGraphParam {
+  const digit = customDigit[columnKey];
+
   if (shipTypeGroup === undefined) {
-    return [];
+    return { digit: digit, items: [] };
   }
 
-  return Object.keys(shipTypeGroup).map((key) => {
+  const items = Object.keys(shipTypeGroup).map((key) => {
+    const label = Const.SHIP_TYPE_LABELS[key] ?? "";
+    const color =
+      key === player.ship_info.type
+        ? customColor.ship_type.own[key]
+        : customColor.ship_type.other[key];
+    const value = shipTypeGroup[key];
+
     return {
-      label: Const.SHIP_TYPE_LABELS[key] ?? "",
-      color:
-        key === player.ship_info.type
-          ? customColor.ship_type.own[key]
-          : customColor.ship_type.other[key],
-      value: shipTypeGroup[key],
+      label: label,
+      color: color,
+      value: value,
     };
   });
+
+  return {
+    digit: digit,
+    items: items,
+  };
 }
 
-$: shipTypeGroup = values(player, statsPattern, statsCatetory, key) as {
+$: shipTypeGroup = values(player, statsPattern, statsCatetory, columnKey) as {
   [key: string]: number;
 };
 
-$: params = derive(player, shipTypeGroup, customColor);
-
-$: digit = customDigit[key];
+$: param = toParam(player, shipTypeGroup, customColor, customDigit);
 </script>
 
 <td class="td-graph">
-  <StackedBarGraph params="{params}" digit="{digit}" />
+  <StackedBarGraph param="{param}" />
 </td>

@@ -1,62 +1,59 @@
 <script lang="ts">
 import type { vo } from "../../wailsjs/go/models";
 import { Const } from "../Const";
-import type { StackedBarGraphParam } from "../StackedBarGraphParam";
-import StackedBarGraph from "../other_component/StackedBarGraph.svelte";
+import type { StackedBarGraphParam } from "../other_component/stacked_bar/StackedBarGraphParam";
+import StackedBarGraph from "../other_component/stacked_bar/StackedBarGraph.svelte";
 import type { StatsCategory } from "../enums";
-import { values } from "../util";
+import { toTierGroup, values } from "../util";
 
 export let player: vo.Player;
 export let statsPattern: string;
 export let statsCatetory: StatsCategory;
-export let key: string;
+export let columnKey: string;
 export let customColor: vo.CustomColor;
 export let customDigit: vo.CustomDigit;
 
-function toTierGroupKey(tier: number): string {
-  if (tier >= 1 && tier <= 4) {
-    return "low";
-  }
-  if (tier >= 5 && tier <= 7) {
-    return "middle";
-  }
-  if (tier >= 8) {
-    return "high";
-  }
-  return "";
-}
-
-function derive(
+function toParam(
   player: vo.Player,
   tierGroup: { [key: string]: number },
-  customColor: vo.CustomColor
-): StackedBarGraphParam[] {
+  customColor: vo.CustomColor,
+  customDigit: vo.CustomDigit
+): StackedBarGraphParam {
+  const digit = customDigit[columnKey];
+
   if (tierGroup === undefined) {
-    return [];
+    return { digit: digit, items: [] };
   }
 
-  return Object.keys(tierGroup).map((key) => {
-    const ownTierGroup = toTierGroupKey(player.ship_info.tier);
+  const items = Object.keys(tierGroup).map((key) => {
+    const ownTierGroup = toTierGroup(player.ship_info.tier);
+    const label = Const.TIER_GROUP_LABELS[key] ?? "";
+    const color =
+      key === ownTierGroup
+        ? customColor.tier.own[key]
+        : customColor.tier.other[key];
+    const value = tierGroup[key];
+
     return {
-      label: Const.TIER_GROUP_LABELS[key] ?? "",
-      color:
-        key === ownTierGroup
-          ? customColor.tier.own[key]
-          : customColor.tier.other[key],
-      value: tierGroup[key],
+      label: label,
+      color: color,
+      value: value,
     };
   });
+
+  return {
+    digit: digit,
+    items: items,
+  };
 }
 
-$: tierGroup = values(player, statsPattern, statsCatetory, key) as {
+$: tierGroup = values(player, statsPattern, statsCatetory, columnKey) as {
   [key: string]: number;
 };
 
-$: params = derive(player, tierGroup, customColor);
-
-$: digit = customDigit[key];
+$: param = toParam(player, tierGroup, customColor, customDigit);
 </script>
 
 <td class="td-graph">
-  <StackedBarGraph params="{params}" digit="{digit}" />
+  <StackedBarGraph param="{param}" />
 </td>

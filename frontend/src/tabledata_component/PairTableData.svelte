@@ -7,13 +7,13 @@ import { values } from "../util";
 export let player: vo.Player;
 export let statsPattern: string;
 export let statsCatetory: StatsCategory;
-export let key: string;
+export let columnKey: string;
 export let option: ComponentOption;
 export let customDigit: vo.CustomDigit;
 
 $: value1 = values(player, statsPattern, statsCatetory, option.key1);
 $: value2 = values(player, statsPattern, statsCatetory, option.key2);
-$: digit = customDigit[key];
+$: digit = customDigit[columnKey];
 </script>
 
 <td class="td-multiple">

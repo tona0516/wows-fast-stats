@@ -236,3 +236,16 @@ function mean(
 
   return values.reduce((a, b) => a + b, 0) / values.length;
 }
+
+export function toTierGroup(tier: number): string {
+  if (tier >= 1 && tier <= 4) {
+    return "low";
+  }
+  if (tier >= 5 && tier <= 7) {
+    return "middle";
+  }
+  if (tier >= 8) {
+    return "high";
+  }
+  return "";
+}

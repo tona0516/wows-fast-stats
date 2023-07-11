@@ -113,12 +113,6 @@ func (m *mockWargamingRepo) ShipsStats(accountID int) (vo.WGShipsStats, error) {
 	return args.Get(0).(vo.WGShipsStats), args.Error(1)
 }
 
-func (m *mockWargamingRepo) EncycInfo() (vo.WGEncycInfo, error) {
-	args := m.Called()
-	//nolint:forcetypeassert
-	return args.Get(0).(vo.WGEncycInfo), args.Error(1)
-}
-
 func (m *mockWargamingRepo) BattleArenas() (vo.WGBattleArenas, error) {
 	args := m.Called()
 	//nolint:forcetypeassert
@@ -129,6 +123,12 @@ func (m *mockWargamingRepo) BattleTypes() (vo.WGBattleTypes, error) {
 	args := m.Called()
 	//nolint:forcetypeassert
 	return args.Get(0).(vo.WGBattleTypes), args.Error(1)
+}
+
+func (m *mockWargamingRepo) Test(appid string) (bool, error) {
+	args := m.Called(appid)
+	//nolint:forcetypeassert
+	return args.Get(0).(bool), args.Error(1)
 }
 
 type mockNumbersRepo struct {

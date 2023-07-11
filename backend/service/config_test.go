@@ -12,6 +12,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 const (
@@ -35,8 +36,7 @@ func TestConfig_UpdateRequired_正常系(t *testing.T) {
 	mockConfigRepo.On("UpdateUser", config).Return(nil)
 	mockConfigRepo.On("User").Return(infra.DefaultUserConfig, nil)
 	mockWargamingRepo := &mockWargamingRepo{}
-	mockWargamingRepo.On("SetAppID", config.Appid).Return()
-	mockWargamingRepo.On("EncycInfo").Return(vo.WGEncycInfo{}, nil)
+	mockWargamingRepo.On("Test", mock.Anything).Return(true, nil)
 
 	// テスト実行
 	c := NewConfig(mockConfigRepo, mockWargamingRepo)
@@ -45,8 +45,7 @@ func TestConfig_UpdateRequired_正常系(t *testing.T) {
 	// アサーション
 	assert.Equal(t, vo.ValidatedResult{}, actual)
 	assert.NoError(t, err)
-	mockWargamingRepo.AssertCalled(t, "SetAppID", config.Appid)
-	mockWargamingRepo.AssertCalled(t, "EncycInfo")
+	mockWargamingRepo.AssertCalled(t, "Test", config.Appid)
 	mockConfigRepo.AssertCalled(t, "User")
 	mockConfigRepo.AssertCalled(t, "UpdateUser", config)
 }
@@ -65,8 +64,7 @@ func TestConfig_UpdateRequired_異常系_不正なインストールパス(t *te
 	// モックの設定
 	mockConfigRepo := &mockConfigRepo{}
 	mockWargamingRepo := &mockWargamingRepo{}
-	mockWargamingRepo.On("SetAppID", config.Appid).Return()
-	mockWargamingRepo.On("EncycInfo").Return(vo.WGEncycInfo{}, nil)
+	mockWargamingRepo.On("Test", mock.Anything).Return(true, nil)
 
 	// テスト実行
 	c := NewConfig(mockConfigRepo, mockWargamingRepo)
@@ -75,8 +73,7 @@ func TestConfig_UpdateRequired_異常系_不正なインストールパス(t *te
 	// アサーション
 	assert.Equal(t, vo.ValidatedResult{InstallPath: apperr.ErrInvalidInstallPath.Error()}, actual)
 	assert.NoError(t, err)
-	mockWargamingRepo.AssertCalled(t, "SetAppID", config.Appid)
-	mockWargamingRepo.AssertCalled(t, "EncycInfo")
+	mockWargamingRepo.AssertCalled(t, "Test", config.Appid)
 	mockConfigRepo.AssertNotCalled(t, "UpdateUser", config)
 }
 
@@ -92,8 +89,7 @@ func TestConfig_UpdateRequired_異常系_不正なAppID(t *testing.T) {
 	// モックの設定
 	mockConfigRepo := &mockConfigRepo{}
 	mockWargamingRepo := &mockWargamingRepo{}
-	mockWargamingRepo.On("SetAppID", config.Appid).Return()
-	mockWargamingRepo.On("EncycInfo").Return(vo.WGEncycInfo{}, errWargaming) // Note: WG APIでエラー
+	mockWargamingRepo.On("Test", mock.Anything).Return(false, errWargaming) // Note: WG APIでエラー
 
 	// テスト実行
 	c := NewConfig(mockConfigRepo, mockWargamingRepo)
@@ -102,8 +98,7 @@ func TestConfig_UpdateRequired_異常系_不正なAppID(t *testing.T) {
 	// アサーション
 	assert.Equal(t, vo.ValidatedResult{AppID: fmt.Sprintf("%s(%s)", apperr.ErrInvalidAppID, errWargaming)}, actual)
 	assert.NoError(t, err)
-	mockWargamingRepo.AssertCalled(t, "SetAppID", config.Appid)
-	mockWargamingRepo.AssertCalled(t, "EncycInfo")
+	mockWargamingRepo.AssertCalled(t, "Test", config.Appid)
 	mockConfigRepo.AssertNotCalled(t, "UpdateUser", config)
 }
 
@@ -125,8 +120,7 @@ func TestConfig_UpdateOptional_正常系(t *testing.T) {
 	mockConfigRepo.On("UpdateUser", actualWritten).Return(nil)
 	mockConfigRepo.On("User").Return(infra.DefaultUserConfig, nil)
 	mockWargamingRepo := &mockWargamingRepo{}
-	mockWargamingRepo.On("SetAppID", config.Appid).Return()
-	mockWargamingRepo.On("EncycInfo").Return(vo.WGEncycInfo{}, nil)
+	mockWargamingRepo.On("Test", mock.Anything).Return(true, nil)
 
 	// テスト実行
 	c := NewConfig(mockConfigRepo, mockWargamingRepo)
@@ -136,8 +130,7 @@ func TestConfig_UpdateOptional_正常系(t *testing.T) {
 	assert.NoError(t, err)
 	mockConfigRepo.AssertCalled(t, "User")
 	mockConfigRepo.AssertCalled(t, "UpdateUser", actualWritten)
-	mockWargamingRepo.AssertNotCalled(t, "SetAppID", config.Appid)
-	mockWargamingRepo.AssertNotCalled(t, "EncycInfo")
+	mockWargamingRepo.AssertNotCalled(t, "Test", config.Appid)
 }
 
 func createInputConfig() vo.UserConfig {

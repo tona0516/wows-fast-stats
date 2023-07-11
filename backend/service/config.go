@@ -99,8 +99,7 @@ func (c *Config) validateRequired(
 		result.InstallPath = apperr.ErrInvalidInstallPath.Error()
 	}
 
-	c.wargamingRepo.SetAppID(appid)
-	if _, err := c.wargamingRepo.EncycInfo(); err != nil {
+	if ok, err := c.wargamingRepo.Test(appid); !ok {
 		result.AppID = fmt.Sprintf("%s(%s)", apperr.ErrInvalidAppID, err.Error())
 	}
 

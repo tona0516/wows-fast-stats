@@ -7,14 +7,14 @@ import { colors, values } from "../util";
 export let player: vo.Player;
 export let statsPattern: string;
 export let statsCatetory: StatsCategory;
-export let key: string;
+export let columnKey: string;
 export let option: ComponentOption;
 export let customColor: vo.CustomColor;
 export let customDigit: vo.CustomDigit;
 
-$: color = colors(key, value, player, statsCatetory, customColor.skill);
-$: value = values(player, statsPattern, statsCatetory, key);
-$: digit = customDigit[key];
+$: color = colors(columnKey, value, player, statsCatetory, customColor.skill);
+$: value = values(player, statsPattern, statsCatetory, columnKey);
+$: digit = customDigit[columnKey];
 </script>
 
 <td class="td-number" style="color: {color}">

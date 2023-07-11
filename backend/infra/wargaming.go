@@ -174,6 +174,18 @@ func (w *Wargaming) BattleTypes() (vo.WGBattleTypes, error) {
 	)
 }
 
+func (w *Wargaming) Test(appid string) (bool, error) {
+	_, err := request(
+		w.encycInfoClient,
+		map[string]string{
+			"application_id": appid,
+			"fields":         vo.WGEncyclopediaInfoData{}.Field(),
+		},
+	)
+
+	return err == nil, err
+}
+
 func request[T vo.WGResponse](
 	client APIClientInterface[T],
 	query map[string]string,
