@@ -27,26 +27,23 @@ func TestWatcher_Start_戦闘開始(t *testing.T) {
 	mockTaiRepo := &mockTempArenaInfoRepo{}
 	mockTaiRepo.On("Get", config.InstallPath).Return(vo.TempArenaInfo{}, nil)
 
-	// イベントが発行されたかどうかを検証するための変数
 	var events []string
-
-	// イベントを発行する関数
 	emitFunc := func(ctx context.Context, eventName string, optionalData ...interface{}) {
 		events = append(events, eventName)
 	}
 
-	watcher := NewWatcher(mockConfigRepo, mockTaiRepo, emitFunc)
+	interval := 10 * time.Millisecond
 
-	// Startメソッドをゴルーチンで非同期に実行する
+	watcher := NewWatcher(interval, mockConfigRepo, mockTaiRepo, emitFunc)
 	go watcher.Start(ctx, ctx)
 
-	// 2秒待ってEventStartが発行されたことを検証する
-	time.Sleep(2 * time.Second)
+	// 20ms待ってEventStartが発行されたことを検証する
+	time.Sleep(20 * time.Millisecond)
 	assert.Contains(t, events, EventStart)
 
-	// 2秒待ってEventStartが発行されなかったことを検証する
+	// さらに100ms待ってEventStartが発行されなかったことを検証する
 	events = nil
-	time.Sleep(2 * time.Second)
+	time.Sleep(100 * time.Millisecond)
 	assert.Empty(t, events)
 }
 
@@ -68,26 +65,23 @@ func TestWatcher_Start_戦闘終了(t *testing.T) {
 
 	mockTaiRepo.On("Get", config.InstallPath).Return(vo.TempArenaInfo{}, errors.New("not exists"))
 
-	// イベントが発行されたかどうかを検証するための変数
 	var events []string
-
-	// イベントを発行する関数
 	emitFunc := func(ctx context.Context, eventName string, optionalData ...interface{}) {
 		events = append(events, eventName)
 	}
 
-	watcher := NewWatcher(mockConfigRepo, mockTaiRepo, emitFunc)
+	interval := 10 * time.Millisecond
 
-	// Startメソッドをゴルーチンで非同期に実行する
+	watcher := NewWatcher(interval, mockConfigRepo, mockTaiRepo, emitFunc)
 	go watcher.Start(ctx, ctx)
 
-	// 2秒待ってEventEndが発行されたことを検証する
-	time.Sleep(2 * time.Second)
+	// 20ms待ってEventEndが発行されたことを検証する
+	time.Sleep(100 * time.Millisecond)
 	assert.Contains(t, events, EventEnd)
 
-	// 2秒待ってEventEndが発行されなかったことを検証する
+	// さらに100秒待ってEventEndが発行されなかったことを検証する
 	events = nil
-	time.Sleep(2 * time.Second)
+	time.Sleep(20 * time.Millisecond)
 	assert.Contains(t, events, EventEnd)
 }
 
@@ -108,21 +102,19 @@ func TestWatcher_Start_キャンセル(t *testing.T) {
 	mockTaiRepo := &mockTempArenaInfoRepo{}
 	mockTaiRepo.On("Get", config.InstallPath).Return(vo.TempArenaInfo{}, nil)
 
-	// イベントが発行されたかどうかを検証するための変数
 	var events []string
-
-	// イベントを発行する関数
 	emitFunc := func(ctx context.Context, eventName string, optionalData ...interface{}) {
 		events = append(events, eventName)
 	}
+	interval := 10 * time.Millisecond
 
-	watcher := NewWatcher(mockConfigRepo, mockTaiRepo, emitFunc)
+	watcher := NewWatcher(interval, mockConfigRepo, mockTaiRepo, emitFunc)
 
 	// Startメソッドをゴルーチンで非同期に実行する
 	go watcher.Start(ctx, ctx)
 
 	// キャンセルしてイベントが発行されなかったことを検証する
 	cancel()
-	time.Sleep(2 * time.Second)
+	time.Sleep(100 * time.Millisecond)
 	assert.Empty(t, events)
 }

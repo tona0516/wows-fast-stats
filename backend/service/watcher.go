@@ -15,17 +15,20 @@ const (
 )
 
 type Watcher struct {
+	interval       time.Duration
 	configRepo     infra.ConfigInterface
 	taiRepo        infra.TempArenaInfoInterface
 	eventsEmitFunc func(ctx context.Context, eventName string, optionalData ...interface{})
 }
 
 func NewWatcher(
+	interval time.Duration,
 	configRepo infra.ConfigInterface,
 	taiRepo infra.TempArenaInfoInterface,
 	eventsEmitFunc func(ctx context.Context, eventName string, optionalData ...interface{}),
 ) *Watcher {
 	return &Watcher{
+		interval:       interval,
 		configRepo:     configRepo,
 		taiRepo:        taiRepo,
 		eventsEmitFunc: eventsEmitFunc,
@@ -40,7 +43,7 @@ func (w *Watcher) Start(appCtx context.Context, ctx context.Context) {
 		case <-ctx.Done():
 			return
 		default:
-			time.Sleep(1 * time.Second)
+			time.Sleep(w.interval)
 
 			userConfig, err := w.configRepo.User()
 			if err != nil {

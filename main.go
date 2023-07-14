@@ -4,6 +4,7 @@ import (
 	"embed"
 	"fmt"
 	"os"
+	"time"
 	"wfs/backend/infra"
 	"wfs/backend/service"
 	"wfs/backend/vo"
@@ -83,10 +84,11 @@ func initApp() *App {
 
 	// service
 	var parallels uint = 5
+	interval := 1 * time.Second
 	configService := service.NewConfig(configRepo, wargamingRepo)
 	screenshotService := service.NewScreenshot(screenshotRepo, runtime.SaveFileDialog)
 	battleService := service.NewBattle(parallels, wargamingRepo, tempArenaInfoRepo, numbersRepo, unregisteredRepo)
-	watcherService := service.NewWatcher(configRepo, tempArenaInfoRepo, runtime.EventsEmit)
+	watcherService := service.NewWatcher(interval, configRepo, tempArenaInfoRepo, runtime.EventsEmit)
 	reportService := service.NewReport(discordRepo, configRepo, tempArenaInfoRepo)
 	updaterService := service.NewUpdater(version, githubRepo)
 
