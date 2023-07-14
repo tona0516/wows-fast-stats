@@ -17,64 +17,50 @@ type TestData struct {
 func TestAPIClient_GetRequest_正常系_クエリなし(t *testing.T) {
 	t.Parallel()
 
-	// テスト用のデータとレスポンスを準備
-	testData := TestData{Name: "test"}
-	//nolint:errchkjson
-	body, _ := json.Marshal(testData)
-	expected := APIResponse[TestData]{
-		StatusCode: 200,
-		Body:       testData,
-		BodyString: string(body),
-	}
+	expected := normalResponse()
 
-	// テスト用の HTTP サーバーを作成し、モックのレスポンスを返すように設定
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		_, _ = w.Write(body)
+		w.WriteHeader(expected.StatusCode)
+		_, _ = w.Write([]byte(expected.BodyString))
 	}))
 	defer server.Close()
 
-	// APIClient のインスタンスを作成
 	client := NewAPIClient[TestData](server.URL, 0)
-
-	// GetRequest を呼び出してレスポンスを取得
 	actual, err := client.GetRequest(map[string]string{})
-	assert.NoError(t, err)
+
 	assert.Equal(t, expected, actual)
+	assert.NoError(t, err)
 }
 
 func TestAPIClient_GetRequest_正常系_最終リトライで成功(t *testing.T) {
 	t.Parallel()
 
-	// テスト用のデータとレスポンスを準備
-	testData := TestData{Name: "test"}
-	//nolint:errchkjson
-	body, _ := json.Marshal(testData)
+	expected := normalResponse()
 
-	// テスト用の HTTP サーバーを作成し、モックのレスポンスを返すように設定
 	retry := 1
 	maxCalls := retry + 1
 	var calls int
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		calls++
+
 		if calls < maxCalls {
 			//nolint:forcetypeassert
 			c, _, _ := w.(http.Hijacker).Hijack()
 			defer c.Close()
-		} else {
-			w.Header().Set("Content-Type", "application/json")
-			w.WriteHeader(http.StatusOK)
-			_, _ = w.Write(body)
+			return
 		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(expected.StatusCode)
+		_, _ = w.Write([]byte(expected.BodyString))
 	}))
 	defer server.Close()
 
-	// APIClient のインスタンスを作成
 	client := NewAPIClient[TestData](server.URL, uint64(retry))
+	actual, err := client.GetRequest(map[string]string{})
 
-	// GetRequest を呼び出してレスポンスを取得
-	_, err := client.GetRequest(map[string]string{})
+	assert.Equal(t, expected, actual)
 	assert.NoError(t, err)
 	assert.Equal(t, maxCalls, calls)
 }
@@ -82,65 +68,45 @@ func TestAPIClient_GetRequest_正常系_最終リトライで成功(t *testing.T
 func TestAPIClient_GetRequest_異常系_不正なレスポンス(t *testing.T) {
 	t.Parallel()
 
-	// テスト用の無効な JSON データ
-	invalidJSON := []byte("invalid-json")
-	expected := APIResponse[TestData]{
-		StatusCode: 200,
-		Body:       TestData{},
-		BodyString: string(invalidJSON),
+	responses := []struct {
+		body string
+	}{
+		{body: "<html></html>"},
+		{body: `{"name":}`},
 	}
 
-	// テスト用の HTTP サーバーを作成し、無効な JSON レスポンスを返すように設定
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		_, _ = w.Write(invalidJSON)
-	}))
-	defer server.Close()
+	for _, res := range responses {
+		res := res
 
-	// APIClient のインスタンスを作成
-	client := NewAPIClient[TestData](server.URL, 0)
+		t.Run("", func(t *testing.T) {
+			t.Parallel()
 
-	// GetRequest を呼び出してエラーを確認
-	actual, err := client.GetRequest(map[string]string{})
-	assert.Error(t, err)
-	assert.Equal(t, expected, actual)
-}
+			expected := APIResponse[TestData]{
+				StatusCode: http.StatusOK,
+				Body:       TestData{},
+				BodyString: res.body,
+			}
 
-func TestAPIClient_GetRequest_異常系_Unmarshal失敗(t *testing.T) {
-	t.Parallel()
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(expected.StatusCode)
+				_, _ = w.Write([]byte(expected.BodyString))
+			}))
+			defer server.Close()
 
-	// テスト用の無効な JSON データ
-	invalidJSON := []byte(`{"name":}`)
-	expected := APIResponse[TestData]{
-		StatusCode: 200,
-		Body:       TestData{},
-		BodyString: string(invalidJSON),
+			client := NewAPIClient[TestData](server.URL, 0)
+			actual, err := client.GetRequest(map[string]string{})
+
+			assert.Error(t, err)
+			assert.Equal(t, expected, actual)
+		})
 	}
-
-	// テスト用の HTTP サーバーを作成し、無効な JSON レスポンスを返すように設定
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		_, _ = w.Write(invalidJSON)
-	}))
-	defer server.Close()
-
-	// APIClient のインスタンスを作成
-	client := NewAPIClient[TestData](server.URL, 0)
-
-	// GetRequest を呼び出してエラーを確認
-	actual, err := client.GetRequest(map[string]string{})
-	assert.Error(t, err)
-	assert.Equal(t, expected, actual)
 }
 
 func TestAPIClient_GetRequest_異常系_すべてのリトライが失敗(t *testing.T) {
 	t.Parallel()
 
-	// テスト用の HTTP サーバーを作成し、モックのレスポンスを返すように設定
 	retry := 1
-	maxCalls := retry + 1
 	var calls int
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		//nolint:forcetypeassert
@@ -150,11 +116,21 @@ func TestAPIClient_GetRequest_異常系_すべてのリトライが失敗(t *tes
 	}))
 	defer server.Close()
 
-	// APIClient のインスタンスを作成
 	client := NewAPIClient[TestData](server.URL, uint64(retry))
-
-	// GetRequest を呼び出してレスポンスを取得
 	_, err := client.GetRequest(map[string]string{})
+
 	assert.Error(t, err)
-	assert.Equal(t, maxCalls, calls)
+	assert.Equal(t, retry+1, calls)
+}
+
+func normalResponse() APIResponse[TestData] {
+	testData := TestData{Name: "test"}
+
+	//nolint:errchkjson
+	body, _ := json.Marshal(testData)
+	return APIResponse[TestData]{
+		StatusCode: http.StatusOK,
+		Body:       testData,
+		BodyString: string(body),
+	}
 }
