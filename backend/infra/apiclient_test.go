@@ -36,7 +36,7 @@ func TestAPIClient_GetRequest_正常系_クエリなし(t *testing.T) {
 	defer server.Close()
 
 	// APIClient のインスタンスを作成
-	client := NewAPIClient[TestData](server.URL)
+	client := NewAPIClient[TestData](server.URL, 0)
 
 	// GetRequest を呼び出してレスポンスを取得
 	actual, err := client.GetRequest(map[string]string{})
@@ -53,10 +53,12 @@ func TestAPIClient_GetRequest_正常系_最終リトライで成功(t *testing.T
 	body, _ := json.Marshal(testData)
 
 	// テスト用の HTTP サーバーを作成し、モックのレスポンスを返すように設定
+	retry := 1
+	maxCalls := retry + 1
 	var calls int
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		calls++
-		if calls < 4 {
+		if calls < maxCalls {
 			//nolint:forcetypeassert
 			c, _, _ := w.(http.Hijacker).Hijack()
 			defer c.Close()
@@ -69,12 +71,12 @@ func TestAPIClient_GetRequest_正常系_最終リトライで成功(t *testing.T
 	defer server.Close()
 
 	// APIClient のインスタンスを作成
-	client := NewAPIClient[TestData](server.URL)
+	client := NewAPIClient[TestData](server.URL, uint64(retry))
 
 	// GetRequest を呼び出してレスポンスを取得
 	_, err := client.GetRequest(map[string]string{})
 	assert.NoError(t, err)
-	assert.Equal(t, 4, calls)
+	assert.Equal(t, maxCalls, calls)
 }
 
 func TestAPIClient_GetRequest_異常系_不正なレスポンス(t *testing.T) {
@@ -97,7 +99,7 @@ func TestAPIClient_GetRequest_異常系_不正なレスポンス(t *testing.T) {
 	defer server.Close()
 
 	// APIClient のインスタンスを作成
-	client := NewAPIClient[TestData](server.URL)
+	client := NewAPIClient[TestData](server.URL, 0)
 
 	// GetRequest を呼び出してエラーを確認
 	actual, err := client.GetRequest(map[string]string{})
@@ -125,7 +127,7 @@ func TestAPIClient_GetRequest_異常系_Unmarshal失敗(t *testing.T) {
 	defer server.Close()
 
 	// APIClient のインスタンスを作成
-	client := NewAPIClient[TestData](server.URL)
+	client := NewAPIClient[TestData](server.URL, 0)
 
 	// GetRequest を呼び出してエラーを確認
 	actual, err := client.GetRequest(map[string]string{})
@@ -133,10 +135,12 @@ func TestAPIClient_GetRequest_異常系_Unmarshal失敗(t *testing.T) {
 	assert.Equal(t, expected, actual)
 }
 
-func TestAPIClient_GetRequest_異常系_最終リトライで失敗(t *testing.T) {
+func TestAPIClient_GetRequest_異常系_すべてのリトライが失敗(t *testing.T) {
 	t.Parallel()
 
 	// テスト用の HTTP サーバーを作成し、モックのレスポンスを返すように設定
+	retry := 1
+	maxCalls := retry + 1
 	var calls int
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		//nolint:forcetypeassert
@@ -147,10 +151,10 @@ func TestAPIClient_GetRequest_異常系_最終リトライで失敗(t *testing.T
 	defer server.Close()
 
 	// APIClient のインスタンスを作成
-	client := NewAPIClient[TestData](server.URL)
+	client := NewAPIClient[TestData](server.URL, uint64(retry))
 
 	// GetRequest を呼び出してレスポンスを取得
 	_, err := client.GetRequest(map[string]string{})
 	assert.Error(t, err)
-	assert.Equal(t, 4, calls)
+	assert.Equal(t, maxCalls, calls)
 }

@@ -7,19 +7,22 @@ import (
 )
 
 type Github struct {
+	config              vo.RequestConfig
 	latestReleaseClient APIClientInterface[vo.GHLatestRelease]
 }
 
-func NewGithub(config vo.GHConfig) *Github {
+func NewGithub(config vo.RequestConfig) *Github {
 	return &Github{
+		config: config,
 		latestReleaseClient: NewAPIClient[vo.GHLatestRelease](
-			config.BaseURL + "/repos/tona0516/wows-fast-stats/releases/latest",
+			config.URL+"/repos/tona0516/wows-fast-stats/releases/latest",
+			config.Retry,
 		),
 	}
 }
 
 func (g *Github) LatestRelease() (vo.GHLatestRelease, error) {
-	b := backoff.WithMaxRetries(backoff.NewExponentialBackOff(), 3)
+	b := backoff.WithMaxRetries(backoff.NewExponentialBackOff(), g.config.Retry)
 	operation := func() (APIResponse[vo.GHLatestRelease], error) {
 		return g.latestReleaseClient.GetRequest(make(map[string]string))
 	}

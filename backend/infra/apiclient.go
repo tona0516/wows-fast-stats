@@ -16,7 +16,8 @@ import (
 )
 
 type APIClient[T any] struct {
-	baseURL string
+	BaseURL string
+	Retry   uint64
 }
 
 type APIResponse[T any] struct {
@@ -31,17 +32,18 @@ type Form struct {
 	isFile  bool
 }
 
-func NewAPIClient[T any](
-	baseURL string,
-) *APIClient[T] {
-	return &APIClient[T]{baseURL: baseURL}
+func NewAPIClient[T any](baseURL string, retry uint64) *APIClient[T] {
+	return &APIClient[T]{
+		BaseURL: baseURL,
+		Retry:   retry,
+	}
 }
 
 func (c *APIClient[T]) GetRequest(query map[string]string) (APIResponse[T], error) {
 	var response APIResponse[T]
 
 	// build URL
-	u, err := url.Parse(c.baseURL)
+	u, err := url.Parse(c.BaseURL)
 	if err != nil {
 		return response, apperr.New(apperr.HTTPRequest, err)
 	}
@@ -52,7 +54,7 @@ func (c *APIClient[T]) GetRequest(query map[string]string) (APIResponse[T], erro
 	u.RawQuery = q.Encode()
 
 	// request
-	b := backoff.WithMaxRetries(backoff.NewExponentialBackOff(), 3)
+	b := backoff.WithMaxRetries(backoff.NewExponentialBackOff(), c.Retry)
 	operation := func() (*http.Response, error) {
 		return http.Get(u.String())
 	}
@@ -87,7 +89,7 @@ func (c *APIClient[T]) PostMultipartFormData(forms []Form) (APIResponse[T], erro
 	var response APIResponse[T]
 
 	// build URL
-	u, err := url.Parse(c.baseURL)
+	u, err := url.Parse(c.BaseURL)
 	if err != nil {
 		return response, apperr.New(apperr.HTTPRequest, err)
 	}
@@ -124,7 +126,7 @@ func (c *APIClient[T]) PostMultipartFormData(forms []Form) (APIResponse[T], erro
 	mw.Close()
 
 	// request
-	b := backoff.WithMaxRetries(backoff.NewExponentialBackOff(), 3)
+	b := backoff.WithMaxRetries(backoff.NewExponentialBackOff(), c.Retry)
 	operation := func() (*http.Response, error) {
 		return http.Post(u.String(), mw.FormDataContentType(), requestBody)
 	}

@@ -7,6 +7,7 @@ import (
 	"os"
 	"strconv"
 	"wfs/backend/apperr"
+	"wfs/backend/vo"
 
 	"github.com/pkg/errors"
 )
@@ -19,9 +20,12 @@ type DisCordRequestBody struct {
 	Content string `json:"content"`
 }
 
-func NewDiscord(webhookURL string) *Discord {
+func NewDiscord(config vo.RequestConfig) *Discord {
 	return &Discord{
-		apiClient: NewAPIClient[any](webhookURL),
+		apiClient: NewAPIClient[any](
+			config.URL,
+			config.Retry,
+		),
 	}
 }
 

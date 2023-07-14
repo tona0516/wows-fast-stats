@@ -18,19 +18,17 @@ var (
 )
 
 type Numbers struct {
-	URL string
+	config vo.RequestConfig
 }
 
-func NewNumbers(url string) *Numbers {
-	return &Numbers{
-		URL: url,
-	}
+func NewNumbers(config vo.RequestConfig) *Numbers {
+	return &Numbers{config: config}
 }
 
 func (n *Numbers) ExpectedStats() (vo.NSExpectedStats, error) {
 	var result vo.NSExpectedStats
 
-	b := backoff.WithMaxRetries(backoff.NewExponentialBackOff(), 3)
+	b := backoff.WithMaxRetries(backoff.NewExponentialBackOff(), n.config.Retry)
 	body, err := backoff.RetryWithData(n.fetch, b)
 	if err != nil {
 		return result, err
@@ -45,7 +43,7 @@ func (n *Numbers) ExpectedStats() (vo.NSExpectedStats, error) {
 }
 
 func (n *Numbers) fetch() ([]byte, error) {
-	res, err := http.Get(n.URL)
+	res, err := http.Get(n.config.URL)
 	if err != nil {
 		return []byte{}, apperr.New(apperr.HTTPRequest, err)
 	}

@@ -16,7 +16,7 @@ func TestGithub_LatestRelease(t *testing.T) {
 		TagName: "1.0.0",
 	}
 
-	github := NewGithub(vo.GHConfig{})
+	github := NewGithub(vo.RequestConfig{})
 	mockAPIClient := &mockAPIClient[vo.GHLatestRelease]{}
 	mockAPIClient.On("GetRequest", mock.Anything).Return(APIResponse[vo.GHLatestRelease]{Body: expected}, nil)
 	github.latestReleaseClient = mockAPIClient

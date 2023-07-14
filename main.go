@@ -58,15 +58,28 @@ func initApp() *App {
 	version := vo.Version{Semver: semver, Revision: revision}
 
 	// infra
+	var maxRetry uint64 = 2
 	logger := infra.NewLogger(vo.Env{Str: env}, version)
-	discordRepo := infra.NewDiscord(discordWebhookURL)
-	wargamingRepo := infra.NewWargaming(vo.WGConfig{BaseURL: "https://api.worldofwarships.asia"})
-	numbersRepo := infra.NewNumbers("https://api.wows-numbers.com/personal/rating/expected/json/")
+	discordRepo := infra.NewDiscord(vo.RequestConfig{
+		URL:   discordWebhookURL,
+		Retry: maxRetry,
+	})
+	wargamingRepo := infra.NewWargaming(vo.RequestConfig{
+		URL:   "https://api.worldofwarships.asia",
+		Retry: maxRetry,
+	})
+	numbersRepo := infra.NewNumbers(vo.RequestConfig{
+		URL:   "https://api.wows-numbers.com/personal/rating/expected/json/",
+		Retry: maxRetry,
+	})
 	tempArenaInfoRepo := infra.NewTempArenaInfo()
 	configRepo := infra.NewConfig()
 	screenshotRepo := infra.NewScreenshot()
 	unregisteredRepo := infra.NewUnregistered()
-	githubRepo := infra.NewGithub(vo.GHConfig{BaseURL: "https://api.github.com"})
+	githubRepo := infra.NewGithub(vo.RequestConfig{
+		URL:   "https://api.github.com",
+		Retry: maxRetry,
+	})
 
 	// service
 	var parallels uint = 5

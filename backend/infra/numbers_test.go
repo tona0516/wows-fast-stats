@@ -30,7 +30,7 @@ func TestNumbers_ExpectedStats(t *testing.T) {
 	defer server.Close()
 
 	// テスト
-	numbers := NewNumbers(server.URL)
+	numbers := NewNumbers(vo.RequestConfig{URL: server.URL})
 	actual, err := numbers.ExpectedStats()
 	assert.NoError(t, err)
 
