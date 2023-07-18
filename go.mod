@@ -4,7 +4,6 @@ go 1.20
 
 require (
 	github.com/cenkalti/backoff/v4 v4.2.1
-	github.com/deckarep/golang-set/v2 v2.3.0
 	github.com/mitchellh/go-ps v1.0.0
 	github.com/pkg/errors v0.9.1
 	github.com/rs/zerolog v1.29.1

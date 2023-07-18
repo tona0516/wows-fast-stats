@@ -11,7 +11,6 @@ import (
 	"wfs/backend/domain"
 	"wfs/backend/infra"
 
-	mapset "github.com/deckarep/golang-set/v2"
 	"github.com/pkg/errors"
 	"github.com/skratchdot/open-golang/open"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
@@ -31,7 +30,7 @@ type App struct {
 	reportService     service.Report
 	updaterService    service.Updater
 	logger            repository.LoggerInterface
-	excludePlayer     mapset.Set[int]
+	excludePlayer     map[int]bool
 }
 
 func NewApp(
@@ -55,7 +54,7 @@ func NewApp(
 		reportService:     reportService,
 		updaterService:    updaterService,
 		logger:            logger,
-		excludePlayer:     mapset.NewSet[int](),
+		excludePlayer:     map[int]bool{},
 	}
 }
 
@@ -327,15 +326,20 @@ func (a *App) OpenDirectory(path string) error {
 }
 
 func (a *App) ExcludePlayerIDs() []int {
-	return a.excludePlayer.ToSlice()
+	ids := make([]int, 0, len(a.excludePlayer))
+	for id := range a.excludePlayer {
+		ids = append(ids, id)
+	}
+
+	return ids
 }
 
 func (a *App) AddExcludePlayerID(playerID int) {
-	a.excludePlayer.Add(playerID)
+	a.excludePlayer[playerID] = true
 }
 
 func (a *App) RemoveExcludePlayerID(playerID int) {
-	a.excludePlayer.Remove(playerID)
+	delete(a.excludePlayer, playerID)
 }
 
 func (a *App) AlertPlayers() ([]domain.AlertPlayer, error) {
