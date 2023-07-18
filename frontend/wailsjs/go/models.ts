@@ -1,4 +1,4 @@
-export namespace vo {
+export namespace domain {
 	
 	export class AlertPlayer {
 	    account_id: number;
@@ -799,34 +799,6 @@ export namespace vo {
 		    return a;
 		}
 	}
-	export class ValidatedResult {
-	    install_path: string;
-	    appid: string;
-	
-	    static createFrom(source: any = {}) {
-	        return new ValidatedResult(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.install_path = source["install_path"];
-	        this.appid = source["appid"];
-	    }
-	}
-	export class Version {
-	    semver: string;
-	    revision: string;
-	
-	    static createFrom(source: any = {}) {
-	        return new Version(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.semver = source["semver"];
-	        this.revision = source["revision"];
-	    }
-	}
 	export class WGError {
 	    code: number;
 	    message: string;
@@ -894,6 +866,39 @@ export namespace vo {
 		}
 	}
 	
+
+}
+
+export namespace vo {
+	
+	export class ValidatedResult {
+	    install_path: string;
+	    appid: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new ValidatedResult(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.install_path = source["install_path"];
+	        this.appid = source["appid"];
+	    }
+	}
+	export class Version {
+	    semver: string;
+	    revision: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new Version(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.semver = source["semver"];
+	        this.revision = source["revision"];
+	    }
+	}
 
 }
 

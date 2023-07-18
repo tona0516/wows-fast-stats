@@ -1,35 +1,35 @@
 <script lang="ts">
-import clone from "clone";
-import { createEventDispatcher } from "svelte";
-import type { vo } from "../../wailsjs/go/models";
-import { BrowserOpenURL } from "../../wailsjs/runtime/runtime";
-import { SkillLevelConverter } from "../RankConverter";
-import { clanURL, playerURL, values } from "../util";
-import { StatsCategory } from "../enums";
-import { storedUserConfig } from "../stores";
+  import clone from "clone";
+  import { createEventDispatcher } from "svelte";
+  import type { domain } from "../../wailsjs/go/models";
+  import { BrowserOpenURL } from "../../wailsjs/runtime/runtime";
+  import { SkillLevelConverter } from "../RankConverter";
+  import { clanURL, playerURL, values } from "../util";
+  import { StatsCategory } from "../enums";
+  import { storedUserConfig } from "../stores";
 
-export let player: vo.Player;
-export let userConfig: vo.UserConfig;
-export let statsPattern: string;
-export let alertPlayers: vo.AlertPlayer[];
+  export let player: domain.Player;
+  export let userConfig: domain.UserConfig;
+  export let statsPattern: string;
+  export let alertPlayers: domain.AlertPlayer[];
 
-const dispatch = createEventDispatcher();
+  const dispatch = createEventDispatcher();
 
-$: alertPlayer = alertPlayers.find(
-  (it) => it.account_id === player.player_info.id
-);
-$: pr = values(player, statsPattern, StatsCategory.Ship, "pr");
-$: color = SkillLevelConverter.fromPR(
-  pr,
-  userConfig.custom_color.skill
-).toBgColorCode();
-$: playerLabel = isBelongToClan()
-  ? `[${player.player_info.clan.tag}] ${player.player_info.name}`
-  : player.player_info.name;
+  $: alertPlayer = alertPlayers.find(
+    (it) => it.account_id === player.player_info.id
+  );
+  $: pr = values(player, statsPattern, StatsCategory.Ship, "pr");
+  $: color = SkillLevelConverter.fromPR(
+    pr,
+    userConfig.custom_color.skill
+  ).toBgColorCode();
+  $: playerLabel = isBelongToClan()
+    ? `[${player.player_info.clan.tag}] ${player.player_info.name}`
+    : player.player_info.name;
 
-function isBelongToClan(): boolean {
-  return player.player_info.clan.id !== 0;
-}
+  function isBelongToClan(): boolean {
+    return player.player_info.clan.id !== 0;
+  }
 </script>
 
 <td class="td-string omit" style="background-color: {color}">
@@ -37,7 +37,7 @@ function isBelongToClan(): boolean {
     {playerLabel}
   {:else}
     {#if alertPlayer}
-      <i class="bi {alertPlayer.pattern}"></i>
+      <i class="bi {alertPlayer.pattern}" />
     {/if}
 
     <!-- svelte-ignore a11y-invalid-attribute -->
@@ -61,7 +61,7 @@ function isBelongToClan(): boolean {
           <a
             class="dropdown-item"
             href="#"
-            on:click="{() => BrowserOpenURL(clanURL(player))}"
+            on:click={() => BrowserOpenURL(clanURL(player))}
             >クラン詳細(WoWS Stats & Numbers)</a
           >
         </li>
@@ -71,7 +71,7 @@ function isBelongToClan(): boolean {
         <a
           class="dropdown-item"
           href="#"
-          on:click="{() => BrowserOpenURL(playerURL(player))}"
+          on:click={() => BrowserOpenURL(playerURL(player))}
           >プレイヤー詳細(WoWS Stats & Numbers)</a
         >
       </li>
@@ -81,24 +81,24 @@ function isBelongToClan(): boolean {
           <a
             class="dropdown-item"
             href="#"
-            on:click="{() =>
-              dispatch('RemoveAlertPlayer', { target: clone(alertPlayer) })}"
+            on:click={() =>
+              dispatch("RemoveAlertPlayer", { target: clone(alertPlayer) })}
             >プレイヤーリストから削除する</a
           >
         {:else}
           <a
             class="dropdown-item"
             href="#"
-            on:click="{() => {
-              dispatch('UpdateAlertPlayer', {
+            on:click={() => {
+              dispatch("UpdateAlertPlayer", {
                 target: {
                   account_id: player.player_info.id,
                   name: player.player_info.name,
-                  pattern: 'bi-check-circle-fill',
-                  message: '',
+                  pattern: "bi-check-circle-fill",
+                  message: "",
                 },
               });
-            }}">プレイヤーリストへ追加する</a
+            }}>プレイヤーリストへ追加する</a
           >
         {/if}
       </li>

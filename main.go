@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"os"
 	"time"
+	"wfs/backend/application/service"
+	"wfs/backend/application/vo"
 	"wfs/backend/infra"
-	"wfs/backend/service"
-	"wfs/backend/vo"
 
 	"github.com/mitchellh/go-ps"
 	"github.com/wailsapp/wails/v2"
@@ -61,23 +61,21 @@ func initApp() *App {
 	// infra
 	var maxRetry uint64 = 2
 	logger := infra.NewLogger(vo.Env{Str: env}, version)
-	discordRepo := infra.NewDiscord(vo.RequestConfig{
+	discord := infra.NewDiscord(infra.RequestConfig{
 		URL:   discordWebhookURL,
 		Retry: maxRetry,
 	})
-	wargamingRepo := infra.NewWargaming(vo.RequestConfig{
+	wargaming := infra.NewWargaming(infra.RequestConfig{
 		URL:   "https://api.worldofwarships.asia",
 		Retry: maxRetry,
 	})
-	numbersRepo := infra.NewNumbers(vo.RequestConfig{
+	numbers := infra.NewNumbers(infra.RequestConfig{
 		URL:   "https://api.wows-numbers.com/personal/rating/expected/json/",
 		Retry: maxRetry,
 	})
-	tempArenaInfoRepo := infra.NewTempArenaInfo()
-	configRepo := infra.NewConfig()
-	screenshotRepo := infra.NewScreenshot()
-	unregisteredRepo := infra.NewUnregistered()
-	githubRepo := infra.NewGithub(vo.RequestConfig{
+	localFile := infra.NewLocalFile()
+	unregistered := infra.NewUnregistered()
+	github := infra.NewGithub(infra.RequestConfig{
 		URL:   "https://api.github.com",
 		Retry: maxRetry,
 	})
@@ -85,12 +83,12 @@ func initApp() *App {
 	// service
 	var parallels uint = 5
 	interval := 1 * time.Second
-	configService := service.NewConfig(configRepo, wargamingRepo)
-	screenshotService := service.NewScreenshot(screenshotRepo, runtime.SaveFileDialog)
-	battleService := service.NewBattle(parallels, wargamingRepo, tempArenaInfoRepo, numbersRepo, unregisteredRepo)
-	watcherService := service.NewWatcher(interval, configRepo, tempArenaInfoRepo, runtime.EventsEmit)
-	reportService := service.NewReport(discordRepo, configRepo, tempArenaInfoRepo)
-	updaterService := service.NewUpdater(version, githubRepo)
+	configService := service.NewConfig(localFile, wargaming)
+	screenshotService := service.NewScreenshot(localFile, runtime.SaveFileDialog)
+	battleService := service.NewBattle(parallels, wargaming, localFile, numbers, unregistered)
+	watcherService := service.NewWatcher(interval, localFile, runtime.EventsEmit)
+	reportService := service.NewReport(localFile, discord)
+	updaterService := service.NewUpdater(version, github)
 
 	return NewApp(
 		vo.Env{Str: env},

@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"wfs/backend/vo"
+	"wfs/backend/domain"
 )
 
 func TestUnregistered_Warship(t *testing.T) {
@@ -27,41 +27,41 @@ func TestUnregistered_Warship(t *testing.T) {
 	actual, err := unregistered.Warship()
 
 	// アサーション
-	expected := map[int]vo.Warship{
+	expected := map[int]domain.Warship{
 		1: {
 			Name:   "Ship 1",
 			Tier:   11,
-			Type:   vo.CV,
+			Type:   domain.CV,
 			Nation: "uk",
 		},
 		2: {
 			Name:   "Ship 2",
 			Tier:   10,
-			Type:   vo.BB,
+			Type:   domain.BB,
 			Nation: "usa",
 		},
 		3: {
 			Name:   "Ship 3",
 			Tier:   9,
-			Type:   vo.CL,
+			Type:   domain.CL,
 			Nation: "japan",
 		},
 		4: {
 			Name:   "Ship 4",
 			Tier:   8,
-			Type:   vo.DD,
+			Type:   domain.DD,
 			Nation: "pan_asia",
 		},
 		5: {
 			Name:   "Ship 5",
 			Tier:   7,
-			Type:   vo.SS,
+			Type:   domain.SS,
 			Nation: "commonwealth",
 		},
 		6: {
 			Name:   "Ship 6",
 			Tier:   6,
-			Type:   vo.AUX,
+			Type:   domain.AUX,
 			Nation: "events",
 		},
 	}

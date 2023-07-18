@@ -4,7 +4,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
-	"wfs/backend/vo"
+	"wfs/backend/application/vo"
 
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/pkgerrors"

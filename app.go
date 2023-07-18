@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"strconv"
 	"wfs/backend/apperr"
+	"wfs/backend/application/repository"
+	"wfs/backend/application/service"
+	"wfs/backend/application/vo"
+	"wfs/backend/domain"
 	"wfs/backend/infra"
-	"wfs/backend/service"
-	"wfs/backend/vo"
 
 	mapset "github.com/deckarep/golang-set/v2"
 	"github.com/pkg/errors"
@@ -28,7 +30,7 @@ type App struct {
 	battleService     service.Battle
 	reportService     service.Report
 	updaterService    service.Updater
-	logger            infra.LoggerInterface
+	logger            repository.LoggerInterface
 	excludePlayer     mapset.Set[int]
 }
 
@@ -41,7 +43,7 @@ func NewApp(
 	battleService service.Battle,
 	reportService service.Report,
 	updaterService service.Updater,
-	logger infra.LoggerInterface,
+	logger repository.LoggerInterface,
 ) *App {
 	return &App{
 		env:               env,
@@ -94,8 +96,8 @@ func (a *App) Ready() {
 	go a.watcherService.Start(a.ctx, ctx)
 }
 
-func (a *App) Battle() (vo.Battle, error) {
-	var result vo.Battle
+func (a *App) Battle() (domain.Battle, error) {
+	var result domain.Battle
 
 	userConfig, err := a.configService.User()
 	if err != nil {
@@ -117,8 +119,8 @@ func (a *App) Battle() (vo.Battle, error) {
 	return result, nil
 }
 
-func (a *App) SampleTeams() []vo.Team {
-	players := make([]vo.Player, 8)
+func (a *App) SampleTeams() []domain.Team {
+	players := make([]domain.Player, 8)
 
 	tiers := []uint{
 		11,
@@ -131,15 +133,15 @@ func (a *App) SampleTeams() []vo.Team {
 		4,
 	}
 
-	shipTypes := []vo.ShipType{
-		vo.CV,
-		vo.BB,
-		vo.BB,
-		vo.CL,
-		vo.CL,
-		vo.DD,
-		vo.DD,
-		vo.SS,
+	shipTypes := []domain.ShipType{
+		domain.CV,
+		domain.BB,
+		domain.BB,
+		domain.CL,
+		domain.CL,
+		domain.DD,
+		domain.DD,
+		domain.SS,
 	}
 
 	prs := []float64{
@@ -176,21 +178,21 @@ func (a *App) SampleTeams() []vo.Team {
 	}
 
 	for i := range players {
-		playerInfo := vo.PlayerInfo{
+		playerInfo := domain.PlayerInfo{
 			ID:   1,
 			Name: fmt.Sprintf("player_name%d", i+1),
-			Clan: vo.Clan{
+			Clan: domain.Clan{
 				Tag: "TEST",
 			},
 		}
-		shipInfo := vo.ShipInfo{
+		shipInfo := domain.ShipInfo{
 			Name:      "Test Ship",
 			Nation:    "japan",
 			Tier:      tiers[i],
 			Type:      shipTypes[i],
 			AvgDamage: 10000,
 		}
-		shipStats := vo.ShipStats{
+		shipStats := domain.ShipStats{
 			Battles:            10,
 			Damage:             10000 * damageRatios[i],
 			WinRate:            winRates[i],
@@ -204,7 +206,7 @@ func (a *App) SampleTeams() []vo.Team {
 			PlanesKilled:       5,
 			PR:                 prs[i],
 		}
-		overallStats := vo.OverallStats{
+		overallStats := domain.OverallStats{
 			Battles:          10,
 			Damage:           10000 * damageRatios[i],
 			WinRate:          winRates[i],
@@ -214,34 +216,34 @@ func (a *App) SampleTeams() []vo.Team {
 			Kill:             1,
 			Exp:              1000,
 			AvgTier:          5,
-			UsingShipTypeRate: vo.ShipTypeGroup{
+			UsingShipTypeRate: domain.ShipTypeGroup{
 				SS: 20,
 				DD: 20,
 				CL: 20,
 				BB: 20,
 				CV: 20,
 			},
-			UsingTierRate: vo.TierGroup{
+			UsingTierRate: domain.TierGroup{
 				Low:    33.3,
 				Middle: 33.3,
 				High:   33.4,
 			},
 		}
-		players[i] = vo.Player{
+		players[i] = domain.Player{
 			PlayerInfo: playerInfo,
 			ShipInfo:   shipInfo,
-			PvPSolo: vo.PlayerStats{
+			PvPSolo: domain.PlayerStats{
 				ShipStats:    shipStats,
 				OverallStats: overallStats,
 			},
-			PvPAll: vo.PlayerStats{
+			PvPAll: domain.PlayerStats{
 				ShipStats:    shipStats,
 				OverallStats: overallStats,
 			},
 		}
 	}
 
-	return []vo.Team{
+	return []domain.Team{
 		{
 			Players: players,
 		},
@@ -257,11 +259,11 @@ func (a *App) SelectDirectory() (string, error) {
 	return path, apperr.ToFrontendError(err)
 }
 
-func (a *App) DefaultUserConfig() vo.UserConfig {
+func (a *App) DefaultUserConfig() domain.UserConfig {
 	return infra.DefaultUserConfig
 }
 
-func (a *App) UserConfig() (vo.UserConfig, error) {
+func (a *App) UserConfig() (domain.UserConfig, error) {
 	config, err := a.configService.User()
 	if err != nil {
 		a.logger.Warn("Failed to get UserConfig", err)
@@ -270,7 +272,7 @@ func (a *App) UserConfig() (vo.UserConfig, error) {
 	return config, apperr.ToFrontendError(err)
 }
 
-func (a *App) ApplyUserConfig(config vo.UserConfig) error {
+func (a *App) ApplyUserConfig(config domain.UserConfig) error {
 	err := a.configService.UpdateOptional(config)
 	if err != nil {
 		a.logger.Warn("Failed to update UserConfig", err)
@@ -336,7 +338,7 @@ func (a *App) RemoveExcludePlayerID(playerID int) {
 	a.excludePlayer.Remove(playerID)
 }
 
-func (a *App) AlertPlayers() ([]vo.AlertPlayer, error) {
+func (a *App) AlertPlayers() ([]domain.AlertPlayer, error) {
 	players, err := a.configService.AlertPlayers()
 	if err != nil {
 		a.logger.Warn("Failed to get AlertPlayers", err)
@@ -345,7 +347,7 @@ func (a *App) AlertPlayers() ([]vo.AlertPlayer, error) {
 	return players, apperr.ToFrontendError(err)
 }
 
-func (a *App) UpdateAlertPlayer(player vo.AlertPlayer) error {
+func (a *App) UpdateAlertPlayer(player domain.AlertPlayer) error {
 	err := a.configService.UpdateAlertPlayer(player)
 	if err != nil {
 		a.logger.Warn("Failed to update AlertPlayer, player.Name:"+player.Name, err)
@@ -363,7 +365,7 @@ func (a *App) RemoveAlertPlayer(accountID int) error {
 	return apperr.ToFrontendError(err)
 }
 
-func (a *App) SearchPlayer(prefix string) (vo.WGAccountList, error) {
+func (a *App) SearchPlayer(prefix string) (domain.WGAccountList, error) {
 	accountList, err := a.configService.SearchPlayer(prefix)
 	if err != nil {
 		a.logger.Warn("Failed to search player, prefix:"+prefix, err)
@@ -373,7 +375,7 @@ func (a *App) SearchPlayer(prefix string) (vo.WGAccountList, error) {
 }
 
 func (a *App) AlertPatterns() []string {
-	return vo.AlertPatterns
+	return domain.AlertPatterns
 }
 
 func (a *App) LogErrorForFrontend(err string) {
@@ -385,9 +387,9 @@ func (a *App) FontSizes() []string {
 }
 
 func (a *App) StatsPatterns() []string {
-	return vo.StatsPatterns
+	return domain.StatsPatterns
 }
 
-func (a *App) LatestRelease() (vo.GHLatestRelease, error) {
+func (a *App) LatestRelease() (domain.GHLatestRelease, error) {
 	return a.updaterService.Updatable()
 }

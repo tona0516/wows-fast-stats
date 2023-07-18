@@ -1,4 +1,4 @@
-import type { vo } from "../wailsjs/go/models";
+import type { domain } from "../wailsjs/go/models";
 import { Const } from "./Const";
 import { DisplayPattern, StatsCategory } from "./enums";
 
@@ -28,12 +28,15 @@ export class ComponenInfo {
     return Const.COLUMN_NAMES[this.columnKey].min;
   }
 
-  shouldShowColumn(displays: vo.Displays, category: StatsCategory): boolean {
+  shouldShowColumn(
+    displays: domain.Displays,
+    category: StatsCategory
+  ): boolean {
     return displays[category][this.columnKey] === true;
   }
 
   shouldShowValue(
-    displays: vo.Displays,
+    displays: domain.Displays,
     category: StatsCategory,
     displayPattern: DisplayPattern
   ): boolean {
@@ -70,7 +73,7 @@ export class ComponentList {
     return Const.COLUMN_NAMES[this.category].min;
   }
 
-  columnCount(displays: vo.Displays): number {
+  columnCount(displays: domain.Displays): number {
     return this.list
       .filter((it) => it.shouldShowColumn(displays, this.category))
       .reduce((a, it) => a + it.option.column, 0);

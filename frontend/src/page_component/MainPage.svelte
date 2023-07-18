@@ -1,22 +1,22 @@
 <script lang="ts">
-import {
-  storedBattle,
-  storedUserConfig,
-  storedSummaryResult,
-  storedAlertPlayers,
-} from "../stores";
-import ColorDescription from "../other_component/ColorDescription.svelte";
-import Ofuse from "../other_component/Ofuse.svelte";
-import StatisticsTable from "../other_component/StatisticsTable.svelte";
-import { toDateForDisplay } from "../util";
+  import {
+    storedBattle,
+    storedUserConfig,
+    storedSummaryResult,
+    storedAlertPlayers,
+  } from "../stores";
+  import ColorDescription from "../other_component/ColorDescription.svelte";
+  import Ofuse from "../other_component/Ofuse.svelte";
+  import StatisticsTable from "../other_component/StatisticsTable.svelte";
+  import { toDateForDisplay } from "../util";
 </script>
 
 {#if $storedBattle}
   <div class="m-2">
     <StatisticsTable
-      teams="{$storedBattle.teams}"
-      userConfig="{$storedUserConfig}"
-      alertPlayers="{$storedAlertPlayers}"
+      teams={$storedBattle.teams}
+      userConfig={$storedUserConfig}
+      alertPlayers={$storedAlertPlayers}
       on:UpdateAlertPlayer
       on:RemoveAlertPlayer
       on:CheckPlayer
@@ -54,12 +54,12 @@ import { toDateForDisplay } from "../util";
         <table class="table table-sm table-text-color w-auto td-multiple">
           <thead>
             <tr>
-              <th></th>
-              <th colspan="{$storedSummaryResult.shipColspan}">艦成績</th>
-              <th colspan="{$storedSummaryResult.overallColspan}">総合成績</th>
+              <th />
+              <th colspan={$storedSummaryResult.shipColspan}>艦成績</th>
+              <th colspan={$storedSummaryResult.overallColspan}>総合成績</th>
             </tr>
             <tr>
-              <th></th>
+              <th />
               {#each $storedSummaryResult.labels as label}
                 <th>{label}</th>
               {/each}
@@ -83,7 +83,7 @@ import { toDateForDisplay } from "../util";
             <tr>
               <td>差</td>
               {#each $storedSummaryResult.diffs as diff}
-                <td class="{diff.colorClass}">{diff.value}</td>
+                <td class={diff.colorClass}>{diff.value}</td>
               {/each}
             </tr>
           </tbody>

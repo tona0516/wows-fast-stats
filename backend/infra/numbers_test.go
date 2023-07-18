@@ -7,7 +7,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"wfs/backend/vo"
+	"wfs/backend/domain"
 )
 
 func TestNumbers_ExpectedStats(t *testing.T) {
@@ -30,14 +30,14 @@ func TestNumbers_ExpectedStats(t *testing.T) {
 	defer server.Close()
 
 	// テスト
-	numbers := NewNumbers(vo.RequestConfig{URL: server.URL})
+	numbers := NewNumbers(RequestConfig{URL: server.URL})
 	actual, err := numbers.ExpectedStats()
 	assert.NoError(t, err)
 
 	// アサーション
-	expected := vo.NSExpectedStats{
+	expected := domain.NSExpectedStats{
 		Time: 1621699200,
-		Data: map[int]vo.NSExpectedStatsData{
+		Data: map[int]domain.NSExpectedStatsData{
 			1234: {
 				AverageDamageDealt: 50000,
 				AverageFrags:       1.2,

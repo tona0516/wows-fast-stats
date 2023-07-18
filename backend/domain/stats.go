@@ -1,9 +1,5 @@
 package domain
 
-import (
-	"wfs/backend/vo"
-)
-
 type StatsMode string
 
 const (
@@ -14,12 +10,12 @@ const (
 )
 
 type Stats struct {
-	AccountInfo vo.WGAccountInfoData
-	ShipsStats  vo.WGShipsStatsData
-	Expected    vo.NSExpectedStatsData
+	AccountInfo WGAccountInfoData
+	ShipsStats  WGShipsStatsData
+	Expected    NSExpectedStatsData
 }
 
-func (s *Stats) SetShipStats(shipStats vo.WGShipsStatsData) {
+func (s *Stats) SetShipStats(shipStats WGShipsStatsData) {
 	s.ShipsStats = shipStats
 }
 
@@ -161,8 +157,8 @@ func (s *Stats) PlanesKilled(mode StatsMode) float64 {
 func (s *Stats) AvgTier(
 	mode StatsMode,
 	accountID int,
-	shipInfo map[int]vo.Warship,
-	shipStats map[int]vo.WGShipsStats,
+	shipInfo map[int]Warship,
+	shipStats map[int]WGShipsStats,
 ) float64 {
 	var sum uint
 	var battles uint
@@ -185,9 +181,9 @@ func (s *Stats) AvgTier(
 func (s *Stats) UsingTierRate(
 	mode StatsMode,
 	accountID int,
-	shipInfo map[int]vo.Warship,
-	shipStats map[int]vo.WGShipsStats,
-) vo.TierGroup {
+	shipInfo map[int]Warship,
+	shipStats map[int]WGShipsStats,
+) TierGroup {
 	lowKey := "low"
 	middleKey := "middle"
 	highKey := "high"
@@ -221,10 +217,10 @@ func (s *Stats) UsingTierRate(
 		allBattles += v
 	}
 	if allBattles < 1 {
-		return vo.TierGroup{}
+		return TierGroup{}
 	}
 
-	return vo.TierGroup{
+	return TierGroup{
 		Low:    tierMap[lowKey] / allBattles * 100,
 		Middle: tierMap[middleKey] / allBattles * 100,
 		High:   tierMap[highKey] / allBattles * 100,
@@ -234,10 +230,10 @@ func (s *Stats) UsingTierRate(
 func (s *Stats) UsingShipTypeRate(
 	mode StatsMode,
 	accountID int,
-	shipInfo map[int]vo.Warship,
-	shipStats map[int]vo.WGShipsStats,
-) vo.ShipTypeGroup {
-	battlesMap := make(map[vo.ShipType]float64)
+	shipInfo map[int]Warship,
+	shipStats map[int]WGShipsStats,
+) ShipTypeGroup {
+	battlesMap := make(map[ShipType]float64)
 
 	playerShipStats := shipStats[accountID].Data[accountID]
 	for _, ship := range playerShipStats {
@@ -258,19 +254,19 @@ func (s *Stats) UsingShipTypeRate(
 		allBattles += v
 	}
 	if allBattles < 1 {
-		return vo.ShipTypeGroup{}
+		return ShipTypeGroup{}
 	}
 
-	return vo.ShipTypeGroup{
-		SS: battlesMap[vo.SS] / allBattles * 100,
-		DD: battlesMap[vo.DD] / allBattles * 100,
-		CL: battlesMap[vo.CL] / allBattles * 100,
-		BB: battlesMap[vo.BB] / allBattles * 100,
-		CV: battlesMap[vo.CV] / allBattles * 100,
+	return ShipTypeGroup{
+		SS: battlesMap[SS] / allBattles * 100,
+		DD: battlesMap[DD] / allBattles * 100,
+		CL: battlesMap[CL] / allBattles * 100,
+		BB: battlesMap[BB] / allBattles * 100,
+		CV: battlesMap[CV] / allBattles * 100,
 	}
 }
 
-func (s *Stats) statsValues(mode StatsMode) vo.WGStatsValues {
+func (s *Stats) statsValues(mode StatsMode) WGStatsValues {
 	switch mode {
 	case ModeShip:
 		return s.ShipsStats.Pvp
@@ -282,10 +278,10 @@ func (s *Stats) statsValues(mode StatsMode) vo.WGStatsValues {
 		return s.AccountInfo.Statistics.PvpSolo
 	}
 
-	return vo.WGStatsValues{}
+	return WGStatsValues{}
 }
 
-func statsValuesFrom(mode StatsMode, s vo.WGShipsStatsData) vo.WGStatsValues {
+func statsValuesFrom(mode StatsMode, s WGShipsStatsData) WGStatsValues {
 	switch mode {
 	case ModeShip:
 		return s.Pvp
@@ -297,7 +293,7 @@ func statsValuesFrom(mode StatsMode, s vo.WGShipsStatsData) vo.WGStatsValues {
 		return s.PvpSolo
 	}
 
-	return vo.WGStatsValues{}
+	return WGStatsValues{}
 }
 
 func avgDamage(damageDealt uint, battles uint) float64 {

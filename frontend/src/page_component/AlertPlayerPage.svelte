@@ -1,34 +1,34 @@
 <script lang="ts">
-import { createEventDispatcher } from "svelte";
-import clone from "clone";
-import { storedAlertPlayers, storedUserConfig } from "../stores.js";
-import type { vo } from "../../wailsjs/go/models.js";
-import { Button } from "sveltestrap";
+  import { createEventDispatcher } from "svelte";
+  import clone from "clone";
+  import { storedAlertPlayers, storedUserConfig } from "../stores.js";
+  import type { domain } from "../../wailsjs/go/models.js";
+  import { Button } from "sveltestrap";
 
-const dispatch = createEventDispatcher();
+  const dispatch = createEventDispatcher();
 
-const alertPlayerColumns = ["プレイヤー名", "アイコン", "メモ", "操作"];
+  const alertPlayerColumns = ["プレイヤー名", "アイコン", "メモ", "操作"];
 
-function onClickAdd() {
-  dispatch("AddAlertPlayer");
-}
+  function onClickAdd() {
+    dispatch("AddAlertPlayer");
+  }
 
-function onClickEdit(player: vo.AlertPlayer) {
-  const target = clone(player);
-  dispatch("UpdateAlertPlayer", { target: target });
-}
+  function onClickEdit(player: domain.AlertPlayer) {
+    const target = clone(player);
+    dispatch("UpdateAlertPlayer", { target: target });
+  }
 
-function onClickRemove(player: vo.AlertPlayer) {
-  const target = clone(player);
-  dispatch("RemoveAlertPlayer", { target: target });
-}
+  function onClickRemove(player: domain.AlertPlayer) {
+    const target = clone(player);
+    dispatch("RemoveAlertPlayer", { target: target });
+  }
 </script>
 
 <div class="mt-3 center">
   <!-- introduction -->
   <div class="alert alert-primary">
     <p>
-      <i class="bi bi-info-circle-fill"></i> プレイヤー検出機能
+      <i class="bi bi-info-circle-fill" /> プレイヤー検出機能
     </p>
     <ul class="m-0">
       <li>リストに追加されたプレイヤーにアイコン表示</li>
@@ -53,7 +53,7 @@ function onClickRemove(player: vo.AlertPlayer) {
           {#each $storedAlertPlayers as player}
             <tr>
               <td>{player.name}</td>
-              <td><i class="bi {player.pattern}"></i></td>
+              <td><i class="bi {player.pattern}" /></td>
               <td>{player.message}</td>
               <td>
                 <Button
@@ -61,14 +61,14 @@ function onClickRemove(player: vo.AlertPlayer) {
                   size="sm"
                   color="success"
                   style="font-size: {$storedUserConfig.font_size};"
-                  on:click="{() => onClickEdit(player)}">編集</Button
+                  on:click={() => onClickEdit(player)}>編集</Button
                 >
                 <Button
                   class="m-1"
                   size="sm"
                   color="danger"
                   style="font-size: {$storedUserConfig.font_size};"
-                  on:click="{() => onClickRemove(player)}">削除</Button
+                  on:click={() => onClickRemove(player)}>削除</Button
                 >
               </td>
             </tr>
@@ -84,6 +84,6 @@ function onClickRemove(player: vo.AlertPlayer) {
     size="sm"
     color="primary"
     style="font-size: {$storedUserConfig.font_size};"
-    on:click="{onClickAdd}">追加</Button
+    on:click={onClickAdd}>追加</Button
   >
 </div>

@@ -1,13 +1,13 @@
 <script lang="ts">
-import type { StackedBarGraphParam } from "./StackedBarGraphParam";
+  import type { StackedBarGraphParam } from "./StackedBarGraphParam";
 
-export let param: StackedBarGraphParam;
+  export let param: StackedBarGraphParam;
 </script>
 
 <table class="charts-css bar hide-data stacked">
   <thead>
     {#each param.items as _}
-      <th scope="col"></th>
+      <th scope="col" />
     {/each}
   </thead>
   <tbody>

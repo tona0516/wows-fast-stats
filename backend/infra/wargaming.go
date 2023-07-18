@@ -4,7 +4,8 @@ import (
 	"strconv"
 	"strings"
 	"wfs/backend/apperr"
-	"wfs/backend/vo"
+
+	"wfs/backend/domain"
 
 	"github.com/cenkalti/backoff/v4"
 	"github.com/pkg/errors"
@@ -12,165 +13,118 @@ import (
 )
 
 type Wargaming struct {
-	appid                  string
-	config                 vo.RequestConfig
-	accountInfoClient      APIClientInterface[vo.WGAccountInfo]
-	accountListClient      APIClientInterface[vo.WGAccountList]
-	clansAccountInfoClient APIClientInterface[vo.WGClansAccountInfo]
-	clansInfoClient        APIClientInterface[vo.WGClansInfo]
-	shipsStatsClient       APIClientInterface[vo.WGShipsStats]
-	encycShipsClient       APIClientInterface[vo.WGEncycShips]
-	encycInfoClient        APIClientInterface[vo.WGEncycInfo]
-	battleArenasClient     APIClientInterface[vo.WGBattleArenas]
-	battleTypesClient      APIClientInterface[vo.WGBattleTypes]
+	appid  string
+	config RequestConfig
 }
 
-func NewWargaming(config vo.RequestConfig) *Wargaming {
-	return &Wargaming{
-		config: config,
-		accountInfoClient: NewAPIClient[vo.WGAccountInfo](
-			config.URL+"/wows/account/info/",
-			config.Retry,
-		),
-		accountListClient: NewAPIClient[vo.WGAccountList](
-			config.URL+"/wows/account/list/",
-			config.Retry,
-		),
-		clansAccountInfoClient: NewAPIClient[vo.WGClansAccountInfo](
-			config.URL+"/wows/clans/accountinfo/",
-			config.Retry,
-		),
-		clansInfoClient: NewAPIClient[vo.WGClansInfo](
-			config.URL+"/wows/clans/info/",
-			config.Retry,
-		),
-		shipsStatsClient: NewAPIClient[vo.WGShipsStats](
-			config.URL+"/wows/ships/stats/",
-			config.Retry,
-		),
-		encycShipsClient: NewAPIClient[vo.WGEncycShips](
-			config.URL+"/wows/encyclopedia/ships/",
-			config.Retry,
-		),
-		encycInfoClient: NewAPIClient[vo.WGEncycInfo](
-			config.URL+"/wows/encyclopedia/info/",
-			config.Retry,
-		),
-		battleArenasClient: NewAPIClient[vo.WGBattleArenas](
-			config.URL+"/wows/encyclopedia/battlearenas/",
-			config.Retry,
-		),
-		battleTypesClient: NewAPIClient[vo.WGBattleTypes](
-			config.URL+"/wows/encyclopedia/battletypes/",
-			config.Retry,
-		),
-	}
+func NewWargaming(config RequestConfig) *Wargaming {
+	return &Wargaming{config: config}
 }
 
 func (w *Wargaming) SetAppID(appid string) {
 	w.appid = appid
 }
 
-func (w *Wargaming) AccountInfo(accountIDs []int) (vo.WGAccountInfo, error) {
+func (w *Wargaming) AccountInfo(accountIDs []int) (domain.WGAccountInfo, error) {
 	strAccountIDs := make([]string, len(accountIDs))
 	for i, v := range accountIDs {
 		strAccountIDs[i] = strconv.Itoa(v)
 	}
 
-	return request(
-		w.accountInfoClient,
+	return request[domain.WGAccountInfo](
+		w.config.URL+"/wows/account/info/",
 		map[string]string{
 			"application_id": w.appid,
 			"account_id":     strings.Join(strAccountIDs, ","),
-			"fields":         vo.WGAccountInfoData{}.Field(),
+			"fields":         domain.WGAccountInfoData{}.Field(),
 			"extra":          "statistics.pvp_solo",
 		},
 		w.config.Retry,
 	)
 }
 
-func (w *Wargaming) AccountList(accountNames []string) (vo.WGAccountList, error) {
-	return request(
-		w.accountListClient,
+func (w *Wargaming) AccountList(accountNames []string) (domain.WGAccountList, error) {
+	return request[domain.WGAccountList](
+		w.config.URL+"/wows/account/list/",
 		map[string]string{
 			"application_id": w.appid,
 			"search":         strings.Join(accountNames, ","),
-			"fields":         vo.WGAccountListData{}.Field(),
+			"fields":         domain.WGAccountListData{}.Field(),
 			"type":           "exact",
 		},
 		w.config.Retry,
 	)
 }
 
-func (w *Wargaming) AccountListForSearch(prefix string) (vo.WGAccountList, error) {
-	return request(
-		w.accountListClient,
+func (w *Wargaming) AccountListForSearch(prefix string) (domain.WGAccountList, error) {
+	return request[domain.WGAccountList](
+		w.config.URL+"/wows/account/list/",
 		map[string]string{
 			"application_id": w.appid,
 			"search":         prefix,
-			"fields":         vo.WGAccountListData{}.Field(),
+			"fields":         domain.WGAccountListData{}.Field(),
 		},
 		w.config.Retry,
 	)
 }
 
-func (w *Wargaming) ClansAccountInfo(accountIDs []int) (vo.WGClansAccountInfo, error) {
+func (w *Wargaming) ClansAccountInfo(accountIDs []int) (domain.WGClansAccountInfo, error) {
 	strAccountIDs := make([]string, len(accountIDs))
 	for i, v := range accountIDs {
 		strAccountIDs[i] = strconv.Itoa(v)
 	}
 
-	return request(
-		w.clansAccountInfoClient,
+	return request[domain.WGClansAccountInfo](
+		w.config.URL+"/wows/clans/accountinfo/",
 		map[string]string{
 			"application_id": w.appid,
 			"account_id":     strings.Join(strAccountIDs, ","),
-			"fields":         vo.WGClansAccountInfoData{}.Field(),
+			"fields":         domain.WGClansAccountInfoData{}.Field(),
 		},
 		w.config.Retry,
 	)
 }
 
-func (w *Wargaming) ClansInfo(clanIDs []int) (vo.WGClansInfo, error) {
+func (w *Wargaming) ClansInfo(clanIDs []int) (domain.WGClansInfo, error) {
 	strClanIDs := make([]string, len(clanIDs))
 	for i, v := range clanIDs {
 		strClanIDs[i] = strconv.Itoa(v)
 	}
 
 	if len(strClanIDs) == 0 {
-		return vo.WGClansInfo{}, nil
+		return domain.WGClansInfo{}, nil
 	}
 
-	return request(
-		w.clansInfoClient,
+	return request[domain.WGClansInfo](
+		w.config.URL+"/wows/clans/info/",
 		map[string]string{
 			"application_id": w.appid,
 			"clan_id":        strings.Join(strClanIDs, ","),
-			"fields":         vo.WGClansInfoData{}.Field(),
+			"fields":         domain.WGClansInfoData{}.Field(),
 		},
 		w.config.Retry,
 	)
 }
 
-func (w *Wargaming) ShipsStats(accountID int) (vo.WGShipsStats, error) {
-	return request(
-		w.shipsStatsClient,
+func (w *Wargaming) ShipsStats(accountID int) (domain.WGShipsStats, error) {
+	return request[domain.WGShipsStats](
+		w.config.URL+"/wows/ships/stats/",
 		map[string]string{
 			"application_id": w.appid,
 			"account_id":     strconv.Itoa(accountID),
-			"fields":         vo.WGShipsStatsData{}.Field(),
+			"fields":         domain.WGShipsStatsData{}.Field(),
 			"extra":          "pvp_solo",
 		},
 		w.config.Retry,
 	)
 }
 
-func (w *Wargaming) EncycShips(pageNo int) (vo.WGEncycShips, error) {
-	return request(
-		w.encycShipsClient,
+func (w *Wargaming) EncycShips(pageNo int) (domain.WGEncycShips, error) {
+	return request[domain.WGEncycShips](
+		w.config.URL+"/wows/encyclopedia/ships/",
 		map[string]string{
 			"application_id": w.appid,
-			"fields":         vo.WGEncyclopediaShipsData{}.Field(),
+			"fields":         domain.WGEncyclopediaShipsData{}.Field(),
 			"language":       "ja",
 			"page_no":        strconv.Itoa(pageNo),
 		},
@@ -178,35 +132,35 @@ func (w *Wargaming) EncycShips(pageNo int) (vo.WGEncycShips, error) {
 	)
 }
 
-func (w *Wargaming) EncycInfo() (vo.WGEncycInfo, error) {
-	return request(
-		w.encycInfoClient,
+func (w *Wargaming) EncycInfo() (domain.WGEncycInfo, error) {
+	return request[domain.WGEncycInfo](
+		w.config.URL+"/wows/encyclopedia/info/",
 		map[string]string{
 			"application_id": w.appid,
-			"fields":         vo.WGEncyclopediaInfoData{}.Field(),
+			"fields":         domain.WGEncyclopediaInfoData{}.Field(),
 		},
 		w.config.Retry,
 	)
 }
 
-func (w *Wargaming) BattleArenas() (vo.WGBattleArenas, error) {
-	return request(
-		w.battleArenasClient,
+func (w *Wargaming) BattleArenas() (domain.WGBattleArenas, error) {
+	return request[domain.WGBattleArenas](
+		w.config.URL+"/wows/encyclopedia/battlearenas/",
 		map[string]string{
 			"application_id": w.appid,
-			"fields":         vo.WGBattleArenasData{}.Field(),
+			"fields":         domain.WGBattleArenasData{}.Field(),
 			"language":       "ja",
 		},
 		w.config.Retry,
 	)
 }
 
-func (w *Wargaming) BattleTypes() (vo.WGBattleTypes, error) {
-	return request(
-		w.battleTypesClient,
+func (w *Wargaming) BattleTypes() (domain.WGBattleTypes, error) {
+	return request[domain.WGBattleTypes](
+		w.config.URL+"/wows/encyclopedia/battletypes/",
 		map[string]string{
 			"application_id": w.appid,
-			"fields":         vo.WGBattleTypesData{}.Field(),
+			"fields":         domain.WGBattleTypesData{}.Field(),
 			"language":       "ja",
 		},
 		w.config.Retry,
@@ -214,11 +168,11 @@ func (w *Wargaming) BattleTypes() (vo.WGBattleTypes, error) {
 }
 
 func (w *Wargaming) Test(appid string) (bool, error) {
-	_, err := request(
-		w.encycInfoClient,
+	_, err := request[domain.WGEncycInfo](
+		w.config.URL+"/wows/encyclopedia/info/",
 		map[string]string{
 			"application_id": appid,
-			"fields":         vo.WGEncyclopediaInfoData{}.Field(),
+			"fields":         domain.WGEncyclopediaInfoData{}.Field(),
 		},
 		w.config.Retry,
 	)
@@ -226,14 +180,14 @@ func (w *Wargaming) Test(appid string) (bool, error) {
 	return err == nil, err
 }
 
-func request[T vo.WGResponse](
-	client APIClientInterface[T],
+func request[T domain.WGResponse](
+	rawURL string,
 	query map[string]string,
 	retry uint64,
 ) (T, error) {
 	b := backoff.WithMaxRetries(backoff.NewExponentialBackOff(), retry)
 	operation := func() (APIResponse[T], error) {
-		res, err := client.GetRequest(query)
+		res, err := getRequest[T](rawURL, query, retry)
 
 		// Note:
 		// https://developers.wargaming.net/documentation/guide/getting-started/#common-errors

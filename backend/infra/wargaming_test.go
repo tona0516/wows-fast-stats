@@ -1,152 +1,217 @@
 package infra
 
 import (
+	"encoding/json"
 	"fmt"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 	"wfs/backend/apperr"
-	"wfs/backend/vo"
+	"wfs/backend/domain"
 
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 )
 
 func TestWargaming_AccountInfo(t *testing.T) {
 	t.Parallel()
 
-	wargaming := NewWargaming(vo.RequestConfig{})
-	wargaming.SetAppID("your-app-id")
+	body, err := json.Marshal(domain.WGAccountInfo{})
+	assert.NoError(t, err)
 
-	mockAPIClient := &mockAPIClient[vo.WGAccountInfo]{}
-	mockAPIClient.On("GetRequest", mock.Anything).Return(APIResponse[vo.WGAccountInfo]{}, nil)
-	wargaming.accountInfoClient = mockAPIClient
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write(body)
+	}))
+	defer server.Close()
+
+	wargaming := NewWargaming(RequestConfig{
+		URL: server.URL,
+	})
 
 	result, err := wargaming.AccountInfo([]int{123, 456})
 
 	assert.NoError(t, err)
-	assert.Equal(t, vo.WGAccountInfo{}, result)
+	assert.Equal(t, domain.WGAccountInfo{}, result)
 }
 
 func TestWargaming_AccountList(t *testing.T) {
 	t.Parallel()
 
-	wargaming := NewWargaming(vo.RequestConfig{})
-	wargaming.SetAppID("your-app-id")
+	body, err := json.Marshal(domain.WGAccountList{})
+	assert.NoError(t, err)
 
-	mockAPIClient := &mockAPIClient[vo.WGAccountList]{}
-	mockAPIClient.On("GetRequest", mock.Anything).Return(APIResponse[vo.WGAccountList]{}, nil)
-	wargaming.accountListClient = mockAPIClient
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write(body)
+	}))
+	defer server.Close()
+
+	wargaming := NewWargaming(RequestConfig{
+		URL: server.URL,
+	})
 
 	result, err := wargaming.AccountList([]string{"player_1", "player_2"})
 
 	assert.NoError(t, err)
-	assert.Equal(t, vo.WGAccountList{}, result)
+	assert.Equal(t, domain.WGAccountList{}, result)
 }
 
 func TestWargaming_ClansAccountInfo(t *testing.T) {
 	t.Parallel()
 
-	wargaming := NewWargaming(vo.RequestConfig{})
-	wargaming.SetAppID("your-app-id")
+	body, err := json.Marshal(domain.WGClansAccountInfo{})
+	assert.NoError(t, err)
 
-	mockAPIClient := &mockAPIClient[vo.WGClansAccountInfo]{}
-	mockAPIClient.On("GetRequest", mock.Anything).Return(APIResponse[vo.WGClansAccountInfo]{}, nil)
-	wargaming.clansAccountInfoClient = mockAPIClient
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write(body)
+	}))
+	defer server.Close()
+
+	wargaming := NewWargaming(RequestConfig{
+		URL: server.URL,
+	})
 
 	result, err := wargaming.ClansAccountInfo([]int{123, 456})
 
 	assert.NoError(t, err)
-	assert.Equal(t, vo.WGClansAccountInfo{}, result)
+	assert.Equal(t, domain.WGClansAccountInfo{}, result)
 }
 
 func TestWargaming_ClansInfo(t *testing.T) {
 	t.Parallel()
 
-	wargaming := NewWargaming(vo.RequestConfig{})
-	wargaming.SetAppID("your-app-id")
+	body, err := json.Marshal(domain.WGClansInfo{})
+	assert.NoError(t, err)
 
-	mockAPIClient := &mockAPIClient[vo.WGClansInfo]{}
-	mockAPIClient.On("GetRequest", mock.Anything).Return(APIResponse[vo.WGClansInfo]{}, nil)
-	wargaming.clansInfoClient = mockAPIClient
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write(body)
+	}))
+	defer server.Close()
+
+	wargaming := NewWargaming(RequestConfig{
+		URL: server.URL,
+	})
 
 	result, err := wargaming.ClansInfo([]int{123, 456})
 
 	assert.NoError(t, err)
-	assert.Equal(t, vo.WGClansInfo{}, result)
+	assert.Equal(t, domain.WGClansInfo{}, result)
 }
 
 func TestWargaming_ShipsStats(t *testing.T) {
 	t.Parallel()
 
-	wargaming := NewWargaming(vo.RequestConfig{})
-	wargaming.SetAppID("your-app-id")
+	body, err := json.Marshal(domain.WGShipsStats{})
+	assert.NoError(t, err)
 
-	mockAPIClient := &mockAPIClient[vo.WGShipsStats]{}
-	mockAPIClient.On("GetRequest", mock.Anything).Return(APIResponse[vo.WGShipsStats]{}, nil)
-	wargaming.shipsStatsClient = mockAPIClient
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write(body)
+	}))
+	defer server.Close()
+
+	wargaming := NewWargaming(RequestConfig{
+		URL: server.URL,
+	})
 
 	result, err := wargaming.ShipsStats(123)
 
 	assert.NoError(t, err)
-	assert.Equal(t, vo.WGShipsStats{}, result)
+	assert.Equal(t, domain.WGShipsStats{}, result)
 }
 
 func TestWargaming_EncycShips(t *testing.T) {
 	t.Parallel()
 
-	wargaming := NewWargaming(vo.RequestConfig{})
-	wargaming.SetAppID("your-app-id")
+	body, err := json.Marshal(domain.WGEncycShips{})
+	assert.NoError(t, err)
 
-	mockAPIClient := &mockAPIClient[vo.WGEncycShips]{}
-	mockAPIClient.On("GetRequest", mock.Anything).Return(APIResponse[vo.WGEncycShips]{}, nil)
-	wargaming.encycShipsClient = mockAPIClient
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write(body)
+	}))
+	defer server.Close()
+
+	wargaming := NewWargaming(RequestConfig{
+		URL: server.URL,
+	})
 
 	result, err := wargaming.EncycShips(1)
 
 	assert.NoError(t, err)
-	assert.Equal(t, vo.WGEncycShips{}, result)
+	assert.Equal(t, domain.WGEncycShips{}, result)
 }
 
 func TestWargaming_BattleArena(t *testing.T) {
 	t.Parallel()
 
-	wargaming := NewWargaming(vo.RequestConfig{})
-	wargaming.SetAppID("your-app-id")
+	body, err := json.Marshal(domain.WGBattleArenas{})
+	assert.NoError(t, err)
 
-	mockAPIClient := &mockAPIClient[vo.WGBattleArenas]{}
-	mockAPIClient.On("GetRequest", mock.Anything).Return(APIResponse[vo.WGBattleArenas]{}, nil)
-	wargaming.battleArenasClient = mockAPIClient
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write(body)
+	}))
+	defer server.Close()
+
+	wargaming := NewWargaming(RequestConfig{
+		URL: server.URL,
+	})
 
 	result, err := wargaming.BattleArenas()
 
 	assert.NoError(t, err)
-	assert.Equal(t, vo.WGBattleArenas{}, result)
+	assert.Equal(t, domain.WGBattleArenas{}, result)
 }
 
 func TestWargaming_BattleTypes(t *testing.T) {
 	t.Parallel()
 
-	wargaming := NewWargaming(vo.RequestConfig{})
-	wargaming.SetAppID("your-app-id")
+	body, err := json.Marshal(domain.WGBattleTypes{})
+	assert.NoError(t, err)
 
-	mockAPIClient := &mockAPIClient[vo.WGBattleTypes]{}
-	mockAPIClient.On("GetRequest", mock.Anything).Return(APIResponse[vo.WGBattleTypes]{}, nil)
-	wargaming.battleTypesClient = mockAPIClient
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write(body)
+	}))
+	defer server.Close()
 
+	wargaming := NewWargaming(RequestConfig{
+		URL: server.URL,
+	})
 	result, err := wargaming.BattleTypes()
 
 	assert.NoError(t, err)
-	assert.Equal(t, vo.WGBattleTypes{}, result)
+	assert.Equal(t, domain.WGBattleTypes{}, result)
 }
 
 func TestWargaming_Test(t *testing.T) {
 	t.Parallel()
 
-	wargaming := NewWargaming(vo.RequestConfig{})
+	body, err := json.Marshal(domain.WGEncycInfo{})
+	assert.NoError(t, err)
 
-	mockAPIClient := &mockAPIClient[vo.WGEncycInfo]{}
-	mockAPIClient.On("GetRequest", mock.Anything).Return(APIResponse[vo.WGEncycInfo]{}, nil)
-	wargaming.encycInfoClient = mockAPIClient
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write(body)
+	}))
+	defer server.Close()
+
+	wargaming := NewWargaming(RequestConfig{
+		URL: server.URL,
+	})
 
 	valid, err := wargaming.Test("hoge")
 	assert.True(t, valid)
@@ -156,72 +221,37 @@ func TestWargaming_Test(t *testing.T) {
 func TestWargaming_AccountInfo_異常系_リトライなし(t *testing.T) {
 	t.Parallel()
 
-	wargaming := NewWargaming(vo.RequestConfig{})
-	wargaming.SetAppID("your-app-id")
+	body := `{
+        "status":"error",
+        "error":{
+            "field":null,
+            "message":"INVALID_APPLICATION_ID",
+            "code":407,
+            "value":null
+        }
+    }`
 
-	message := "INVALID_APPLICATION_ID"
-	mockAPIClient := &mockAPIClient[vo.WGAccountInfo]{}
+	var calls int
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		calls++
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte(body))
+	}))
+	defer server.Close()
 
-	response := APIResponse[vo.WGAccountInfo]{
-		Body: vo.WGAccountInfo{
-			Status: "error",
-			Error:  vo.WGError{Message: message},
-		},
-		BodyString: `{
-            \"status\":\"error\",
-            \"error\":{
-                \"field\":null,
-                \"message\":\"INVALID_APPLICATION_ID\",
-                \"code\":407,\"value\":null
-            }
-        }`,
-	}
-	mockAPIClient.On("GetRequest", mock.Anything).Return(response, nil)
-	wargaming.accountInfoClient = mockAPIClient
+	wargaming := NewWargaming(RequestConfig{
+		URL: server.URL,
+	})
 
 	_, err := wargaming.AccountInfo([]int{123, 456})
 
-	assert.EqualError(t, err, apperr.New(apperr.WargamingAPIError, errors.New(response.BodyString)).Error())
-	mockAPIClient.AssertNumberOfCalls(t, "GetRequest", 1)
+	assert.EqualError(t, err, apperr.New(apperr.WargamingAPIError, errors.New(body)).Error())
+	assert.Equal(t, 1, calls)
 }
 
 func TestWargaming_AccountInfo_正常系_最大リトライ(t *testing.T) {
 	t.Parallel()
-
-	var retry uint64 = 1
-	wargaming := NewWargaming(vo.RequestConfig{Retry: retry})
-	wargaming.SetAppID("your-app-id")
-
-	messages := []string{
-		"REQUEST_LIMIT_EXCEEDED",
-		"SOURCE_NOT_AVAILABLE",
-	}
-
-	for _, v := range messages {
-		mockAPIClient := &mockAPIClient[vo.WGAccountInfo]{}
-		errorResponse := APIResponse[vo.WGAccountInfo]{
-			Body: vo.WGAccountInfo{Error: vo.WGError{Message: v}},
-		}
-		successResponse := APIResponse[vo.WGAccountInfo]{
-			Body: vo.WGAccountInfo{},
-		}
-		mockAPIClient.On("GetRequest", mock.Anything).Return(errorResponse, nil).Times(1)
-		mockAPIClient.On("GetRequest", mock.Anything).Return(successResponse, nil).Times(1)
-		wargaming.accountInfoClient = mockAPIClient
-
-		_, err := wargaming.AccountInfo([]int{123, 456})
-
-		assert.NoError(t, err)
-		mockAPIClient.AssertNumberOfCalls(t, "GetRequest", int(retry+1))
-	}
-}
-
-func TestWargaming_AccountInfo_異常系_最大リトライ(t *testing.T) {
-	t.Parallel()
-
-	var retry uint64 = 1
-	wargaming := NewWargaming(vo.RequestConfig{Retry: retry})
-	wargaming.SetAppID("your-app-id")
 
 	messages := []string{
 		"REQUEST_LIMIT_EXCEEDED",
@@ -229,31 +259,80 @@ func TestWargaming_AccountInfo_異常系_最大リトライ(t *testing.T) {
 	}
 
 	for _, message := range messages {
-		mockAPIClient := &mockAPIClient[vo.WGAccountInfo]{}
-		response := APIResponse[vo.WGAccountInfo]{
-			Body: vo.WGAccountInfo{
-				Error: vo.WGError{
-					Message: message,
-				},
-			},
-			BodyString: fmt.Sprintf(`{
-                \"status\":\"error\",
-                \"error\":{
-                    \"field\":null,
-                    \"message\":\"%s\",
-                    \"code\":407,\"value\":null
-                }
-            }`, message),
-		}
-		mockAPIClient.On("GetRequest", mock.Anything).Return(response, nil)
-		wargaming.accountInfoClient = mockAPIClient
+		body := fmt.Sprintf(`{
+            "status":"error",
+            "error":{
+                "field":null,
+                "message":"%s",
+                "code":407,
+                "value":null
+            }
+        }`, message)
+
+		var retry uint64 = 1
+		var calls int
+		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			calls++
+
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusOK)
+
+			if calls < int(retry+1) {
+				_, _ = w.Write([]byte(body))
+				return
+			}
+
+			body, _ := json.Marshal(domain.WGAccountInfo{})
+			_, _ = w.Write(body)
+		}))
+		defer server.Close()
+
+		wargaming := NewWargaming(RequestConfig{URL: server.URL, Retry: retry})
+
+		_, err := wargaming.AccountInfo([]int{123, 456})
+
+		assert.NoError(t, err)
+		assert.Equal(t, int(retry+1), calls)
+	}
+}
+
+func TestWargaming_AccountInfo_異常系_最大リトライ(t *testing.T) {
+	t.Parallel()
+
+	messages := []string{
+		"REQUEST_LIMIT_EXCEEDED",
+		"SOURCE_NOT_AVAILABLE",
+	}
+
+	for _, message := range messages {
+		body := fmt.Sprintf(`{
+            "status":"error",
+            "error":{
+                "field":null,
+                "message":"%s",
+                "code":407,
+                "value":null
+            }
+        }`, message)
+
+		var retry uint64 = 1
+		var calls int
+		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			calls++
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(body))
+		}))
+		defer server.Close()
+
+		wargaming := NewWargaming(RequestConfig{URL: server.URL, Retry: retry})
 
 		_, err := wargaming.AccountInfo([]int{123, 456})
 
 		assert.EqualError(t, err, apperr.New(
 			apperr.WargamingAPITemporaryUnavaillalble,
-			errors.New(response.BodyString),
+			errors.New(body),
 		).Error())
-		mockAPIClient.AssertNumberOfCalls(t, "GetRequest", int(retry+1))
+		assert.Equal(t, int(retry+1), calls)
 	}
 }

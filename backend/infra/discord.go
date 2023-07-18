@@ -7,30 +7,23 @@ import (
 	"os"
 	"strconv"
 	"wfs/backend/apperr"
-	"wfs/backend/vo"
 
 	"github.com/pkg/errors"
 )
 
 type Discord struct {
-	apiClient APIClientInterface[any]
+	config RequestConfig
 }
 
 type DisCordRequestBody struct {
 	Content string `json:"content"`
 }
 
-func NewDiscord(config vo.RequestConfig) *Discord {
-	return &Discord{
-		apiClient: NewAPIClient[any](
-			config.URL,
-			config.Retry,
-		),
-	}
+func NewDiscord(config RequestConfig) *Discord {
+	return &Discord{config: config}
 }
 
-func (d *Discord) Upload(text string) (APIResponse[any], error) {
-	response := APIResponse[any]{}
+func (d *Discord) Upload(text string) error {
 	zipName := "out.zip"
 	textName := "out.txt"
 
@@ -41,22 +34,22 @@ func (d *Discord) Upload(text string) (APIResponse[any], error) {
 		_ = os.Remove(zipName)
 	}()
 	if err != nil {
-		return response, apperr.New(apperr.WriteFile, err)
+		return apperr.New(apperr.WriteFile, err)
 	}
 
 	zw := zip.NewWriter(file)
 	fw, err := zw.Create(textName)
 	if err != nil {
-		return response, apperr.New(apperr.WriteFile, err)
+		return apperr.New(apperr.WriteFile, err)
 	}
 
 	_, err = fw.Write([]byte(text))
 	if err != nil {
-		return response, apperr.New(apperr.WriteFile, err)
+		return apperr.New(apperr.WriteFile, err)
 	}
 
 	if err := zw.Close(); err != nil {
-		return response, apperr.New(apperr.WriteFile, err)
+		return apperr.New(apperr.WriteFile, err)
 	}
 
 	// upload zip
@@ -67,9 +60,9 @@ func (d *Discord) Upload(text string) (APIResponse[any], error) {
 		{name: "file", content: zipName, isFile: true},
 	}
 
-	response, err = d.apiClient.PostMultipartFormData(forms)
+	response, err := postMultipartFormData[any](d.config.URL, forms, d.config.Retry)
 	if err != nil {
-		return response, err
+		return err
 	}
 
 	if response.StatusCode != http.StatusOK {
@@ -77,8 +70,8 @@ func (d *Discord) Upload(text string) (APIResponse[any], error) {
 			strconv.Itoa(response.StatusCode) +
 			" response_body: " +
 			response.BodyString
-		return response, apperr.New(apperr.DiscordAPIError, errors.New(message))
+		return apperr.New(apperr.DiscordAPIError, errors.New(message))
 	}
 
-	return response, nil
+	return nil
 }

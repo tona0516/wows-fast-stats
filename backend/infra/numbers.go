@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strconv"
 	"wfs/backend/apperr"
-	"wfs/backend/vo"
+	"wfs/backend/domain"
 
 	"github.com/cenkalti/backoff/v4"
 	"github.com/pkg/errors"
@@ -18,15 +18,15 @@ var (
 )
 
 type Numbers struct {
-	config vo.RequestConfig
+	config RequestConfig
 }
 
-func NewNumbers(config vo.RequestConfig) *Numbers {
+func NewNumbers(config RequestConfig) *Numbers {
 	return &Numbers{config: config}
 }
 
-func (n *Numbers) ExpectedStats() (vo.NSExpectedStats, error) {
-	var result vo.NSExpectedStats
+func (n *Numbers) ExpectedStats() (domain.NSExpectedStats, error) {
+	var result domain.NSExpectedStats
 
 	b := backoff.WithMaxRetries(backoff.NewExponentialBackOff(), n.config.Retry)
 	body, err := backoff.RetryWithData(n.fetch, b)
@@ -57,8 +57,8 @@ func (n *Numbers) fetch() ([]byte, error) {
 	return body, nil
 }
 
-func parse(body []byte) (vo.NSExpectedStats, error) {
-	var result vo.NSExpectedStats
+func parse(body []byte) (domain.NSExpectedStats, error) {
+	var result domain.NSExpectedStats
 
 	depth1 := make(map[string]interface{})
 	if err := json.Unmarshal(body, &depth1); err != nil {
@@ -74,7 +74,7 @@ func parse(body []byte) (vo.NSExpectedStats, error) {
 		return result, apperr.New(apperr.NumbersAPIParse, errNoDataKey)
 	}
 
-	data := make(map[int]vo.NSExpectedStatsData)
+	data := make(map[int]domain.NSExpectedStatsData)
 	for key, value := range depth2 {
 		shipID, err := strconv.Atoi(key)
 		if err != nil {
@@ -101,14 +101,14 @@ func parse(body []byte) (vo.NSExpectedStats, error) {
 			continue
 		}
 
-		data[shipID] = vo.NSExpectedStatsData{
+		data[shipID] = domain.NSExpectedStatsData{
 			AverageDamageDealt: damage,
 			AverageFrags:       frags,
 			WinRate:            wr,
 		}
 	}
 
-	result = vo.NSExpectedStats{
+	result = domain.NSExpectedStats{
 		Time: int(time),
 		Data: data,
 	}

@@ -1,4 +1,4 @@
-import type { vo } from "../wailsjs/go/models";
+import type { domain } from "../wailsjs/go/models";
 import { SkillLevel } from "./enums";
 
 const skillLevels = Object.values(SkillLevel);
@@ -48,15 +48,18 @@ const damageRatioRange = new Ranges([
 const winRateRange = new Ranges([47, 50, 52, 54, 56, 60, 65, Number.MAX_VALUE]);
 
 export class SkillLevelConverter {
-  skillColor: vo.SkillColor;
+  skillColor: domain.SkillColor;
   skillLevel?: SkillLevel;
 
-  private constructor(skillColor: vo.SkillColor, skillLevel?: SkillLevel) {
+  private constructor(skillColor: domain.SkillColor, skillLevel?: SkillLevel) {
     this.skillColor = skillColor;
     this.skillLevel = skillLevel;
   }
 
-  static fromPR(value: number, skillColor: vo.SkillColor): SkillLevelConverter {
+  static fromPR(
+    value: number,
+    skillColor: domain.SkillColor
+  ): SkillLevelConverter {
     const range = prRange.values.find((it) => value >= 0 && value < it.max);
     return range
       ? new SkillLevelConverter(skillColor, range.skillLevel)
@@ -66,7 +69,7 @@ export class SkillLevelConverter {
   static fromDamage(
     value: number,
     expected: number,
-    skillColor: vo.SkillColor
+    skillColor: domain.SkillColor
   ): SkillLevelConverter {
     const ratio = value / expected ?? 0;
     const range = damageRatioRange.values.find((it) => ratio < it.max);
@@ -77,7 +80,7 @@ export class SkillLevelConverter {
 
   static fromWinRate(
     value: number,
-    skillColor: vo.SkillColor
+    skillColor: domain.SkillColor
   ): SkillLevelConverter {
     const range = winRateRange.values.find((it) => value < it.max);
     return range

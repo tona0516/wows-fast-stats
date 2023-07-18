@@ -1,4 +1,4 @@
-import type { vo } from "../wailsjs/go/models";
+import type { domain } from "../wailsjs/go/models";
 import { Func, Page } from "./enums";
 
 export namespace Const {
@@ -55,7 +55,7 @@ export namespace Const {
 
   export const MAX_MEMO_LENGTH = 100;
 
-  export const DEFAULT_ALERT_PLAYER: vo.AlertPlayer = {
+  export const DEFAULT_ALERT_PLAYER: domain.AlertPlayer = {
     account_id: 0,
     name: "",
     pattern: "bi-check-circle-fill",

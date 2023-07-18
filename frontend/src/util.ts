@@ -1,5 +1,5 @@
 import { format, fromUnixTime } from "date-fns";
-import type { vo } from "../wailsjs/go/models";
+import type { domain } from "../wailsjs/go/models";
 import { Const } from "./Const";
 import { DisplayPattern, StatsCategory } from "./enums";
 import { SkillLevelConverter } from "./RankConverter";
@@ -7,9 +7,9 @@ import { SkillLevelConverter } from "./RankConverter";
 export function colors(
   key: string,
   value: number,
-  player: vo.Player,
+  player: domain.Player,
   statsCategory: StatsCategory,
-  skillColor: vo.SkillColor
+  skillColor: domain.SkillColor
 ): string {
   switch (key) {
     case "pr":
@@ -34,7 +34,7 @@ export function colors(
 }
 
 export function values(
-  player: vo.Player,
+  player: domain.Player,
   statsPattern: string,
   statsCategory: StatsCategory,
   key: string
@@ -52,9 +52,9 @@ export interface SummaryResult {
 }
 
 export function summary(
-  battle: vo.Battle,
+  battle: domain.Battle,
   excludes: number[],
-  userConfig: vo.UserConfig
+  userConfig: domain.UserConfig
 ): SummaryResult {
   if (!battle) {
     return undefined;
@@ -135,7 +135,7 @@ export function summary(
   };
 }
 
-export function clanURL(player: vo.Player): string {
+export function clanURL(player: domain.Player): string {
   return (
     Const.BASE_NUMBERS_URL +
     "clan/" +
@@ -145,7 +145,7 @@ export function clanURL(player: vo.Player): string {
   );
 }
 
-export function playerURL(player: vo.Player): string {
+export function playerURL(player: domain.Player): string {
   return (
     Const.BASE_NUMBERS_URL +
     "player/" +
@@ -155,7 +155,7 @@ export function playerURL(player: vo.Player): string {
   );
 }
 
-export function shipURL(player: vo.Player): string {
+export function shipURL(player: domain.Player): string {
   return (
     Const.BASE_NUMBERS_URL +
     "ship/" +
@@ -184,7 +184,7 @@ export function tierString(value: number): string {
 }
 
 export function decideDisplayPattern(
-  player: vo.Player,
+  player: domain.Player,
   statsPattern: string
 ): DisplayPattern {
   if (player.player_info.is_hidden) {
@@ -214,7 +214,7 @@ export function toDateForFilename(unixtime: number): string {
 }
 
 function mean(
-  players: vo.Player[],
+  players: domain.Player[],
   statsCategory: StatsCategory,
   statsPattern: string,
   key: string

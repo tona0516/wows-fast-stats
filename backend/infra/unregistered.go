@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"strings"
 	"wfs/backend/apperr"
-	"wfs/backend/vo"
+	"wfs/backend/domain"
 )
 
 //go:embed resource/ships.json
@@ -17,9 +17,9 @@ func NewUnregistered() *Unregistered {
 	return &Unregistered{}
 }
 
-func (u *Unregistered) Warship() (map[int]vo.Warship, error) {
+func (u *Unregistered) Warship() (map[int]domain.Warship, error) {
 	var ships []unregisteredShip
-	result := make(map[int]vo.Warship, 0)
+	result := make(map[int]domain.Warship, 0)
 
 	if err := json.Unmarshal(shipsByte, &ships); err != nil {
 		return result, apperr.New(apperr.ReadFile, err)
@@ -31,10 +31,10 @@ func (u *Unregistered) Warship() (map[int]vo.Warship, error) {
 			nation = "uk"
 		}
 
-		result[us.ID] = vo.Warship{
+		result[us.ID] = domain.Warship{
 			Name:   us.En,
 			Tier:   us.Level,
-			Type:   vo.NewShipType(us.Species),
+			Type:   domain.NewShipType(us.Species),
 			Nation: nation,
 		}
 	}

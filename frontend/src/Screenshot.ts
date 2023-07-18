@@ -1,13 +1,13 @@
 import * as htmlToImage from "html-to-image";
 import { AutoScreenshot, ManualScreenshot } from "../wailsjs/go/main/App";
-import type { vo } from "../wailsjs/go/models";
+import type { domain } from "../wailsjs/go/models";
 import { toDateForFilename } from "./util";
 
 export class Screenshot {
   isFirst: boolean;
-  battle: vo.Battle;
+  battle: domain.Battle;
 
-  constructor(battle: vo.Battle, isFirst: boolean) {
+  constructor(battle: domain.Battle, isFirst: boolean) {
     this.battle = battle;
     this.isFirst = isFirst;
   }

@@ -1,141 +1,141 @@
 <script lang="ts">
-import clone from "clone";
-import { createEventDispatcher } from "svelte";
-import { get } from "svelte/store";
-import {
-  ApplyRequiredUserConfig,
-  ApplyUserConfig,
-  DefaultUserConfig,
-  FontSizes,
-  OpenDirectory,
-  SampleTeams,
-  SelectDirectory,
-  UserConfig,
-} from "../../wailsjs/go/main/App";
-import { BrowserOpenURL, LogDebug } from "../../wailsjs/runtime/runtime";
-import { storedUserConfig } from "../stores";
-import { Const } from "../Const";
-import type { vo } from "../../wailsjs/go/models";
-import StatisticsTable from "../other_component/StatisticsTable.svelte";
-import {
-  Alert,
-  Badge,
-  Button,
-  FormGroup,
-  Input,
-  Label,
-  TabContent,
-  TabPane,
-} from "sveltestrap";
-import ConfirmModal from "../other_component/ConfirmModal.svelte";
+  import clone from "clone";
+  import { createEventDispatcher } from "svelte";
+  import { get } from "svelte/store";
+  import {
+    ApplyRequiredUserConfig,
+    ApplyUserConfig,
+    DefaultUserConfig,
+    FontSizes,
+    OpenDirectory,
+    SampleTeams,
+    SelectDirectory,
+    UserConfig,
+  } from "../../wailsjs/go/main/App";
+  import { BrowserOpenURL, LogDebug } from "../../wailsjs/runtime/runtime";
+  import { storedUserConfig } from "../stores";
+  import { Const } from "../Const";
+  import type { domain, vo } from "../../wailsjs/go/models";
+  import StatisticsTable from "../other_component/StatisticsTable.svelte";
+  import {
+    Alert,
+    Badge,
+    Button,
+    FormGroup,
+    Input,
+    Label,
+    TabContent,
+    TabPane,
+  } from "sveltestrap";
+  import ConfirmModal from "../other_component/ConfirmModal.svelte";
 
-const dispatch = createEventDispatcher();
+  const dispatch = createEventDispatcher();
 
-let inputUserConfig = get(storedUserConfig);
-storedUserConfig.subscribe((it) => {
-  inputUserConfig = clone(it);
-});
-let defaultUserConfig: vo.UserConfig;
-let isLoading = false;
-let sampleTeams: vo.Team[] = [];
-let displayKeys: string[] = [];
-let resetDisplaySettingConfirmModal: ConfirmModal;
-let validatedResult: vo.ValidatedResult;
+  let inputUserConfig = get(storedUserConfig);
+  storedUserConfig.subscribe((it) => {
+    inputUserConfig = clone(it);
+  });
+  let defaultUserConfig: domain.UserConfig;
+  let isLoading = false;
+  let sampleTeams: domain.Team[] = [];
+  let displayKeys: string[] = [];
+  let resetDisplaySettingConfirmModal: ConfirmModal;
+  let validatedResult: vo.ValidatedResult;
 
-async function clickApply() {
-  isLoading = true;
-  try {
-    validatedResult = await ApplyRequiredUserConfig(
-      inputUserConfig.install_path,
-      inputUserConfig.appid
-    );
+  async function clickApply() {
+    isLoading = true;
+    try {
+      validatedResult = await ApplyRequiredUserConfig(
+        inputUserConfig.install_path,
+        inputUserConfig.appid
+      );
 
-    const errorTexts = Object.values(validatedResult);
-    const isValid =
-      errorTexts.filter((it) => it == "").length === errorTexts.length;
-    if (isValid) {
+      const errorTexts = Object.values(validatedResult);
+      const isValid =
+        errorTexts.filter((it) => it == "").length === errorTexts.length;
+      if (isValid) {
+        const latest = await UserConfig();
+        storedUserConfig.set(latest);
+        dispatch("UpdateSuccess", { message: "設定を更新しました。" });
+      }
+    } catch (error) {
+      inputUserConfig = get(storedUserConfig);
+      dispatch("Failure", { message: error });
+    } finally {
+      isLoading = false;
+    }
+  }
+
+  async function silentApply() {
+    LogDebug("silentApply");
+    // Note: for the following sveltestrap bug
+    // https://github.com/bestguy/sveltestrap/issues/461
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
+    try {
+      await ApplyUserConfig(inputUserConfig);
       const latest = await UserConfig();
       storedUserConfig.set(latest);
-      dispatch("UpdateSuccess", { message: "設定を更新しました。" });
+    } catch (error) {
+      inputUserConfig = get(storedUserConfig);
     }
-  } catch (error) {
-    inputUserConfig = get(storedUserConfig);
-    dispatch("Failure", { message: error });
-  } finally {
-    isLoading = false;
   }
-}
 
-async function silentApply() {
-  LogDebug("silentApply");
-  // Note: for the following sveltestrap bug
-  // https://github.com/bestguy/sveltestrap/issues/461
-  await new Promise((resolve) => setTimeout(resolve, 100));
-
-  try {
-    await ApplyUserConfig(inputUserConfig);
-    const latest = await UserConfig();
-    storedUserConfig.set(latest);
-  } catch (error) {
-    inputUserConfig = get(storedUserConfig);
+  async function openDirectory(path: string) {
+    try {
+      await OpenDirectory(path);
+    } catch (error) {
+      dispatch("Failure", { message: error });
+    }
   }
-}
 
-async function openDirectory(path: string) {
-  try {
-    await OpenDirectory(path);
-  } catch (error) {
-    dispatch("Failure", { message: error });
+  async function selectDirectory() {
+    try {
+      const path = await SelectDirectory();
+      if (!path) return;
+      inputUserConfig.install_path = path;
+    } catch (error) {
+      dispatch("Failure", { message: error });
+    }
   }
-}
 
-async function selectDirectory() {
-  try {
-    const path = await SelectDirectory();
-    if (!path) return;
-    inputUserConfig.install_path = path;
-  } catch (error) {
-    dispatch("Failure", { message: error });
+  async function toggleAll(e: any) {
+    const isSelectAll: boolean = e.target.checked;
+
+    Object.keys(inputUserConfig.displays.ship).forEach(
+      (key) => (inputUserConfig.displays.ship[key] = isSelectAll)
+    );
+    Object.keys(inputUserConfig.displays.overall).forEach(
+      (key) => (inputUserConfig.displays.overall[key] = isSelectAll)
+    );
+
+    await silentApply();
   }
-}
 
-async function toggleAll(e: any) {
-  const isSelectAll: boolean = e.target.checked;
+  async function clickResetDisplaySetting() {
+    inputUserConfig.font_size = defaultUserConfig.font_size;
+    inputUserConfig.displays = defaultUserConfig.displays;
+    inputUserConfig.custom_color = defaultUserConfig.custom_color;
+    inputUserConfig.custom_digit = defaultUserConfig.custom_digit;
 
-  Object.keys(inputUserConfig.displays.ship).forEach(
-    (key) => (inputUserConfig.displays.ship[key] = isSelectAll)
-  );
-  Object.keys(inputUserConfig.displays.overall).forEach(
-    (key) => (inputUserConfig.displays.overall[key] = isSelectAll)
-  );
+    await silentApply();
+  }
 
-  await silentApply();
-}
+  async function main() {
+    defaultUserConfig = await DefaultUserConfig();
+    sampleTeams = await SampleTeams();
+    const shipKeys = Object.keys($storedUserConfig.displays.ship);
+    const overallKeys = Object.keys($storedUserConfig.displays.overall);
+    displayKeys = Array.from(new Set([...shipKeys, ...overallKeys]));
+  }
 
-async function clickResetDisplaySetting() {
-  inputUserConfig.font_size = defaultUserConfig.font_size;
-  inputUserConfig.displays = defaultUserConfig.displays;
-  inputUserConfig.custom_color = defaultUserConfig.custom_color;
-  inputUserConfig.custom_digit = defaultUserConfig.custom_digit;
-
-  await silentApply();
-}
-
-async function main() {
-  defaultUserConfig = await DefaultUserConfig();
-  sampleTeams = await SampleTeams();
-  const shipKeys = Object.keys($storedUserConfig.displays.ship);
-  const overallKeys = Object.keys($storedUserConfig.displays.overall);
-  displayKeys = Array.from(new Set([...shipKeys, ...overallKeys]));
-}
-
-main();
+  main();
 </script>
 
 <ConfirmModal
   message="表示設定をリセットしますか？"
-  on:onConfirmed="{clickResetDisplaySetting}"
-  bind:this="{resetDisplaySettingConfirmModal}"
+  on:onConfirmed={clickResetDisplaySetting}
+  bind:this={resetDisplaySettingConfirmModal}
 />
 
 <div class="m-3">
@@ -153,12 +153,12 @@ main();
             type="text"
             class="text-form w-auto"
             style="font-size: {$storedUserConfig.font_size};"
-            bind:value="{inputUserConfig.install_path}"
+            bind:value={inputUserConfig.install_path}
           />
           <Button
             color="secondary"
             style="font-size: {$storedUserConfig.font_size};"
-            on:click="{selectDirectory}">選択</Button
+            on:click={selectDirectory}>選択</Button
           >
         </div>
 
@@ -176,15 +176,14 @@ main();
           type="text"
           class="text-form w-auto"
           style="font-size: {$storedUserConfig.font_size};"
-          bind:value="{inputUserConfig.appid}"
+          bind:value={inputUserConfig.appid}
         />
         <div>
           <!-- svelte-ignore a11y-invalid-attribute -->
           <a
             class="td-link"
             href="#"
-            on:click="{() =>
-              BrowserOpenURL('https://developers.wargaming.net/')}"
+            on:click={() => BrowserOpenURL("https://developers.wargaming.net/")}
             >Developer Room</a
           >で作成したIDを入力してください。
         </div>
@@ -201,14 +200,15 @@ main();
         <Button
           color="primary"
           style="font-size: {$storedUserConfig.font_size};"
-          disabled="{isLoading}"
-          on:click="{clickApply}"
+          disabled={isLoading}
+          on:click={clickApply}
         >
           {#if isLoading}
             <span
               class="spinner-border spinner-border-sm"
               role="status"
-              aria-hidden="true"></span>
+              aria-hidden="true"
+            />
             更新中...
           {:else}
             保存
@@ -225,14 +225,13 @@ main();
           type="select"
           class="w-auto"
           style="font-size: {$storedUserConfig.font_size};"
-          bind:value="{inputUserConfig.font_size}"
-          on:change="{silentApply}"
+          bind:value={inputUserConfig.font_size}
+          on:change={silentApply}
         >
           {#await FontSizes() then fontSizes}
             {#each fontSizes as fs}
-              <option
-                selected="{fs === $storedUserConfig.font_size}"
-                value="{fs}">{Const.FONT_SIZE[fs]}</option
+              <option selected={fs === $storedUserConfig.font_size} value={fs}
+                >{Const.FONT_SIZE[fs]}</option
               >
             {/each}
           {/await}
@@ -245,12 +244,12 @@ main();
         <Input
           type="switch"
           style="font-size: {$storedUserConfig.font_size};"
-          on:change="{toggleAll}"
-          checked="{Object.values(inputUserConfig.displays.ship).filter(
+          on:change={toggleAll}
+          checked={Object.values(inputUserConfig.displays.ship).filter(
             (it) => !it
           ).length === 0 &&
             Object.values(inputUserConfig.displays.overall).filter((it) => !it)
-              .length === 0}"
+              .length === 0}
           label="全選択"
         />
 
@@ -274,8 +273,8 @@ main();
                     <Input
                       type="switch"
                       class="center"
-                      bind:checked="{inputUserConfig.displays.ship[key]}"
-                      on:change="{silentApply}"
+                      bind:checked={inputUserConfig.displays.ship[key]}
+                      on:change={silentApply}
                     />
                   {/if}
                 </td>
@@ -285,8 +284,8 @@ main();
                     <Input
                       type="switch"
                       class="center"
-                      bind:checked="{inputUserConfig.displays.overall[key]}"
-                      on:change="{silentApply}"
+                      bind:checked={inputUserConfig.displays.overall[key]}
+                      on:change={silentApply}
                     />
                   {/if}
                 </td>
@@ -297,14 +296,13 @@ main();
                       type="select"
                       class="p-1 m-1"
                       style="font-size: {$storedUserConfig.font_size};"
-                      bind:value="{inputUserConfig.custom_digit[key]}"
-                      on:change="{silentApply}"
+                      bind:value={inputUserConfig.custom_digit[key]}
+                      on:change={silentApply}
                     >
                       {#each [0, 1, 2] as digit}
                         <option
-                          selected="{digit ===
-                            inputUserConfig.custom_digit[key]}"
-                          value="{digit}">{digit}</option
+                          selected={digit === inputUserConfig.custom_digit[key]}
+                          value={digit}>{digit}</option
                         >
                       {/each}
                     </Input>
@@ -337,8 +335,8 @@ main();
                   <Input
                     type="color"
                     class="m-1"
-                    bind:value="{inputUserConfig.custom_color.skill.text[key]}"
-                    on:input="{silentApply}"
+                    bind:value={inputUserConfig.custom_color.skill.text[key]}
+                    on:input={silentApply}
                   />
                 </td>
 
@@ -346,10 +344,10 @@ main();
                   <Input
                     type="color"
                     class="m-1"
-                    bind:value="{inputUserConfig.custom_color.skill.background[
+                    bind:value={inputUserConfig.custom_color.skill.background[
                       key
-                    ]}"
-                    on:input="{silentApply}"
+                    ]}
+                    on:input={silentApply}
                   />
                 </td>
               </tr>
@@ -379,8 +377,8 @@ main();
                   <Input
                     type="color"
                     class="m-1"
-                    bind:value="{inputUserConfig.custom_color.tier.own[key]}"
-                    on:input="{silentApply}"
+                    bind:value={inputUserConfig.custom_color.tier.own[key]}
+                    on:input={silentApply}
                   />
                 </td>
 
@@ -388,8 +386,8 @@ main();
                   <Input
                     type="color"
                     class="m-1"
-                    bind:value="{inputUserConfig.custom_color.tier.other[key]}"
-                    on:input="{silentApply}"
+                    bind:value={inputUserConfig.custom_color.tier.other[key]}
+                    on:input={silentApply}
                   />
                 </td>
               </tr>
@@ -419,10 +417,8 @@ main();
                   <Input
                     type="color"
                     class="m-1"
-                    bind:value="{inputUserConfig.custom_color.ship_type.own[
-                      key
-                    ]}"
-                    on:input="{silentApply}"
+                    bind:value={inputUserConfig.custom_color.ship_type.own[key]}
+                    on:input={silentApply}
                   />
                 </td>
 
@@ -430,10 +426,10 @@ main();
                   <Input
                     type="color"
                     class="m-1"
-                    bind:value="{inputUserConfig.custom_color.ship_type.other[
+                    bind:value={inputUserConfig.custom_color.ship_type.other[
                       key
-                    ]}"
-                    on:input="{silentApply}"
+                    ]}
+                    on:input={silentApply}
                   />
                 </td>
               </tr>
@@ -447,9 +443,9 @@ main();
 
         <div style="font-size: {inputUserConfig.font_size};">
           <StatisticsTable
-            teams="{sampleTeams}"
-            userConfig="{inputUserConfig}"
-            alertPlayers="{[]}"
+            teams={sampleTeams}
+            userConfig={inputUserConfig}
+            alertPlayers={[]}
           />
         </div>
 
@@ -457,7 +453,7 @@ main();
           size="sm"
           color="warning"
           style="font-size: {$storedUserConfig.font_size};"
-          on:click="{resetDisplaySettingConfirmModal.toggle}">リセット</Button
+          on:click={resetDisplaySettingConfirmModal.toggle}>リセット</Button
         >
       </div>
     </TabPane>
@@ -469,13 +465,13 @@ main();
           <Label>チーム平均に含める最小戦闘数(艦戦績)</Label>
           <Input
             type="range"
-            min="{teamAvg.min_ship_battles}"
-            max="{100}"
-            step="{1}"
+            min={teamAvg.min_ship_battles}
+            max={100}
+            step={1}
             class="text-form w-auto"
             style="font-size: {$storedUserConfig.font_size};"
-            bind:value="{inputUserConfig.team_average.min_ship_battles}"
-            on:change="{silentApply}"
+            bind:value={inputUserConfig.team_average.min_ship_battles}
+            on:change={silentApply}
           />
           <div>
             {inputUserConfig.team_average.min_ship_battles}
@@ -486,13 +482,13 @@ main();
           <Label>チーム平均に含める最小戦闘数(総合成績)</Label>
           <Input
             type="range"
-            min="{teamAvg.min_overall_battles}"
-            max="{3000}"
-            step="{10}"
+            min={teamAvg.min_overall_battles}
+            max={3000}
+            step={10}
             class="text-form w-auto"
             style="font-size: {$storedUserConfig.font_size};"
-            bind:value="{inputUserConfig.team_average.min_overall_battles}"
-            on:change="{silentApply}"
+            bind:value={inputUserConfig.team_average.min_overall_battles}
+            on:change={silentApply}
           />
           <div>
             {inputUserConfig.team_average.min_overall_battles}
@@ -507,38 +503,38 @@ main();
             <Input
               type="switch"
               label="自動でスクリーンショットを保存する"
-              bind:checked="{inputUserConfig.save_screenshot}"
-              on:change="{silentApply}"
+              bind:checked={inputUserConfig.save_screenshot}
+              on:change={silentApply}
             />
             <!-- svelte-ignore a11y-invalid-attribute -->
             <a
               class="td-link"
               href="#"
-              on:click="{() => openDirectory('screenshot/')}"
-              ><i class="bi bi-folder2-open"></i> 保存フォルダを開く
+              on:click={() => openDirectory("screenshot/")}
+              ><i class="bi bi-folder2-open" /> 保存フォルダを開く
             </a>
           </li>
           <li class="mb-3">
             <Input
               type="switch"
               label="【開発用】自動で戦闘情報(tempArenaInfo.json)を保存する"
-              bind:checked="{inputUserConfig.save_temp_arena_info}"
-              on:change="{silentApply}"
+              bind:checked={inputUserConfig.save_temp_arena_info}
+              on:change={silentApply}
             />
             <!-- svelte-ignore a11y-invalid-attribute -->
             <a
               class="td-link"
               href="#"
-              on:click="{() => openDirectory('temp_arena_info/')}"
-              ><i class="bi bi-folder2-open"></i> 保存フォルダを開く
+              on:click={() => openDirectory("temp_arena_info/")}
+              ><i class="bi bi-folder2-open" /> 保存フォルダを開く
             </a>
           </li>
           <li class="mb-3">
             <Input
               type="switch"
               label="アプリ改善のためのデータ送信を許可する"
-              bind:checked="{inputUserConfig.send_report}"
-              on:change="{silentApply}"
+              bind:checked={inputUserConfig.send_report}
+              on:change={silentApply}
             />
             <ul>
               <li>アプリバージョン</li>
@@ -551,8 +547,8 @@ main();
             <Input
               type="switch"
               label="新しいバージョンがある場合に通知する"
-              bind:checked="{inputUserConfig.notify_updatable}"
-              on:change="{silentApply}"
+              bind:checked={inputUserConfig.notify_updatable}
+              on:change={silentApply}
             />
           </li>
         </ul>
