@@ -6,13 +6,11 @@ require (
 	github.com/cenkalti/backoff/v4 v4.2.1
 	github.com/mitchellh/go-ps v1.0.0
 	github.com/pkg/errors v0.9.1
-	github.com/rs/zerolog v1.29.1
 	github.com/skratchdot/open-golang v0.0.0-20200116055534-eef842397966
 	github.com/stretchr/testify v1.8.3
 	github.com/wailsapp/wails/v2 v2.5.1
 	golang.org/x/exp v0.0.0-20230522175609-2e198f4a06a1
 	golang.org/x/sync v0.2.0
-	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 )
 
 require (

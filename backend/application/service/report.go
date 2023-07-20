@@ -10,21 +10,24 @@ import (
 )
 
 type Report struct {
+	version   vo.Version
 	localFile repository.LocalFileInterface
 	discord   repository.DiscordInterface
 }
 
 func NewReport(
+	version vo.Version,
 	localFile repository.LocalFileInterface,
 	discord repository.DiscordInterface,
 ) *Report {
 	return &Report{
+		version:   version,
 		localFile: localFile,
 		discord:   discord,
 	}
 }
 
-func (r *Report) Send(version vo.Version, content error) error {
+func (r *Report) Send(content error) error {
 	// get UserConfig
 	userConfig, err := r.localFile.User()
 	if err != nil {
@@ -45,9 +48,9 @@ func (r *Report) Send(version vo.Version, content error) error {
 	// make content
 	targets := []string{
 		"Semver:",
-		fmt.Sprintf("%+v\n", version.Semver),
+		fmt.Sprintf("%+v\n", r.version.Semver),
 		"Revision:",
-		fmt.Sprintf("%+v\n", version.Revision),
+		fmt.Sprintf("%+v\n", r.version.Revision),
 		"Error:",
 		fmt.Sprintf("%+v\n", content),
 		"UserConfig:",

@@ -9,6 +9,7 @@
     storedAlertPlayers,
     storedExcludePlayerIDs,
     storedSummaryResult,
+    storedLogs,
   } from "./stores";
   import { summary } from "./util";
   import {
@@ -25,7 +26,7 @@
     EventsOn,
     LogDebug,
   } from "../wailsjs/runtime/runtime";
-  import type { domain } from "../wailsjs/go/models";
+  import type { domain, vo } from "../wailsjs/go/models";
   import MainPage from "./page_component/MainPage.svelte";
   import ConfigPage from "./page_component/ConfigPage.svelte";
   import AppInfoPage from "./page_component/AppInfoPage.svelte";
@@ -47,8 +48,18 @@
     summary($storedBattle, $storedExcludePlayerIDs, $storedUserConfig)
   );
 
+  EventsOn(AppEvent.log, async (param: vo.LogParam) => {
+    LogDebug(`EventsOn:${AppEvent.log}`);
+
+    const formatted = Object.values(param).join("\t");
+    storedLogs.update((logs) => {
+      logs.push(formatted);
+      return logs;
+    });
+  });
+
   EventsOn(AppEvent.battleStart, async () => {
-    LogDebug(AppEvent.battleStart);
+    LogDebug(`EventsOn:${AppEvent.battleStart}`);
 
     try {
       notification.removeToastWithKey(ToastKey.wait);
@@ -93,7 +104,7 @@
   });
 
   EventsOn(AppEvent.battleEnd, () => {
-    LogDebug(AppEvent.battleEnd);
+    LogDebug(`EventsOn:${AppEvent.battleEnd}`);
 
     notification.showToastWithKey(
       "戦闘中ではありません。開始時に自動的にリロードします。",

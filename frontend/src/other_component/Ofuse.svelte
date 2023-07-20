@@ -3,7 +3,7 @@
   import { storedUserConfig } from "../stores";
 </script>
 
-<div class="center">
+<div class="center mt-2 mx-2">
   <span> 気に入ってもらえたらカンパお願いします🙏 </span>
 
   <button

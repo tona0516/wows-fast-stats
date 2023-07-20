@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"time"
 	"wfs/backend/application/repository"
+	"wfs/backend/application/vo"
 )
 
 const (
@@ -16,13 +17,13 @@ const (
 type Watcher struct {
 	interval       time.Duration
 	localFile      repository.LocalFileInterface
-	eventsEmitFunc func(ctx context.Context, eventName string, optionalData ...interface{})
+	eventsEmitFunc vo.EventEmit
 }
 
 func NewWatcher(
 	interval time.Duration,
 	localFile repository.LocalFileInterface,
-	eventsEmitFunc func(ctx context.Context, eventName string, optionalData ...interface{}),
+	eventsEmitFunc vo.EventEmit,
 ) *Watcher {
 	return &Watcher{
 		interval:       interval,

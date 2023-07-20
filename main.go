@@ -57,10 +57,10 @@ func main() {
 
 func initApp() *App {
 	version := vo.Version{Semver: semver, Revision: revision}
+	env := vo.Env{Str: env}
 
 	// infra
 	var maxRetry uint64 = 2
-	logger := infra.NewLogger(vo.Env{Str: env}, version)
 	discord := infra.NewDiscord(infra.RequestConfig{
 		URL:   discordWebhookURL,
 		Retry: maxRetry,
@@ -82,24 +82,25 @@ func initApp() *App {
 
 	// service
 	var parallels uint = 5
-	interval := 1 * time.Second
+	watchInterval := 1 * time.Second
 	configService := service.NewConfig(localFile, wargaming)
 	screenshotService := service.NewScreenshot(localFile, runtime.SaveFileDialog)
 	battleService := service.NewBattle(parallels, wargaming, localFile, numbers, unregistered)
-	watcherService := service.NewWatcher(interval, localFile, runtime.EventsEmit)
-	reportService := service.NewReport(localFile, discord)
+	watcherService := service.NewWatcher(watchInterval, localFile, runtime.EventsEmit)
+	reportService := service.NewReport(version, localFile, discord)
 	updaterService := service.NewUpdater(version, github)
+	logger := service.NewLogger(env, version, runtime.EventsEmit, *reportService)
 
 	return NewApp(
-		vo.Env{Str: env},
-		vo.Version{Semver: semver, Revision: revision},
+		env,
+		version,
 		*configService,
 		*screenshotService,
 		*watcherService,
 		*battleService,
 		*reportService,
 		*updaterService,
-		logger,
+		*logger,
 	)
 }
 

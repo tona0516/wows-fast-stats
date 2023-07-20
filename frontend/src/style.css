@@ -125,7 +125,7 @@ body {
 }
 
 .text-form {
-  min-width: 400px;
+  min-width: 480px;
 }
 
 .nav-link {
@@ -134,4 +134,9 @@ body {
 
 .modal-color {
   background-color: var(--app-background-color);
+}
+
+.logging {
+  min-width: 640px;
+  min-height: 320px;
 }

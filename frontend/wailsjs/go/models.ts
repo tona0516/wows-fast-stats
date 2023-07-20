@@ -871,6 +871,26 @@ export namespace domain {
 
 export namespace vo {
 	
+	export class LogParam {
+	    timestamp: string;
+	    log_level: string;
+	    semver: string;
+	    message: string;
+	    error: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new LogParam(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.timestamp = source["timestamp"];
+	        this.log_level = source["log_level"];
+	        this.semver = source["semver"];
+	        this.message = source["message"];
+	        this.error = source["error"];
+	    }
+	}
 	export class ValidatedResult {
 	    install_path: string;
 	    appid: string;

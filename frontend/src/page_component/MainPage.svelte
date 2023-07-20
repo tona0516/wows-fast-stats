@@ -4,15 +4,17 @@
     storedUserConfig,
     storedSummaryResult,
     storedAlertPlayers,
+    storedLogs,
   } from "../stores";
   import ColorDescription from "../other_component/ColorDescription.svelte";
   import Ofuse from "../other_component/Ofuse.svelte";
   import StatisticsTable from "../other_component/StatisticsTable.svelte";
   import { toDateForDisplay } from "../util";
+  import Logging from "../other_component/Logging.svelte";
 </script>
 
 {#if $storedBattle}
-  <div class="m-2">
+  <div class="mt-2 mx-2">
     <StatisticsTable
       teams={$storedBattle.teams}
       userConfig={$storedUserConfig}
@@ -26,8 +28,6 @@
   {#if $storedSummaryResult}
     <div class="d-flex justify-content-center">
       <div class="center mx-2">
-        <h6>戦闘情報</h6>
-
         <table class="table table-sm table-text-color w-auto td-multiple">
           <tbody>
             <tr>
@@ -49,8 +49,6 @@
       </div>
 
       <div class="center mx-2">
-        <h6>チーム平均</h6>
-
         <table class="table table-sm table-text-color w-auto td-multiple">
           <thead>
             <tr>
@@ -93,6 +91,8 @@
   {/if}
 {/if}
 
-<ColorDescription />
+<ColorDescription userConfig={$storedUserConfig} />
+
+<Logging logs={$storedLogs} />
 
 <Ofuse />

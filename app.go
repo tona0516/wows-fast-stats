@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"strconv"
 	"wfs/backend/apperr"
-	"wfs/backend/application/repository"
 	"wfs/backend/application/service"
 	"wfs/backend/application/vo"
 	"wfs/backend/domain"
@@ -29,7 +28,7 @@ type App struct {
 	battleService     service.Battle
 	reportService     service.Report
 	updaterService    service.Updater
-	logger            repository.LoggerInterface
+	logger            service.Logger
 	excludePlayer     map[int]bool
 }
 
@@ -42,7 +41,7 @@ func NewApp(
 	battleService service.Battle,
 	reportService service.Report,
 	updaterService service.Updater,
-	logger repository.LoggerInterface,
+	logger service.Logger,
 ) *App {
 	return &App{
 		env:               env,
@@ -59,8 +58,9 @@ func NewApp(
 }
 
 func (a *App) onStartup(ctx context.Context) {
-	a.logger.Debug("onStartup() called")
 	a.ctx = ctx
+	a.logger.SetContext(ctx)
+	a.logger.Debug("startup backend")
 
 	appConfig, err := a.configService.App()
 	if err == nil {
@@ -73,7 +73,7 @@ func (a *App) onStartup(ctx context.Context) {
 }
 
 func (a *App) onShutdown(ctx context.Context) {
-	a.logger.Debug("onShutdown() called")
+	a.logger.Debug("shutdown backend")
 
 	// Save windows size
 	appConfig, _ := a.configService.App()
@@ -108,7 +108,7 @@ func (a *App) Battle() (domain.Battle, error) {
 	if err != nil {
 		a.logger.Error("Failed to fetch Battle", err)
 
-		if err := a.reportService.Send(a.version, err); err != nil {
+		if err := a.reportService.Send(err); err != nil {
 			a.logger.Warn("Failed to send Report", err)
 		}
 
@@ -396,4 +396,9 @@ func (a *App) StatsPatterns() []string {
 
 func (a *App) LatestRelease() (domain.GHLatestRelease, error) {
 	return a.updaterService.Updatable()
+}
+
+func (a *App) LogParam() vo.LogParam {
+	// type sharing for frontend
+	return vo.LogParam{}
 }
