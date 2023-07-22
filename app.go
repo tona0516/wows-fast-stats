@@ -19,7 +19,6 @@ const PARALLELS = 5
 
 type App struct {
 	ctx               context.Context
-	version           vo.Version
 	env               vo.Env
 	cancelWatcher     context.CancelFunc
 	configService     service.Config
@@ -34,7 +33,6 @@ type App struct {
 
 func NewApp(
 	env vo.Env,
-	version vo.Version,
 	configService service.Config,
 	screenshotService service.Screenshot,
 	watcherService service.Watcher,
@@ -45,7 +43,6 @@ func NewApp(
 ) *App {
 	return &App{
 		env:               env,
-		version:           version,
 		configService:     configService,
 		screenshotService: screenshotService,
 		watcherService:    watcherService,
@@ -310,8 +307,8 @@ func (a *App) AutoScreenshot(filename string, base64Data string) error {
 	return apperr.ToFrontendError(err)
 }
 
-func (a *App) AppVersion() vo.Version {
-	return a.version
+func (a *App) Semver() string {
+	return a.env.Semver
 }
 
 func (a *App) OpenDirectory(path string) error {

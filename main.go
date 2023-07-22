@@ -4,6 +4,7 @@ import (
 	"embed"
 	"fmt"
 	"os"
+	"strconv"
 	"time"
 	"wfs/backend/application/service"
 	"wfs/backend/application/vo"
@@ -21,30 +22,42 @@ var assets embed.FS
 
 //nolint:gochecknoglobals
 var (
-	semver            string
-	env               string
-	discordWebhookURL string
+	AppName           string
+	Semver            string
+	IsDebug           string
+	DiscordWebhookURL string
 )
 
 func main() {
-	app := initApp()
-
 	if isAlreadyRunning() {
 		os.Exit(0)
 		return
 	}
 
+	isDebug, _ := strconv.ParseBool(IsDebug)
+	env := vo.Env{
+		AppName: AppName,
+		Semver:  Semver,
+		IsDebug: isDebug,
+	}
+
+	app := initApp(env)
+
+	title := AppName
+	if isDebug {
+		title = fmt.Sprintf("%s [開発環境]", AppName)
+	}
+
 	// Create application with options
 	err := wails.Run(&options.App{
-		Title:  "wows-fast-stats",
+		Title:  title,
 		Width:  1280,
 		Height: 720,
 		AssetServer: &assetserver.Options{
 			Assets: assets,
 		},
-		BackgroundColour: &options.RGBA{R: 27, G: 38, B: 54, A: 1},
-		OnStartup:        app.onStartup,
-		OnShutdown:       app.onShutdown,
+		OnStartup:  app.onStartup,
+		OnShutdown: app.onShutdown,
 		Bind: []interface{}{
 			app,
 		},
@@ -54,14 +67,11 @@ func main() {
 	}
 }
 
-func initApp() *App {
-	version := vo.Version{Semver: semver}
-	env := vo.Env{Str: env}
-
+func initApp(env vo.Env) *App {
 	// infra
 	var maxRetry uint64 = 2
 	discord := infra.NewDiscord(infra.RequestConfig{
-		URL:   discordWebhookURL,
+		URL:   DiscordWebhookURL,
 		Retry: maxRetry,
 	})
 	wargaming := infra.NewWargaming(infra.RequestConfig{
@@ -86,13 +96,12 @@ func initApp() *App {
 	screenshotService := service.NewScreenshot(localFile, runtime.SaveFileDialog)
 	battleService := service.NewBattle(parallels, wargaming, localFile, numbers, unregistered)
 	watcherService := service.NewWatcher(watchInterval, localFile, runtime.EventsEmit)
-	reportService := service.NewReport(version, localFile, discord)
-	updaterService := service.NewUpdater(version, github)
-	logger := service.NewLogger(env, version, runtime.EventsEmit, *reportService)
+	reportService := service.NewReport(env, localFile, discord)
+	updaterService := service.NewUpdater(env, github)
+	logger := service.NewLogger(env, runtime.EventsEmit, *reportService)
 
 	return NewApp(
 		env,
-		version,
 		*configService,
 		*screenshotService,
 		*watcherService,

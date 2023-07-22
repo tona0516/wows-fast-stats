@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { AppVersion } from "../../wailsjs/go/main/App";
+  import { Semver } from "../../wailsjs/go/main/App";
   import { BrowserOpenURL } from "../../wailsjs/runtime/runtime";
   import iconApp from "../assets/images/appicon.png";
 </script>
@@ -10,8 +10,8 @@
   <div class="m-1 center">
     <div>wows-fast-stats</div>
 
-    {#await AppVersion() then version}
-      <div>バージョン {version.semver}</div>
+    {#await Semver() then semver}
+      <div>バージョン {semver}</div>
     {/await}
   </div>
 

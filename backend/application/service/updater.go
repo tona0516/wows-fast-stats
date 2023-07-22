@@ -10,24 +10,24 @@ import (
 )
 
 type Updater struct {
-	currentVersion vo.Version
-	github         repository.GithubInterface
+	env    vo.Env
+	github repository.GithubInterface
 }
 
 func NewUpdater(
-	currentVersion vo.Version,
+	env vo.Env,
 	github repository.GithubInterface,
 ) *Updater {
 	return &Updater{
-		currentVersion: currentVersion,
-		github:         github,
+		env:    env,
+		github: github,
 	}
 }
 
 func (u *Updater) Updatable() (domain.GHLatestRelease, error) {
 	var latestRelease domain.GHLatestRelease
 
-	c, err := semver.NewConstraint(fmt.Sprintf("> %s", u.currentVersion.Semver))
+	c, err := semver.NewConstraint(fmt.Sprintf("> %s", u.env.Semver))
 	if err != nil {
 		return latestRelease, err
 	}

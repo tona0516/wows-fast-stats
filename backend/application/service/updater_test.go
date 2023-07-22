@@ -12,9 +12,9 @@ import (
 func TestUpdater_Updatable_正常系_アップデートあり(t *testing.T) {
 	t.Parallel()
 
-	currentVersion := vo.Version{Semver: "1.0.0"}
+	env := vo.Env{Semver: "1.0.0"}
 	mockGithub := &mockGithub{}
-	updater := NewUpdater(currentVersion, mockGithub)
+	updater := NewUpdater(env, mockGithub)
 
 	response := domain.GHLatestRelease{TagName: "2.0.0", HTMLURL: "https://hoge.com"}
 	mockGithub.On("LatestRelease").Return(response, nil)
@@ -31,9 +31,9 @@ func TestUpdater_Updatable_正常系_アップデートあり(t *testing.T) {
 func TestUpdater_Updatable_正常系_アップデートなし(t *testing.T) {
 	t.Parallel()
 
-	currentVersion := vo.Version{Semver: "1.0.0"}
+	env := vo.Env{Semver: "1.0.0"}
 	mockGithub := &mockGithub{}
-	updater := NewUpdater(currentVersion, mockGithub)
+	updater := NewUpdater(env, mockGithub)
 
 	response := domain.GHLatestRelease{TagName: "1.0.0", HTMLURL: "https://hoge.com"}
 	mockGithub.On("LatestRelease").Return(response, nil)
@@ -50,9 +50,9 @@ func TestUpdater_Updatable_正常系_アップデートなし(t *testing.T) {
 func TestUpdater_Updatable_異常系(t *testing.T) {
 	t.Parallel()
 
-	currentVersion := vo.Version{Semver: "1.0.0"}
+	env := vo.Env{Semver: "1.0.0"}
 	mockGithub := &mockGithub{}
-	updater := NewUpdater(currentVersion, mockGithub)
+	updater := NewUpdater(env, mockGithub)
 
 	//nolint:goerr113
 	expected := errors.New("some error")

@@ -10,18 +10,18 @@ import (
 )
 
 type Report struct {
-	version   vo.Version
+	env       vo.Env
 	localFile repository.LocalFileInterface
 	discord   repository.DiscordInterface
 }
 
 func NewReport(
-	version vo.Version,
+	env vo.Env,
 	localFile repository.LocalFileInterface,
 	discord repository.DiscordInterface,
 ) *Report {
 	return &Report{
-		version:   version,
+		env:       env,
 		localFile: localFile,
 		discord:   discord,
 	}
@@ -48,7 +48,7 @@ func (r *Report) Send(content error) error {
 	// make content
 	targets := []string{
 		"Semver:",
-		fmt.Sprintf("%+v\n", r.version.Semver),
+		fmt.Sprintf("%+v\n", r.env.Semver),
 		"Error:",
 		fmt.Sprintf("%+v\n", content),
 		"UserConfig:",

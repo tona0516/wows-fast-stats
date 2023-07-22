@@ -14,10 +14,6 @@ export function AlertPlayers() {
   return window['go']['main']['App']['AlertPlayers']();
 }
 
-export function AppVersion() {
-  return window['go']['main']['App']['AppVersion']();
-}
-
 export function ApplyRequiredUserConfig(arg1, arg2) {
   return window['go']['main']['App']['ApplyRequiredUserConfig'](arg1, arg2);
 }
@@ -88,6 +84,10 @@ export function SearchPlayer(arg1) {
 
 export function SelectDirectory() {
   return window['go']['main']['App']['SelectDirectory']();
+}
+
+export function Semver() {
+  return window['go']['main']['App']['Semver']();
 }
 
 export function StatsPatterns() {

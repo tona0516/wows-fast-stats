@@ -9,8 +9,6 @@ export function AlertPatterns():Promise<Array<string>>;
 
 export function AlertPlayers():Promise<Array<domain.AlertPlayer>>;
 
-export function AppVersion():Promise<vo.Version>;
-
 export function ApplyRequiredUserConfig(arg1:string,arg2:string):Promise<vo.ValidatedResult>;
 
 export function ApplyUserConfig(arg1:domain.UserConfig):Promise<void>;
@@ -46,6 +44,8 @@ export function SampleTeams():Promise<Array<domain.Team>>;
 export function SearchPlayer(arg1:string):Promise<domain.WGAccountList>;
 
 export function SelectDirectory():Promise<string>;
+
+export function Semver():Promise<string>;
 
 export function StatsPatterns():Promise<Array<string>>;
 

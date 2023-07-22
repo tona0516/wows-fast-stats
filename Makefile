@@ -1,12 +1,12 @@
-APP := wows-fast-stats
+APP_NAME := wows-fast-stats
 SEMVER := 0.7.0
-EXE := $(APP)-$(SEMVER).exe
-ZIP := $(APP).zip
+EXE := $(APP_NAME)-$(SEMVER).exe
+ZIP := $(APP_NAME).zip
 DISCORD_WEBHOOK_URL := $(shell cat discord_webhook_url)
 
-LDFLAGS_COMMON := -X main.semver=$(SEMVER) -X main.discordWebhookURL=$(DISCORD_WEBHOOK_URL)
-LDFLAGS_DEV := -X main.env=debug $(LDFLAGS_COMMON)
-LDFLAGS_PROD := -X main.env=production $(LDFLAGS_COMMON)
+LDFLAGS_COMMON := -X main.AppName=$(APP_NAME) -X main.Semver=$(SEMVER) -X main.DiscordWebhookURL=$(DISCORD_WEBHOOK_URL)
+LDFLAGS_DEV := $(LDFLAGS_COMMON) -X main.IsDebug=true
+LDFLAGS_PROD := $(LDFLAGS_COMMON)
 
 TEST_DIR := test_install_dir/replays/
 
@@ -36,11 +36,11 @@ build-nolint: gen
 
 .PHONY: package
 package: build
-	rm -rf $(APP) $(ZIP)
-	mkdir $(APP)
-	cp build/bin/$(EXE) $(APP)
-	zip -r $(ZIP) $(APP)
-	rm -rf $(APP)
+	rm -rf $(APP_NAME) $(ZIP)
+	mkdir $(APP_NAME)
+	cp build/bin/$(EXE) $(APP_NAME)
+	zip -r $(ZIP) $(APP_NAME)
+	rm -rf $(APP_NAME)
 
 .PHONY: gen
 gen:

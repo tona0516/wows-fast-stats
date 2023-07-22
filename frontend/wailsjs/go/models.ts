@@ -905,18 +905,6 @@ export namespace vo {
 	        this.appid = source["appid"];
 	    }
 	}
-	export class Version {
-	    semver: string;
-	
-	    static createFrom(source: any = {}) {
-	        return new Version(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.semver = source["semver"];
-	    }
-	}
 
 }
 

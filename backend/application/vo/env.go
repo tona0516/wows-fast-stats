@@ -1,10 +1,8 @@
 package vo
 
+// Note: set by ldflags in Makefile.
 type Env struct {
-	// Note: set by ldflags in Makefile
-	Str string
-}
-
-func (e *Env) IsProduction() bool {
-	return e.Str == "production"
+	AppName string `json:"app_name"`
+	IsDebug bool   `json:"is_debug"`
+	Semver  string `json:"semver"`
 }
