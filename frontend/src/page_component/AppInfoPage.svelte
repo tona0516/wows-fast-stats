@@ -12,7 +12,6 @@
 
     {#await AppVersion() then version}
       <div>バージョン {version.semver}</div>
-      <div>リビジョン {version.revision}</div>
     {/await}
   </div>
 

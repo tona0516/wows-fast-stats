@@ -49,8 +49,6 @@ func (r *Report) Send(content error) error {
 	targets := []string{
 		"Semver:",
 		fmt.Sprintf("%+v\n", r.version.Semver),
-		"Revision:",
-		fmt.Sprintf("%+v\n", r.version.Revision),
 		"Error:",
 		fmt.Sprintf("%+v\n", content),
 		"UserConfig:",

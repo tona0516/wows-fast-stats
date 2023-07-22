@@ -907,7 +907,6 @@ export namespace vo {
 	}
 	export class Version {
 	    semver: string;
-	    revision: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new Version(source);
@@ -916,7 +915,6 @@ export namespace vo {
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.semver = source["semver"];
-	        this.revision = source["revision"];
 	    }
 	}
 

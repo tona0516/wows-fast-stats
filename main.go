@@ -22,7 +22,6 @@ var assets embed.FS
 //nolint:gochecknoglobals
 var (
 	semver            string
-	revision          string
 	env               string
 	discordWebhookURL string
 )
@@ -56,7 +55,7 @@ func main() {
 }
 
 func initApp() *App {
-	version := vo.Version{Semver: semver, Revision: revision}
+	version := vo.Version{Semver: semver}
 	env := vo.Env{Str: env}
 
 	// infra

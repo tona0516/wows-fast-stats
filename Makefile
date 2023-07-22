@@ -1,11 +1,10 @@
 APP := wows-fast-stats
 SEMVER := 0.7.0
-REVISION := $(shell git rev-parse --short HEAD)
 EXE := $(APP)-$(SEMVER).exe
 ZIP := $(APP).zip
 DISCORD_WEBHOOK_URL := $(shell cat discord_webhook_url)
 
-LDFLAGS_COMMON := -X main.semver=$(SEMVER) -X main.revision=$(REVISION) -X main.discordWebhookURL=$(DISCORD_WEBHOOK_URL)
+LDFLAGS_COMMON := -X main.semver=$(SEMVER) -X main.discordWebhookURL=$(DISCORD_WEBHOOK_URL)
 LDFLAGS_DEV := -X main.env=debug $(LDFLAGS_COMMON)
 LDFLAGS_PROD := -X main.env=production $(LDFLAGS_COMMON)
 
