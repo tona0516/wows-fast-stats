@@ -45,7 +45,7 @@ func main() {
 
 	title := AppName
 	if isDebug {
-		title = fmt.Sprintf("%s [開発環境]", AppName)
+		title += " [dev]"
 	}
 
 	// Create application with options

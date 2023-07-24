@@ -1,5 +1,5 @@
 package repository
 
 type DiscordInterface interface {
-	Upload(text string) error
+	Upload(text string, message string) error
 }

@@ -23,7 +23,7 @@ func NewDiscord(config RequestConfig) *Discord {
 	return &Discord{config: config}
 }
 
-func (d *Discord) Upload(text string) error {
+func (d *Discord) Upload(text string, message string) error {
 	zipName := "out.zip"
 	textName := "out.txt"
 
@@ -54,7 +54,7 @@ func (d *Discord) Upload(text string) error {
 
 	// upload zip
 	//nolint:errchkjson
-	payload, _ := json.Marshal(DisCordRequestBody{Content: "uploaded file!"})
+	payload, _ := json.Marshal(DisCordRequestBody{Content: message})
 	forms := []Form{
 		{name: "payload_json", content: string(payload), isFile: false},
 		{name: "file", content: zipName, isFile: true},

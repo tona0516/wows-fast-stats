@@ -64,7 +64,11 @@ func (r *Report) Send(content error) error {
 	}
 
 	// send report
-	return r.discord.Upload(sb.String())
+	message := "uploaded file!"
+	if r.env.IsDebug {
+		message += " [dev]"
+	}
+	return r.discord.Upload(sb.String(), message)
 }
 
 func prettryJSON(data any) string {
