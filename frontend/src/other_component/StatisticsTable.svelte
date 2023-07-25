@@ -3,7 +3,7 @@
   import AvgCheckboxTableData from "../tabledata_component/AvgCheckboxTableData.svelte";
   import PlayerNameTableData from "../tabledata_component/PlayerNameTableData.svelte";
   import ShipInfoTableData from "../tabledata_component/ShipInfoTableData.svelte";
-  import GenericTableData from "../tabledata_component/GenericTableData.svelte";
+  import SingleTableData from "../tabledata_component/SingleTableData.svelte";
   import PairTableData from "../tabledata_component/PairTableData.svelte";
   import ShipTypeRateTableData from "../tabledata_component/ShipTypeRateTableData.svelte";
   import TierRateTableData from "../tabledata_component/TierRateTableData.svelte";
@@ -23,14 +23,14 @@
   ]);
 
   const shipComponents = new ComponentList(StatsCategory.Ship, [
-    new ComponenInfo("pr", GenericTableData),
-    new ComponenInfo("damage", GenericTableData),
-    new ComponenInfo("win_rate", GenericTableData, { unit: "%" }),
-    new ComponenInfo("kd_rate", GenericTableData),
-    new ComponenInfo("kill", GenericTableData),
-    new ComponenInfo("planes_killed", GenericTableData),
-    new ComponenInfo("exp", GenericTableData),
-    new ComponenInfo("battles", GenericTableData),
+    new ComponenInfo("pr", SingleTableData),
+    new ComponenInfo("damage", SingleTableData),
+    new ComponenInfo("win_rate", SingleTableData, { unit: "%" }),
+    new ComponenInfo("kd_rate", SingleTableData),
+    new ComponenInfo("kill", SingleTableData),
+    new ComponenInfo("planes_killed", SingleTableData),
+    new ComponenInfo("exp", SingleTableData),
+    new ComponenInfo("battles", SingleTableData),
     new ComponenInfo("survived_rate", PairTableData, {
       unit: "%",
       key1: "win_survived_rate",
@@ -44,19 +44,19 @@
   ]);
 
   const overallComponents = new ComponentList(StatsCategory.Overall, [
-    new ComponenInfo("damage", GenericTableData),
-    new ComponenInfo("win_rate", GenericTableData, { unit: "%" }),
-    new ComponenInfo("kd_rate", GenericTableData),
-    new ComponenInfo("kill", GenericTableData),
-    new ComponenInfo("death", GenericTableData),
-    new ComponenInfo("exp", GenericTableData),
-    new ComponenInfo("battles", GenericTableData),
+    new ComponenInfo("damage", SingleTableData),
+    new ComponenInfo("win_rate", SingleTableData, { unit: "%" }),
+    new ComponenInfo("kd_rate", SingleTableData),
+    new ComponenInfo("kill", SingleTableData),
+    new ComponenInfo("death", SingleTableData),
+    new ComponenInfo("exp", SingleTableData),
+    new ComponenInfo("battles", SingleTableData),
     new ComponenInfo("survived_rate", PairTableData, {
       unit: "%",
       key1: "win_survived_rate",
       key2: "lose_survived_rate",
     }),
-    new ComponenInfo("avg_tier", GenericTableData),
+    new ComponenInfo("avg_tier", SingleTableData),
     new ComponenInfo("using_ship_type_rate", ShipTypeRateTableData),
     new ComponenInfo("using_tier_rate", TierRateTableData),
   ]);
