@@ -9,7 +9,7 @@
     const loggingID = document.getElementById(elementID);
     if (loggingID) {
       // Note: subscribeが更新前にコールされるため更新後にスクロールさせるために少し遅延させる
-      setTimeout(() => (loggingID.scrollTop = loggingID.scrollHeight), 0.5);
+      setTimeout(() => (loggingID.scrollTop = loggingID.scrollHeight), 100);
     }
   });
 </script>
