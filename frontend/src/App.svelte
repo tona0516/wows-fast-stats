@@ -17,7 +17,7 @@
     Battle,
     ExcludePlayerIDs,
     LogErrorForFrontend,
-    Ready,
+    StartWatching,
     LatestRelease,
     UserConfig,
   } from "../wailsjs/go/main/App";
@@ -185,7 +185,7 @@
       return;
     }
 
-    Ready();
+    StartWatching();
   }
 
   window.onload = function () {
@@ -237,7 +237,7 @@
           notification.showToast(event.detail.message, "success");
           notification.removeToastWithKey(ToastKey.needConfig);
           if (!$storedBattle) {
-            Ready();
+            StartWatching();
           }
         }}
         on:Failure={(event) =>

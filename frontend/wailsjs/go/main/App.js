@@ -62,10 +62,6 @@ export function OpenDirectory(arg1) {
   return window['go']['main']['App']['OpenDirectory'](arg1);
 }
 
-export function Ready() {
-  return window['go']['main']['App']['Ready']();
-}
-
 export function RemoveAlertPlayer(arg1) {
   return window['go']['main']['App']['RemoveAlertPlayer'](arg1);
 }
@@ -88,6 +84,10 @@ export function SelectDirectory() {
 
 export function Semver() {
   return window['go']['main']['App']['Semver']();
+}
+
+export function StartWatching() {
+  return window['go']['main']['App']['StartWatching']();
 }
 
 export function StatsPatterns() {

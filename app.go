@@ -82,7 +82,7 @@ func (a *App) onShutdown(ctx context.Context) {
 	}
 }
 
-func (a *App) Ready() {
+func (a *App) StartWatching() {
 	if a.cancelWatcher != nil {
 		a.cancelWatcher()
 	}

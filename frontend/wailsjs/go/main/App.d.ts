@@ -33,8 +33,6 @@ export function ManualScreenshot(arg1:string,arg2:string):Promise<void>;
 
 export function OpenDirectory(arg1:string):Promise<void>;
 
-export function Ready():Promise<void>;
-
 export function RemoveAlertPlayer(arg1:number):Promise<void>;
 
 export function RemoveExcludePlayerID(arg1:number):Promise<void>;
@@ -46,6 +44,8 @@ export function SearchPlayer(arg1:string):Promise<domain.WGAccountList>;
 export function SelectDirectory():Promise<string>;
 
 export function Semver():Promise<string>;
+
+export function StartWatching():Promise<void>;
 
 export function StatsPatterns():Promise<Array<string>>;
 
