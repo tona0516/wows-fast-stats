@@ -50,10 +50,6 @@ export function LogErrorForFrontend(arg1) {
   return window['go']['main']['App']['LogErrorForFrontend'](arg1);
 }
 
-export function LogParam() {
-  return window['go']['main']['App']['LogParam']();
-}
-
 export function ManualScreenshot(arg1, arg2) {
   return window['go']['main']['App']['ManualScreenshot'](arg1, arg2);
 }

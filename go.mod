@@ -13,6 +13,8 @@ require (
 	golang.org/x/sync v0.2.0
 )
 
+require github.com/rs/zerolog v1.29.1
+
 require (
 	github.com/Masterminds/semver/v3 v3.2.1
 	github.com/bep/debounce v1.2.1 // indirect

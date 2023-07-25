@@ -98,7 +98,6 @@ func initApp(env vo.Env) *App {
 	watcherService := service.NewWatcher(watchInterval, localFile, runtime.EventsEmit)
 	reportService := service.NewReport(env, localFile, discord)
 	updaterService := service.NewUpdater(env, github)
-	logger := service.NewLogger(env, runtime.EventsEmit, *reportService)
 
 	return NewApp(
 		env,
@@ -108,7 +107,6 @@ func initApp(env vo.Env) *App {
 		*battleService,
 		*reportService,
 		*updaterService,
-		*logger,
 	)
 }
 

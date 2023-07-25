@@ -23,10 +23,11 @@
   } from "../wailsjs/go/main/App";
   import {
     BrowserOpenURL,
+    EventsEmit,
     EventsOn,
     LogDebug,
   } from "../wailsjs/runtime/runtime";
-  import type { domain, vo } from "../wailsjs/go/models";
+  import type { domain } from "../wailsjs/go/models";
   import MainPage from "./page_component/MainPage.svelte";
   import ConfigPage from "./page_component/ConfigPage.svelte";
   import AppInfoPage from "./page_component/AppInfoPage.svelte";
@@ -48,12 +49,11 @@
     summary($storedBattle, $storedExcludePlayerIDs, $storedUserConfig)
   );
 
-  EventsOn(AppEvent.log, async (param: vo.LogParam) => {
+  EventsOn(AppEvent.log, async (log: string) => {
     LogDebug(`EventsOn:${AppEvent.log}`);
 
-    const formatted = Object.values(param).join("\t");
     storedLogs.update((logs) => {
-      logs.push(formatted);
+      logs.push(log);
       return logs;
     });
   });
@@ -141,6 +141,8 @@
   }
 
   async function main() {
+    EventsEmit("ONLOAD");
+
     try {
       const players = await AlertPlayers();
       storedAlertPlayers.set(players);

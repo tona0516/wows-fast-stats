@@ -2,20 +2,19 @@ package main
 
 import (
 	"context"
-	"fmt"
-	"strconv"
 	"wfs/backend/apperr"
 	"wfs/backend/application/service"
 	"wfs/backend/application/vo"
 	"wfs/backend/domain"
 	"wfs/backend/infra"
+	"wfs/backend/logger"
 
 	"github.com/pkg/errors"
 	"github.com/skratchdot/open-golang/open"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
-const PARALLELS = 5
+const EventOnload = "ONLOAD"
 
 type App struct {
 	ctx               context.Context
@@ -27,7 +26,6 @@ type App struct {
 	battleService     service.Battle
 	reportService     service.Report
 	updaterService    service.Updater
-	logger            service.Logger
 	excludePlayer     map[int]bool
 }
 
@@ -39,7 +37,6 @@ func NewApp(
 	battleService service.Battle,
 	reportService service.Report,
 	updaterService service.Updater,
-	logger service.Logger,
 ) *App {
 	return &App{
 		env:               env,
@@ -49,15 +46,17 @@ func NewApp(
 		battleService:     battleService,
 		reportService:     reportService,
 		updaterService:    updaterService,
-		logger:            logger,
 		excludePlayer:     map[int]bool{},
 	}
 }
 
 func (a *App) onStartup(ctx context.Context) {
 	a.ctx = ctx
-	a.logger.SetContext(ctx)
-	a.logger.Debug("startup backend")
+	logger.Init(ctx, a.env)
+
+	runtime.EventsOn(ctx, EventOnload, func(optionalData ...interface{}) {
+		logger.Zerolog().Info().Msg("application started")
+	})
 
 	appConfig, err := a.configService.App()
 	if err == nil {
@@ -70,7 +69,7 @@ func (a *App) onStartup(ctx context.Context) {
 }
 
 func (a *App) onShutdown(ctx context.Context) {
-	a.logger.Debug("shutdown backend")
+	logger.Zerolog().Info().Msg("application will shutdown...")
 
 	// Save windows size
 	appConfig, _ := a.configService.App()
@@ -78,7 +77,7 @@ func (a *App) onShutdown(ctx context.Context) {
 	appConfig.Window.Width = width
 	appConfig.Window.Height = height
 	if err := a.configService.UpdateApp(appConfig); err != nil {
-		a.logger.Warn("Failed to update AppConfig", err)
+		logger.Zerolog().Error().Err(err).Send()
 	}
 }
 
@@ -97,16 +96,16 @@ func (a *App) Battle() (domain.Battle, error) {
 
 	userConfig, err := a.configService.User()
 	if err != nil {
-		a.logger.Error("Failed to get UserConfig", err)
+		logger.Zerolog().Error().Err(err).Send()
 		return result, apperr.ToFrontendError(err)
 	}
 
 	result, err = a.battleService.Battle(userConfig)
 	if err != nil {
-		a.logger.Error("Failed to fetch Battle", err)
+		logger.Zerolog().Error().Err(err).Send()
 
 		if err := a.reportService.Send(err); err != nil {
-			a.logger.Warn("Failed to send Report", err)
+			logger.Zerolog().Error().Err(err).Send()
 		}
 
 		return result, apperr.ToFrontendError(err)
@@ -116,140 +115,13 @@ func (a *App) Battle() (domain.Battle, error) {
 }
 
 func (a *App) SampleTeams() []domain.Team {
-	players := make([]domain.Player, 8)
-
-	tiers := []uint{
-		11,
-		10,
-		9,
-		8,
-		7,
-		6,
-		5,
-		4,
-	}
-
-	shipTypes := []domain.ShipType{
-		domain.CV,
-		domain.BB,
-		domain.BB,
-		domain.CL,
-		domain.CL,
-		domain.DD,
-		domain.DD,
-		domain.SS,
-	}
-
-	prs := []float64{
-		0,
-		750,
-		1100,
-		1350,
-		1550,
-		1750,
-		2100,
-		2450,
-	}
-
-	damageRatios := []float64{
-		0,
-		0.6,
-		0.8,
-		1.0,
-		1.2,
-		1.4,
-		1.5,
-		1.6,
-	}
-
-	winRates := []float64{
-		0,
-		47,
-		50,
-		52,
-		54,
-		56,
-		60,
-		65,
-	}
-
-	for i := range players {
-		playerInfo := domain.PlayerInfo{
-			ID:   1,
-			Name: fmt.Sprintf("player_name%d", i+1),
-			Clan: domain.Clan{
-				Tag: "TEST",
-			},
-		}
-		shipInfo := domain.ShipInfo{
-			Name:      "Test Ship",
-			Nation:    "japan",
-			Tier:      tiers[i],
-			Type:      shipTypes[i],
-			AvgDamage: 10000,
-		}
-		shipStats := domain.ShipStats{
-			Battles:            10,
-			Damage:             10000 * damageRatios[i],
-			WinRate:            winRates[i],
-			WinSurvivedRate:    50,
-			LoseSurvivedRate:   50,
-			KdRate:             1,
-			Kill:               1,
-			Exp:                1000,
-			MainBatteryHitRate: 50,
-			TorpedoesHitRate:   5,
-			PlanesKilled:       5,
-			PR:                 prs[i],
-		}
-		overallStats := domain.OverallStats{
-			Battles:          10,
-			Damage:           10000 * damageRatios[i],
-			WinRate:          winRates[i],
-			WinSurvivedRate:  50,
-			LoseSurvivedRate: 50,
-			KdRate:           1,
-			Kill:             1,
-			Exp:              1000,
-			AvgTier:          5,
-			UsingShipTypeRate: domain.ShipTypeGroup{
-				SS: 20,
-				DD: 20,
-				CL: 20,
-				BB: 20,
-				CV: 20,
-			},
-			UsingTierRate: domain.TierGroup{
-				Low:    33.3,
-				Middle: 33.3,
-				High:   33.4,
-			},
-		}
-		players[i] = domain.Player{
-			PlayerInfo: playerInfo,
-			ShipInfo:   shipInfo,
-			PvPSolo: domain.PlayerStats{
-				ShipStats:    shipStats,
-				OverallStats: overallStats,
-			},
-			PvPAll: domain.PlayerStats{
-				ShipStats:    shipStats,
-				OverallStats: overallStats,
-			},
-		}
-	}
-
-	return []domain.Team{
-		{
-			Players: players,
-		},
-	}
+	return domain.SampleTeams()
 }
 
 func (a *App) SelectDirectory() (string, error) {
 	path, err := runtime.OpenDirectoryDialog(a.ctx, runtime.OpenDialogOptions{})
 	if err != nil {
-		a.logger.Warn("Failed to get directory, path:"+path, err)
+		logger.Zerolog().Error().Err(err).Str("path", path).Send()
 	}
 
 	return path, apperr.ToFrontendError(err)
@@ -262,7 +134,7 @@ func (a *App) DefaultUserConfig() domain.UserConfig {
 func (a *App) UserConfig() (domain.UserConfig, error) {
 	config, err := a.configService.User()
 	if err != nil {
-		a.logger.Warn("Failed to get UserConfig", err)
+		logger.Zerolog().Error().Err(err).Send()
 	}
 
 	return config, apperr.ToFrontendError(err)
@@ -271,7 +143,7 @@ func (a *App) UserConfig() (domain.UserConfig, error) {
 func (a *App) ApplyUserConfig(config domain.UserConfig) error {
 	err := a.configService.UpdateOptional(config)
 	if err != nil {
-		a.logger.Warn("Failed to update UserConfig", err)
+		logger.Zerolog().Error().Err(err).Send()
 	}
 
 	return apperr.ToFrontendError(err)
@@ -283,7 +155,7 @@ func (a *App) ApplyRequiredUserConfig(
 ) (vo.ValidatedResult, error) {
 	validatedResult, err := a.configService.UpdateRequired(installPath, appid)
 	if err != nil {
-		a.logger.Warn("Failed to update UserConfig for required", err)
+		logger.Zerolog().Error().Err(err).Send()
 	}
 
 	return validatedResult, apperr.ToFrontendError(err)
@@ -292,7 +164,7 @@ func (a *App) ApplyRequiredUserConfig(
 func (a *App) ManualScreenshot(filename string, base64Data string) error {
 	err := a.screenshotService.SaveWithDialog(a.ctx, filename, base64Data)
 	if err != nil {
-		a.logger.Warn("Failed to save screenshot, filename:"+filename+" base64Data:"+base64Data, err)
+		logger.Zerolog().Error().Err(err).Str("filename", filename).Send()
 	}
 
 	return apperr.ToFrontendError(err)
@@ -301,7 +173,7 @@ func (a *App) ManualScreenshot(filename string, base64Data string) error {
 func (a *App) AutoScreenshot(filename string, base64Data string) error {
 	err := a.screenshotService.SaveForAuto(filename, base64Data)
 	if err != nil {
-		a.logger.Warn("Failed to save screenshot, filename:"+filename+" base64Data:"+base64Data, err)
+		logger.Zerolog().Error().Err(err).Str("filename", filename).Send()
 	}
 
 	return apperr.ToFrontendError(err)
@@ -315,7 +187,7 @@ func (a *App) OpenDirectory(path string) error {
 	err := open.Run(path)
 	if err != nil {
 		wraped := apperr.New(apperr.OpenDirectory, err)
-		a.logger.Warn("Failed to open directory, path:"+path, wraped)
+		logger.Zerolog().Error().Err(wraped).Str("path", path).Send()
 		return apperr.ToFrontendError(wraped)
 	}
 
@@ -342,7 +214,7 @@ func (a *App) RemoveExcludePlayerID(playerID int) {
 func (a *App) AlertPlayers() ([]domain.AlertPlayer, error) {
 	players, err := a.configService.AlertPlayers()
 	if err != nil {
-		a.logger.Warn("Failed to get AlertPlayers", err)
+		logger.Zerolog().Error().Err(err).Send()
 	}
 
 	return players, apperr.ToFrontendError(err)
@@ -351,7 +223,7 @@ func (a *App) AlertPlayers() ([]domain.AlertPlayer, error) {
 func (a *App) UpdateAlertPlayer(player domain.AlertPlayer) error {
 	err := a.configService.UpdateAlertPlayer(player)
 	if err != nil {
-		a.logger.Warn("Failed to update AlertPlayer, player.Name:"+player.Name, err)
+		logger.Zerolog().Error().Err(err).Str("player", player.Name).Send()
 	}
 
 	return apperr.ToFrontendError(err)
@@ -360,7 +232,7 @@ func (a *App) UpdateAlertPlayer(player domain.AlertPlayer) error {
 func (a *App) RemoveAlertPlayer(accountID int) error {
 	err := a.configService.RemoveAlertPlayer(accountID)
 	if err != nil {
-		a.logger.Warn("Failed to remove AlertPlayer, accountID:"+strconv.Itoa(accountID), err)
+		logger.Zerolog().Error().Err(err).Int("account id", accountID).Send()
 	}
 
 	return apperr.ToFrontendError(err)
@@ -369,7 +241,7 @@ func (a *App) RemoveAlertPlayer(accountID int) error {
 func (a *App) SearchPlayer(prefix string) (domain.WGAccountList, error) {
 	accountList, err := a.configService.SearchPlayer(prefix)
 	if err != nil {
-		a.logger.Warn("Failed to search player, prefix:"+prefix, err)
+		logger.Zerolog().Error().Err(err).Str("prefix", prefix).Send()
 	}
 
 	return accountList, apperr.ToFrontendError(err)
@@ -379,8 +251,9 @@ func (a *App) AlertPatterns() []string {
 	return domain.AlertPatterns
 }
 
-func (a *App) LogErrorForFrontend(err string) {
-	a.logger.Warn("Error has occurred in frontend", apperr.New(apperr.FrontendError, errors.New(err)))
+func (a *App) LogErrorForFrontend(errString string) {
+	err := apperr.New(apperr.FrontendError, errors.New(errString))
+	logger.Zerolog().Error().Err(err).Send()
 }
 
 func (a *App) FontSizes() []string {
@@ -393,9 +266,4 @@ func (a *App) StatsPatterns() []string {
 
 func (a *App) LatestRelease() (domain.GHLatestRelease, error) {
 	return a.updaterService.Updatable()
-}
-
-func (a *App) LogParam() vo.LogParam {
-	// type sharing for frontend
-	return vo.LogParam{}
 }
