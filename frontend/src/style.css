@@ -137,6 +137,6 @@ body {
 }
 
 .logging {
-  min-width: 640px;
-  min-height: 320px;
+  width: 40em;
+  height: 20em;
 }
