@@ -7,6 +7,7 @@ import (
 	"time"
 	"wfs/backend/application/repository"
 	"wfs/backend/application/vo"
+	"wfs/backend/domain"
 )
 
 const (
@@ -32,7 +33,7 @@ func NewWatcher(
 	}
 }
 
-func (w *Watcher) Start(appCtx context.Context, ctx context.Context) {
+func (w *Watcher) Start(appCtx context.Context, ctx context.Context, userConfig domain.UserConfig) {
 	var latestHash string
 
 	for {
@@ -42,14 +43,7 @@ func (w *Watcher) Start(appCtx context.Context, ctx context.Context) {
 		default:
 			time.Sleep(w.interval)
 
-			userConfig, err := w.localFile.User()
-			if err != nil {
-				continue
-			}
-			if userConfig.Appid == "" {
-				continue
-			}
-
+			// TODO 存在しないエラーとその他のエラーを分ける
 			tempArenaInfo, err := w.localFile.TempArenaInfo(userConfig.InstallPath)
 			if err != nil {
 				w.eventsEmitFunc(appCtx, EventEnd)

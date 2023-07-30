@@ -23,7 +23,6 @@ func TestWatcher_Start_戦闘開始(t *testing.T) {
 	}
 
 	mockLocalFile := &mockLocalFile{}
-	mockLocalFile.On("User").Return(config, nil)
 	mockLocalFile.On("TempArenaInfo", config.InstallPath).Return(domain.TempArenaInfo{}, nil)
 
 	var events []string
@@ -34,7 +33,7 @@ func TestWatcher_Start_戦闘開始(t *testing.T) {
 	interval := 10 * time.Millisecond
 
 	watcher := NewWatcher(interval, mockLocalFile, emitFunc)
-	go watcher.Start(ctx, ctx)
+	go watcher.Start(ctx, ctx, config)
 
 	// 20ms待ってEventStartが発行されたことを検証する
 	time.Sleep(20 * time.Millisecond)
@@ -59,7 +58,6 @@ func TestWatcher_Start_戦闘終了(t *testing.T) {
 	}
 
 	mockLocalFile := &mockLocalFile{}
-	mockLocalFile.On("User").Return(config, nil)
 	mockLocalFile.On("TempArenaInfo", config.InstallPath).Return(domain.TempArenaInfo{}, errors.New("not exists"))
 
 	var events []string
@@ -70,7 +68,7 @@ func TestWatcher_Start_戦闘終了(t *testing.T) {
 	interval := 10 * time.Millisecond
 
 	watcher := NewWatcher(interval, mockLocalFile, emitFunc)
-	go watcher.Start(ctx, ctx)
+	go watcher.Start(ctx, ctx, config)
 
 	// 20ms待ってEventEndが発行されたことを検証する
 	time.Sleep(100 * time.Millisecond)
@@ -95,7 +93,6 @@ func TestWatcher_Start_キャンセル(t *testing.T) {
 	}
 
 	mockLocalFile := &mockLocalFile{}
-	mockLocalFile.On("User").Return(config, nil)
 	mockLocalFile.On("TempArenaInfo", config.InstallPath).Return(domain.TempArenaInfo{}, nil)
 
 	var events []string
@@ -107,7 +104,7 @@ func TestWatcher_Start_キャンセル(t *testing.T) {
 	watcher := NewWatcher(interval, mockLocalFile, emitFunc)
 
 	// Startメソッドをゴルーチンで非同期に実行する
-	go watcher.Start(ctx, ctx)
+	go watcher.Start(ctx, ctx, config)
 
 	// キャンセルしてイベントが発行されなかったことを検証する
 	cancel()

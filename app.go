@@ -81,14 +81,23 @@ func (a *App) onShutdown(ctx context.Context) {
 	}
 }
 
-func (a *App) StartWatching() {
+func (a *App) StartWatching() error {
+	userConfig, err := a.configService.User()
+	if err != nil {
+		return err
+	}
+	if userConfig.InstallPath == "" {
+		return apperr.ErrInvalidInstallPath
+	}
+
 	if a.cancelWatcher != nil {
 		a.cancelWatcher()
 	}
 	ctx, cancel := context.WithCancel(context.Background())
 	a.cancelWatcher = cancel
+	go a.watcherService.Start(a.ctx, ctx, userConfig)
 
-	go a.watcherService.Start(a.ctx, ctx)
+	return nil
 }
 
 func (a *App) Battle() (domain.Battle, error) {

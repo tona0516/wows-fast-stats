@@ -187,7 +187,11 @@
       return;
     }
 
-    StartWatching();
+    try {
+      StartWatching();
+    } catch (error) {
+      notification.showToast(error, "error");
+    }
   }
 
   window.onload = function () {
@@ -239,7 +243,11 @@
           notification.showToast(event.detail.message, "success");
           notification.removeToastWithKey(ToastKey.needConfig);
           if (!$storedBattle) {
-            StartWatching();
+            try {
+              StartWatching();
+            } catch (error) {
+              notification.showToast(error, "error");
+            }
           }
         }}
         on:Failure={(event) =>
