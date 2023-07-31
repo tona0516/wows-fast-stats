@@ -2,6 +2,7 @@ package infra
 
 import (
 	"encoding/base64"
+	"encoding/json"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -14,16 +15,16 @@ import (
 )
 
 const (
-	ConfigDirName         string = "config"
-	ConfigUserName        string = "user.json"
-	ConfigAppName         string = "app.json"
-	ConfigAlertPlayerName string = "alert_player.json"
-	tempArenaInfoDir      string = "temp_arena_info"
-	ReplayDir             string = "replays"
-	TempArenaInfoName     string = "tempArenaInfo.json"
+	// directory.
+	configDir        string = "config"
+	replaysDir       string = "replays"
+	tempArenaInfoDir string = "temp_arena_info"
+	// file.
+	userConfigFile    string = "user.json"
+	appConfigFile     string = "app.json"
+	alertPlayerFile   string = "alert_player.json"
+	tempArenaInfoFile string = "tempArenaInfo.json"
 )
-
-var errNoTempArenaInfo = errors.New("no tempArenaInfo.json")
 
 //nolint:gochecknoglobals
 var DefaultUserConfig domain.UserConfig = domain.UserConfig{
@@ -122,35 +123,76 @@ var DefaultUserConfig domain.UserConfig = domain.UserConfig{
 	},
 }
 
-type LocalFile struct{}
+type LocalFile struct {
+	userConfigPath  string
+	appConfigPath   string
+	alertPlayerPath string
+}
 
 func NewLocalFile() *LocalFile {
-	return &LocalFile{}
+	return &LocalFile{
+		userConfigPath:  filepath.Join(configDir, userConfigFile),
+		appConfigPath:   filepath.Join(configDir, appConfigFile),
+		alertPlayerPath: filepath.Join(configDir, alertPlayerFile),
+	}
 }
 
 func (l *LocalFile) User() (domain.UserConfig, error) {
-	// note: set default value
-	return read(ConfigUserName, DefaultUserConfig)
+	config, err := readJSON[domain.UserConfig](l.userConfigPath)
+	if err != nil {
+		if errors.Is(err, fs.ErrNotExist) {
+			return DefaultUserConfig, nil
+		}
+		return domain.UserConfig{}, apperr.New(apperr.ReadFile, err)
+	}
+
+	return config, nil
 }
 
 func (l *LocalFile) UpdateUser(config domain.UserConfig) error {
-	return update(ConfigUserName, config)
+	if err := writeJSON(l.userConfigPath, config); err != nil {
+		return apperr.New(apperr.WriteFile, err)
+	}
+
+	return nil
 }
 
 func (l *LocalFile) App() (vo.AppConfig, error) {
-	return read(ConfigAppName, vo.AppConfig{})
+	config, err := readJSON[vo.AppConfig](l.appConfigPath)
+	if err != nil {
+		config = vo.AppConfig{}
+		if errors.Is(err, fs.ErrNotExist) {
+			return config, nil
+		}
+		return config, apperr.New(apperr.ReadFile, err)
+	}
+
+	return config, nil
 }
 
 func (l *LocalFile) UpdateApp(config vo.AppConfig) error {
-	return update(ConfigAppName, config)
+	if err := writeJSON(l.appConfigPath, config); err != nil {
+		return apperr.New(apperr.WriteFile, err)
+	}
+
+	return nil
 }
 
 func (l *LocalFile) AlertPlayers() ([]domain.AlertPlayer, error) {
-	return read(ConfigAlertPlayerName, make([]domain.AlertPlayer, 0))
+	players, err := readJSON[[]domain.AlertPlayer](l.alertPlayerPath)
+	if err != nil {
+		players = make([]domain.AlertPlayer, 0)
+		if errors.Is(err, fs.ErrNotExist) {
+			return players, nil
+		}
+		return players, apperr.New(apperr.ReadFile, err)
+	}
+
+	return players, nil
 }
 
 func (l *LocalFile) UpdateAlertPlayer(player domain.AlertPlayer) error {
-	players, err := read(ConfigAlertPlayerName, make([]domain.AlertPlayer, 0))
+	players, err := l.AlertPlayers()
 	if err != nil {
 		return err
 	}
@@ -168,11 +210,15 @@ func (l *LocalFile) UpdateAlertPlayer(player domain.AlertPlayer) error {
 		players = append(players, player)
 	}
 
-	return update(ConfigAlertPlayerName, players)
+	if err := writeJSON(l.alertPlayerPath, players); err != nil {
+		return apperr.New(apperr.WriteFile, err)
+	}
+
+	return nil
 }
 
 func (l *LocalFile) RemoveAlertPlayer(accountID int) error {
-	players, err := read(ConfigAlertPlayerName, make([]domain.AlertPlayer, 0))
+	players, err := l.AlertPlayers()
 	if err != nil {
 		return err
 	}
@@ -190,7 +236,11 @@ func (l *LocalFile) RemoveAlertPlayer(accountID int) error {
 		return nil
 	}
 
-	return update(ConfigAlertPlayerName, players)
+	if err := writeJSON(l.alertPlayerPath, players); err != nil {
+		return apperr.New(apperr.WriteFile, err)
+	}
+
+	return nil
 }
 
 func (l *LocalFile) SaveScreenshot(path string, base64Data string) error {
@@ -219,7 +269,7 @@ func (l *LocalFile) TempArenaInfo(installPath string) (domain.TempArenaInfo, err
 	var tempArenaInfo domain.TempArenaInfo
 
 	tempArenaInfoPaths := []string{}
-	root := filepath.Join(installPath, ReplayDir)
+	root := filepath.Join(installPath, replaysDir)
 	err := filepath.WalkDir(root, func(path string, info fs.DirEntry, err error) error {
 		if err != nil {
 			return err
@@ -229,7 +279,7 @@ func (l *LocalFile) TempArenaInfo(installPath string) (domain.TempArenaInfo, err
 			return nil
 		}
 
-		if info.Name() != TempArenaInfoName {
+		if info.Name() != tempArenaInfoFile {
 			return nil
 		}
 
@@ -243,14 +293,13 @@ func (l *LocalFile) TempArenaInfo(installPath string) (domain.TempArenaInfo, err
 
 	tempArenaInfo, err = decideTempArenaInfo(tempArenaInfoPaths)
 	if err != nil {
-		return tempArenaInfo, err
+		return tempArenaInfo, apperr.New(apperr.ReadFile, err)
 	}
 
 	return tempArenaInfo, nil
 }
 
 func (l *LocalFile) SaveTempArenaInfo(tempArenaInfo domain.TempArenaInfo) error {
-	_ = os.Mkdir(tempArenaInfoDir, 0o755)
 	path := filepath.Join(tempArenaInfoDir, "tempArenaInfo_"+strconv.FormatInt(tempArenaInfo.Unixtime(), 10)+".json")
 
 	if err := writeJSON(path, tempArenaInfo); err != nil {
@@ -261,64 +310,67 @@ func (l *LocalFile) SaveTempArenaInfo(tempArenaInfo domain.TempArenaInfo) error 
 }
 
 func decideTempArenaInfo(paths []string) (domain.TempArenaInfo, error) {
+	var result domain.TempArenaInfo
 	size := len(paths)
 
 	if size == 0 {
-		return domain.TempArenaInfo{}, apperr.New(apperr.ReadFile, errNoTempArenaInfo)
+		return result, fs.ErrNotExist
 	}
 
 	if size == 1 {
-		tempArenaInfo, err := readJSON(paths[0], domain.TempArenaInfo{})
+		result, err := readJSON[domain.TempArenaInfo](paths[0])
 		if err != nil {
-			return domain.TempArenaInfo{}, apperr.New(apperr.ReadFile, err)
+			return result, err
 		}
 
-		return tempArenaInfo, nil
+		return result, nil
 	}
 
-	var latest *domain.TempArenaInfo
-	var latestUnixtime int64
+	var latest domain.TempArenaInfo
 	for _, path := range paths {
-		tempArenaInfo, err := readJSON(path, domain.TempArenaInfo{})
+		tempArenaInfo, err := readJSON[domain.TempArenaInfo](path)
 		if err != nil {
 			continue
 		}
 
-		unixtime := tempArenaInfo.Unixtime()
-
-		if unixtime > latestUnixtime {
-			latest = &tempArenaInfo
-			latestUnixtime = unixtime
+		if tempArenaInfo.Unixtime() > latest.Unixtime() {
+			latest = tempArenaInfo
 		}
 	}
 
-	if latest == nil {
-		return domain.TempArenaInfo{}, apperr.New(apperr.ReadFile, errNoTempArenaInfo)
+	if latest.Unixtime() == 0 {
+		return result, fs.ErrNotExist
 	}
 
-	return *latest, nil
+	return latest, nil
 }
 
-func read[T any](filename string, defaultValue T) (T, error) {
-	path := filepath.Join(ConfigDirName, filename)
-	result, err := readJSON(path, defaultValue)
-	if err != nil {
-		if errors.Is(err, os.ErrNotExist) {
-			return defaultValue, nil
-		}
+func readJSON[T any](path string) (T, error) {
+	var result T
 
-		return defaultValue, apperr.New(apperr.ReadFile, err)
+	f, err := os.ReadFile(path)
+	if err != nil {
+		return result, err
+	}
+
+	if err := json.Unmarshal(f, &result); err != nil {
+		return result, err
 	}
 
 	return result, nil
 }
 
-func update[T any](filename string, target T) error {
-	path := filepath.Join(ConfigDirName, filename)
-	err := writeJSON(path, target)
-	if err != nil {
-		return apperr.New(apperr.WriteFile, err)
-	}
+func writeJSON[T any](path string, target T) error {
+	_ = os.MkdirAll(filepath.Dir(path), 0o755)
 
-	return nil
+	f, err := os.Create(path)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	encoder := json.NewEncoder(f)
+	encoder.SetIndent("", "  ")
+
+	return encoder.Encode(target)
 }

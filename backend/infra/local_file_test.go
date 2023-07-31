@@ -16,7 +16,7 @@ const testInstallPath = "testdata"
 //nolint:paralleltest
 func TestLocalFile_User(t *testing.T) {
 	// テストで生成したディレクトリを削除
-	defer os.RemoveAll(ConfigDirName)
+	defer os.RemoveAll(configDir)
 
 	expected := domain.UserConfig{
 		FontSize: "large",
@@ -41,7 +41,7 @@ func TestLocalFile_User(t *testing.T) {
 	assert.Equal(t, expected, actual)
 
 	// 取得：異常系 存在しない場合 デフォルト値を返却する
-	err = os.Remove(filepath.Join(ConfigDirName, ConfigUserName))
+	err = os.Remove(filepath.Join(configDir, userConfigFile))
 	assert.NoError(t, err)
 
 	actual, err = localFile.User()
@@ -52,7 +52,7 @@ func TestLocalFile_User(t *testing.T) {
 //nolint:paralleltest
 func TestLocalFile_App(t *testing.T) {
 	// テストで生成したディレクトリを削除
-	defer os.RemoveAll(ConfigDirName)
+	defer os.RemoveAll(configDir)
 
 	expected := vo.AppConfig{
 		Window: vo.WindowConfig{
@@ -73,7 +73,7 @@ func TestLocalFile_App(t *testing.T) {
 	assert.Equal(t, expected, actual)
 
 	// 取得：異常系 存在しない場合 デフォルト値を返却する
-	err = os.Remove(filepath.Join(ConfigDirName, ConfigAppName))
+	err = os.Remove(filepath.Join(configDir, appConfigFile))
 	assert.NoError(t, err)
 
 	actual, err = localFile.App()
@@ -84,7 +84,7 @@ func TestLocalFile_App(t *testing.T) {
 //nolint:paralleltest
 func TestLocalFile_AlertPlayers(t *testing.T) {
 	// テストで生成したディレクトリを削除
-	defer os.RemoveAll(ConfigDirName)
+	defer os.RemoveAll(configDir)
 
 	expected1 := domain.AlertPlayer{
 		AccountID: 100,
@@ -122,7 +122,7 @@ func TestLocalFile_AlertPlayers(t *testing.T) {
 	assert.Equal(t, []domain.AlertPlayer{expected2}, actual)
 
 	// 取得：異常系 存在しない場合 デフォルト値を返却する
-	err = os.Remove(filepath.Join(ConfigDirName, ConfigAlertPlayerName))
+	err = os.Remove(filepath.Join(configDir, alertPlayerFile))
 	assert.NoError(t, err)
 
 	actual, err = localFile.AlertPlayers()
@@ -169,8 +169,8 @@ func TestLocalFile_GetTempArenaInfo_正常系(t *testing.T) {
 	}
 
 	paths := []string{
-		filepath.Join(testInstallPath, ReplayDir, TempArenaInfoName),
-		filepath.Join(testInstallPath, ReplayDir, "12.4.0", TempArenaInfoName),
+		filepath.Join(testInstallPath, replaysDir, tempArenaInfoFile),
+		filepath.Join(testInstallPath, replaysDir, "12.4.0", tempArenaInfoFile),
 	}
 
 	for _, path := range paths {
@@ -218,9 +218,9 @@ func TestLocalFile_GetTempArenaInfo_正常系_該当ファイルが複数存在�
 	installPath := "testdata"
 	defer os.RemoveAll(installPath)
 
-	err := writeJSON(filepath.Join(installPath, ReplayDir, TempArenaInfoName), older)
+	err := writeJSON(filepath.Join(installPath, replaysDir, tempArenaInfoFile), older)
 	assert.NoError(t, err)
-	err = writeJSON(filepath.Join(installPath, ReplayDir, "12.4.0", TempArenaInfoName), expected)
+	err = writeJSON(filepath.Join(installPath, replaysDir, "12.4.0", tempArenaInfoFile), expected)
 	assert.NoError(t, err)
 
 	actual, err := localFile.TempArenaInfo(installPath)
@@ -234,8 +234,8 @@ func TestLocalFile_GetTempArenaInfo_異常系_該当ファイルなし(t *testin
 
 	installPath := "testdata"
 	paths := []string{
-		filepath.Join(installPath, ReplayDir, "hoge.wowsreplay"),
-		filepath.Join(installPath, ReplayDir, "12.4.0", "hoge.wowsreplay"),
+		filepath.Join(installPath, replaysDir, "hoge.wowsreplay"),
+		filepath.Join(installPath, replaysDir, "12.4.0", "hoge.wowsreplay"),
 	}
 
 	for _, path := range paths {
