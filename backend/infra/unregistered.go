@@ -22,7 +22,7 @@ func (u *Unregistered) Warship() (map[int]domain.Warship, error) {
 	result := make(map[int]domain.Warship, 0)
 
 	if err := json.Unmarshal(shipsByte, &ships); err != nil {
-		return result, apperr.New(apperr.ReadFile, err)
+		return result, apperr.New(apperr.ErrReadFile, err)
 	}
 
 	for _, us := range ships {

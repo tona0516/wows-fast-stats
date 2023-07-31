@@ -143,7 +143,7 @@ func (l *LocalFile) User() (domain.UserConfig, error) {
 		if errors.Is(err, fs.ErrNotExist) {
 			return DefaultUserConfig, nil
 		}
-		return domain.UserConfig{}, apperr.New(apperr.ReadFile, err)
+		return domain.UserConfig{}, apperr.New(apperr.ErrReadFile, err)
 	}
 
 	return config, nil
@@ -151,7 +151,7 @@ func (l *LocalFile) User() (domain.UserConfig, error) {
 
 func (l *LocalFile) UpdateUser(config domain.UserConfig) error {
 	if err := writeJSON(l.userConfigPath, config); err != nil {
-		return apperr.New(apperr.WriteFile, err)
+		return apperr.New(apperr.ErrWriteFile, err)
 	}
 
 	return nil
@@ -164,7 +164,7 @@ func (l *LocalFile) App() (vo.AppConfig, error) {
 		if errors.Is(err, fs.ErrNotExist) {
 			return config, nil
 		}
-		return config, apperr.New(apperr.ReadFile, err)
+		return config, apperr.New(apperr.ErrReadFile, err)
 	}
 
 	return config, nil
@@ -172,7 +172,7 @@ func (l *LocalFile) App() (vo.AppConfig, error) {
 
 func (l *LocalFile) UpdateApp(config vo.AppConfig) error {
 	if err := writeJSON(l.appConfigPath, config); err != nil {
-		return apperr.New(apperr.WriteFile, err)
+		return apperr.New(apperr.ErrWriteFile, err)
 	}
 
 	return nil
@@ -185,7 +185,7 @@ func (l *LocalFile) AlertPlayers() ([]domain.AlertPlayer, error) {
 		if errors.Is(err, fs.ErrNotExist) {
 			return players, nil
 		}
-		return players, apperr.New(apperr.ReadFile, err)
+		return players, apperr.New(apperr.ErrReadFile, err)
 	}
 
 	return players, nil
@@ -211,7 +211,7 @@ func (l *LocalFile) UpdateAlertPlayer(player domain.AlertPlayer) error {
 	}
 
 	if err := writeJSON(l.alertPlayerPath, players); err != nil {
-		return apperr.New(apperr.WriteFile, err)
+		return apperr.New(apperr.ErrWriteFile, err)
 	}
 
 	return nil
@@ -237,7 +237,7 @@ func (l *LocalFile) RemoveAlertPlayer(accountID int) error {
 	}
 
 	if err := writeJSON(l.alertPlayerPath, players); err != nil {
-		return apperr.New(apperr.WriteFile, err)
+		return apperr.New(apperr.ErrWriteFile, err)
 	}
 
 	return nil
@@ -249,17 +249,17 @@ func (l *LocalFile) SaveScreenshot(path string, base64Data string) error {
 
 	data, err := base64.StdEncoding.DecodeString(base64Data)
 	if err != nil {
-		return apperr.New(apperr.DecodeBase64, err)
+		return apperr.New(apperr.ErrWriteFile, err)
 	}
 
 	f, err := os.Create(path)
 	if err != nil {
-		return apperr.New(apperr.WriteFile, err)
+		return apperr.New(apperr.ErrWriteFile, err)
 	}
 	defer f.Close()
 
 	if _, err := f.Write(data); err != nil {
-		return apperr.New(apperr.WriteFile, err)
+		return apperr.New(apperr.ErrWriteFile, err)
 	}
 
 	return nil
@@ -288,12 +288,12 @@ func (l *LocalFile) TempArenaInfo(installPath string) (domain.TempArenaInfo, err
 	})
 
 	if err != nil {
-		return tempArenaInfo, apperr.New(apperr.ReadFile, err)
+		return tempArenaInfo, apperr.New(apperr.ErrReadFile, err)
 	}
 
 	tempArenaInfo, err = decideTempArenaInfo(tempArenaInfoPaths)
 	if err != nil {
-		return tempArenaInfo, apperr.New(apperr.ReadFile, err)
+		return tempArenaInfo, apperr.New(apperr.ErrReadFile, err)
 	}
 
 	return tempArenaInfo, nil
@@ -303,7 +303,7 @@ func (l *LocalFile) SaveTempArenaInfo(tempArenaInfo domain.TempArenaInfo) error 
 	path := filepath.Join(tempArenaInfoDir, "tempArenaInfo_"+strconv.FormatInt(tempArenaInfo.Unixtime(), 10)+".json")
 
 	if err := writeJSON(path, tempArenaInfo); err != nil {
-		return apperr.New(apperr.WriteFile, err)
+		return apperr.New(apperr.ErrWriteFile, err)
 	}
 
 	return nil

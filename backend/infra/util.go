@@ -36,7 +36,7 @@ func getRequest[T any](
 	// build URL
 	u, err := url.Parse(rawURL)
 	if err != nil {
-		return response, apperr.New(apperr.HTTPRequest, err)
+		return response, apperr.New(apperr.ErrHTTPRequest, err)
 	}
 	q := u.Query()
 	for k, v := range query {
@@ -52,7 +52,7 @@ func getRequest[T any](
 
 	res, err := backoff.RetryWithData(operation, b)
 	if err != nil {
-		return response, apperr.New(apperr.HTTPRequest, err)
+		return response, apperr.New(apperr.ErrHTTPRequest, err)
 	}
 
 	response.StatusCode = res.StatusCode
@@ -61,7 +61,7 @@ func getRequest[T any](
 
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
-		return response, apperr.New(apperr.HTTPRequest, err)
+		return response, apperr.New(apperr.ErrHTTPRequest, err)
 	}
 
 	response.BodyString = *(*string)(unsafe.Pointer(&body))
@@ -69,7 +69,7 @@ func getRequest[T any](
 	// serialize
 	err = json.Unmarshal(body, &response.Body)
 	if err != nil {
-		return response, apperr.New(apperr.HTTPRequest, err)
+		return response, apperr.New(apperr.ErrHTTPRequest, err)
 	}
 
 	return response, nil
@@ -86,7 +86,7 @@ func postMultipartFormData[T any](
 	// build URL
 	u, err := url.Parse(rawURL)
 	if err != nil {
-		return response, apperr.New(apperr.HTTPRequest, err)
+		return response, apperr.New(apperr.ErrHTTPRequest, err)
 	}
 
 	// build request
@@ -128,7 +128,7 @@ func postMultipartFormData[T any](
 
 	res, err := backoff.RetryWithData(operation, b)
 	if err != nil {
-		return response, apperr.New(apperr.HTTPRequest, err)
+		return response, apperr.New(apperr.ErrHTTPRequest, err)
 	}
 
 	response.StatusCode = res.StatusCode
@@ -137,7 +137,7 @@ func postMultipartFormData[T any](
 
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
-		return response, apperr.New(apperr.HTTPRequest, err)
+		return response, apperr.New(apperr.ErrHTTPRequest, err)
 	}
 
 	response.BodyString = *(*string)(unsafe.Pointer(&body))
@@ -145,7 +145,7 @@ func postMultipartFormData[T any](
 	// serialize
 	err = json.Unmarshal(body, &response.Body)
 	if err != nil {
-		return response, apperr.New(apperr.HTTPRequest, err)
+		return response, apperr.New(apperr.ErrHTTPRequest, err)
 	}
 
 	return response, nil

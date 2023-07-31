@@ -10,7 +10,6 @@ import (
 	"wfs/backend/logger"
 
 	"github.com/pkg/errors"
-	"github.com/skratchdot/open-golang/open"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
@@ -77,17 +76,14 @@ func (a *App) onShutdown(ctx context.Context) {
 	appConfig.Window.Width = width
 	appConfig.Window.Height = height
 	if err := a.configService.UpdateApp(appConfig); err != nil {
-		logger.Zerolog().Error().Err(err).Send()
+		a.reportErrorIfNeeded(err)
 	}
 }
 
 func (a *App) StartWatching() error {
-	userConfig, err := a.configService.User()
-	if err != nil {
+	if err := a.watcherService.Prepare(a.ctx); err != nil {
+		a.reportErrorIfNeeded(err)
 		return err
-	}
-	if userConfig.InstallPath == "" {
-		return apperr.ErrInvalidInstallPath
 	}
 
 	if a.cancelWatcher != nil {
@@ -95,32 +91,26 @@ func (a *App) StartWatching() error {
 	}
 	ctx, cancel := context.WithCancel(context.Background())
 	a.cancelWatcher = cancel
-	go a.watcherService.Start(a.ctx, ctx, userConfig)
+
+	go a.watcherService.Start(ctx)
 
 	return nil
 }
 
-func (a *App) Battle() (domain.Battle, error) {
-	var result domain.Battle
-
+func (a *App) Battle() (battle domain.Battle, err error) {
 	userConfig, err := a.configService.User()
 	if err != nil {
-		logger.Zerolog().Error().Err(err).Send()
-		return result, apperr.ToFrontendError(err)
+		a.reportErrorIfNeeded(err)
+		return battle, err
 	}
 
-	result, err = a.battleService.Battle(userConfig)
+	battle, err = a.battleService.Battle(userConfig)
 	if err != nil {
-		logger.Zerolog().Error().Err(err).Send()
-
-		if err := a.reportService.Send(err); err != nil {
-			logger.Zerolog().Error().Err(err).Send()
-		}
-
-		return result, apperr.ToFrontendError(err)
+		a.reportErrorIfNeeded(err)
+		return battle, err
 	}
 
-	return result, nil
+	return battle, nil
 }
 
 func (a *App) SampleTeams() []domain.Team {
@@ -128,12 +118,17 @@ func (a *App) SampleTeams() []domain.Team {
 }
 
 func (a *App) SelectDirectory() (string, error) {
-	path, err := runtime.OpenDirectoryDialog(a.ctx, runtime.OpenDialogOptions{})
-	if err != nil {
-		logger.Zerolog().Error().Err(err).Str("path", path).Send()
-	}
+	path, err := a.configService.SelectDirectory(a.ctx)
+	a.reportErrorIfNeeded(err)
 
-	return path, apperr.ToFrontendError(err)
+	return path, err
+}
+
+func (a *App) OpenDirectory(path string) error {
+	err := a.configService.OpenDirectory(path)
+	a.reportErrorIfNeeded(err)
+
+	return err
 }
 
 func (a *App) DefaultUserConfig() domain.UserConfig {
@@ -142,20 +137,16 @@ func (a *App) DefaultUserConfig() domain.UserConfig {
 
 func (a *App) UserConfig() (domain.UserConfig, error) {
 	config, err := a.configService.User()
-	if err != nil {
-		logger.Zerolog().Error().Err(err).Send()
-	}
+	a.reportErrorIfNeeded(err)
 
-	return config, apperr.ToFrontendError(err)
+	return config, err
 }
 
 func (a *App) ApplyUserConfig(config domain.UserConfig) error {
 	err := a.configService.UpdateOptional(config)
-	if err != nil {
-		logger.Zerolog().Error().Err(err).Send()
-	}
+	a.reportErrorIfNeeded(err)
 
-	return apperr.ToFrontendError(err)
+	return err
 }
 
 func (a *App) ApplyRequiredUserConfig(
@@ -163,44 +154,31 @@ func (a *App) ApplyRequiredUserConfig(
 	appid string,
 ) (vo.ValidatedResult, error) {
 	validatedResult, err := a.configService.UpdateRequired(installPath, appid)
-	if err != nil {
-		logger.Zerolog().Error().Err(err).Send()
-	}
+	a.reportErrorIfNeeded(err)
 
-	return validatedResult, apperr.ToFrontendError(err)
+	return validatedResult, err
 }
 
 func (a *App) ManualScreenshot(filename string, base64Data string) error {
 	err := a.screenshotService.SaveWithDialog(a.ctx, filename, base64Data)
-	if err != nil {
-		logger.Zerolog().Error().Err(err).Str("filename", filename).Send()
+	a.reportErrorIfNeeded(err)
+
+	if errors.Is(err, apperr.ErrUserCanceled) {
+		return nil
 	}
 
-	return apperr.ToFrontendError(err)
+	return err
 }
 
 func (a *App) AutoScreenshot(filename string, base64Data string) error {
 	err := a.screenshotService.SaveForAuto(filename, base64Data)
-	if err != nil {
-		logger.Zerolog().Error().Err(err).Str("filename", filename).Send()
-	}
+	a.reportErrorIfNeeded(err)
 
-	return apperr.ToFrontendError(err)
+	return err
 }
 
 func (a *App) Semver() string {
 	return a.env.Semver
-}
-
-func (a *App) OpenDirectory(path string) error {
-	err := open.Run(path)
-	if err != nil {
-		wraped := apperr.New(apperr.OpenDirectory, err)
-		logger.Zerolog().Error().Err(wraped).Str("path", path).Send()
-		return apperr.ToFrontendError(wraped)
-	}
-
-	return nil
 }
 
 func (a *App) ExcludePlayerIDs() []int {
@@ -222,38 +200,30 @@ func (a *App) RemoveExcludePlayerID(playerID int) {
 
 func (a *App) AlertPlayers() ([]domain.AlertPlayer, error) {
 	players, err := a.configService.AlertPlayers()
-	if err != nil {
-		logger.Zerolog().Error().Err(err).Send()
-	}
+	a.reportErrorIfNeeded(err)
 
-	return players, apperr.ToFrontendError(err)
+	return players, err
 }
 
 func (a *App) UpdateAlertPlayer(player domain.AlertPlayer) error {
 	err := a.configService.UpdateAlertPlayer(player)
-	if err != nil {
-		logger.Zerolog().Error().Err(err).Str("player", player.Name).Send()
-	}
+	a.reportErrorIfNeeded(err)
 
-	return apperr.ToFrontendError(err)
+	return err
 }
 
 func (a *App) RemoveAlertPlayer(accountID int) error {
 	err := a.configService.RemoveAlertPlayer(accountID)
-	if err != nil {
-		logger.Zerolog().Error().Err(err).Int("account id", accountID).Send()
-	}
+	a.reportErrorIfNeeded(err)
 
-	return apperr.ToFrontendError(err)
+	return err
 }
 
 func (a *App) SearchPlayer(prefix string) (domain.WGAccountList, error) {
 	accountList, err := a.configService.SearchPlayer(prefix)
-	if err != nil {
-		logger.Zerolog().Error().Err(err).Str("prefix", prefix).Send()
-	}
+	a.reportErrorIfNeeded(err)
 
-	return accountList, apperr.ToFrontendError(err)
+	return accountList, err
 }
 
 func (a *App) AlertPatterns() []string {
@@ -261,8 +231,8 @@ func (a *App) AlertPatterns() []string {
 }
 
 func (a *App) LogErrorForFrontend(errString string) {
-	err := apperr.New(apperr.FrontendError, errors.New(errString))
-	logger.Zerolog().Error().Err(err).Send()
+	err := apperr.New(apperr.ErrFrontend, errors.New(errString))
+	a.reportErrorIfNeeded(err)
 }
 
 func (a *App) FontSizes() []string {
@@ -275,4 +245,16 @@ func (a *App) StatsPatterns() []string {
 
 func (a *App) LatestRelease() (domain.GHLatestRelease, error) {
 	return a.updaterService.Updatable()
+}
+
+func (a *App) reportErrorIfNeeded(err error) {
+	if err == nil {
+		return
+	}
+
+	logger.Zerolog().Error().Err(err).Send()
+
+	if errSend := a.reportService.Send(err); errSend != nil {
+		logger.Zerolog().Warn().Err(errSend).Send()
+	}
 }

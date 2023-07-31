@@ -1,13 +1,16 @@
 package service
 
 import (
-	"fmt"
+	"context"
 	"os"
 	"path/filepath"
 	"wfs/backend/apperr"
 	"wfs/backend/application/repository"
 	"wfs/backend/application/vo"
 	"wfs/backend/domain"
+
+	"github.com/skratchdot/open-golang/open"
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 const GameExeName = "WorldOfWarships.exe"
@@ -41,7 +44,7 @@ func (c *Config) UpdateRequired(
 		return validatedResult, nil
 	}
 
-	// Note: overerite only required setting
+	// Note: overwrite only required setting
 	config, err := c.localFile.User()
 	if err != nil {
 		return validatedResult, err
@@ -90,6 +93,23 @@ func (c *Config) SearchPlayer(prefix string) (domain.WGAccountList, error) {
 	return c.wargaming.AccountListForSearch(prefix)
 }
 
+func (c *Config) SelectDirectory(appCtx context.Context) (string, error) {
+	selected, err := runtime.OpenDirectoryDialog(appCtx, runtime.OpenDialogOptions{})
+	if err != nil {
+		return "", apperr.New(apperr.ErrSelectDirectory, err)
+	}
+
+	return selected, nil
+}
+
+func (c *Config) OpenDirectory(path string) error {
+	if err := open.Run(path); err != nil {
+		return apperr.New(apperr.ErrOpenDirectory, err)
+	}
+
+	return nil
+}
+
 func (c *Config) validateRequired(
 	installPath string,
 	appid string,
@@ -97,11 +117,11 @@ func (c *Config) validateRequired(
 	result := vo.ValidatedResult{}
 
 	if _, err := os.Stat(filepath.Join(installPath, GameExeName)); err != nil {
-		result.InstallPath = apperr.ErrInvalidInstallPath.Error()
+		result.InstallPath = apperr.New(apperr.ErrInvalidInstallPath, nil).Error()
 	}
 
 	if ok, err := c.wargaming.Test(appid); !ok {
-		result.AppID = fmt.Sprintf("%s(%s)", apperr.ErrInvalidAppID, err.Error())
+		result.AppID = apperr.New(apperr.ErrInvalidAppID, err).Error()
 	}
 
 	return result

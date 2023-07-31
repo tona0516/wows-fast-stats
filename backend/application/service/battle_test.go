@@ -107,7 +107,7 @@ func TestBattle_Battle_異常系(t *testing.T) {
 
 	mockWargaming, mockNumbers, mockUnregistered, _ := initMocksForBattle()
 	mockLocalFileRepo := &mockLocalFile{}
-	expectedError := apperr.New(apperr.ReadFile, nil)
+	expectedError := apperr.New(apperr.ErrReadFile, nil)
 	mockLocalFileRepo.On("TempArenaInfo", mock.Anything).Return(domain.TempArenaInfo{}, expectedError)
 	mockLocalFileRepo.On("SaveTempArenaInfo", mock.Anything).Return(nil)
 

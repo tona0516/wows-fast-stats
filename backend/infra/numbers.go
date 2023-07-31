@@ -2,8 +2,6 @@ package infra
 
 import (
 	"encoding/json"
-	"io"
-	"net/http"
 	"strconv"
 	"wfs/backend/apperr"
 	"wfs/backend/domain"
@@ -29,12 +27,16 @@ func (n *Numbers) ExpectedStats() (domain.NSExpectedStats, error) {
 	var result domain.NSExpectedStats
 
 	b := backoff.WithMaxRetries(backoff.NewExponentialBackOff(), n.config.Retry)
-	body, err := backoff.RetryWithData(n.fetch, b)
+	operation := func() (APIResponse[any], error) {
+		return getRequest[any](n.config.URL, map[string]string{}, n.config.Retry)
+	}
+
+	response, err := backoff.RetryWithData(operation, b)
 	if err != nil {
 		return result, err
 	}
 
-	result, err = parse(body)
+	result, err = parse([]byte(response.BodyString))
 	if err != nil {
 		return result, err
 	}
@@ -42,36 +44,21 @@ func (n *Numbers) ExpectedStats() (domain.NSExpectedStats, error) {
 	return result, nil
 }
 
-func (n *Numbers) fetch() ([]byte, error) {
-	res, err := http.Get(n.config.URL)
-	if err != nil {
-		return []byte{}, apperr.New(apperr.HTTPRequest, err)
-	}
-	defer res.Body.Close()
-
-	body, err := io.ReadAll(res.Body)
-	if err != nil {
-		return []byte{}, apperr.New(apperr.HTTPRequest, err)
-	}
-
-	return body, nil
-}
-
 func parse(body []byte) (domain.NSExpectedStats, error) {
 	var result domain.NSExpectedStats
 
 	depth1 := make(map[string]interface{})
 	if err := json.Unmarshal(body, &depth1); err != nil {
-		return result, apperr.New(apperr.NumbersAPIParse, err)
+		return result, apperr.New(apperr.ErrNumbersAPIParse, err)
 	}
 
 	time, ok := depth1["time"].(float64)
 	if !ok {
-		return result, apperr.New(apperr.NumbersAPIParse, errNoTimeKey)
+		return result, apperr.New(apperr.ErrNumbersAPIParse, errNoTimeKey)
 	}
 	depth2, ok := depth1["data"].(map[string]interface{})
 	if !ok {
-		return result, apperr.New(apperr.NumbersAPIParse, errNoDataKey)
+		return result, apperr.New(apperr.ErrNumbersAPIParse, errNoDataKey)
 	}
 
 	data := make(map[int]domain.NSExpectedStatsData)

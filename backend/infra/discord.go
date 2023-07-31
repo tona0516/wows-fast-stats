@@ -34,22 +34,22 @@ func (d *Discord) Upload(text string, message string) error {
 		_ = os.Remove(zipName)
 	}()
 	if err != nil {
-		return apperr.New(apperr.WriteFile, err)
+		return apperr.New(apperr.ErrWriteFile, err)
 	}
 
 	zw := zip.NewWriter(file)
 	fw, err := zw.Create(textName)
 	if err != nil {
-		return apperr.New(apperr.WriteFile, err)
+		return apperr.New(apperr.ErrWriteFile, err)
 	}
 
 	_, err = fw.Write([]byte(text))
 	if err != nil {
-		return apperr.New(apperr.WriteFile, err)
+		return apperr.New(apperr.ErrWriteFile, err)
 	}
 
 	if err := zw.Close(); err != nil {
-		return apperr.New(apperr.WriteFile, err)
+		return apperr.New(apperr.ErrWriteFile, err)
 	}
 
 	// upload zip
@@ -70,7 +70,7 @@ func (d *Discord) Upload(text string, message string) error {
 			strconv.Itoa(response.StatusCode) +
 			" response_body: " +
 			response.BodyString
-		return apperr.New(apperr.DiscordAPIError, errors.New(message))
+		return apperr.New(apperr.ErrDiscordAPI, errors.New(message))
 	}
 
 	return nil

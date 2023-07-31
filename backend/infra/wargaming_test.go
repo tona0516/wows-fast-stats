@@ -246,7 +246,7 @@ func TestWargaming_AccountInfo_異常系_リトライなし(t *testing.T) {
 
 	_, err := wargaming.AccountInfo([]int{123, 456})
 
-	assert.EqualError(t, err, apperr.New(apperr.WargamingAPIError, errors.New(body)).Error())
+	assert.EqualError(t, err, apperr.New(apperr.ErrWGAPI, errors.New(body)).Error())
 	assert.Equal(t, 1, calls)
 }
 
@@ -330,7 +330,7 @@ func TestWargaming_AccountInfo_異常系_最大リトライ(t *testing.T) {
 		_, err := wargaming.AccountInfo([]int{123, 456})
 
 		assert.EqualError(t, err, apperr.New(
-			apperr.WargamingAPITemporaryUnavaillalble,
+			apperr.ErrWGAPITemporaryUnavaillalble,
 			errors.New(body),
 		).Error())
 		assert.Equal(t, int(retry+1), calls)

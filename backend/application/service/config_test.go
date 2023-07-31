@@ -1,7 +1,6 @@
 package service
 
 import (
-	"fmt"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -21,7 +20,7 @@ const (
 	DefaultAppID       = "abc123"
 )
 
-var errWargaming = apperr.New(apperr.WargamingAPIError, errors.New("INVALID_APPLICATION_ID"))
+var errWargaming = apperr.New(apperr.ErrWGAPI, errors.New("INVALID_APPLICATION_ID"))
 
 //nolint:paralleltest
 func TestConfig_UpdateRequired_正常系(t *testing.T) {
@@ -72,7 +71,7 @@ func TestConfig_UpdateRequired_異常系_不正なインストールパス(t *te
 	actual, err := c.UpdateRequired(config.InstallPath, config.Appid)
 
 	// アサーション
-	assert.Equal(t, vo.ValidatedResult{InstallPath: apperr.ErrInvalidInstallPath.Error()}, actual)
+	assert.Equal(t, vo.ValidatedResult{InstallPath: apperr.New(apperr.ErrInvalidInstallPath, nil).Error()}, actual)
 	assert.NoError(t, err)
 	mockWargaming.AssertCalled(t, "Test", config.Appid)
 	mockLocalFile.AssertNotCalled(t, "UpdateUser", config)
@@ -97,7 +96,7 @@ func TestConfig_UpdateRequired_異常系_不正なAppID(t *testing.T) {
 	actual, err := c.UpdateRequired(config.InstallPath, config.Appid)
 
 	// アサーション
-	assert.Equal(t, vo.ValidatedResult{AppID: fmt.Sprintf("%s(%s)", apperr.ErrInvalidAppID, errWargaming)}, actual)
+	assert.Equal(t, vo.ValidatedResult{AppID: apperr.New(apperr.ErrInvalidAppID, errWargaming).Error()}, actual)
 	assert.NoError(t, err)
 	mockWargaming.AssertCalled(t, "Test", config.Appid)
 	mockLocalFile.AssertNotCalled(t, "UpdateUser", config)

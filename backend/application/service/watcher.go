@@ -3,8 +3,11 @@ package service
 import (
 	"context"
 	"crypto/sha256"
+	"errors"
 	"fmt"
+	"io/fs"
 	"time"
+	"wfs/backend/apperr"
 	"wfs/backend/application/repository"
 	"wfs/backend/application/vo"
 	"wfs/backend/domain"
@@ -13,12 +16,15 @@ import (
 const (
 	EventStart = "BATTLE_START"
 	EventEnd   = "BATTLE_END"
+	EventErr   = "BATTLE_ERR"
 )
 
 type Watcher struct {
 	interval       time.Duration
 	localFile      repository.LocalFileInterface
 	eventsEmitFunc vo.EventEmit
+	appCtx         context.Context
+	userConfig     domain.UserConfig
 }
 
 func NewWatcher(
@@ -33,7 +39,22 @@ func NewWatcher(
 	}
 }
 
-func (w *Watcher) Start(appCtx context.Context, ctx context.Context, userConfig domain.UserConfig) {
+func (w *Watcher) Prepare(appCtx context.Context) error {
+	userConfig, err := w.localFile.User()
+	if err != nil {
+		return err
+	}
+
+	if userConfig.InstallPath == "" {
+		return apperr.New(apperr.ErrInvalidInstallPath, nil)
+	}
+
+	w.appCtx = appCtx
+	w.userConfig = userConfig
+	return nil
+}
+
+func (w *Watcher) Start(ctx context.Context) {
 	var latestHash string
 
 	for {
@@ -43,11 +64,15 @@ func (w *Watcher) Start(appCtx context.Context, ctx context.Context, userConfig 
 		default:
 			time.Sleep(w.interval)
 
-			// TODO 存在しないエラーとその他のエラーを分ける
-			tempArenaInfo, err := w.localFile.TempArenaInfo(userConfig.InstallPath)
+			tempArenaInfo, err := w.localFile.TempArenaInfo(w.userConfig.InstallPath)
 			if err != nil {
-				w.eventsEmitFunc(appCtx, EventEnd)
-				continue
+				if errors.Is(err, fs.ErrNotExist) {
+					w.eventsEmitFunc(w.appCtx, EventEnd)
+					continue
+				}
+
+				w.eventsEmitFunc(w.appCtx, EventErr, err.Error())
+				return
 			}
 
 			hash := fmt.Sprintf("%x", sha256.Sum256([]byte(fmt.Sprintf("%x", tempArenaInfo))))
@@ -57,7 +82,7 @@ func (w *Watcher) Start(appCtx context.Context, ctx context.Context, userConfig 
 			}
 
 			latestHash = hash
-			w.eventsEmitFunc(appCtx, EventStart)
+			w.eventsEmitFunc(w.appCtx, EventStart)
 		}
 	}
 }

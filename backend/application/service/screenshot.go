@@ -32,11 +32,12 @@ func (s *Screenshot) SaveWithDialog(ctx context.Context, filename string, base64
 	path, err := s.saveFileDialogFunc(ctx, runtime.SaveDialogOptions{
 		DefaultFilename: filename,
 	})
+
 	if err != nil {
-		return apperr.New(apperr.ShowDialog, err)
+		return apperr.New(apperr.ErrShowDialog, err)
 	}
 	if path == "" {
-		return apperr.New(apperr.UserCanceled, nil)
+		return apperr.New(apperr.ErrUserCanceled, nil)
 	}
 
 	return s.localFile.SaveScreenshot(path, base64Data)

@@ -113,6 +113,12 @@
     );
   });
 
+  EventsOn(AppEvent.battleErr, (error: string) => {
+    LogDebug(`EventsOn:${AppEvent.battleErr}`);
+
+    notification.showToastWithKey(error, "error", ToastKey.error);
+  });
+
   async function showAddAlertPlayerModal(_: CustomEvent<any>) {
     addAlertPlayerModal.toggle();
   }

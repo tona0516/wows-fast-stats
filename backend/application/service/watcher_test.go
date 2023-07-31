@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"io/fs"
 	"testing"
 	"time"
 	"wfs/backend/domain"
@@ -23,6 +24,7 @@ func TestWatcher_Start_戦闘開始(t *testing.T) {
 	}
 
 	mockLocalFile := &mockLocalFile{}
+	mockLocalFile.On("User").Return(config, nil)
 	mockLocalFile.On("TempArenaInfo", config.InstallPath).Return(domain.TempArenaInfo{}, nil)
 
 	var events []string
@@ -33,13 +35,13 @@ func TestWatcher_Start_戦闘開始(t *testing.T) {
 	interval := 10 * time.Millisecond
 
 	watcher := NewWatcher(interval, mockLocalFile, emitFunc)
-	go watcher.Start(ctx, ctx, config)
+	err := watcher.Prepare(ctx)
+	assert.NoError(t, err)
+	go watcher.Start(ctx)
 
-	// 20ms待ってEventStartが発行されたことを検証する
 	time.Sleep(20 * time.Millisecond)
 	assert.Contains(t, events, EventStart)
 
-	// さらに100ms待ってEventStartが発行されなかったことを検証する
 	events = nil
 	time.Sleep(100 * time.Millisecond)
 	assert.Empty(t, events)
@@ -58,7 +60,8 @@ func TestWatcher_Start_戦闘終了(t *testing.T) {
 	}
 
 	mockLocalFile := &mockLocalFile{}
-	mockLocalFile.On("TempArenaInfo", config.InstallPath).Return(domain.TempArenaInfo{}, errors.New("not exists"))
+	mockLocalFile.On("User").Return(config, nil)
+	mockLocalFile.On("TempArenaInfo", config.InstallPath).Return(domain.TempArenaInfo{}, fs.ErrNotExist)
 
 	var events []string
 	emitFunc := func(ctx context.Context, eventName string, optionalData ...interface{}) {
@@ -68,16 +71,52 @@ func TestWatcher_Start_戦闘終了(t *testing.T) {
 	interval := 10 * time.Millisecond
 
 	watcher := NewWatcher(interval, mockLocalFile, emitFunc)
-	go watcher.Start(ctx, ctx, config)
+	err := watcher.Prepare(ctx)
+	assert.NoError(t, err)
+	go watcher.Start(ctx)
 
-	// 20ms待ってEventEndが発行されたことを検証する
-	time.Sleep(100 * time.Millisecond)
-	assert.Contains(t, events, EventEnd)
-
-	// さらに100秒待ってEventEndが発行されなかったことを検証する
-	events = nil
 	time.Sleep(20 * time.Millisecond)
 	assert.Contains(t, events, EventEnd)
+
+	events = nil
+	time.Sleep(100 * time.Millisecond)
+	assert.Contains(t, events, EventEnd)
+}
+
+func TestWatcher_Start_エラー発生(t *testing.T) {
+	t.Parallel()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	config := domain.UserConfig{
+		InstallPath: "install_path_test",
+		Appid:       "abc123",
+		FontSize:    "medium",
+	}
+
+	mockLocalFile := &mockLocalFile{}
+	mockLocalFile.On("User").Return(config, nil)
+	mockLocalFile.On("TempArenaInfo", config.InstallPath).Return(domain.TempArenaInfo{}, errors.New("some error"))
+
+	var events []string
+	emitFunc := func(ctx context.Context, eventName string, optionalData ...interface{}) {
+		events = append(events, eventName)
+	}
+
+	interval := 10 * time.Millisecond
+
+	watcher := NewWatcher(interval, mockLocalFile, emitFunc)
+	err := watcher.Prepare(ctx)
+	assert.NoError(t, err)
+	go watcher.Start(ctx)
+
+	time.Sleep(20 * time.Millisecond)
+	assert.Contains(t, events, EventErr)
+
+	events = nil
+	time.Sleep(100 * time.Millisecond)
+	assert.Empty(t, events)
 }
 
 func TestWatcher_Start_キャンセル(t *testing.T) {
@@ -93,6 +132,7 @@ func TestWatcher_Start_キャンセル(t *testing.T) {
 	}
 
 	mockLocalFile := &mockLocalFile{}
+	mockLocalFile.On("User").Return(config, nil)
 	mockLocalFile.On("TempArenaInfo", config.InstallPath).Return(domain.TempArenaInfo{}, nil)
 
 	var events []string
@@ -103,11 +143,11 @@ func TestWatcher_Start_キャンセル(t *testing.T) {
 
 	watcher := NewWatcher(interval, mockLocalFile, emitFunc)
 
-	// Startメソッドをゴルーチンで非同期に実行する
-	go watcher.Start(ctx, ctx, config)
-
-	// キャンセルしてイベントが発行されなかったことを検証する
+	err := watcher.Prepare(ctx)
+	assert.NoError(t, err)
+	go watcher.Start(ctx)
 	cancel()
+
 	time.Sleep(100 * time.Millisecond)
 	assert.Empty(t, events)
 }

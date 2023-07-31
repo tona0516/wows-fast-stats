@@ -52,6 +52,7 @@ export enum ToastKey {
 export enum AppEvent {
   battleStart = "BATTLE_START",
   battleEnd = "BATTLE_END",
+  battleErr = "BATTLE_ERR",
   log = "LOG",
   onload = "ONLOAD",
 }
