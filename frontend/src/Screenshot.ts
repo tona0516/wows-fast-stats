@@ -14,7 +14,7 @@ export class Screenshot {
 
   private async getScreenshotBase64(): Promise<[string, string]> {
     // Workaround: first screenshot cann't draw values in table.
-    const mainPageElem = document.getElementById("mainpage");
+    const mainPageElem = document.getElementById("stats");
     if (this.isFirst) {
       await htmlToImage.toPng(mainPageElem);
     }

@@ -233,14 +233,12 @@
     />
 
     {#if $storedCurrentPage === Page.Main}
-      <div id="mainpage">
-        <MainPage
-          on:UpdateAlertPlayer={(event) => showUpdateAlertPlayerModal(event)}
-          on:RemoveAlertPlayer={(event) => showRemoveAlertPlayerModal(event)}
-          on:CheckPlayer={async () =>
-            storedExcludePlayerIDs.set(await ExcludePlayerIDs())}
-        />
-      </div>
+      <MainPage
+        on:UpdateAlertPlayer={(event) => showUpdateAlertPlayerModal(event)}
+        on:RemoveAlertPlayer={(event) => showRemoveAlertPlayerModal(event)}
+        on:CheckPlayer={async () =>
+          storedExcludePlayerIDs.set(await ExcludePlayerIDs())}
+      />
     {/if}
 
     {#if $storedCurrentPage === Page.Config}

@@ -126,7 +126,9 @@ func (a *App) SelectDirectory() (string, error) {
 
 func (a *App) OpenDirectory(path string) error {
 	err := a.configService.OpenDirectory(path)
-	a.reportErrorIfNeeded(err)
+	if err != nil {
+		logger.Zerolog().Warn().Err(err).Send()
+	}
 
 	return err
 }
