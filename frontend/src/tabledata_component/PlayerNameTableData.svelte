@@ -18,21 +18,41 @@
   $: alertPlayer = alertPlayers.find(
     (it) => it.account_id === player.player_info.id
   );
-  $: pr = values(player, statsPattern, StatsCategory.Ship, "pr");
-  $: color = SkillLevelConverter.fromPR(
-    pr,
-    userConfig.custom_color.skill
-  ).toBgColorCode();
-  $: playerLabel = isBelongToClan()
+  $: bgcolor = bgColor(player, userConfig, statsPattern);
+  $: playerLabel = isBelongToClan(player)
     ? `[${player.player_info.clan.tag}] ${player.player_info.name}`
     : player.player_info.name;
 
-  function isBelongToClan(): boolean {
+  function isBelongToClan(player: domain.Player): boolean {
     return player.player_info.clan.id !== 0;
+  }
+
+  function bgColor(
+    player: domain.Player,
+    userConfig: domain.UserConfig,
+    statsPattern: string
+  ): string {
+    let statsCategory: StatsCategory;
+    if (userConfig.custom_color.player_name === "ship") {
+      statsCategory = StatsCategory.Ship;
+    }
+    if (userConfig.custom_color.player_name === "overall") {
+      statsCategory = StatsCategory.Overall;
+    }
+
+    if (!statsCategory) {
+      return "";
+    }
+
+    const pr = values(player, statsPattern, statsCategory, "pr");
+    return SkillLevelConverter.fromPR(
+      pr,
+      userConfig.custom_color.skill
+    ).toBgColorCode();
   }
 </script>
 
-<td class="td-string omit" style="background-color: {color}">
+<td class="td-string omit" style="background-color: {bgcolor}">
   {#if player.player_info.id === 0}
     {playerLabel}
   {:else}
@@ -55,7 +75,7 @@
       aria-labelledby="dropdownMenuLink"
       style="font-size: {$storedUserConfig.font_size};"
     >
-      {#if isBelongToClan()}
+      {#if isBelongToClan(player)}
         <!-- svelte-ignore a11y-invalid-attribute -->
         <li>
           <a

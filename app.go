@@ -245,6 +245,10 @@ func (a *App) StatsPatterns() []string {
 	return domain.StatsPatterns
 }
 
+func (a *App) PlayerNameColors() []string {
+	return domain.PlayerNameColors
+}
+
 func (a *App) LatestRelease() (domain.GHLatestRelease, error) {
 	return a.updaterService.Updatable()
 }

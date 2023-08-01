@@ -101,6 +101,7 @@ var DefaultUserConfig domain.UserConfig = domain.UserConfig{
 				SS: "#B3CDE3",
 			},
 		},
+		PlayerName: domain.PlayerNameColorShip,
 	},
 	CustomDigit: domain.CustomDigit{
 		PR:                0,

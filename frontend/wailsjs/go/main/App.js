@@ -58,6 +58,10 @@ export function OpenDirectory(arg1) {
   return window['go']['main']['App']['OpenDirectory'](arg1);
 }
 
+export function PlayerNameColors() {
+  return window['go']['main']['App']['PlayerNameColors']();
+}
+
 export function RemoveAlertPlayer(arg1) {
   return window['go']['main']['App']['RemoveAlertPlayer'](arg1);
 }

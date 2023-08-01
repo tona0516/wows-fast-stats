@@ -8,6 +8,7 @@
     DefaultUserConfig,
     FontSizes,
     OpenDirectory,
+    PlayerNameColors,
     SampleTeams,
     SelectDirectory,
     UserConfig,
@@ -436,6 +437,27 @@
             {/each}
           </tbody>
         </table>
+      </FormGroup>
+
+      <!-- font-size -->
+      <FormGroup class="center">
+        <Label>プレイヤー名の背景色</Label>
+        <Input
+          type="select"
+          class="w-auto"
+          style="font-size: {$storedUserConfig.font_size};"
+          bind:value={inputUserConfig.custom_color.player_name}
+          on:change={silentApply}
+        >
+          {#await PlayerNameColors() then playerNameColors}
+            {#each playerNameColors as pnc}
+              <option
+                selected={pnc === $storedUserConfig.custom_color.player_name}
+                value={pnc}>{Const.PLAYER_NAME_COLOR[pnc]}</option
+              >
+            {/each}
+          {/await}
+        </Input>
       </FormGroup>
 
       <div class="center">

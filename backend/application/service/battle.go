@@ -289,23 +289,20 @@ func (b *Battle) compose(
 			ownShip = warship.Name
 		}
 
-		stats := domain.Stats{
-			AccountInfo: accountInfo.Data[accountID],
-			Expected:    expectedStats.Data[vehicle.ShipID],
-		}
-		for _, v := range shipStats[accountID].Data[accountID] {
-			if v.ShipID == vehicle.ShipID {
-				stats.SetShipStats(v)
-				break
-			}
-		}
+		stats := domain.NewStats(
+			vehicle.ShipID,
+			accountInfo.Data[accountID],
+			shipStats[accountID].Data[accountID],
+			expectedStats.Data,
+			nickname,
+		)
 
 		player := domain.Player{
 			PlayerInfo: domain.PlayerInfo{
 				ID:       accountID,
 				Name:     nickname,
 				Clan:     clan,
-				IsHidden: stats.AccountInfo.HiddenProfile,
+				IsHidden: accountInfo.Data[accountID].HiddenProfile,
 			},
 			ShipInfo: domain.ShipInfo{
 				ID:        vehicle.ShipID,
@@ -313,10 +310,10 @@ func (b *Battle) compose(
 				Nation:    warship.Nation,
 				Tier:      warship.Tier,
 				Type:      warship.Type,
-				AvgDamage: stats.Expected.AverageDamageDealt,
+				AvgDamage: expectedStats.Data[vehicle.ShipID].AverageDamageDealt,
 			},
-			PvPSolo: playerStats(domain.StatsPatternPvPSolo, stats, accountID, warships, shipStats),
-			PvPAll:  playerStats(domain.StatsPatternPvPAll, stats, accountID, warships, shipStats),
+			PvPSolo: playerStats(domain.StatsPatternPvPSolo, stats, warships),
+			PvPAll:  playerStats(domain.StatsPatternPvPAll, stats, warships),
 		}
 
 		if vehicle.Relation == 0 || vehicle.Relation == 1 {
@@ -355,51 +352,37 @@ func (b *Battle) compose(
 
 func playerStats(
 	statsPattern domain.StatsPattern,
-	stats domain.Stats,
-	accountID int,
+	stats *domain.Stats,
 	warships map[int]domain.Warship,
-	shipStats map[int]domain.WGShipsStats,
 ) domain.PlayerStats {
-	var modeShip domain.StatsMode
-	var modeOverall domain.StatsMode
-
-	if statsPattern == domain.StatsPatternPvPSolo {
-		modeShip = domain.ModeShipSolo
-		modeOverall = domain.ModeOverallSolo
-	}
-
-	if statsPattern == domain.StatsPatternPvPAll {
-		modeShip = domain.ModeShip
-		modeOverall = domain.ModeOverall
-	}
-
 	return domain.PlayerStats{
 		ShipStats: domain.ShipStats{
-			Battles:            stats.Battles(modeShip),
-			Damage:             stats.AvgDamage(modeShip),
-			WinRate:            stats.WinRate(modeShip),
-			WinSurvivedRate:    stats.WinSurvivedRate(modeShip),
-			LoseSurvivedRate:   stats.LoseSurvivedRate(modeShip),
-			KdRate:             stats.KdRate(modeShip),
-			Kill:               stats.AvgKill(modeShip),
-			Exp:                stats.AvgExp(modeShip),
-			MainBatteryHitRate: stats.MainBatteryHitRate(modeShip),
-			TorpedoesHitRate:   stats.TorpedoesHitRate(modeShip),
-			PlanesKilled:       stats.PlanesKilled(modeShip),
-			PR:                 stats.ShipPR(modeShip),
+			Battles:            stats.Battles(domain.StatsCategoryShip, statsPattern),
+			Damage:             stats.AvgDamage(domain.StatsCategoryShip, statsPattern),
+			WinRate:            stats.WinRate(domain.StatsCategoryShip, statsPattern),
+			WinSurvivedRate:    stats.WinSurvivedRate(domain.StatsCategoryShip, statsPattern),
+			LoseSurvivedRate:   stats.LoseSurvivedRate(domain.StatsCategoryShip, statsPattern),
+			KdRate:             stats.KdRate(domain.StatsCategoryShip, statsPattern),
+			Kill:               stats.AvgKill(domain.StatsCategoryShip, statsPattern),
+			Exp:                stats.AvgExp(domain.StatsCategoryShip, statsPattern),
+			PR:                 stats.PR(domain.StatsCategoryShip, statsPattern),
+			MainBatteryHitRate: stats.MainBatteryHitRate(domain.StatsCategoryShip, statsPattern),
+			TorpedoesHitRate:   stats.TorpedoesHitRate(domain.StatsCategoryShip, statsPattern),
+			PlanesKilled:       stats.PlanesKilled(domain.StatsCategoryShip, statsPattern),
 		},
 		OverallStats: domain.OverallStats{
-			Battles:           stats.Battles(modeOverall),
-			Damage:            stats.AvgDamage(modeOverall),
-			WinRate:           stats.WinRate(modeOverall),
-			WinSurvivedRate:   stats.WinSurvivedRate(modeOverall),
-			LoseSurvivedRate:  stats.LoseSurvivedRate(modeOverall),
-			KdRate:            stats.KdRate(modeOverall),
-			Kill:              stats.AvgKill(modeOverall),
-			Exp:               stats.AvgExp(modeOverall),
-			AvgTier:           stats.AvgTier(modeOverall, accountID, warships, shipStats),
-			UsingShipTypeRate: stats.UsingShipTypeRate(modeOverall, accountID, warships, shipStats),
-			UsingTierRate:     stats.UsingTierRate(modeOverall, accountID, warships, shipStats),
+			Battles:           stats.Battles(domain.StatsCategoryOverall, statsPattern),
+			Damage:            stats.AvgDamage(domain.StatsCategoryOverall, statsPattern),
+			WinRate:           stats.WinRate(domain.StatsCategoryOverall, statsPattern),
+			WinSurvivedRate:   stats.WinSurvivedRate(domain.StatsCategoryOverall, statsPattern),
+			LoseSurvivedRate:  stats.LoseSurvivedRate(domain.StatsCategoryOverall, statsPattern),
+			KdRate:            stats.KdRate(domain.StatsCategoryOverall, statsPattern),
+			Kill:              stats.AvgKill(domain.StatsCategoryOverall, statsPattern),
+			Exp:               stats.AvgExp(domain.StatsCategoryOverall, statsPattern),
+			PR:                stats.PR(domain.StatsCategoryOverall, statsPattern),
+			AvgTier:           stats.AvgTier(statsPattern, warships),
+			UsingShipTypeRate: stats.UsingShipTypeRate(statsPattern, warships),
+			UsingTierRate:     stats.UsingTierRate(statsPattern, warships),
 		},
 	}
 }

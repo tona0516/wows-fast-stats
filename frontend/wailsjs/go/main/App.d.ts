@@ -31,6 +31,8 @@ export function ManualScreenshot(arg1:string,arg2:string):Promise<void>;
 
 export function OpenDirectory(arg1:string):Promise<void>;
 
+export function PlayerNameColors():Promise<Array<string>>;
+
 export function RemoveAlertPlayer(arg1:number):Promise<void>;
 
 export function RemoveExcludePlayerID(arg1:number):Promise<void>;

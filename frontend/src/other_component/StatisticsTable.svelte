@@ -44,6 +44,7 @@
   ]);
 
   const overallComponents = new ComponentList(StatsCategory.Overall, [
+    new ComponenInfo("pr", SingleTableData),
     new ComponenInfo("damage", SingleTableData),
     new ComponenInfo("win_rate", SingleTableData, { unit: "%" }),
     new ComponenInfo("kd_rate", SingleTableData),

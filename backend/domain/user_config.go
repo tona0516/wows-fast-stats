@@ -45,6 +45,7 @@ type Ship struct {
 }
 
 type Overall struct {
+	PR                bool `json:"pr"`
 	Damage            bool `json:"damage"`
 	WinRate           bool `json:"win_rate"`
 	KdRate            bool `json:"kd_rate"`
@@ -58,9 +59,10 @@ type Overall struct {
 }
 
 type CustomColor struct {
-	Skill    SkillColor    `json:"skill"`
-	Tier     TierColor     `json:"tier"`
-	ShipType ShipTypeColor `json:"ship_type"`
+	Skill      SkillColor      `json:"skill"`
+	Tier       TierColor       `json:"tier"`
+	ShipType   ShipTypeColor   `json:"ship_type"`
+	PlayerName PlayerNameColor `json:"player_name"`
 }
 
 type TierColor struct {

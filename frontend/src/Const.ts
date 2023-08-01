@@ -110,4 +110,10 @@ export namespace Const {
     pvp_solo: "ランダム戦(ソロ)",
     pvp_all: "ランダム戦",
   };
+
+  export const PLAYER_NAME_COLOR = {
+    ship: "艦成績のPR",
+    overall: "総合成績のPR",
+    none: "なし",
+  };
 }

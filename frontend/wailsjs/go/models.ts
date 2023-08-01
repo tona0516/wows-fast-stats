@@ -79,6 +79,7 @@ export namespace domain {
 	    kd_rate: number;
 	    kill: number;
 	    exp: number;
+	    pr: number;
 	    avg_tier: number;
 	    using_ship_type_rate: ShipTypeGroup;
 	    using_tier_rate: TierGroup;
@@ -97,6 +98,7 @@ export namespace domain {
 	        this.kd_rate = source["kd_rate"];
 	        this.kill = source["kill"];
 	        this.exp = source["exp"];
+	        this.pr = source["pr"];
 	        this.avg_tier = source["avg_tier"];
 	        this.using_ship_type_rate = this.convertValues(source["using_ship_type_rate"], ShipTypeGroup);
 	        this.using_tier_rate = this.convertValues(source["using_tier_rate"], TierGroup);
@@ -129,10 +131,10 @@ export namespace domain {
 	    kd_rate: number;
 	    kill: number;
 	    exp: number;
+	    pr: number;
 	    main_battery_hit_rate: number;
 	    torpedoes_hit_rate: number;
 	    planes_killed: number;
-	    pr: number;
 	
 	    static createFrom(source: any = {}) {
 	        return new ShipStats(source);
@@ -148,10 +150,10 @@ export namespace domain {
 	        this.kd_rate = source["kd_rate"];
 	        this.kill = source["kill"];
 	        this.exp = source["exp"];
+	        this.pr = source["pr"];
 	        this.main_battery_hit_rate = source["main_battery_hit_rate"];
 	        this.torpedoes_hit_rate = source["torpedoes_hit_rate"];
 	        this.planes_killed = source["planes_killed"];
-	        this.pr = source["pr"];
 	    }
 	}
 	export class PlayerStats {
@@ -539,6 +541,7 @@ export namespace domain {
 	    skill: SkillColor;
 	    tier: TierColor;
 	    ship_type: ShipTypeColor;
+	    player_name: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new CustomColor(source);
@@ -549,6 +552,7 @@ export namespace domain {
 	        this.skill = this.convertValues(source["skill"], SkillColor);
 	        this.tier = this.convertValues(source["tier"], TierColor);
 	        this.ship_type = this.convertValues(source["ship_type"], ShipTypeColor);
+	        this.player_name = source["player_name"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -606,6 +610,7 @@ export namespace domain {
 	    }
 	}
 	export class Overall {
+	    pr: boolean;
 	    damage: boolean;
 	    win_rate: boolean;
 	    kd_rate: boolean;
@@ -623,6 +628,7 @@ export namespace domain {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.pr = source["pr"];
 	        this.damage = source["damage"];
 	        this.win_rate = source["win_rate"];
 	        this.kd_rate = source["kd_rate"];
