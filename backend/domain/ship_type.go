@@ -2,44 +2,6 @@ package domain
 
 type ShipType string
 
-//nolint:gochecknoglobals
-var shipTypePriority = map[ShipType]int{
-	CV:   0,
-	BB:   1,
-	CL:   2,
-	DD:   3,
-	SS:   4,
-	AUX:  5,
-	NONE: 999,
-}
-
-func NewShipType(raw string) ShipType {
-	switch raw {
-	case "AirCarrier":
-		return CV
-	case "Battleship":
-		return BB
-	case "Cruiser":
-		return CL
-	case "Destroyer":
-		return DD
-	case "Submarine":
-		return SS
-	case "Auxiliary":
-		return AUX
-	}
-
-	return NONE
-}
-
-func (s ShipType) Priority() int {
-	if priority, ok := shipTypePriority[s]; ok {
-		return priority
-	}
-
-	return 999
-}
-
 const (
 	CV   ShipType = "cv"
 	BB   ShipType = "bb"
@@ -49,3 +11,42 @@ const (
 	AUX  ShipType = "aux"
 	NONE ShipType = "none"
 )
+
+//nolint:gochecknoglobals
+var (
+	shipTypeNames = map[string]ShipType{
+		"AirCarrier": CV,
+		"Battleship": BB,
+		"Cruiser":    CL,
+		"Destroyer":  DD,
+		"Submarine":  SS,
+		"Auxiliary":  AUX,
+	}
+	shipTypePriorities = []ShipType{
+		CV,
+		BB,
+		CL,
+		DD,
+		SS,
+		AUX,
+	}
+)
+
+func NewShipType(raw string) ShipType {
+	shipType, ok := shipTypeNames[raw]
+	if !ok {
+		return NONE
+	}
+
+	return shipType
+}
+
+func (s ShipType) Priority() int {
+	for i, shipType := range shipTypePriorities {
+		if shipType == s {
+			return i
+		}
+	}
+
+	return 999
+}
