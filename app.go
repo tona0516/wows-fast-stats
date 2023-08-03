@@ -53,6 +53,7 @@ func NewApp(
 func (a *App) onStartup(ctx context.Context) {
 	a.ctx = ctx
 	logger.Init(ctx, a.env, a.reportRepo)
+	logger.Error(errors.New("hoge"))
 
 	runtime.EventsOn(ctx, EventOnload, func(optionalData ...interface{}) {
 		logger.Info("application started")

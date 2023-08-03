@@ -29,10 +29,7 @@ func NewReport(
 func (r *Report) Send(content any) {
 	// get UserConfig
 	userConfig, err := r.localFile.User()
-	if err != nil {
-		return
-	}
-	if !userConfig.SendReport {
+	if err != nil || !userConfig.SendReport {
 		return
 	}
 	jsonUserConfig := prettryJSON(userConfig)

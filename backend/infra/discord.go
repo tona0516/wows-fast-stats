@@ -1,7 +1,6 @@
 package infra
 
 import (
-	"archive/zip"
 	"encoding/json"
 	"net/http"
 	"os"
@@ -24,40 +23,30 @@ func NewDiscord(config RequestConfig) *Discord {
 }
 
 func (d *Discord) Upload(text string, message string) error {
-	zipName := "out.zip"
-	textName := "out.txt"
+	filename := "out.txt"
 
-	// create zip
-	file, err := os.Create(zipName)
+	// create file
+	file, err := os.Create(filename)
 	defer func() {
 		_ = file.Close()
-		_ = os.Remove(zipName)
+		_ = os.Remove(filename)
 	}()
 	if err != nil {
 		return apperr.New(apperr.ErrWriteFile, err)
 	}
 
-	zw := zip.NewWriter(file)
-	fw, err := zw.Create(textName)
+	// write text to file
+	_, err = file.Write([]byte(text))
 	if err != nil {
 		return apperr.New(apperr.ErrWriteFile, err)
 	}
 
-	_, err = fw.Write([]byte(text))
-	if err != nil {
-		return apperr.New(apperr.ErrWriteFile, err)
-	}
-
-	if err := zw.Close(); err != nil {
-		return apperr.New(apperr.ErrWriteFile, err)
-	}
-
-	// upload zip
+	// upload file
 	//nolint:errchkjson
 	payload, _ := json.Marshal(DisCordRequestBody{Content: message})
 	forms := []Form{
 		{name: "payload_json", content: string(payload), isFile: false},
-		{name: "file", content: zipName, isFile: true},
+		{name: "file", content: filename, isFile: true},
 	}
 
 	response, err := postMultipartFormData[any](d.config.URL, forms, d.config.Retry)
