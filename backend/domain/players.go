@@ -23,7 +23,7 @@ func (p Players) Less(i, j int) bool {
 	}
 
 	if one.Nation != second.Nation {
-		return one.Nation < second.Nation
+		return one.Nation.Priority() < second.Nation.Priority()
 	}
 
 	return one.Name < second.Name

@@ -146,7 +146,7 @@ func (b *Battle) fetchWarship(result chan vo.Result[map[int]domain.Warship]) {
 				Name:   warship.Name,
 				Tier:   warship.Tier,
 				Type:   domain.NewShipType(warship.Type),
-				Nation: warship.Nation,
+				Nation: domain.Nation(warship.Nation),
 			}
 			mu.Unlock()
 		}

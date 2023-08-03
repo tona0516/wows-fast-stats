@@ -35,7 +35,7 @@ func (u *Unregistered) Warship() (map[int]domain.Warship, error) {
 			Name:   us.En,
 			Tier:   us.Level,
 			Type:   domain.NewShipType(us.Species),
-			Nation: nation,
+			Nation: domain.Nation(nation),
 		}
 	}
 

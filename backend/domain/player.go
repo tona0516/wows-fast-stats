@@ -10,7 +10,7 @@ type PlayerInfo struct {
 type ShipInfo struct {
 	ID        int      `json:"id"`
 	Name      string   `json:"name"`
-	Nation    string   `json:"nation"`
+	Nation    Nation   `json:"nation"`
 	Tier      uint     `json:"tier"`
 	Type      ShipType `json:"type"`
 	AvgDamage float64  `json:"avg_damage"`
