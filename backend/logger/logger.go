@@ -4,6 +4,7 @@ import (
 	"context"
 	"os"
 	"time"
+	"wfs/backend/application/repository"
 	"wfs/backend/application/vo"
 
 	"github.com/rs/zerolog"
@@ -16,10 +17,15 @@ import (
 var instance = &Logger{}
 
 type Logger struct {
-	zlog zerolog.Logger
+	zlog   zerolog.Logger
+	report repository.ReportInterface
 }
 
-func Init(appCtx context.Context, env vo.Env) {
+func Init(
+	appCtx context.Context,
+	env vo.Env,
+	report repository.ReportInterface,
+) {
 	// wails logger setting
 	runtime.LogSetLogLevel(appCtx, wailsLogger.ERROR)
 
@@ -28,8 +34,6 @@ func Init(appCtx context.Context, env vo.Env) {
 
 	if env.IsDebug {
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)
-	} else {
-		zerolog.SetGlobalLevel(zerolog.InfoLevel)
 	}
 
 	consoleWriter := zerolog.ConsoleWriter{
@@ -49,10 +53,32 @@ func Init(appCtx context.Context, env vo.Env) {
 		Stack().
 		Str("version", env.Semver).
 		Logger()
+
+	instance.report = report
 }
 
-func Zerolog() *zerolog.Logger {
-	return &instance.zlog
+func Debug(message string) {
+	instance.zlog.Debug().Msg(message)
+}
+
+func Info(message string) {
+	instance.zlog.Info().Msg(message)
+}
+
+func Warn(err error) {
+	instance.zlog.Warn().Err(err).Send()
+
+	if instance.report != nil {
+		instance.report.Send(err)
+	}
+}
+
+func Error(err error) {
+	instance.zlog.Error().Err(err).Send()
+
+	if instance.report != nil {
+		instance.report.Send(err)
+	}
 }
 
 type FrontendWriter struct {

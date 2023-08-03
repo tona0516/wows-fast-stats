@@ -11,6 +11,7 @@ import (
 	"wfs/backend/application/repository"
 	"wfs/backend/application/vo"
 	"wfs/backend/domain"
+	"wfs/backend/logger"
 )
 
 const (
@@ -71,6 +72,7 @@ func (w *Watcher) Start(ctx context.Context) {
 					continue
 				}
 
+				logger.Error(err)
 				w.eventsEmitFunc(w.appCtx, EventErr, err.Error())
 				return
 			}

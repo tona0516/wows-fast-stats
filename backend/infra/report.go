@@ -1,24 +1,23 @@
-package service
+package infra
 
 import (
 	"bytes"
 	"encoding/json"
 	"fmt"
 	"strings"
-	"wfs/backend/application/repository"
 	"wfs/backend/application/vo"
 )
 
 type Report struct {
 	env       vo.Env
-	localFile repository.LocalFileInterface
-	discord   repository.DiscordInterface
+	localFile LocalFile
+	discord   Discord
 }
 
 func NewReport(
 	env vo.Env,
-	localFile repository.LocalFileInterface,
-	discord repository.DiscordInterface,
+	localFile LocalFile,
+	discord Discord,
 ) *Report {
 	return &Report{
 		env:       env,
@@ -27,14 +26,14 @@ func NewReport(
 	}
 }
 
-func (r *Report) Send(content error) error {
+func (r *Report) Send(content any) {
 	// get UserConfig
 	userConfig, err := r.localFile.User()
 	if err != nil {
-		return err
+		return
 	}
 	if !userConfig.SendReport {
-		return nil
+		return
 	}
 	jsonUserConfig := prettryJSON(userConfig)
 
@@ -49,7 +48,7 @@ func (r *Report) Send(content error) error {
 	targets := []string{
 		"Semver:",
 		fmt.Sprintf("%+v\n", r.env.Semver),
-		"Error:",
+		"Content:",
 		fmt.Sprintf("%+v\n", content),
 		"UserConfig:",
 		jsonUserConfig,
@@ -68,7 +67,8 @@ func (r *Report) Send(content error) error {
 	if r.env.IsDebug {
 		message += " [dev]"
 	}
-	return r.discord.Upload(sb.String(), message)
+
+	_ = r.discord.Upload(sb.String(), message)
 }
 
 func prettryJSON(data any) string {

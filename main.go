@@ -70,10 +70,6 @@ func main() {
 func initApp(env vo.Env) *App {
 	// infra
 	var maxRetry uint64 = 2
-	discord := infra.NewDiscord(infra.RequestConfig{
-		URL:   DiscordWebhookURL,
-		Retry: maxRetry,
-	})
 	wargaming := infra.NewWargaming(infra.RequestConfig{
 		URL:   "https://api.worldofwarships.asia",
 		Retry: maxRetry,
@@ -88,6 +84,11 @@ func initApp(env vo.Env) *App {
 		URL:   "https://api.github.com",
 		Retry: maxRetry,
 	})
+	discord := infra.NewDiscord(infra.RequestConfig{
+		URL:   DiscordWebhookURL,
+		Retry: maxRetry,
+	})
+	report := infra.NewReport(env, *localFile, *discord)
 
 	// service
 	var parallels uint = 5
@@ -96,16 +97,15 @@ func initApp(env vo.Env) *App {
 	screenshotService := service.NewScreenshot(localFile, runtime.SaveFileDialog)
 	battleService := service.NewBattle(parallels, wargaming, localFile, numbers, unregistered)
 	watcherService := service.NewWatcher(watchInterval, localFile, runtime.EventsEmit)
-	reportService := service.NewReport(env, localFile, discord)
 	updaterService := service.NewUpdater(env, github)
 
 	return NewApp(
 		env,
+		report,
 		*configService,
 		*screenshotService,
 		*watcherService,
 		*battleService,
-		*reportService,
 		*updaterService,
 	)
 }

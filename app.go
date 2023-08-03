@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"wfs/backend/apperr"
+	"wfs/backend/application/repository"
 	"wfs/backend/application/service"
 	"wfs/backend/application/vo"
 	"wfs/backend/domain"
@@ -19,31 +20,31 @@ type App struct {
 	ctx               context.Context
 	env               vo.Env
 	cancelWatcher     context.CancelFunc
+	reportRepo        repository.ReportInterface
 	configService     service.Config
 	screenshotService service.Screenshot
 	watcherService    service.Watcher
 	battleService     service.Battle
-	reportService     service.Report
 	updaterService    service.Updater
 	excludePlayer     map[int]bool
 }
 
 func NewApp(
 	env vo.Env,
+	reportRepo repository.ReportInterface,
 	configService service.Config,
 	screenshotService service.Screenshot,
 	watcherService service.Watcher,
 	battleService service.Battle,
-	reportService service.Report,
 	updaterService service.Updater,
 ) *App {
 	return &App{
 		env:               env,
+		reportRepo:        reportRepo,
 		configService:     configService,
 		screenshotService: screenshotService,
 		watcherService:    watcherService,
 		battleService:     battleService,
-		reportService:     reportService,
 		updaterService:    updaterService,
 		excludePlayer:     map[int]bool{},
 	}
@@ -51,10 +52,10 @@ func NewApp(
 
 func (a *App) onStartup(ctx context.Context) {
 	a.ctx = ctx
-	logger.Init(ctx, a.env)
+	logger.Init(ctx, a.env, a.reportRepo)
 
 	runtime.EventsOn(ctx, EventOnload, func(optionalData ...interface{}) {
-		logger.Zerolog().Info().Msg("application started")
+		logger.Info("application started")
 	})
 
 	appConfig, err := a.configService.App()
@@ -68,7 +69,7 @@ func (a *App) onStartup(ctx context.Context) {
 }
 
 func (a *App) onShutdown(ctx context.Context) {
-	logger.Zerolog().Info().Msg("application will shutdown...")
+	logger.Info("application will shutdown...")
 
 	// Save windows size
 	appConfig, _ := a.configService.App()
@@ -76,13 +77,13 @@ func (a *App) onShutdown(ctx context.Context) {
 	appConfig.Window.Width = width
 	appConfig.Window.Height = height
 	if err := a.configService.UpdateApp(appConfig); err != nil {
-		a.reportErrorIfNeeded(err)
+		logger.Error(err)
 	}
 }
 
 func (a *App) StartWatching() error {
 	if err := a.watcherService.Prepare(a.ctx); err != nil {
-		a.reportErrorIfNeeded(err)
+		logger.Error(err)
 		return err
 	}
 
@@ -100,13 +101,13 @@ func (a *App) StartWatching() error {
 func (a *App) Battle() (battle domain.Battle, err error) {
 	userConfig, err := a.configService.User()
 	if err != nil {
-		a.reportErrorIfNeeded(err)
+		logger.Error(err)
 		return battle, err
 	}
 
 	battle, err = a.battleService.Battle(userConfig)
 	if err != nil {
-		a.reportErrorIfNeeded(err)
+		logger.Error(err)
 		return battle, err
 	}
 
@@ -119,7 +120,9 @@ func (a *App) SampleTeams() []domain.Team {
 
 func (a *App) SelectDirectory() (string, error) {
 	path, err := a.configService.SelectDirectory(a.ctx)
-	a.reportErrorIfNeeded(err)
+	if err != nil {
+		logger.Error(err)
+	}
 
 	return path, err
 }
@@ -127,7 +130,7 @@ func (a *App) SelectDirectory() (string, error) {
 func (a *App) OpenDirectory(path string) error {
 	err := a.configService.OpenDirectory(path)
 	if err != nil {
-		logger.Zerolog().Warn().Err(err).Send()
+		logger.Warn(err)
 	}
 
 	return err
@@ -139,14 +142,18 @@ func (a *App) DefaultUserConfig() domain.UserConfig {
 
 func (a *App) UserConfig() (domain.UserConfig, error) {
 	config, err := a.configService.User()
-	a.reportErrorIfNeeded(err)
+	if err != nil {
+		logger.Error(err)
+	}
 
 	return config, err
 }
 
 func (a *App) ApplyUserConfig(config domain.UserConfig) error {
 	err := a.configService.UpdateOptional(config)
-	a.reportErrorIfNeeded(err)
+	if err != nil {
+		logger.Error(err)
+	}
 
 	return err
 }
@@ -156,17 +163,21 @@ func (a *App) ApplyRequiredUserConfig(
 	appid string,
 ) (vo.ValidatedResult, error) {
 	validatedResult, err := a.configService.UpdateRequired(installPath, appid)
-	a.reportErrorIfNeeded(err)
+	if err != nil {
+		logger.Error(err)
+	}
 
 	return validatedResult, err
 }
 
 func (a *App) ManualScreenshot(filename string, base64Data string) error {
 	err := a.screenshotService.SaveWithDialog(a.ctx, filename, base64Data)
-	a.reportErrorIfNeeded(err)
-
 	if errors.Is(err, apperr.ErrUserCanceled) {
 		return nil
+	}
+
+	if err != nil {
+		logger.Error(err)
 	}
 
 	return err
@@ -174,7 +185,9 @@ func (a *App) ManualScreenshot(filename string, base64Data string) error {
 
 func (a *App) AutoScreenshot(filename string, base64Data string) error {
 	err := a.screenshotService.SaveForAuto(filename, base64Data)
-	a.reportErrorIfNeeded(err)
+	if err != nil {
+		logger.Error(err)
+	}
 
 	return err
 }
@@ -202,28 +215,36 @@ func (a *App) RemoveExcludePlayerID(playerID int) {
 
 func (a *App) AlertPlayers() ([]domain.AlertPlayer, error) {
 	players, err := a.configService.AlertPlayers()
-	a.reportErrorIfNeeded(err)
+	if err != nil {
+		logger.Error(err)
+	}
 
 	return players, err
 }
 
 func (a *App) UpdateAlertPlayer(player domain.AlertPlayer) error {
 	err := a.configService.UpdateAlertPlayer(player)
-	a.reportErrorIfNeeded(err)
+	if err != nil {
+		logger.Error(err)
+	}
 
 	return err
 }
 
 func (a *App) RemoveAlertPlayer(accountID int) error {
 	err := a.configService.RemoveAlertPlayer(accountID)
-	a.reportErrorIfNeeded(err)
+	if err != nil {
+		logger.Error(err)
+	}
 
 	return err
 }
 
 func (a *App) SearchPlayer(prefix string) (domain.WGAccountList, error) {
 	accountList, err := a.configService.SearchPlayer(prefix)
-	a.reportErrorIfNeeded(err)
+	if err != nil {
+		logger.Error(err)
+	}
 
 	return accountList, err
 }
@@ -234,7 +255,9 @@ func (a *App) AlertPatterns() []string {
 
 func (a *App) LogErrorForFrontend(errString string) {
 	err := apperr.New(apperr.ErrFrontend, errors.New(errString))
-	a.reportErrorIfNeeded(err)
+	if err != nil {
+		logger.Error(err)
+	}
 }
 
 func (a *App) FontSizes() []string {
@@ -251,16 +274,4 @@ func (a *App) PlayerNameColors() []string {
 
 func (a *App) LatestRelease() (domain.GHLatestRelease, error) {
 	return a.updaterService.Updatable()
-}
-
-func (a *App) reportErrorIfNeeded(err error) {
-	if err == nil {
-		return
-	}
-
-	logger.Zerolog().Error().Err(err).Send()
-
-	if errSend := a.reportService.Send(err); errSend != nil {
-		logger.Zerolog().Warn().Err(errSend).Send()
-	}
 }
