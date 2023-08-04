@@ -4,8 +4,7 @@ import (
 	"context"
 	"os"
 	"time"
-	"wfs/backend/application/repository"
-	"wfs/backend/application/vo"
+	"wfs/backend/logger/repository"
 
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/pkgerrors"
@@ -23,7 +22,8 @@ type Logger struct {
 
 func Init(
 	appCtx context.Context,
-	env vo.Env,
+	appVersion string,
+	isDev bool,
 	report repository.ReportInterface,
 ) {
 	// wails logger setting
@@ -32,8 +32,10 @@ func Init(
 	// zerolog setting
 	zerolog.ErrorStackMarshaler = pkgerrors.MarshalStack
 
-	if env.IsDebug {
+	if isDev {
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)
+	} else {
+		zerolog.SetGlobalLevel(zerolog.InfoLevel)
 	}
 
 	consoleWriter := zerolog.ConsoleWriter{
@@ -51,7 +53,7 @@ func Init(
 		With().
 		Timestamp().
 		Stack().
-		Str("version", env.Semver).
+		Str("version", appVersion).
 		Logger()
 
 	instance.report = report

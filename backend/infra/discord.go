@@ -36,7 +36,7 @@ func (d *Discord) Upload(text string, message string) error {
 	}
 
 	// write text to file
-	_, err = file.Write([]byte(text))
+	_, err = file.WriteString(text)
 	if err != nil {
 		return apperr.New(apperr.ErrWriteFile, err)
 	}

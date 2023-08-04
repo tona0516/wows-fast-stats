@@ -3,12 +3,12 @@ package main
 import (
 	"context"
 	"wfs/backend/apperr"
-	"wfs/backend/application/repository"
 	"wfs/backend/application/service"
 	"wfs/backend/application/vo"
 	"wfs/backend/domain"
 	"wfs/backend/infra"
 	"wfs/backend/logger"
+	"wfs/backend/logger/repository"
 
 	"github.com/pkg/errors"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
@@ -52,8 +52,7 @@ func NewApp(
 
 func (a *App) onStartup(ctx context.Context) {
 	a.ctx = ctx
-	logger.Init(ctx, a.env, a.reportRepo)
-	logger.Error(errors.New("hoge"))
+	logger.Init(ctx, a.env.Semver, a.env.IsDev, a.reportRepo)
 
 	runtime.EventsOn(ctx, EventOnload, func(optionalData ...interface{}) {
 		logger.Info("application started")

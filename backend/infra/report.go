@@ -61,7 +61,7 @@ func (r *Report) Send(content any) {
 
 	// send report
 	message := "uploaded file!"
-	if r.env.IsDebug {
+	if r.env.IsDev {
 		message += " [dev]"
 	}
 

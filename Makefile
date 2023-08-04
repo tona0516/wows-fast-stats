@@ -5,7 +5,7 @@ ZIP := $(APP_NAME).zip
 DISCORD_WEBHOOK_URL := $(shell cat discord_webhook_url)
 
 LDFLAGS_COMMON := -X main.AppName=$(APP_NAME) -X main.Semver=$(SEMVER) -X main.DiscordWebhookURL=$(DISCORD_WEBHOOK_URL)
-LDFLAGS_DEV := $(LDFLAGS_COMMON) -X main.IsDebug=true
+LDFLAGS_DEV := $(LDFLAGS_COMMON) -X main.IsDev=true
 LDFLAGS_PROD := $(LDFLAGS_COMMON)
 
 TEST_DIR := test_install_dir/replays/

@@ -24,7 +24,7 @@ var assets embed.FS
 var (
 	AppName           string
 	Semver            string
-	IsDebug           string
+	IsDev             string
 	DiscordWebhookURL string
 )
 
@@ -34,17 +34,17 @@ func main() {
 		return
 	}
 
-	isDebug, _ := strconv.ParseBool(IsDebug)
+	isDev, _ := strconv.ParseBool(IsDev)
 	env := vo.Env{
 		AppName: AppName,
 		Semver:  Semver,
-		IsDebug: isDebug,
+		IsDev:   isDev,
 	}
 
 	app := initApp(env)
 
 	title := AppName
-	if isDebug {
+	if isDev {
 		title += " [dev]"
 	}
 
