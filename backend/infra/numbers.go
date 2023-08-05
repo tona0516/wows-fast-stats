@@ -10,6 +10,12 @@ import (
 	"github.com/pkg/errors"
 )
 
+const (
+	NumbersAvgDamage = "average_damage_dealt"
+	NumbersAvgFrags  = "average_frags"
+	NumbersWinrate   = "win_rate"
+)
+
 var (
 	errNoTimeKey = errors.New("no time key")
 	errNoDataKey = errors.New("no data key")
@@ -47,48 +53,48 @@ func (n *Numbers) ExpectedStats() (domain.NSExpectedStats, error) {
 func parse(body []byte) (domain.NSExpectedStats, error) {
 	var result domain.NSExpectedStats
 
-	depth1 := make(map[string]interface{})
-	if err := json.Unmarshal(body, &depth1); err != nil {
-		return result, apperr.New(apperr.ErrNumbersAPIParse, err)
+	root := make(map[string]interface{})
+	if err := json.Unmarshal(body, &root); err != nil {
+		return result, apperr.New(apperr.ErrNumbersAPI, err)
 	}
 
-	time, ok := depth1["time"].(float64)
+	time, ok := root["time"].(float64)
 	if !ok {
-		return result, apperr.New(apperr.ErrNumbersAPIParse, errNoTimeKey)
+		return result, apperr.New(apperr.ErrNumbersAPI, errNoTimeKey)
 	}
-	depth2, ok := depth1["data"].(map[string]interface{})
+	data, ok := root["data"].(map[string]interface{})
 	if !ok {
-		return result, apperr.New(apperr.ErrNumbersAPIParse, errNoDataKey)
+		return result, apperr.New(apperr.ErrNumbersAPI, errNoDataKey)
 	}
 
-	data := make(map[int]domain.NSExpectedStatsData)
-	for key, value := range depth2 {
+	esd := make(map[int]domain.NSExpectedStatsData)
+	for key, value := range data {
 		shipID, err := strconv.Atoi(key)
 		if err != nil {
 			continue
 		}
 
-		valueMap, ok := value.(map[string]interface{})
+		values, ok := value.(map[string]interface{})
 		if !ok {
 			continue
 		}
 
-		damage, ok := valueMap["average_damage_dealt"].(float64)
+		damage, ok := values[NumbersAvgDamage].(float64)
 		if !ok {
 			continue
 		}
 
-		frags, ok := valueMap["average_frags"].(float64)
+		frags, ok := values[NumbersAvgFrags].(float64)
 		if !ok {
 			continue
 		}
 
-		wr, ok := valueMap["win_rate"].(float64)
+		wr, ok := values[NumbersWinrate].(float64)
 		if !ok {
 			continue
 		}
 
-		data[shipID] = domain.NSExpectedStatsData{
+		esd[shipID] = domain.NSExpectedStatsData{
 			AverageDamageDealt: damage,
 			AverageFrags:       frags,
 			WinRate:            wr,
@@ -97,7 +103,7 @@ func parse(body []byte) (domain.NSExpectedStats, error) {
 
 	result = domain.NSExpectedStats{
 		Time: int(time),
-		Data: data,
+		Data: esd,
 	}
 
 	return result, nil
