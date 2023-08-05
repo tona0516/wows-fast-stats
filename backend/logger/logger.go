@@ -71,7 +71,7 @@ func Warn(err error) {
 	instance.zlog.Warn().Err(err).Send()
 
 	if instance.report != nil {
-		instance.report.Send(err)
+		instance.report.Send("warn has occurred!", err)
 	}
 }
 
@@ -79,7 +79,7 @@ func Error(err error) {
 	instance.zlog.Error().Err(err).Send()
 
 	if instance.report != nil {
-		instance.report.Send(err)
+		instance.report.Send("error has occurred!", err)
 	}
 }
 
