@@ -32,4 +32,5 @@ var (
 	ErrSelectDirectory             AppError = errors.New("フォルダが選択できませんでした。")
 	ErrOpenDirectory               AppError = errors.New("フォルダが開けません。存在しない可能性があります。")
 	ErrFrontend                    AppError = errors.New("FrontendError")
+	ErrUnexpected                  AppError = errors.New("予期しないエラーが発生しました。")
 )

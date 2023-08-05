@@ -1,27 +1,30 @@
 package domain
 
 import (
+	"fmt"
 	"math"
+	"wfs/backend/apperr"
+	"wfs/backend/logger"
 )
 
 type Stats struct {
 	useShipID     int
 	accountInfo   WGAccountInfoData
-	shipsStats    []WGShipsStatsData
-	expectedStats map[int]NSExpectedStatsData
 	useShipStats  WGShipsStatsData
+	allShipsStats []WGShipsStatsData
+	expectedStats map[int]NSExpectedStatsData
 	nickname      string
 }
 
 func NewStats(
 	useShipID int,
 	accountInfo WGAccountInfoData,
-	shipsStats []WGShipsStatsData,
+	allShipsStats []WGShipsStatsData,
 	expectedStats map[int]NSExpectedStatsData,
 	nickname string,
 ) *Stats {
 	var useShipStats WGShipsStatsData
-	for _, v := range shipsStats {
+	for _, v := range allShipsStats {
 		if v.ShipID == useShipID {
 			useShipStats = v
 			break
@@ -31,9 +34,9 @@ func NewStats(
 	return &Stats{
 		useShipID:     useShipID,
 		accountInfo:   accountInfo,
-		shipsStats:    shipsStats,
-		expectedStats: expectedStats,
 		useShipStats:  useShipStats,
+		allShipsStats: allShipsStats,
+		expectedStats: expectedStats,
 		nickname:      nickname,
 	}
 }
@@ -44,30 +47,32 @@ func (s *Stats) PR(category StatsCategory, pattern StatsPattern) float64 {
 		values := s.statsValues(StatsCategoryShip, pattern)
 		battles := values.Battles
 
-		actual := PRFactor{
-			damage: avgDamage(values.DamageDealt, battles),
-			frags:  avgKill(values.Frags, battles),
-			wins:   winRate(values.Wins, battles),
-		}
-		expected := PRFactor{
-			damage: s.expectedStats[s.useShipID].AverageDamageDealt,
-			frags:  s.expectedStats[s.useShipID].AverageFrags,
-			wins:   s.expectedStats[s.useShipID].WinRate,
-		}
-
-		return pr(actual, expected, battles)
+		return s.pr(
+			PRFactor{
+				damage: avgDamage(values.DamageDealt, battles),
+				frags:  avgKill(values.Frags, battles),
+				wins:   winRate(values.Wins, battles),
+			},
+			PRFactor{
+				damage: s.expectedStats[s.useShipID].AverageDamageDealt,
+				frags:  s.expectedStats[s.useShipID].AverageFrags,
+				wins:   s.expectedStats[s.useShipID].WinRate,
+			},
+			battles,
+		)
 
 	case StatsCategoryOverall:
-		actual := PRFactor{}
-		expected := PRFactor{}
-		var allBattles uint
+		var (
+			actual     PRFactor
+			expected   PRFactor
+			allBattles uint
+		)
 
-		for _, ship := range s.shipsStats {
+		for _, ship := range s.allShipsStats {
 			values := s.statsValuesForm(ship, pattern)
 			battles := values.Battles
 
-			shipID := ship.ShipID
-			es, ok := s.expectedStats[shipID]
+			es, ok := s.expectedStats[ship.ShipID]
 			if !ok {
 				continue
 			}
@@ -83,9 +88,10 @@ func (s *Stats) PR(category StatsCategory, pattern StatsPattern) float64 {
 			allBattles += battles
 		}
 
-		return pr(actual, expected, allBattles)
+		return s.pr(actual, expected, allBattles)
 	}
 
+	logger.Error(apperr.ErrUnexpected)
 	return -1
 }
 
@@ -96,21 +102,17 @@ func (s *Stats) Battles(category StatsCategory, pattern StatsPattern) uint {
 
 func (s *Stats) AvgDamage(category StatsCategory, pattern StatsPattern) float64 {
 	values := s.statsValues(category, pattern)
-	damageDealt := values.DamageDealt
-	battles := values.Battles
-	return avgDamage(damageDealt, battles)
+	return avgDamage(values.DamageDealt, values.Battles)
 }
 
 func (s *Stats) KdRate(category StatsCategory, pattern StatsPattern) float64 {
 	values := s.statsValues(category, pattern)
-	frags := values.Frags
-
 	death := values.Battles - values.SurvivedBattles
 	if death < 1 {
-		return float64(frags)
+		death = 1
 	}
 
-	return float64(frags) / float64(death)
+	return float64(values.Frags) / float64(death)
 }
 
 func (s *Stats) AvgKill(category StatsCategory, pattern StatsPattern) float64 {
@@ -120,14 +122,12 @@ func (s *Stats) AvgKill(category StatsCategory, pattern StatsPattern) float64 {
 
 func (s *Stats) AvgExp(category StatsCategory, pattern StatsPattern) float64 {
 	values := s.statsValues(category, pattern)
-	xp := values.Xp
 	battles := values.Battles
-
 	if battles < 1 {
 		return 0
 	}
 
-	return float64(xp) / float64(battles)
+	return float64(values.Xp) / float64(battles)
 }
 
 func (s *Stats) WinRate(category StatsCategory, pattern StatsPattern) float64 {
@@ -189,10 +189,12 @@ func (s *Stats) AvgTier(
 	pattern StatsPattern,
 	warships map[int]Warship,
 ) float64 {
-	var sum uint
-	var battles uint
+	var (
+		sum     uint
+		battles uint
+	)
 
-	for _, stats := range s.shipsStats {
+	for _, stats := range s.allShipsStats {
 		warship, ok := warships[stats.ShipID]
 		if !ok {
 			continue
@@ -216,19 +218,15 @@ func (s *Stats) UsingTierRate(
 ) TierGroup {
 	var tierGroup TierGroup
 
-	for _, ship := range s.shipsStats {
-		values := s.statsValuesForm(ship, pattern)
-		battles := values.Battles
-		if battles < 1 {
-			continue
-		}
-
+	for _, ship := range s.allShipsStats {
 		warship, ok := warships[ship.ShipID]
 		if !ok {
 			continue
 		}
-		tier := warship.Tier
 
+		values := s.statsValuesForm(ship, pattern)
+		tier := warship.Tier
+		battles := values.Battles
 		switch {
 		case tier >= 1 && tier <= 4:
 			tierGroup.Low += float64(battles)
@@ -257,19 +255,14 @@ func (s *Stats) UsingShipTypeRate(
 ) ShipTypeGroup {
 	shipTypeMap := make(map[ShipType]float64)
 
-	for _, ship := range s.shipsStats {
-		values := s.statsValuesForm(ship, pattern)
-		battles := values.Battles
-		if battles < 1 {
-			continue
-		}
-
+	for _, ship := range s.allShipsStats {
 		warship, ok := warships[ship.ShipID]
 		if !ok {
 			continue
 		}
 
-		shipTypeMap[warship.Type] += float64(battles)
+		values := s.statsValuesForm(ship, pattern)
+		shipTypeMap[warship.Type] += float64(values.Battles)
 	}
 
 	var allBattles float64
@@ -307,6 +300,7 @@ func (s *Stats) statsValues(category StatsCategory, pattern StatsPattern) WGStat
 		}
 	}
 
+	logger.Error(apperr.ErrUnexpected)
 	return WGStatsValues{}
 }
 
@@ -318,34 +312,11 @@ func (s *Stats) statsValuesForm(statsData WGShipsStatsData, pattern StatsPattern
 		return statsData.PvpSolo
 	}
 
+	logger.Error(apperr.ErrUnexpected)
 	return WGStatsValues{}
 }
 
-func avgDamage(damageDealt uint, battles uint) float64 {
-	if battles < 1 {
-		return -1
-	}
-
-	return float64(damageDealt) / float64(battles)
-}
-
-func avgKill(frags uint, battles uint) float64 {
-	if battles < 1 {
-		return -1
-	}
-
-	return float64(frags) / float64(battles)
-}
-
-func winRate(wins uint, battles uint) float64 {
-	if battles < 1 {
-		return -1
-	}
-
-	return float64(wins) / float64(battles) * 100
-}
-
-func pr(
+func (s *Stats) pr(
 	actual PRFactor,
 	expected PRFactor,
 	battles uint,
@@ -361,6 +332,7 @@ func pr(
 	}
 
 	if !ratio.Valid() {
+		logger.Info(fmt.Sprintf("PRが算出できませんでした: nickname=%s actual=%+v, expected=%+v", s.nickname, actual, expected))
 		return -1
 	}
 
@@ -371,4 +343,28 @@ func pr(
 	}
 
 	return 700*norm.damage + 300*norm.frags + 150*norm.wins
+}
+
+func avgDamage(damageDealt uint, battles uint) float64 {
+	if battles < 1 {
+		return 0
+	}
+
+	return float64(damageDealt) / float64(battles)
+}
+
+func avgKill(frags uint, battles uint) float64 {
+	if battles < 1 {
+		return 0
+	}
+
+	return float64(frags) / float64(battles)
+}
+
+func winRate(wins uint, battles uint) float64 {
+	if battles < 1 {
+		return 0
+	}
+
+	return float64(wins) / float64(battles) * 100
 }
