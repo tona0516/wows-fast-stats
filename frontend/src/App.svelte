@@ -16,7 +16,7 @@
     AlertPlayers,
     Battle,
     ExcludePlayerIDs,
-    LogErrorForFrontend,
+    LogError,
     StartWatching,
     LatestRelease,
     UserConfig,
@@ -96,9 +96,7 @@
           "スクリーンショットの自動保存に失敗しました。",
           "error"
         );
-        LogErrorForFrontend(
-          error.name + "," + error.message + "," + error.stack
-        );
+        LogError(error.name + "," + error.message + "," + error.stack);
       }
     }
   });

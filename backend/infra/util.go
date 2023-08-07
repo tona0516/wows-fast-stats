@@ -8,16 +8,14 @@ import (
 	"net/http"
 	"net/url"
 	"os"
-	"unsafe"
 	"wfs/backend/apperr"
-
-	"github.com/cenkalti/backoff/v4"
+	"wfs/backend/application/vo"
 )
 
 type APIResponse[T any] struct {
 	StatusCode int
+	BodyByte   []byte
 	Body       T
-	BodyString string
 }
 
 type Form struct {
@@ -28,8 +26,7 @@ type Form struct {
 
 func getRequest[T any](
 	rawURL string,
-	query map[string]string,
-	retry uint64,
+	queries ...vo.Pair,
 ) (APIResponse[T], error) {
 	var response APIResponse[T]
 
@@ -39,18 +36,13 @@ func getRequest[T any](
 		return response, apperr.New(apperr.ErrHTTPRequest, err)
 	}
 	q := u.Query()
-	for k, v := range query {
-		q.Add(k, v)
+	for _, query := range queries {
+		q.Add(query.Key, query.Value)
 	}
 	u.RawQuery = q.Encode()
 
 	// request
-	b := backoff.WithMaxRetries(backoff.NewExponentialBackOff(), retry)
-	operation := func() (*http.Response, error) {
-		return http.Get(u.String())
-	}
-
-	res, err := backoff.RetryWithData(operation, b)
+	res, err := http.Get(u.String())
 	if err != nil {
 		return response, apperr.New(apperr.ErrHTTPRequest, err)
 	}
@@ -59,15 +51,13 @@ func getRequest[T any](
 
 	defer res.Body.Close()
 
-	body, err := io.ReadAll(res.Body)
+	response.BodyByte, err = io.ReadAll(res.Body)
 	if err != nil {
 		return response, apperr.New(apperr.ErrHTTPRequest, err)
 	}
 
-	response.BodyString = *(*string)(unsafe.Pointer(&body))
-
 	// serialize
-	err = json.Unmarshal(body, &response.Body)
+	err = json.Unmarshal(response.BodyByte, &response.Body)
 	if err != nil {
 		return response, apperr.New(apperr.ErrHTTPRequest, err)
 	}
@@ -79,7 +69,6 @@ func getRequest[T any](
 func postMultipartFormData[T any](
 	rawURL string,
 	forms []Form,
-	retry uint64,
 ) (APIResponse[T], error) {
 	var response APIResponse[T]
 
@@ -121,12 +110,7 @@ func postMultipartFormData[T any](
 	mw.Close()
 
 	// request
-	b := backoff.WithMaxRetries(backoff.NewExponentialBackOff(), retry)
-	operation := func() (*http.Response, error) {
-		return http.Post(u.String(), mw.FormDataContentType(), requestBody)
-	}
-
-	res, err := backoff.RetryWithData(operation, b)
+	res, err := http.Post(u.String(), mw.FormDataContentType(), requestBody)
 	if err != nil {
 		return response, apperr.New(apperr.ErrHTTPRequest, err)
 	}
@@ -135,15 +119,13 @@ func postMultipartFormData[T any](
 
 	defer res.Body.Close()
 
-	body, err := io.ReadAll(res.Body)
+	response.BodyByte, err = io.ReadAll(res.Body)
 	if err != nil {
 		return response, apperr.New(apperr.ErrHTTPRequest, err)
 	}
 
-	response.BodyString = *(*string)(unsafe.Pointer(&body))
-
 	// serialize
-	err = json.Unmarshal(body, &response.Body)
+	err = json.Unmarshal(response.BodyByte, &response.Body)
 	if err != nil {
 		return response, apperr.New(apperr.ErrHTTPRequest, err)
 	}

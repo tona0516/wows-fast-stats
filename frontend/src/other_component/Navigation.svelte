@@ -3,7 +3,7 @@
   import { createEventDispatcher } from "svelte";
   import {
     ApplyUserConfig,
-    LogErrorForFrontend,
+    LogError,
     StatsPatterns,
   } from "../../wailsjs/go/main/App";
   import { WindowReloadApp } from "../../wailsjs/runtime/runtime";
@@ -61,7 +61,7 @@
       }
 
       dispatch("Failure", { message: error });
-      LogErrorForFrontend(error.name + "," + error.message + "," + error.stack);
+      LogError(error.name + "," + error.message + "," + error.stack);
     } finally {
       storedIsFirstScreenshot.set(false);
       isLoadingScreenshot = false;

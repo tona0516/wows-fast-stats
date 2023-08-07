@@ -4,6 +4,7 @@ import (
 	"context"
 	"os"
 	"time"
+	"wfs/backend/application/vo"
 	"wfs/backend/logger/repository"
 
 	"github.com/rs/zerolog"
@@ -59,27 +60,43 @@ func Init(
 	instance.report = report
 }
 
-func Debug(message string) {
-	instance.zlog.Debug().Msg(message)
+func Debug(message string, contexts ...vo.Pair) {
+	e := instance.zlog.Debug()
+	addContext(e, contexts...)
+	e.Msg(message)
 }
 
-func Info(message string) {
-	instance.zlog.Info().Msg(message)
+func Info(message string, contexts ...vo.Pair) {
+	e := instance.zlog.Info()
+	addContext(e, contexts...)
+	e.Msg(message)
 }
 
-func Warn(err error) {
-	instance.zlog.Warn().Err(err).Send()
+func Warn(err error, contexts ...vo.Pair) {
+	e := instance.zlog.Warn().Err(err)
+	addContext(e, contexts...)
+	e.Send()
 
 	if instance.report != nil {
 		instance.report.Send("warn has occurred!", err)
 	}
 }
 
-func Error(err error) {
-	instance.zlog.Error().Err(err).Send()
+func Error(err error, contexts ...vo.Pair) {
+	e := instance.zlog.Error().Err(err)
+	addContext(e, contexts...)
+	e.Send()
 
 	if instance.report != nil {
 		instance.report.Send("error has occurred!", err)
+	}
+}
+
+func addContext(e *zerolog.Event, contexts ...vo.Pair) {
+	if len(contexts) != 0 {
+		for _, c := range contexts {
+			e = e.Str(c.Key, c.Value)
+		}
 	}
 }
 

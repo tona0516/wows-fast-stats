@@ -2,12 +2,10 @@ package infra
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"os"
-	"strconv"
 	"wfs/backend/apperr"
-
-	"github.com/pkg/errors"
 )
 
 type Discord struct {
@@ -27,13 +25,14 @@ func (d *Discord) Upload(text string, message string) error {
 
 	// create file
 	file, err := os.Create(filename)
+	if err != nil {
+		return apperr.New(apperr.ErrWriteFile, err)
+	}
+
 	defer func() {
 		_ = file.Close()
 		_ = os.Remove(filename)
 	}()
-	if err != nil {
-		return apperr.New(apperr.ErrWriteFile, err)
-	}
 
 	// write text to file
 	_, err = file.WriteString(text)
@@ -49,17 +48,14 @@ func (d *Discord) Upload(text string, message string) error {
 		{name: "file", content: filename, isFile: true},
 	}
 
-	response, err := postMultipartFormData[any](d.config.URL, forms, d.config.Retry)
+	res, err := postMultipartFormData[any](d.config.URL, forms)
 	if err != nil {
-		return err
+		return apperr.New(apperr.ErrDiscordAPI, err)
 	}
 
-	if response.StatusCode != http.StatusOK {
-		message := "status_code: " +
-			strconv.Itoa(response.StatusCode) +
-			" response_body: " +
-			response.BodyString
-		return apperr.New(apperr.ErrDiscordAPI, errors.New(message))
+	if res.StatusCode != http.StatusOK {
+		//nolint:goerr113
+		return apperr.New(apperr.ErrDiscordAPI, fmt.Errorf("status_code=%d, body=%s", res.StatusCode, res.BodyByte))
 	}
 
 	return nil

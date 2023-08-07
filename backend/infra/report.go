@@ -26,7 +26,7 @@ func NewReport(
 	}
 }
 
-func (r *Report) Send(message string, content any) {
+func (r *Report) Send(message string, content error) {
 	// get UserConfig
 	userConfig, err := r.localFile.User()
 	if err != nil || !userConfig.SendReport {
@@ -61,7 +61,9 @@ func (r *Report) Send(message string, content any) {
 
 	// send report
 	if r.env.IsDev {
-		message = fmt.Sprintf("[dev]%s", message)
+		message = fmt.Sprintf("[dev] %s", message)
+	} else {
+		message = fmt.Sprintf("[prod] %s", message)
 	}
 
 	_ = r.discord.Upload(sb.String(), message)

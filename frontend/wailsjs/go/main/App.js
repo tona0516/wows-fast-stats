@@ -46,8 +46,8 @@ export function LatestRelease() {
   return window['go']['main']['App']['LatestRelease']();
 }
 
-export function LogErrorForFrontend(arg1) {
-  return window['go']['main']['App']['LogErrorForFrontend'](arg1);
+export function LogError(arg1) {
+  return window['go']['main']['App']['LogError'](arg1);
 }
 
 export function ManualScreenshot(arg1, arg2) {

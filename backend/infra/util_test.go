@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"wfs/backend/application/vo"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -22,45 +23,32 @@ func TestUtil_getRequest_正常系_クエリなし(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(expected.StatusCode)
-		_, _ = w.Write([]byte(expected.BodyString))
+		_, _ = w.Write(expected.BodyByte)
 	}))
 	defer server.Close()
 
-	actual, err := getRequest[TestData](server.URL, map[string]string{}, 0)
+	actual, err := getRequest[TestData](server.URL)
 
 	assert.Equal(t, expected, actual)
 	assert.NoError(t, err)
 }
 
-func TestUtil_getRequest_正常系_最終リトライで成功(t *testing.T) {
+func TestUtil_getRequest_正常系_クエリあり(t *testing.T) {
 	t.Parallel()
 
 	expected := normalResponse()
 
-	retry := 1
-	maxCalls := retry + 1
-	var calls int
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		calls++
-
-		if calls < maxCalls {
-			//nolint:forcetypeassert
-			c, _, _ := w.(http.Hijacker).Hijack()
-			defer c.Close()
-			return
-		}
-
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(expected.StatusCode)
-		_, _ = w.Write([]byte(expected.BodyString))
+		_, _ = w.Write(expected.BodyByte)
 	}))
 	defer server.Close()
 
-	actual, err := getRequest[TestData](server.URL, map[string]string{}, uint64(retry))
+	actual, err := getRequest[TestData](server.URL, vo.NewPair("hoge", "fuga"))
 
 	assert.Equal(t, expected, actual)
 	assert.NoError(t, err)
-	assert.Equal(t, maxCalls, calls)
 }
 
 func TestUtil_getRequest_異常系_不正なレスポンス(t *testing.T) {
@@ -82,41 +70,22 @@ func TestUtil_getRequest_異常系_不正なレスポンス(t *testing.T) {
 			expected := APIResponse[TestData]{
 				StatusCode: http.StatusOK,
 				Body:       TestData{},
-				BodyString: res.body,
+				BodyByte:   []byte(res.body),
 			}
 
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(expected.StatusCode)
-				_, _ = w.Write([]byte(expected.BodyString))
+				_, _ = w.Write(expected.BodyByte)
 			}))
 			defer server.Close()
 
-			actual, err := getRequest[TestData](server.URL, map[string]string{}, 0)
+			actual, err := getRequest[TestData](server.URL)
 
 			assert.Error(t, err)
 			assert.Equal(t, expected, actual)
 		})
 	}
-}
-
-func TestUtil_getRequest_異常系_すべてのリトライが失敗(t *testing.T) {
-	t.Parallel()
-
-	retry := 1
-	var calls int
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		//nolint:forcetypeassert
-		c, _, _ := w.(http.Hijacker).Hijack()
-		defer c.Close()
-		calls++
-	}))
-	defer server.Close()
-
-	_, err := getRequest[TestData](server.URL, map[string]string{}, uint64(retry))
-
-	assert.Error(t, err)
-	assert.Equal(t, retry+1, calls)
 }
 
 func normalResponse() APIResponse[TestData] {
@@ -127,6 +96,6 @@ func normalResponse() APIResponse[TestData] {
 	return APIResponse[TestData]{
 		StatusCode: http.StatusOK,
 		Body:       testData,
-		BodyString: string(body),
+		BodyByte:   body,
 	}
 }

@@ -1,5 +1,5 @@
 package repository
 
 type ReportInterface interface {
-	Send(message string, content any)
+	Send(message string, content error)
 }

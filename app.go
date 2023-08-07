@@ -253,11 +253,8 @@ func (a *App) AlertPatterns() []string {
 	return domain.AlertPatterns
 }
 
-func (a *App) LogErrorForFrontend(errString string) {
-	err := apperr.New(apperr.ErrFrontend, errors.New(errString))
-	if err != nil {
-		logger.Error(err)
-	}
+func (a *App) LogError(errString string) {
+	logger.Error(apperr.New(apperr.ErrFrontend, errors.New(errString)))
 }
 
 func (a *App) FontSizes() []string {

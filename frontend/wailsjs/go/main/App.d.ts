@@ -25,7 +25,7 @@ export function FontSizes():Promise<Array<string>>;
 
 export function LatestRelease():Promise<domain.GHLatestRelease>;
 
-export function LogErrorForFrontend(arg1:string):Promise<void>;
+export function LogError(arg1:string):Promise<void>;
 
 export function ManualScreenshot(arg1:string,arg2:string):Promise<void>;
 

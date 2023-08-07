@@ -91,7 +91,7 @@ func (s *Stats) PR(category StatsCategory, pattern StatsPattern) float64 {
 		return s.pr(actual, expected, allBattles)
 	}
 
-	logger.Error(apperr.ErrUnexpected)
+	logger.Error(apperr.New(apperr.ErrUnexpected, nil))
 	return -1
 }
 
@@ -300,7 +300,7 @@ func (s *Stats) statsValues(category StatsCategory, pattern StatsPattern) WGStat
 		}
 	}
 
-	logger.Error(apperr.ErrUnexpected)
+	logger.Error(apperr.New(apperr.ErrUnexpected, nil))
 	return WGStatsValues{}
 }
 
@@ -312,7 +312,7 @@ func (s *Stats) statsValuesForm(statsData WGShipsStatsData, pattern StatsPattern
 		return statsData.PvpSolo
 	}
 
-	logger.Error(apperr.ErrUnexpected)
+	logger.Error(apperr.New(apperr.ErrUnexpected, nil))
 	return WGStatsValues{}
 }
 
