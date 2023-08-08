@@ -2,11 +2,12 @@ APP_NAME := wows-fast-stats
 SEMVER := 0.7.0
 EXE := $(APP_NAME)-$(SEMVER).exe
 ZIP := $(APP_NAME).zip
-DISCORD_WEBHOOK_URL := $(shell cat discord_webhook_url)
+DISCORD_WEBHOOK_URL_PROD := $(shell cat discord_webhook_url_prod)
+DISCORD_WEBHOOK_URL_DEV := $(shell cat discord_webhook_url_dev)
 
-LDFLAGS_COMMON := -X main.AppName=$(APP_NAME) -X main.Semver=$(SEMVER) -X main.DiscordWebhookURL=$(DISCORD_WEBHOOK_URL)
-LDFLAGS_DEV := $(LDFLAGS_COMMON) -X main.IsDev=true
-LDFLAGS_PROD := $(LDFLAGS_COMMON)
+LDFLAGS_COMMON := -X main.AppName=$(APP_NAME) -X main.Semver=$(SEMVER)
+LDFLAGS_DEV := $(LDFLAGS_COMMON) -X main.DiscordWebhookURL=$(DISCORD_WEBHOOK_URL_DEV) -X main.IsDev=true
+LDFLAGS_PROD := $(LDFLAGS_COMMON) -X main.DiscordWebhookURL=$(DISCORD_WEBHOOK_URL_PROD)
 
 TEST_DIR := test_install_dir/replays/
 

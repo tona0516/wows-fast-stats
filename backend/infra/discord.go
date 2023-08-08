@@ -20,9 +20,7 @@ func NewDiscord(config RequestConfig) *Discord {
 	return &Discord{config: config}
 }
 
-func (d *Discord) Upload(text string, message string) error {
-	filename := "out.txt"
-
+func (d *Discord) Upload(filename string, text string, message string) error {
 	// create file
 	file, err := os.Create(filename)
 	if err != nil {

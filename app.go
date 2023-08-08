@@ -52,7 +52,7 @@ func NewApp(
 
 func (a *App) onStartup(ctx context.Context) {
 	a.ctx = ctx
-	logger.Init(ctx, a.env.Semver, a.env.IsDev, a.reportRepo)
+	logger.Init(ctx, a.env, a.reportRepo)
 
 	runtime.EventsOn(ctx, EventOnload, func(optionalData ...interface{}) {
 		logger.Info("application started")

@@ -23,8 +23,7 @@ type Logger struct {
 
 func Init(
 	appCtx context.Context,
-	appVersion string,
-	isDev bool,
+	env vo.Env,
 	report repository.ReportInterface,
 ) {
 	// wails logger setting
@@ -33,7 +32,7 @@ func Init(
 	// zerolog setting
 	zerolog.ErrorStackMarshaler = pkgerrors.MarshalStack
 
-	if isDev {
+	if env.IsDev {
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)
 	} else {
 		zerolog.SetGlobalLevel(zerolog.InfoLevel)
@@ -54,7 +53,7 @@ func Init(
 		With().
 		Timestamp().
 		Stack().
-		Str("version", appVersion).
+		Str("semver", env.Semver).
 		Logger()
 
 	instance.report = report

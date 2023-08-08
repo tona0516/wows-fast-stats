@@ -60,13 +60,7 @@ func (r *Report) Send(message string, content error) {
 	}
 
 	// send report
-	if r.env.IsDev {
-		message = fmt.Sprintf("[dev] %s", message)
-	} else {
-		message = fmt.Sprintf("[prod] %s", message)
-	}
-
-	_ = r.discord.Upload(sb.String(), message)
+	_ = r.discord.Upload("report.txt", sb.String(), message)
 }
 
 func prettryJSON(data any) string {
