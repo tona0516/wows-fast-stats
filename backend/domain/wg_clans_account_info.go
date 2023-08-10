@@ -8,9 +8,11 @@ import (
 )
 
 type WGClansAccountInfo struct {
-	Status string                         `json:"status"`
-	Data   map[int]WGClansAccountInfoData `json:"data"`
-	Error  WGError                        `json:"error"`
+	WGResponseCommon[map[int]WGClansAccountInfoData]
+}
+
+func (w WGClansAccountInfo) Field() string {
+	return fieldQuery(reflect.TypeOf(&WGClansAccountInfoData{}).Elem())
 }
 
 func (w WGClansAccountInfo) ClanIDs() []int {
@@ -24,18 +26,6 @@ func (w WGClansAccountInfo) ClanIDs() []int {
 	return clanIDs
 }
 
-func (w WGClansAccountInfo) GetStatus() string {
-	return w.Status
-}
-
-func (w WGClansAccountInfo) GetError() WGError {
-	return w.Error
-}
-
 type WGClansAccountInfoData struct {
 	ClanID int `json:"clan_id"`
-}
-
-func (w WGClansAccountInfoData) Field() string {
-	return fieldQuery(reflect.TypeOf(&w).Elem())
 }

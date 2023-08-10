@@ -8,16 +8,14 @@ import (
 
 func TestWGAccountList_AccountIDs(t *testing.T) {
 	t.Parallel()
-	data := []WGAccountListData{
+
+	w := WGAccountList{}
+	w.Data = []WGAccountListData{
 		{NickName: "John", AccountID: 123},
 		{NickName: "Alice", AccountID: 0},
 		{NickName: "Bob", AccountID: 456},
 		{NickName: "Charlie", AccountID: 789},
 		{NickName: "John", AccountID: 123},
-	}
-
-	w := WGAccountList{
-		Data: data,
 	}
 
 	expectedIDs := []int{123, 456, 789}
@@ -28,14 +26,12 @@ func TestWGAccountList_AccountIDs(t *testing.T) {
 
 func TestWGAccountList_AccountID(t *testing.T) {
 	t.Parallel()
-	data := []WGAccountListData{
+
+	w := WGAccountList{}
+	w.Data = []WGAccountListData{
 		{NickName: "John", AccountID: 123},
 		{NickName: "Alice", AccountID: 456},
 		{NickName: "Bob", AccountID: 789},
-	}
-
-	w := WGAccountList{
-		Data: data,
 	}
 
 	nickname := "Alice"
@@ -47,14 +43,12 @@ func TestWGAccountList_AccountID(t *testing.T) {
 
 func TestWGAccountList_AccountID_NotExist(t *testing.T) {
 	t.Parallel()
-	data := []WGAccountListData{
+
+	w := WGAccountList{}
+	w.Data = []WGAccountListData{
 		{NickName: "John", AccountID: 123},
 		{NickName: "Alice", AccountID: 456},
 		{NickName: "Bob", AccountID: 789},
-	}
-
-	w := WGAccountList{
-		Data: data,
 	}
 
 	nickname := "Unknown"

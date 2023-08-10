@@ -8,9 +8,7 @@ import (
 )
 
 type WGAccountList struct {
-	Status string              `json:"status"`
-	Data   []WGAccountListData `json:"data"`
-	Error  WGError             `json:"error"`
+	WGResponseCommon[[]WGAccountListData]
 }
 
 func (w WGAccountList) AccountIDs() []int {
@@ -35,19 +33,11 @@ func (w WGAccountList) AccountID(nickname string) int {
 	return 0
 }
 
-func (w WGAccountList) GetStatus() string {
-	return w.Status
-}
-
-func (w WGAccountList) GetError() WGError {
-	return w.Error
+func (w WGAccountList) Field() string {
+	return fieldQuery(reflect.TypeOf(&WGAccountListData{}).Elem())
 }
 
 type WGAccountListData struct {
 	NickName  string `json:"nickname"`
 	AccountID int    `json:"account_id"`
-}
-
-func (w WGAccountListData) Field() string {
-	return fieldQuery(reflect.TypeOf(&w).Elem())
 }

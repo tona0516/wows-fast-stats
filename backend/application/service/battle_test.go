@@ -16,12 +16,12 @@ func initMocksForBattle() (*mockWargaming, *mockNumbers, *mockUnregistered, *moc
 	mockLocalFile := &mockLocalFile{}
 
 	mockWargaming.On("SetAppID", mock.Anything).Return()
-	accountList := domain.WGAccountList{
-		Data: []domain.WGAccountListData{
-			{NickName: "player_1", AccountID: 1},
-			{NickName: "player_2", AccountID: 2},
-		},
+	accountList := domain.WGAccountList{}
+	accountList.Data = []domain.WGAccountListData{
+		{NickName: "player_1", AccountID: 1},
+		{NickName: "player_2", AccountID: 2},
 	}
+
 	mockWargaming.On("AccountList", mock.Anything).Return(accountList, nil)
 	mockWargaming.On("EncycShips", mock.Anything).Return(domain.WGEncycShips{}, nil)
 	mockWargaming.On("BattleArenas").Return(domain.WGBattleArenas{}, nil)

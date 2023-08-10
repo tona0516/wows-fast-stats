@@ -39,11 +39,10 @@ func TestTempArenaInfo_Unixtime(t *testing.T) {
 
 func TestTempArenaInfo_BattleArena(t *testing.T) {
 	t.Parallel()
-	battleArenas := WGBattleArenas{
-		Data: map[int]WGBattleArenasData{
-			1: {Name: "Arena1"},
-			2: {Name: "Arena2"},
-		},
+	w := WGBattleArenas{}
+	w.Data = map[int]WGBattleArenasData{
+		1: {Name: "Arena1"},
+		2: {Name: "Arena2"},
 	}
 
 	info := &TempArenaInfo{
@@ -51,18 +50,17 @@ func TestTempArenaInfo_BattleArena(t *testing.T) {
 	}
 
 	expectedBattleArena := "Arena2"
-	actualBattleArena := info.BattleArena(battleArenas)
+	actualBattleArena := info.BattleArena(w)
 
 	assert.Equal(t, expectedBattleArena, actualBattleArena)
 }
 
 func TestTempArenaInfo_BattleType(t *testing.T) {
 	t.Parallel()
-	battleTypes := WGBattleTypes{
-		Data: map[string]WGBattleTypesData{
-			"RANDOM": {Name: "Random Battle"},
-			"COOP":   {Name: "Co-op Battle"},
-		},
+	w := WGBattleTypes{}
+	w.Data = map[string]WGBattleTypesData{
+		"RANDOM": {Name: "Random Battle"},
+		"COOP":   {Name: "Co-op Battle"},
 	}
 
 	info := &TempArenaInfo{
@@ -70,7 +68,7 @@ func TestTempArenaInfo_BattleType(t *testing.T) {
 	}
 
 	expectedBattleType := "RandomBattle"
-	actualBattleType := info.BattleType(battleTypes)
+	actualBattleType := info.BattleType(w)
 
 	assert.Equal(t, expectedBattleType, actualBattleType)
 }

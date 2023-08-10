@@ -3,9 +3,11 @@ package domain
 import "reflect"
 
 type WGAccountInfo struct {
-	Status string                    `json:"status"`
-	Data   map[int]WGAccountInfoData `json:"data"`
-	Error  WGError                   `json:"error"`
+	WGResponseCommon[map[int]WGAccountInfoData]
+}
+
+func (w WGAccountInfo) Field() string {
+	return fieldQuery(reflect.TypeOf(&WGAccountInfoData{}).Elem())
 }
 
 type WGAccountInfoData struct {
@@ -14,16 +16,4 @@ type WGAccountInfoData struct {
 		Pvp     WGStatsValues `json:"pvp"`
 		PvpSolo WGStatsValues `json:"pvp_solo"`
 	} `json:"statistics"`
-}
-
-func (w WGAccountInfo) GetStatus() string {
-	return w.Status
-}
-
-func (w WGAccountInfo) GetError() WGError {
-	return w.Error
-}
-
-func (w WGAccountInfoData) Field() string {
-	return fieldQuery(reflect.TypeOf(&w).Elem())
 }

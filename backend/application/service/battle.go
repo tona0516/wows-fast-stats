@@ -139,7 +139,7 @@ func (b *Battle) fetchWarship(result chan vo.Result[map[int]domain.Warship]) {
 	warships := make(map[int]domain.Warship, 0)
 
 	var mu sync.Mutex
-	addToResult := func(data map[int]domain.WGEncyclopediaShipsData) {
+	addToResult := func(data map[int]domain.WGEncycShipsData) {
 		for shipID, warship := range data {
 			mu.Lock()
 			warships[shipID] = domain.Warship{

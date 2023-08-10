@@ -38,7 +38,7 @@ func (w *Wargaming) AccountInfo(accountIDs []int) (domain.WGAccountInfo, error) 
 		w.config.URL+"/wows/account/info/",
 		vo.NewPair("application_id", w.appid),
 		vo.NewPair("account_id", strings.Join(strAccountIDs, ",")),
-		vo.NewPair("fields", domain.WGAccountInfoData{}.Field()),
+		vo.NewPair("fields", domain.WGAccountInfo{}.Field()),
 		vo.NewPair("extra", "statistics.pvp_solo"),
 	)
 }
@@ -49,7 +49,7 @@ func (w *Wargaming) AccountList(accountNames []string) (domain.WGAccountList, er
 		w.config.URL+"/wows/account/list/",
 		vo.NewPair("application_id", w.appid),
 		vo.NewPair("search", strings.Join(accountNames, ",")),
-		vo.NewPair("fields", domain.WGAccountListData{}.Field()),
+		vo.NewPair("fields", domain.WGAccountList{}.Field()),
 		vo.NewPair("type", "exact"),
 	)
 }
@@ -60,7 +60,7 @@ func (w *Wargaming) AccountListForSearch(prefix string) (domain.WGAccountList, e
 		w.config.URL+"/wows/account/list/",
 		vo.NewPair("application_id", w.appid),
 		vo.NewPair("search", prefix),
-		vo.NewPair("fields", domain.WGAccountListData{}.Field()),
+		vo.NewPair("fields", domain.WGAccountList{}.Field()),
 	)
 }
 
@@ -75,7 +75,7 @@ func (w *Wargaming) ClansAccountInfo(accountIDs []int) (domain.WGClansAccountInf
 		w.config.URL+"/wows/clans/accountinfo/",
 		vo.NewPair("application_id", w.appid),
 		vo.NewPair("account_id", strings.Join(strAccountIDs, ",")),
-		vo.NewPair("fields", domain.WGClansAccountInfoData{}.Field()),
+		vo.NewPair("fields", domain.WGClansAccountInfo{}.Field()),
 	)
 }
 
@@ -94,7 +94,7 @@ func (w *Wargaming) ClansInfo(clanIDs []int) (domain.WGClansInfo, error) {
 		w.config.URL+"/wows/clans/info/",
 		vo.NewPair("application_id", w.appid),
 		vo.NewPair("clan_id", strings.Join(strClanIDs, ",")),
-		vo.NewPair("fields", domain.WGClansInfoData{}.Field()),
+		vo.NewPair("fields", domain.WGClansInfo{}.Field()),
 	)
 }
 
@@ -104,7 +104,7 @@ func (w *Wargaming) ShipsStats(accountID int) (domain.WGShipsStats, error) {
 		w.config.URL+"/wows/ships/stats/",
 		vo.NewPair("application_id", w.appid),
 		vo.NewPair("account_id", strconv.Itoa(accountID)),
-		vo.NewPair("fields", domain.WGShipsStatsData{}.Field()),
+		vo.NewPair("fields", domain.WGShipsStats{}.Field()),
 		vo.NewPair("extra", "pvp_solo"),
 	)
 }
@@ -114,7 +114,7 @@ func (w *Wargaming) EncycShips(pageNo int) (domain.WGEncycShips, error) {
 		w.config.Retry,
 		w.config.URL+"/wows/encyclopedia/ships/",
 		vo.NewPair("application_id", w.appid),
-		vo.NewPair("fields", domain.WGEncyclopediaShipsData{}.Field()),
+		vo.NewPair("fields", domain.WGEncycShips{}.Field()),
 		vo.NewPair("language", "ja"),
 		vo.NewPair("page_no", strconv.Itoa(pageNo)),
 	)
@@ -125,7 +125,7 @@ func (w *Wargaming) EncycInfo() (domain.WGEncycInfo, error) {
 		w.config.Retry,
 		w.config.URL+"/wows/encyclopedia/info/",
 		vo.NewPair("application_id", w.appid),
-		vo.NewPair("fields", domain.WGEncyclopediaInfoData{}.Field()),
+		vo.NewPair("fields", domain.WGEncycInfo{}.Field()),
 	)
 }
 
@@ -134,7 +134,7 @@ func (w *Wargaming) BattleArenas() (domain.WGBattleArenas, error) {
 		w.config.Retry,
 		w.config.URL+"/wows/encyclopedia/battlearenas/",
 		vo.NewPair("application_id", w.appid),
-		vo.NewPair("fields", domain.WGBattleArenasData{}.Field()),
+		vo.NewPair("fields", domain.WGBattleArenas{}.Field()),
 		vo.NewPair("language", "ja"),
 	)
 }
@@ -144,7 +144,7 @@ func (w *Wargaming) BattleTypes() (domain.WGBattleTypes, error) {
 		w.config.Retry,
 		w.config.URL+"/wows/encyclopedia/battletypes/",
 		vo.NewPair("application_id", w.appid),
-		vo.NewPair("fields", domain.WGBattleTypesData{}.Field()),
+		vo.NewPair("fields", domain.WGBattleTypes{}.Field()),
 		vo.NewPair("language", "ja"),
 	)
 }
@@ -154,7 +154,7 @@ func (w *Wargaming) Test(appid string) (bool, error) {
 		w.config.Retry,
 		w.config.URL+"/wows/encyclopedia/info/",
 		vo.NewPair("application_id", appid),
-		vo.NewPair("fields", domain.WGEncyclopediaInfoData{}.Field()),
+		vo.NewPair("fields", domain.WGEncycInfo{}.Field()),
 	)
 
 	return err == nil, err

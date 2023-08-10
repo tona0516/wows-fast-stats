@@ -805,6 +805,20 @@ export namespace domain {
 		    return a;
 		}
 	}
+	export class WGAccountListData {
+	    nickname: string;
+	    account_id: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new WGAccountListData(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.nickname = source["nickname"];
+	        this.account_id = source["account_id"];
+	    }
+	}
 	export class WGError {
 	    code: number;
 	    message: string;
@@ -823,24 +837,11 @@ export namespace domain {
 	        this.value = source["value"];
 	    }
 	}
-	export class WGAccountListData {
-	    nickname: string;
-	    account_id: number;
-	
-	    static createFrom(source: any = {}) {
-	        return new WGAccountListData(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.nickname = source["nickname"];
-	        this.account_id = source["account_id"];
-	    }
-	}
 	export class WGAccountList {
 	    status: string;
+	    // Go type: WGError
+	    error: any;
 	    data: WGAccountListData[];
-	    error: WGError;
 	
 	    static createFrom(source: any = {}) {
 	        return new WGAccountList(source);
@@ -849,8 +850,8 @@ export namespace domain {
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.status = source["status"];
+	        this.error = this.convertValues(source["error"], null);
 	        this.data = this.convertValues(source["data"], WGAccountListData);
-	        this.error = this.convertValues(source["error"], WGError);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -871,7 +872,6 @@ export namespace domain {
 		    return a;
 		}
 	}
-	
 
 }
 
