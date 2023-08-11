@@ -139,12 +139,12 @@ func NewLocalFile() *LocalFile {
 }
 
 func (l *LocalFile) User() (domain.UserConfig, error) {
-	config, err := readJSON[domain.UserConfig](l.userConfigPath)
+	config, err := readJSON(l.userConfigPath, DefaultUserConfig)
 	if err != nil {
 		if errors.Is(err, fs.ErrNotExist) {
 			return DefaultUserConfig, nil
 		}
-		return domain.UserConfig{}, apperr.New(apperr.ErrReadFile, err)
+		return config, apperr.New(apperr.ErrReadFile, err)
 	}
 
 	return config, nil
@@ -159,11 +159,10 @@ func (l *LocalFile) UpdateUser(config domain.UserConfig) error {
 }
 
 func (l *LocalFile) App() (vo.AppConfig, error) {
-	config, err := readJSON[vo.AppConfig](l.appConfigPath)
+	config, err := readJSON(l.appConfigPath, vo.AppConfig{})
 	if err != nil {
-		config = vo.AppConfig{}
 		if errors.Is(err, fs.ErrNotExist) {
-			return config, nil
+			return vo.AppConfig{}, nil
 		}
 		return config, apperr.New(apperr.ErrReadFile, err)
 	}
@@ -180,7 +179,7 @@ func (l *LocalFile) UpdateApp(config vo.AppConfig) error {
 }
 
 func (l *LocalFile) AlertPlayers() ([]domain.AlertPlayer, error) {
-	players, err := readJSON[[]domain.AlertPlayer](l.alertPlayerPath)
+	players, err := readJSON(l.alertPlayerPath, []domain.AlertPlayer{})
 	if err != nil {
 		players = make([]domain.AlertPlayer, 0)
 		if errors.Is(err, fs.ErrNotExist) {
@@ -319,7 +318,7 @@ func decideTempArenaInfo(paths []string) (domain.TempArenaInfo, error) {
 	}
 
 	if size == 1 {
-		result, err := readJSON[domain.TempArenaInfo](paths[0])
+		result, err := readJSON(paths[0], domain.TempArenaInfo{})
 		if err != nil {
 			return result, err
 		}
@@ -329,7 +328,7 @@ func decideTempArenaInfo(paths []string) (domain.TempArenaInfo, error) {
 
 	var latest domain.TempArenaInfo
 	for _, path := range paths {
-		tempArenaInfo, err := readJSON[domain.TempArenaInfo](path)
+		tempArenaInfo, err := readJSON(path, domain.TempArenaInfo{})
 		if err != nil {
 			continue
 		}
@@ -346,19 +345,17 @@ func decideTempArenaInfo(paths []string) (domain.TempArenaInfo, error) {
 	return latest, nil
 }
 
-func readJSON[T any](path string) (T, error) {
-	var result T
-
+func readJSON[T any](path string, defaulValue T) (T, error) {
 	f, err := os.ReadFile(path)
 	if err != nil {
-		return result, err
+		return defaulValue, err
 	}
 
-	if err := json.Unmarshal(f, &result); err != nil {
-		return result, err
+	if err := json.Unmarshal(f, &defaulValue); err != nil {
+		return defaulValue, err
 	}
 
-	return result, nil
+	return defaulValue, nil
 }
 
 func writeJSON[T any](path string, target T) error {

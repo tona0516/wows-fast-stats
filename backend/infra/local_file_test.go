@@ -1,6 +1,7 @@
 package infra
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"testing"
@@ -47,6 +48,31 @@ func TestLocalFile_User(t *testing.T) {
 	actual, err = localFile.User()
 	assert.NoError(t, err)
 	assert.Equal(t, DefaultUserConfig, actual)
+}
+
+//nolint:paralleltest
+func TestLocalFile_User_異常系_ファイルに新規パラメータが存在しない(t *testing.T) {
+	// テストで生成したディレクトリを削除
+	defer os.RemoveAll(configDir)
+
+	// 必須項目のみconfig.jsonに書き込む
+	installPath := "dir/"
+	appid := "abc"
+	saved := fmt.Sprintf(`{"install_path": "%s","appid": "%s"}`, installPath, appid)
+	err := os.Mkdir(configDir, os.ModePerm)
+	assert.NoError(t, err)
+	err = os.WriteFile(filepath.Join(configDir, userConfigFile), []byte(saved), os.ModePerm)
+	assert.NoError(t, err)
+
+	localFile := NewLocalFile()
+	actual, err := localFile.User()
+	assert.NoError(t, err)
+
+	// 存在するパラメータはその値、存在しないパラメータはデフォルト値が格納されていること
+	expected := DefaultUserConfig
+	expected.InstallPath = installPath
+	expected.Appid = appid
+	assert.Equal(t, expected, actual)
 }
 
 //nolint:paralleltest
