@@ -19,7 +19,7 @@
   const basicComponents = new ComponentList(StatsCategory.Basic, [
     new ComponenInfo("is_in_avg", AvgCheckboxTableData),
     new ComponenInfo("player_name", PlayerNameTableData),
-    new ComponenInfo("ship_info", ShipInfoTableData, { column: 2 }),
+    new ComponenInfo("ship_info", ShipInfoTableData, { column: 3 }),
   ]);
 
   const shipComponents = new ComponentList(StatsCategory.Ship, [
