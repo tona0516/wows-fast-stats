@@ -143,10 +143,11 @@ func (b *Battle) fetchWarship(result chan vo.Result[map[int]domain.Warship]) {
 		for shipID, warship := range data {
 			mu.Lock()
 			warships[shipID] = domain.Warship{
-				Name:   warship.Name,
-				Tier:   warship.Tier,
-				Type:   domain.NewShipType(warship.Type),
-				Nation: domain.Nation(warship.Nation),
+				Name:      warship.Name,
+				Tier:      warship.Tier,
+				Type:      domain.NewShipType(warship.Type),
+				Nation:    domain.Nation(warship.Nation),
+				IsPremium: warship.IsPremium,
 			}
 			mu.Unlock()
 		}
@@ -310,6 +311,7 @@ func (b *Battle) compose(
 				Nation:    warship.Nation,
 				Tier:      warship.Tier,
 				Type:      warship.Type,
+				IsPremium: warship.IsPremium,
 				AvgDamage: expectedStats.Data[vehicle.ShipID].AverageDamageDealt,
 			},
 			PvPSolo: playerStats(domain.StatsPatternPvPSolo, stats, warships),

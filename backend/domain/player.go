@@ -13,6 +13,7 @@ type ShipInfo struct {
 	Nation    Nation   `json:"nation"`
 	Tier      uint     `json:"tier"`
 	Type      ShipType `json:"type"`
+	IsPremium bool     `json:"is_premium"`
 	AvgDamage float64  `json:"avg_damage"`
 }
 

@@ -15,8 +15,9 @@ func (w WGEncycShips) Field() string {
 }
 
 type WGEncycShipsData struct {
-	Tier   uint   `json:"tier"`
-	Type   string `json:"type"`
-	Name   string `json:"name"`
-	Nation string `json:"nation"`
+	Tier      uint   `json:"tier"`
+	Type      string `json:"type"`
+	Name      string `json:"name"`
+	Nation    string `json:"nation"`
+	IsPremium bool   `json:"is_premium"`
 }

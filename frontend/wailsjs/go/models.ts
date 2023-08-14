@@ -194,6 +194,7 @@ export namespace domain {
 	    nation: string;
 	    tier: number;
 	    type: string;
+	    is_premium: boolean;
 	    avg_damage: number;
 	
 	    static createFrom(source: any = {}) {
@@ -207,6 +208,7 @@ export namespace domain {
 	        this.nation = source["nation"];
 	        this.tier = source["tier"];
 	        this.type = source["type"];
+	        this.is_premium = source["is_premium"];
 	        this.avg_damage = source["avg_damage"];
 	    }
 	}
