@@ -2,8 +2,9 @@ package service
 
 import (
 	"testing"
+	"wfs/backend/apperr"
 
-	"github.com/pkg/errors"
+	"github.com/morikuni/failure"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -36,13 +37,15 @@ func TestUtil_doParallel_異常系(t *testing.T) {
 
 	values := makeRange(1, 5)
 
-	expected := "error occurred"
+	expected := apperr.HTTPRequestError
 	err := doParallel(2, values, func(value int) error {
 		if value == values[len(values)-1] {
-			return errors.New(expected)
+			return failure.New(expected)
 		}
 		return nil
 	})
 
-	assert.EqualError(t, err, expected)
+	code, ok := failure.CodeOf(err)
+	assert.True(t, ok)
+	assert.Equal(t, code, expected)
 }

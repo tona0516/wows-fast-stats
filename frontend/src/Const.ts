@@ -1,31 +1,102 @@
 import type { domain } from "../wailsjs/go/models";
-import { Func, Page } from "./enums";
+import { Func, Page, SkillLevel } from "./enums";
+
+import iconCommonWealth from "./assets/images/nation-commonwealth.png";
+import iconEurope from "./assets/images/nation-europe.png";
+import iconFrance from "./assets/images/nation-france.png";
+import iconGermany from "./assets/images/nation-germany.png";
+import iconItaly from "./assets/images/nation-italy.png";
+import iconJapan from "./assets/images/nation-japan.png";
+import iconNetherlands from "./assets/images/nation-netherlands.png";
+import iconNone from "./assets/images/nation-none.png";
+import iconPanAmerica from "./assets/images/nation-pan-america.png";
+import iconPanAsia from "./assets/images/nation-pan-asia.png";
+import iconSpain from "./assets/images/nation-spain.png";
+import iconUk from "./assets/images/nation-uk.png";
+import iconUsa from "./assets/images/nation-usa.png";
+import iconUssr from "./assets/images/nation-ussr.png";
+
+export class ColumnName {
+  min: string;
+  full: string;
+
+  constructor(min: string, full: string) {
+    this.min = min;
+    this.full = full;
+  }
+}
+
+export class NavigationItem<T> {
+  name: T;
+  title: string;
+  iconClass: string;
+
+  constructor(name: T, title: string, iconClass: string) {
+    this.title = title;
+    this.name = name;
+    this.iconClass = iconClass;
+  }
+}
+
+export class SkillLevelItem {
+  level: SkillLevel;
+  tier: number;
+  shipType: string;
+  minPR: number;
+  maxPR: number;
+  minDamage: number;
+  maxDamage: number;
+  minWin: number;
+  maxWin: number;
+
+  constructor(
+    level: SkillLevel,
+    tier: number,
+    shipType: string,
+    minPR: number,
+    maxPR: number,
+    minDamage: number,
+    maxDamage: number,
+    minWin: number,
+    maxWin: number
+  ) {
+    this.level = level;
+    this.tier = tier;
+    this.shipType = shipType;
+    this.minPR = minPR;
+    this.maxPR = maxPR;
+    this.minDamage = minDamage;
+    this.maxDamage = maxDamage;
+    this.minWin = minWin;
+    this.maxWin = maxWin;
+  }
+}
 
 export namespace Const {
   export const BASE_NUMBERS_URL = "https://asia.wows-numbers.com/";
 
   export const COLUMN_NAMES = {
     // categoty
-    basic: { min: "基本情報", full: "基本情報" },
-    ship: { min: "艦成績", full: "艦成績" },
-    overall: { min: "総合成績", full: "総合成績" },
+    basic: new ColumnName("基本情報", "基本情報"),
+    ship: new ColumnName("艦成績", "艦成績"),
+    overall: new ColumnName("総合成績", "総合成績"),
     // value
-    is_in_avg: { min: "", full: "" },
-    player_name: { min: "プレイヤー", full: "プレイヤー" },
-    ship_info: { min: "艦", full: "艦情報" },
-    pr: { min: "PR", full: "Personal Rating" },
-    damage: { min: "Dmg", full: "平均ダメージ" },
-    win_rate: { min: "勝率", full: "勝率" },
-    kd_rate: { min: "K/D", full: "K/D比" },
-    kill: { min: "撃沈", full: "平均撃沈数" },
-    planes_killed: { min: "撃墜", full: "平均撃墜数" },
-    survived_rate: { min: "生存率(勝|負)", full: "生存率 (勝利|敗北)" },
-    exp: { min: "Exp", full: "平均取得経験値" },
-    battles: { min: "戦闘数", full: "戦闘数" },
-    avg_tier: { min: "平均T", full: "平均Tier" },
-    using_ship_type_rate: { min: "艦割合", full: "艦種別プレイ割合" },
-    using_tier_rate: { min: "T割合", full: "ティア別プレイ割合" },
-    hit_rate: { min: "Hit率(主|魚)", full: "命中率 (主砲|魚雷)" },
+    is_in_avg: new ColumnName("", ""),
+    player_name: new ColumnName("プレイヤー", "プレイヤー"),
+    ship_info: new ColumnName("艦", "艦情報"),
+    pr: new ColumnName("PR", "Personal Rating"),
+    damage: new ColumnName("Dmg", "平均ダメージ"),
+    win_rate: new ColumnName("勝率", "勝率"),
+    kd_rate: new ColumnName("K/D", "K/D比"),
+    kill: new ColumnName("撃沈", "平均撃沈数"),
+    planes_killed: new ColumnName("撃墜", "平均撃墜数"),
+    survived_rate: new ColumnName("生存率(勝|負)", "生存率 (勝利|敗北)"),
+    exp: new ColumnName("Exp", "平均取得経験値"),
+    battles: new ColumnName("戦闘数", "戦闘数"),
+    avg_tier: new ColumnName("平均T", "平均Tier"),
+    using_ship_type_rate: new ColumnName("艦割合", "艦種別プレイ割合"),
+    using_tier_rate: new ColumnName("T割合", "ティア別プレイ割合"),
+    hit_rate: new ColumnName("Hit率(主|魚)", "命中率 (主砲|魚雷)"),
   };
 
   export const SKILL_LEVEL_LABELS = {
@@ -62,40 +133,20 @@ export namespace Const {
     message: "",
   };
 
-  export const PAGES: { title: string; name: Page; iconClass: string }[] = [
-    {
-      title: "ホーム",
-      name: Page.Main,
-      iconClass: "bi bi-house",
-    },
-    {
-      title: "設定",
-      name: Page.Config,
-      iconClass: "bi bi-gear",
-    },
-    {
-      title: "アプリ情報",
-      name: Page.AppInfo,
-      iconClass: "bi bi-info-circle",
-    },
-    {
-      title: "プレイヤーリスト",
-      name: Page.AlertPlayer,
-      iconClass: "bi bi-person-lines-fill",
-    },
+  export const PAGES: NavigationItem<Page>[] = [
+    new NavigationItem(Page.Main, "ホーム", "bi bi-house"),
+    new NavigationItem(Page.Config, "設定", "bi bi-gear"),
+    new NavigationItem(Page.AppInfo, "アプリ情報", "bi bi-info-circle"),
+    new NavigationItem(
+      Page.AlertPlayer,
+      "プレイヤーリスト",
+      "bi bi-person-lines-fill"
+    ),
   ];
 
-  export const FUNCS: { title: string; name: Func; iconClass: string }[] = [
-    {
-      title: "リロード",
-      name: Func.Reload,
-      iconClass: "bi bi-arrow-clockwise",
-    },
-    {
-      title: "スクリーンショット",
-      name: Func.Screenshot,
-      iconClass: "bi bi-camera",
-    },
+  export const FUNCS: NavigationItem<Func>[] = [
+    new NavigationItem(Func.Reload, "リロード", "bi bi-arrow-clockwise"),
+    new NavigationItem(Func.Screenshot, "スクリーンショット", "bi bi-camera"),
   ];
 
   export const FONT_SIZE = {
@@ -116,4 +167,72 @@ export namespace Const {
     overall: "総合成績のPR",
     none: "なし",
   };
+
+  export const NATION_ICON = {
+    japan: iconJapan,
+    usa: iconUsa,
+    ussr: iconUssr,
+    germany: iconGermany,
+    uk: iconUk,
+    france: iconFrance,
+    italy: iconItaly,
+    pan_asia: iconPanAsia,
+    europe: iconEurope,
+    netherlands: iconNetherlands,
+    commonwealth: iconCommonWealth,
+    pan_america: iconPanAmerica,
+    spain: iconSpain,
+    none: iconNone,
+  };
+
+  export const SKILL_LEVELS = [
+    new SkillLevelItem(SkillLevel.Bad, 11, "cv", 0, 750, 0, 0.6, 0, 47),
+    new SkillLevelItem(
+      SkillLevel.BelowAvg,
+      10,
+      "bb",
+      750,
+      1100,
+      0.6,
+      0.8,
+      47,
+      50
+    ),
+    new SkillLevelItem(SkillLevel.Avg, 9, "bb", 1100, 1350, 0.8, 1.0, 50, 52),
+    new SkillLevelItem(SkillLevel.Good, 8, "cl", 1350, 1550, 1.0, 1.2, 52, 54),
+    new SkillLevelItem(
+      SkillLevel.VeryGood,
+      7,
+      "cl",
+      1550,
+      1750,
+      1.2,
+      1.4,
+      54,
+      56
+    ),
+    new SkillLevelItem(SkillLevel.Great, 6, "dd", 1750, 2100, 1.4, 1.5, 56, 60),
+    new SkillLevelItem(
+      SkillLevel.Unicum,
+      5,
+      "dd",
+      2100,
+      2450,
+      1.5,
+      1.6,
+      60,
+      65
+    ),
+    new SkillLevelItem(
+      SkillLevel.SuperUnicum,
+      4,
+      "ss",
+      2450,
+      9999,
+      1.6,
+      10,
+      65,
+      100
+    ),
+  ];
 }

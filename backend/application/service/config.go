@@ -9,6 +9,7 @@ import (
 	"wfs/backend/application/vo"
 	"wfs/backend/domain"
 
+	"github.com/morikuni/failure"
 	"github.com/skratchdot/open-golang/open"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
@@ -16,8 +17,12 @@ import (
 const GameExeName = "WorldOfWarships.exe"
 
 type Config struct {
-	localFile repository.LocalFileInterface
-	wargaming repository.WargamingInterface
+	localFile               repository.LocalFileInterface
+	wargaming               repository.WargamingInterface
+	WindowGetSizeFunc       WindowGetSizeFunc
+	WindowSetSizeFunc       WindowSetSizeFunc
+	OpenDirectoryDialogFunc OpenDirectoryDialogFunc
+	OpenWithDefaultAppFunc  OpenWithDefaultAppFunc
 }
 
 func NewConfig(
@@ -25,13 +30,18 @@ func NewConfig(
 	wargaming repository.WargamingInterface,
 ) *Config {
 	return &Config{
-		localFile: localFile,
-		wargaming: wargaming,
+		localFile:               localFile,
+		wargaming:               wargaming,
+		WindowGetSizeFunc:       runtime.WindowGetSize,
+		WindowSetSizeFunc:       runtime.WindowSetSize,
+		OpenDirectoryDialogFunc: runtime.OpenDirectoryDialog,
+		OpenWithDefaultAppFunc:  open.Run,
 	}
 }
 
 func (c *Config) User() (domain.UserConfig, error) {
-	return c.localFile.User()
+	config, err := c.localFile.User()
+	return config, failure.Wrap(err)
 }
 
 func (c *Config) UpdateRequired(
@@ -47,64 +57,90 @@ func (c *Config) UpdateRequired(
 	// Note: overwrite only required setting
 	config, err := c.localFile.User()
 	if err != nil {
-		return validatedResult, err
+		return validatedResult, failure.Wrap(err)
 	}
 	config.InstallPath = installPath
 	config.Appid = appid
 
 	// write
-	return validatedResult, c.localFile.UpdateUser(config)
+	err = c.localFile.UpdateUser(config)
+
+	return validatedResult, failure.Wrap(err)
 }
 
 func (c *Config) UpdateOptional(config domain.UserConfig) error {
 	// Note: exclulde required setting
 	saved, err := c.localFile.User()
 	if err != nil {
-		return err
+		return failure.Wrap(err)
 	}
 	config.InstallPath = saved.InstallPath
 	config.Appid = saved.Appid
 
 	// write
-	return c.localFile.UpdateUser(config)
+	err = c.localFile.UpdateUser(config)
+	return failure.Wrap(err)
 }
 
-func (c *Config) App() (vo.AppConfig, error) {
-	return c.localFile.App()
+func (c *Config) ApplyAppConfig(appCtx context.Context) error {
+	config, err := c.localFile.App()
+	if err != nil {
+		return failure.Wrap(err)
+	}
+
+	// Set window size
+	window := config.Window
+	if window.Width > 0 && window.Height > 0 {
+		c.WindowSetSizeFunc(appCtx, window.Width, window.Height)
+	}
+
+	return nil
 }
 
-func (c *Config) UpdateApp(config vo.AppConfig) error {
-	return c.localFile.UpdateApp(config)
+func (c *Config) SaveAppConfig(appCtx context.Context) error {
+	config, _ := c.localFile.App()
+
+	// Save windows size
+	width, height := c.WindowGetSizeFunc(appCtx)
+	config.Window.Width = width
+	config.Window.Height = height
+
+	return failure.Wrap(c.localFile.UpdateApp(config))
 }
 
 func (c *Config) AlertPlayers() ([]domain.AlertPlayer, error) {
-	return c.localFile.AlertPlayers()
+	players, err := c.localFile.AlertPlayers()
+	return players, failure.Wrap(err)
 }
 
 func (c *Config) UpdateAlertPlayer(player domain.AlertPlayer) error {
-	return c.localFile.UpdateAlertPlayer(player)
+	err := c.localFile.UpdateAlertPlayer(player)
+	return failure.Wrap(err)
 }
 
 func (c *Config) RemoveAlertPlayer(accountID int) error {
-	return c.localFile.RemoveAlertPlayer(accountID)
+	err := c.localFile.RemoveAlertPlayer(accountID)
+	return failure.Wrap(err)
 }
 
 func (c *Config) SearchPlayer(prefix string) (domain.WGAccountList, error) {
-	return c.wargaming.AccountListForSearch(prefix)
+	list, err := c.wargaming.AccountListForSearch(prefix)
+	return list, failure.Wrap(err)
 }
 
 func (c *Config) SelectDirectory(appCtx context.Context) (string, error) {
-	selected, err := runtime.OpenDirectoryDialog(appCtx, runtime.OpenDialogOptions{})
+	selected, err := c.OpenDirectoryDialogFunc(appCtx, runtime.OpenDialogOptions{})
 	if err != nil {
-		return "", apperr.New(apperr.ErrSelectDirectory, err)
+		return selected, failure.New(apperr.WailsError, failure.Messagef("%s", err.Error()))
 	}
 
 	return selected, nil
 }
 
 func (c *Config) OpenDirectory(path string) error {
-	if err := open.Run(path); err != nil {
-		return apperr.New(apperr.ErrOpenDirectory, err)
+	err := c.OpenWithDefaultAppFunc(path)
+	if err != nil {
+		return failure.New(apperr.OpenDirectoryError, failure.Context{"path": path}, failure.Messagef("%s", err.Error()))
 	}
 
 	return nil
@@ -117,11 +153,11 @@ func (c *Config) validateRequired(
 	result := vo.ValidatedResult{}
 
 	if _, err := os.Stat(filepath.Join(installPath, GameExeName)); err != nil {
-		result.InstallPath = apperr.New(apperr.ErrInvalidInstallPath, nil).Error()
+		result.InstallPath = apperr.InvalidInstallPath.ErrorCode()
 	}
 
-	if ok, err := c.wargaming.Test(appid); !ok {
-		result.AppID = apperr.New(apperr.ErrInvalidAppID, err).Error()
+	if ok, _ := c.wargaming.Test(appid); !ok {
+		result.AppID = apperr.InvalidAppID.ErrorCode()
 	}
 
 	return result

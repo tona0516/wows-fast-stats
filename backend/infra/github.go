@@ -1,12 +1,13 @@
 package infra
 
 import (
+	"net/http"
 	"strconv"
-	"wfs/backend/application/vo"
+	"wfs/backend/apperr"
 	"wfs/backend/domain"
-	"wfs/backend/logger"
 
 	"github.com/cenkalti/backoff/v4"
+	"github.com/morikuni/failure"
 )
 
 type Github struct {
@@ -27,13 +28,18 @@ func (g *Github) LatestRelease() (domain.GHLatestRelease, error) {
 
 	res, err := backoff.RetryWithData(operation, b)
 	if err != nil {
-		logger.Error(
-			err,
-			vo.NewPair("url", g.config.URL),
-			vo.NewPair("status_code", strconv.Itoa(res.StatusCode)),
-			vo.NewPair("response_body", string(res.BodyByte)),
+		return res.Body, failure.Wrap(err)
+	}
+
+	if res.StatusCode != http.StatusOK {
+		return res.Body, failure.New(
+			apperr.GithubAPIError,
+			failure.Context{
+				"status_code": strconv.Itoa(res.StatusCode),
+				"body":        string(res.ByteBody),
+			},
 		)
 	}
 
-	return res.Body, err
+	return res.Body, nil
 }

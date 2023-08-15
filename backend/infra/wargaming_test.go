@@ -9,21 +9,14 @@ import (
 	"wfs/backend/apperr"
 	"wfs/backend/domain"
 
-	"github.com/pkg/errors"
+	"github.com/morikuni/failure"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestWargaming_AccountInfo(t *testing.T) {
 	t.Parallel()
 
-	body, err := json.Marshal(domain.WGAccountInfo{})
-	assert.NoError(t, err)
-
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		_, _ = w.Write(body)
-	}))
+	server := simpleMockServer(200, domain.WGAccountInfo{})
 	defer server.Close()
 
 	wargaming := NewWargaming(RequestConfig{
@@ -31,7 +24,6 @@ func TestWargaming_AccountInfo(t *testing.T) {
 	})
 
 	result, err := wargaming.AccountInfo([]int{123, 456})
-
 	assert.NoError(t, err)
 	assert.Equal(t, domain.WGAccountInfo{}, result)
 }
@@ -39,14 +31,7 @@ func TestWargaming_AccountInfo(t *testing.T) {
 func TestWargaming_AccountList(t *testing.T) {
 	t.Parallel()
 
-	body, err := json.Marshal(domain.WGAccountList{})
-	assert.NoError(t, err)
-
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		_, _ = w.Write(body)
-	}))
+	server := simpleMockServer(200, domain.WGAccountList{})
 	defer server.Close()
 
 	wargaming := NewWargaming(RequestConfig{
@@ -59,17 +44,26 @@ func TestWargaming_AccountList(t *testing.T) {
 	assert.Equal(t, domain.WGAccountList{}, result)
 }
 
+func TestWargaming_AccountListForSearch(t *testing.T) {
+	t.Parallel()
+
+	server := simpleMockServer(200, domain.WGAccountList{})
+	defer server.Close()
+
+	wargaming := NewWargaming(RequestConfig{
+		URL: server.URL,
+	})
+
+	result, err := wargaming.AccountListForSearch("player")
+
+	assert.NoError(t, err)
+	assert.Equal(t, domain.WGAccountList{}, result)
+}
+
 func TestWargaming_ClansAccountInfo(t *testing.T) {
 	t.Parallel()
 
-	body, err := json.Marshal(domain.WGClansAccountInfo{})
-	assert.NoError(t, err)
-
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		_, _ = w.Write(body)
-	}))
+	server := simpleMockServer(200, domain.WGClansAccountInfo{})
 	defer server.Close()
 
 	wargaming := NewWargaming(RequestConfig{
@@ -85,14 +79,7 @@ func TestWargaming_ClansAccountInfo(t *testing.T) {
 func TestWargaming_ClansInfo(t *testing.T) {
 	t.Parallel()
 
-	body, err := json.Marshal(domain.WGClansInfo{})
-	assert.NoError(t, err)
-
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		_, _ = w.Write(body)
-	}))
+	server := simpleMockServer(200, domain.WGClansInfo{})
 	defer server.Close()
 
 	wargaming := NewWargaming(RequestConfig{
@@ -108,14 +95,7 @@ func TestWargaming_ClansInfo(t *testing.T) {
 func TestWargaming_ShipsStats(t *testing.T) {
 	t.Parallel()
 
-	body, err := json.Marshal(domain.WGShipsStats{})
-	assert.NoError(t, err)
-
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		_, _ = w.Write(body)
-	}))
+	server := simpleMockServer(200, domain.WGShipsStats{})
 	defer server.Close()
 
 	wargaming := NewWargaming(RequestConfig{
@@ -131,14 +111,7 @@ func TestWargaming_ShipsStats(t *testing.T) {
 func TestWargaming_EncycShips(t *testing.T) {
 	t.Parallel()
 
-	body, err := json.Marshal(domain.WGEncycShips{})
-	assert.NoError(t, err)
-
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		_, _ = w.Write(body)
-	}))
+	server := simpleMockServer(200, domain.WGEncycShips{})
 	defer server.Close()
 
 	wargaming := NewWargaming(RequestConfig{
@@ -151,17 +124,26 @@ func TestWargaming_EncycShips(t *testing.T) {
 	assert.Equal(t, domain.WGEncycShips{}, result)
 }
 
+func TestWargaming_EncycInfo(t *testing.T) {
+	t.Parallel()
+
+	server := simpleMockServer(200, domain.WGEncycInfo{})
+	defer server.Close()
+
+	wargaming := NewWargaming(RequestConfig{
+		URL: server.URL,
+	})
+
+	result, err := wargaming.EncycInfo()
+
+	assert.NoError(t, err)
+	assert.Equal(t, domain.WGEncycInfo{}, result)
+}
+
 func TestWargaming_BattleArena(t *testing.T) {
 	t.Parallel()
 
-	body, err := json.Marshal(domain.WGBattleArenas{})
-	assert.NoError(t, err)
-
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		_, _ = w.Write(body)
-	}))
+	server := simpleMockServer(200, domain.WGBattleArenas{})
 	defer server.Close()
 
 	wargaming := NewWargaming(RequestConfig{
@@ -177,14 +159,7 @@ func TestWargaming_BattleArena(t *testing.T) {
 func TestWargaming_BattleTypes(t *testing.T) {
 	t.Parallel()
 
-	body, err := json.Marshal(domain.WGBattleTypes{})
-	assert.NoError(t, err)
-
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		_, _ = w.Write(body)
-	}))
+	server := simpleMockServer(200, domain.WGBattleTypes{})
 	defer server.Close()
 
 	wargaming := NewWargaming(RequestConfig{
@@ -199,14 +174,7 @@ func TestWargaming_BattleTypes(t *testing.T) {
 func TestWargaming_Test(t *testing.T) {
 	t.Parallel()
 
-	body, err := json.Marshal(domain.WGEncycInfo{})
-	assert.NoError(t, err)
-
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		_, _ = w.Write(body)
-	}))
+	server := simpleMockServer(200, domain.WGEncycInfo{})
 	defer server.Close()
 
 	wargaming := NewWargaming(RequestConfig{
@@ -245,8 +213,9 @@ func TestWargaming_AccountInfo_異常系_リトライなし(t *testing.T) {
 	})
 
 	_, err := wargaming.AccountInfo([]int{123, 456})
-
-	assert.EqualError(t, err, apperr.New(apperr.ErrWGAPI, errors.New("INVALID_APPLICATION_ID")).Error())
+	code, ok := failure.CodeOf(err)
+	assert.True(t, ok)
+	assert.Equal(t, code, apperr.WGAPIError)
 	assert.Equal(t, 1, calls)
 }
 
@@ -329,10 +298,9 @@ func TestWargaming_AccountInfo_異常系_最大リトライ(t *testing.T) {
 
 		_, err := wargaming.AccountInfo([]int{123, 456})
 
-		assert.EqualError(t, err, apperr.New(
-			apperr.ErrWGAPITemporaryUnavaillalble,
-			errors.New(message),
-		).Error())
+		code, ok := failure.CodeOf(err)
+		assert.True(t, ok)
+		assert.Equal(t, code, apperr.WGAPITemporaryUnavaillalble)
 		assert.Equal(t, int(retry+1), calls)
 	}
 }

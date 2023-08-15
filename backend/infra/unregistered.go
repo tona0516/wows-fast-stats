@@ -4,8 +4,9 @@ import (
 	_ "embed"
 	"encoding/json"
 	"strings"
-	"wfs/backend/apperr"
 	"wfs/backend/domain"
+
+	"github.com/morikuni/failure"
 )
 
 //go:embed resource/ships.json
@@ -22,7 +23,7 @@ func (u *Unregistered) Warship() (map[int]domain.Warship, error) {
 	result := make(map[int]domain.Warship, 0)
 
 	if err := json.Unmarshal(shipsByte, &ships); err != nil {
-		return result, apperr.New(apperr.ErrReadFile, err)
+		return result, failure.Wrap(err)
 	}
 
 	for _, us := range ships {

@@ -2,12 +2,12 @@ package service
 
 import (
 	"context"
-	"io/fs"
 	"testing"
 	"time"
+	"wfs/backend/apperr"
 	"wfs/backend/domain"
 
-	"github.com/pkg/errors"
+	"github.com/morikuni/failure"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -61,7 +61,7 @@ func TestWatcher_Start_戦闘終了(t *testing.T) {
 
 	mockLocalFile := &mockLocalFile{}
 	mockLocalFile.On("User").Return(config, nil)
-	mockLocalFile.On("TempArenaInfo", config.InstallPath).Return(domain.TempArenaInfo{}, fs.ErrNotExist)
+	mockLocalFile.On("TempArenaInfo", config.InstallPath).Return(domain.TempArenaInfo{}, failure.New(apperr.FileNotExist))
 
 	var events []string
 	emitFunc := func(ctx context.Context, eventName string, optionalData ...interface{}) {
@@ -97,7 +97,10 @@ func TestWatcher_Start_エラー発生(t *testing.T) {
 
 	mockLocalFile := &mockLocalFile{}
 	mockLocalFile.On("User").Return(config, nil)
-	mockLocalFile.On("TempArenaInfo", config.InstallPath).Return(domain.TempArenaInfo{}, errors.New("some error"))
+	mockLocalFile.On("TempArenaInfo", config.InstallPath).Return(
+		domain.TempArenaInfo{},
+		failure.New(apperr.UnexpectedError),
+	)
 
 	var events []string
 	emitFunc := func(ctx context.Context, eventName string, optionalData ...interface{}) {

@@ -8,14 +8,17 @@ import (
 	"net/http"
 	"net/url"
 	"os"
-	"wfs/backend/apperr"
+	"strconv"
 	"wfs/backend/application/vo"
+
+	"github.com/morikuni/failure"
 )
 
 type APIResponse[T any] struct {
+	FullURL    string
 	StatusCode int
-	BodyByte   []byte
 	Body       T
+	ByteBody   []byte
 }
 
 type Form struct {
@@ -29,37 +32,40 @@ func getRequest[T any](
 	queries ...vo.Pair,
 ) (APIResponse[T], error) {
 	var response APIResponse[T]
+	errCtx := failure.Context{}
 
 	// build URL
 	u, err := url.Parse(rawURL)
 	if err != nil {
-		return response, apperr.New(apperr.ErrHTTPRequest, err)
+		return response, failure.Wrap(err, errCtx)
 	}
 	q := u.Query()
 	for _, query := range queries {
 		q.Add(query.Key, query.Value)
 	}
 	u.RawQuery = q.Encode()
+	response.FullURL = u.String()
+	errCtx["url"] = u.String()
 
 	// request
 	res, err := http.Get(u.String())
 	if err != nil {
-		return response, apperr.New(apperr.ErrHTTPRequest, err)
+		return response, failure.Wrap(err, errCtx)
 	}
-
-	response.StatusCode = res.StatusCode
-
 	defer res.Body.Close()
+	response.StatusCode = res.StatusCode
+	errCtx["status_code"] = strconv.Itoa(res.StatusCode)
 
-	response.BodyByte, err = io.ReadAll(res.Body)
+	response.ByteBody, err = io.ReadAll(res.Body)
 	if err != nil {
-		return response, apperr.New(apperr.ErrHTTPRequest, err)
+		return response, failure.Wrap(err, errCtx)
 	}
+	errCtx["body"] = string(response.ByteBody)
 
-	// serialize
-	err = json.Unmarshal(response.BodyByte, &response.Body)
+	// deserialize
+	err = json.Unmarshal(response.ByteBody, &response.Body)
 	if err != nil {
-		return response, apperr.New(apperr.ErrHTTPRequest, err)
+		return response, failure.Wrap(err, errCtx)
 	}
 
 	return response, nil
@@ -75,7 +81,7 @@ func postMultipartFormData[T any](
 	// build URL
 	u, err := url.Parse(rawURL)
 	if err != nil {
-		return response, apperr.New(apperr.ErrHTTPRequest, err)
+		return response, failure.Wrap(err)
 	}
 
 	// build request
@@ -87,21 +93,21 @@ func postMultipartFormData[T any](
 		if form.isFile {
 			f, err := os.Open(form.content)
 			if err != nil {
-				return response, err
+				return response, failure.Wrap(err)
 			}
 
 			fw, err := mw.CreateFormFile(form.name, form.content)
 			if err != nil {
-				return response, err
+				return response, failure.Wrap(err)
 			}
 
 			_, err = io.Copy(fw, f)
 			if err != nil {
-				return response, err
+				return response, failure.Wrap(err)
 			}
 		} else {
 			if err := mw.WriteField(form.name, form.content); err != nil {
-				return response, err
+				return response, failure.Wrap(err)
 			}
 		}
 	}
@@ -112,22 +118,20 @@ func postMultipartFormData[T any](
 	// request
 	res, err := http.Post(u.String(), mw.FormDataContentType(), requestBody)
 	if err != nil {
-		return response, apperr.New(apperr.ErrHTTPRequest, err)
+		return response, failure.Wrap(err)
 	}
-
+	defer res.Body.Close()
 	response.StatusCode = res.StatusCode
 
-	defer res.Body.Close()
-
-	response.BodyByte, err = io.ReadAll(res.Body)
+	response.ByteBody, err = io.ReadAll(res.Body)
 	if err != nil {
-		return response, apperr.New(apperr.ErrHTTPRequest, err)
+		return response, failure.Wrap(err)
 	}
 
 	// serialize
-	err = json.Unmarshal(response.BodyByte, &response.Body)
+	err = json.Unmarshal(response.ByteBody, &response.Body)
 	if err != nil {
-		return response, apperr.New(apperr.ErrHTTPRequest, err)
+		return response, failure.Wrap(err)
 	}
 
 	return response, nil

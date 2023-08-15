@@ -4,6 +4,18 @@ import { Const } from "./Const";
 import { DisplayPattern, StatsCategory } from "./enums";
 import { SkillLevelConverter } from "./RankConverter";
 
+import iconPremiumBB from "./assets/images/icon-bb-premium.png";
+import iconBB from "./assets/images/icon-bb.png";
+import iconPremiumCL from "./assets/images/icon-cl-premium.png";
+import iconCL from "./assets/images/icon-cl.png";
+import iconPremiumCV from "./assets/images/icon-cv-premium.png";
+import iconCV from "./assets/images/icon-cv.png";
+import iconPremiumDD from "./assets/images/icon-dd-premium.png";
+import iconDD from "./assets/images/icon-dd.png";
+import iconNone from "./assets/images/icon-none.png";
+import iconPremiumSS from "./assets/images/icon-ss-premium.png";
+import iconSS from "./assets/images/icon-ss.png";
+
 export function colors(
   key: string,
   value: number,
@@ -248,4 +260,98 @@ export function toTierGroup(tier: number): string {
     return "high";
   }
   return "";
+}
+
+export function shipTypeIcon(shipInfo: domain.ShipInfo): string {
+  switch (shipInfo.type) {
+    case "cv":
+      return shipInfo.is_premium ? iconPremiumCV : iconCV;
+    case "bb":
+      return shipInfo.is_premium ? iconPremiumBB : iconBB;
+    case "cl":
+      return shipInfo.is_premium ? iconPremiumCL : iconCL;
+    case "dd":
+      return shipInfo.is_premium ? iconPremiumDD : iconDD;
+    case "ss":
+      return shipInfo.is_premium ? iconPremiumSS : iconSS;
+    default:
+      return iconNone;
+  }
+}
+
+export function sampleTeam(): domain.Team {
+  const avgDamage = 10000;
+  const players: domain.Player[] = Const.SKILL_LEVELS.map((value, i, _) => {
+    const playerInfo: domain.PlayerInfo = {
+      id: 1,
+      name: "player_name" + i + 1,
+      clan: { tag: "TEST" } as domain.Clan,
+      is_hidden: false,
+      convertValues: null,
+    };
+    const shipInfo: domain.ShipInfo = {
+      id: 1,
+      name: "Test Ship",
+      nation: "japan",
+      tier: value.tier,
+      type: value.shipType,
+      avg_damage: avgDamage,
+      is_premium: false,
+    };
+    const shipStats: domain.ShipStats = {
+      battles: 10,
+      damage: value.minDamage * avgDamage,
+      win_rate: value.minWin,
+      win_survived_rate: 50,
+      lose_survived_rate: 50,
+      kd_rate: 1,
+      kill: 1,
+      exp: 1000,
+      pr: value.minPR,
+      main_battery_hit_rate: 50,
+      torpedoes_hit_rate: 5,
+      planes_killed: 5,
+    };
+    const overallStats: domain.OverallStats = {
+      battles: 10,
+      damage: value.minDamage * avgDamage,
+      win_rate: value.minWin,
+      win_survived_rate: 50,
+      lose_survived_rate: 50,
+      kd_rate: 1,
+      kill: 1,
+      exp: 1000,
+      pr: value.minPR,
+      avg_tier: 5,
+      using_ship_type_rate: {
+        ss: 20,
+        dd: 20,
+        cl: 20,
+        bb: 20,
+        cv: 20,
+      } as domain.ShipTypeGroup,
+      using_tier_rate: {
+        low: 33.3,
+        middle: 33.3,
+        high: 33.4,
+      } as domain.TierGroup,
+      convertValues: null,
+    };
+
+    return {
+      player_info: playerInfo,
+      ship_info: shipInfo,
+      pvp_solo: {
+        ship: shipStats,
+        overall: overallStats,
+      } as domain.PlayerStats,
+      pvp_all: {
+        ship: shipStats,
+        overall: overallStats,
+      } as domain.PlayerStats,
+      convertValues: null,
+    };
+  });
+
+  return { players: players } as domain.Team;
 }

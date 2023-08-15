@@ -1,10 +1,8 @@
 package infra
 
 import (
-	"encoding/json"
-	"net/http"
-	"net/http/httptest"
 	"testing"
+	"wfs/backend/apperr"
 	"wfs/backend/domain"
 
 	"github.com/stretchr/testify/assert"
@@ -13,26 +11,36 @@ import (
 func TestGithub_LatestRelease(t *testing.T) {
 	t.Parallel()
 
-	expected := domain.GHLatestRelease{
-		HTMLURL: "https://github.com/tona0516/wows-fast-stats/releases/tag/1.0.0",
-		TagName: "1.0.0",
-	}
-	body, err := json.Marshal(expected)
-	assert.NoError(t, err)
+	t.Run("正常系", func(t *testing.T) {
+		t.Parallel()
 
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		_, _ = w.Write(body)
-	}))
-	defer server.Close()
+		expected := domain.GHLatestRelease{
+			HTMLURL: "https://github.com/tona0516/wows-fast-stats/releases/tag/1.0.0",
+			TagName: "1.0.0",
+		}
+		server := simpleMockServer(200, expected)
+		defer server.Close()
 
-	github := NewGithub(RequestConfig{
-		URL: server.URL,
+		github := NewGithub(RequestConfig{
+			URL: server.URL,
+		})
+
+		actual, err := github.LatestRelease()
+		assert.NoError(t, err)
+		assert.Equal(t, expected, actual)
 	})
 
-	actual, err := github.LatestRelease()
+	t.Run("異常系", func(t *testing.T) {
+		t.Parallel()
 
-	assert.NoError(t, err)
-	assert.Equal(t, expected, actual)
+		server := simpleMockServer(400, "{}")
+		defer server.Close()
+
+		github := NewGithub(RequestConfig{
+			URL: server.URL,
+		})
+
+		_, err := github.LatestRelease()
+		assert.EqualError(t, apperr.Unwrap(err), apperr.GithubAPIError.ErrorCode())
+	})
 }

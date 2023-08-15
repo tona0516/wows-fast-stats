@@ -3,6 +3,7 @@ package infra
 import (
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -11,7 +12,7 @@ import (
 	"wfs/backend/application/vo"
 	"wfs/backend/domain"
 
-	"github.com/pkg/errors"
+	"github.com/morikuni/failure"
 )
 
 const (
@@ -140,61 +141,45 @@ func NewLocalFile() *LocalFile {
 
 func (l *LocalFile) User() (domain.UserConfig, error) {
 	config, err := readJSON(l.userConfigPath, DefaultUserConfig)
-	if err != nil {
-		if errors.Is(err, fs.ErrNotExist) {
-			return DefaultUserConfig, nil
-		}
-		return config, apperr.New(apperr.ErrReadFile, err)
+	if err != nil && failure.Is(err, apperr.FileNotExist) {
+		return DefaultUserConfig, nil
 	}
 
-	return config, nil
+	return config, failure.Wrap(err)
 }
 
 func (l *LocalFile) UpdateUser(config domain.UserConfig) error {
-	if err := writeJSON(l.userConfigPath, config); err != nil {
-		return apperr.New(apperr.ErrWriteFile, err)
-	}
-
-	return nil
+	err := writeJSON(l.userConfigPath, config)
+	return failure.Wrap(err)
 }
 
 func (l *LocalFile) App() (vo.AppConfig, error) {
 	config, err := readJSON(l.appConfigPath, vo.AppConfig{})
-	if err != nil {
-		if errors.Is(err, fs.ErrNotExist) {
-			return vo.AppConfig{}, nil
-		}
-		return config, apperr.New(apperr.ErrReadFile, err)
+	if err != nil && failure.Is(err, apperr.FileNotExist) {
+		return vo.AppConfig{}, nil
 	}
 
-	return config, nil
+	return config, failure.Wrap(err)
 }
 
 func (l *LocalFile) UpdateApp(config vo.AppConfig) error {
-	if err := writeJSON(l.appConfigPath, config); err != nil {
-		return apperr.New(apperr.ErrWriteFile, err)
-	}
-
-	return nil
+	err := writeJSON(l.appConfigPath, config)
+	return failure.Wrap(err)
 }
 
 func (l *LocalFile) AlertPlayers() ([]domain.AlertPlayer, error) {
 	players, err := readJSON(l.alertPlayerPath, []domain.AlertPlayer{})
-	if err != nil {
-		players = make([]domain.AlertPlayer, 0)
-		if errors.Is(err, fs.ErrNotExist) {
-			return players, nil
-		}
-		return players, apperr.New(apperr.ErrReadFile, err)
+	if err != nil && failure.Is(err, apperr.FileNotExist) {
+		return []domain.AlertPlayer{}, nil
 	}
 
-	return players, nil
+	return players, failure.Wrap(err)
 }
 
 func (l *LocalFile) UpdateAlertPlayer(player domain.AlertPlayer) error {
 	players, err := l.AlertPlayers()
 	if err != nil {
-		return err
+		return failure.Wrap(err)
 	}
 
 	var isMatched bool
@@ -210,17 +195,14 @@ func (l *LocalFile) UpdateAlertPlayer(player domain.AlertPlayer) error {
 		players = append(players, player)
 	}
 
-	if err := writeJSON(l.alertPlayerPath, players); err != nil {
-		return apperr.New(apperr.ErrWriteFile, err)
-	}
-
-	return nil
+	err = writeJSON(l.alertPlayerPath, players)
+	return failure.Wrap(err)
 }
 
 func (l *LocalFile) RemoveAlertPlayer(accountID int) error {
 	players, err := l.AlertPlayers()
 	if err != nil {
-		return err
+		return failure.Wrap(err)
 	}
 
 	var isMatched bool
@@ -236,11 +218,8 @@ func (l *LocalFile) RemoveAlertPlayer(accountID int) error {
 		return nil
 	}
 
-	if err := writeJSON(l.alertPlayerPath, players); err != nil {
-		return apperr.New(apperr.ErrWriteFile, err)
-	}
-
-	return nil
+	err = writeJSON(l.alertPlayerPath, players)
+	return failure.Wrap(err)
 }
 
 func (l *LocalFile) SaveScreenshot(path string, base64Data string) error {
@@ -249,20 +228,17 @@ func (l *LocalFile) SaveScreenshot(path string, base64Data string) error {
 
 	data, err := base64.StdEncoding.DecodeString(base64Data)
 	if err != nil {
-		return apperr.New(apperr.ErrWriteFile, err)
+		return failure.Wrap(err)
 	}
 
 	f, err := os.Create(path)
 	if err != nil {
-		return apperr.New(apperr.ErrWriteFile, err)
+		return failure.Wrap(err)
 	}
 	defer f.Close()
 
-	if _, err := f.Write(data); err != nil {
-		return apperr.New(apperr.ErrWriteFile, err)
-	}
-
-	return nil
+	_, err = f.Write(data)
+	return failure.Wrap(err)
 }
 
 func (l *LocalFile) TempArenaInfo(installPath string) (domain.TempArenaInfo, error) {
@@ -272,7 +248,7 @@ func (l *LocalFile) TempArenaInfo(installPath string) (domain.TempArenaInfo, err
 	root := filepath.Join(installPath, replaysDir)
 	err := filepath.WalkDir(root, func(path string, info fs.DirEntry, err error) error {
 		if err != nil {
-			return err
+			return failure.Wrap(err)
 		}
 
 		if info.IsDir() {
@@ -288,25 +264,17 @@ func (l *LocalFile) TempArenaInfo(installPath string) (domain.TempArenaInfo, err
 	})
 
 	if err != nil {
-		return tempArenaInfo, apperr.New(apperr.ErrReadFile, err)
+		return tempArenaInfo, failure.Wrap(err)
 	}
 
 	tempArenaInfo, err = decideTempArenaInfo(tempArenaInfoPaths)
-	if err != nil {
-		return tempArenaInfo, apperr.New(apperr.ErrReadFile, err)
-	}
-
-	return tempArenaInfo, nil
+	return tempArenaInfo, failure.Wrap(err)
 }
 
 func (l *LocalFile) SaveTempArenaInfo(tempArenaInfo domain.TempArenaInfo) error {
 	path := filepath.Join(tempArenaInfoDir, "tempArenaInfo_"+strconv.FormatInt(tempArenaInfo.Unixtime(), 10)+".json")
-
-	if err := writeJSON(path, tempArenaInfo); err != nil {
-		return apperr.New(apperr.ErrWriteFile, err)
-	}
-
-	return nil
+	err := writeJSON(path, tempArenaInfo)
+	return failure.Wrap(err)
 }
 
 func decideTempArenaInfo(paths []string) (domain.TempArenaInfo, error) {
@@ -314,16 +282,12 @@ func decideTempArenaInfo(paths []string) (domain.TempArenaInfo, error) {
 	size := len(paths)
 
 	if size == 0 {
-		return result, fs.ErrNotExist
+		return result, failure.New(apperr.FileNotExist)
 	}
 
 	if size == 1 {
 		result, err := readJSON(paths[0], domain.TempArenaInfo{})
-		if err != nil {
-			return result, err
-		}
-
-		return result, nil
+		return result, failure.Wrap(err)
 	}
 
 	var latest domain.TempArenaInfo
@@ -339,36 +303,42 @@ func decideTempArenaInfo(paths []string) (domain.TempArenaInfo, error) {
 	}
 
 	if latest.Unixtime() == 0 {
-		return result, fs.ErrNotExist
+		return result, failure.New(apperr.FileNotExist)
 	}
 
 	return latest, nil
 }
 
 func readJSON[T any](path string, defaulValue T) (T, error) {
+	errCtx := failure.Context{"path": path}
+
 	f, err := os.ReadFile(path)
 	if err != nil {
-		return defaulValue, err
+		if errors.Is(err, os.ErrNotExist) {
+			return defaulValue, failure.New(apperr.FileNotExist, errCtx)
+		}
+		return defaulValue, failure.Wrap(err, errCtx)
 	}
+	errCtx["target"] = string(f)
 
-	if err := json.Unmarshal(f, &defaulValue); err != nil {
-		return defaulValue, err
-	}
-
-	return defaulValue, nil
+	err = json.Unmarshal(f, &defaulValue)
+	return defaulValue, failure.Wrap(err, errCtx)
 }
 
 func writeJSON[T any](path string, target T) error {
-	_ = os.MkdirAll(filepath.Dir(path), 0o755)
+	//nolint:errchkjson
+	marshaled, _ := json.Marshal(target)
+	errCtx := failure.Context{"path": path, "target": string(marshaled)}
 
+	_ = os.MkdirAll(filepath.Dir(path), 0o755)
 	f, err := os.Create(path)
 	if err != nil {
-		return err
+		return failure.Wrap(err, errCtx)
 	}
 	defer f.Close()
 
 	encoder := json.NewEncoder(f)
 	encoder.SetIndent("", "  ")
-
-	return encoder.Encode(target)
+	err = encoder.Encode(target)
+	return failure.Wrap(err, errCtx)
 }

@@ -10,7 +10,7 @@ import (
 	"wfs/backend/logger"
 	"wfs/backend/logger/repository"
 
-	"github.com/pkg/errors"
+	"github.com/morikuni/failure"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
@@ -58,25 +58,15 @@ func (a *App) onStartup(ctx context.Context) {
 		logger.Info("application started")
 	})
 
-	appConfig, err := a.configService.App()
-	if err == nil {
-		// Set window size
-		window := appConfig.Window
-		if window.Width > 0 && window.Height > 0 {
-			runtime.WindowSetSize(ctx, window.Width, window.Height)
-		}
+	if err := a.configService.ApplyAppConfig(ctx); err != nil {
+		logger.Error(err)
 	}
 }
 
 func (a *App) onShutdown(ctx context.Context) {
 	logger.Info("application will shutdown...")
 
-	// Save windows size
-	appConfig, _ := a.configService.App()
-	width, height := runtime.WindowGetSize(ctx)
-	appConfig.Window.Width = width
-	appConfig.Window.Height = height
-	if err := a.configService.UpdateApp(appConfig); err != nil {
+	if err := a.configService.SaveAppConfig(ctx); err != nil {
 		logger.Error(err)
 	}
 }
@@ -84,7 +74,7 @@ func (a *App) onShutdown(ctx context.Context) {
 func (a *App) StartWatching() error {
 	if err := a.watcherService.Prepare(a.ctx); err != nil {
 		logger.Error(err)
-		return err
+		return apperr.Unwrap(err)
 	}
 
 	if a.cancelWatcher != nil {
@@ -102,20 +92,16 @@ func (a *App) Battle() (battle domain.Battle, err error) {
 	userConfig, err := a.configService.User()
 	if err != nil {
 		logger.Error(err)
-		return battle, err
+		return battle, apperr.Unwrap(err)
 	}
 
 	battle, err = a.battleService.Battle(userConfig)
 	if err != nil {
 		logger.Error(err)
-		return battle, err
+		return battle, apperr.Unwrap(err)
 	}
 
 	return battle, nil
-}
-
-func (a *App) SampleTeams() []domain.Team {
-	return domain.SampleTeams()
 }
 
 func (a *App) SelectDirectory() (string, error) {
@@ -124,7 +110,7 @@ func (a *App) SelectDirectory() (string, error) {
 		logger.Error(err)
 	}
 
-	return path, err
+	return path, apperr.Unwrap(err)
 }
 
 func (a *App) OpenDirectory(path string) error {
@@ -133,7 +119,7 @@ func (a *App) OpenDirectory(path string) error {
 		logger.Warn(err)
 	}
 
-	return err
+	return apperr.Unwrap(err)
 }
 
 func (a *App) DefaultUserConfig() domain.UserConfig {
@@ -146,7 +132,7 @@ func (a *App) UserConfig() (domain.UserConfig, error) {
 		logger.Error(err)
 	}
 
-	return config, err
+	return config, apperr.Unwrap(err)
 }
 
 func (a *App) ApplyUserConfig(config domain.UserConfig) error {
@@ -155,7 +141,7 @@ func (a *App) ApplyUserConfig(config domain.UserConfig) error {
 		logger.Error(err)
 	}
 
-	return err
+	return apperr.Unwrap(err)
 }
 
 func (a *App) ApplyRequiredUserConfig(
@@ -167,12 +153,12 @@ func (a *App) ApplyRequiredUserConfig(
 		logger.Error(err)
 	}
 
-	return validatedResult, err
+	return validatedResult, apperr.Unwrap(err)
 }
 
 func (a *App) ManualScreenshot(filename string, base64Data string) error {
 	err := a.screenshotService.SaveWithDialog(a.ctx, filename, base64Data)
-	if errors.Is(err, apperr.ErrUserCanceled) {
+	if failure.Is(err, apperr.UserCanceled) {
 		return nil
 	}
 
@@ -180,7 +166,7 @@ func (a *App) ManualScreenshot(filename string, base64Data string) error {
 		logger.Error(err)
 	}
 
-	return err
+	return apperr.Unwrap(err)
 }
 
 func (a *App) AutoScreenshot(filename string, base64Data string) error {
@@ -189,7 +175,7 @@ func (a *App) AutoScreenshot(filename string, base64Data string) error {
 		logger.Error(err)
 	}
 
-	return err
+	return apperr.Unwrap(err)
 }
 
 func (a *App) Semver() string {
@@ -219,7 +205,7 @@ func (a *App) AlertPlayers() ([]domain.AlertPlayer, error) {
 		logger.Error(err)
 	}
 
-	return players, err
+	return players, apperr.Unwrap(err)
 }
 
 func (a *App) UpdateAlertPlayer(player domain.AlertPlayer) error {
@@ -228,7 +214,7 @@ func (a *App) UpdateAlertPlayer(player domain.AlertPlayer) error {
 		logger.Error(err)
 	}
 
-	return err
+	return apperr.Unwrap(err)
 }
 
 func (a *App) RemoveAlertPlayer(accountID int) error {
@@ -237,7 +223,7 @@ func (a *App) RemoveAlertPlayer(accountID int) error {
 		logger.Error(err)
 	}
 
-	return err
+	return apperr.Unwrap(err)
 }
 
 func (a *App) SearchPlayer(prefix string) (domain.WGAccountList, error) {
@@ -246,7 +232,7 @@ func (a *App) SearchPlayer(prefix string) (domain.WGAccountList, error) {
 		logger.Error(err)
 	}
 
-	return accountList, err
+	return accountList, apperr.Unwrap(err)
 }
 
 func (a *App) AlertPatterns() []string {
@@ -254,7 +240,8 @@ func (a *App) AlertPatterns() []string {
 }
 
 func (a *App) LogError(errString string) {
-	logger.Error(apperr.New(apperr.ErrFrontend, errors.New(errString)))
+	err := failure.New(apperr.FrontendError, failure.Messagef("%s", errString))
+	logger.Error(err)
 }
 
 func (a *App) FontSizes() []string {
@@ -270,5 +257,6 @@ func (a *App) PlayerNameColors() []string {
 }
 
 func (a *App) LatestRelease() (domain.GHLatestRelease, error) {
-	return a.updaterService.Updatable()
+	latestRelease, err := a.updaterService.Updatable()
+	return latestRelease, apperr.Unwrap(err)
 }

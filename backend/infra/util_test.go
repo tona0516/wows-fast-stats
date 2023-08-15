@@ -23,9 +23,10 @@ func TestUtil_getRequest_正常系_クエリなし(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(expected.StatusCode)
-		_, _ = w.Write(expected.BodyByte)
+		_, _ = w.Write(expected.ByteBody)
 	}))
 	defer server.Close()
+	expected.FullURL = server.URL
 
 	actual, err := getRequest[TestData](server.URL)
 
@@ -41,9 +42,10 @@ func TestUtil_getRequest_正常系_クエリあり(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(expected.StatusCode)
-		_, _ = w.Write(expected.BodyByte)
+		_, _ = w.Write(expected.ByteBody)
 	}))
 	defer server.Close()
+	expected.FullURL = server.URL + "?hoge=fuga"
 
 	actual, err := getRequest[TestData](server.URL, vo.NewPair("hoge", "fuga"))
 
@@ -70,15 +72,16 @@ func TestUtil_getRequest_異常系_不正なレスポンス(t *testing.T) {
 			expected := APIResponse[TestData]{
 				StatusCode: http.StatusOK,
 				Body:       TestData{},
-				BodyByte:   []byte(res.body),
+				ByteBody:   []byte(res.body),
 			}
 
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(expected.StatusCode)
-				_, _ = w.Write(expected.BodyByte)
+				_, _ = w.Write(expected.ByteBody)
 			}))
 			defer server.Close()
+			expected.FullURL = server.URL
 
 			actual, err := getRequest[TestData](server.URL)
 
@@ -90,12 +93,12 @@ func TestUtil_getRequest_異常系_不正なレスポンス(t *testing.T) {
 
 func normalResponse() APIResponse[TestData] {
 	testData := TestData{Name: "test"}
-
 	//nolint:errchkjson
-	body, _ := json.Marshal(testData)
+	byteBody, _ := json.Marshal(testData)
+
 	return APIResponse[TestData]{
 		StatusCode: http.StatusOK,
 		Body:       testData,
-		BodyByte:   body,
+		ByteBody:   byteBody,
 	}
 }

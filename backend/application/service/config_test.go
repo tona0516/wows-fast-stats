@@ -10,7 +10,7 @@ import (
 	"wfs/backend/domain"
 	"wfs/backend/infra"
 
-	"github.com/pkg/errors"
+	"github.com/morikuni/failure"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -20,7 +20,7 @@ const (
 	DefaultAppID       = "abc123"
 )
 
-var errWargaming = apperr.New(apperr.ErrWGAPI, errors.New("INVALID_APPLICATION_ID"))
+var errWargaming = failure.New(apperr.WGAPIError)
 
 //nolint:paralleltest
 func TestConfig_UpdateRequired_正常系(t *testing.T) {
@@ -71,7 +71,7 @@ func TestConfig_UpdateRequired_異常系_不正なインストールパス(t *te
 	actual, err := c.UpdateRequired(config.InstallPath, config.Appid)
 
 	// アサーション
-	assert.Equal(t, vo.ValidatedResult{InstallPath: apperr.New(apperr.ErrInvalidInstallPath, nil).Error()}, actual)
+	assert.Equal(t, vo.ValidatedResult{InstallPath: apperr.InvalidInstallPath.ErrorCode()}, actual)
 	assert.NoError(t, err)
 	mockWargaming.AssertCalled(t, "Test", config.Appid)
 	mockLocalFile.AssertNotCalled(t, "UpdateUser", config)
@@ -96,7 +96,7 @@ func TestConfig_UpdateRequired_異常系_不正なAppID(t *testing.T) {
 	actual, err := c.UpdateRequired(config.InstallPath, config.Appid)
 
 	// アサーション
-	assert.Equal(t, vo.ValidatedResult{AppID: apperr.New(apperr.ErrInvalidAppID, errWargaming).Error()}, actual)
+	assert.Equal(t, vo.ValidatedResult{AppID: apperr.InvalidAppID.ErrorCode()}, actual)
 	assert.NoError(t, err)
 	mockWargaming.AssertCalled(t, "Test", config.Appid)
 	mockLocalFile.AssertNotCalled(t, "UpdateUser", config)

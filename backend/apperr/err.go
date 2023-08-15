@@ -1,36 +1,39 @@
 package apperr
 
 import (
-	"github.com/pkg/errors"
+	"errors"
+
+	"github.com/morikuni/failure"
 )
 
-func New(
-	appErr AppError,
-	raw error,
-) error {
-	if raw != nil {
-		return errors.WithStack(errors.Wrap(raw, appErr.Error()))
+const (
+	FileNotExist                failure.StringCode = "ファイルが存在しません。"
+	ExpectedStatsParseError     failure.StringCode = "ExpectedStatsパースエラー"
+	HTTPRequestError            failure.StringCode = "HTTPリクエストエラー"
+	WGAPITemporaryUnavaillalble failure.StringCode = "WG APIが一時的に利用できません。リロードしてください。"
+	WGAPIError                  failure.StringCode = "WG APIが利用できません。再起動するか、設定を見直してください。"
+	NumbersAPIError             failure.StringCode = "NumbersAPIエラー"
+	DiscordAPIError             failure.StringCode = "DiscordAPIエラー"
+	GithubAPIError              failure.StringCode = "GithubAPIエラー"
+	InvalidInstallPath          failure.StringCode = "選択したフォルダに「WorldOfWarships.exe」が存在しません。"
+	InvalidAppID                failure.StringCode = "WG APIと通信できません。アプリケーションIDが間違っている可能性があります。"
+	UserCanceled                failure.StringCode = "ユーザキャンセル"
+	OpenDirectoryError          failure.StringCode = "フォルダが開けません。存在しない可能性があります。"
+	FrontendError               failure.StringCode = "フロントエンドエラー"
+	WailsError                  failure.StringCode = "Wailsエラー"
+	UnexpectedError             failure.StringCode = "予期しないエラーが発生しました。"
+)
+
+func Unwrap(err error) error {
+	if err == nil {
+		return nil
 	}
 
-	return errors.WithStack(appErr)
+	code, ok := failure.CodeOf(err)
+	if !ok {
+		return err
+	}
+
+	//nolint:goerr113
+	return errors.New(code.ErrorCode())
 }
-
-type AppError error
-
-var (
-	ErrHTTPRequest                 AppError = errors.New("HTTPリクエスト")
-	ErrWGAPITemporaryUnavaillalble AppError = errors.New("WG APIが一時的に利用できません。リロードしてください。")
-	ErrWGAPI                       AppError = errors.New("WG APIが利用できません。再起動するか、設定を見直してください。")
-	ErrNumbersAPI                  AppError = errors.New("NumbersAPIエラー")
-	ErrDiscordAPI                  AppError = errors.New("DiscordAPIエラー")
-	ErrInvalidInstallPath          AppError = errors.New("選択したフォルダに「WorldOfWarships.exe」が存在しません。")
-	ErrInvalidAppID                AppError = errors.New("WG APIと通信できません。アプリケーションIDが間違っている可能性があります。")
-	ErrReadFile                    AppError = errors.New("ファイル読み込み")
-	ErrWriteFile                   AppError = errors.New("ファイル書き込み")
-	ErrShowDialog                  AppError = errors.New("ダイアログ表示")
-	ErrUserCanceled                AppError = errors.New("ユーザキャンセル")
-	ErrSelectDirectory             AppError = errors.New("フォルダが選択できませんでした。")
-	ErrOpenDirectory               AppError = errors.New("フォルダが開けません。存在しない可能性があります。")
-	ErrFrontend                    AppError = errors.New("フロントエンドエラー")
-	ErrUnexpected                  AppError = errors.New("予期しないエラーが発生しました。")
-)

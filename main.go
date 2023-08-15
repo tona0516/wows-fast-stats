@@ -75,7 +75,7 @@ func initApp(env vo.Env) *App {
 		Retry: maxRetry,
 	})
 	numbers := infra.NewNumbers(infra.RequestConfig{
-		URL:   "https://api.wows-numbers.com/personal/rating/expected/json/",
+		URL:   "https://api.wows-numbers.com",
 		Retry: maxRetry,
 	})
 	localFile := infra.NewLocalFile()
@@ -94,7 +94,7 @@ func initApp(env vo.Env) *App {
 	var parallels uint = 5
 	watchInterval := 1 * time.Second
 	configService := service.NewConfig(localFile, wargaming)
-	screenshotService := service.NewScreenshot(localFile, runtime.SaveFileDialog)
+	screenshotService := service.NewScreenshot(localFile)
 	battleService := service.NewBattle(parallels, wargaming, localFile, numbers, unregistered)
 	watcherService := service.NewWatcher(watchInterval, localFile, runtime.EventsEmit)
 	updaterService := service.NewUpdater(env, github)

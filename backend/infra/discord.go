@@ -2,10 +2,12 @@ package infra
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"os"
+	"strconv"
 	"wfs/backend/apperr"
+
+	"github.com/morikuni/failure"
 )
 
 type Discord struct {
@@ -24,7 +26,7 @@ func (d *Discord) Upload(filename string, text string, message string) error {
 	// create file
 	file, err := os.Create(filename)
 	if err != nil {
-		return apperr.New(apperr.ErrWriteFile, err)
+		return failure.Wrap(err)
 	}
 
 	defer func() {
@@ -35,7 +37,7 @@ func (d *Discord) Upload(filename string, text string, message string) error {
 	// write text to file
 	_, err = file.WriteString(text)
 	if err != nil {
-		return apperr.New(apperr.ErrWriteFile, err)
+		return failure.Wrap(err)
 	}
 
 	// upload file
@@ -48,12 +50,17 @@ func (d *Discord) Upload(filename string, text string, message string) error {
 
 	res, err := postMultipartFormData[any](d.config.URL, forms)
 	if err != nil {
-		return apperr.New(apperr.ErrDiscordAPI, err)
+		return failure.Wrap(err)
 	}
 
 	if res.StatusCode != http.StatusOK {
-		//nolint:goerr113
-		return apperr.New(apperr.ErrDiscordAPI, fmt.Errorf("status_code=%d, body=%s", res.StatusCode, res.BodyByte))
+		return failure.New(
+			apperr.DiscordAPIError,
+			failure.Context{
+				"status_code": strconv.Itoa(res.StatusCode),
+				"body":        string(res.ByteBody),
+			},
+		)
 	}
 
 	return nil

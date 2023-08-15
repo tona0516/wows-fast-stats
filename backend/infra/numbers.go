@@ -1,12 +1,13 @@
 package infra
 
 import (
+	"net/http"
 	"strconv"
-	"wfs/backend/application/vo"
+	"wfs/backend/apperr"
 	"wfs/backend/domain"
-	"wfs/backend/logger"
 
 	"github.com/cenkalti/backoff/v4"
+	"github.com/morikuni/failure"
 )
 
 type Numbers struct {
@@ -20,18 +21,23 @@ func NewNumbers(config RequestConfig) *Numbers {
 func (n *Numbers) ExpectedStats() (domain.NSExpectedStats, error) {
 	b := backoff.WithMaxRetries(backoff.NewExponentialBackOff(), n.config.Retry)
 	operation := func() (APIResponse[domain.NSExpectedStats], error) {
-		return getRequest[domain.NSExpectedStats](n.config.URL)
+		return getRequest[domain.NSExpectedStats](n.config.URL + "/personal/rating/expected/json/")
 	}
 
 	res, err := backoff.RetryWithData(operation, b)
 	if err != nil {
-		logger.Error(
-			err,
-			vo.NewPair("url", n.config.URL),
-			vo.NewPair("status_code", strconv.Itoa(res.StatusCode)),
-			vo.NewPair("response_body", string(res.BodyByte)),
+		return res.Body, failure.Wrap(err)
+	}
+
+	if res.StatusCode != http.StatusOK {
+		return res.Body, failure.New(
+			apperr.NumbersAPIError,
+			failure.Context{
+				"status_code": strconv.Itoa(res.StatusCode),
+				"body":        string(res.ByteBody),
+			},
 		)
 	}
 
-	return res.Body, err
+	return res.Body, nil
 }

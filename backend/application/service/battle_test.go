@@ -5,6 +5,7 @@ import (
 	"wfs/backend/apperr"
 	"wfs/backend/domain"
 
+	"github.com/morikuni/failure"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -35,7 +36,12 @@ func initMocksForBattle() (*mockWargaming, *mockNumbers, *mockUnregistered, *moc
 
 	mockUnregistered.On("Warship").Return(map[int]domain.Warship{}, nil)
 
-	mockLocalFile.On("TempArenaInfo", mock.Anything).Return(domain.TempArenaInfo{}, nil)
+	mockLocalFile.On("TempArenaInfo", mock.Anything).Return(domain.TempArenaInfo{
+		Vehicles: []domain.Vehicle{
+			{ShipID: 1, Name: "player_1", Relation: 0},
+			{ShipID: 2, Name: "player_2", Relation: 2},
+		},
+	}, nil)
 	mockLocalFile.On("SaveTempArenaInfo", mock.Anything).Return(nil)
 
 	return mockWargaming, mockNumbers, mockUnregistered, mockLocalFile
@@ -107,7 +113,7 @@ func TestBattle_Battle_異常系(t *testing.T) {
 
 	mockWargaming, mockNumbers, mockUnregistered, _ := initMocksForBattle()
 	mockLocalFileRepo := &mockLocalFile{}
-	expectedError := apperr.New(apperr.ErrReadFile, nil)
+	expectedError := failure.New(apperr.FileNotExist)
 	mockLocalFileRepo.On("TempArenaInfo", mock.Anything).Return(domain.TempArenaInfo{}, expectedError)
 	mockLocalFileRepo.On("SaveTempArenaInfo", mock.Anything).Return(nil)
 
@@ -117,7 +123,9 @@ func TestBattle_Battle_異常系(t *testing.T) {
 	_, err := b.Battle(domain.UserConfig{})
 
 	// アサーション
-	assert.EqualError(t, err, expectedError.Error())
+	code, ok := failure.CodeOf(err)
+	assert.True(t, ok)
+	assert.Equal(t, code, apperr.FileNotExist)
 
 	mockWargaming.AssertCalled(t, "SetAppID", mock.Anything)
 	mockWargaming.AssertNotCalled(t, "AccountList", mock.Anything)
