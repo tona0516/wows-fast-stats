@@ -1,11 +1,12 @@
 package service
 
 import (
-	"errors"
 	"testing"
+	"wfs/backend/apperr"
 	"wfs/backend/application/vo"
 	"wfs/backend/domain"
 
+	"github.com/morikuni/failure"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -54,12 +55,14 @@ func TestUpdater_Updatable_異常系(t *testing.T) {
 	mockGithub := &mockGithub{}
 	updater := NewUpdater(env, mockGithub)
 
-	//nolint:goerr113
-	expected := errors.New("some error")
+	expected := failure.New(apperr.HTTPRequestError)
 	mockGithub.On("LatestRelease").Return(domain.GHLatestRelease{}, expected)
 
 	_, err := updater.Updatable()
 
-	assert.EqualError(t, err, expected.Error())
+	code, ok := failure.CodeOf(err)
+	assert.True(t, ok)
+	assert.Equal(t, code, apperr.HTTPRequestError)
+
 	mockGithub.AssertCalled(t, "LatestRelease")
 }

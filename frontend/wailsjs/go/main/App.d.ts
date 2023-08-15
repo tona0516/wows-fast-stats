@@ -37,8 +37,6 @@ export function RemoveAlertPlayer(arg1:number):Promise<void>;
 
 export function RemoveExcludePlayerID(arg1:number):Promise<void>;
 
-export function SampleTeams():Promise<Array<domain.Team>>;
-
 export function SearchPlayer(arg1:string):Promise<domain.WGAccountList>;
 
 export function SelectDirectory():Promise<string>;

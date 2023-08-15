@@ -9,7 +9,6 @@
     FontSizes,
     OpenDirectory,
     PlayerNameColors,
-    SampleTeams,
     SelectDirectory,
     UserConfig,
   } from "../../wailsjs/go/main/App";
@@ -29,6 +28,7 @@
     TabPane,
   } from "sveltestrap";
   import ConfirmModal from "../other_component/ConfirmModal.svelte";
+  import { sampleTeam } from "../util";
 
   const dispatch = createEventDispatcher();
 
@@ -38,7 +38,6 @@
   });
   let defaultUserConfig: domain.UserConfig;
   let isLoading = false;
-  let sampleTeams: domain.Team[] = [];
   let displayKeys: string[] = [];
   let resetDisplaySettingConfirmModal: ConfirmModal;
   let validatedResult: vo.ValidatedResult;
@@ -124,7 +123,6 @@
 
   async function main() {
     defaultUserConfig = await DefaultUserConfig();
-    sampleTeams = await SampleTeams();
     const shipKeys = Object.keys($storedUserConfig.displays.ship);
     const overallKeys = Object.keys($storedUserConfig.displays.overall);
     displayKeys = Array.from(new Set([...shipKeys, ...overallKeys]));
@@ -465,7 +463,7 @@
 
         <div style="font-size: {inputUserConfig.font_size};">
           <StatisticsTable
-            teams={sampleTeams}
+            teams={[sampleTeam()]}
             userConfig={inputUserConfig}
             alertPlayers={[]}
           />

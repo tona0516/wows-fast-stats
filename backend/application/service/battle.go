@@ -7,6 +7,8 @@ import (
 	"wfs/backend/application/repository"
 	"wfs/backend/application/vo"
 	"wfs/backend/domain"
+
+	"github.com/morikuni/failure"
 )
 
 type Battle struct {
@@ -59,11 +61,11 @@ func (b *Battle) Battle(userConfig domain.UserConfig) (domain.Battle, error) {
 	// Get tempArenaInfo.json
 	tempArenaInfo, err := b.localFile.TempArenaInfo(userConfig.InstallPath)
 	if err != nil {
-		return result, err
+		return result, failure.Wrap(err)
 	}
 	if userConfig.SaveTempArenaInfo {
 		if err := b.localFile.SaveTempArenaInfo(tempArenaInfo); err != nil {
-			return result, err
+			return result, failure.Wrap(err)
 		}
 	}
 
@@ -71,7 +73,7 @@ func (b *Battle) Battle(userConfig domain.UserConfig) (domain.Battle, error) {
 	accountNames := tempArenaInfo.AccountNames()
 	accountList, err := b.wargaming.AccountList(accountNames)
 	if err != nil {
-		return result, err
+		return result, failure.Wrap(err)
 	}
 	accountIDs := accountList.AccountIDs()
 
@@ -114,7 +116,7 @@ func (b *Battle) Battle(userConfig domain.UserConfig) (domain.Battle, error) {
 
 	for _, err := range errs {
 		if err != nil {
-			return result, err
+			return result, failure.Wrap(err)
 		}
 	}
 
@@ -156,7 +158,7 @@ func (b *Battle) fetchWarship(result chan vo.Result[map[int]domain.Warship]) {
 	first := 1
 	res, err := b.wargaming.EncycShips(first)
 	if err != nil {
-		result <- vo.Result[map[int]domain.Warship]{Error: err}
+		result <- vo.Result[map[int]domain.Warship]{Error: failure.Wrap(err)}
 		return
 	}
 	addToResult(res.Data)
@@ -172,13 +174,13 @@ func (b *Battle) fetchWarship(result chan vo.Result[map[int]domain.Warship]) {
 		return nil
 	})
 	if err != nil {
-		result <- vo.Result[map[int]domain.Warship]{Error: err}
+		result <- vo.Result[map[int]domain.Warship]{Error: failure.Wrap(err)}
 		return
 	}
 
 	unregisteredShipInfo, err := b.unregistered.Warship()
 	if err != nil {
-		result <- vo.Result[map[int]domain.Warship]{Error: err}
+		result <- vo.Result[map[int]domain.Warship]{Error: failure.Wrap(err)}
 		return
 	}
 	for k, v := range unregisteredShipInfo {
@@ -192,22 +194,22 @@ func (b *Battle) fetchWarship(result chan vo.Result[map[int]domain.Warship]) {
 
 func (b *Battle) fetchExpectedStats(result chan vo.Result[domain.NSExpectedStats]) {
 	expectedStats, err := b.numbers.ExpectedStats()
-	result <- vo.Result[domain.NSExpectedStats]{Value: expectedStats, Error: err}
+	result <- vo.Result[domain.NSExpectedStats]{Value: expectedStats, Error: failure.Wrap(err)}
 }
 
 func (b *Battle) fetchBattleArenas(result chan vo.Result[domain.WGBattleArenas]) {
 	battleArenas, err := b.wargaming.BattleArenas()
-	result <- vo.Result[domain.WGBattleArenas]{Value: battleArenas, Error: err}
+	result <- vo.Result[domain.WGBattleArenas]{Value: battleArenas, Error: failure.Wrap(err)}
 }
 
 func (b *Battle) fetchBattleTypes(result chan vo.Result[domain.WGBattleTypes]) {
 	battleTypes, err := b.wargaming.BattleTypes()
-	result <- vo.Result[domain.WGBattleTypes]{Value: battleTypes, Error: err}
+	result <- vo.Result[domain.WGBattleTypes]{Value: battleTypes, Error: failure.Wrap(err)}
 }
 
 func (b *Battle) accountInfo(accountIDs []int, result chan vo.Result[domain.WGAccountInfo]) {
 	accountInfo, err := b.wargaming.AccountInfo(accountIDs)
-	result <- vo.Result[domain.WGAccountInfo]{Value: accountInfo, Error: err}
+	result <- vo.Result[domain.WGAccountInfo]{Value: accountInfo, Error: failure.Wrap(err)}
 }
 
 func (b *Battle) shipStats(accountIDs []int, result chan vo.Result[map[int]domain.WGShipsStats]) {
@@ -226,7 +228,7 @@ func (b *Battle) shipStats(accountIDs []int, result chan vo.Result[map[int]domai
 		return nil
 	})
 
-	result <- vo.Result[map[int]domain.WGShipsStats]{Value: shipStatsMap, Error: err}
+	result <- vo.Result[map[int]domain.WGShipsStats]{Value: shipStatsMap, Error: failure.Wrap(err)}
 }
 
 func (b *Battle) clanTag(accountIDs []int, result chan vo.Result[map[int]domain.Clan]) {
@@ -234,7 +236,7 @@ func (b *Battle) clanTag(accountIDs []int, result chan vo.Result[map[int]domain.
 
 	clansAccountInfo, err := b.wargaming.ClansAccountInfo(accountIDs)
 	if err != nil {
-		result <- vo.Result[map[int]domain.Clan]{Error: err}
+		result <- vo.Result[map[int]domain.Clan]{Error: failure.Wrap(err)}
 
 		return
 	}
@@ -242,7 +244,7 @@ func (b *Battle) clanTag(accountIDs []int, result chan vo.Result[map[int]domain.
 	clanIDs := clansAccountInfo.ClanIDs()
 	clansInfo, err := b.wargaming.ClansInfo(clanIDs)
 	if err != nil {
-		result <- vo.Result[map[int]domain.Clan]{Error: err}
+		result <- vo.Result[map[int]domain.Clan]{Error: failure.Wrap(err)}
 
 		return
 	}

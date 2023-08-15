@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"wfs/backend/apperr"
 
-	"github.com/pkg/errors"
+	"github.com/morikuni/failure"
 )
 
 const (
@@ -14,29 +14,26 @@ const (
 	NumbersWinrate   = "win_rate"
 )
 
-var (
-	errNoTimeKey = errors.New("no time key")
-	errNoDataKey = errors.New("no data key")
-)
-
 type NSExpectedStats struct {
 	Time int64                       `json:"time"`
 	Data map[int]NSExpectedStatsData `json:"data"`
 }
 
 func (n *NSExpectedStats) UnmarshalJSON(b []byte) error {
+	errCtx := failure.Context{"body": string(b)}
+
 	root := make(map[string]interface{})
 	if err := json.Unmarshal(b, &root); err != nil {
-		return apperr.New(apperr.ErrNumbersAPI, err)
+		return failure.New(apperr.ExpectedStatsParseError, errCtx, failure.Messagef("%s", err.Error()))
 	}
 
 	time, ok := root["time"].(float64)
 	if !ok {
-		return errNoTimeKey
+		return failure.New(apperr.ExpectedStatsParseError, errCtx, failure.Messagef("%s", "no time key"))
 	}
 	data, ok := root["data"].(map[string]interface{})
 	if !ok {
-		return errNoDataKey
+		return failure.New(apperr.ExpectedStatsParseError, errCtx, failure.Messagef("%s", "no data key"))
 	}
 
 	esd := make(map[int]NSExpectedStatsData)

@@ -6,39 +6,40 @@ import (
 	"wfs/backend/apperr"
 	"wfs/backend/application/repository"
 
+	"github.com/morikuni/failure"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 type Screenshot struct {
 	localFile          repository.LocalFileInterface
-	saveFileDialogFunc func(ctx context.Context, dialogOptions runtime.SaveDialogOptions) (string, error)
+	SaveFileDialogFunc SaveFileDialogFunc
 }
 
 func NewScreenshot(
-	localFile repository.LocalFileInterface,
-	saveFileDialogFunc func(ctx context.Context, dialogOptions runtime.SaveDialogOptions) (string, error),
-) *Screenshot {
+	localFile repository.LocalFileInterface) *Screenshot {
 	return &Screenshot{
 		localFile:          localFile,
-		saveFileDialogFunc: saveFileDialogFunc,
+		SaveFileDialogFunc: runtime.SaveFileDialog,
 	}
 }
 
 func (s *Screenshot) SaveForAuto(filename string, base64Data string) error {
-	return s.localFile.SaveScreenshot(filepath.Join("screenshot", filename), base64Data)
+	err := s.localFile.SaveScreenshot(filepath.Join("screenshot", filename), base64Data)
+	return failure.Wrap(err)
 }
 
 func (s *Screenshot) SaveWithDialog(ctx context.Context, filename string, base64Data string) error {
-	path, err := s.saveFileDialogFunc(ctx, runtime.SaveDialogOptions{
+	path, err := s.SaveFileDialogFunc(ctx, runtime.SaveDialogOptions{
 		DefaultFilename: filename,
 	})
 
 	if err != nil {
-		return apperr.New(apperr.ErrShowDialog, err)
+		return failure.New(apperr.WailsError, failure.Messagef("%s", err.Error()))
 	}
 	if path == "" {
-		return apperr.New(apperr.ErrUserCanceled, nil)
+		return failure.New(apperr.UserCanceled)
 	}
 
-	return s.localFile.SaveScreenshot(path, base64Data)
+	err = s.localFile.SaveScreenshot(path, base64Data)
+	return failure.Wrap(err)
 }

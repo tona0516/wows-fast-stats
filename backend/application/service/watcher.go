@@ -3,15 +3,15 @@ package service
 import (
 	"context"
 	"crypto/sha256"
-	"errors"
 	"fmt"
-	"io/fs"
 	"time"
 	"wfs/backend/apperr"
 	"wfs/backend/application/repository"
 	"wfs/backend/application/vo"
 	"wfs/backend/domain"
 	"wfs/backend/logger"
+
+	"github.com/morikuni/failure"
 )
 
 const (
@@ -43,11 +43,11 @@ func NewWatcher(
 func (w *Watcher) Prepare(appCtx context.Context) error {
 	userConfig, err := w.localFile.User()
 	if err != nil {
-		return err
+		return failure.Wrap(err)
 	}
 
 	if userConfig.InstallPath == "" {
-		return apperr.New(apperr.ErrInvalidInstallPath, nil)
+		return failure.New(apperr.InvalidInstallPath)
 	}
 
 	w.appCtx = appCtx
@@ -67,13 +67,13 @@ func (w *Watcher) Start(ctx context.Context) {
 
 			tempArenaInfo, err := w.localFile.TempArenaInfo(w.userConfig.InstallPath)
 			if err != nil {
-				if errors.Is(err, fs.ErrNotExist) {
+				if failure.Is(err, apperr.FileNotExist) {
 					w.eventsEmitFunc(w.appCtx, EventEnd)
 					continue
 				}
 
 				logger.Error(err)
-				w.eventsEmitFunc(w.appCtx, EventErr, err.Error())
+				w.eventsEmitFunc(w.appCtx, EventErr, apperr.Unwrap(err))
 				return
 			}
 

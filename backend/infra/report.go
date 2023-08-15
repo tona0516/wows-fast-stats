@@ -8,6 +8,8 @@ import (
 	"wfs/backend/application/vo"
 )
 
+const emptyJSON = "{}"
+
 type Report struct {
 	env       vo.Env
 	localFile LocalFile
@@ -36,8 +38,10 @@ func (r *Report) Send(message string, content error) {
 
 	// get TempArenaInfo
 	tempArenaInfo, err := r.localFile.TempArenaInfo(userConfig.InstallPath)
-	jsonTempArenaInfo := "{}"
-	if err == nil {
+	var jsonTempArenaInfo string
+	if err != nil {
+		jsonTempArenaInfo = emptyJSON
+	} else {
 		jsonTempArenaInfo = prettryJSON(tempArenaInfo)
 	}
 
@@ -45,7 +49,7 @@ func (r *Report) Send(message string, content error) {
 	targets := []string{
 		"Semver:",
 		fmt.Sprintf("%+v\n", r.env.Semver),
-		"Content:",
+		"Error:",
 		fmt.Sprintf("%+v\n", content),
 		"UserConfig:",
 		jsonUserConfig,
@@ -69,7 +73,7 @@ func prettryJSON(data any) string {
 	encoder.SetIndent("", "  ")
 
 	if err := encoder.Encode(data); err != nil {
-		return "{}"
+		return emptyJSON
 	}
 
 	return buffer.String()

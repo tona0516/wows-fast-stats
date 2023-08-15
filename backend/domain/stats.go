@@ -1,10 +1,11 @@
 package domain
 
 import (
-	"fmt"
 	"math"
 	"wfs/backend/apperr"
 	"wfs/backend/logger"
+
+	"github.com/morikuni/failure"
 )
 
 type Stats struct {
@@ -91,13 +92,12 @@ func (s *Stats) PR(category StatsCategory, pattern StatsPattern) float64 {
 		return s.pr(actual, expected, allBattles)
 	}
 
-	logger.Error(apperr.New(apperr.ErrUnexpected, nil))
+	logger.Error(failure.New(apperr.UnexpectedError))
 	return -1
 }
 
 func (s *Stats) Battles(category StatsCategory, pattern StatsPattern) uint {
-	values := s.statsValues(category, pattern)
-	return values.Battles
+	return s.statsValues(category, pattern).Battles
 }
 
 func (s *Stats) AvgDamage(category StatsCategory, pattern StatsPattern) float64 {
@@ -122,12 +122,7 @@ func (s *Stats) AvgKill(category StatsCategory, pattern StatsPattern) float64 {
 
 func (s *Stats) AvgExp(category StatsCategory, pattern StatsPattern) float64 {
 	values := s.statsValues(category, pattern)
-	battles := values.Battles
-	if battles < 1 {
-		return 0
-	}
-
-	return float64(values.Xp) / float64(battles)
+	return div(values.Xp, values.Battles)
 }
 
 func (s *Stats) WinRate(category StatsCategory, pattern StatsPattern) float64 {
@@ -137,52 +132,28 @@ func (s *Stats) WinRate(category StatsCategory, pattern StatsPattern) float64 {
 
 func (s *Stats) WinSurvivedRate(category StatsCategory, pattern StatsPattern) float64 {
 	values := s.statsValues(category, pattern)
-	wins := values.Wins
-	if wins < 1 {
-		return 0
-	}
-
-	return float64(values.SurvivedWins) / float64(wins) * 100
+	return percentage(values.SurvivedWins, values.Wins)
 }
 
 func (s *Stats) LoseSurvivedRate(category StatsCategory, pattern StatsPattern) float64 {
 	values := s.statsValues(category, pattern)
 	loses := values.Battles - values.Wins
-	if loses < 1 {
-		return 0
-	}
-
-	return float64(values.SurvivedBattles-values.SurvivedWins) / float64(loses) * 100
+	return percentage(values.SurvivedBattles-values.SurvivedWins, loses)
 }
 
 func (s *Stats) MainBatteryHitRate(category StatsCategory, pattern StatsPattern) float64 {
 	values := s.statsValues(category, pattern)
-	shots := values.MainBattery.Shots
-	if shots < 1 {
-		return 0
-	}
-
-	return float64(values.MainBattery.Hits) / float64(shots) * 100
+	return percentage(values.MainBattery.Hits, values.MainBattery.Shots)
 }
 
 func (s *Stats) TorpedoesHitRate(category StatsCategory, pattern StatsPattern) float64 {
 	values := s.statsValues(category, pattern)
-	shots := values.Torpedoes.Shots
-	if shots < 1 {
-		return 0
-	}
-
-	return float64(values.Torpedoes.Hits) / float64(shots) * 100
+	return percentage(values.Torpedoes.Hits, values.Torpedoes.Shots)
 }
 
 func (s *Stats) PlanesKilled(category StatsCategory, pattern StatsPattern) float64 {
 	values := s.statsValues(category, pattern)
-	battles := values.Battles
-	if battles < 1 {
-		return 0
-	}
-
-	return float64(values.PlanesKilled) / float64(battles)
+	return div(values.PlanesKilled, values.Battles)
 }
 
 func (s *Stats) AvgTier(
@@ -190,8 +161,8 @@ func (s *Stats) AvgTier(
 	warships map[int]Warship,
 ) float64 {
 	var (
-		sum     uint
-		battles uint
+		sum        uint
+		allBattles uint
 	)
 
 	for _, stats := range s.allShipsStats {
@@ -202,21 +173,17 @@ func (s *Stats) AvgTier(
 
 		values := s.statsValuesForm(stats, pattern)
 		sum += values.Battles * warship.Tier
-		battles += values.Battles
+		allBattles += values.Battles
 	}
 
-	if battles < 1 {
-		return 0
-	}
-
-	return float64(sum) / float64(battles)
+	return div(sum, allBattles)
 }
 
 func (s *Stats) UsingTierRate(
 	pattern StatsPattern,
 	warships map[int]Warship,
 ) TierGroup {
-	var tierGroup TierGroup
+	tierGroupMap := make(map[string]uint)
 
 	for _, ship := range s.allShipsStats {
 		warship, ok := warships[ship.ShipID]
@@ -229,23 +196,23 @@ func (s *Stats) UsingTierRate(
 		battles := values.Battles
 		switch {
 		case tier >= 1 && tier <= 4:
-			tierGroup.Low += float64(battles)
+			tierGroupMap["low"] += battles
 		case tier >= 5 && tier <= 7:
-			tierGroup.Middle += float64(battles)
+			tierGroupMap["middle"] += battles
 		case tier >= 8:
-			tierGroup.High += float64(battles)
+			tierGroupMap["high"] += battles
 		}
 	}
 
-	allBattles := tierGroup.Low + tierGroup.Middle + tierGroup.High
-	if allBattles < 1 {
-		return TierGroup{}
+	var allBattles uint
+	for _, v := range tierGroupMap {
+		allBattles += v
 	}
 
 	return TierGroup{
-		Low:    tierGroup.Low / allBattles * 100,
-		Middle: tierGroup.Middle / allBattles * 100,
-		High:   tierGroup.High / allBattles * 100,
+		Low:    percentage(tierGroupMap["low"], allBattles),
+		Middle: percentage(tierGroupMap["middle"], allBattles),
+		High:   percentage(tierGroupMap["high"], allBattles),
 	}
 }
 
@@ -253,7 +220,7 @@ func (s *Stats) UsingShipTypeRate(
 	pattern StatsPattern,
 	warships map[int]Warship,
 ) ShipTypeGroup {
-	shipTypeMap := make(map[ShipType]float64)
+	shipTypeMap := make(map[ShipType]uint)
 
 	for _, ship := range s.allShipsStats {
 		warship, ok := warships[ship.ShipID]
@@ -262,23 +229,20 @@ func (s *Stats) UsingShipTypeRate(
 		}
 
 		values := s.statsValuesForm(ship, pattern)
-		shipTypeMap[warship.Type] += float64(values.Battles)
+		shipTypeMap[warship.Type] += values.Battles
 	}
 
-	var allBattles float64
+	var allBattles uint
 	for _, v := range shipTypeMap {
 		allBattles += v
 	}
-	if allBattles < 1 {
-		return ShipTypeGroup{}
-	}
 
 	return ShipTypeGroup{
-		SS: shipTypeMap[SS] / allBattles * 100,
-		DD: shipTypeMap[DD] / allBattles * 100,
-		CL: shipTypeMap[CL] / allBattles * 100,
-		BB: shipTypeMap[BB] / allBattles * 100,
-		CV: shipTypeMap[CV] / allBattles * 100,
+		SS: percentage(shipTypeMap[SS], allBattles),
+		DD: percentage(shipTypeMap[DD], allBattles),
+		CL: percentage(shipTypeMap[CL], allBattles),
+		BB: percentage(shipTypeMap[BB], allBattles),
+		CV: percentage(shipTypeMap[CV], allBattles),
 	}
 }
 
@@ -300,7 +264,7 @@ func (s *Stats) statsValues(category StatsCategory, pattern StatsPattern) WGStat
 		}
 	}
 
-	logger.Error(apperr.New(apperr.ErrUnexpected, nil))
+	logger.Error(failure.New(apperr.UnexpectedError))
 	return WGStatsValues{}
 }
 
@@ -312,7 +276,7 @@ func (s *Stats) statsValuesForm(statsData WGShipsStatsData, pattern StatsPattern
 		return statsData.PvpSolo
 	}
 
-	logger.Error(apperr.New(apperr.ErrUnexpected, nil))
+	logger.Error(failure.New(apperr.UnexpectedError))
 	return WGStatsValues{}
 }
 
@@ -332,7 +296,6 @@ func (s *Stats) pr(
 	}
 
 	if !ratio.Valid() {
-		logger.Info(fmt.Sprintf("PRが算出できませんでした: nickname=%s actual=%+v, expected=%+v", s.nickname, actual, expected))
 		return -1
 	}
 
@@ -346,25 +309,25 @@ func (s *Stats) pr(
 }
 
 func avgDamage(damageDealt uint, battles uint) float64 {
-	if battles < 1 {
-		return 0
-	}
-
-	return float64(damageDealt) / float64(battles)
+	return div(damageDealt, battles)
 }
 
 func avgKill(frags uint, battles uint) float64 {
-	if battles < 1 {
-		return 0
-	}
-
-	return float64(frags) / float64(battles)
+	return div(frags, battles)
 }
 
 func winRate(wins uint, battles uint) float64 {
-	if battles < 1 {
+	return percentage(wins, battles)
+}
+
+func div(a uint, b uint) float64 {
+	if b <= 0 {
 		return 0
 	}
 
-	return float64(wins) / float64(battles) * 100
+	return float64(a) / float64(b)
+}
+
+func percentage(a uint, b uint) float64 {
+	return div(a, b) * 100
 }

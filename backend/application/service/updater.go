@@ -7,6 +7,7 @@ import (
 	"wfs/backend/domain"
 
 	"github.com/Masterminds/semver/v3"
+	"github.com/morikuni/failure"
 )
 
 type Updater struct {
@@ -29,16 +30,16 @@ func (u *Updater) Updatable() (domain.GHLatestRelease, error) {
 
 	c, err := semver.NewConstraint(fmt.Sprintf("> %s", u.env.Semver))
 	if err != nil {
-		return latestRelease, err
+		return latestRelease, failure.Wrap(err)
 	}
 
 	latestRelease, err = u.github.LatestRelease()
 	if err != nil {
-		return latestRelease, err
+		return latestRelease, failure.Wrap(err)
 	}
 	latest, err := semver.NewVersion(latestRelease.TagName)
 	if err != nil {
-		return latestRelease, err
+		return latestRelease, failure.Wrap(err)
 	}
 
 	updatable, _ := c.Validate(latest)

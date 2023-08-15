@@ -70,10 +70,6 @@ export function RemoveExcludePlayerID(arg1) {
   return window['go']['main']['App']['RemoveExcludePlayerID'](arg1);
 }
 
-export function SampleTeams() {
-  return window['go']['main']['App']['SampleTeams']();
-}
-
 export function SearchPlayer(arg1) {
   return window['go']['main']['App']['SearchPlayer'](arg1);
 }

@@ -5,12 +5,11 @@ import (
 	"strings"
 	"wfs/backend/apperr"
 	"wfs/backend/application/vo"
-	"wfs/backend/logger"
 
 	"wfs/backend/domain"
 
 	"github.com/cenkalti/backoff/v4"
-	"github.com/pkg/errors"
+	"github.com/morikuni/failure"
 	"golang.org/x/exp/slices"
 )
 
@@ -157,7 +156,7 @@ func (w *Wargaming) Test(appid string) (bool, error) {
 		vo.NewPair("fields", domain.WGEncycInfo{}.Field()),
 	)
 
-	return err == nil, err
+	return err == nil, failure.Wrap(err)
 }
 
 func request[T domain.WGResponse](
@@ -170,7 +169,7 @@ func request[T domain.WGResponse](
 		res, err := getRequest[T](rawURL, query...)
 
 		if err != nil {
-			return res, backoff.Permanent(apperr.New(apperr.ErrWGAPI, err))
+			return res, failure.Wrap(err)
 		}
 
 		if res.Body.GetStatus() == "error" {
@@ -178,24 +177,20 @@ func request[T domain.WGResponse](
 			// https://developers.wargaming.net/documentation/guide/getting-started/#common-errors
 			message := res.Body.GetError().Message
 			if slices.Contains([]string{"REQUEST_LIMIT_EXCEEDED", "SOURCE_NOT_AVAILABLE"}, message) {
-				return res, apperr.New(apperr.ErrWGAPITemporaryUnavaillalble, errors.New(message))
+				return res, failure.New(apperr.WGAPITemporaryUnavaillalble)
 			}
 
-			return res, apperr.New(apperr.ErrWGAPI, errors.New(message))
+			return res, failure.New(apperr.WGAPIError)
 		}
 
 		return res, nil
 	}
-
 	res, err := backoff.RetryWithData(operation, b)
-	if err != nil && !errors.Is(err, apperr.ErrWGAPITemporaryUnavaillalble) {
-		logger.Error(
-			err,
-			vo.NewPair("url", rawURL),
-			vo.NewPair("status_code", strconv.Itoa(res.StatusCode)),
-			vo.NewPair("response_body", string(res.BodyByte)),
-		)
-	}
 
-	return res.Body, err
+	errCtx := failure.Context{
+		"url":         res.FullURL,
+		"status_code": strconv.Itoa(res.StatusCode),
+		"body":        string(res.ByteBody),
+	}
+	return res.Body, failure.Wrap(err, errCtx)
 }

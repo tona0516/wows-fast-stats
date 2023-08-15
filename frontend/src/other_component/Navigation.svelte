@@ -15,7 +15,7 @@
     storedUserConfig,
   } from "../stores";
   import { Func, Page } from "../enums";
-  import { Const } from "../Const";
+  import { Const, NavigationItem } from "../Const";
   import { Button, Spinner } from "sveltestrap";
 
   const dispatch = createEventDispatcher();
@@ -23,19 +23,17 @@
   let isLoadingScreenshot: boolean = false;
   let selectedStatsPattern: string;
 
-  function onSwitchPage(page: Page) {
-    storedCurrentPage.set(page);
+  function onSwitchPage(item: NavigationItem<Page>) {
+    storedCurrentPage.set(item.name);
   }
 
-  async function onClickFunc(func: Func) {
-    switch (func) {
+  async function onClickFunc(item: NavigationItem<Func>) {
+    switch (item.name) {
       case Func.Reload:
         reload();
         break;
       case Func.Screenshot:
         await screenshot();
-        break;
-      default:
         break;
     }
   }
@@ -106,7 +104,7 @@
             class="m-1 {$storedCurrentPage === page.name && 'active'}"
             title={page.title}
             style="font-size: {$storedUserConfig.font_size};"
-            on:click={() => onSwitchPage(page.name)}
+            on:click={() => onSwitchPage(page)}
           >
             <i class={page.iconClass} />
             {page.title}
@@ -123,7 +121,7 @@
               disabled={func.name === Func.Screenshot &&
                 ($storedBattle === undefined || isLoadingScreenshot)}
               style="font-size: {$storedUserConfig.font_size};"
-              on:click={() => onClickFunc(func.name)}
+              on:click={() => onClickFunc(func)}
             >
               {#if func.name === Func.Screenshot && isLoadingScreenshot}
                 <Spinner size="sm" type="border" /> 読み込み中

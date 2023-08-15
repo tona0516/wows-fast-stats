@@ -35,4 +35,5 @@ linters:
     - depguard
     - gosmopolitan
     - nonamedreturns
+    - dupl
   fast: false
