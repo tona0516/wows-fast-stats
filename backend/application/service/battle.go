@@ -82,8 +82,8 @@ func (b *Battle) Battle(userConfig domain.UserConfig) (domain.Battle, error) {
 	shipStatsResult := make(chan vo.Result[map[int]domain.WGShipsStats])
 	clanResult := make(chan vo.Result[map[int]domain.Clan])
 	go b.accountInfo(accountIDs, accountInfoResult)
-	go b.shipStats(accountIDs, shipStatsResult)
-	go b.clanTag(accountIDs, clanResult)
+	go b.fetchShipStats(accountIDs, shipStatsResult)
+	go b.fetchClanTag(accountIDs, clanResult)
 
 	errs := make([]error, 0)
 
@@ -212,7 +212,7 @@ func (b *Battle) accountInfo(accountIDs []int, result chan vo.Result[domain.WGAc
 	result <- vo.Result[domain.WGAccountInfo]{Value: accountInfo, Error: failure.Wrap(err)}
 }
 
-func (b *Battle) shipStats(accountIDs []int, result chan vo.Result[map[int]domain.WGShipsStats]) {
+func (b *Battle) fetchShipStats(accountIDs []int, result chan vo.Result[map[int]domain.WGShipsStats]) {
 	shipStatsMap := make(map[int]domain.WGShipsStats)
 	var mu sync.Mutex
 	err := doParallel(b.parallels, accountIDs, func(accountID int) error {
@@ -231,7 +231,7 @@ func (b *Battle) shipStats(accountIDs []int, result chan vo.Result[map[int]domai
 	result <- vo.Result[map[int]domain.WGShipsStats]{Value: shipStatsMap, Error: failure.Wrap(err)}
 }
 
-func (b *Battle) clanTag(accountIDs []int, result chan vo.Result[map[int]domain.Clan]) {
+func (b *Battle) fetchClanTag(accountIDs []int, result chan vo.Result[map[int]domain.Clan]) {
 	clanMap := make(map[int]domain.Clan)
 
 	clansAccountInfo, err := b.wargaming.ClansAccountInfo(accountIDs)
