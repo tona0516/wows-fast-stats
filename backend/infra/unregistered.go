@@ -27,25 +27,30 @@ func (u *Unregistered) Warship() (map[int]domain.Warship, error) {
 	}
 
 	for _, us := range ships {
-		nation := strings.ToLower(us.Nation)
-		if nation == "united_kingdom" {
-			nation = "uk"
-		}
-
 		result[us.ID] = domain.Warship{
-			Name:   us.En,
+			Name:   us.Ja,
 			Tier:   us.Level,
 			Type:   domain.NewShipType(us.Species),
-			Nation: domain.Nation(nation),
+			Nation: domain.Nation(toOfficialNation(us.Nation)),
 		}
 	}
 
 	return result, nil
 }
 
+func toOfficialNation(input string) string {
+	nation := strings.ToLower(input)
+	if nation == "united_kingdom" {
+		nation = "uk"
+	}
+
+	return nation
+}
+
 type unregisteredShip struct {
-	ID      int    `json:"id"`
 	En      string `json:"en"`
+	ID      int    `json:"id"`
+	Ja      string `json:"ja"`
 	Level   uint   `json:"level"`
 	Nation  string `json:"nation"`
 	Species string `json:"Species"`
