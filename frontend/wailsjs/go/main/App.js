@@ -6,8 +6,16 @@ export function AddExcludePlayerID(arg1) {
   return window['go']['main']['App']['AddExcludePlayerID'](arg1);
 }
 
-export function AppVersion() {
-  return window['go']['main']['App']['AppVersion']();
+export function AlertPatterns() {
+  return window['go']['main']['App']['AlertPatterns']();
+}
+
+export function AlertPlayers() {
+  return window['go']['main']['App']['AlertPlayers']();
+}
+
+export function ApplyRequiredUserConfig(arg1, arg2) {
+  return window['go']['main']['App']['ApplyRequiredUserConfig'](arg1, arg2);
 }
 
 export function ApplyUserConfig(arg1) {
@@ -22,12 +30,24 @@ export function Battle() {
   return window['go']['main']['App']['Battle']();
 }
 
-export function Cwd() {
-  return window['go']['main']['App']['Cwd']();
+export function DefaultUserConfig() {
+  return window['go']['main']['App']['DefaultUserConfig']();
 }
 
 export function ExcludePlayerIDs() {
   return window['go']['main']['App']['ExcludePlayerIDs']();
+}
+
+export function FontSizes() {
+  return window['go']['main']['App']['FontSizes']();
+}
+
+export function LatestRelease() {
+  return window['go']['main']['App']['LatestRelease']();
+}
+
+export function LogError(arg1) {
+  return window['go']['main']['App']['LogError'](arg1);
 }
 
 export function ManualScreenshot(arg1, arg2) {
@@ -38,16 +58,40 @@ export function OpenDirectory(arg1) {
   return window['go']['main']['App']['OpenDirectory'](arg1);
 }
 
-export function Ready() {
-  return window['go']['main']['App']['Ready']();
+export function PlayerNameColors() {
+  return window['go']['main']['App']['PlayerNameColors']();
+}
+
+export function RemoveAlertPlayer(arg1) {
+  return window['go']['main']['App']['RemoveAlertPlayer'](arg1);
 }
 
 export function RemoveExcludePlayerID(arg1) {
   return window['go']['main']['App']['RemoveExcludePlayerID'](arg1);
 }
 
+export function SearchPlayer(arg1) {
+  return window['go']['main']['App']['SearchPlayer'](arg1);
+}
+
 export function SelectDirectory() {
   return window['go']['main']['App']['SelectDirectory']();
+}
+
+export function Semver() {
+  return window['go']['main']['App']['Semver']();
+}
+
+export function StartWatching() {
+  return window['go']['main']['App']['StartWatching']();
+}
+
+export function StatsPatterns() {
+  return window['go']['main']['App']['StatsPatterns']();
+}
+
+export function UpdateAlertPlayer(arg1) {
+  return window['go']['main']['App']['UpdateAlertPlayer'](arg1);
 }
 
 export function UserConfig() {

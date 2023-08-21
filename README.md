@@ -1,17 +1,8 @@
 # wows-fast-stats
-## About
-This is the fast XVM for World of Warships.
+高速動作を目指したWorld of WarshipsのXVMです。
 
-## Run for development
-```
-$ git clone git@github.com:tona0516/wows-fast-stats.git && cd wows-fast-stats/
-$ make setup
-$ make dev
-```
+## ユーザ向け
+[はじめに](https://github.com/tona0516/wows-fast-stats/wiki/%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB)
 
-## Build binary
-```
-$ make build
-$ ls build/bin
-wows-fast-stats-0.3.0.exe*
-```
+## デベロッパー向け
+[For developer](https://github.com/tona0516/wows-fast-stats/wiki/For-developer)

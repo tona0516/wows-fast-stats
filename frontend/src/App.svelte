@@ -1,134 +1,276 @@
 <script lang="ts">
-import {
-  UserConfig,
-  Battle,
-  ExcludePlayerIDs,
-  Ready,
-} from "../wailsjs/go/main/App.js";
-import Notification from "./Notification.svelte";
-import ConfigPage from "./PageConfig.svelte";
-import MainPage from "./PageMain.svelte";
-import { EventsOn } from "../wailsjs/runtime/runtime.js";
-import AppInfo from "./PageAppInfo.svelte";
+  import AddAlertPlayerModal from "./other_component/AddAlertPlayerModal.svelte";
+  import { Screenshot } from "./Screenshot";
+  import {
+    storedBattle,
+    storedUserConfig,
+    storedIsFirstScreenshot,
+    storedCurrentPage,
+    storedAlertPlayers,
+    storedExcludePlayerIDs,
+    storedSummaryResult,
+    storedLogs,
+  } from "./stores";
+  import { summary } from "./util";
+  import {
+    AlertPlayers,
+    Battle,
+    ExcludePlayerIDs,
+    LogError,
+    StartWatching,
+    LatestRelease,
+    UserConfig,
+  } from "../wailsjs/go/main/App";
+  import {
+    BrowserOpenURL,
+    EventsEmit,
+    EventsOn,
+    LogDebug,
+  } from "../wailsjs/runtime/runtime";
+  import type { domain } from "../wailsjs/go/models";
+  import MainPage from "./page_component/MainPage.svelte";
+  import ConfigPage from "./page_component/ConfigPage.svelte";
+  import AppInfoPage from "./page_component/AppInfoPage.svelte";
+  import AlertPlayerPage from "./page_component/AlertPlayerPage.svelte";
+  import UpdateAlertPlayerModal from "./other_component/UpdateAlertPlayerModal.svelte";
+  import RemoveAlertPlayerModal from "./other_component/RemoveAlertPlayerModal.svelte";
+  import Notification from "./other_component/Notification.svelte";
+  import Navigation from "./other_component/Navigation.svelte";
+  import { AppEvent, Page, ToastKey } from "./enums";
 
-import "bootstrap-icons/font/bootstrap-icons.css";
-import type { vo } from "wailsjs/go/models.js";
-import { Average, type AverageFactor } from "./Average.js";
-import Navigation from "./Navigation.svelte";
-import type { Page } from "./Page.js";
-import { Screenshot } from "./Screenshot.js";
+  import "bootstrap-icons/font/bootstrap-icons.css";
 
-let currentPage: Page;
-let battle: vo.Battle;
-let config: vo.UserConfig;
-let averageFactors: AverageFactor;
-let excludePlayerIDs: number[];
-let notification: Notification;
-let isFirstScreenshot: boolean;
+  let notification: Notification;
+  let addAlertPlayerModal: AddAlertPlayerModal;
+  let updateAlertPlayerModal: UpdateAlertPlayerModal;
+  let removeAlertPlayerModal: RemoveAlertPlayerModal;
 
-EventsOn("BATTLE_START", async () => {
-  try {
-    notification.removeToastWithKey("not_in_battle");
-    notification.showToastWithKey("戦闘データの取得中...", "info", "battle");
-
-    const start = new Date().getTime();
-
-    battle = await Battle();
-    excludePlayerIDs = await ExcludePlayerIDs();
-    const average = new Average(battle);
-    averageFactors = average.calc(excludePlayerIDs);
-
-    const elapsed = (new Date().getTime() - start) / 1000;
-    notification.showToast(`データ取得完了: ${elapsed}秒`, "success");
-    notification.removeToastWithKey("error");
-
-    if (config.save_screenshot) {
-      const screenshot = new Screenshot(battle, isFirstScreenshot);
-      screenshot.auto().finally(() => {
-        isFirstScreenshot = false;
-      });
-    }
-  } catch (error) {
-    notification.showToastWithKey(error, "error", "error");
-  } finally {
-    notification.removeToastWithKey("battle");
-  }
-});
-
-EventsOn("BATTLE_END", () => {
-  notification.showToastWithKey(
-    "戦闘中ではありません。開始時に自動的にリロードします。",
-    "info",
-    "not_in_battle"
+  $: storedSummaryResult.set(
+    summary($storedBattle, $storedExcludePlayerIDs, $storedUserConfig)
   );
-});
 
-async function main() {
-  try {
-    config = await UserConfig();
-  } catch (error) {
+  EventsOn(AppEvent.log, async (log: string) => {
+    LogDebug(`EventsOn:${AppEvent.log}`);
+
+    storedLogs.update((logs) => {
+      logs.push(log);
+      return logs;
+    });
+  });
+
+  EventsOn(AppEvent.battleStart, async () => {
+    LogDebug(`EventsOn:${AppEvent.battleStart}`);
+
+    try {
+      notification.removeToastWithKey(ToastKey.wait);
+      notification.showToastWithKey(
+        "戦闘データの取得中...",
+        "info",
+        ToastKey.fetching
+      );
+
+      const start = new Date().getTime();
+
+      storedBattle.set(await Battle());
+      storedExcludePlayerIDs.set(await ExcludePlayerIDs());
+
+      const elapsed = (new Date().getTime() - start) / 1000;
+      notification.showToast(`データ取得完了: ${elapsed}秒`, "success");
+      notification.removeToastWithKey(ToastKey.error);
+    } catch (error) {
+      notification.showToastWithKey(error, "error", ToastKey.error);
+    } finally {
+      notification.removeToastWithKey(ToastKey.fetching);
+    }
+
+    if ($storedUserConfig.save_screenshot) {
+      try {
+        const screenshot = new Screenshot(
+          $storedBattle,
+          $storedIsFirstScreenshot
+        );
+        screenshot.auto();
+        storedIsFirstScreenshot.set(false);
+      } catch (error) {
+        notification.showToast(
+          "スクリーンショットの自動保存に失敗しました。",
+          "error"
+        );
+        LogError(error.name + "," + error.message + "," + error.stack);
+      }
+    }
+  });
+
+  EventsOn(AppEvent.battleEnd, () => {
+    LogDebug(`EventsOn:${AppEvent.battleEnd}`);
+
     notification.showToastWithKey(
-      "未設定の状態のため開始できません。「設定」から入力してください。",
+      "戦闘中ではありません。開始時に自動的にリロードします。",
       "info",
-      "need_config"
+      ToastKey.wait
     );
-    return;
+  });
+
+  EventsOn(AppEvent.battleErr, (error: string) => {
+    LogDebug(`EventsOn:${AppEvent.battleErr}`);
+
+    notification.showToastWithKey(error, "error", ToastKey.error);
+  });
+
+  async function showAddAlertPlayerModal(_: CustomEvent<any>) {
+    addAlertPlayerModal.toggle();
   }
 
-  Ready();
-}
+  async function showUpdateAlertPlayerModal(event: CustomEvent<any>) {
+    updateAlertPlayerModal.setTarget(event.detail.target);
+    updateAlertPlayerModal.toggle();
+  }
 
-window.onload = function () {
-  main();
-};
+  async function showRemoveAlertPlayerModal(event: CustomEvent<any>) {
+    removeAlertPlayerModal.setTarget(event.detail.target);
+    removeAlertPlayerModal.toggle();
+  }
+
+  async function onSuccessAlertPlayerModal() {
+    try {
+      const players = await AlertPlayers();
+      storedAlertPlayers.set(players);
+    } catch (error) {
+      notification.showToast(error, "error");
+    }
+  }
+
+  async function onFailureAlertPlayerModal(event: CustomEvent<any>) {
+    notification.showToast(event.detail.message, "error");
+  }
+
+  async function main() {
+    EventsEmit("ONLOAD");
+
+    try {
+      const players = await AlertPlayers();
+      storedAlertPlayers.set(players);
+    } catch (error) {
+      notification.showToast(error, "error");
+      return;
+    }
+
+    let config: domain.UserConfig;
+    try {
+      config = await UserConfig();
+      storedUserConfig.set(config);
+    } catch (error) {
+      notification.showToast(error, "error");
+      return;
+    }
+
+    if (config.notify_updatable) {
+      try {
+        const latestRelease = await LatestRelease();
+        if (latestRelease.updatable) {
+          notification.showToastWithKey(
+            "新しいバージョンがあります: " +
+              latestRelease.tag_name +
+              "(クリックで開く)",
+            "warning",
+            ToastKey.updatable,
+            () => BrowserOpenURL(latestRelease.html_url)
+          );
+        }
+      } catch (error) {
+        notification.showToast(error, "error");
+      }
+    }
+
+    if (!config.appid) {
+      notification.showToastWithKey(
+        "未設定の状態のため開始できません。「設定」から入力してください。",
+        "info",
+        ToastKey.needConfig
+      );
+      return;
+    }
+
+    try {
+      StartWatching();
+    } catch (error) {
+      notification.showToast(error, "error");
+    }
+  }
+
+  window.onload = function () {
+    main();
+  };
 </script>
 
 <main>
-  <div style="font-size: {config?.font_size || 'medium'};">
-    <Navigation
-      bind:config="{config}"
-      bind:currentPage="{currentPage}"
-      bind:battle="{battle}"
-      bind:isFirstScreenshot="{isFirstScreenshot}"
-      on:onScreenshotSuccess="{(event) =>
-        notification.showToast(event.detail.message, 'success')}"
-      on:onScreenshotFailure="{(event) =>
-        notification.showToast(event.detail.message, 'error')}"
+  <div style="font-size: {$storedUserConfig.font_size};">
+    <AddAlertPlayerModal
+      bind:this={addAlertPlayerModal}
+      on:Success={onSuccessAlertPlayerModal}
+      on:Failure={(event) => onFailureAlertPlayerModal(event)}
     />
 
-    {#if currentPage === "main"}
-      <div id="mainpage">
-        <MainPage
-          bind:config="{config}"
-          bind:battle="{battle}"
-          bind:averageFactors="{averageFactors}"
-          bind:excludePlayerIDs="{excludePlayerIDs}"
-        />
-      </div>
-    {/if}
+    <UpdateAlertPlayerModal
+      bind:this={updateAlertPlayerModal}
+      on:Success={onSuccessAlertPlayerModal}
+      on:Failure={(event) => onFailureAlertPlayerModal(event)}
+    />
 
-    {#if currentPage === "config"}
-      <ConfigPage
-        bind:config="{config}"
-        on:onUpdateSuccess="{(event) => {
-          notification.showToast(event.detail.message, 'success');
-          notification.removeToastWithKey('need_config');
-          config = event.detail.config;
-          if (!battle) {
-            Ready();
-          }
-        }}"
-        on:onUpdateFailure="{(event) =>
-          notification.showToast(event.detail.message, 'error')}"
-        on:onOpenDirectoryFailure="{(event) =>
-          notification.showToast(event.detail.message, 'error')}"
+    <RemoveAlertPlayerModal
+      bind:this={removeAlertPlayerModal}
+      on:Success={onSuccessAlertPlayerModal}
+      on:Failure={(event) => onFailureAlertPlayerModal(event)}
+    />
+
+    <Navigation
+      on:Success={(event) =>
+        notification.showToast(event.detail.message, "success")}
+      on:Failure={(event) =>
+        notification.showToast(event.detail.message, "error")}
+    />
+
+    {#if $storedCurrentPage === Page.Main}
+      <MainPage
+        on:UpdateAlertPlayer={(event) => showUpdateAlertPlayerModal(event)}
+        on:RemoveAlertPlayer={(event) => showRemoveAlertPlayerModal(event)}
+        on:CheckPlayer={async () =>
+          storedExcludePlayerIDs.set(await ExcludePlayerIDs())}
       />
     {/if}
 
-    {#if currentPage === "appinfo"}
-      <AppInfo />
+    {#if $storedCurrentPage === Page.Config}
+      <ConfigPage
+        on:UpdateSuccess={(event) => {
+          notification.showToast(event.detail.message, "success");
+          notification.removeToastWithKey(ToastKey.needConfig);
+          if (!$storedBattle) {
+            try {
+              StartWatching();
+            } catch (error) {
+              notification.showToast(error, "error");
+            }
+          }
+        }}
+        on:Failure={(event) =>
+          notification.showToast(event.detail.message, "error")}
+      />
     {/if}
 
-    <Notification bind:this="{notification}" />
+    {#if $storedCurrentPage === Page.AppInfo}
+      <AppInfoPage />
+    {/if}
+
+    {#if $storedCurrentPage === Page.AlertPlayer}
+      <AlertPlayerPage
+        on:AddAlertPlayer={(event) => showAddAlertPlayerModal(event)}
+        on:UpdateAlertPlayer={(event) => showUpdateAlertPlayerModal(event)}
+        on:RemoveAlertPlayer={(event) => showRemoveAlertPlayerModal(event)}
+        on:Failure={(event) =>
+          notification.showToast(event.detail.message, "error")}
+      />
+    {/if}
+
+    <Notification bind:this={notification} />
   </div>
 </main>

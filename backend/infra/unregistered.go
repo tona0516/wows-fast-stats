@@ -1,13 +1,12 @@
 package infra
 
 import (
-	"changeme/backend/apperr"
-	"changeme/backend/vo"
 	_ "embed"
 	"encoding/json"
 	"strings"
+	"wfs/backend/domain"
 
-	"github.com/pkg/errors"
+	"github.com/morikuni/failure"
 )
 
 //go:embed resource/ships.json
@@ -15,14 +14,16 @@ var shipsByte []byte
 
 type Unregistered struct{}
 
-func (u *Unregistered) Warship() (map[int]vo.Warship, error) {
-	errDetail := apperr.Unreg.Warship
+func NewUnregistered() *Unregistered {
+	return &Unregistered{}
+}
 
+func (u *Unregistered) Warship() (map[int]domain.Warship, error) {
 	var ships []unregisteredShip
-	result := make(map[int]vo.Warship, 0)
+	result := make(map[int]domain.Warship, 0)
 
 	if err := json.Unmarshal(shipsByte, &ships); err != nil {
-		return result, errors.WithStack(errDetail.WithRaw(err))
+		return result, failure.Wrap(err)
 	}
 
 	for _, us := range ships {
@@ -31,11 +32,11 @@ func (u *Unregistered) Warship() (map[int]vo.Warship, error) {
 			nation = "uk"
 		}
 
-		result[us.ID] = vo.Warship{
+		result[us.ID] = domain.Warship{
 			Name:   us.En,
 			Tier:   us.Level,
-			Type:   vo.NewShipType(us.Species),
-			Nation: nation,
+			Type:   domain.NewShipType(us.Species),
+			Nation: domain.Nation(nation),
 		}
 	}
 

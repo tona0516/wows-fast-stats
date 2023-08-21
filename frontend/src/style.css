@@ -1,15 +1,20 @@
+:root {
+  --app-background-color: #2d2c2c;
+  --app-text-color: #ffffff;
+}
+
 html {
-  background-color: #2d2c2c;
-  color: #ffffff;
+  background-color: var(--app-background-color);
+  color: var(--app-text-color);
 }
 
 body {
   margin: 0;
-  color: #ffffff;
+  color: var(--app-text-color);
   font-family: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
     "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif;
-  background-color: #2d2c2c;
+  background-color: var(--app-background-color);
 }
 
 @font-face {
@@ -24,13 +29,18 @@ body {
   height: 100vh;
 }
 
+#mainpage {
+  background-color: var(--app-background-color);
+  color: var(--app-text-color);
+}
+
 .btn {
   white-space: nowrap;
   text-align: center;
 }
 
 .table-text-color {
-  color: #ffffff;
+  color: var(--app-text-color);
 }
 
 .table td {
@@ -49,7 +59,7 @@ body {
 }
 
 .td-link {
-  color: #ffffff;
+  color: var(--app-text-color);
 }
 
 .td-string {
@@ -66,8 +76,14 @@ body {
 }
 
 .td-graph {
-  min-width: 140px;
-  max-width: 140px;
+  min-width: 6em;
+  max-width: 6em;
+}
+
+.td-checkbox {
+  padding: 1px;
+  width: 1em;
+  height: 1em;
 }
 
 .no_data {
@@ -83,27 +99,16 @@ body {
   white-space: nowrap;
 }
 
-.in-avg {
+.nation-icon {
+  width: 1.5em;
   display: flex;
   align-items: center;
-  justify-content: center;
 }
 
 .ship-icon {
-  height: 0.7em;
+  width: 1.25em;
   display: flex;
   align-items: center;
-}
-
-.horizontal {
-  display: flex;
-  align-items: center;
-}
-
-.form-style {
-  width: 75%;
-  max-width: 600px;
-  margin: auto;
 }
 
 .higher {
@@ -114,20 +119,30 @@ body {
   color: #fc4e32;
 }
 
-.form-style {
-  text-align: left;
+.alert-player {
+  text-align: center;
 }
 
-.centerize {
+.center {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
 }
 
-.text-center {
-  text-align: center;
+.text-form {
+  min-width: 480px;
 }
 
-.appinfo {
-  text-align: center;
+.nav-link {
+  color: var(--app-text-color);
+}
+
+.modal-color {
+  background-color: var(--app-background-color);
+}
+
+.logging {
+  width: 50em;
+  height: 25em;
 }

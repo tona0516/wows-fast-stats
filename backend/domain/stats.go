@@ -1,282 +1,333 @@
 package domain
 
 import (
-	"changeme/backend/vo"
+	"math"
+	"wfs/backend/apperr"
+	"wfs/backend/logger"
+
+	"github.com/morikuni/failure"
 )
 
-type StatsFactor struct {
-	Battles         uint
-	SurvivedBattles uint
-	DamageDealt     uint
-	Frags           uint
-	Wins            uint
-	SurvivedWins    uint
-	Xp              uint
-	MainBattery     struct {
-		Hits  uint
-		Shots uint
-	}
-	Torpedoes struct {
-		Hits  uint
-		Shots uint
-	}
-}
 type Stats struct {
-	Ship    StatsFactor
-	Overall StatsFactor
+	useShipID     int
+	accountInfo   WGAccountInfoData
+	useShipStats  WGShipsStatsData
+	allShipsStats []WGShipsStatsData
+	expectedStats map[int]NSExpectedStatsData
+	nickname      string
 }
 
-func (s *Stats) SetShipStats(ship StatsFactor) {
-	s.Ship = ship
-}
-
-func (s *Stats) ShipAvgDamage() float64 {
-	if s.Ship.Battles > 0 {
-		return float64(s.Ship.DamageDealt) / float64(s.Ship.Battles)
+func NewStats(
+	useShipID int,
+	accountInfo WGAccountInfoData,
+	allShipsStats []WGShipsStatsData,
+	expectedStats map[int]NSExpectedStatsData,
+	nickname string,
+) *Stats {
+	var useShipStats WGShipsStatsData
+	for _, v := range allShipsStats {
+		if v.ShipID == useShipID {
+			useShipStats = v
+			break
+		}
 	}
 
-	return 0
+	return &Stats{
+		useShipID:     useShipID,
+		accountInfo:   accountInfo,
+		useShipStats:  useShipStats,
+		allShipsStats: allShipsStats,
+		expectedStats: expectedStats,
+		nickname:      nickname,
+	}
 }
 
-func (s *Stats) ShipKdRate() float64 {
-	if s.Ship.Battles-s.Ship.SurvivedBattles > 0 {
-		return float64(s.Ship.Frags) / float64(s.Ship.Battles-s.Ship.SurvivedBattles)
+func (s *Stats) PR(category StatsCategory, pattern StatsPattern) float64 {
+	switch category {
+	case StatsCategoryShip:
+		values := s.statsValues(StatsCategoryShip, pattern)
+		battles := values.Battles
+
+		return s.pr(
+			PRFactor{
+				damage: avgDamage(values.DamageDealt, battles),
+				frags:  avgKill(values.Frags, battles),
+				wins:   winRate(values.Wins, battles),
+			},
+			PRFactor{
+				damage: s.expectedStats[s.useShipID].AverageDamageDealt,
+				frags:  s.expectedStats[s.useShipID].AverageFrags,
+				wins:   s.expectedStats[s.useShipID].WinRate,
+			},
+			battles,
+		)
+
+	case StatsCategoryOverall:
+		var (
+			actual     PRFactor
+			expected   PRFactor
+			allBattles uint
+		)
+
+		for _, ship := range s.allShipsStats {
+			values := s.statsValuesForm(ship, pattern)
+			battles := values.Battles
+
+			es, ok := s.expectedStats[ship.ShipID]
+			if !ok {
+				continue
+			}
+
+			actual.damage += float64(values.DamageDealt)
+			actual.frags += float64(values.Frags)
+			actual.wins += float64(values.Wins)
+
+			expected.damage += es.AverageDamageDealt * float64(battles)
+			expected.frags += es.AverageFrags * float64(battles)
+			expected.wins += es.WinRate / 100 * float64(battles)
+
+			allBattles += battles
+		}
+
+		return s.pr(actual, expected, allBattles)
 	}
 
-	return 0
+	logger.Error(failure.New(apperr.UnexpectedError))
+	return -1
 }
 
-func (s *Stats) ShipAvgFrags() float64 {
-	if s.Ship.Battles > 0 {
-		return float64(s.Ship.Frags) / float64(s.Ship.Battles)
+func (s *Stats) Battles(category StatsCategory, pattern StatsPattern) uint {
+	return s.statsValues(category, pattern).Battles
+}
+
+func (s *Stats) AvgDamage(category StatsCategory, pattern StatsPattern) float64 {
+	values := s.statsValues(category, pattern)
+	return avgDamage(values.DamageDealt, values.Battles)
+}
+
+func (s *Stats) KdRate(category StatsCategory, pattern StatsPattern) float64 {
+	values := s.statsValues(category, pattern)
+	death := values.Battles - values.SurvivedBattles
+	if death < 1 {
+		death = 1
 	}
 
-	return 0
+	return float64(values.Frags) / float64(death)
 }
 
-func (s *Stats) ShipAvgExp() float64 {
-	if s.Ship.Battles > 0 {
-		return float64(s.Ship.Xp) / float64(s.Ship.Battles)
-	}
-
-	return 0
+func (s *Stats) AvgKill(category StatsCategory, pattern StatsPattern) float64 {
+	values := s.statsValues(category, pattern)
+	return avgKill(values.Frags, values.Battles)
 }
 
-func (s *Stats) ShipWinRate() float64 {
-	if s.Ship.Battles > 0 {
-		return float64(s.Ship.Wins) / float64(s.Ship.Battles) * 100
-	}
-
-	return 0
+func (s *Stats) AvgExp(category StatsCategory, pattern StatsPattern) float64 {
+	values := s.statsValues(category, pattern)
+	return div(values.Xp, values.Battles)
 }
 
-func (s *Stats) ShipWinSurvivedRate() float64 {
-	if s.Ship.Wins > 0 {
-		return float64(s.Ship.SurvivedWins) / float64(s.Ship.Wins) * 100
-	}
-
-	return 0
+func (s *Stats) WinRate(category StatsCategory, pattern StatsPattern) float64 {
+	values := s.statsValues(category, pattern)
+	return winRate(values.Wins, values.Battles)
 }
 
-func (s *Stats) ShipLoseSurvivedRate() float64 {
-	loses := s.Ship.Battles - s.Ship.Wins
-	if loses > 0 {
-		return float64(s.Ship.SurvivedBattles-s.Ship.SurvivedWins) / float64(loses) * 100
-	}
-
-	return 0
+func (s *Stats) WinSurvivedRate(category StatsCategory, pattern StatsPattern) float64 {
+	values := s.statsValues(category, pattern)
+	return percentage(values.SurvivedWins, values.Wins)
 }
 
-func (s *Stats) ShipMainBatteryHitRate() float64 {
-	if s.Ship.MainBattery.Shots > 0 {
-		return float64(s.Ship.MainBattery.Hits) / float64(s.Ship.MainBattery.Shots) * 100
-	}
-
-	return 0
+func (s *Stats) LoseSurvivedRate(category StatsCategory, pattern StatsPattern) float64 {
+	values := s.statsValues(category, pattern)
+	loses := values.Battles - values.Wins
+	return percentage(values.SurvivedBattles-values.SurvivedWins, loses)
 }
 
-func (s *Stats) ShipTorpedoesHitRate() float64 {
-	if s.Ship.Torpedoes.Shots > 0 {
-		return float64(s.Ship.Torpedoes.Hits) / float64(s.Ship.Torpedoes.Shots) * 100
-	}
-
-	return 0
+func (s *Stats) MainBatteryHitRate(category StatsCategory, pattern StatsPattern) float64 {
+	values := s.statsValues(category, pattern)
+	return percentage(values.MainBattery.Hits, values.MainBattery.Shots)
 }
 
-func (s *Stats) OverallAvgDamage() float64 {
-	if s.Overall.Battles > 0 {
-		return float64(s.Overall.DamageDealt) / float64(s.Overall.Battles)
-	}
-
-	return 0
+func (s *Stats) TorpedoesHitRate(category StatsCategory, pattern StatsPattern) float64 {
+	values := s.statsValues(category, pattern)
+	return percentage(values.Torpedoes.Hits, values.Torpedoes.Shots)
 }
 
-func (s *Stats) OverallKdRate() float64 {
-	if s.Overall.Battles-s.Overall.SurvivedBattles > 0 {
-		return float64(s.Overall.Frags) / float64(s.Overall.Battles-s.Overall.SurvivedBattles)
-	}
-
-	return 0
+func (s *Stats) PlanesKilled(category StatsCategory, pattern StatsPattern) float64 {
+	values := s.statsValues(category, pattern)
+	return div(values.PlanesKilled, values.Battles)
 }
 
-func (s *Stats) OverallAvgExp() float64 {
-	if s.Overall.Battles > 0 {
-		return float64(s.Overall.Xp) / float64(s.Overall.Battles)
-	}
-
-	return 0
-}
-
-func (s *Stats) OverallWinRate() float64 {
-	if s.Overall.Battles > 0 {
-		return float64(s.Overall.Wins) / float64(s.Overall.Battles) * 100
-	}
-
-	return 0
-}
-
-func (s *Stats) OverallWinSurvivedRate() float64 {
-	if s.Overall.Wins > 0 {
-		return float64(s.Overall.SurvivedWins) / float64(s.Overall.Wins) * 100
-	}
-
-	return 0
-}
-
-func (s *Stats) OverallLoseSurvivedRate() float64 {
-	loses := s.Overall.Battles - s.Overall.Wins
-	if loses > 0 {
-		return float64(s.Overall.SurvivedBattles-s.Overall.SurvivedWins) / float64(loses) * 100
-	}
-
-	return 0
-}
-
-func (s *Stats) OverallAvgTier(
-	accountID int,
-	shipInfo map[int]vo.Warship,
-	shipStats map[int]vo.WGShipsStats,
+func (s *Stats) AvgTier(
+	pattern StatsPattern,
+	warships map[int]Warship,
 ) float64 {
-	var sum uint
-	var battles uint
-	playerShipStats := shipStats[accountID].Data[accountID]
-	for _, ship := range playerShipStats {
-		shipID := ship.ShipID
-		tier := shipInfo[shipID].Tier
-		sum += ship.Pvp.Battles * tier
-		battles += ship.Pvp.Battles
+	var (
+		sum        uint
+		allBattles uint
+	)
+
+	for _, stats := range s.allShipsStats {
+		warship, ok := warships[stats.ShipID]
+		if !ok {
+			continue
+		}
+
+		values := s.statsValuesForm(stats, pattern)
+		sum += values.Battles * warship.Tier
+		allBattles += values.Battles
 	}
 
-	if battles == 0 {
+	return div(sum, allBattles)
+}
+
+func (s *Stats) UsingTierRate(
+	pattern StatsPattern,
+	warships map[int]Warship,
+) TierGroup {
+	tierGroupMap := make(map[string]uint)
+
+	for _, ship := range s.allShipsStats {
+		warship, ok := warships[ship.ShipID]
+		if !ok {
+			continue
+		}
+
+		values := s.statsValuesForm(ship, pattern)
+		tier := warship.Tier
+		battles := values.Battles
+		switch {
+		case tier >= 1 && tier <= 4:
+			tierGroupMap["low"] += battles
+		case tier >= 5 && tier <= 7:
+			tierGroupMap["middle"] += battles
+		case tier >= 8:
+			tierGroupMap["high"] += battles
+		}
+	}
+
+	var allBattles uint
+	for _, v := range tierGroupMap {
+		allBattles += v
+	}
+
+	return TierGroup{
+		Low:    percentage(tierGroupMap["low"], allBattles),
+		Middle: percentage(tierGroupMap["middle"], allBattles),
+		High:   percentage(tierGroupMap["high"], allBattles),
+	}
+}
+
+func (s *Stats) UsingShipTypeRate(
+	pattern StatsPattern,
+	warships map[int]Warship,
+) ShipTypeGroup {
+	shipTypeMap := make(map[ShipType]uint)
+
+	for _, ship := range s.allShipsStats {
+		warship, ok := warships[ship.ShipID]
+		if !ok {
+			continue
+		}
+
+		values := s.statsValuesForm(ship, pattern)
+		shipTypeMap[warship.Type] += values.Battles
+	}
+
+	var allBattles uint
+	for _, v := range shipTypeMap {
+		allBattles += v
+	}
+
+	return ShipTypeGroup{
+		SS: percentage(shipTypeMap[SS], allBattles),
+		DD: percentage(shipTypeMap[DD], allBattles),
+		CL: percentage(shipTypeMap[CL], allBattles),
+		BB: percentage(shipTypeMap[BB], allBattles),
+		CV: percentage(shipTypeMap[CV], allBattles),
+	}
+}
+
+func (s *Stats) statsValues(category StatsCategory, pattern StatsPattern) WGStatsValues {
+	switch category {
+	case StatsCategoryShip:
+		switch pattern {
+		case StatsPatternPvPAll:
+			return s.useShipStats.Pvp
+		case StatsPatternPvPSolo:
+			return s.useShipStats.PvpSolo
+		}
+	case StatsCategoryOverall:
+		switch pattern {
+		case StatsPatternPvPAll:
+			return s.accountInfo.Statistics.Pvp
+		case StatsPatternPvPSolo:
+			return s.accountInfo.Statistics.PvpSolo
+		}
+	}
+
+	logger.Error(failure.New(apperr.UnexpectedError))
+	return WGStatsValues{}
+}
+
+func (s *Stats) statsValuesForm(statsData WGShipsStatsData, pattern StatsPattern) WGStatsValues {
+	switch pattern {
+	case StatsPatternPvPAll:
+		return statsData.Pvp
+	case StatsPatternPvPSolo:
+		return statsData.PvpSolo
+	}
+
+	logger.Error(failure.New(apperr.UnexpectedError))
+	return WGStatsValues{}
+}
+
+func (s *Stats) pr(
+	actual PRFactor,
+	expected PRFactor,
+	battles uint,
+) float64 {
+	if battles < 1 {
+		return -1
+	}
+
+	ratio := PRFactor{
+		damage: actual.damage / expected.damage,
+		frags:  actual.frags / expected.frags,
+		wins:   actual.wins / expected.wins,
+	}
+
+	if !ratio.Valid() {
+		return -1
+	}
+
+	norm := PRFactor{
+		damage: math.Max(0, (ratio.damage-0.4)/(1-0.4)),
+		frags:  math.Max(0, (ratio.frags-0.1)/(1-0.1)),
+		wins:   math.Max(0, (ratio.wins-0.7)/(1-0.7)),
+	}
+
+	return 700*norm.damage + 300*norm.frags + 150*norm.wins
+}
+
+func avgDamage(damageDealt uint, battles uint) float64 {
+	return div(damageDealt, battles)
+}
+
+func avgKill(frags uint, battles uint) float64 {
+	return div(frags, battles)
+}
+
+func winRate(wins uint, battles uint) float64 {
+	return percentage(wins, battles)
+}
+
+func div(a uint, b uint) float64 {
+	if b <= 0 {
 		return 0
 	}
 
-	return float64(sum) / float64(battles)
+	return float64(a) / float64(b)
 }
 
-func (s *Stats) OverallUsingTierRate(
-	accountID int,
-	shipInfo map[int]vo.Warship,
-	shipStats map[int]vo.WGShipsStats,
-) vo.TierGroup {
-	var (
-		low        uint
-		middle     uint
-		high       uint
-		allBattles uint
-	)
-
-	playerShipStats := shipStats[accountID].Data[accountID]
-	for _, ship := range playerShipStats {
-		battles := ship.Pvp.Battles
-		if battles == 0 {
-			continue
-		}
-
-		shipID := ship.ShipID
-		tier := shipInfo[shipID].Tier
-
-		switch {
-		case tier >= 1 && tier <= 4:
-			low += battles
-			allBattles += battles
-		case tier >= 5 && tier <= 7:
-			middle += battles
-			allBattles += battles
-		case tier >= 8:
-			high += battles
-			allBattles += battles
-		}
-	}
-
-	if allBattles == 0 {
-		return vo.TierGroup{}
-	}
-
-	return vo.TierGroup{
-		Low:    float64(low) / float64(allBattles) * 100,
-		Middle: float64(middle) / float64(allBattles) * 100,
-		High:   float64(high) / float64(allBattles) * 100,
-	}
-}
-
-//nolint:cyclop
-func (s *Stats) OverallUsingShipTypeRate(
-	accountID int,
-	shipInfo map[int]vo.Warship,
-	shipStats map[int]vo.WGShipsStats,
-) vo.ShipTypeGroup {
-	var (
-		ss         uint
-		dd         uint
-		cl         uint
-		bb         uint
-		cv         uint
-		allBattles uint
-	)
-
-	playerShipStats := shipStats[accountID].Data[accountID]
-	for _, ship := range playerShipStats {
-		battles := ship.Pvp.Battles
-		if battles == 0 {
-			continue
-		}
-
-		shipID := ship.ShipID
-		shipType := shipInfo[shipID].Type
-
-		switch shipType {
-		case vo.SS:
-			ss += battles
-			allBattles += battles
-		case vo.DD:
-			dd += battles
-			allBattles += battles
-		case vo.CL:
-			cl += battles
-			allBattles += battles
-		case vo.BB:
-			bb += battles
-			allBattles += battles
-		case vo.CV:
-			cv += battles
-			allBattles += battles
-		case vo.AUX:
-			continue
-		case vo.NONE:
-			continue
-		}
-	}
-
-	if allBattles == 0 {
-		return vo.ShipTypeGroup{}
-	}
-
-	return vo.ShipTypeGroup{
-		SS: float64(ss) / float64(allBattles) * 100,
-		DD: float64(dd) / float64(allBattles) * 100,
-		CL: float64(cl) / float64(allBattles) * 100,
-		BB: float64(bb) / float64(allBattles) * 100,
-		CV: float64(cv) / float64(allBattles) * 100,
-	}
+func percentage(a uint, b uint) float64 {
+	return div(a, b) * 100
 }

@@ -1,190 +1,262 @@
 package main
 
 import (
-	"changeme/backend/apperr"
-	"changeme/backend/domain"
-	"changeme/backend/infra"
-	"changeme/backend/service"
-	"changeme/backend/vo"
 	"context"
-	"os"
+	"wfs/backend/apperr"
+	"wfs/backend/application/service"
+	"wfs/backend/application/vo"
+	"wfs/backend/domain"
+	"wfs/backend/infra"
+	"wfs/backend/logger"
+	"wfs/backend/logger/repository"
 
-	"github.com/pkg/errors"
-	"github.com/skratchdot/open-golang/open"
+	"github.com/morikuni/failure"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
-const PARALLELS = 5
+const EventOnload = "ONLOAD"
 
 type App struct {
-	version             vo.Version
-	env                 vo.Env
-	ctx                 context.Context
-	userConfig          vo.UserConfig
-	appConfig           vo.AppConfig
-	excludePlayer       domain.ExcludePlayer
-	isSuccessfulOnce    bool
-	logger              infra.Logger
-	cancelReplayWatcher context.CancelFunc
-	configService       service.Config
-	screenshotService   service.Screenshot
+	ctx               context.Context
+	env               vo.Env
+	cancelWatcher     context.CancelFunc
+	reportRepo        repository.ReportInterface
+	configService     service.Config
+	screenshotService service.Screenshot
+	watcherService    service.Watcher
+	battleService     service.Battle
+	updaterService    service.Updater
+	excludePlayer     map[int]bool
 }
 
-func NewApp(env vo.Env, version vo.Version) *App {
+func NewApp(
+	env vo.Env,
+	reportRepo repository.ReportInterface,
+	configService service.Config,
+	screenshotService service.Screenshot,
+	watcherService service.Watcher,
+	battleService service.Battle,
+	updaterService service.Updater,
+) *App {
 	return &App{
 		env:               env,
-		version:           version,
-		excludePlayer:     *domain.NewExcludePlayer(),
-		logger:            *infra.NewLogger(env, version),
-		configService:     *service.NewConfig(infra.Config{}),
-		screenshotService: *service.NewScreenshot(infra.Screenshot{}),
+		reportRepo:        reportRepo,
+		configService:     configService,
+		screenshotService: screenshotService,
+		watcherService:    watcherService,
+		battleService:     battleService,
+		updaterService:    updaterService,
+		excludePlayer:     map[int]bool{},
 	}
 }
 
 func (a *App) onStartup(ctx context.Context) {
-	a.logger.Info("start app.")
 	a.ctx = ctx
+	logger.Init(ctx, a.env, a.reportRepo)
 
-	// Read configs
-	userConfig, err := a.configService.User()
-	if err != nil {
-		a.logger.Info("No user config.")
-	}
-	a.userConfig = userConfig
+	runtime.EventsOn(ctx, EventOnload, func(optionalData ...interface{}) {
+		logger.Info("application started")
+	})
 
-	appConfig, err := a.configService.App()
-	if err != nil {
-		a.logger.Info("No app config.")
-	}
-	a.appConfig = appConfig
-
-	// Set window size
-	window := a.appConfig.Window
-	if window.Width > 0 && window.Height > 0 {
-		runtime.WindowSetSize(ctx, window.Width, window.Height)
+	if err := a.configService.ApplyAppConfig(ctx); err != nil {
+		logger.Error(err)
 	}
 }
 
 func (a *App) onShutdown(ctx context.Context) {
-	a.logger.Info("shutdown app.")
+	logger.Info("application will shutdown...")
 
-	// Save windows size
-	width, height := runtime.WindowGetSize(ctx)
-	a.appConfig.Window.Width = width
-	a.appConfig.Window.Height = height
-	err := a.configService.UpdateApp(a.appConfig)
-	if err != nil {
-		a.logger.Warn("Failed to update app config.", err)
+	if err := a.configService.SaveAppConfig(ctx); err != nil {
+		logger.Error(err)
 	}
 }
 
-func (a *App) Ready() {
-	if a.cancelReplayWatcher != nil {
-		a.cancelReplayWatcher()
+func (a *App) StartWatching() error {
+	if err := a.watcherService.Prepare(a.ctx); err != nil {
+		logger.Error(err)
+		return apperr.Unwrap(err)
+	}
+
+	if a.cancelWatcher != nil {
+		a.cancelWatcher()
 	}
 	ctx, cancel := context.WithCancel(context.Background())
-	a.cancelReplayWatcher = cancel
+	a.cancelWatcher = cancel
 
-	rw := service.NewReplayWatcher(
-		a.ctx,
-		infra.Config{},
-		infra.TempArenaInfo{},
-	)
-	go rw.Start(ctx)
-}
-
-func (a *App) Battle() (vo.Battle, error) {
-	battle := service.NewBattle(
-		PARALLELS,
-		a.userConfig,
-		infra.Wargaming{AppID: a.userConfig.Appid},
-		infra.TempArenaInfo{},
-	)
-
-	result, err := battle.Battle(a.isSuccessfulOnce)
-	if err != nil {
-		a.logger.Error("Failed to get battle.", err)
-
-		return result, err
-	}
-
-	a.isSuccessfulOnce = true
-
-	return result, nil
-}
-
-func (a *App) SelectDirectory() (string, error) {
-	path, err := runtime.OpenDirectoryDialog(a.ctx, runtime.OpenDialogOptions{})
-	if err != nil {
-		a.logger.Error("Failed to get client installing path.", err)
-	}
-
-	return path, err
-}
-
-func (a *App) UserConfig() (vo.UserConfig, error) {
-	return a.configService.User()
-}
-
-func (a *App) ApplyUserConfig(config vo.UserConfig) error {
-	if err := a.configService.UpdateUser(config); err != nil {
-		a.logger.Error("Failed to apply user config.", err)
-
-		return err
-	}
-	a.userConfig = config
+	go a.watcherService.Start(ctx)
 
 	return nil
 }
 
-func (a *App) ManualScreenshot(filename string, base64Data string) error {
-	err := a.screenshotService.SaveWithDialog(a.ctx, filename, base64Data)
+func (a *App) Battle() (battle domain.Battle, err error) {
+	userConfig, err := a.configService.User()
 	if err != nil {
-		a.logger.Error("Failed to save screenshot by manual.", err)
+		logger.Error(err)
+		return battle, apperr.Unwrap(err)
 	}
 
-	return err
+	battle, err = a.battleService.Battle(userConfig)
+	if err != nil {
+		logger.Error(err)
+		return battle, apperr.Unwrap(err)
+	}
+
+	return battle, nil
+}
+
+func (a *App) SelectDirectory() (string, error) {
+	path, err := a.configService.SelectDirectory(a.ctx)
+	if err != nil {
+		logger.Error(err)
+	}
+
+	return path, apperr.Unwrap(err)
+}
+
+func (a *App) OpenDirectory(path string) error {
+	err := a.configService.OpenDirectory(path)
+	if err != nil {
+		logger.Warn(err)
+	}
+
+	return apperr.Unwrap(err)
+}
+
+func (a *App) DefaultUserConfig() domain.UserConfig {
+	return infra.DefaultUserConfig
+}
+
+func (a *App) UserConfig() (domain.UserConfig, error) {
+	config, err := a.configService.User()
+	if err != nil {
+		logger.Error(err)
+	}
+
+	return config, apperr.Unwrap(err)
+}
+
+func (a *App) ApplyUserConfig(config domain.UserConfig) error {
+	err := a.configService.UpdateOptional(config)
+	if err != nil {
+		logger.Error(err)
+	}
+
+	return apperr.Unwrap(err)
+}
+
+func (a *App) ApplyRequiredUserConfig(
+	installPath string,
+	appid string,
+) (vo.ValidatedResult, error) {
+	validatedResult, err := a.configService.UpdateRequired(installPath, appid)
+	if err != nil {
+		logger.Error(err)
+	}
+
+	return validatedResult, apperr.Unwrap(err)
+}
+
+func (a *App) ManualScreenshot(filename string, base64Data string) error {
+	err := a.screenshotService.SaveWithDialog(a.ctx, filename, base64Data)
+	if failure.Is(err, apperr.UserCanceled) {
+		return nil
+	}
+
+	if err != nil {
+		logger.Error(err)
+	}
+
+	return apperr.Unwrap(err)
 }
 
 func (a *App) AutoScreenshot(filename string, base64Data string) error {
 	err := a.screenshotService.SaveForAuto(filename, base64Data)
 	if err != nil {
-		a.logger.Error("Failed to save screenshot by auto.", err)
+		logger.Error(err)
 	}
 
-	return err
+	return apperr.Unwrap(err)
 }
 
-func (a *App) Cwd() (string, error) {
-	cwd, err := os.Getwd()
-	if err != nil {
-		a.logger.Warn("Failed to get cwd.", err)
-	}
-
-	return cwd, errors.WithStack(apperr.App.Cwd.WithRaw(err))
-}
-
-func (a *App) AppVersion() vo.Version {
-	return a.version
-}
-
-func (a *App) OpenDirectory(path string) error {
-	err := open.Run(path)
-	if err != nil {
-		a.logger.Warn("Failed to open directory.", err)
-	}
-
-	return errors.WithStack(apperr.App.OpenDir.WithRaw(err))
+func (a *App) Semver() string {
+	return a.env.Semver
 }
 
 func (a *App) ExcludePlayerIDs() []int {
-	return a.excludePlayer.Get()
+	ids := make([]int, 0, len(a.excludePlayer))
+	for id := range a.excludePlayer {
+		ids = append(ids, id)
+	}
+
+	return ids
 }
 
 func (a *App) AddExcludePlayerID(playerID int) {
-	a.excludePlayer.Add(playerID)
+	a.excludePlayer[playerID] = true
 }
 
 func (a *App) RemoveExcludePlayerID(playerID int) {
-	a.excludePlayer.Remove(playerID)
+	delete(a.excludePlayer, playerID)
+}
+
+func (a *App) AlertPlayers() ([]domain.AlertPlayer, error) {
+	players, err := a.configService.AlertPlayers()
+	if err != nil {
+		logger.Error(err)
+	}
+
+	return players, apperr.Unwrap(err)
+}
+
+func (a *App) UpdateAlertPlayer(player domain.AlertPlayer) error {
+	err := a.configService.UpdateAlertPlayer(player)
+	if err != nil {
+		logger.Error(err)
+	}
+
+	return apperr.Unwrap(err)
+}
+
+func (a *App) RemoveAlertPlayer(accountID int) error {
+	err := a.configService.RemoveAlertPlayer(accountID)
+	if err != nil {
+		logger.Error(err)
+	}
+
+	return apperr.Unwrap(err)
+}
+
+func (a *App) SearchPlayer(prefix string) (domain.WGAccountList, error) {
+	accountList, err := a.configService.SearchPlayer(prefix)
+	if err != nil {
+		logger.Error(err)
+	}
+
+	return accountList, apperr.Unwrap(err)
+}
+
+func (a *App) AlertPatterns() []string {
+	return domain.AlertPatterns
+}
+
+func (a *App) LogError(errString string) {
+	err := failure.New(apperr.FrontendError, failure.Messagef("%s", errString))
+	logger.Error(err)
+}
+
+func (a *App) FontSizes() []string {
+	return vo.FontSizes
+}
+
+func (a *App) StatsPatterns() []string {
+	return domain.StatsPatterns
+}
+
+func (a *App) PlayerNameColors() []string {
+	return domain.PlayerNameColors
+}
+
+func (a *App) LatestRelease() (domain.GHLatestRelease, error) {
+	latestRelease, err := a.updaterService.Updatable()
+	return latestRelease, apperr.Unwrap(err)
 }
