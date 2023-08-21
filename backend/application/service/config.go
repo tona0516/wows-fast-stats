@@ -104,7 +104,6 @@ func (c *Config) SaveAppConfig(appCtx context.Context) error {
 	width, height := c.WindowGetSizeFunc(appCtx)
 	config.Window.Width = width
 	config.Window.Height = height
-
 	return failure.Wrap(c.localFile.UpdateApp(config))
 }
 
