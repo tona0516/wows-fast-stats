@@ -1,20 +1,19 @@
-import type { domain } from "../wailsjs/go/models";
-import { Func, Page, SkillLevel } from "./enums";
-
-import iconCommonWealth from "./assets/images/nation-commonwealth.png";
-import iconEurope from "./assets/images/nation-europe.png";
-import iconFrance from "./assets/images/nation-france.png";
-import iconGermany from "./assets/images/nation-germany.png";
-import iconItaly from "./assets/images/nation-italy.png";
-import iconJapan from "./assets/images/nation-japan.png";
-import iconNetherlands from "./assets/images/nation-netherlands.png";
-import iconNone from "./assets/images/nation-none.png";
-import iconPanAmerica from "./assets/images/nation-pan-america.png";
-import iconPanAsia from "./assets/images/nation-pan-asia.png";
-import iconSpain from "./assets/images/nation-spain.png";
-import iconUk from "./assets/images/nation-uk.png";
-import iconUsa from "./assets/images/nation-usa.png";
-import iconUssr from "./assets/images/nation-ussr.png";
+import iconCommonWealth from "src/assets/images/nation-commonwealth.png";
+import iconEurope from "src/assets/images/nation-europe.png";
+import iconFrance from "src/assets/images/nation-france.png";
+import iconGermany from "src/assets/images/nation-germany.png";
+import iconItaly from "src/assets/images/nation-italy.png";
+import iconJapan from "src/assets/images/nation-japan.png";
+import iconNetherlands from "src/assets/images/nation-netherlands.png";
+import iconNone from "src/assets/images/nation-none.png";
+import iconPanAmerica from "src/assets/images/nation-pan-america.png";
+import iconPanAsia from "src/assets/images/nation-pan-asia.png";
+import iconSpain from "src/assets/images/nation-spain.png";
+import iconUk from "src/assets/images/nation-uk.png";
+import iconUsa from "src/assets/images/nation-usa.png";
+import iconUssr from "src/assets/images/nation-ussr.png";
+import { Func, Page, SkillLevel } from "src/enums";
+import type { domain } from "wailsjs/go/models";
 
 export class ColumnName {
   min: string;

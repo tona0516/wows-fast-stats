@@ -1,22 +1,18 @@
 <script lang="ts">
   import clone from "clone";
-  import { createEventDispatcher } from "svelte";
+  import { type NavigationItem, Const } from "src/Const";
+  import { Screenshot } from "src/Screenshot";
+  import { Page, Func } from "src/enums";
   import {
-    ApplyUserConfig,
-    LogError,
-    StatsPatterns,
-  } from "../../wailsjs/go/main/App";
-  import { WindowReloadApp } from "../../wailsjs/runtime/runtime";
-  import { Screenshot } from "../Screenshot";
-  import {
-    storedBattle,
     storedCurrentPage,
     storedIsFirstScreenshot,
     storedUserConfig,
-  } from "../stores";
-  import { Func, Page } from "../enums";
-  import { Const, NavigationItem } from "../Const";
+    storedBattle,
+  } from "src/stores";
+  import { createEventDispatcher } from "svelte";
   import { Button, Spinner } from "sveltestrap";
+  import { ApplyUserConfig, StatsPatterns } from "wailsjs/go/main/App";
+  import { WindowReloadApp, LogError } from "wailsjs/runtime/runtime";
 
   const dispatch = createEventDispatcher();
 

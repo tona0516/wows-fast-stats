@@ -1,12 +1,12 @@
 <script lang="ts">
   import clone from "clone";
+  import { SkillLevelConverter } from "src/RankConverter";
+  import { StatsCategory } from "src/enums";
+  import { storedUserConfig } from "src/stores";
+  import { values, clanURL, playerURL } from "src/util";
   import { createEventDispatcher } from "svelte";
-  import type { domain } from "../../wailsjs/go/models";
-  import { BrowserOpenURL } from "../../wailsjs/runtime/runtime";
-  import { SkillLevelConverter } from "../RankConverter";
-  import { clanURL, playerURL, values } from "../util";
-  import { StatsCategory } from "../enums";
-  import { storedUserConfig } from "../stores";
+  import type { domain } from "wailsjs/go/models";
+  import { BrowserOpenURL } from "wailsjs/runtime/runtime";
 
   export let player: domain.Player;
   export let userConfig: domain.UserConfig;

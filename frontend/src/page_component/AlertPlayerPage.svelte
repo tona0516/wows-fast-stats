@@ -1,9 +1,9 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
   import clone from "clone";
-  import { storedAlertPlayers, storedUserConfig } from "../stores.js";
-  import type { domain } from "../../wailsjs/go/models.js";
   import { Button } from "sveltestrap";
+  import { storedAlertPlayers, storedUserConfig } from "src/stores";
+  import type { domain } from "wailsjs/go/models";
 
   const dispatch = createEventDispatcher();
 

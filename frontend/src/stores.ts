@@ -1,7 +1,7 @@
+import type { Page } from "src/enums";
+import type { SummaryResult } from "src/util";
 import { writable, type Writable } from "svelte/store";
-import type { domain } from "../wailsjs/go/models";
-import type { Page } from "./enums";
-import type { SummaryResult } from "./util";
+import type { domain } from "wailsjs/go/models";
 
 export const storedBattle = writable(undefined) as Writable<domain.Battle>;
 export const storedSummaryResult = writable(

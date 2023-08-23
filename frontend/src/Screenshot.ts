@@ -1,7 +1,7 @@
 import * as htmlToImage from "html-to-image";
-import { AutoScreenshot, ManualScreenshot } from "../wailsjs/go/main/App";
-import type { domain } from "../wailsjs/go/models";
-import { toDateForFilename } from "./util";
+import { toDateForFilename } from "src/util";
+import { AutoScreenshot, ManualScreenshot } from "wailsjs/go/main/App";
+import type { domain } from "wailsjs/go/models";
 
 export class Screenshot {
   isFirst: boolean;

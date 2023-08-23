@@ -1,16 +1,16 @@
 <script lang="ts">
+  import ColorDescription from "src/other_component/ColorDescription.svelte";
+  import Ofuse from "src/other_component/Ofuse.svelte";
+  import StatisticsTable from "src/other_component/StatisticsTable.svelte";
+  import { toDateForDisplay } from "src/util";
+  import Logging from "src/other_component/Logging.svelte";
   import {
     storedBattle,
     storedUserConfig,
-    storedSummaryResult,
     storedAlertPlayers,
+    storedSummaryResult,
     storedLogs,
-  } from "../stores";
-  import ColorDescription from "../other_component/ColorDescription.svelte";
-  import Ofuse from "../other_component/Ofuse.svelte";
-  import StatisticsTable from "../other_component/StatisticsTable.svelte";
-  import { toDateForDisplay } from "../util";
-  import Logging from "../other_component/Logging.svelte";
+  } from "src/stores";
 </script>
 
 <div id="stats">

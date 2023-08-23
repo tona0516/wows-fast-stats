@@ -1,20 +1,19 @@
 import { format, fromUnixTime } from "date-fns";
-import type { domain } from "../wailsjs/go/models";
-import { Const } from "./Const";
-import { DisplayPattern, StatsCategory } from "./enums";
-import { SkillLevelConverter } from "./RankConverter";
-
-import iconPremiumBB from "./assets/images/icon-bb-premium.png";
-import iconBB from "./assets/images/icon-bb.png";
-import iconPremiumCL from "./assets/images/icon-cl-premium.png";
-import iconCL from "./assets/images/icon-cl.png";
-import iconPremiumCV from "./assets/images/icon-cv-premium.png";
-import iconCV from "./assets/images/icon-cv.png";
-import iconPremiumDD from "./assets/images/icon-dd-premium.png";
-import iconDD from "./assets/images/icon-dd.png";
-import iconNone from "./assets/images/icon-none.png";
-import iconPremiumSS from "./assets/images/icon-ss-premium.png";
-import iconSS from "./assets/images/icon-ss.png";
+import iconPremiumBB from "src/assets/images/icon-bb-premium.png";
+import iconBB from "src/assets/images/icon-bb.png";
+import iconPremiumCL from "src/assets/images/icon-cl-premium.png";
+import iconCL from "src/assets/images/icon-cl.png";
+import iconPremiumCV from "src/assets/images/icon-cv-premium.png";
+import iconCV from "src/assets/images/icon-cv.png";
+import iconPremiumDD from "src/assets/images/icon-dd-premium.png";
+import iconDD from "src/assets/images/icon-dd.png";
+import iconNone from "src/assets/images/icon-none.png";
+import iconPremiumSS from "src/assets/images/icon-ss-premium.png";
+import iconSS from "src/assets/images/icon-ss.png";
+import { Const } from "src/Const";
+import { DisplayPattern, StatsCategory } from "src/enums";
+import { SkillLevelConverter } from "src/RankConverter";
+import type { domain } from "wailsjs/go/models";
 
 export function colors(
   key: string,

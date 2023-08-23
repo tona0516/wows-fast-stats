@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { BrowserOpenURL } from "../../wailsjs/runtime/runtime";
-  import { storedUserConfig } from "../stores";
+  import { storedUserConfig } from "src/stores";
+  import { BrowserOpenURL } from "wailsjs/runtime/runtime";
 </script>
 
 <div class="center mt-2 mx-2">

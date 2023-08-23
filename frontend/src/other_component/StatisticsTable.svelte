@@ -1,16 +1,16 @@
 <script lang="ts">
-  import type { domain } from "../../wailsjs/go/models";
-  import AvgCheckboxTableData from "../tabledata_component/AvgCheckboxTableData.svelte";
-  import PlayerNameTableData from "../tabledata_component/PlayerNameTableData.svelte";
-  import ShipInfoTableData from "../tabledata_component/ShipInfoTableData.svelte";
-  import SingleTableData from "../tabledata_component/SingleTableData.svelte";
-  import PairTableData from "../tabledata_component/PairTableData.svelte";
-  import ShipTypeRateTableData from "../tabledata_component/ShipTypeRateTableData.svelte";
-  import TierRateTableData from "../tabledata_component/TierRateTableData.svelte";
-  import { ComponenInfo, ComponentList } from "../ComponentList";
-  import { StatsCategory } from "../enums";
-  import NoData from "../tabledata_component/NoData.svelte";
-  import { decideDisplayPattern } from "../util";
+  import { ComponentList, ComponenInfo } from "src/ComponentList";
+  import { StatsCategory } from "src/enums";
+  import NoData from "src/tabledata_component/NoData.svelte";
+  import AvgCheckboxTableData from "src/tabledata_component/AvgCheckboxTableData.svelte";
+  import PlayerNameTableData from "src/tabledata_component/PlayerNameTableData.svelte";
+  import ShipInfoTableData from "src/tabledata_component/ShipInfoTableData.svelte";
+  import SingleTableData from "src/tabledata_component/SingleTableData.svelte";
+  import PairTableData from "src/tabledata_component/PairTableData.svelte";
+  import ShipTypeRateTableData from "src/tabledata_component/ShipTypeRateTableData.svelte";
+  import TierRateTableData from "src/tabledata_component/TierRateTableData.svelte";
+  import { decideDisplayPattern } from "src/util";
+  import type { domain } from "wailsjs/go/models";
 
   export let teams: domain.Team[];
   export let userConfig: domain.UserConfig;

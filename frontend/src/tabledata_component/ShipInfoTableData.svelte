@@ -1,9 +1,8 @@
 <script lang="ts">
-  import { BrowserOpenURL } from "../../wailsjs/runtime/runtime";
-
-  import type { domain } from "../../wailsjs/go/models";
-  import { shipTypeIcon, shipURL, tierString } from "../util";
-  import { Const } from "../Const";
+  import { Const } from "src/Const";
+  import { shipTypeIcon, shipURL, tierString } from "src/util";
+  import type { domain } from "wailsjs/go/models";
+  import { BrowserOpenURL } from "wailsjs/runtime/runtime";
 
   export let player: domain.Player;
   export let userConfig: domain.UserConfig;

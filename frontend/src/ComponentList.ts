@@ -1,6 +1,6 @@
-import type { domain } from "../wailsjs/go/models";
-import { Const } from "./Const";
-import { DisplayPattern, StatsCategory } from "./enums";
+import { Const } from "src/Const";
+import { DisplayPattern, StatsCategory } from "src/enums";
+import type { domain } from "wailsjs/go/models";
 
 export interface ComponentOption {
   column?: number;

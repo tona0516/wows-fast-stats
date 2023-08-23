@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { BrowserOpenURL } from "../../wailsjs/runtime/runtime";
-  import { SkillLevelConverter } from "../RankConverter";
-  import { Const } from "../Const";
-  import type { domain } from "../../wailsjs/go/models";
+  import { Const } from "src/Const";
+  import { SkillLevelConverter } from "src/RankConverter";
+  import type { domain } from "wailsjs/go/models";
+  import { BrowserOpenURL } from "wailsjs/runtime/runtime";
 
   export let userConfig: domain.UserConfig;
 </script>

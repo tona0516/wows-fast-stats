@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { storedLogs } from "../stores";
+  import { storedLogs } from "src/stores";
 
   export let logs: string[];
 

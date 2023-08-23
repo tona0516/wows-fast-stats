@@ -1,8 +1,8 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
   import { Modal, ModalBody, ModalFooter, Button } from "sveltestrap";
-  import type { domain } from "../../wailsjs/go/models";
-  import { RemoveAlertPlayer } from "../../wailsjs/go/main/App";
+  import { RemoveAlertPlayer } from "wailsjs/go/main/App";
+  import type { domain } from "wailsjs/go/models";
 
   export const toggle = () => (open = !open);
   export const setTarget = (p: domain.AlertPlayer) => (target = p);

@@ -1,11 +1,11 @@
 <script lang="ts">
+  import { storedExcludePlayerIDs } from "src/stores";
   import { createEventDispatcher } from "svelte";
   import {
     RemoveExcludePlayerID,
     AddExcludePlayerID,
-  } from "../../wailsjs/go/main/App";
-  import type { domain } from "../../wailsjs/go/models";
-  import { storedExcludePlayerIDs } from "../stores";
+  } from "wailsjs/go/main/App";
+  import type { domain } from "wailsjs/go/models";
 
   export let player: domain.Player;
 

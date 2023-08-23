@@ -1,44 +1,44 @@
 <script lang="ts">
-  import AddAlertPlayerModal from "./other_component/AddAlertPlayerModal.svelte";
-  import { Screenshot } from "./Screenshot";
-  import {
-    storedBattle,
-    storedUserConfig,
-    storedIsFirstScreenshot,
-    storedCurrentPage,
-    storedAlertPlayers,
-    storedExcludePlayerIDs,
-    storedSummaryResult,
-    storedLogs,
-  } from "./stores";
-  import { summary } from "./util";
-  import {
-    AlertPlayers,
-    Battle,
-    ExcludePlayerIDs,
-    LogError,
-    StartWatching,
-    LatestRelease,
-    UserConfig,
-  } from "../wailsjs/go/main/App";
-  import {
-    BrowserOpenURL,
-    EventsEmit,
-    EventsOn,
-    LogDebug,
-  } from "../wailsjs/runtime/runtime";
-  import type { domain } from "../wailsjs/go/models";
-  import MainPage from "./page_component/MainPage.svelte";
-  import ConfigPage from "./page_component/ConfigPage.svelte";
-  import AppInfoPage from "./page_component/AppInfoPage.svelte";
-  import AlertPlayerPage from "./page_component/AlertPlayerPage.svelte";
-  import UpdateAlertPlayerModal from "./other_component/UpdateAlertPlayerModal.svelte";
-  import RemoveAlertPlayerModal from "./other_component/RemoveAlertPlayerModal.svelte";
-  import Notification from "./other_component/Notification.svelte";
-  import Navigation from "./other_component/Navigation.svelte";
-  import { AppEvent, Page, ToastKey } from "./enums";
+  import AddAlertPlayerModal from "src/other_component/AddAlertPlayerModal.svelte";
+  import MainPage from "src/page_component/MainPage.svelte";
+  import ConfigPage from "src/page_component/ConfigPage.svelte";
+  import AppInfoPage from "src/page_component/AppInfoPage.svelte";
+  import AlertPlayerPage from "src/page_component/AlertPlayerPage.svelte";
+  import UpdateAlertPlayerModal from "src/other_component/UpdateAlertPlayerModal.svelte";
+  import RemoveAlertPlayerModal from "src/other_component/RemoveAlertPlayerModal.svelte";
+  import Notification from "src/other_component/Notification.svelte";
+  import Navigation from "src/other_component/Navigation.svelte";
 
   import "bootstrap-icons/font/bootstrap-icons.css";
+  import {
+    Battle,
+    ExcludePlayerIDs,
+    AlertPlayers,
+    UserConfig,
+    LatestRelease,
+    StartWatching,
+  } from "wailsjs/go/main/App";
+  import type { domain } from "wailsjs/go/models";
+  import {
+    EventsOn,
+    LogDebug,
+    LogError,
+    EventsEmit,
+    BrowserOpenURL,
+  } from "wailsjs/runtime/runtime";
+  import { Screenshot } from "./Screenshot";
+  import { AppEvent, ToastKey, Page } from "./enums";
+  import {
+    storedSummaryResult,
+    storedLogs,
+    storedBattle,
+    storedExcludePlayerIDs,
+    storedIsFirstScreenshot,
+    storedAlertPlayers,
+    storedUserConfig,
+    storedCurrentPage,
+  } from "./stores";
+  import { summary } from "./util";
 
   let notification: Notification;
   let addAlertPlayerModal: AddAlertPlayerModal;

@@ -1,8 +1,8 @@
 <script lang="ts">
-  import type { domain } from "../../wailsjs/go/models";
-  import type { ComponentOption } from "../ComponentList";
-  import type { StatsCategory } from "../enums";
-  import { values } from "../util";
+  import type { ComponentOption } from "src/ComponentList";
+  import type { StatsCategory } from "src/enums";
+  import { values } from "src/util";
+  import type { domain } from "wailsjs/go/models";
 
   export let player: domain.Player;
   export let statsPattern: string;

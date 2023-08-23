@@ -3,21 +3,6 @@
   import { createEventDispatcher } from "svelte";
   import { get } from "svelte/store";
   import {
-    ApplyRequiredUserConfig,
-    ApplyUserConfig,
-    DefaultUserConfig,
-    FontSizes,
-    OpenDirectory,
-    PlayerNameColors,
-    SelectDirectory,
-    UserConfig,
-  } from "../../wailsjs/go/main/App";
-  import { BrowserOpenURL, LogDebug } from "../../wailsjs/runtime/runtime";
-  import { storedUserConfig } from "../stores";
-  import { Const } from "../Const";
-  import type { domain, vo } from "../../wailsjs/go/models";
-  import StatisticsTable from "../other_component/StatisticsTable.svelte";
-  import {
     Alert,
     Badge,
     Button,
@@ -27,8 +12,23 @@
     TabContent,
     TabPane,
   } from "sveltestrap";
-  import ConfirmModal from "../other_component/ConfirmModal.svelte";
-  import { sampleTeam } from "../util";
+  import ConfirmModal from "src/other_component/ConfirmModal.svelte";
+  import { Const } from "src/Const";
+  import StatisticsTable from "src/other_component/StatisticsTable.svelte";
+  import { storedUserConfig } from "src/stores";
+  import { sampleTeam } from "src/util";
+  import {
+    ApplyRequiredUserConfig,
+    UserConfig,
+    ApplyUserConfig,
+    OpenDirectory,
+    SelectDirectory,
+    DefaultUserConfig,
+    FontSizes,
+    PlayerNameColors,
+  } from "wailsjs/go/main/App";
+  import type { domain, vo } from "wailsjs/go/models";
+  import { LogDebug, BrowserOpenURL } from "wailsjs/runtime/runtime";
 
   const dispatch = createEventDispatcher();
 

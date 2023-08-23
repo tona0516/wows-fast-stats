@@ -18,7 +18,8 @@
     "svelte-check": "^2.8.0",
     "svelte-preprocess": "^4.10.7",
     "typescript": "^4.6.4",
-    "vite": "^3.0.0"
+    "vite": "^3.0.0",
+    "vite-tsconfig-paths": "^4.2.0"
   },
   "dependencies": {
     "@types/clone": "^2.1.1",

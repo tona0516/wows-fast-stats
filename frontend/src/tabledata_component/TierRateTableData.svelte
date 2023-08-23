@@ -1,10 +1,10 @@
 <script lang="ts">
-  import type { domain } from "../../wailsjs/go/models";
-  import { Const } from "../Const";
-  import type { StackedBarGraphParam } from "../other_component/stacked_bar/StackedBarGraphParam";
-  import StackedBarGraph from "../other_component/stacked_bar/StackedBarGraph.svelte";
-  import type { StatsCategory } from "../enums";
-  import { toTierGroup, values } from "../util";
+  import type { StackedBarGraphParam } from "src/other_component/stacked_bar/StackedBarGraphParam";
+  import StackedBarGraph from "src/other_component/stacked_bar/StackedBarGraph.svelte";
+  import { Const } from "src/Const";
+  import type { StatsCategory } from "src/enums";
+  import { toTierGroup, values } from "src/util";
+  import type { domain } from "wailsjs/go/models";
 
   export let player: domain.Player;
   export let statsPattern: string;

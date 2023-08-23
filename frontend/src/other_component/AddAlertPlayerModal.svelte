@@ -1,23 +1,23 @@
 <script lang="ts">
   import Svelecte from "svelecte";
   import clone from "clone";
+  import { Const } from "src/Const";
   import { createEventDispatcher } from "svelte";
   import {
     Modal,
     ModalBody,
-    ModalFooter,
-    Button,
     FormGroup,
     Label,
     Input,
+    ModalFooter,
+    Button,
   } from "sveltestrap";
   import {
     SearchPlayer,
     AlertPatterns,
     UpdateAlertPlayer,
-  } from "../../wailsjs/go/main/App";
-  import type { domain } from "../../wailsjs/go/models";
-  import { Const } from "../Const";
+  } from "wailsjs/go/main/App";
+  import type { domain } from "wailsjs/go/models";
 
   export const toggle = () => (open = !open);
 

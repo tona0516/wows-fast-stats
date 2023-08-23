@@ -1,5 +1,5 @@
-import type { domain } from "../wailsjs/go/models";
-import { Const, SkillLevelItem } from "./Const";
+import { Const, type SkillLevelItem } from "src/Const";
+import type { domain } from "wailsjs/go/models";
 
 export class SkillLevelConverter {
   skillColor: domain.SkillColor;

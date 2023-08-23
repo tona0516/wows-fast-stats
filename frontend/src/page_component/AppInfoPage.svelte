@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { Semver } from "../../wailsjs/go/main/App";
-  import { BrowserOpenURL } from "../../wailsjs/runtime/runtime";
-  import iconApp from "../assets/images/appicon.png";
+  import { Semver } from "wailsjs/go/main/App";
+  import { BrowserOpenURL } from "wailsjs/runtime/runtime";
+  import iconApp from "src/assets/images/appicon.png";
 </script>
 
 <div class="mt-3 center">
