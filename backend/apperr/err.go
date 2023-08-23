@@ -22,6 +22,8 @@ const (
 	FrontendError               failure.StringCode = "フロントエンドエラー"
 	WailsError                  failure.StringCode = "Wailsエラー"
 	UnexpectedError             failure.StringCode = "予期しないエラーが発生しました。"
+
+	FailSafeProccess failure.StringCode = "フェイルセーフ用の処理が実行されました。"
 )
 
 func Unwrap(err error) error {

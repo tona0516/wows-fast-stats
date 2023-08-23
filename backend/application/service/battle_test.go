@@ -43,6 +43,7 @@ func initMocksForBattle() (*mockWargaming, *mockNumbers, *mockUnregistered, *moc
 		},
 	}, nil)
 	mockLocalFile.On("SaveTempArenaInfo", mock.Anything).Return(nil)
+	mockLocalFile.On("SaveNSExpectedStats", mock.Anything).Return(nil)
 
 	return mockWargaming, mockNumbers, mockUnregistered, mockLocalFile
 }
@@ -50,10 +51,10 @@ func initMocksForBattle() (*mockWargaming, *mockNumbers, *mockUnregistered, *moc
 func TestBattle_Battle_正常系_初回(t *testing.T) {
 	t.Parallel()
 
-	mockWargaming, mockNumbers, mockUnregistered, mockLocalFileRepo := initMocksForBattle()
+	mockWargaming, mockNumbers, mockUnregistered, mockLocalFile := initMocksForBattle()
 
 	// テスト
-	b := NewBattle(5, mockWargaming, mockLocalFileRepo, mockNumbers, mockUnregistered)
+	b := NewBattle(5, mockWargaming, mockLocalFile, mockNumbers, mockUnregistered)
 	_, err := b.Battle(domain.UserConfig{})
 
 	// アサーション
@@ -73,8 +74,9 @@ func TestBattle_Battle_正常系_初回(t *testing.T) {
 
 	mockUnregistered.AssertCalled(t, "Warship")
 
-	mockLocalFileRepo.AssertCalled(t, "TempArenaInfo", mock.Anything)
-	mockLocalFileRepo.AssertNotCalled(t, "SaveTempArenaInfo", mock.Anything)
+	mockLocalFile.AssertCalled(t, "SaveNSExpectedStats", mock.Anything)
+	mockLocalFile.AssertCalled(t, "TempArenaInfo", mock.Anything)
+	mockLocalFile.AssertNotCalled(t, "SaveTempArenaInfo", mock.Anything)
 }
 
 func TestBattle_Battle_正常系_2回目以降(t *testing.T) {
@@ -104,6 +106,7 @@ func TestBattle_Battle_正常系_2回目以降(t *testing.T) {
 
 	mockUnregistered.AssertNotCalled(t, "Warship")
 
+	mockLocalFile.AssertNotCalled(t, "SaveNSExpectedStats", mock.Anything)
 	mockLocalFile.AssertCalled(t, "TempArenaInfo", mock.Anything)
 	mockLocalFile.AssertNotCalled(t, "SaveTempArenaInfo", mock.Anything)
 }
@@ -112,13 +115,13 @@ func TestBattle_Battle_異常系(t *testing.T) {
 	t.Parallel()
 
 	mockWargaming, mockNumbers, mockUnregistered, _ := initMocksForBattle()
-	mockLocalFileRepo := &mockLocalFile{}
+	mockLocalFile := &mockLocalFile{}
 	expectedError := failure.New(apperr.FileNotExist)
-	mockLocalFileRepo.On("TempArenaInfo", mock.Anything).Return(domain.TempArenaInfo{}, expectedError)
-	mockLocalFileRepo.On("SaveTempArenaInfo", mock.Anything).Return(nil)
+	mockLocalFile.On("TempArenaInfo", mock.Anything).Return(domain.TempArenaInfo{}, expectedError)
+	mockLocalFile.On("SaveTempArenaInfo", mock.Anything).Return(nil)
 
 	// テスト
-	b := NewBattle(5, mockWargaming, mockLocalFileRepo, mockNumbers, mockUnregistered)
+	b := NewBattle(5, mockWargaming, mockLocalFile, mockNumbers, mockUnregistered)
 	b.isFirstBattle = false
 	_, err := b.Battle(domain.UserConfig{})
 
@@ -141,6 +144,7 @@ func TestBattle_Battle_異常系(t *testing.T) {
 
 	mockUnregistered.AssertNotCalled(t, "Warship")
 
-	mockLocalFileRepo.AssertCalled(t, "TempArenaInfo", mock.Anything)
-	mockLocalFileRepo.AssertNotCalled(t, "SaveTempArenaInfo", mock.Anything)
+	mockLocalFile.AssertNotCalled(t, "SaveNSExpectedStats", mock.Anything)
+	mockLocalFile.AssertCalled(t, "TempArenaInfo", mock.Anything)
+	mockLocalFile.AssertNotCalled(t, "SaveTempArenaInfo", mock.Anything)
 }

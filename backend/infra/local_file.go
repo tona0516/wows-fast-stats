@@ -20,11 +20,13 @@ const (
 	configDir        string = "config"
 	replaysDir       string = "replays"
 	tempArenaInfoDir string = "temp_arena_info"
+	cacheDir         string = "cache"
 	// file.
-	userConfigFile    string = "user.json"
-	appConfigFile     string = "app.json"
-	alertPlayerFile   string = "alert_player.json"
-	tempArenaInfoFile string = "tempArenaInfo.json"
+	userConfigFile      string = "user.json"
+	appConfigFile       string = "app.json"
+	alertPlayerFile     string = "alert_player.json"
+	tempArenaInfoFile   string = "tempArenaInfo.json"
+	nsExpectedStatsFile string = "ns_expected_stats.json"
 )
 
 //nolint:gochecknoglobals
@@ -126,16 +128,18 @@ var DefaultUserConfig domain.UserConfig = domain.UserConfig{
 }
 
 type LocalFile struct {
-	userConfigPath  string
-	appConfigPath   string
-	alertPlayerPath string
+	userConfigPath      string
+	appConfigPath       string
+	alertPlayerPath     string
+	nsExpectedStatsPath string
 }
 
 func NewLocalFile() *LocalFile {
 	return &LocalFile{
-		userConfigPath:  filepath.Join(configDir, userConfigFile),
-		appConfigPath:   filepath.Join(configDir, appConfigFile),
-		alertPlayerPath: filepath.Join(configDir, alertPlayerFile),
+		userConfigPath:      filepath.Join(configDir, userConfigFile),
+		appConfigPath:       filepath.Join(configDir, appConfigFile),
+		alertPlayerPath:     filepath.Join(configDir, alertPlayerFile),
+		nsExpectedStatsPath: filepath.Join(cacheDir, nsExpectedStatsFile),
 	}
 }
 
@@ -274,6 +278,16 @@ func (l *LocalFile) TempArenaInfo(installPath string) (domain.TempArenaInfo, err
 func (l *LocalFile) SaveTempArenaInfo(tempArenaInfo domain.TempArenaInfo) error {
 	path := filepath.Join(tempArenaInfoDir, "tempArenaInfo_"+strconv.FormatInt(tempArenaInfo.Unixtime(), 10)+".json")
 	err := writeJSON(path, tempArenaInfo)
+	return failure.Wrap(err)
+}
+
+func (l *LocalFile) CachedNSExpectedStats() (domain.NSExpectedStats, error) {
+	expectedStats, err := readJSON(l.nsExpectedStatsPath, domain.NSExpectedStats{})
+	return expectedStats, failure.Wrap(err)
+}
+
+func (l *LocalFile) SaveNSExpectedStats(expectedStats domain.NSExpectedStats) error {
+	err := writeJSON(l.nsExpectedStatsPath, expectedStats)
 	return failure.Wrap(err)
 }
 

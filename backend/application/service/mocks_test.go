@@ -65,6 +65,17 @@ func (m *mockLocalFile) SaveTempArenaInfo(tempArenaInfo domain.TempArenaInfo) er
 	return args.Error(0)
 }
 
+func (m *mockLocalFile) CachedNSExpectedStats() (domain.NSExpectedStats, error) {
+	args := m.Called()
+	//nolint:forcetypeassert
+	return args.Get(0).(domain.NSExpectedStats), args.Error(1)
+}
+
+func (m *mockLocalFile) SaveNSExpectedStats(expectedStats domain.NSExpectedStats) error {
+	args := m.Called(expectedStats)
+	return args.Error(0)
+}
+
 type mockWargaming struct {
 	mock.Mock
 }

@@ -16,4 +16,6 @@ type LocalFileInterface interface {
 	SaveScreenshot(path string, base64Data string) error
 	TempArenaInfo(installPath string) (domain.TempArenaInfo, error)
 	SaveTempArenaInfo(tempArenaInfo domain.TempArenaInfo) error
+	CachedNSExpectedStats() (domain.NSExpectedStats, error)
+	SaveNSExpectedStats(expectedStats domain.NSExpectedStats) error
 }

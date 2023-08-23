@@ -4,9 +4,11 @@ import (
 	"sort"
 	"sync"
 
+	"wfs/backend/apperr"
 	"wfs/backend/application/repository"
 	"wfs/backend/application/vo"
 	"wfs/backend/domain"
+	"wfs/backend/logger"
 
 	"github.com/morikuni/failure"
 )
@@ -193,8 +195,22 @@ func (b *Battle) fetchWarship(result chan vo.Result[map[int]domain.Warship]) {
 }
 
 func (b *Battle) fetchExpectedStats(result chan vo.Result[domain.NSExpectedStats]) {
-	expectedStats, err := b.numbers.ExpectedStats()
-	result <- vo.Result[domain.NSExpectedStats]{Value: expectedStats, Error: failure.Wrap(err)}
+	expectedStats, errFetch := b.numbers.ExpectedStats()
+	if errFetch == nil {
+		_ = b.localFile.SaveNSExpectedStats(expectedStats)
+		result <- vo.Result[domain.NSExpectedStats]{Value: expectedStats}
+		return
+	}
+
+	logger.Warn(failure.New(apperr.FailSafeProccess))
+
+	expectedStats, errCache := b.localFile.CachedNSExpectedStats()
+	if errCache == nil {
+		result <- vo.Result[domain.NSExpectedStats]{Value: expectedStats}
+		return
+	}
+
+	result <- vo.Result[domain.NSExpectedStats]{Value: expectedStats, Error: failure.Wrap(errFetch)}
 }
 
 func (b *Battle) fetchBattleArenas(result chan vo.Result[domain.WGBattleArenas]) {
