@@ -3,13 +3,11 @@
   import Ofuse from "src/other_component/Ofuse.svelte";
   import StatisticsTable from "src/other_component/StatisticsTable.svelte";
   import { toDateForDisplay } from "src/util";
-  import Logging from "src/other_component/Logging.svelte";
   import {
     storedBattle,
     storedUserConfig,
     storedAlertPlayers,
     storedSummaryResult,
-    storedLogs,
   } from "src/stores";
 </script>
 
@@ -94,7 +92,5 @@
 
   <ColorDescription userConfig={$storedUserConfig} />
 </div>
-
-<Logging logs={$storedLogs} />
 
 <Ofuse />

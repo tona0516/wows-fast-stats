@@ -2,6 +2,8 @@
   import { Semver } from "wailsjs/go/main/App";
   import { BrowserOpenURL } from "wailsjs/runtime/runtime";
   import iconApp from "src/assets/images/appicon.png";
+  import Logging from "src/other_component/Logging.svelte";
+  import { storedLogs } from "src/stores";
 </script>
 
 <div class="mt-3 center">
@@ -56,6 +58,8 @@
       </a>
     </div>
   </div>
+
+  <Logging logs={$storedLogs} />
 
   <div class="m-1">Copyright © 2023 tona0516 All Rights Reserved.</div>
 </div>
