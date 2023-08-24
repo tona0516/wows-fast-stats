@@ -86,6 +86,10 @@ body {
   height: 1em;
 }
 
+.td-icon {
+  width: 1em;
+}
+
 .no_data {
   max-width: 0px;
   text-align: center;

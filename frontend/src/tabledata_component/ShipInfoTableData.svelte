@@ -11,7 +11,7 @@
     userConfig.custom_color.ship_type.own[player.ship_info.type] ?? "#00000000";
 </script>
 
-<td>
+<td class="td-icon">
   <img
     alt=""
     src={Const.NATION_ICON[player.ship_info.nation] ?? Const.NATION_ICON.none}
@@ -19,7 +19,7 @@
   />
 </td>
 
-<td style="background-color: {color}">
+<td class="td-icon" style="background-color: {color}">
   <img alt="" src={shipTypeIcon(player.ship_info)} class="ship-icon" />
 </td>
 
