@@ -46,7 +46,7 @@ func TestNSExpectedStats_UnmarshalJSON(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, NSExpectedStats{
 			Time: int64(1621845600),
-			Data: map[int]NSExpectedStatsData{
+			Data: AllExpectedStats{
 				1: {
 					AverageDamageDealt: 50000.0,
 					AverageFrags:       1.5,

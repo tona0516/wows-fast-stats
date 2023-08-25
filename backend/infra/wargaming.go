@@ -5,6 +5,7 @@ import (
 	"strings"
 	"wfs/backend/apperr"
 	"wfs/backend/application/vo"
+	"wfs/backend/infra/response"
 
 	"wfs/backend/domain"
 
@@ -32,35 +33,41 @@ func (w *Wargaming) AccountInfo(accountIDs []int) (domain.WGAccountInfo, error) 
 		strAccountIDs[i] = strconv.Itoa(v)
 	}
 
-	return request[domain.WGAccountInfo](
+	res, err := request[response.WGAccountInfo](
 		w.config.Retry,
 		w.config.URL+"/wows/account/info/",
 		vo.NewPair("application_id", w.appid),
 		vo.NewPair("account_id", strings.Join(strAccountIDs, ",")),
-		vo.NewPair("fields", domain.WGAccountInfo{}.Field()),
+		vo.NewPair("fields", response.WGAccountInfo{}.Field()),
 		vo.NewPair("extra", "statistics.pvp_solo"),
 	)
+
+	return res.Data, failure.Wrap(err)
 }
 
 func (w *Wargaming) AccountList(accountNames []string) (domain.WGAccountList, error) {
-	return request[domain.WGAccountList](
+	res, err := request[response.WGAccountList](
 		w.config.Retry,
 		w.config.URL+"/wows/account/list/",
 		vo.NewPair("application_id", w.appid),
 		vo.NewPair("search", strings.Join(accountNames, ",")),
-		vo.NewPair("fields", domain.WGAccountList{}.Field()),
+		vo.NewPair("fields", response.WGAccountList{}.Field()),
 		vo.NewPair("type", "exact"),
 	)
+
+	return res.Data, failure.Wrap(err)
 }
 
 func (w *Wargaming) AccountListForSearch(prefix string) (domain.WGAccountList, error) {
-	return request[domain.WGAccountList](
+	res, err := request[response.WGAccountList](
 		w.config.Retry,
 		w.config.URL+"/wows/account/list/",
 		vo.NewPair("application_id", w.appid),
 		vo.NewPair("search", prefix),
-		vo.NewPair("fields", domain.WGAccountList{}.Field()),
+		vo.NewPair("fields", response.WGAccountList{}.Field()),
 	)
+
+	return res.Data, failure.Wrap(err)
 }
 
 func (w *Wargaming) ClansAccountInfo(accountIDs []int) (domain.WGClansAccountInfo, error) {
@@ -69,13 +76,15 @@ func (w *Wargaming) ClansAccountInfo(accountIDs []int) (domain.WGClansAccountInf
 		strAccountIDs[i] = strconv.Itoa(v)
 	}
 
-	return request[domain.WGClansAccountInfo](
+	res, err := request[response.WGClansAccountInfo](
 		w.config.Retry,
 		w.config.URL+"/wows/clans/accountinfo/",
 		vo.NewPair("application_id", w.appid),
 		vo.NewPair("account_id", strings.Join(strAccountIDs, ",")),
-		vo.NewPair("fields", domain.WGClansAccountInfo{}.Field()),
+		vo.NewPair("fields", response.WGClansAccountInfo{}.Field()),
 	)
+
+	return res.Data, failure.Wrap(err)
 }
 
 func (w *Wargaming) ClansInfo(clanIDs []int) (domain.WGClansInfo, error) {
@@ -88,78 +97,90 @@ func (w *Wargaming) ClansInfo(clanIDs []int) (domain.WGClansInfo, error) {
 		return domain.WGClansInfo{}, nil
 	}
 
-	return request[domain.WGClansInfo](
+	res, err := request[response.WGClansInfo](
 		w.config.Retry,
 		w.config.URL+"/wows/clans/info/",
 		vo.NewPair("application_id", w.appid),
 		vo.NewPair("clan_id", strings.Join(strClanIDs, ",")),
-		vo.NewPair("fields", domain.WGClansInfo{}.Field()),
+		vo.NewPair("fields", response.WGClansInfo{}.Field()),
 	)
+
+	return res.Data, failure.Wrap(err)
 }
 
 func (w *Wargaming) ShipsStats(accountID int) (domain.WGShipsStats, error) {
-	return request[domain.WGShipsStats](
+	res, err := request[response.WGShipsStats](
 		w.config.Retry,
 		w.config.URL+"/wows/ships/stats/",
 		vo.NewPair("application_id", w.appid),
 		vo.NewPair("account_id", strconv.Itoa(accountID)),
-		vo.NewPair("fields", domain.WGShipsStats{}.Field()),
+		vo.NewPair("fields", response.WGShipsStats{}.Field()),
 		vo.NewPair("extra", "pvp_solo"),
 	)
+
+	return res.Data, failure.Wrap(err)
 }
 
-func (w *Wargaming) EncycShips(pageNo int) (domain.WGEncycShips, error) {
-	return request[domain.WGEncycShips](
+func (w *Wargaming) EncycShips(pageNo int) (domain.WGEncycShips, int, error) {
+	res, err := request[response.WGEncycShips](
 		w.config.Retry,
 		w.config.URL+"/wows/encyclopedia/ships/",
 		vo.NewPair("application_id", w.appid),
-		vo.NewPair("fields", domain.WGEncycShips{}.Field()),
+		vo.NewPair("fields", response.WGEncycShips{}.Field()),
 		vo.NewPair("language", "ja"),
 		vo.NewPair("page_no", strconv.Itoa(pageNo)),
 	)
+
+	return res.Data, res.Meta.PageTotal, failure.Wrap(err)
 }
 
-func (w *Wargaming) EncycInfo() (domain.WGEncycInfo, error) {
-	return request[domain.WGEncycInfo](
+func (w *Wargaming) EncycInfo() (domain.WGEncycInfoData, error) {
+	res, err := request[response.WGEncycInfo](
 		w.config.Retry,
 		w.config.URL+"/wows/encyclopedia/info/",
 		vo.NewPair("application_id", w.appid),
-		vo.NewPair("fields", domain.WGEncycInfo{}.Field()),
+		vo.NewPair("fields", response.WGEncycInfo{}.Field()),
 	)
+
+	return res.Data, failure.Wrap(err)
 }
 
 func (w *Wargaming) BattleArenas() (domain.WGBattleArenas, error) {
-	return request[domain.WGBattleArenas](
+	res, err := request[response.WGBattleArenas](
 		w.config.Retry,
 		w.config.URL+"/wows/encyclopedia/battlearenas/",
 		vo.NewPair("application_id", w.appid),
-		vo.NewPair("fields", domain.WGBattleArenas{}.Field()),
+		vo.NewPair("fields", response.WGBattleArenas{}.Field()),
 		vo.NewPair("language", "ja"),
 	)
+
+	return res.Data, failure.Wrap(err)
 }
 
 func (w *Wargaming) BattleTypes() (domain.WGBattleTypes, error) {
-	return request[domain.WGBattleTypes](
+	res, err := request[response.WGBattleTypes](
 		w.config.Retry,
 		w.config.URL+"/wows/encyclopedia/battletypes/",
 		vo.NewPair("application_id", w.appid),
-		vo.NewPair("fields", domain.WGBattleTypes{}.Field()),
+		vo.NewPair("fields", response.WGBattleTypes{}.Field()),
 		vo.NewPair("language", "ja"),
 	)
+
+	return res.Data, failure.Wrap(err)
 }
 
 func (w *Wargaming) Test(appid string) (bool, error) {
-	_, err := request[domain.WGEncycInfo](
+	_, err := request[response.WGEncycInfo](
 		w.config.Retry,
 		w.config.URL+"/wows/encyclopedia/info/",
 		vo.NewPair("application_id", appid),
-		vo.NewPair("fields", domain.WGEncycInfo{}.Field()),
+		vo.NewPair("fields", response.WGEncycInfo{}.Field()),
 	)
 
 	return err == nil, failure.Wrap(err)
 }
 
-func request[T domain.WGResponse](
+func request[T response.WGResponse](
 	retry uint64,
 	rawURL string,
 	query ...vo.Pair,
@@ -192,5 +213,6 @@ func request[T domain.WGResponse](
 		"status_code": strconv.Itoa(res.StatusCode),
 		"body":        string(res.ByteBody),
 	}
+
 	return res.Body, failure.Wrap(err, errCtx)
 }

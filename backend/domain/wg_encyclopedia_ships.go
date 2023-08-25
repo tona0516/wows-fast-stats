@@ -1,18 +1,6 @@
 package domain
 
-import "reflect"
-
-type WGEncycShips struct {
-	WGResponseCommon[map[int]WGEncycShipsData]
-	Meta struct {
-		PageTotal int `json:"page_total"`
-		Page      int `json:"page"`
-	} `json:"meta"`
-}
-
-func (w WGEncycShips) Field() string {
-	return fieldQuery(reflect.TypeOf(&WGEncycShipsData{}).Elem())
-}
+type WGEncycShips map[int]WGEncycShipsData
 
 type WGEncycShipsData struct {
 	Tier      uint   `json:"tier"`

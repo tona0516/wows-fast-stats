@@ -39,8 +39,7 @@ func TestTempArenaInfo_Unixtime(t *testing.T) {
 
 func TestTempArenaInfo_BattleArena(t *testing.T) {
 	t.Parallel()
-	w := WGBattleArenas{}
-	w.Data = map[int]WGBattleArenasData{
+	w := WGBattleArenas{
 		1: {Name: "Arena1"},
 		2: {Name: "Arena2"},
 	}
@@ -57,8 +56,7 @@ func TestTempArenaInfo_BattleArena(t *testing.T) {
 
 func TestTempArenaInfo_BattleType(t *testing.T) {
 	t.Parallel()
-	w := WGBattleTypes{}
-	w.Data = map[string]WGBattleTypesData{
+	w := WGBattleTypes{
 		"RANDOM": {Name: "Random Battle"},
 		"COOP":   {Name: "Co-op Battle"},
 	}

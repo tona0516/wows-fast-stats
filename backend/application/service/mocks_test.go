@@ -114,10 +114,10 @@ func (m *mockWargaming) ClansInfo(clanIDs []int) (domain.WGClansInfo, error) {
 	return args.Get(0).(domain.WGClansInfo), args.Error(1)
 }
 
-func (m *mockWargaming) EncycShips(pageNo int) (domain.WGEncycShips, error) {
+func (m *mockWargaming) EncycShips(pageNo int) (domain.WGEncycShips, int, error) {
 	args := m.Called(pageNo)
 	//nolint:forcetypeassert
-	return args.Get(0).(domain.WGEncycShips), args.Error(1)
+	return args.Get(0).(domain.WGEncycShips), args.Int(1), args.Error(2)
 }
 
 func (m *mockWargaming) ShipsStats(accountID int) (domain.WGShipsStats, error) {
@@ -158,10 +158,10 @@ type mockUnregistered struct {
 	mock.Mock
 }
 
-func (m *mockUnregistered) Warship() (map[int]domain.Warship, error) {
+func (m *mockUnregistered) Warship() (domain.Warships, error) {
 	args := m.Called()
 	//nolint:forcetypeassert
-	return args.Get(0).(map[int]domain.Warship), args.Error(1)
+	return args.Get(0).(domain.Warships), args.Error(1)
 }
 
 type mockGithub struct {

@@ -1,14 +1,12 @@
 package domain
 
-import "reflect"
+type AllPlayerShipsStats map[int]WGShipsStats
 
-type WGShipsStats struct {
-	WGResponseCommon[map[int][]WGShipsStatsData]
+func (w AllPlayerShipsStats) Player(accountID int) []WGShipsStatsData {
+	return w[accountID][accountID]
 }
 
-func (w WGShipsStats) Field() string {
-	return fieldQuery(reflect.TypeOf(&WGShipsStatsData{}).Elem())
-}
+type WGShipsStats map[int][]WGShipsStatsData
 
 type WGShipsStatsData struct {
 	Pvp     WGStatsValues `json:"pvp"`

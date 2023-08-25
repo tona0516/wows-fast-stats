@@ -1,5 +1,7 @@
 package domain
 
+type Warships map[int]Warship
+
 type Warship struct {
 	Name      string
 	Tier      uint

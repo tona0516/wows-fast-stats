@@ -29,11 +29,6 @@
   let target: domain.AlertPlayer = clone(Const.DEFAULT_ALERT_PLAYER);
   let searchResult: domain.WGAccountListData;
 
-  async function search(input: string) {
-    const accountList = await SearchPlayer(input);
-    return accountList.data;
-  }
-
   async function onOpen() {
     alertPatterns = await AlertPatterns();
     target = clone(Const.DEFAULT_ALERT_PLAYER);
@@ -82,7 +77,7 @@
         style="color: #2d2c2c;"
         valueAsObject
         id="player"
-        fetch={search}
+        fetch={SearchPlayer}
         placeholder=""
         minQuery="3"
         labelField="nickname"

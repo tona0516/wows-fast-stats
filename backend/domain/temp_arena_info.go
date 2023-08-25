@@ -13,13 +13,6 @@ type TempArenaInfo struct {
 	PlayerName string    `json:"playerName"`
 }
 
-type Vehicle struct {
-	ShipID   int    `json:"shipId"`
-	Relation int    `json:"relation"`
-	ID       int    `json:"id"`
-	Name     string `json:"name"`
-}
-
 func (t *TempArenaInfo) AccountNames() []string {
 	accountNames := make([]string, 0)
 	for _, v := range t.Vehicles {
@@ -49,10 +42,21 @@ func (t *TempArenaInfo) Unixtime() int64 {
 }
 
 func (t *TempArenaInfo) BattleArena(battleArenas WGBattleArenas) string {
-	return battleArenas.Data[t.MapID].Name
+	return battleArenas[t.MapID].Name
 }
 
 func (t *TempArenaInfo) BattleType(battleTypes WGBattleTypes) string {
-	rawBattleType := battleTypes.Data[strings.ToUpper(t.MatchGroup)].Name
+	rawBattleType := battleTypes[strings.ToUpper(t.MatchGroup)].Name
 	return strings.ReplaceAll(rawBattleType, " ", "")
+}
+
+type Vehicle struct {
+	ShipID   int    `json:"shipId"`
+	Relation int    `json:"relation"`
+	ID       int    `json:"id"`
+	Name     string `json:"name"`
+}
+
+func (v *Vehicle) IsFriend() bool {
+	return v.Relation == 0 || v.Relation == 1
 }

@@ -26,7 +26,7 @@ type App struct {
 	watcherService    service.Watcher
 	battleService     service.Battle
 	updaterService    service.Updater
-	excludePlayer     map[int]bool
+	excludePlayers    domain.ExcludedPlayers
 }
 
 func NewApp(
@@ -46,7 +46,7 @@ func NewApp(
 		watcherService:    watcherService,
 		battleService:     battleService,
 		updaterService:    updaterService,
-		excludePlayer:     map[int]bool{},
+		excludePlayers:    domain.ExcludedPlayers{},
 	}
 }
 
@@ -183,20 +183,15 @@ func (a *App) Semver() string {
 }
 
 func (a *App) ExcludePlayerIDs() []int {
-	ids := make([]int, 0, len(a.excludePlayer))
-	for id := range a.excludePlayer {
-		ids = append(ids, id)
-	}
-
-	return ids
+	return a.excludePlayers.PlayerIDs()
 }
 
 func (a *App) AddExcludePlayerID(playerID int) {
-	a.excludePlayer[playerID] = true
+	a.excludePlayers.Add(playerID)
 }
 
 func (a *App) RemoveExcludePlayerID(playerID int) {
-	delete(a.excludePlayer, playerID)
+	a.excludePlayers.Remove(playerID)
 }
 
 func (a *App) AlertPlayers() ([]domain.AlertPlayer, error) {

@@ -8,14 +8,14 @@ import (
 
 const (
 	allowableDelta = 0.01
-	nickname       = "ut"
 )
 
 //nolint:gochecknoglobals
 var (
 	emptyAccountInfo   = WGAccountInfoData{}
 	emptyShipsStats    = []WGShipsStatsData{}
-	emptyExpectedStats = map[int]NSExpectedStatsData{}
+	emptyExpectedStats = AllExpectedStats{}
+	emptyWarships      = Warships{}
 )
 
 // ref: https://asia.wows-numbers.com/personal/rating
@@ -46,14 +46,14 @@ func TestStats_PR_Ship(t *testing.T) {
 					ShipID: useShipID,
 				},
 			},
-			map[int]NSExpectedStatsData{
+			AllExpectedStats{
 				useShipID: {
 					AverageDamageDealt: 8000,
 					AverageFrags:       1,
 					WinRate:            50,
 				},
 			},
-			nickname,
+			emptyWarships,
 		)
 
 		assert.InDelta(t, p.expected, stats.PR(StatsCategoryShip, StatsPatternPvPAll), allowableDelta)
@@ -106,7 +106,7 @@ func TestStats_PR_Overall(t *testing.T) {
 				ShipID: 4,
 			},
 		},
-		map[int]NSExpectedStatsData{
+		AllExpectedStats{
 			1: {
 				AverageDamageDealt: 53792.23172971,
 				WinRate:            50.092406353286,
@@ -128,7 +128,7 @@ func TestStats_PR_Overall(t *testing.T) {
 				AverageFrags:       0.68628943618969,
 			},
 		},
-		nickname,
+		emptyWarships,
 	)
 
 	assert.InDelta(t, 2215.0243612353, stats.PR(StatsCategoryOverall, StatsPatternPvPAll), allowableDelta)
@@ -152,7 +152,7 @@ func TestStats_AvgDamage_Overall(t *testing.T) {
 		},
 		emptyShipsStats,
 		emptyExpectedStats,
-		nickname,
+		emptyWarships,
 	)
 
 	assert.InDelta(t, 10000, stats.AvgDamage(StatsCategoryOverall, StatsPatternPvPAll), allowableDelta)
@@ -176,7 +176,7 @@ func TestStats_AvgDamage_Overall_Solo(t *testing.T) {
 		},
 		emptyShipsStats,
 		emptyExpectedStats,
-		nickname,
+		emptyWarships,
 	)
 
 	assert.InDelta(t, 10000, stats.AvgDamage(StatsCategoryOverall, StatsPatternPvPSolo), allowableDelta)
@@ -197,7 +197,7 @@ func TestStats_AvgDamage_Ship(t *testing.T) {
 			},
 		},
 		emptyExpectedStats,
-		nickname,
+		emptyWarships,
 	)
 
 	assert.InDelta(t, 10000, stats.AvgDamage(StatsCategoryShip, StatsPatternPvPAll), allowableDelta)
@@ -218,7 +218,7 @@ func TestStats_AvgDamage_Ship_Solo(t *testing.T) {
 			},
 		},
 		emptyExpectedStats,
-		nickname,
+		emptyWarships,
 	)
 
 	assert.InDelta(t, 10000, stats.AvgDamage(StatsCategoryShip, StatsPatternPvPSolo), allowableDelta)
@@ -241,7 +241,7 @@ func TestStats_Battles(t *testing.T) {
 		},
 		emptyShipsStats,
 		emptyExpectedStats,
-		nickname,
+		emptyWarships,
 	)
 
 	assert.InDelta(t, 100, stats.Battles(StatsCategoryOverall, StatsPatternPvPAll), allowableDelta)
@@ -266,7 +266,7 @@ func TestStats_KdRate(t *testing.T) {
 		},
 		emptyShipsStats,
 		emptyExpectedStats,
-		nickname,
+		emptyWarships,
 	)
 
 	assert.InDelta(t, 0.5, stats.KdRate(StatsCategoryOverall, StatsPatternPvPAll), allowableDelta)
@@ -290,7 +290,7 @@ func TestStats_AvgKill(t *testing.T) {
 		},
 		emptyShipsStats,
 		emptyExpectedStats,
-		nickname,
+		emptyWarships,
 	)
 
 	assert.InDelta(t, 0.3, stats.AvgKill(StatsCategoryOverall, StatsPatternPvPAll), allowableDelta)
@@ -314,7 +314,7 @@ func TestStats_AvgExp(t *testing.T) {
 		},
 		emptyShipsStats,
 		emptyExpectedStats,
-		nickname,
+		emptyWarships,
 	)
 
 	assert.InDelta(t, 1500, stats.AvgExp(StatsCategoryOverall, StatsPatternPvPAll), allowableDelta)
@@ -338,7 +338,7 @@ func TestStats_WinRate(t *testing.T) {
 		},
 		emptyShipsStats,
 		emptyExpectedStats,
-		nickname,
+		emptyWarships,
 	)
 
 	assert.InDelta(t, 60, stats.WinRate(StatsCategoryOverall, StatsPatternPvPAll), allowableDelta)
@@ -362,7 +362,7 @@ func TestStats_WinSurvivedRate(t *testing.T) {
 		},
 		emptyShipsStats,
 		emptyExpectedStats,
-		nickname,
+		emptyWarships,
 	)
 
 	assert.InDelta(t, 20, stats.WinSurvivedRate(StatsCategoryOverall, StatsPatternPvPAll), allowableDelta)
@@ -388,7 +388,7 @@ func TestStats_LoseSurvivedRate(t *testing.T) {
 		},
 		emptyShipsStats,
 		emptyExpectedStats,
-		nickname,
+		emptyWarships,
 	)
 
 	assert.InDelta(t, 50, stats.LoseSurvivedRate(StatsCategoryOverall, StatsPatternPvPAll), allowableDelta)
@@ -416,7 +416,7 @@ func TestStats_MainBatteryHitRate(t *testing.T) {
 			},
 		},
 		emptyExpectedStats,
-		nickname,
+		emptyWarships,
 	)
 
 	assert.InDelta(t, 50, stats.MainBatteryHitRate(StatsCategoryShip, StatsPatternPvPAll), allowableDelta)
@@ -444,7 +444,7 @@ func TestStats_TorpedoesHitRate(t *testing.T) {
 			},
 		},
 		emptyExpectedStats,
-		nickname,
+		emptyWarships,
 	)
 
 	assert.InDelta(t, 25, stats.TorpedoesHitRate(StatsCategoryShip, StatsPatternPvPAll), allowableDelta)
@@ -467,7 +467,7 @@ func TestStats_PlanesKilled(t *testing.T) {
 			},
 		},
 		emptyExpectedStats,
-		nickname,
+		emptyWarships,
 	)
 
 	assert.InDelta(t, 33.4, stats.PlanesKilled(StatsCategoryShip, StatsPatternPvPAll), allowableDelta)
@@ -490,14 +490,13 @@ func TestStats_AvgTier(t *testing.T) {
 			},
 		},
 		emptyExpectedStats,
-		nickname,
+		Warships{
+			100: {Tier: 5},
+			200: {Tier: 8},
+		},
 	)
-	warships := map[int]Warship{
-		100: {Tier: 5},
-		200: {Tier: 8},
-	}
 
-	assert.InDelta(t, 7.14, stats.AvgTier(StatsPatternPvPAll, warships), allowableDelta)
+	assert.InDelta(t, 7.14, stats.AvgTier(StatsPatternPvPAll), allowableDelta)
 }
 
 func TestStats_UsingTierRate(t *testing.T) {
@@ -521,15 +520,14 @@ func TestStats_UsingTierRate(t *testing.T) {
 			},
 		},
 		emptyExpectedStats,
-		nickname,
+		Warships{
+			100: {Tier: 5},
+			200: {Tier: 8},
+			300: {Tier: 4},
+		},
 	)
-	warships := map[int]Warship{
-		100: {Tier: 5},
-		200: {Tier: 8},
-		300: {Tier: 4},
-	}
 
-	tierGroup := stats.UsingTierRate(StatsPatternPvPAll, warships)
+	tierGroup := stats.UsingTierRate(StatsPatternPvPAll)
 	assert.InDelta(t, 20, tierGroup.Low, allowableDelta)
 	assert.InDelta(t, 30, tierGroup.Middle, allowableDelta)
 	assert.InDelta(t, 50, tierGroup.High, allowableDelta)
@@ -537,13 +535,6 @@ func TestStats_UsingTierRate(t *testing.T) {
 
 func TestStats_UsingShipTypeRate(t *testing.T) {
 	t.Parallel()
-
-	warships := map[int]Warship{
-		100: {Type: DD},
-		200: {Type: CL},
-		300: {Type: BB},
-		400: {Type: CV},
-	}
 
 	stats := NewStats(
 		0,
@@ -567,10 +558,15 @@ func TestStats_UsingShipTypeRate(t *testing.T) {
 			},
 		},
 		emptyExpectedStats,
-		nickname,
+		Warships{
+			100: {Type: DD},
+			200: {Type: CL},
+			300: {Type: BB},
+			400: {Type: CV},
+		},
 	)
 
-	shipTypeGroup := stats.UsingShipTypeRate(StatsPatternPvPAll, warships)
+	shipTypeGroup := stats.UsingShipTypeRate(StatsPatternPvPAll)
 	assert.InDelta(t, 0, shipTypeGroup.SS, allowableDelta)
 	assert.InDelta(t, 15, shipTypeGroup.DD, allowableDelta)
 	assert.InDelta(t, 25, shipTypeGroup.CL, allowableDelta)

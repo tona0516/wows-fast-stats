@@ -1,4 +1,4 @@
-package domain
+package response
 
 type WGResponseCommon[T any] struct {
 	Status string  `json:"status"`

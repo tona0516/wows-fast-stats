@@ -17,14 +17,13 @@ func initMocksForBattle() (*mockWargaming, *mockNumbers, *mockUnregistered, *moc
 	mockLocalFile := &mockLocalFile{}
 
 	mockWargaming.On("SetAppID", mock.Anything).Return()
-	accountList := domain.WGAccountList{}
-	accountList.Data = []domain.WGAccountListData{
+	accountList := domain.WGAccountList{
 		{NickName: "player_1", AccountID: 1},
 		{NickName: "player_2", AccountID: 2},
 	}
 
 	mockWargaming.On("AccountList", mock.Anything).Return(accountList, nil)
-	mockWargaming.On("EncycShips", mock.Anything).Return(domain.WGEncycShips{}, nil)
+	mockWargaming.On("EncycShips", mock.Anything).Return(domain.WGEncycShips{}, 2, nil)
 	mockWargaming.On("BattleArenas").Return(domain.WGBattleArenas{}, nil)
 	mockWargaming.On("BattleTypes").Return(domain.WGBattleTypes{}, nil)
 	mockWargaming.On("AccountInfo", mock.Anything).Return(domain.WGAccountInfo{}, nil)
@@ -34,7 +33,7 @@ func initMocksForBattle() (*mockWargaming, *mockNumbers, *mockUnregistered, *moc
 
 	mockNumbers.On("ExpectedStats").Return(domain.NSExpectedStats{}, nil)
 
-	mockUnregistered.On("Warship").Return(map[int]domain.Warship{}, nil)
+	mockUnregistered.On("Warship").Return(domain.Warships{}, nil)
 
 	mockLocalFile.On("TempArenaInfo", mock.Anything).Return(domain.TempArenaInfo{
 		Vehicles: []domain.Vehicle{

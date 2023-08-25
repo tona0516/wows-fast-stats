@@ -9,20 +9,20 @@ import (
 )
 
 type Stats struct {
-	useShipID     int
-	accountInfo   WGAccountInfoData
-	useShipStats  WGShipsStatsData
-	allShipsStats []WGShipsStatsData
-	expectedStats map[int]NSExpectedStatsData
-	nickname      string
+	useShipID        int
+	accountInfo      WGAccountInfoData
+	useShipStats     WGShipsStatsData
+	allShipsStats    []WGShipsStatsData
+	allExpectedStats AllExpectedStats
+	warships         Warships
 }
 
 func NewStats(
 	useShipID int,
 	accountInfo WGAccountInfoData,
 	allShipsStats []WGShipsStatsData,
-	expectedStats map[int]NSExpectedStatsData,
-	nickname string,
+	expectedStats AllExpectedStats,
+	warships Warships,
 ) *Stats {
 	var useShipStats WGShipsStatsData
 	for _, v := range allShipsStats {
@@ -33,12 +33,12 @@ func NewStats(
 	}
 
 	return &Stats{
-		useShipID:     useShipID,
-		accountInfo:   accountInfo,
-		useShipStats:  useShipStats,
-		allShipsStats: allShipsStats,
-		expectedStats: expectedStats,
-		nickname:      nickname,
+		useShipID:        useShipID,
+		accountInfo:      accountInfo,
+		useShipStats:     useShipStats,
+		allShipsStats:    allShipsStats,
+		allExpectedStats: expectedStats,
+		warships:         warships,
 	}
 }
 
@@ -55,9 +55,9 @@ func (s *Stats) PR(category StatsCategory, pattern StatsPattern) float64 {
 				wins:   winRate(values.Wins, battles),
 			},
 			PRFactor{
-				damage: s.expectedStats[s.useShipID].AverageDamageDealt,
-				frags:  s.expectedStats[s.useShipID].AverageFrags,
-				wins:   s.expectedStats[s.useShipID].WinRate,
+				damage: s.allExpectedStats[s.useShipID].AverageDamageDealt,
+				frags:  s.allExpectedStats[s.useShipID].AverageFrags,
+				wins:   s.allExpectedStats[s.useShipID].WinRate,
 			},
 			battles,
 		)
@@ -73,7 +73,7 @@ func (s *Stats) PR(category StatsCategory, pattern StatsPattern) float64 {
 			values := s.statsValuesForm(ship, pattern)
 			battles := values.Battles
 
-			es, ok := s.expectedStats[ship.ShipID]
+			es, ok := s.allExpectedStats[ship.ShipID]
 			if !ok {
 				continue
 			}
@@ -158,7 +158,6 @@ func (s *Stats) PlanesKilled(category StatsCategory, pattern StatsPattern) float
 
 func (s *Stats) AvgTier(
 	pattern StatsPattern,
-	warships map[int]Warship,
 ) float64 {
 	var (
 		sum        uint
@@ -166,7 +165,7 @@ func (s *Stats) AvgTier(
 	)
 
 	for _, stats := range s.allShipsStats {
-		warship, ok := warships[stats.ShipID]
+		warship, ok := s.warships[stats.ShipID]
 		if !ok {
 			continue
 		}
@@ -181,12 +180,11 @@ func (s *Stats) AvgTier(
 
 func (s *Stats) UsingTierRate(
 	pattern StatsPattern,
-	warships map[int]Warship,
 ) TierGroup {
 	tierGroupMap := make(map[string]uint)
 
 	for _, ship := range s.allShipsStats {
-		warship, ok := warships[ship.ShipID]
+		warship, ok := s.warships[ship.ShipID]
 		if !ok {
 			continue
 		}
@@ -218,12 +216,11 @@ func (s *Stats) UsingTierRate(
 
 func (s *Stats) UsingShipTypeRate(
 	pattern StatsPattern,
-	warships map[int]Warship,
 ) ShipTypeGroup {
 	shipTypeMap := make(map[ShipType]uint)
 
 	for _, ship := range s.allShipsStats {
-		warship, ok := warships[ship.ShipID]
+		warship, ok := s.warships[ship.ShipID]
 		if !ok {
 			continue
 		}

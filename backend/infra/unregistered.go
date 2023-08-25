@@ -18,9 +18,9 @@ func NewUnregistered() *Unregistered {
 	return &Unregistered{}
 }
 
-func (u *Unregistered) Warship() (map[int]domain.Warship, error) {
+func (u *Unregistered) Warship() (domain.Warships, error) {
 	var ships []unregisteredShip
-	result := make(map[int]domain.Warship, 0)
+	result := make(domain.Warships)
 
 	if err := json.Unmarshal(shipsByte, &ships); err != nil {
 		return result, failure.Wrap(err)

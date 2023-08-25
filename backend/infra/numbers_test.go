@@ -35,7 +35,7 @@ func TestNumbers_ExpectedStats(t *testing.T) {
 		// アサーション
 		expected := domain.NSExpectedStats{
 			Time: 1621699200,
-			Data: map[int]domain.NSExpectedStatsData{
+			Data: map[int]domain.ExpectedStats{
 				1234: {
 					AverageDamageDealt: 50000,
 					AverageFrags:       1.2,

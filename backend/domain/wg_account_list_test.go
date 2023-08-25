@@ -9,8 +9,7 @@ import (
 func TestWGAccountList_AccountIDs(t *testing.T) {
 	t.Parallel()
 
-	w := WGAccountList{}
-	w.Data = []WGAccountListData{
+	w := WGAccountList{
 		{NickName: "John", AccountID: 123},
 		{NickName: "Alice", AccountID: 0},
 		{NickName: "Bob", AccountID: 456},
@@ -27,8 +26,7 @@ func TestWGAccountList_AccountIDs(t *testing.T) {
 func TestWGAccountList_AccountID(t *testing.T) {
 	t.Parallel()
 
-	w := WGAccountList{}
-	w.Data = []WGAccountListData{
+	w := WGAccountList{
 		{NickName: "John", AccountID: 123},
 		{NickName: "Alice", AccountID: 456},
 		{NickName: "Bob", AccountID: 789},
@@ -44,8 +42,7 @@ func TestWGAccountList_AccountID(t *testing.T) {
 func TestWGAccountList_AccountID_NotExist(t *testing.T) {
 	t.Parallel()
 
-	w := WGAccountList{}
-	w.Data = []WGAccountListData{
+	w := WGAccountList{
 		{NickName: "John", AccountID: 123},
 		{NickName: "Alice", AccountID: 456},
 		{NickName: "Bob", AccountID: 789},

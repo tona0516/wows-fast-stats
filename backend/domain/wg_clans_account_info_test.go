@@ -9,8 +9,7 @@ import (
 func TestWGClansAccountInfo_ClanIDs(t *testing.T) {
 	t.Parallel()
 
-	w := WGClansAccountInfo{}
-	w.Data = map[int]WGClansAccountInfoData{
+	w := WGClansAccountInfo{
 		1: {ClanID: 123},
 		2: {ClanID: 0},
 		3: {ClanID: 456},

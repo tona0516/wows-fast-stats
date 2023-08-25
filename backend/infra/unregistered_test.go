@@ -27,7 +27,7 @@ func TestUnregistered_Warship(t *testing.T) {
 	actual, err := unregistered.Warship()
 
 	// アサーション
-	expected := map[int]domain.Warship{
+	expected := domain.Warships{
 		1: {
 			Name:      "Ship 1",
 			Tier:      11,

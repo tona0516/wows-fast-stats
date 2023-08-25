@@ -1,19 +1,16 @@
 package domain
 
 import (
-	"reflect"
 	"sort"
 
 	"golang.org/x/exp/slices"
 )
 
-type WGAccountList struct {
-	WGResponseCommon[[]WGAccountListData]
-}
+type WGAccountList []WGAccountListData
 
 func (w WGAccountList) AccountIDs() []int {
 	accountIDs := make([]int, 0)
-	for _, v := range w.Data {
+	for _, v := range w {
 		if v.AccountID != 0 && !slices.Contains(accountIDs, v.AccountID) {
 			accountIDs = append(accountIDs, v.AccountID)
 		}
@@ -24,17 +21,13 @@ func (w WGAccountList) AccountIDs() []int {
 }
 
 func (w WGAccountList) AccountID(nickname string) int {
-	for _, v := range w.Data {
+	for _, v := range w {
 		if v.NickName == nickname {
 			return v.AccountID
 		}
 	}
 
 	return 0
-}
-
-func (w WGAccountList) Field() string {
-	return fieldQuery(reflect.TypeOf(&WGAccountListData{}).Elem())
 }
 
 type WGAccountListData struct {

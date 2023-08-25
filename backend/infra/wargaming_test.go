@@ -8,6 +8,7 @@ import (
 	"testing"
 	"wfs/backend/apperr"
 	"wfs/backend/domain"
+	"wfs/backend/infra/response"
 
 	"github.com/morikuni/failure"
 	"github.com/stretchr/testify/assert"
@@ -16,7 +17,13 @@ import (
 func TestWargaming_AccountInfo(t *testing.T) {
 	t.Parallel()
 
-	server := simpleMockServer(200, domain.WGAccountInfo{})
+	server := simpleMockServer(200, response.WGAccountInfo{
+		WGResponseCommon: response.WGResponseCommon[domain.WGAccountInfo]{
+			Status: "",
+			Error:  response.WGError{},
+			Data:   map[int]domain.WGAccountInfoData{},
+		},
+	})
 	defer server.Close()
 
 	wargaming := NewWargaming(RequestConfig{
@@ -31,7 +38,12 @@ func TestWargaming_AccountInfo(t *testing.T) {
 func TestWargaming_AccountList(t *testing.T) {
 	t.Parallel()
 
-	server := simpleMockServer(200, domain.WGAccountList{})
+	server := simpleMockServer(200, response.WGAccountList{
+		WGResponseCommon: response.WGResponseCommon[domain.WGAccountList]{
+			Status: "",
+			Error:  response.WGError{},
+			Data:   []domain.WGAccountListData{},
+		}})
 	defer server.Close()
 
 	wargaming := NewWargaming(RequestConfig{
@@ -47,7 +59,13 @@ func TestWargaming_AccountList(t *testing.T) {
 func TestWargaming_AccountListForSearch(t *testing.T) {
 	t.Parallel()
 
-	server := simpleMockServer(200, domain.WGAccountList{})
+	server := simpleMockServer(200, response.WGAccountList{
+		WGResponseCommon: response.WGResponseCommon[domain.WGAccountList]{
+			Status: "",
+			Error:  response.WGError{},
+			Data:   []domain.WGAccountListData{},
+		},
+	})
 	defer server.Close()
 
 	wargaming := NewWargaming(RequestConfig{
@@ -63,7 +81,13 @@ func TestWargaming_AccountListForSearch(t *testing.T) {
 func TestWargaming_ClansAccountInfo(t *testing.T) {
 	t.Parallel()
 
-	server := simpleMockServer(200, domain.WGClansAccountInfo{})
+	server := simpleMockServer(200, response.WGClansAccountInfo{
+		WGResponseCommon: response.WGResponseCommon[domain.WGClansAccountInfo]{
+			Status: "",
+			Error:  response.WGError{},
+			Data:   map[int]domain.WGClansAccountInfoData{},
+		},
+	})
 	defer server.Close()
 
 	wargaming := NewWargaming(RequestConfig{
@@ -79,7 +103,13 @@ func TestWargaming_ClansAccountInfo(t *testing.T) {
 func TestWargaming_ClansInfo(t *testing.T) {
 	t.Parallel()
 
-	server := simpleMockServer(200, domain.WGClansInfo{})
+	server := simpleMockServer(200, response.WGClansInfo{
+		WGResponseCommon: response.WGResponseCommon[domain.WGClansInfo]{
+			Status: "",
+			Error:  response.WGError{},
+			Data:   map[int]domain.WGClansInfoData{},
+		},
+	})
 	defer server.Close()
 
 	wargaming := NewWargaming(RequestConfig{
@@ -95,7 +125,13 @@ func TestWargaming_ClansInfo(t *testing.T) {
 func TestWargaming_ShipsStats(t *testing.T) {
 	t.Parallel()
 
-	server := simpleMockServer(200, domain.WGShipsStats{})
+	server := simpleMockServer(200, response.WGShipsStats{
+		WGResponseCommon: response.WGResponseCommon[domain.WGShipsStats]{
+			Status: "",
+			Error:  response.WGError{},
+			Data:   map[int][]domain.WGShipsStatsData{},
+		},
+	})
 	defer server.Close()
 
 	wargaming := NewWargaming(RequestConfig{
@@ -111,23 +147,35 @@ func TestWargaming_ShipsStats(t *testing.T) {
 func TestWargaming_EncycShips(t *testing.T) {
 	t.Parallel()
 
-	server := simpleMockServer(200, domain.WGEncycShips{})
+	expectedPageTotal := 5
+	server := simpleMockServer(200, response.WGEncycShips{
+		WGResponseCommon: response.WGResponseCommon[domain.WGEncycShips]{
+			Status: "",
+			Error:  response.WGError{},
+			Data:   map[int]domain.WGEncycShipsData{},
+		},
+		Meta: struct {
+			PageTotal int `json:"page_total"`
+			Page      int `json:"page"`
+		}{PageTotal: expectedPageTotal},
+	})
 	defer server.Close()
 
 	wargaming := NewWargaming(RequestConfig{
 		URL: server.URL,
 	})
 
-	result, err := wargaming.EncycShips(1)
+	result, pageTotal, err := wargaming.EncycShips(1)
 
 	assert.NoError(t, err)
 	assert.Equal(t, domain.WGEncycShips{}, result)
+	assert.Equal(t, expectedPageTotal, pageTotal)
 }
 
 func TestWargaming_EncycInfo(t *testing.T) {
 	t.Parallel()
 
-	server := simpleMockServer(200, domain.WGEncycInfo{})
+	server := simpleMockServer(200, response.WGEncycInfo{})
 	defer server.Close()
 
 	wargaming := NewWargaming(RequestConfig{
@@ -137,13 +185,19 @@ func TestWargaming_EncycInfo(t *testing.T) {
 	result, err := wargaming.EncycInfo()
 
 	assert.NoError(t, err)
-	assert.Equal(t, domain.WGEncycInfo{}, result)
+	assert.Equal(t, domain.WGEncycInfoData{}, result)
 }
 
 func TestWargaming_BattleArena(t *testing.T) {
 	t.Parallel()
 
-	server := simpleMockServer(200, domain.WGBattleArenas{})
+	server := simpleMockServer(200, response.WGBattleArenas{
+		WGResponseCommon: response.WGResponseCommon[domain.WGBattleArenas]{
+			Status: "",
+			Error:  response.WGError{},
+			Data:   map[int]domain.WGBattleArenasData{},
+		},
+	})
 	defer server.Close()
 
 	wargaming := NewWargaming(RequestConfig{
@@ -159,7 +213,13 @@ func TestWargaming_BattleArena(t *testing.T) {
 func TestWargaming_BattleTypes(t *testing.T) {
 	t.Parallel()
 
-	server := simpleMockServer(200, domain.WGBattleTypes{})
+	server := simpleMockServer(200, response.WGBattleTypes{
+		WGResponseCommon: response.WGResponseCommon[domain.WGBattleTypes]{
+			Status: "",
+			Error:  response.WGError{},
+			Data:   map[string]domain.WGBattleTypesData{},
+		},
+	})
 	defer server.Close()
 
 	wargaming := NewWargaming(RequestConfig{
@@ -174,7 +234,7 @@ func TestWargaming_BattleTypes(t *testing.T) {
 func TestWargaming_Test(t *testing.T) {
 	t.Parallel()
 
-	server := simpleMockServer(200, domain.WGEncycInfo{})
+	server := simpleMockServer(200, response.WGEncycInfo{})
 	defer server.Close()
 
 	wargaming := NewWargaming(RequestConfig{
@@ -251,7 +311,7 @@ func TestWargaming_AccountInfo_正常系_最大リトライ(t *testing.T) {
 				return
 			}
 
-			body, _ := json.Marshal(domain.WGAccountInfo{})
+			body, _ := json.Marshal(response.WGAccountInfo{})
 			_, _ = w.Write(body)
 		}))
 		defer server.Close()
