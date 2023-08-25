@@ -75,7 +75,7 @@
       storedExcludePlayerIDs.set(await ExcludePlayerIDs());
 
       const elapsed = (new Date().getTime() - start) / 1000;
-      notification.showToast(`データ取得完了: ${elapsed}秒`, "success");
+      notification.showSuccessToast(`データ取得完了: ${elapsed}秒`);
       notification.removeToastWithKey(ToastKey.error);
     } catch (error) {
       notification.showToastWithKey(error, "error", ToastKey.error);
@@ -87,10 +87,7 @@
       try {
         await screenshot.auto($storedBattle.meta);
       } catch (error) {
-        notification.showToast(
-          "スクリーンショットの自動保存に失敗しました。",
-          "error"
-        );
+        notification.showErrorToast(error);
       }
     }
   });
@@ -130,12 +127,12 @@
       const players = await AlertPlayers();
       storedAlertPlayers.set(players);
     } catch (error) {
-      notification.showToast(error, "error");
+      notification.showErrorToast(error);
     }
   }
 
   async function onFailureAlertPlayerModal(event: CustomEvent<any>) {
-    notification.showToast(event.detail.message, "error");
+    notification.showErrorToast(event.detail.message);
   }
 
   async function main() {
@@ -145,7 +142,7 @@
       const players = await AlertPlayers();
       storedAlertPlayers.set(players);
     } catch (error) {
-      notification.showToast(error, "error");
+      notification.showErrorToast(error);
       return;
     }
 
@@ -154,7 +151,7 @@
       config = await UserConfig();
       storedUserConfig.set(config);
     } catch (error) {
-      notification.showToast(error, "error");
+      notification.showErrorToast(error);
       return;
     }
 
@@ -172,7 +169,7 @@
           );
         }
       } catch (error) {
-        notification.showToast(error, "error");
+        notification.showErrorToast(error);
       }
     }
 
@@ -188,7 +185,7 @@
     try {
       StartWatching();
     } catch (error) {
-      notification.showToast(error, "error");
+      notification.showErrorToast(error);
     }
   }
 
@@ -220,9 +217,8 @@
     <Navigation
       {screenshot}
       on:Success={(event) =>
-        notification.showToast(event.detail.message, "success")}
-      on:Failure={(event) =>
-        notification.showToast(event.detail.message, "error")}
+        notification.showSuccessToast(event.detail.message)}
+      on:Failure={(event) => notification.showErrorToast(event.detail.message)}
     />
 
     {#if $storedCurrentPage === Page.Main}
@@ -237,18 +233,18 @@
     {#if $storedCurrentPage === Page.Config}
       <ConfigPage
         on:UpdateSuccess={(event) => {
-          notification.showToast(event.detail.message, "success");
+          notification.showSuccessToast(event.detail.message);
           notification.removeToastWithKey(ToastKey.needConfig);
           if (!$storedBattle) {
             try {
               StartWatching();
             } catch (error) {
-              notification.showToast(error, "error");
+              notification.showErrorToast(error);
             }
           }
         }}
         on:Failure={(event) =>
-          notification.showToast(event.detail.message, "error")}
+          notification.showErrorToast(event.detail.message)}
       />
     {/if}
 
@@ -262,7 +258,7 @@
         on:UpdateAlertPlayer={(event) => showUpdateAlertPlayerModal(event)}
         on:RemoveAlertPlayer={(event) => showRemoveAlertPlayerModal(event)}
         on:Failure={(event) =>
-          notification.showToast(event.detail.message, "error")}
+          notification.showErrorToast(event.detail.message)}
       />
     {/if}
 

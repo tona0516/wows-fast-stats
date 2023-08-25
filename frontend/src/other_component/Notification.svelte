@@ -13,12 +13,22 @@
 
   let toastDict: { [key: string]: ToastProps } = {};
 
-  export function showToast(message: string, type: ToastType) {
+  export function showSuccessToast(message: string) {
     toasts.add({
       description: message,
       duration: DURATION_MS,
       placement: PLACEMENT,
-      type: type,
+      type: "success",
+      theme: THEME,
+    });
+  }
+
+  export function showErrorToast(message: string) {
+    toasts.add({
+      description: message,
+      duration: DURATION_MS,
+      placement: PLACEMENT,
+      type: "error",
       theme: THEME,
     });
   }
