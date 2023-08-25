@@ -66,3 +66,7 @@ test:
 put-temp-arema-info:
 	$(eval TEMP_ARENA_INFO := $(shell ls test_install_dir/replays | fzf))
 	cp $(TEST_DIR)$(TEMP_ARENA_INFO) $(TEST_DIR)tempArenaInfo.json
+
+.PHONY: remove-files
+remove-files:
+	rm -rf config/ cache/ temp_arena_info/ screenshot/
