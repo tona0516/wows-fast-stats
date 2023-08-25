@@ -22,18 +22,16 @@
   import {
     EventsOn,
     LogDebug,
-    LogError,
     EventsEmit,
     BrowserOpenURL,
   } from "wailsjs/runtime/runtime";
-  import { Screenshot } from "./Screenshot";
+  import { Screenshot } from "src/Screenshot";
   import { AppEvent, ToastKey, Page } from "./enums";
   import {
     storedSummaryResult,
     storedLogs,
     storedBattle,
     storedExcludePlayerIDs,
-    storedIsFirstScreenshot,
     storedAlertPlayers,
     storedUserConfig,
     storedCurrentPage,
@@ -44,6 +42,8 @@
   let addAlertPlayerModal: AddAlertPlayerModal;
   let updateAlertPlayerModal: UpdateAlertPlayerModal;
   let removeAlertPlayerModal: RemoveAlertPlayerModal;
+
+  let screenshot = new Screenshot();
 
   $: storedSummaryResult.set(
     summary($storedBattle, $storedExcludePlayerIDs, $storedUserConfig)
@@ -85,18 +85,12 @@
 
     if ($storedUserConfig.save_screenshot) {
       try {
-        const screenshot = new Screenshot(
-          $storedBattle,
-          $storedIsFirstScreenshot
-        );
-        screenshot.auto();
-        storedIsFirstScreenshot.set(false);
+        await screenshot.auto($storedBattle.meta);
       } catch (error) {
         notification.showToast(
           "スクリーンショットの自動保存に失敗しました。",
           "error"
         );
-        LogError(error.name + "," + error.message + "," + error.stack);
       }
     }
   });
@@ -224,6 +218,7 @@
     />
 
     <Navigation
+      {screenshot}
       on:Success={(event) =>
         notification.showToast(event.detail.message, "success")}
       on:Failure={(event) =>

@@ -13,5 +13,4 @@ export const storedUserConfig = writable({}) as Writable<domain.UserConfig>;
 export const storedAlertPlayers = writable([]) as Writable<
   domain.AlertPlayer[]
 >;
-export const storedIsFirstScreenshot = writable(true) as Writable<boolean>;
 export const storedLogs = writable([]) as Writable<string[]>;

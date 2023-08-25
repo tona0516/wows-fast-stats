@@ -1,22 +1,23 @@
 <script lang="ts">
   import clone from "clone";
   import { type NavigationItem, Const } from "src/Const";
-  import { Screenshot } from "src/Screenshot";
+  import type { Screenshot } from "src/Screenshot";
   import { Page, Func } from "src/enums";
   import {
     storedCurrentPage,
-    storedIsFirstScreenshot,
     storedUserConfig,
     storedBattle,
   } from "src/stores";
   import { createEventDispatcher } from "svelte";
   import { Button, Spinner } from "sveltestrap";
   import { ApplyUserConfig, StatsPatterns } from "wailsjs/go/main/App";
-  import { WindowReloadApp, LogError } from "wailsjs/runtime/runtime";
+  import { WindowReloadApp } from "wailsjs/runtime/runtime";
+
+  export let screenshot: Screenshot;
 
   const dispatch = createEventDispatcher();
 
-  let isLoadingScreenshot: boolean = false;
+  let isScreenshotting: boolean = false;
   let selectedStatsPattern: string;
 
   function onSwitchPage(item: NavigationItem<Page>) {
@@ -29,7 +30,7 @@
         reload();
         break;
       case Func.Screenshot:
-        await screenshot();
+        await takeScreenshot();
         break;
     }
   }
@@ -38,27 +39,16 @@
     WindowReloadApp();
   }
 
-  async function screenshot() {
+  async function takeScreenshot() {
     try {
-      isLoadingScreenshot = true;
-      const screenshot = new Screenshot(
-        $storedBattle,
-        $storedIsFirstScreenshot
-      );
-      await screenshot.manual();
-      dispatch("Success", {
-        message: "スクリーンショットを保存しました。",
-      });
-    } catch (error) {
-      if (error.message.includes("Canceled")) {
-        return;
+      isScreenshotting = true;
+      if (await screenshot.manual($storedBattle.meta)) {
+        dispatch("Success", { message: "スクリーンショットを保存しました。" });
       }
-
+    } catch (error) {
       dispatch("Failure", { message: error });
-      LogError(error.name + "," + error.message + "," + error.stack);
     } finally {
-      storedIsFirstScreenshot.set(false);
-      isLoadingScreenshot = false;
+      isScreenshotting = false;
     }
   }
 
@@ -115,11 +105,11 @@
               class="m-1"
               title={func.title}
               disabled={func.name === Func.Screenshot &&
-                ($storedBattle === undefined || isLoadingScreenshot)}
+                ($storedBattle === undefined || isScreenshotting)}
               style="font-size: {$storedUserConfig.font_size};"
               on:click={() => onClickFunc(func)}
             >
-              {#if func.name === Func.Screenshot && isLoadingScreenshot}
+              {#if func.name === Func.Screenshot && isScreenshotting}
                 <Spinner size="sm" type="border" /> 読み込み中
               {:else}
                 <i class={func.iconClass} />
