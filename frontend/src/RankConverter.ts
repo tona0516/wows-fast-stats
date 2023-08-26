@@ -14,8 +14,8 @@ export class SkillLevelConverter {
   }
 
   static fromPR(value: number, color: domain.SkillColor): SkillLevelConverter {
-    const level = Const.SKILL_LEVELS.find(
-      (it) => value >= 0 && value < it.maxPR
+    const level = Const.SKILL_LEVELS.findLast(
+      (it) => value >= 0 && value >= it.minPR
     );
     return level
       ? new SkillLevelConverter(color, level)
@@ -28,7 +28,7 @@ export class SkillLevelConverter {
     color: domain.SkillColor
   ): SkillLevelConverter {
     const ratio = value / expected ?? 0;
-    const level = Const.SKILL_LEVELS.find((it) => ratio < it.maxDamage);
+    const level = Const.SKILL_LEVELS.findLast((it) => ratio >= it.minDamage);
     return level
       ? new SkillLevelConverter(color, level)
       : new SkillLevelConverter(color);
@@ -38,7 +38,7 @@ export class SkillLevelConverter {
     value: number,
     color: domain.SkillColor
   ): SkillLevelConverter {
-    const level = Const.SKILL_LEVELS.find((it) => value < it.maxWin);
+    const level = Const.SKILL_LEVELS.findLast((it) => value >= it.minWin);
     return level
       ? new SkillLevelConverter(color, level)
       : new SkillLevelConverter(color);
