@@ -5,9 +5,9 @@
   export const toggle = () => (open = !open);
   export let message: string;
 
-  const dispatch = createEventDispatcher();
-
   let open = false;
+
+  const dispatch = createEventDispatcher();
 </script>
 
 <Modal isOpen={open} {toggle}>

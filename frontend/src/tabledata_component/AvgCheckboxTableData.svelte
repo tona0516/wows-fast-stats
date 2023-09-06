@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { IsInAvg } from "src/lib/column/IsInAvg";
   import { storedExcludePlayerIDs } from "src/stores";
   import { createEventDispatcher } from "svelte";
   import {
@@ -7,25 +8,26 @@
   } from "wailsjs/go/main/App";
   import type { domain } from "wailsjs/go/models";
 
+  export let column: IsInAvg;
   export let player: domain.Player;
 
-  $: isChecked = !$storedExcludePlayerIDs.includes(player.player_info.id);
+  $: accountID = player.player_info.id;
+  $: isChecked = !$storedExcludePlayerIDs.includes(accountID);
 
   const dispatch = createEventDispatcher();
 
-  async function onCheck(e: any) {
-    const accountID = player.player_info.id;
+  const onCheck = async (e: any) => {
     if (e.target.checked) {
       await RemoveExcludePlayerID(accountID);
     } else {
       await AddExcludePlayerID(accountID);
     }
     dispatch("CheckPlayer");
-  }
+  };
 </script>
 
 <td class="td-checkbox">
-  {#if player.player_info.id !== 0}
+  {#if column.displayValue(player)}
     <input
       class="form-check-input"
       type="checkbox"

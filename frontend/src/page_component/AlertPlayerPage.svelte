@@ -1,9 +1,9 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
   import clone from "clone";
-  import { Button } from "sveltestrap";
   import { storedAlertPlayers, storedUserConfig } from "src/stores";
   import type { domain } from "wailsjs/go/models";
+  import { Button } from "sveltestrap";
 
   const dispatch = createEventDispatcher();
 
@@ -57,17 +57,14 @@
               <td>{player.message}</td>
               <td>
                 <Button
-                  class="m-1"
                   size="sm"
                   color="success"
-                  style="font-size: {$storedUserConfig.font_size};"
-                  on:click={() => onClickEdit(player)}>編集</Button
-                >
+                  on:click={() => onClickEdit(player)}
+                  >編集
+                </Button>
                 <Button
-                  class="m-1"
                   size="sm"
                   color="danger"
-                  style="font-size: {$storedUserConfig.font_size};"
                   on:click={() => onClickRemove(player)}>削除</Button
                 >
               </td>
@@ -79,11 +76,5 @@
   </div>
 
   <!-- add button -->
-  <Button
-    class="m-1"
-    size="sm"
-    color="primary"
-    style="font-size: {$storedUserConfig.font_size};"
-    on:click={onClickAdd}>追加</Button
-  >
+  <Button size="sm" color="primary" on:click={onClickAdd}>追加</Button>
 </div>

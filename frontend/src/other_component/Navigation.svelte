@@ -1,8 +1,8 @@
 <script lang="ts">
   import clone from "clone";
-  import { type NavigationItem, Const } from "src/Const";
-  import type { Screenshot } from "src/Screenshot";
-  import { Page, Func } from "src/enums";
+  import { DispName } from "src/lib/DispName";
+  import type { Screenshot } from "src/lib/Screenshot";
+  import { Func, Page, type StatsExtra } from "src/lib/types";
   import {
     storedCurrentPage,
     storedUserConfig,
@@ -10,39 +10,41 @@
   } from "src/stores";
   import { createEventDispatcher } from "svelte";
   import { Button, Spinner } from "sveltestrap";
-  import { ApplyUserConfig, StatsPatterns } from "wailsjs/go/main/App";
-  import { WindowReloadApp } from "wailsjs/runtime/runtime";
+  import { ApplyUserConfig } from "wailsjs/go/main/App";
+  import { WindowReload } from "wailsjs/runtime/runtime";
 
   export let screenshot: Screenshot;
 
+  let isScreenshotting = false;
+  let selectedStatsPattern: StatsExtra;
+  let meta = $storedBattle?.meta;
+  storedBattle.subscribe((it) => {
+    meta = it?.meta;
+  });
+
+  $: disableScreenshotButton = meta === undefined || isScreenshotting;
+
   const dispatch = createEventDispatcher();
+  const navID = "navbarNavAltMarkup";
 
-  let isScreenshotting: boolean = false;
-  let selectedStatsPattern: string;
-
-  function onSwitchPage(item: NavigationItem<Page>) {
-    storedCurrentPage.set(item.name);
-  }
-
-  async function onClickFunc(item: NavigationItem<Func>) {
-    switch (item.name) {
-      case Func.Reload:
-        reload();
-        break;
-      case Func.Screenshot:
-        await takeScreenshot();
+  const onClickFunc = (func: Func) => {
+    switch (func) {
+      case Func.RELOAD:
+        WindowReload();
+      case Func.SCREENSHOT:
+        takeScreenshot();
         break;
     }
-  }
+  };
 
-  function reload() {
-    WindowReloadApp();
-  }
+  const takeScreenshot = async () => {
+    if (!meta) {
+      return;
+    }
 
-  async function takeScreenshot() {
     try {
       isScreenshotting = true;
-      if (await screenshot.manual($storedBattle.meta)) {
+      if (await screenshot.manual(meta)) {
         dispatch("Success", { message: "スクリーンショットを保存しました。" });
       }
     } catch (error) {
@@ -50,89 +52,87 @@
     } finally {
       isScreenshotting = false;
     }
-  }
+  };
 
-  async function onStatsPatternChanged() {
+  const onStatsPatternChanged = async () => {
+    // Note: for the following sveltestrap bug
+    // https://github.com/bestguy/sveltestrap/issues/461
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
     try {
-      const config = clone($storedUserConfig);
+      let config = clone($storedUserConfig);
       config.stats_pattern = selectedStatsPattern;
-
       await ApplyUserConfig(config);
       storedUserConfig.set(config);
     } catch (error) {
       dispatch("Failure", { message: error });
       return;
     }
-  }
+  };
 </script>
 
+<!-- Note: doesn't show buttons with sveltestrap -->
 <nav class="navbar navbar-expand-sm sticky-top navbar-light bg-light p-1">
   <div class="container-fluid">
     <button
-      class="navbar-toggler m-1"
+      class="navbar-toggler"
       type="button"
       data-bs-toggle="collapse"
-      data-bs-target="#navbarNavAltMarkup"
-      aria-controls="navbarNavAltMarkup"
+      data-bs-target="#{navID}"
+      aria-controls={navID}
       aria-expanded="false"
-      aria-label="Toggle navigation"
-      style="font-size: {$storedUserConfig.font_size};"
     >
       <span class="navbar-toggler-icon" />
     </button>
-    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+    <div class="collapse navbar-collapse" id={navID}>
       <div class="navbar-nav">
-        {#each Const.PAGES as page}
+        {#each DispName.PAGES as page}
           <Button
             size="sm"
             color="secondary"
             outline
-            class="m-1 {$storedCurrentPage === page.name && 'active'}"
-            title={page.title}
+            class="m-1 {$storedCurrentPage === page.first ? 'active' : ''}"
             style="font-size: {$storedUserConfig.font_size};"
-            on:click={() => onSwitchPage(page)}
+            on:click={() => storedCurrentPage.set(page.first)}
           >
-            <i class={page.iconClass} />
-            {page.title}
+            <i class={page.third} />
+            {page.second}
           </Button>
         {/each}
-        {#if $storedCurrentPage == Page.Main}
-          {#each Const.FUNCS as func}
+        {#if $storedCurrentPage == Page.MAIN}
+          {#each DispName.FUNCS as func}
             <Button
               size="sm"
               color="success"
               outline
               class="m-1"
-              title={func.title}
-              disabled={func.name === Func.Screenshot &&
-                ($storedBattle === undefined || isScreenshotting)}
+              disabled={func.first === Func.SCREENSHOT &&
+                disableScreenshotButton}
               style="font-size: {$storedUserConfig.font_size};"
-              on:click={() => onClickFunc(func)}
+              on:click={() => onClickFunc(func.first)}
             >
-              {#if func.name === Func.Screenshot && isScreenshotting}
-                <Spinner size="sm" type="border" /> 読み込み中
+              {#if func.first === Func.SCREENSHOT && isScreenshotting}
+                <Spinner size="sm" /> 読み込み中
               {:else}
-                <i class={func.iconClass} />
-                {func.title}
+                <i class={func.third} />
+                {func.second}
               {/if}
             </Button>
           {/each}
 
+          <!-- Note: sveltestrap "input" binds empty value when page changed -->
           <select
             class="form-select form-select-sm m-1"
             style="font-size: {$storedUserConfig.font_size};"
             bind:value={selectedStatsPattern}
             on:change={onStatsPatternChanged}
           >
-            {#await StatsPatterns() then statsPatterns}
-              {#each statsPatterns as sp}
-                {@const label = Const.STATS_PATTERN[sp]}
-                <option
-                  selected={sp === $storedUserConfig.stats_pattern}
-                  value={sp}>{label}</option
-                >
-              {/each}
-            {/await}
+            {#each DispName.STATS_PATTERNS as pair}
+              <option
+                selected={pair.first === $storedUserConfig.stats_pattern}
+                value={pair.first}>{pair.second}</option
+              >
+            {/each}
           </select>
         {/if}
       </div>

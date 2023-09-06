@@ -1,11 +1,8 @@
 <script lang="ts">
-  import AddAlertPlayerModal from "src/other_component/AddAlertPlayerModal.svelte";
   import MainPage from "src/page_component/MainPage.svelte";
   import ConfigPage from "src/page_component/ConfigPage.svelte";
   import AppInfoPage from "src/page_component/AppInfoPage.svelte";
   import AlertPlayerPage from "src/page_component/AlertPlayerPage.svelte";
-  import UpdateAlertPlayerModal from "src/other_component/UpdateAlertPlayerModal.svelte";
-  import RemoveAlertPlayerModal from "src/other_component/RemoveAlertPlayerModal.svelte";
   import Notification from "src/other_component/Notification.svelte";
   import Navigation from "src/other_component/Navigation.svelte";
 
@@ -17,6 +14,7 @@
     UserConfig,
     LatestRelease,
     StartWatching,
+    DefaultUserConfig,
   } from "wailsjs/go/main/App";
   import type { domain } from "wailsjs/go/models";
   import {
@@ -25,19 +23,23 @@
     EventsEmit,
     BrowserOpenURL,
   } from "wailsjs/runtime/runtime";
-  import { Screenshot } from "src/Screenshot";
-  import { AppEvent, ToastKey, Page } from "./enums";
+  import { Screenshot } from "src/lib/Screenshot";
   import {
-    storedSummaryResult,
+    storedSummary,
     storedLogs,
     storedBattle,
     storedExcludePlayerIDs,
     storedAlertPlayers,
     storedUserConfig,
     storedCurrentPage,
-  } from "./stores";
-  import { summary } from "./util";
+  } from "src/stores";
+  import { calculateSummary } from "src/lib/util";
+  import AddAlertPlayerModal from "src/other_component/AddAlertPlayerModal.svelte";
+  import UpdateAlertPlayerModal from "src/other_component/UpdateAlertPlayerModal.svelte";
+  import RemoveAlertPlayerModal from "src/other_component/RemoveAlertPlayerModal.svelte";
+  import { AppEvent, Page, ToastKey } from "./lib/types";
 
+  let defaultUserConfig: domain.UserConfig;
   let notification: Notification;
   let addAlertPlayerModal: AddAlertPlayerModal;
   let updateAlertPlayerModal: UpdateAlertPlayerModal;
@@ -45,12 +47,12 @@
 
   let screenshot = new Screenshot();
 
-  $: storedSummaryResult.set(
-    summary($storedBattle, $storedExcludePlayerIDs, $storedUserConfig)
+  $: storedSummary.set(
+    calculateSummary($storedBattle, $storedExcludePlayerIDs, $storedUserConfig),
   );
 
-  EventsOn(AppEvent.log, async (log: string) => {
-    LogDebug(`EventsOn:${AppEvent.log}`);
+  EventsOn(AppEvent.LOG, async (log: string) => {
+    LogDebug(`EventsOn:${AppEvent.LOG}`);
 
     storedLogs.update((logs) => {
       logs.push(log);
@@ -58,85 +60,88 @@
     });
   });
 
-  EventsOn(AppEvent.battleStart, async () => {
-    LogDebug(`EventsOn:${AppEvent.battleStart}`);
+  EventsOn(AppEvent.BATTLE_START, async () => {
+    LogDebug(`EventsOn:${AppEvent.BATTLE_START}`);
 
     try {
-      notification.removeToastWithKey(ToastKey.wait);
+      notification.removeToastWithKey(ToastKey.WAIT);
       notification.showToastWithKey(
         "戦闘データの取得中...",
         "info",
-        ToastKey.fetching
+        ToastKey.FETCHING,
       );
 
       const start = new Date().getTime();
 
-      storedBattle.set(await Battle());
-      storedExcludePlayerIDs.set(await ExcludePlayerIDs());
+      const battle = await Battle();
+      storedBattle.set(battle);
+      const excludeIDs = await ExcludePlayerIDs();
+      storedExcludePlayerIDs.set(excludeIDs);
+
+      const summary = calculateSummary(battle, excludeIDs, $storedUserConfig);
+      storedSummary.set(summary);
 
       const elapsed = (new Date().getTime() - start) / 1000;
       notification.showSuccessToast(`データ取得完了: ${elapsed}秒`);
-      notification.removeToastWithKey(ToastKey.error);
-    } catch (error) {
-      notification.showToastWithKey(error, "error", ToastKey.error);
-    } finally {
-      notification.removeToastWithKey(ToastKey.fetching);
-    }
+      notification.removeToastWithKey(ToastKey.ERROR);
 
-    if ($storedUserConfig.save_screenshot) {
-      try {
-        await screenshot.auto($storedBattle.meta);
-      } catch (error) {
-        notification.showErrorToast(error);
+      if ($storedUserConfig.save_screenshot) {
+        await screenshot.auto(battle.meta);
       }
+    } catch (error) {
+      notification.showToastWithKey(error, "error", ToastKey.ERROR);
+    } finally {
+      notification.removeToastWithKey(ToastKey.FETCHING);
     }
   });
 
-  EventsOn(AppEvent.battleEnd, () => {
-    LogDebug(`EventsOn:${AppEvent.battleEnd}`);
+  EventsOn(AppEvent.BATTLE_END, () => {
+    LogDebug(`EventsOn:${AppEvent.BATTLE_END}`);
 
     notification.showToastWithKey(
       "戦闘中ではありません。開始時に自動的にリロードします。",
       "info",
-      ToastKey.wait
+      ToastKey.WAIT,
     );
   });
 
-  EventsOn(AppEvent.battleErr, (error: string) => {
-    LogDebug(`EventsOn:${AppEvent.battleErr}`);
+  EventsOn(AppEvent.BATTLE_ERR, (error: string) => {
+    LogDebug(`EventsOn:${AppEvent.BATTLE_ERR}`);
 
-    notification.showToastWithKey(error, "error", ToastKey.error);
+    notification.showToastWithKey(error, "error", ToastKey.ERROR);
   });
 
-  async function showAddAlertPlayerModal(_: CustomEvent<any>) {
-    addAlertPlayerModal.toggle();
-  }
-
-  async function showUpdateAlertPlayerModal(event: CustomEvent<any>) {
-    updateAlertPlayerModal.setTarget(event.detail.target);
-    updateAlertPlayerModal.toggle();
-  }
-
-  async function showRemoveAlertPlayerModal(event: CustomEvent<any>) {
-    removeAlertPlayerModal.setTarget(event.detail.target);
-    removeAlertPlayerModal.toggle();
-  }
-
-  async function onSuccessAlertPlayerModal() {
+  const onAlertPlayerUpdated = async () => {
     try {
       const players = await AlertPlayers();
       storedAlertPlayers.set(players);
     } catch (error) {
       notification.showErrorToast(error);
     }
-  }
+  };
 
-  async function onFailureAlertPlayerModal(event: CustomEvent<any>) {
+  const onAlertPlayerUpdateFailed = (event: CustomEvent<any>) => {
     notification.showErrorToast(event.detail.message);
-  }
+  };
+
+  const showAddAlertPlayerModal = (_: CustomEvent<any>) => {
+    addAlertPlayerModal.toggle();
+  };
+
+  const showUpdateAlertPlayerModal = (event: CustomEvent<any>) => {
+    updateAlertPlayerModal.setTarget(event.detail.target);
+    updateAlertPlayerModal.toggle();
+  };
+
+  const showRemoveAlertPlayerModal = (event: CustomEvent<any>) => {
+    removeAlertPlayerModal.setTarget(event.detail.target);
+    removeAlertPlayerModal.toggle();
+  };
 
   async function main() {
     EventsEmit("ONLOAD");
+
+    defaultUserConfig = await DefaultUserConfig();
 
     try {
       const players = await AlertPlayers();
@@ -164,8 +169,8 @@
               latestRelease.tag_name +
               "(クリックで開く)",
             "warning",
-            ToastKey.updatable,
-            () => BrowserOpenURL(latestRelease.html_url)
+            ToastKey.UPDATABLE,
+            () => BrowserOpenURL(latestRelease.html_url),
           );
         }
       } catch (error) {
@@ -177,7 +182,7 @@
       notification.showToastWithKey(
         "未設定の状態のため開始できません。「設定」から入力してください。",
         "info",
-        ToastKey.needConfig
+        ToastKey.NEED_CONFIG,
       );
       return;
     }
@@ -198,20 +203,20 @@
   <div style="font-size: {$storedUserConfig.font_size};">
     <AddAlertPlayerModal
       bind:this={addAlertPlayerModal}
-      on:Success={onSuccessAlertPlayerModal}
-      on:Failure={(event) => onFailureAlertPlayerModal(event)}
+      on:Success={onAlertPlayerUpdated}
+      on:Failure={(event) => onAlertPlayerUpdateFailed(event)}
     />
 
     <UpdateAlertPlayerModal
       bind:this={updateAlertPlayerModal}
-      on:Success={onSuccessAlertPlayerModal}
-      on:Failure={(event) => onFailureAlertPlayerModal(event)}
+      on:Success={onAlertPlayerUpdated}
+      on:Failure={(event) => onAlertPlayerUpdateFailed(event)}
     />
 
     <RemoveAlertPlayerModal
       bind:this={removeAlertPlayerModal}
-      on:Success={onSuccessAlertPlayerModal}
-      on:Failure={(event) => onFailureAlertPlayerModal(event)}
+      on:Success={onAlertPlayerUpdated}
+      on:Failure={(event) => onAlertPlayerUpdateFailed(event)}
     />
 
     <Navigation
@@ -221,20 +226,21 @@
       on:Failure={(event) => notification.showErrorToast(event.detail.message)}
     />
 
-    {#if $storedCurrentPage === Page.Main}
+    {#if $storedCurrentPage === Page.MAIN}
       <MainPage
-        on:UpdateAlertPlayer={(event) => showUpdateAlertPlayerModal(event)}
-        on:RemoveAlertPlayer={(event) => showRemoveAlertPlayerModal(event)}
+        on:UpdateAlertPlayer={(e) => showUpdateAlertPlayerModal(e)}
+        on:RemoveAlertPlayer={(e) => showRemoveAlertPlayerModal(e)}
         on:CheckPlayer={async () =>
           storedExcludePlayerIDs.set(await ExcludePlayerIDs())}
       />
     {/if}
 
-    {#if $storedCurrentPage === Page.Config}
+    {#if $storedCurrentPage === Page.CONFIG}
       <ConfigPage
+        {defaultUserConfig}
         on:UpdateSuccess={(event) => {
           notification.showSuccessToast(event.detail.message);
-          notification.removeToastWithKey(ToastKey.needConfig);
+          notification.removeToastWithKey(ToastKey.NEED_CONFIG);
           if (!$storedBattle) {
             try {
               StartWatching();
@@ -248,15 +254,15 @@
       />
     {/if}
 
-    {#if $storedCurrentPage === Page.AppInfo}
+    {#if $storedCurrentPage === Page.APPINFO}
       <AppInfoPage />
     {/if}
 
-    {#if $storedCurrentPage === Page.AlertPlayer}
+    {#if $storedCurrentPage === Page.ALERT_PLAYER}
       <AlertPlayerPage
-        on:AddAlertPlayer={(event) => showAddAlertPlayerModal(event)}
-        on:UpdateAlertPlayer={(event) => showUpdateAlertPlayerModal(event)}
-        on:RemoveAlertPlayer={(event) => showRemoveAlertPlayerModal(event)}
+        on:AddAlertPlayer={showAddAlertPlayerModal}
+        on:UpdateAlertPlayer={(e) => showUpdateAlertPlayerModal(e)}
+        on:RemoveAlertPlayer={(e) => showRemoveAlertPlayerModal(e)}
         on:Failure={(event) =>
           notification.showErrorToast(event.detail.message)}
       />

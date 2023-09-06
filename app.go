@@ -229,18 +229,6 @@ func (a *App) LogError(errString string) {
 	logger.Error(err)
 }
 
-func (a *App) FontSizes() []string {
-	return vo.FontSizes
-}
-
-func (a *App) StatsPatterns() []string {
-	return domain.StatsPatterns
-}
-
-func (a *App) PlayerNameColors() []string {
-	return domain.PlayerNameColors
-}
-
 func (a *App) LatestRelease() (domain.GHLatestRelease, error) {
 	latestRelease, err := a.updaterService.Updatable()
 	return latestRelease, apperr.Unwrap(err)

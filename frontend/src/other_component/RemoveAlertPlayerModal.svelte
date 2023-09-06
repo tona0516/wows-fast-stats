@@ -7,12 +7,12 @@
   export const toggle = () => (open = !open);
   export const setTarget = (p: domain.AlertPlayer) => (target = p);
 
-  const dispatch = createEventDispatcher();
-
   let open = false;
   let target: domain.AlertPlayer;
 
-  async function remove(accountID: number) {
+  const dispatch = createEventDispatcher();
+
+  const remove = async (accountID: number) => {
     try {
       await RemoveAlertPlayer(accountID);
       dispatch("Success");
@@ -22,7 +22,7 @@
     } finally {
       toggle();
     }
-  }
+  };
 </script>
 
 <Modal isOpen={open} {toggle}>

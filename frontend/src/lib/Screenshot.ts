@@ -1,5 +1,6 @@
+// @ts-ignore
 import * as htmlToImage from "html-to-image";
-import { toDateForFilename } from "src/util";
+import { toDateForFilename } from "src/lib/util";
 import {
   AutoScreenshot,
   LogError,
@@ -11,10 +12,14 @@ export class Screenshot {
   private isFirst: boolean = true;
 
   private async getScreenshotBase64(
-    meta: domain.Meta
+    meta: domain.Meta,
   ): Promise<[string, string]> {
     // Workaround: first screenshot cann't draw values in table.
     const mainPageElem = document.getElementById("stats");
+    if (!mainPageElem) {
+      throw Error("cann't get element for screenshot");
+    }
+
     if (this.isFirst) {
       await htmlToImage.toPng(mainPageElem);
       this.isFirst = false;

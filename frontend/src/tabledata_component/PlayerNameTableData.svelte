@@ -1,60 +1,27 @@
 <script lang="ts">
   import clone from "clone";
-  import { SkillLevelConverter } from "src/RankConverter";
-  import { StatsCategory } from "src/enums";
-  import { storedUserConfig } from "src/stores";
-  import { values, clanURL, playerURL } from "src/util";
+  import type { PlayerName } from "src/lib/column/PlayerName";
+  import { storedAlertPlayers } from "src/stores";
   import { createEventDispatcher } from "svelte";
   import type { domain } from "wailsjs/go/models";
   import { BrowserOpenURL } from "wailsjs/runtime/runtime";
 
+  export let column: PlayerName;
   export let player: domain.Player;
-  export let userConfig: domain.UserConfig;
-  export let statsPattern: string;
-  export let alertPlayers: domain.AlertPlayer[];
 
   const dispatch = createEventDispatcher();
 
-  $: alertPlayer = alertPlayers.find(
-    (it) => it.account_id === player.player_info.id
+  $: alertPlayer = $storedAlertPlayers.find(
+    (it) => it.account_id === player.player_info.id,
   );
-  $: bgcolor = bgColor(player, userConfig, statsPattern);
-  $: playerLabel = isBelongToClan(player)
-    ? `[${player.player_info.clan.tag}] ${player.player_info.name}`
-    : player.player_info.name;
-
-  function isBelongToClan(player: domain.Player): boolean {
-    return player.player_info.clan.id !== 0;
-  }
-
-  function bgColor(
-    player: domain.Player,
-    userConfig: domain.UserConfig,
-    statsPattern: string
-  ): string {
-    let statsCategory: StatsCategory;
-    if (userConfig.custom_color.player_name === "ship") {
-      statsCategory = StatsCategory.Ship;
-    }
-    if (userConfig.custom_color.player_name === "overall") {
-      statsCategory = StatsCategory.Overall;
-    }
-
-    if (!statsCategory) {
-      return "";
-    }
-
-    const pr = values(player, statsPattern, statsCategory, "pr");
-    return SkillLevelConverter.fromPR(
-      pr,
-      userConfig.custom_color.skill
-    ).toBgColorCode();
-  }
 </script>
 
-<td class="td-string omit" style="background-color: {bgcolor}">
+<td
+  class="td-string omit"
+  style="background-color: {column.bgColorCode(player)}"
+>
   {#if player.player_info.id === 0}
-    {playerLabel}
+    {column.displayValue(player)}
   {:else}
     {#if alertPlayer}
       <i class="bi {alertPlayer.pattern}" />
@@ -67,21 +34,17 @@
       id="dropdownMenuLink"
       data-bs-toggle="dropdown"
     >
-      {playerLabel}
+      {column.displayValue(player)}
     </a>
 
-    <ul
-      class="dropdown-menu"
-      aria-labelledby="dropdownMenuLink"
-      style="font-size: {$storedUserConfig.font_size};"
-    >
-      {#if isBelongToClan(player)}
+    <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+      {#if player.player_info.clan.id}
         <!-- svelte-ignore a11y-invalid-attribute -->
         <li>
           <a
             class="dropdown-item"
             href="#"
-            on:click={() => BrowserOpenURL(clanURL(player))}
+            on:click={() => BrowserOpenURL(column.clanURL(player))}
             >クラン詳細(WoWS Stats & Numbers)</a
           >
         </li>
@@ -91,7 +54,7 @@
         <a
           class="dropdown-item"
           href="#"
-          on:click={() => BrowserOpenURL(playerURL(player))}
+          on:click={() => BrowserOpenURL(column.playerURL(player))}
           >プレイヤー詳細(WoWS Stats & Numbers)</a
         >
       </li>

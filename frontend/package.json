@@ -10,16 +10,16 @@
     "check": "svelte-check --tsconfig ./tsconfig.json"
   },
   "devDependencies": {
-    "@sveltejs/vite-plugin-svelte": "^2.4.5",
+    "@sveltejs/vite-plugin-svelte": "^1.4.0",
     "@tsconfig/svelte": "^5.0.2",
-    "@types/node": "^20.5.7",
+    "@types/node": "^20.5.9",
     "prettier": "^3.0.2",
     "prettier-plugin-organize-imports": "^3.2.3",
     "prettier-plugin-svelte": "^3.0.3",
     "svelte-check": "^3.5.0",
     "svelte-preprocess": "^5.0.4",
     "typescript": "^5.2.2",
-    "vite": "^4.4.9",
+    "vite": "^3.2.7",
     "vite-tsconfig-paths": "^4.2.0"
   },
   "dependencies": {
@@ -31,6 +31,6 @@
     "svelecte": "^3.16.1",
     "svelte": "^3.59.1",
     "svelte-toasts": "^1.1.2",
-    "sveltestrap": "^5.11.1"
+    "sveltestrap": "^5.11.2"
   }
 }

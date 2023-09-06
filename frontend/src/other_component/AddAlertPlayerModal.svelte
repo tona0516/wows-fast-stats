@@ -1,7 +1,7 @@
 <script lang="ts">
+  // @ts-ignore
   import Svelecte from "svelecte";
   import clone from "clone";
-  import { Const } from "src/Const";
   import { createEventDispatcher } from "svelte";
   import {
     Modal,
@@ -18,27 +18,29 @@
     UpdateAlertPlayer,
   } from "wailsjs/go/main/App";
   import type { domain } from "wailsjs/go/models";
+  import { MAX_MEMO_LENGTH } from "src/const";
 
   export const toggle = () => (open = !open);
 
+  let open = false;
+  let target: domain.AlertPlayer;
+  let searchResult: domain.WGAccountListData | undefined;
+
+  const DEFAULT_ALERT_PLAYER: domain.AlertPlayer = {
+    account_id: 0,
+    name: "",
+    pattern: "bi-check-circle-fill",
+    message: "",
+  };
+
   const dispatch = createEventDispatcher();
 
-  let open = false;
-
-  let alertPatterns: string[] = [];
-  let target: domain.AlertPlayer = clone(Const.DEFAULT_ALERT_PLAYER);
-  let searchResult: domain.WGAccountListData;
-
-  async function onOpen() {
-    alertPatterns = await AlertPatterns();
-    target = clone(Const.DEFAULT_ALERT_PLAYER);
+  const onOpen = async () => {
+    target = clone(DEFAULT_ALERT_PLAYER);
     searchResult = undefined;
-  }
+  };
 
-  async function add(
-    player: domain.AlertPlayer,
-    searchResult: domain.WGAccountListData
-  ) {
+  const add = async (player: domain.AlertPlayer) => {
     try {
       if (!searchResult) {
         dispatch("Failure", { message: "不正な入力です" });
@@ -60,13 +62,13 @@
     } finally {
       toggle();
     }
-  }
+  };
 
-  function validate(player: domain.AlertPlayer): boolean {
+  const validate = (player: domain.AlertPlayer): boolean => {
     return (
       player.account_id !== 0 && player.name !== "" && player.pattern !== ""
     );
-  }
+  };
 </script>
 
 <Modal isOpen={open} {toggle} on:open={onOpen}>
@@ -87,8 +89,7 @@
 
     <FormGroup>
       <Label>アイコン</Label>
-      <!-- TODO migrate sveltestrap -->
-      <div>
+      {#await AlertPatterns() then alertPatterns}
         {#each alertPatterns as pattern}
           <div class="form-check form-check-inline">
             <input
@@ -102,24 +103,22 @@
             </label>
           </div>
         {/each}
-      </div>
+      {/await}
     </FormGroup>
 
     <FormGroup>
       <Label>メモ(任意)</Label>
       <Input
         type="textarea"
-        maxlength={Const.MAX_MEMO_LENGTH}
+        maxlength={MAX_MEMO_LENGTH}
         bind:value={target.message}
       />
-      <span>{target.message.length}/{Const.MAX_MEMO_LENGTH}</span>
+      <span>{target.message.length}/{MAX_MEMO_LENGTH}</span>
     </FormGroup>
   </ModalBody>
 
   <ModalFooter class="modal-color">
     <Button size="sm" color="secondary" on:click={toggle}>キャンセル</Button>
-    <Button size="sm" color="primary" on:click={() => add(target, searchResult)}
-      >追加</Button
-    >
+    <Button size="sm" color="primary" on:click={() => add(target)}>追加</Button>
   </ModalFooter>
 </Modal>

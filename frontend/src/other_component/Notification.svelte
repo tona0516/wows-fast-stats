@@ -13,9 +13,9 @@
 
   let toastDict: { [key: string]: ToastProps } = {};
 
-  export function showSuccessToast(message: string) {
+  export function showSuccessToast(description: string) {
     toasts.add({
-      description: message,
+      description: description,
       duration: DURATION_MS,
       placement: PLACEMENT,
       type: "success",
@@ -23,9 +23,9 @@
     });
   }
 
-  export function showErrorToast(message: string) {
+  export function showErrorToast(message: any) {
     toasts.add({
-      description: message,
+      description: toDescription(message),
       duration: DURATION_MS,
       placement: PLACEMENT,
       type: "error",
@@ -34,10 +34,10 @@
   }
 
   export function showToastWithKey(
-    message: string,
+    message: any,
     type: ToastType,
     key: string,
-    onClick: () => void = null
+    onClick?: () => void,
   ) {
     if (toastDict[key]) {
       return;
@@ -48,7 +48,7 @@
     }
 
     const toast = toasts.add({
-      description: message,
+      description: toDescription(message),
       duration: 0,
       placement: PLACEMENT,
       type: type,
@@ -60,13 +60,21 @@
   }
 
   export function removeToastWithKey(key: string) {
-    if (!toastDict[key]) {
+    const toast = toastDict[key];
+
+    if (!toast || !toast.remove) {
       return;
     }
 
-    toastDict[key].remove();
+    toast.remove();
     delete toastDict[key];
   }
+
+  const toDescription = (message: any): string => {
+    return message instanceof Error
+      ? `${message.name}: ${message.message}`
+      : message;
+  };
 </script>
 
 <ToastContainer let:data>

@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { Const } from "src/Const";
-  import { SkillLevelConverter } from "src/RankConverter";
+  import { ratingFactors } from "src/lib/rating/RatingConst";
+  import { RatingConverterFactory } from "src/lib/rating/RatingConverter";
   import type { domain } from "wailsjs/go/models";
-  import { BrowserOpenURL } from "wailsjs/runtime/runtime";
+  import ExternalLink from "./ExternalLink.svelte";
 
   export let userConfig: domain.UserConfig;
 </script>
@@ -17,33 +17,34 @@
         <th>勝率</th>
       </thead>
       <tbody>
-        {#each Object.values(Const.SKILL_LEVELS) as v}
+        {#each ratingFactors() as factor}
           <tr>
-            <td>{v.level}</td>
+            <td>{factor.level}</td>
             <td
-              style="background-color: {SkillLevelConverter.fromPR(
-                v.minPR,
-                userConfig.custom_color.skill
-              ).toBgColorCode()};">player_name</td
+              style="background-color: {RatingConverterFactory.fromPR(
+                factor.minPR,
+                userConfig,
+              ).bgColorCode()};">player_name</td
             >
             <td
-              style="color: {SkillLevelConverter.fromPR(
-                v.minPR,
-                userConfig.custom_color.skill
-              ).toTextColorCode()};">{v.minPR} ~ {v.maxPR}</td
+              style="color: {RatingConverterFactory.fromPR(
+                factor.minPR,
+                userConfig,
+              ).textColorCode()};">{factor.minPR} ~ {factor.maxPR}</td
             >
             <td
-              style="color: {SkillLevelConverter.fromDamage(
-                v.minDamage,
+              style="color: {RatingConverterFactory.fromDamage(
+                factor.minDamage,
                 1.0,
-                userConfig.custom_color.skill
-              ).toTextColorCode()};">{v.minDamage}倍 ~ {v.maxDamage}倍</td
+                userConfig,
+              ).textColorCode()};"
+              >{factor.minDamage}倍 ~ {factor.maxDamage}倍</td
             >
             <td
-              style="color: {SkillLevelConverter.fromWinRate(
-                v.minWin,
-                userConfig.custom_color.skill
-              ).toTextColorCode()};">{v.minWin}% ~ {v.maxWin}%</td
+              style="color: {RatingConverterFactory.fromWinRate(
+                factor.minWin,
+                userConfig,
+              ).textColorCode()};">{factor.minWin}% ~ {factor.maxWin}%</td
             >
           </tr>
         {/each}
@@ -52,25 +53,16 @@
 
     <ul>
       <li>
-        <!-- svelte-ignore a11y-invalid-attribute -->
-        <a
-          class="td-link"
-          href="#"
-          on:click={() =>
-            BrowserOpenURL("https://asia.wows-numbers.com/personal/rating")}
-          >PRについて <i class="bi bi-box-arrow-up-right" /></a
-        >
+        <ExternalLink
+          url="https://asia.wows-numbers.com/personal/rating"
+          text="PRについて"
+        />
       </li>
       <li>
-        <!-- svelte-ignore a11y-invalid-attribute -->
-        <a
-          class="td-link"
-          href="#"
-          on:click={() =>
-            BrowserOpenURL(
-              "https://asia.wows-numbers.com/personal/rating/expected/preview/"
-            )}>艦種別平均値について <i class="bi bi-box-arrow-up-right" /></a
-        >
+        <ExternalLink
+          url="https://asia.wows-numbers.com/personal/rating/expected/preview/"
+          text="艦種別平均値について"
+        />
       </li>
     </ul>
   {/if}
