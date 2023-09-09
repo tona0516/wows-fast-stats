@@ -2,7 +2,7 @@
   import clone from "clone";
   import { DispName } from "src/lib/DispName";
   import type { Screenshot } from "src/lib/Screenshot";
-  import { Func, Page, type StatsExtra } from "src/lib/types";
+  import { Func, Page, ScreenshotType, type StatsExtra } from "src/lib/types";
   import {
     storedCurrentPage,
     storedUserConfig,
@@ -11,7 +11,7 @@
   import { createEventDispatcher } from "svelte";
   import { Button, Spinner } from "sveltestrap";
   import { ApplyUserConfig } from "wailsjs/go/main/App";
-  import { WindowReload } from "wailsjs/runtime/runtime";
+  import { WindowReloadApp } from "wailsjs/runtime/runtime";
 
   export let screenshot: Screenshot;
 
@@ -30,7 +30,7 @@
   const onClickFunc = (func: Func) => {
     switch (func) {
       case Func.RELOAD:
-        WindowReload();
+        WindowReloadApp();
       case Func.SCREENSHOT:
         takeScreenshot();
         break;
@@ -44,7 +44,7 @@
 
     try {
       isScreenshotting = true;
-      if (await screenshot.manual(meta)) {
+      if (await screenshot.take(ScreenshotType.manual, meta)) {
         dispatch("Success", { message: "スクリーンショットを保存しました。" });
       }
     } catch (error) {

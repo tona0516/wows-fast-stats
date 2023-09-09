@@ -1,5 +1,4 @@
 // @ts-ignore
-import { format, fromUnixTime } from "date-fns";
 import { ColumnArray } from "src/lib/ColumnArray";
 import { AvgTier } from "src/lib/column/AvgTier";
 import { Battles } from "src/lib/column/Battles";
@@ -21,7 +20,6 @@ import type { AbstractSingleColumn } from "src/lib/column/intetface/AbstractSing
 import type { IColumn } from "src/lib/column/intetface/IColumn";
 import type { ISummaryColumn } from "src/lib/column/intetface/ISummaryColumn";
 import {
-  RowPattern,
   type BasicKey,
   type CommonStatsKey,
   type OptionalBattle,
@@ -199,55 +197,4 @@ export const calculateSummary = (
     enemies: enemies,
     diffs: diffs,
   };
-};
-
-export const tierString = (value: number): string => {
-  if (value === 11) return "★";
-
-  const decimal = [10, 9, 5, 4, 1];
-  const romanNumeral = ["X", "IX", "V", "IV", "I"];
-
-  let romanized = "";
-
-  for (var i = 0; i < decimal.length; i++) {
-    while (decimal[i] <= value) {
-      romanized += romanNumeral[i];
-      value -= decimal[i];
-    }
-  }
-
-  return romanized;
-};
-
-export const toDateForDisplay = (unixtime: number): string => {
-  return format(fromUnixTime(unixtime), "yyyy/MM/dd HH:mm:ss");
-};
-
-export const toDateForFilename = (unixtime: number): string => {
-  return format(fromUnixTime(unixtime), "yyyy-MM-dd-HH-mm-ss");
-};
-
-export const decideRowPattern = (
-  player: domain.Player,
-  statsPattern: string,
-  allColumnCount: number,
-): RowPattern => {
-  if (allColumnCount === 0) {
-    return RowPattern.NO_COLUMN;
-  }
-
-  if (player.player_info.is_hidden === true) {
-    return RowPattern.PRIVATE;
-  }
-
-  const stats = toPlayerStats(player, statsPattern);
-  if (player.player_info.id === 0 || stats.overall.battles === 0) {
-    return RowPattern.NO_DATA;
-  }
-
-  if (stats.ship.battles === 0) {
-    return RowPattern.NO_SHIP_STATS;
-  }
-
-  return RowPattern.FULL;
 };

@@ -1,6 +1,5 @@
 import type { IColumn } from "src/lib/column/intetface/IColumn";
 import type { BasicKey } from "src/lib/types";
-import { tierString } from "src/lib/util";
 import ShipInfoTableData from "src/tabledata_component/ShipInfoTableData.svelte";
 import type { domain } from "wailsjs/go/models";
 
@@ -77,7 +76,7 @@ export class ShipInfo implements IColumn<BasicKey> {
   }
 
   displayValue(player: domain.Player): string {
-    return `${tierString(player.ship_info.tier)} ${player.ship_info.name}`;
+    return `${this.tierString(player.ship_info.tier)} ${player.ship_info.name}`;
   }
 
   bgColorCode(player: domain.Player): string {
@@ -129,5 +128,23 @@ export class ShipInfo implements IColumn<BasicKey> {
 
   nationIconPath(player: domain.Player): string {
     return NATION_ICONS[player.ship_info.nation] ?? NATION_ICONS.none;
+  }
+
+  private tierString(value: number): string {
+    if (value === 11) return "★";
+
+    const decimal = [10, 9, 5, 4, 1];
+    const romanNumeral = ["X", "IX", "V", "IV", "I"];
+
+    let romanized = "";
+
+    for (var i = 0; i < decimal.length; i++) {
+      while (decimal[i] <= value) {
+        romanized += romanNumeral[i];
+        value -= decimal[i];
+      }
+    }
+
+    return romanized;
   }
 }

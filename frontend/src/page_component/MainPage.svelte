@@ -1,12 +1,17 @@
 <script lang="ts">
-  import { toDateForDisplay } from "src/lib/util";
+  import { format, fromUnixTime } from "date-fns";
+  import { MAIN_PAGE_ID } from "src/const";
   import ColorDescription from "src/other_component/ColorDescription.svelte";
   import Ofuse from "src/other_component/Ofuse.svelte";
   import StatisticsTable from "src/other_component/StatisticsTable.svelte";
   import { storedBattle, storedUserConfig, storedSummary } from "src/stores";
+
+  const formattedDate = (unixtime: number): string => {
+    return format(fromUnixTime(unixtime), "yyyy/MM/dd HH:mm:ss");
+  };
 </script>
 
-<div id="stats">
+<div id={MAIN_PAGE_ID}>
   {#if $storedBattle}
     <div class="mt-2 mx-2">
       <StatisticsTable
@@ -25,7 +30,7 @@
             <tbody>
               <tr>
                 <td>日時</td>
-                <td>{toDateForDisplay($storedBattle.meta.unixtime)}</td>
+                <td>{formattedDate($storedBattle.meta.unixtime)}</td>
               </tr>
 
               <tr>

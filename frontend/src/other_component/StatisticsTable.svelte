@@ -1,6 +1,6 @@
 <script lang="ts">
   import { RowPattern } from "src/lib/types";
-  import { decideRowPattern, tableColumns } from "src/lib/util";
+  import { tableColumns, toPlayerStats } from "src/lib/util";
   import type { domain } from "wailsjs/go/models";
 
   export let teams: domain.Team[];
@@ -10,6 +10,31 @@
   $: [basicColumns, shipColumns, overallColumns] = categories;
   $: shipColumnCount = shipColumns.columnCount();
   $: allColumnCount = shipColumnCount + overallColumns.columnCount();
+
+  const decideRowPattern = (
+    player: domain.Player,
+    statsPattern: string,
+    allColumnCount: number,
+  ): RowPattern => {
+    if (allColumnCount === 0) {
+      return RowPattern.NO_COLUMN;
+    }
+
+    if (player.player_info.is_hidden === true) {
+      return RowPattern.PRIVATE;
+    }
+
+    const stats = toPlayerStats(player, statsPattern);
+    if (player.player_info.id === 0 || stats.overall.battles === 0) {
+      return RowPattern.NO_DATA;
+    }
+
+    if (stats.ship.battles === 0) {
+      return RowPattern.NO_SHIP_STATS;
+    }
+
+    return RowPattern.FULL;
+  };
 </script>
 
 <table class="table table-sm table-bordered table-text-color">

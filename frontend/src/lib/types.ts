@@ -63,6 +63,13 @@ export const BasicKey = {
 };
 export type BasicKey = (typeof BasicKey)[keyof typeof BasicKey];
 
+export const ScreenshotType = {
+  manual: "manual",
+  auto: "auto",
+};
+export type ScreenshotType =
+  (typeof ScreenshotType)[keyof typeof ScreenshotType];
+
 type CommonMethod = "convertValues";
 
 export type StatsCategory = Exclude<keyof domain.PlayerStats, CommonMethod>;

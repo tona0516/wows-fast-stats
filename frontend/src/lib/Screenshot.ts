@@ -1,6 +1,8 @@
 // @ts-ignore
+import { format, fromUnixTime } from "date-fns";
 import * as htmlToImage from "html-to-image";
-import { toDateForFilename } from "src/lib/util";
+import { MAIN_PAGE_ID } from "src/const";
+import { ScreenshotType } from "src/lib/types";
 import {
   AutoScreenshot,
   LogError,
@@ -11,46 +13,31 @@ import type { domain } from "wailsjs/go/models";
 export class Screenshot {
   private isFirst: boolean = true;
 
-  private async getScreenshotBase64(
-    meta: domain.Meta,
-  ): Promise<[string, string]> {
-    // Workaround: first screenshot cann't draw values in table.
-    const mainPageElem = document.getElementById("stats");
-    if (!mainPageElem) {
-      throw Error("cann't get element for screenshot");
-    }
-
-    if (this.isFirst) {
-      await htmlToImage.toPng(mainPageElem);
-      this.isFirst = false;
-    }
-    const dataUrl = await htmlToImage.toPng(mainPageElem);
-    const date = toDateForFilename(meta.unixtime);
-    const ownShip = meta.own_ship.replaceAll(" ", "-");
-    const filename = `${date}_${ownShip}_${meta.arena}_${meta.type}.png`;
-    const base64Data = dataUrl.split(",")[1];
-    return [filename, base64Data];
-  }
-
-  async manual(meta: domain.Meta): Promise<boolean> {
+  async take(type: ScreenshotType, meta: domain.Meta): Promise<boolean> {
     try {
-      const [filename, data] = await this.getScreenshotBase64(meta);
-      await ManualScreenshot(filename, data);
-      return true;
-    } catch (error) {
-      const errorJSON = JSON.stringify(error);
-      if (errorJSON.includes("ユーザキャンセル")) {
-        return false;
+      const element = document.getElementById(MAIN_PAGE_ID);
+
+      // Workaround: first screenshot can't draw values in table.
+      if (this.isFirst) {
+        await htmlToImage.toPng(element!);
+        this.isFirst = false;
       }
-      LogError(errorJSON);
-      throw error;
-    }
-  }
+      const base64Data = (await htmlToImage.toPng(element!)).split(",")[1];
 
-  async auto(meta: domain.Meta): Promise<boolean> {
-    try {
-      const [filename, data] = await this.getScreenshotBase64(meta);
-      await AutoScreenshot(filename, data);
+      const filename = `${format(
+        fromUnixTime(meta.unixtime),
+        "yyyy-MM-dd-HH-mm-ss",
+      )}_${meta.own_ship.replaceAll(" ", "-")}_${meta.arena}_${meta.type}.png`;
+
+      switch (type) {
+        case ScreenshotType.manual:
+          await ManualScreenshot(filename, base64Data);
+          break;
+        case ScreenshotType.auto:
+          await AutoScreenshot(filename, base64Data);
+          break;
+      }
+
       return true;
     } catch (error) {
       const errorJSON = JSON.stringify(error);

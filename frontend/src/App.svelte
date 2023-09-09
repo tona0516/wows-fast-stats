@@ -19,7 +19,6 @@
   import type { domain } from "wailsjs/go/models";
   import {
     EventsOn,
-    LogDebug,
     EventsEmit,
     BrowserOpenURL,
   } from "wailsjs/runtime/runtime";
@@ -37,7 +36,7 @@
   import AddAlertPlayerModal from "src/other_component/AddAlertPlayerModal.svelte";
   import UpdateAlertPlayerModal from "src/other_component/UpdateAlertPlayerModal.svelte";
   import RemoveAlertPlayerModal from "src/other_component/RemoveAlertPlayerModal.svelte";
-  import { AppEvent, Page, ToastKey } from "./lib/types";
+  import { AppEvent, Page, ScreenshotType, ToastKey } from "./lib/types";
 
   let defaultUserConfig: domain.UserConfig;
   let notification: Notification;
@@ -52,8 +51,6 @@
   );
 
   EventsOn(AppEvent.LOG, async (log: string) => {
-    LogDebug(`EventsOn:${AppEvent.LOG}`);
-
     storedLogs.update((logs) => {
       logs.push(log);
       return logs;
@@ -61,8 +58,6 @@
   });
 
   EventsOn(AppEvent.BATTLE_START, async () => {
-    LogDebug(`EventsOn:${AppEvent.BATTLE_START}`);
-
     try {
       notification.removeToastWithKey(ToastKey.WAIT);
       notification.showToastWithKey(
@@ -86,7 +81,7 @@
       notification.removeToastWithKey(ToastKey.ERROR);
 
       if ($storedUserConfig.save_screenshot) {
-        await screenshot.auto(battle.meta);
+        screenshot.take(ScreenshotType.auto, battle.meta);
       }
     } catch (error) {
       notification.showToastWithKey(error, "error", ToastKey.ERROR);
@@ -96,8 +91,6 @@
   });
 
   EventsOn(AppEvent.BATTLE_END, () => {
-    LogDebug(`EventsOn:${AppEvent.BATTLE_END}`);
-
     notification.showToastWithKey(
       "戦闘中ではありません。開始時に自動的にリロードします。",
       "info",
@@ -106,8 +99,6 @@
   });
 
   EventsOn(AppEvent.BATTLE_ERR, (error: string) => {
-    LogDebug(`EventsOn:${AppEvent.BATTLE_ERR}`);
-
     notification.showToastWithKey(error, "error", ToastKey.ERROR);
   });
 
