@@ -18,22 +18,6 @@ export namespace domain {
 	        this.message = source["message"];
 	    }
 	}
-	export class Basic {
-	    is_in_avg: boolean;
-	    player_name: boolean;
-	    ship_info: boolean;
-	
-	    static createFrom(source: any = {}) {
-	        return new Basic(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.is_in_avg = source["is_in_avg"];
-	        this.player_name = source["player_name"];
-	        this.ship_info = source["ship_info"];
-	    }
-	}
 	export class TierGroup {
 	    low: number;
 	    middle: number;
@@ -686,7 +670,6 @@ export namespace domain {
 	    }
 	}
 	export class Displays {
-	    basic: Basic;
 	    ship: Ship;
 	    overall: Overall;
 	
@@ -696,7 +679,6 @@ export namespace domain {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.basic = this.convertValues(source["basic"], Basic);
 	        this.ship = this.convertValues(source["ship"], Ship);
 	        this.overall = this.convertValues(source["overall"], Overall);
 	    }

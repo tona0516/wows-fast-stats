@@ -22,10 +22,11 @@ func TestLocalFile_User(t *testing.T) {
 	expected := domain.UserConfig{
 		FontSize: "large",
 		Displays: domain.Displays{
-			Basic: domain.Basic{
-				IsInAvg:    false,
-				PlayerName: true,
-				ShipInfo:   false,
+			Ship: domain.Ship{
+				PR: true,
+			},
+			Overall: domain.Overall{
+				PR: false,
 			},
 		},
 	}

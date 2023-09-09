@@ -20,15 +20,8 @@ type UserConfig struct {
 }
 
 type Displays struct {
-	Basic   Basic   `json:"basic"`
 	Ship    Ship    `json:"ship"`
 	Overall Overall `json:"overall"`
-}
-
-type Basic struct {
-	IsInAvg    bool `json:"is_in_avg"`
-	PlayerName bool `json:"player_name"`
-	ShipInfo   bool `json:"ship_info"`
 }
 
 type Ship struct {
