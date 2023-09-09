@@ -4,8 +4,8 @@ import type {
   StackedBarGraphParam,
 } from "src/lib/StackedBarGraphParam";
 import { AbstractGraphColumn } from "src/lib/column/intetface/AbstractGraphColumn";
-import type { OverallOnlyKey } from "src/lib/types";
-import { tierString, toPlayerStats } from "src/lib/util";
+import type { OverallOnlyKey, TierGroup } from "src/lib/types";
+import { toPlayerStats } from "src/lib/util";
 import type { domain } from "wailsjs/go/models";
 
 export class UsingTierRate extends AbstractGraphColumn<OverallOnlyKey> {
@@ -33,7 +33,7 @@ export class UsingTierRate extends AbstractGraphColumn<OverallOnlyKey> {
     const digit = this.userConfig.custom_digit.using_tier_rate;
     const tierRateGroup = toPlayerStats(player, this.userConfig.stats_pattern)
       .overall.using_tier_rate;
-    const ownTierGroup = tierString(player.ship_info.tier);
+    const ownTierGroup = this.toTierGroup(player.ship_info.tier);
     const colors = this.userConfig.custom_color.tier;
 
     let items: StackedBarGraphItem[] = [];
@@ -47,5 +47,19 @@ export class UsingTierRate extends AbstractGraphColumn<OverallOnlyKey> {
     });
 
     return { digit: digit, items: items };
+  }
+
+  private toTierGroup(tier: number): TierGroup | undefined {
+    if (tier >= 1 && tier <= 4) {
+      return "low";
+    }
+    if (tier >= 5 && tier <= 7) {
+      return "middle";
+    }
+    if (tier >= 8) {
+      return "high";
+    }
+
+    return undefined;
   }
 }
