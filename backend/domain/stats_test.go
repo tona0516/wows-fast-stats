@@ -224,6 +224,29 @@ func TestStats_AvgDamage_Ship_Solo(t *testing.T) {
 	assert.InDelta(t, 10000, stats.AvgDamage(StatsCategoryShip, StatsPatternPvPSolo), allowableDelta)
 }
 
+func TestStats_MaxDamage(t *testing.T) {
+	t.Parallel()
+
+	stats := NewStats(
+		0,
+		WGAccountInfoData{
+			Statistics: struct {
+				Pvp     WGStatsValues `json:"pvp"`
+				PvpSolo WGStatsValues `json:"pvp_solo"`
+			}{
+				Pvp: WGStatsValues{
+					MaxDamageDealt: 1000000,
+				},
+			},
+		},
+		emptyShipsStats,
+		emptyExpectedStats,
+		emptyWarships,
+	)
+
+	assert.InDelta(t, 1000000, stats.MaxDamage(StatsCategoryOverall, StatsPatternPvPAll), allowableDelta)
+}
+
 func TestStats_Battles(t *testing.T) {
 	t.Parallel()
 

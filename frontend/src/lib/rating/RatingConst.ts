@@ -38,6 +38,7 @@ export const sampleTeam = (): domain.Team => {
     const shipStats: domain.ShipStats = {
       battles: 10,
       damage: value.minDamage * avgDamage,
+      max_damage: value.minDamage * avgDamage * 1.5,
       win_rate: value.minWin,
       win_survived_rate: 50,
       lose_survived_rate: 50,
@@ -52,6 +53,7 @@ export const sampleTeam = (): domain.Team => {
     const overallStats: domain.OverallStats = {
       battles: 10,
       damage: value.minDamage * avgDamage,
+      max_damage: value.minDamage * avgDamage * 1.5,
       win_rate: value.minWin,
       win_survived_rate: 50,
       lose_survived_rate: 50,

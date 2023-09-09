@@ -9,6 +9,7 @@ import { HitRate } from "src/lib/column/HitRate";
 import { IsInAvg } from "src/lib/column/IsInAvg";
 import { KDRate } from "src/lib/column/KDRate";
 import { Kill } from "src/lib/column/Kill";
+import { MaxDamage } from "src/lib/column/MaxDamage";
 import { PR } from "src/lib/column/PR";
 import { PlanesKilled } from "src/lib/column/PlanesKilled";
 import { PlayerName } from "src/lib/column/PlayerName";
@@ -50,6 +51,7 @@ export const tableColumns = (
     new ColumnArray<ShipKey>("ship", [
       new PR(userConfig, "ship"),
       new Damage(userConfig, "ship"),
+      new MaxDamage(userConfig, "ship"),
       new WinRate(userConfig, "ship"),
       new KDRate(userConfig, "ship"),
       new Kill(userConfig, "ship"),
@@ -62,6 +64,7 @@ export const tableColumns = (
     new ColumnArray<OverallKey>("overall", [
       new PR(userConfig, "overall"),
       new Damage(userConfig, "overall"),
+      new MaxDamage(userConfig, "overall"),
       new WinRate(userConfig, "overall"),
       new KDRate(userConfig, "overall"),
       new Kill(userConfig, "overall"),
@@ -88,6 +91,7 @@ export const displayColumns = (): [
     [
       new PR(userConfig, category),
       new Damage(userConfig, category),
+      new MaxDamage(userConfig, category),
       new WinRate(userConfig, category),
       new KDRate(userConfig, category),
       new Kill(userConfig, category),

@@ -73,6 +73,7 @@ export namespace domain {
 	export class OverallStats {
 	    battles: number;
 	    damage: number;
+	    max_damage: number;
 	    win_rate: number;
 	    win_survived_rate: number;
 	    lose_survived_rate: number;
@@ -92,6 +93,7 @@ export namespace domain {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.battles = source["battles"];
 	        this.damage = source["damage"];
+	        this.max_damage = source["max_damage"];
 	        this.win_rate = source["win_rate"];
 	        this.win_survived_rate = source["win_survived_rate"];
 	        this.lose_survived_rate = source["lose_survived_rate"];
@@ -125,6 +127,7 @@ export namespace domain {
 	export class ShipStats {
 	    battles: number;
 	    damage: number;
+	    max_damage: number;
 	    win_rate: number;
 	    win_survived_rate: number;
 	    lose_survived_rate: number;
@@ -144,6 +147,7 @@ export namespace domain {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.battles = source["battles"];
 	        this.damage = source["damage"];
+	        this.max_damage = source["max_damage"];
 	        this.win_rate = source["win_rate"];
 	        this.win_survived_rate = source["win_survived_rate"];
 	        this.lose_survived_rate = source["lose_survived_rate"];
@@ -578,6 +582,7 @@ export namespace domain {
 	export class CustomDigit {
 	    pr: number;
 	    damage: number;
+	    max_damage: number;
 	    win_rate: number;
 	    kd_rate: number;
 	    kill: number;
@@ -598,6 +603,7 @@ export namespace domain {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.pr = source["pr"];
 	        this.damage = source["damage"];
+	        this.max_damage = source["max_damage"];
 	        this.win_rate = source["win_rate"];
 	        this.kd_rate = source["kd_rate"];
 	        this.kill = source["kill"];
@@ -614,6 +620,7 @@ export namespace domain {
 	export class Overall {
 	    pr: boolean;
 	    damage: boolean;
+	    max_damage: boolean;
 	    win_rate: boolean;
 	    kd_rate: boolean;
 	    kill: boolean;
@@ -632,6 +639,7 @@ export namespace domain {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.pr = source["pr"];
 	        this.damage = source["damage"];
+	        this.max_damage = source["max_damage"];
 	        this.win_rate = source["win_rate"];
 	        this.kd_rate = source["kd_rate"];
 	        this.kill = source["kill"];
@@ -646,6 +654,7 @@ export namespace domain {
 	export class Ship {
 	    pr: boolean;
 	    damage: boolean;
+	    max_damage: boolean;
 	    win_rate: boolean;
 	    kd_rate: boolean;
 	    kill: boolean;
@@ -663,6 +672,7 @@ export namespace domain {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.pr = source["pr"];
 	        this.damage = source["damage"];
+	        this.max_damage = source["max_damage"];
 	        this.win_rate = source["win_rate"];
 	        this.kd_rate = source["kd_rate"];
 	        this.kill = source["kill"];

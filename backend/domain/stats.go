@@ -105,6 +105,10 @@ func (s *Stats) AvgDamage(category StatsCategory, pattern StatsPattern) float64 
 	return avgDamage(values.DamageDealt, values.Battles)
 }
 
+func (s *Stats) MaxDamage(category StatsCategory, pattern StatsPattern) uint {
+	return s.statsValues(category, pattern).MaxDamageDealt
+}
+
 func (s *Stats) KdRate(category StatsCategory, pattern StatsPattern) float64 {
 	values := s.statsValues(category, pattern)
 	death := values.Battles - values.SurvivedBattles

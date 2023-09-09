@@ -34,6 +34,7 @@ type Basic struct {
 type Ship struct {
 	PR           bool `json:"pr"`
 	Damage       bool `json:"damage"`
+	MaxDamage    bool `json:"max_damage"`
 	WinRate      bool `json:"win_rate"`
 	KdRate       bool `json:"kd_rate"`
 	Kill         bool `json:"kill"`
@@ -47,6 +48,7 @@ type Ship struct {
 type Overall struct {
 	PR                bool `json:"pr"`
 	Damage            bool `json:"damage"`
+	MaxDamage         bool `json:"max_damage"`
 	WinRate           bool `json:"win_rate"`
 	KdRate            bool `json:"kd_rate"`
 	Kill              bool `json:"kill"`
@@ -108,6 +110,7 @@ type ShipTypeColorCode struct {
 type CustomDigit struct {
 	PR                uint `json:"pr"`
 	Damage            uint `json:"damage"`
+	MaxDamage         uint `json:"max_damage"`
 	WinRate           uint `json:"win_rate"`
 	KdRate            uint `json:"kd_rate"`
 	Kill              uint `json:"kill"`

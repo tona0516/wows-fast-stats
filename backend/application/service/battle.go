@@ -400,6 +400,7 @@ func playerStats(
 		ShipStats: domain.ShipStats{
 			Battles:            stats.Battles(domain.StatsCategoryShip, statsPattern),
 			Damage:             stats.AvgDamage(domain.StatsCategoryShip, statsPattern),
+			MaxDamage:          stats.MaxDamage(domain.StatsCategoryShip, statsPattern),
 			WinRate:            stats.WinRate(domain.StatsCategoryShip, statsPattern),
 			WinSurvivedRate:    stats.WinSurvivedRate(domain.StatsCategoryShip, statsPattern),
 			LoseSurvivedRate:   stats.LoseSurvivedRate(domain.StatsCategoryShip, statsPattern),
@@ -414,6 +415,7 @@ func playerStats(
 		OverallStats: domain.OverallStats{
 			Battles:           stats.Battles(domain.StatsCategoryOverall, statsPattern),
 			Damage:            stats.AvgDamage(domain.StatsCategoryOverall, statsPattern),
+			MaxDamage:         stats.MaxDamage(domain.StatsCategoryOverall, statsPattern),
 			WinRate:           stats.WinRate(domain.StatsCategoryOverall, statsPattern),
 			WinSurvivedRate:   stats.WinSurvivedRate(domain.StatsCategoryOverall, statsPattern),
 			LoseSurvivedRate:  stats.LoseSurvivedRate(domain.StatsCategoryOverall, statsPattern),
