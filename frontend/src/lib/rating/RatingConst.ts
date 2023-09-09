@@ -54,6 +54,7 @@ export const sampleTeam = (): domain.Team => {
       battles: 10,
       damage: value.minDamage * avgDamage,
       max_damage: value.minDamage * avgDamage * 1.5,
+      max_damage_ship_name: "Test Ship",
       win_rate: value.minWin,
       win_survived_rate: 50,
       lose_survived_rate: 50,

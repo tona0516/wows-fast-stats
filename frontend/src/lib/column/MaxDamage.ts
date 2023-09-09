@@ -32,7 +32,12 @@ export class MaxDamage extends AbstractSingleColumn<CommonStatsKey> {
   }
 
   tdClass(player: domain.Player): string {
-    return CssClass.TD_NUM;
+    switch (this.category) {
+      case "ship":
+        return CssClass.TD_NUM;
+      case "overall":
+        return `${CssClass.TD_STR} ${CssClass.OMIT}`;
+    }
   }
 
   displayValue(player: domain.Player): string {
@@ -40,7 +45,16 @@ export class MaxDamage extends AbstractSingleColumn<CommonStatsKey> {
       this.category
     ].max_damage;
     const digit = this.userConfig.custom_digit.max_damage;
-    return value.toFixed(digit);
+
+    switch (this.category) {
+      case "ship":
+        return value.toFixed(digit);
+      case "overall":
+        const shipName = toPlayerStats(player, this.userConfig.stats_pattern)[
+          this.category
+        ].max_damage_ship_name;
+        return `${value.toFixed(digit)} | ${shipName}`;
+    }
   }
 
   textColorCode(player: domain.Player): string {

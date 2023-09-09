@@ -42,6 +42,7 @@ type OverallStats struct {
 	Battles           uint          `json:"battles"`
 	Damage            float64       `json:"damage"`
 	MaxDamage         uint          `json:"max_damage"`
+	MaxDamageShipName string        `json:"max_damage_ship_name"`
 	WinRate           float64       `json:"win_rate"`
 	WinSurvivedRate   float64       `json:"win_survived_rate"`
 	LoseSurvivedRate  float64       `json:"lose_survived_rate"`

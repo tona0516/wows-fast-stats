@@ -1,6 +1,6 @@
 package domain
 
-type WGStatsValues struct {
+type WGShipStatsValues struct {
 	Wins            uint `json:"wins"`
 	Battles         uint `json:"battles"`
 	DamageDealt     uint `json:"damage_dealt"`

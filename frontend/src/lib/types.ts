@@ -52,6 +52,8 @@ export type RowPattern = (typeof RowPattern)[keyof typeof RowPattern];
 export const CssClass = {
   TD_NUM: "td-number",
   TD_MULTI: "td-multiple",
+  TD_STR: "td-string",
+  OMIT: "omit",
 };
 export type CssClass = (typeof CssClass)[keyof typeof CssClass];
 

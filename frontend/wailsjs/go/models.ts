@@ -74,6 +74,7 @@ export namespace domain {
 	    battles: number;
 	    damage: number;
 	    max_damage: number;
+	    max_damage_ship_name: string;
 	    win_rate: number;
 	    win_survived_rate: number;
 	    lose_survived_rate: number;
@@ -94,6 +95,7 @@ export namespace domain {
 	        this.battles = source["battles"];
 	        this.damage = source["damage"];
 	        this.max_damage = source["max_damage"];
+	        this.max_damage_ship_name = source["max_damage_ship_name"];
 	        this.win_rate = source["win_rate"];
 	        this.win_survived_rate = source["win_survived_rate"];
 	        this.lose_survived_rate = source["lose_survived_rate"];

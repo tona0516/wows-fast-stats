@@ -9,7 +9,7 @@ func (w AllPlayerShipsStats) Player(accountID int) []WGShipsStatsData {
 type WGShipsStats map[int][]WGShipsStatsData
 
 type WGShipsStatsData struct {
-	Pvp     WGStatsValues `json:"pvp"`
-	PvpSolo WGStatsValues `json:"pvp_solo"`
-	ShipID  int           `json:"ship_id"`
+	Pvp     WGShipStatsValues `json:"pvp"`
+	PvpSolo WGShipStatsValues `json:"pvp_solo"`
+	ShipID  int               `json:"ship_id"`
 }
