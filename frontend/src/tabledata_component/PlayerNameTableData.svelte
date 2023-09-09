@@ -1,26 +1,52 @@
 <script lang="ts">
   import clone from "clone";
   import type { PlayerName } from "src/lib/column/PlayerName";
-  import { storedAlertPlayers } from "src/stores";
+  import { storedAlertPlayers, storedExcludePlayerIDs } from "src/stores";
   import { createEventDispatcher } from "svelte";
+  import {
+    AddExcludePlayerID,
+    RemoveExcludePlayerID,
+  } from "wailsjs/go/main/App";
   import type { domain } from "wailsjs/go/models";
   import { BrowserOpenURL } from "wailsjs/runtime/runtime";
 
   export let column: PlayerName;
   export let player: domain.Player;
 
+  $: accountID = player.player_info.id;
+  $: isChecked = !$storedExcludePlayerIDs.includes(accountID);
+  $: alertPlayer = $storedAlertPlayers.find(
+    (it) => it.account_id === accountID,
+  );
+
   const dispatch = createEventDispatcher();
 
-  $: alertPlayer = $storedAlertPlayers.find(
-    (it) => it.account_id === player.player_info.id,
-  );
+  const onCheck = async (e: any) => {
+    if (e.target.checked) {
+      await RemoveExcludePlayerID(accountID);
+    } else {
+      await AddExcludePlayerID(accountID);
+    }
+    dispatch("CheckPlayer");
+  };
 </script>
+
+<td class="td-checkbox">
+  {#if column.isShowCheckBox(player)}
+    <input
+      class="form-check-input"
+      type="checkbox"
+      on:click={onCheck}
+      checked={isChecked}
+    />
+  {/if}
+</td>
 
 <td
   class="td-string omit"
   style="background-color: {column.bgColorCode(player)}"
 >
-  {#if player.player_info.id === 0}
+  {#if accountID === 0}
     {column.displayValue(player)}
   {:else}
     {#if alertPlayer}

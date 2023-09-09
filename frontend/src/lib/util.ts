@@ -6,7 +6,6 @@ import { Battles } from "src/lib/column/Battles";
 import { Damage } from "src/lib/column/Damage";
 import { Exp } from "src/lib/column/Exp";
 import { HitRate } from "src/lib/column/HitRate";
-import { IsInAvg } from "src/lib/column/IsInAvg";
 import { KDRate } from "src/lib/column/KDRate";
 import { Kill } from "src/lib/column/Kill";
 import { MaxDamage } from "src/lib/column/MaxDamage";
@@ -44,7 +43,6 @@ export const tableColumns = (
 ] => {
   return [
     new ColumnArray<BasicKey>("basic", [
-      new IsInAvg(),
       new PlayerName(userConfig),
       new ShipInfo(userConfig),
     ]),

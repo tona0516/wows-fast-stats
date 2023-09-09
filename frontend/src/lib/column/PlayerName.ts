@@ -26,7 +26,7 @@ export class PlayerName implements IColumn<BasicKey> {
   }
 
   countInnerColumn(): number {
-    return 1;
+    return 2;
   }
 
   svelteComponent() {
@@ -39,6 +39,10 @@ export class PlayerName implements IColumn<BasicKey> {
     const playerName = player.player_info.name;
 
     return clanID !== 0 ? `[${clanTag}] ${playerName}` : playerName;
+  }
+
+  isShowCheckBox(player: domain.Player): boolean {
+    return player.player_info.id !== 0;
   }
 
   bgColorCode(player: domain.Player): string {
