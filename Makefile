@@ -25,7 +25,7 @@ setup: check-prerequisite
 	go install github.com/wailsapp/wails/v2/cmd/wails@latest
 	go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 	go install golang.org/x/tools/cmd/stringer@latest
-	npm ci
+	cd frontend && npm ci
 
 .PHONY: build
 build: gen lint test
