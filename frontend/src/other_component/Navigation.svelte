@@ -31,6 +31,7 @@
     switch (func) {
       case Func.RELOAD:
         WindowReloadApp();
+        break;
       case Func.SCREENSHOT:
         takeScreenshot();
         break;
