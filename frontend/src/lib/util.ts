@@ -198,3 +198,21 @@ export const calculateSummary = (
     diffs: diffs,
   };
 };
+
+export const tierString = (value: number): string => {
+  if (value === 11) return "★";
+
+  const decimal = [10, 9, 5, 4, 1];
+  const romanNumeral = ["X", "IX", "V", "IV", "I"];
+
+  let romanized = "";
+
+  for (var i = 0; i < decimal.length; i++) {
+    while (decimal[i] <= value) {
+      romanized += romanNumeral[i];
+      value -= decimal[i];
+    }
+  }
+
+  return romanized;
+};

@@ -122,22 +122,26 @@ func (s *Stats) AvgDamage(category StatsCategory, pattern StatsPattern) float64 
 	return 0
 }
 
-func (s *Stats) MaxDamage(category StatsCategory, pattern StatsPattern) uint {
+func (s *Stats) MaxDamage(category StatsCategory, pattern StatsPattern) MaxDamage {
 	ship, player := s.statsValues(pattern)
 	switch category {
 	case StatsCategoryShip:
-		return ship.MaxDamageDealt
+		return MaxDamage{
+			Damage: ship.MaxDamageDealt,
+		}
 	case StatsCategoryOverall:
-		return player.MaxDamageDealt
+		shipID := player.MaxDamageDealtShipID
+		warship := s.warships[shipID]
+		return MaxDamage{
+			ShipID:   shipID,
+			ShipName: warship.Name,
+			ShipTier: warship.Tier,
+			Damage:   player.MaxDamageDealt,
+		}
 	}
 
 	logger.Error(failure.New(apperr.UnexpectedError))
-	return 0
-}
-
-func (s *Stats) MaxDamageShipName(pattern StatsPattern) string {
-	_, player := s.statsValues(pattern)
-	return s.warships[player.MaxDamageDealtShipID].Name
+	return MaxDamage{}
 }
 
 func (s *Stats) KdRate(category StatsCategory, pattern StatsPattern) float64 {

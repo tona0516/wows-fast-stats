@@ -38,7 +38,12 @@ export const sampleTeam = (): domain.Team => {
     const shipStats: domain.ShipStats = {
       battles: 10,
       damage: value.minDamage * avgDamage,
-      max_damage: value.minDamage * avgDamage * 1.5,
+      max_damage: {
+        ship_id: 0,
+        ship_name: "",
+        ship_tier: 0,
+        damage: value.minDamage * avgDamage * 1.5,
+      },
       win_rate: value.minWin,
       win_survived_rate: 50,
       lose_survived_rate: 50,
@@ -49,12 +54,19 @@ export const sampleTeam = (): domain.Team => {
       main_battery_hit_rate: 50,
       torpedoes_hit_rate: 5,
       planes_killed: 5,
+      convertValues: function (a: any, classs: any, asMap?: boolean) {
+        throw new Error("Function not implemented.");
+      },
     };
     const overallStats: domain.OverallStats = {
       battles: 10,
       damage: value.minDamage * avgDamage,
-      max_damage: value.minDamage * avgDamage * 1.5,
-      max_damage_ship_name: "Test Ship",
+      max_damage: {
+        ship_id: 0,
+        ship_name: "Test Ship",
+        ship_tier: 5,
+        damage: value.minDamage * avgDamage * 1.5,
+      },
       win_rate: value.minWin,
       win_survived_rate: 50,
       lose_survived_rate: 50,

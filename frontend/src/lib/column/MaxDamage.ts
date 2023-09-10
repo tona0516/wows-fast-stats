@@ -1,20 +1,15 @@
-import { AbstractSingleColumn } from "src/lib/column/intetface/AbstractSingleColumn";
-import {
-  CssClass,
-  type CommonStatsKey,
-  type StatsCategory,
-} from "src/lib/types";
-import { toPlayerStats } from "src/lib/util";
+import { BASE_NUMBERS_URL } from "src/const";
+import { type IColumn } from "src/lib/column/intetface/IColumn";
+import { type CommonStatsKey, type StatsCategory } from "src/lib/types";
+import { tierString, toPlayerStats } from "src/lib/util";
+import MaxDamageTableData from "src/tabledata_component/MaxDamageTableData.svelte";
 import type { domain } from "wailsjs/go/models";
 
-export class MaxDamage extends AbstractSingleColumn<CommonStatsKey> {
+export class MaxDamage implements IColumn<CommonStatsKey> {
   constructor(
     private userConfig: domain.UserConfig,
     private category: StatsCategory,
-  ) {
-    super();
-  }
-
+  ) {}
   displayKey(): CommonStatsKey {
     return "max_damage";
   }
@@ -31,33 +26,39 @@ export class MaxDamage extends AbstractSingleColumn<CommonStatsKey> {
     return this.userConfig.displays[this.category].max_damage;
   }
 
-  tdClass(player: domain.Player): string {
+  countInnerColumn(): number {
     switch (this.category) {
       case "ship":
-        return CssClass.TD_NUM;
+        return 1;
       case "overall":
-        return `${CssClass.TD_STR} ${CssClass.OMIT}`;
+        return 2;
     }
   }
 
-  displayValue(player: domain.Player): string {
+  svelteComponent() {
+    return MaxDamageTableData;
+  }
+
+  damage(player: domain.Player): string {
     const value = toPlayerStats(player, this.userConfig.stats_pattern)[
       this.category
-    ].max_damage;
+    ].max_damage.damage;
     const digit = this.userConfig.custom_digit.max_damage;
-
-    switch (this.category) {
-      case "ship":
-        return value.toFixed(digit);
-      case "overall":
-        const shipName = toPlayerStats(player, this.userConfig.stats_pattern)[
-          this.category
-        ].max_damage_ship_name;
-        return `${value.toFixed(digit)} | ${shipName}`;
-    }
+    return value.toFixed(digit);
   }
 
-  textColorCode(player: domain.Player): string {
-    return "";
+  shipInfo(player: domain.Player): [url: string, text: string] {
+    const maxDamage = toPlayerStats(player, this.userConfig.stats_pattern)
+      .overall.max_damage;
+    const url =
+      BASE_NUMBERS_URL +
+      "ship/" +
+      maxDamage.ship_id +
+      "," +
+      maxDamage.ship_name.replaceAll(" ", "-");
+
+    const text = `${tierString(maxDamage.ship_tier)} ${maxDamage.ship_name}`;
+
+    return [url, text];
   }
 }

@@ -224,8 +224,41 @@ func TestStats_AvgDamage_Ship_Solo(t *testing.T) {
 	assert.InDelta(t, 10000, stats.AvgDamage(StatsCategoryShip, StatsPatternPvPSolo), allowableDelta)
 }
 
-func TestStats_MaxDamage(t *testing.T) {
+func TestStats_MaxDamage_Ship(t *testing.T) {
 	t.Parallel()
+
+	expected := MaxDamage{
+		Damage: 200000,
+	}
+
+	useShipID := 100
+	stats := NewStats(
+		useShipID,
+		emptyAccountInfo,
+		[]WGShipsStatsData{
+			{
+				Pvp: WGShipStatsValues{
+					MaxDamageDealt: expected.Damage,
+				},
+				ShipID: useShipID,
+			},
+		},
+		emptyExpectedStats,
+		emptyWarships,
+	)
+
+	assert.Equal(t, expected, stats.MaxDamage(StatsCategoryShip, StatsPatternPvPAll))
+}
+
+func TestStats_MaxDamage_Overall(t *testing.T) {
+	t.Parallel()
+
+	expected := MaxDamage{
+		ShipID:   100,
+		ShipName: "yamato",
+		ShipTier: 10,
+		Damage:   200000,
+	}
 
 	stats := NewStats(
 		0,
@@ -235,20 +268,22 @@ func TestStats_MaxDamage(t *testing.T) {
 				PvpSolo WGPlayerStatsValues `json:"pvp_solo"`
 			}{
 				Pvp: WGPlayerStatsValues{
-					MaxDamageDealt:       1000000,
-					MaxDamageDealtShipID: 100,
+					MaxDamageDealt:       expected.Damage,
+					MaxDamageDealtShipID: expected.ShipID,
 				},
 			},
 		},
 		emptyShipsStats,
 		emptyExpectedStats,
 		Warships{
-			100: {Name: "yamato"},
+			expected.ShipID: {
+				Name: expected.ShipName,
+				Tier: expected.ShipTier,
+			},
 		},
 	)
 
-	assert.InDelta(t, 1000000, stats.MaxDamage(StatsCategoryOverall, StatsPatternPvPAll), allowableDelta)
-	assert.Equal(t, "yamato", stats.MaxDamageShipName(StatsPatternPvPAll))
+	assert.Equal(t, expected, stats.MaxDamage(StatsCategoryOverall, StatsPatternPvPAll))
 }
 
 func TestStats_Battles(t *testing.T) {

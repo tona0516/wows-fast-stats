@@ -416,7 +416,6 @@ func playerStats(
 			Battles:           stats.Battles(domain.StatsCategoryOverall, statsPattern),
 			Damage:            stats.AvgDamage(domain.StatsCategoryOverall, statsPattern),
 			MaxDamage:         stats.MaxDamage(domain.StatsCategoryOverall, statsPattern),
-			MaxDamageShipName: stats.MaxDamageShipName(statsPattern),
 			WinRate:           stats.WinRate(domain.StatsCategoryOverall, statsPattern),
 			WinSurvivedRate:   stats.WinSurvivedRate(domain.StatsCategoryOverall, statsPattern),
 			LoseSurvivedRate:  stats.LoseSurvivedRate(domain.StatsCategoryOverall, statsPattern),
