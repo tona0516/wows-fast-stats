@@ -2,7 +2,7 @@
   import clone from "clone";
   import { DispName } from "src/lib/DispName";
   import type { Screenshot } from "src/lib/Screenshot";
-  import { Func, Page, ScreenshotType, type StatsExtra } from "src/lib/types";
+  import { Func, Page, ScreenshotType } from "src/lib/types";
   import {
     storedCurrentPage,
     storedUserConfig,
@@ -16,11 +16,11 @@
   export let screenshot: Screenshot;
 
   let isScreenshotting = false;
-  let selectedStatsPattern: StatsExtra;
   let meta = $storedBattle?.meta;
   storedBattle.subscribe((it) => {
     meta = it?.meta;
   });
+  let selectedStatsPattern: string = $storedUserConfig.stats_pattern;
 
   $: disableScreenshotButton = meta === undefined || isScreenshotting;
 
@@ -130,7 +130,7 @@
           >
             {#each DispName.STATS_PATTERNS as pair}
               <option
-                selected={pair.first === $storedUserConfig.stats_pattern}
+                selected={pair.first == $storedUserConfig.stats_pattern}
                 value={pair.first}>{pair.second}</option
               >
             {/each}
