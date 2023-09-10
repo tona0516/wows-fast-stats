@@ -8,7 +8,7 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/skratchdot/open-golang v0.0.0-20200116055534-eef842397966
 	github.com/stretchr/testify v1.8.3
-	github.com/wailsapp/wails/v2 v2.5.1
+	github.com/wailsapp/wails/v2 v2.6.0
 	golang.org/x/exp v0.0.0-20230522175609-2e198f4a06a1
 	golang.org/x/sync v0.2.0
 )
@@ -16,6 +16,8 @@ require (
 require github.com/rs/zerolog v1.29.1
 
 require github.com/morikuni/failure v1.1.2
+
+require github.com/wailsapp/go-webview2 v1.0.1 // indirect
 
 require (
 	github.com/Masterminds/semver/v3 v3.2.1
