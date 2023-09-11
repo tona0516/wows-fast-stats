@@ -16,7 +16,7 @@ import { SurvivedRate } from "src/lib/column/SurvivedRate";
 import { UsingShipTypeRate } from "src/lib/column/UsingShipTypeRate";
 import { UsingTierRate } from "src/lib/column/UsingTierRate";
 import { WinRate } from "src/lib/column/WinRate";
-import { IColumn } from "src/lib/column/intetface/IColumn";
+import { type IColumn } from "src/lib/column/intetface/IColumn";
 import {
   includesOveralls,
   includesShips,

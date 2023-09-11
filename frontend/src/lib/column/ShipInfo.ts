@@ -10,7 +10,6 @@ import FlagGermany from "src/assets/images/flag_Germany.png";
 import FlagItaly from "src/assets/images/flag_Italy.png";
 import FlagJapan from "src/assets/images/flag_Japan.png";
 import FlagNetherlands from "src/assets/images/flag_Netherlands.png";
-import FlagNone from "src/assets/images/flag_None.png";
 import FlagPanAmerica from "src/assets/images/flag_Pan_America.png";
 import FlagPanAsia from "src/assets/images/flag_Pan_Asia.png";
 import FlagUssr from "src/assets/images/flag_Russia.png";
@@ -26,7 +25,6 @@ import ShipCV from "src/assets/images/ship_cv.png";
 import ShipPremiumCV from "src/assets/images/ship_cv_premium.png";
 import ShipDD from "src/assets/images/ship_dd.png";
 import ShipPremiumDD from "src/assets/images/ship_dd_premium.png";
-import ShipNone from "src/assets/images/ship_none.png";
 import ShipSS from "src/assets/images/ship_ss.png";
 import ShipPremiumSS from "src/assets/images/ship_ss_premium.png";
 
@@ -47,7 +45,6 @@ const FLAGS: { [key: string]: string } = {
   commonwealth: FlagCommonWealth,
   pan_america: FlagPanAmerica,
   spain: FlagSpain,
-  none: FlagNone,
 };
 
 const SHIP_ICONS: { [key: string]: string } = {
@@ -123,13 +120,13 @@ export class ShipInfo implements IColumn<BasicKey> {
     const type = shipInfo.type;
 
     if (!isShipType(type)) {
-      return ShipNone;
+      return "";
     }
 
     return shipInfo.is_premium ? PREMIUM_SHIP_ICONS[type] : SHIP_ICONS[type];
   }
 
   nationIconPath(player: domain.Player): string {
-    return FLAGS[player.ship_info.nation] ?? FLAGS.none;
+    return FLAGS[player.ship_info.nation] ?? "";
   }
 }
