@@ -3,50 +3,67 @@ import type { BasicKey } from "src/lib/types";
 import ShipInfoTableData from "src/tabledata_component/ShipInfoTableData.svelte";
 import type { domain } from "wailsjs/go/models";
 
-import CommonWealthNationIcon from "src/assets/images/nation-commonwealth.png";
-import EuropeNationIcon from "src/assets/images/nation-europe.png";
-import FranceNationIcon from "src/assets/images/nation-france.png";
-import GermanyNationIcon from "src/assets/images/nation-germany.png";
-import ItalyNationIcon from "src/assets/images/nation-italy.png";
-import JapanNationIcon from "src/assets/images/nation-japan.png";
-import NetherlandsNationIcon from "src/assets/images/nation-netherlands.png";
-import NoneNationIcon from "src/assets/images/nation-none.png";
-import PanAmericaNationIcon from "src/assets/images/nation-pan-america.png";
-import PanAsiaNationIcon from "src/assets/images/nation-pan-asia.png";
-import SpainNationIcon from "src/assets/images/nation-spain.png";
-import UkNationIcon from "src/assets/images/nation-uk.png";
-import UsaNationIcon from "src/assets/images/nation-usa.png";
-import UssrNationIcon from "src/assets/images/nation-ussr.png";
+import FlagCommonWealth from "src/assets/images/flag_Commonwealth.png";
+import FlagEurope from "src/assets/images/flag_Europe.png";
+import FlagFrance from "src/assets/images/flag_France.png";
+import FlagGermany from "src/assets/images/flag_Germany.png";
+import FlagItaly from "src/assets/images/flag_Italy.png";
+import FlagJapan from "src/assets/images/flag_Japan.png";
+import FlagNetherlands from "src/assets/images/flag_Netherlands.png";
+import FlagNone from "src/assets/images/flag_None.png";
+import FlagPanAmerica from "src/assets/images/flag_Pan_America.png";
+import FlagPanAsia from "src/assets/images/flag_Pan_Asia.png";
+import FlagUssr from "src/assets/images/flag_Russia.png";
+import FlagSpain from "src/assets/images/flag_Spain.png";
+import FlagUsa from "src/assets/images/flag_USA.png";
+import FlagUk from "src/assets/images/flag_United_Kingdom.png";
 
-import PremiumBBShipIcon from "src/assets/images/icon-bb-premium.png";
-import BBShipIcon from "src/assets/images/icon-bb.png";
-import PremiumCLShipIcon from "src/assets/images/icon-cl-premium.png";
-import CLShipIcon from "src/assets/images/icon-cl.png";
-import PremiumCVShipIcon from "src/assets/images/icon-cv-premium.png";
-import CVShipIcon from "src/assets/images/icon-cv.png";
-import PremiumDDShipIcon from "src/assets/images/icon-dd-premium.png";
-import DDShipIcon from "src/assets/images/icon-dd.png";
-import NoneShipIcon from "src/assets/images/icon-none.png";
-import PremiumSSShipIcon from "src/assets/images/icon-ss-premium.png";
-import SSShipIcon from "src/assets/images/icon-ss.png";
+import ShipBB from "src/assets/images/ship_bb.png";
+import ShipPremiumBB from "src/assets/images/ship_bb_premium.png";
+import ShipCL from "src/assets/images/ship_cl.png";
+import ShipPremiumCL from "src/assets/images/ship_cl_premium.png";
+import ShipCV from "src/assets/images/ship_cv.png";
+import ShipPremiumCV from "src/assets/images/ship_cv_premium.png";
+import ShipDD from "src/assets/images/ship_dd.png";
+import ShipPremiumDD from "src/assets/images/ship_dd_premium.png";
+import ShipNone from "src/assets/images/ship_none.png";
+import ShipSS from "src/assets/images/ship_ss.png";
+import ShipPremiumSS from "src/assets/images/ship_ss_premium.png";
+
 import { BASE_NUMBERS_URL } from "src/const";
-import { tierString } from "src/lib/util";
+import { isShipType, tierString } from "src/lib/util";
 
-const NATION_ICONS: { [key: string]: string } = {
-  japan: JapanNationIcon,
-  usa: UsaNationIcon,
-  ussr: UssrNationIcon,
-  germany: GermanyNationIcon,
-  uk: UkNationIcon,
-  france: FranceNationIcon,
-  italy: ItalyNationIcon,
-  pan_asia: PanAsiaNationIcon,
-  europe: EuropeNationIcon,
-  netherlands: NetherlandsNationIcon,
-  commonwealth: CommonWealthNationIcon,
-  pan_america: PanAmericaNationIcon,
-  spain: SpainNationIcon,
-  none: NoneNationIcon,
+const FLAGS: { [key: string]: string } = {
+  japan: FlagJapan,
+  usa: FlagUsa,
+  ussr: FlagUssr,
+  germany: FlagGermany,
+  uk: FlagUk,
+  france: FlagFrance,
+  italy: FlagItaly,
+  pan_asia: FlagPanAsia,
+  europe: FlagEurope,
+  netherlands: FlagNetherlands,
+  commonwealth: FlagCommonWealth,
+  pan_america: FlagPanAmerica,
+  spain: FlagSpain,
+  none: FlagNone,
+};
+
+const SHIP_ICONS: { [key: string]: string } = {
+  cv: ShipCV,
+  bb: ShipBB,
+  cl: ShipCL,
+  dd: ShipDD,
+  ss: ShipSS,
+};
+
+const PREMIUM_SHIP_ICONS: { [key: string]: string } = {
+  cv: ShipPremiumCV,
+  bb: ShipPremiumBB,
+  cl: ShipPremiumCL,
+  dd: ShipPremiumDD,
+  ss: ShipPremiumSS,
 };
 
 export class ShipInfo implements IColumn<BasicKey> {
@@ -82,20 +99,13 @@ export class ShipInfo implements IColumn<BasicKey> {
 
   bgColorCode(player: domain.Player): string {
     const ownColor = this.userConfig.custom_color.ship_type.own;
-    switch (player.ship_info.type) {
-      case "cv":
-        return ownColor.cv;
-      case "bb":
-        return ownColor.bb;
-      case "cl":
-        return ownColor.cl;
-      case "dd":
-        return ownColor.dd;
-      case "ss":
-        return ownColor.ss;
-      default:
+    const type = player.ship_info.type
+
+    if (!isShipType(type)) {
         return "#00000000";
     }
+
+    return ownColor[type]
   }
 
   shipURL(player: domain.Player): string {
@@ -110,24 +120,16 @@ export class ShipInfo implements IColumn<BasicKey> {
 
   shipTypeIconPath(player: domain.Player): string {
     const shipInfo = player.ship_info;
+    const type = shipInfo.type;
 
-    switch (shipInfo.type) {
-      case "cv":
-        return shipInfo.is_premium ? PremiumCVShipIcon : CVShipIcon;
-      case "bb":
-        return shipInfo.is_premium ? PremiumBBShipIcon : BBShipIcon;
-      case "cl":
-        return shipInfo.is_premium ? PremiumCLShipIcon : CLShipIcon;
-      case "dd":
-        return shipInfo.is_premium ? PremiumDDShipIcon : DDShipIcon;
-      case "ss":
-        return shipInfo.is_premium ? PremiumSSShipIcon : SSShipIcon;
-      default:
-        return NoneShipIcon;
+    if (!isShipType(type)) {
+        return ShipNone;
     }
+
+    return shipInfo.is_premium ? PREMIUM_SHIP_ICONS[type] : SHIP_ICONS[type];
   }
 
   nationIconPath(player: domain.Player): string {
-    return NATION_ICONS[player.ship_info.nation] ?? NATION_ICONS.none;
+    return FLAGS[player.ship_info.nation] ?? FLAGS.none;
   }
 }

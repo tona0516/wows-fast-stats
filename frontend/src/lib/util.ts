@@ -20,6 +20,7 @@ import type { AbstractSingleColumn } from "src/lib/column/intetface/AbstractSing
 import type { IColumn } from "src/lib/column/intetface/IColumn";
 import type { ISummaryColumn } from "src/lib/column/intetface/ISummaryColumn";
 import {
+  type ShipType,
   type BasicKey,
   type CommonStatsKey,
   type OptionalBattle,
@@ -215,4 +216,13 @@ export const tierString = (value: number): string => {
   }
 
   return romanized;
+};
+
+export const isShipType = (value: string): value is ShipType => {
+  try {
+    value as ShipType;
+    return true;
+  } catch {
+    return false;
+  }
 };
