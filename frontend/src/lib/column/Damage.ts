@@ -1,16 +1,12 @@
 import { AbstractSingleColumn } from "src/lib/column/intetface/AbstractSingleColumn";
 import type { ISummaryColumn } from "src/lib/column/intetface/ISummaryColumn";
 import { RatingConverterFactory } from "src/lib/rating/RatingConverter";
-import {
-  CssClass,
-  type CommonStatsKey,
-  type StatsCategory,
-} from "src/lib/types";
+import { CssClass, type CommonKey, type StatsCategory } from "src/lib/types";
 import { toPlayerStats } from "src/lib/util";
 import type { domain } from "wailsjs/go/models";
 
 export class Damage
-  extends AbstractSingleColumn<CommonStatsKey>
+  extends AbstractSingleColumn<CommonKey>
   implements ISummaryColumn
 {
   constructor(
@@ -20,7 +16,7 @@ export class Damage
     super();
   }
 
-  displayKey(): CommonStatsKey {
+  displayKey(): CommonKey {
     return "damage";
   }
 

@@ -1,16 +1,16 @@
 import { BASE_NUMBERS_URL } from "src/const";
 import { type IColumn } from "src/lib/column/intetface/IColumn";
-import { type CommonStatsKey, type StatsCategory } from "src/lib/types";
+import { type CommonKey, type StatsCategory } from "src/lib/types";
 import { tierString, toPlayerStats } from "src/lib/util";
 import MaxDamageTableData from "src/tabledata_component/MaxDamageTableData.svelte";
 import type { domain } from "wailsjs/go/models";
 
-export class MaxDamage implements IColumn<CommonStatsKey> {
+export class MaxDamage implements IColumn<CommonKey> {
   constructor(
     private userConfig: domain.UserConfig,
     private category: StatsCategory,
   ) {}
-  displayKey(): CommonStatsKey {
+  displayKey(): CommonKey {
     return "max_damage";
   }
 

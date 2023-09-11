@@ -1,19 +1,19 @@
 import { DispName } from "src/lib/DispName";
+import { AbstractGraphColumn } from "src/lib/column/intetface/AbstractGraphColumn";
+import type { OverallKey, TierGroup } from "src/lib/types";
+import { toPlayerStats } from "src/lib/util";
 import type {
   StackedBarGraphItem,
   StackedBarGraphParam,
-} from "src/lib/StackedBarGraphParam";
-import { AbstractGraphColumn } from "src/lib/column/intetface/AbstractGraphColumn";
-import type { OverallOnlyKey, TierGroup } from "src/lib/types";
-import { toPlayerStats } from "src/lib/util";
+} from "src/lib/value_object/StackedBarGraphParam";
 import type { domain } from "wailsjs/go/models";
 
-export class UsingTierRate extends AbstractGraphColumn<OverallOnlyKey> {
+export class UsingTierRate extends AbstractGraphColumn<OverallKey> {
   constructor(private userConfig: domain.UserConfig) {
     super();
   }
 
-  displayKey(): OverallOnlyKey {
+  displayKey(): OverallKey {
     return "using_tier_rate";
   }
 

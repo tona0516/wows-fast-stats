@@ -32,11 +32,11 @@
     storedUserConfig,
     storedCurrentPage,
   } from "src/stores";
-  import { calculateSummary } from "src/lib/util";
   import AddAlertPlayerModal from "src/other_component/AddAlertPlayerModal.svelte";
   import UpdateAlertPlayerModal from "src/other_component/UpdateAlertPlayerModal.svelte";
   import RemoveAlertPlayerModal from "src/other_component/RemoveAlertPlayerModal.svelte";
   import { AppEvent, Page, ScreenshotType, ToastKey } from "./lib/types";
+  import { Summary } from "./lib/Summary";
 
   let defaultUserConfig: domain.UserConfig;
   let notification: Notification;
@@ -47,7 +47,11 @@
   let screenshot = new Screenshot();
 
   $: storedSummary.set(
-    calculateSummary($storedBattle, $storedExcludePlayerIDs, $storedUserConfig),
+    Summary.calculate(
+      $storedBattle,
+      $storedExcludePlayerIDs,
+      $storedUserConfig,
+    ),
   );
 
   EventsOn(AppEvent.LOG, async (log: string) => {
@@ -73,7 +77,7 @@
       const excludeIDs = await ExcludePlayerIDs();
       storedExcludePlayerIDs.set(excludeIDs);
 
-      const summary = calculateSummary(battle, excludeIDs, $storedUserConfig);
+      const summary = Summary.calculate(battle, excludeIDs, $storedUserConfig);
       storedSummary.set(summary);
 
       const elapsed = (new Date().getTime() - start) / 1000;

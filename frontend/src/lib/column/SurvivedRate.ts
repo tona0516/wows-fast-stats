@@ -1,13 +1,9 @@
 import { AbstractSingleColumn } from "src/lib/column/intetface/AbstractSingleColumn";
-import {
-  CssClass,
-  type CommonStatsKey,
-  type StatsCategory,
-} from "src/lib/types";
+import { CssClass, type CommonKey, type StatsCategory } from "src/lib/types";
 import { toPlayerStats } from "src/lib/util";
 import type { domain } from "wailsjs/go/models";
 
-export class SurvivedRate extends AbstractSingleColumn<CommonStatsKey> {
+export class SurvivedRate extends AbstractSingleColumn<CommonKey> {
   constructor(
     private userConfig: domain.UserConfig,
     private category: StatsCategory,
@@ -15,7 +11,7 @@ export class SurvivedRate extends AbstractSingleColumn<CommonStatsKey> {
     super();
   }
 
-  displayKey(): CommonStatsKey {
+  displayKey(): CommonKey {
     return "survived_rate";
   }
 

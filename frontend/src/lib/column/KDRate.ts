@@ -1,15 +1,11 @@
 import { AbstractSingleColumn } from "src/lib/column/intetface/AbstractSingleColumn";
 import type { ISummaryColumn } from "src/lib/column/intetface/ISummaryColumn";
-import {
-  CssClass,
-  type CommonStatsKey,
-  type StatsCategory,
-} from "src/lib/types";
+import { CssClass, type CommonKey, type StatsCategory } from "src/lib/types";
 import { toPlayerStats } from "src/lib/util";
 import type { domain } from "wailsjs/go/models";
 
 export class KDRate
-  extends AbstractSingleColumn<CommonStatsKey>
+  extends AbstractSingleColumn<CommonKey>
   implements ISummaryColumn
 {
   constructor(
@@ -19,7 +15,7 @@ export class KDRate
     super();
   }
 
-  displayKey(): CommonStatsKey {
+  displayKey(): CommonKey {
     return "kd_rate";
   }
 

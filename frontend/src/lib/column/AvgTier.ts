@@ -1,14 +1,14 @@
 import { AbstractSingleColumn } from "src/lib/column/intetface/AbstractSingleColumn";
-import { CssClass, type OverallOnlyKey } from "src/lib/types";
+import { CssClass, type OverallKey } from "src/lib/types";
 import { toPlayerStats } from "src/lib/util";
 import type { domain } from "wailsjs/go/models";
 
-export class AvgTier extends AbstractSingleColumn<OverallOnlyKey> {
+export class AvgTier extends AbstractSingleColumn<OverallKey> {
   constructor(private userConfig: domain.UserConfig) {
     super();
   }
 
-  displayKey(): OverallOnlyKey {
+  displayKey(): OverallKey {
     return "avg_tier";
   }
 

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { DispName } from "src/lib/DispName";
   import { sampleTeam } from "src/lib/rating/RatingConst";
-  import { displayColumns } from "src/lib/util";
+  import { displayItems } from "src/lib/util";
   import ConfirmModal from "src/other_component/ConfirmModal.svelte";
   import StatisticsTable from "src/other_component/StatisticsTable.svelte";
   import { storedUserConfig } from "src/stores";
@@ -15,7 +15,7 @@
   let resetModal: ConfirmModal;
 
   const dispatch = createEventDispatcher();
-  const [commons, shipOnlys, overallOnlys] = displayColumns();
+  const displays = displayItems();
 
   const onResetConfirmed = () => {
     inputUserConfig.font_size = defaultUserConfig.font_size;
@@ -59,115 +59,49 @@
       </tr>
     </thead>
     <tbody>
-      {#each commons as column}
+      {#each displays as display}
         <tr>
           <td>
-            {column.fullDisplayName()}
+            {display.name}
           </td>
 
-          <td>
-            <Input
-              type="switch"
-              bind:checked={inputUserConfig.displays.ship[column.displayKey()]}
-              on:change={() => dispatch("Change")}
-            />
-          </td>
+          {#if display.shipKey}
+            <td>
+              <Input
+                type="switch"
+                bind:checked={inputUserConfig.displays.ship[display.shipKey]}
+                on:change={() => dispatch("Change")}
+              />
+            </td>
+          {:else}
+            <td></td>
+          {/if}
 
-          <td>
-            <Input
-              type="switch"
-              bind:checked={inputUserConfig.displays.overall[
-                column.displayKey()
-              ]}
-              on:change={() => dispatch("Change")}
-            />
-          </td>
+          {#if display.overallKey}
+            <td>
+              <Input
+                type="switch"
+                bind:checked={inputUserConfig.displays.overall[
+                  display.overallKey
+                ]}
+                on:change={() => dispatch("Change")}
+              />
+            </td>
+          {:else}
+            <td></td>
+          {/if}
 
           <td>
             <FormGroup>
               <Input
                 type="select"
-                bind:value={inputUserConfig.custom_digit[column.displayKey()]}
+                bind:value={inputUserConfig.custom_digit[display.digitKey]}
                 on:change={() => dispatch("Change")}
               >
                 {#each [0, 1, 2] as digit}
                   <option
                     selected={digit ===
-                      inputUserConfig.custom_digit[column.displayKey()]}
-                    value={digit}>{digit}</option
-                  >
-                {/each}
-              </Input>
-            </FormGroup>
-          </td>
-        </tr>
-      {/each}
-
-      {#each shipOnlys as column}
-        <tr>
-          <td>
-            {column.fullDisplayName()}
-          </td>
-
-          <td>
-            <Input
-              type="switch"
-              bind:checked={inputUserConfig.displays.ship[column.displayKey()]}
-              on:change={() => dispatch("Change")}
-            />
-          </td>
-
-          <td></td>
-
-          <td>
-            <FormGroup>
-              <Input
-                type="select"
-                bind:value={inputUserConfig.custom_digit[column.displayKey()]}
-                on:change={() => dispatch("Change")}
-              >
-                {#each [0, 1, 2] as digit}
-                  <option
-                    selected={digit ===
-                      inputUserConfig.custom_digit[column.displayKey()]}
-                    value={digit}>{digit}</option
-                  >
-                {/each}
-              </Input>
-            </FormGroup>
-          </td>
-        </tr>
-      {/each}
-
-      {#each overallOnlys as column}
-        <tr>
-          <td>
-            {column.fullDisplayName()}
-          </td>
-
-          <td></td>
-
-          <td>
-            <Input
-              type="switch"
-              bind:checked={inputUserConfig.displays.overall[
-                column.displayKey()
-              ]}
-              on:change={() => dispatch("Change")}
-            />
-          </td>
-
-          <td>
-            <FormGroup>
-              <Input
-                type="select"
-                bind:value={inputUserConfig.custom_digit[column.displayKey()]}
-                on:change={() => dispatch("Change")}
-              >
-                {#each [0, 1, 2] as digit}
-                  <option
-                    selected={digit ===
-                      inputUserConfig.custom_digit[column.displayKey()]}
+                      inputUserConfig.custom_digit[display.digitKey]}
                     value={digit}>{digit}</option
                   >
                 {/each}

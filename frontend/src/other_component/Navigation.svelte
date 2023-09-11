@@ -92,12 +92,12 @@
             size="sm"
             color="secondary"
             outline
-            class="m-1 {$storedCurrentPage === page.first ? 'active' : ''}"
+            class="m-1 {$storedCurrentPage === page.type ? 'active' : ''}"
             style="font-size: {$storedUserConfig.font_size};"
-            on:click={() => storedCurrentPage.set(page.first)}
+            on:click={() => storedCurrentPage.set(page.type)}
           >
-            <i class={page.third} />
-            {page.second}
+            <i class={page.icon} />
+            {page.dispName}
           </Button>
         {/each}
         {#if $storedCurrentPage == Page.MAIN}
@@ -107,16 +107,16 @@
               color="success"
               outline
               class="m-1"
-              disabled={func.first === Func.SCREENSHOT &&
+              disabled={func.type === Func.SCREENSHOT &&
                 disableScreenshotButton}
               style="font-size: {$storedUserConfig.font_size};"
-              on:click={() => onClickFunc(func.first)}
+              on:click={() => onClickFunc(func.type)}
             >
-              {#if func.first === Func.SCREENSHOT && isScreenshotting}
+              {#if func.type === Func.SCREENSHOT && isScreenshotting}
                 <Spinner size="sm" /> 読み込み中
               {:else}
-                <i class={func.third} />
-                {func.second}
+                <i class={func.icon} />
+                {func.dispName}
               {/if}
             </Button>
           {/each}

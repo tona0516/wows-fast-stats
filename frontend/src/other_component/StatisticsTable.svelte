@@ -43,7 +43,7 @@
       <tr>
         {#each categories as category}
           {#if category.columnCount() > 0}
-            <th colspan={category.columnCount()}>{category.categoryName()}</th>
+            <th colspan={category.columnCount()}>{category.dispName()}</th>
           {/if}
         {/each}
       </tr>

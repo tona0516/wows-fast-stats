@@ -1,19 +1,19 @@
 import { DispName } from "src/lib/DispName";
+import { AbstractGraphColumn } from "src/lib/column/intetface/AbstractGraphColumn";
+import type { OverallKey } from "src/lib/types";
+import { toPlayerStats } from "src/lib/util";
 import type {
   StackedBarGraphItem,
   StackedBarGraphParam,
-} from "src/lib/StackedBarGraphParam";
-import { AbstractGraphColumn } from "src/lib/column/intetface/AbstractGraphColumn";
-import type { OverallOnlyKey } from "src/lib/types";
-import { toPlayerStats } from "src/lib/util";
+} from "src/lib/value_object/StackedBarGraphParam";
 import type { domain } from "wailsjs/go/models";
 
-export class UsingShipTypeRate extends AbstractGraphColumn<OverallOnlyKey> {
+export class UsingShipTypeRate extends AbstractGraphColumn<OverallKey> {
   constructor(private userConfig: domain.UserConfig) {
     super();
   }
 
-  displayKey(): OverallOnlyKey {
+  displayKey(): OverallKey {
     return "using_ship_type_rate";
   }
 

@@ -1,14 +1,14 @@
 import { AbstractSingleColumn } from "src/lib/column/intetface/AbstractSingleColumn";
-import { CssClass, type ShipOnlyKey } from "src/lib/types";
+import { CssClass, type ShipKey } from "src/lib/types";
 import { toPlayerStats } from "src/lib/util";
 import type { domain } from "wailsjs/go/models";
 
-export class HitRate extends AbstractSingleColumn<ShipOnlyKey> {
+export class HitRate extends AbstractSingleColumn<ShipKey> {
   constructor(private userConfig: domain.UserConfig) {
     super();
   }
 
-  displayKey(): ShipOnlyKey {
+  displayKey(): ShipKey {
     return "hit_rate";
   }
 

@@ -10,7 +10,7 @@ export class ColumnArray<T> extends Array<IColumn<any>> {
     super(...items);
   }
 
-  categoryName(): string {
+  dispName(): string {
     const label = DispName.COLUMN_CATEGORIES.find(
       (cc) => cc.key === this.category,
     );

@@ -83,11 +83,20 @@ export type StatsExtra = Exclude<
 export type Rating = Readonly<keyof domain.SkillColorCode>;
 
 export type ShipKey = Readonly<keyof domain.Ship>;
-export type OverallKey = Readonly<keyof domain.Overall>;
+const ships = Object.keys(new domain.Ship());
+export const includesShips = (key: string): boolean => {
+  return ships.includes(key);
+};
 
-export type CommonStatsKey = ShipKey & OverallKey;
-export type ShipOnlyKey = Exclude<ShipKey, CommonStatsKey>;
-export type OverallOnlyKey = Exclude<OverallKey, CommonStatsKey>;
+export type OverallKey = Readonly<keyof domain.Overall>;
+const overalls = Object.keys(new domain.Overall());
+export const includesOveralls = (key: string): boolean => {
+  return overalls.includes(key);
+};
+
+export type CommonKey = ShipKey & OverallKey;
+
+export type DigitKey = Readonly<keyof domain.CustomDigit>;
 
 export type OptionalBattle = domain.Battle | undefined;
 export type OptionalSummary = Summary | undefined;
