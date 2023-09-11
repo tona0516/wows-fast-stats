@@ -99,13 +99,13 @@ export class ShipInfo implements IColumn<BasicKey> {
 
   bgColorCode(player: domain.Player): string {
     const ownColor = this.userConfig.custom_color.ship_type.own;
-    const type = player.ship_info.type
+    const type = player.ship_info.type;
 
     if (!isShipType(type)) {
-        return "#00000000";
+      return "#00000000";
     }
 
-    return ownColor[type]
+    return ownColor[type];
   }
 
   shipURL(player: domain.Player): string {
@@ -123,7 +123,7 @@ export class ShipInfo implements IColumn<BasicKey> {
     const type = shipInfo.type;
 
     if (!isShipType(type)) {
-        return ShipNone;
+      return ShipNone;
     }
 
     return shipInfo.is_premium ? PREMIUM_SHIP_ICONS[type] : SHIP_ICONS[type];

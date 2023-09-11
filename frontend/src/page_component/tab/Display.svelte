@@ -40,10 +40,9 @@
     bind:value={inputUserConfig.font_size}
     on:change={() => dispatch("Change")}
   >
-    {#each DispName.FONT_SIZES as pair}
-      <option
-        selected={pair.first === $storedUserConfig.font_size}
-        value={pair.first}>{pair.second}</option
+    {#each DispName.FONT_SIZES as fs}
+      <option selected={fs.key === $storedUserConfig.font_size} value={fs.key}
+        >{fs.value}</option
       >
     {/each}
   </Input>
@@ -192,13 +191,13 @@
       </tr>
     </thead>
     <tbody>
-      {#each DispName.SKILL_LEVELS as pair}
+      {#each DispName.SKILL_LEVELS as sl}
         <tr>
-          <td>{pair.second}</td>
+          <td>{sl.value}</td>
           <td>
             <Input
               type="color"
-              bind:value={inputUserConfig.custom_color.skill.text[pair.first]}
+              bind:value={inputUserConfig.custom_color.skill.text[sl.key]}
               on:input={() => dispatch("Change")}
             />
           </td>
@@ -206,9 +205,7 @@
           <td>
             <Input
               type="color"
-              bind:value={inputUserConfig.custom_color.skill.background[
-                pair.first
-              ]}
+              bind:value={inputUserConfig.custom_color.skill.background[sl.key]}
               on:input={() => dispatch("Change")}
             />
           </td>
@@ -229,13 +226,13 @@
       </tr>
     </thead>
     <tbody>
-      {#each DispName.TIER_GROUPS as pair}
+      {#each DispName.TIER_GROUPS as tg}
         <tr>
-          <td>{pair.second}</td>
+          <td>{tg.value}</td>
           <td>
             <Input
               type="color"
-              bind:value={inputUserConfig.custom_color.tier.own[pair.first]}
+              bind:value={inputUserConfig.custom_color.tier.own[tg.key]}
               on:input={() => dispatch("Change")}
             />
           </td>
@@ -243,7 +240,7 @@
           <td>
             <Input
               type="color"
-              bind:value={inputUserConfig.custom_color.tier.other[pair.first]}
+              bind:value={inputUserConfig.custom_color.tier.other[tg.key]}
               on:input={() => dispatch("Change")}
             />
           </td>
@@ -264,15 +261,13 @@
       </tr>
     </thead>
     <tbody>
-      {#each DispName.SHIP_TYPES as pair}
+      {#each DispName.SHIP_TYPES as st}
         <tr>
-          <td>{pair.second}</td>
+          <td>{st.value}</td>
           <td>
             <Input
               type="color"
-              bind:value={inputUserConfig.custom_color.ship_type.own[
-                pair.first
-              ]}
+              bind:value={inputUserConfig.custom_color.ship_type.own[st.key]}
               on:input={() => dispatch("Change")}
             />
           </td>
@@ -280,9 +275,7 @@
           <td>
             <Input
               type="color"
-              bind:value={inputUserConfig.custom_color.ship_type.other[
-                pair.first
-              ]}
+              bind:value={inputUserConfig.custom_color.ship_type.other[st.key]}
               on:input={() => dispatch("Change")}
             />
           </td>
@@ -299,10 +292,10 @@
     bind:value={inputUserConfig.custom_color.player_name}
     on:change={() => dispatch("Change")}
   >
-    {#each DispName.PLAYER_NAME_COLORS as pair}
+    {#each DispName.PLAYER_NAME_COLORS as pnc}
       <option
-        selected={pair.first === $storedUserConfig.custom_color.player_name}
-        value={pair.first}>{pair.second}</option
+        selected={pnc.key === $storedUserConfig.custom_color.player_name}
+        value={pnc.key}>{pnc.value}</option
       >
     {/each}
   </Input>

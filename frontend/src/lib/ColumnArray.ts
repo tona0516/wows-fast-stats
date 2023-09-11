@@ -12,13 +12,13 @@ export class ColumnArray<T> extends Array<IColumn<any>> {
 
   categoryName(): string {
     const label = DispName.COLUMN_CATEGORIES.find(
-      (pair) => pair.first === this.category,
+      (cc) => cc.key === this.category,
     );
     if (!label) {
       throw Error(`unexpected error: ColumnCategory: ${this.category}`);
     }
 
-    return label.second;
+    return label.value;
   }
 
   columnCount(): number {

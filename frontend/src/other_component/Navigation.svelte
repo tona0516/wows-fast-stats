@@ -128,10 +128,10 @@
             bind:value={selectedStatsPattern}
             on:change={onStatsPatternChanged}
           >
-            {#each DispName.STATS_PATTERNS as pair}
+            {#each DispName.STATS_PATTERNS as sp}
               <option
-                selected={pair.first == $storedUserConfig.stats_pattern}
-                value={pair.first}>{pair.second}</option
+                selected={sp.key == $storedUserConfig.stats_pattern}
+                value={sp.key}>{sp.value}</option
               >
             {/each}
           </select>

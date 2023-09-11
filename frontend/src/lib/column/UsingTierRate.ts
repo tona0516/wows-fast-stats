@@ -37,13 +37,11 @@ export class UsingTierRate extends AbstractGraphColumn<OverallOnlyKey> {
     const colors = this.userConfig.custom_color.tier;
 
     let items: StackedBarGraphItem[] = [];
-    DispName.TIER_GROUPS.forEach((pair) => {
-      const value = tierRateGroup[pair.first];
+    DispName.TIER_GROUPS.forEach((tg) => {
+      const value = tierRateGroup[tg.key];
       const colorCode =
-        pair.first === ownTierGroup
-          ? colors.own[pair.first]
-          : colors.other[pair.first];
-      items.push({ label: pair.second, colorCode: colorCode, value: value });
+        tg.key === ownTierGroup ? colors.own[tg.key] : colors.other[tg.key];
+      items.push({ label: tg.value, colorCode: colorCode, value: value });
     });
 
     return { digit: digit, items: items };

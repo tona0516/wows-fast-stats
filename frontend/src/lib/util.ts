@@ -20,7 +20,6 @@ import type { AbstractSingleColumn } from "src/lib/column/intetface/AbstractSing
 import type { IColumn } from "src/lib/column/intetface/IColumn";
 import type { ISummaryColumn } from "src/lib/column/intetface/ISummaryColumn";
 import {
-  type ShipType,
   type BasicKey,
   type CommonStatsKey,
   type OptionalBattle,
@@ -29,6 +28,7 @@ import {
   type OverallOnlyKey,
   type ShipKey,
   type ShipOnlyKey,
+  type ShipType,
   type StatsCategory,
 } from "src/lib/types";
 import { domain } from "wailsjs/go/models";

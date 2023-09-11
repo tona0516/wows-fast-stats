@@ -1,4 +1,4 @@
-import { Pair } from "src/lib/Pair";
+import { KeyValue } from "src/lib/KeyValue";
 import { Triple } from "src/lib/Triple";
 import {
   Func,
@@ -13,54 +13,54 @@ import {
 } from "src/lib/types";
 
 export namespace DispName {
-  export const STATS_PATTERNS: Pair<StatsExtra, string>[] = [
-    new Pair("pvp_solo", "ランダム戦(ソロ)"),
-    new Pair("pvp_all", "ランダム戦"),
+  export const STATS_PATTERNS: KeyValue<StatsExtra, string>[] = [
+    new KeyValue("pvp_solo", "ランダム戦(ソロ)"),
+    new KeyValue("pvp_all", "ランダム戦"),
   ];
 
-  export const COLUMN_CATEGORIES: Pair<ColumnCategory, string>[] = [
-    new Pair("basic", "基本情報"),
-    new Pair("ship", "艦成績"),
-    new Pair("overall", "総合成績"),
+  export const COLUMN_CATEGORIES: KeyValue<ColumnCategory, string>[] = [
+    new KeyValue("basic", "基本情報"),
+    new KeyValue("ship", "艦成績"),
+    new KeyValue("overall", "総合成績"),
   ];
 
-  export const SKILL_LEVELS: Pair<Rating, string>[] = [
-    new Pair("bad", "Bad"),
-    new Pair("below_avg", "Below Average"),
-    new Pair("avg", "Average"),
-    new Pair("good", "Good"),
-    new Pair("very_good", "Very Good"),
-    new Pair("great", "Great"),
-    new Pair("unicum", "Unicum"),
-    new Pair("super_unicum", "Super Unicum"),
+  export const SKILL_LEVELS: KeyValue<Rating, string>[] = [
+    new KeyValue("bad", "Bad"),
+    new KeyValue("below_avg", "Below Average"),
+    new KeyValue("avg", "Average"),
+    new KeyValue("good", "Good"),
+    new KeyValue("very_good", "Very Good"),
+    new KeyValue("great", "Great"),
+    new KeyValue("unicum", "Unicum"),
+    new KeyValue("super_unicum", "Super Unicum"),
   ];
 
-  export const FONT_SIZES: Pair<FontSize, string>[] = [
-    new Pair("x-small", "極小"),
-    new Pair("small", "小"),
-    new Pair("medium", "中"),
-    new Pair("large", "大"),
-    new Pair("x-large", "極大"),
+  export const FONT_SIZES: KeyValue<FontSize, string>[] = [
+    new KeyValue("x-small", "極小"),
+    new KeyValue("small", "小"),
+    new KeyValue("medium", "中"),
+    new KeyValue("large", "大"),
+    new KeyValue("x-large", "極大"),
   ];
 
-  export const PLAYER_NAME_COLORS: Pair<PlayerNameColor, string>[] = [
-    new Pair("ship", "艦成績のPR"),
-    new Pair("overall", "総合成績のPR"),
-    new Pair("none", "なし"),
+  export const PLAYER_NAME_COLORS: KeyValue<PlayerNameColor, string>[] = [
+    new KeyValue("ship", "艦成績のPR"),
+    new KeyValue("overall", "総合成績のPR"),
+    new KeyValue("none", "なし"),
   ];
 
-  export const SHIP_TYPES: Pair<ShipType, string>[] = [
-    new Pair("ss", "潜水艦"),
-    new Pair("dd", "駆逐艦"),
-    new Pair("cl", "巡洋艦"),
-    new Pair("bb", "戦艦"),
-    new Pair("cv", "空母"),
+  export const SHIP_TYPES: KeyValue<ShipType, string>[] = [
+    new KeyValue("ss", "潜水艦"),
+    new KeyValue("dd", "駆逐艦"),
+    new KeyValue("cl", "巡洋艦"),
+    new KeyValue("bb", "戦艦"),
+    new KeyValue("cv", "空母"),
   ];
 
-  export const TIER_GROUPS: Pair<TierGroup, string>[] = [
-    new Pair("low", "1~4"),
-    new Pair("middle", "5~7"),
-    new Pair("high", "8~★"),
+  export const TIER_GROUPS: KeyValue<TierGroup, string>[] = [
+    new KeyValue("low", "1~4"),
+    new KeyValue("middle", "5~7"),
+    new KeyValue("high", "8~★"),
   ];
 
   export const PAGES: Triple<Page, string, string>[] = [
