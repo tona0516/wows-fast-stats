@@ -3,6 +3,7 @@
   import type { PlayerName } from "src/lib/column/PlayerName";
   import { storedAlertPlayers, storedExcludePlayerIDs } from "src/stores";
   import { createEventDispatcher } from "svelte";
+  import { Tooltip } from "sveltestrap";
   import {
     AddExcludePlayerID,
     RemoveExcludePlayerID,
@@ -42,80 +43,79 @@
   {/if}
 </td>
 
-<td
-  class="td-string omit"
-  style="background-color: {column.bgColorCode(player)}"
->
-  {#if accountID === 0}
-    {column.displayValue(player)}
-  {:else}
-    {#if alertPlayer}
-      <i class="bi {alertPlayer.pattern}" />
-    {/if}
-
-    <!-- svelte-ignore a11y-invalid-attribute -->
-    <a
-      class="td-link dropdown-toggle"
-      href="#"
-      id="dropdownMenuLink"
-      data-bs-toggle="dropdown"
-    >
+<td style="background-color: {column.bgColorCode(player)}">
+  <div id={`player-${player.player_info.name}`} class="td-string omit">
+    {#if accountID === 0}
       {column.displayValue(player)}
-    </a>
+    {:else}
+      {#if alertPlayer}
+        <i class="bi {alertPlayer.pattern}" />
+      {/if}
 
-    <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-      {#if player.player_info.clan.id}
+      <!-- svelte-ignore a11y-invalid-attribute -->
+      <a
+        class="td-link dropdown-toggle"
+        href="#"
+        id="dropdownMenuLink"
+        data-bs-toggle="dropdown"
+      >
+        {column.displayValue(player)}
+      </a>
+
+      <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+        {#if player.player_info.clan.id}
+          <!-- svelte-ignore a11y-invalid-attribute -->
+          <li>
+            <a
+              class="dropdown-item"
+              href="#"
+              on:click={() => BrowserOpenURL(column.clanURL(player))}
+              >クラン詳細(WoWS Stats & Numbers)</a
+            >
+          </li>
+        {/if}
         <!-- svelte-ignore a11y-invalid-attribute -->
         <li>
           <a
             class="dropdown-item"
             href="#"
-            on:click={() => BrowserOpenURL(column.clanURL(player))}
-            >クラン詳細(WoWS Stats & Numbers)</a
+            on:click={() => BrowserOpenURL(column.playerURL(player))}
+            >プレイヤー詳細(WoWS Stats & Numbers)</a
           >
         </li>
-      {/if}
-      <!-- svelte-ignore a11y-invalid-attribute -->
-      <li>
-        <a
-          class="dropdown-item"
-          href="#"
-          on:click={() => BrowserOpenURL(column.playerURL(player))}
-          >プレイヤー詳細(WoWS Stats & Numbers)</a
-        >
-      </li>
-      <!-- svelte-ignore a11y-invalid-attribute -->
-      <li>
-        {#if alertPlayer}
-          <a
-            class="dropdown-item"
-            href="#"
-            on:click={() =>
-              dispatch("RemoveAlertPlayer", { target: clone(alertPlayer) })}
-            >プレイヤーリストから削除する</a
-          >
-        {:else}
-          <a
-            class="dropdown-item"
-            href="#"
-            on:click={() => {
-              dispatch("UpdateAlertPlayer", {
-                target: {
-                  account_id: player.player_info.id,
-                  name: player.player_info.name,
-                  pattern: "bi-check-circle-fill",
-                  message: "",
-                },
-              });
-            }}>プレイヤーリストへ追加する</a
-          >
-        {/if}
-      </li>
-      {#if alertPlayer}
+        <!-- svelte-ignore a11y-invalid-attribute -->
         <li>
-          <div class="dropdown-item">メモ: {alertPlayer.message}</div>
+          {#if alertPlayer}
+            <a
+              class="dropdown-item"
+              href="#"
+              on:click={() =>
+                dispatch("RemoveAlertPlayer", { target: clone(alertPlayer) })}
+              >プレイヤーリストから削除する</a
+            >
+          {:else}
+            <a
+              class="dropdown-item"
+              href="#"
+              on:click={() => {
+                dispatch("UpdateAlertPlayer", {
+                  target: {
+                    account_id: player.player_info.id,
+                    name: player.player_info.name,
+                    pattern: "bi-check-circle-fill",
+                    message: "",
+                  },
+                });
+              }}>プレイヤーリストへ追加する</a
+            >
+          {/if}
         </li>
-      {/if}
-    </ul>
+      </ul>
+    {/if}
+  </div>
+  {#if alertPlayer}
+    <Tooltip target={`player-${player.player_info.name}`} placement="top">
+      メモ: {alertPlayer.message}
+    </Tooltip>
   {/if}
 </td>
