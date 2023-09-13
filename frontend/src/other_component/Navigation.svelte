@@ -9,7 +9,7 @@
     storedBattle,
   } from "src/stores";
   import { createEventDispatcher } from "svelte";
-  import { Button, Spinner } from "sveltestrap";
+  import { Button, Spinner, Tooltip } from "sveltestrap";
   import { ApplyUserConfig } from "wailsjs/go/main/App";
   import { WindowReloadApp } from "wailsjs/runtime/runtime";
 
@@ -73,7 +73,7 @@
 </script>
 
 <!-- Note: doesn't show buttons with sveltestrap -->
-<nav class="navbar navbar-expand-sm sticky-top navbar-light bg-light p-1">
+<nav class="navbar navbar-expand-sm sticky-top bg-light p-1">
   <div class="container-fluid">
     <button
       class="navbar-toggler"
@@ -82,6 +82,7 @@
       data-bs-target="#{navID}"
       aria-controls={navID}
       aria-expanded="false"
+      style="font-size: {$storedUserConfig.font_size};"
     >
       <span class="navbar-toggler-icon" />
     </button>
@@ -89,6 +90,7 @@
       <div class="navbar-nav">
         {#each DispName.PAGES as page}
           <Button
+            id={`page-${page.type}`}
             size="sm"
             color="secondary"
             outline
@@ -97,12 +99,15 @@
             on:click={() => storedCurrentPage.set(page.type)}
           >
             <i class={page.icon} />
-            {page.dispName}
           </Button>
+          <Tooltip target={`page-${page.type}`} placement="bottom"
+            >{page.dispName}</Tooltip
+          >
         {/each}
         {#if $storedCurrentPage == Page.MAIN}
           {#each DispName.FUNCS as func}
             <Button
+              id={`func-${func.type}`}
               size="sm"
               color="success"
               outline
@@ -116,9 +121,11 @@
                 <Spinner size="sm" /> 読み込み中
               {:else}
                 <i class={func.icon} />
-                {func.dispName}
               {/if}
             </Button>
+            <Tooltip target={`func-${func.type}`} placement="bottom"
+              >{func.dispName}</Tooltip
+            >
           {/each}
 
           <!-- Note: sveltestrap "input" binds empty value when page changed -->

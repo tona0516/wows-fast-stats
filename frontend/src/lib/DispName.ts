@@ -66,12 +66,12 @@ export namespace DispName {
   export const PAGES: NavItem<Page>[] = [
     { type: Page.MAIN, dispName: "ホーム", icon: "bi bi-house" },
     { type: Page.CONFIG, dispName: "設定", icon: "bi bi-gear" },
-    { type: Page.APPINFO, dispName: "アプリ情報", icon: "bi bi-info-circle" },
     {
       type: Page.ALERT_PLAYER,
       dispName: "プレイヤーリスト",
       icon: "bi bi-person-lines-fill",
     },
+    { type: Page.APPINFO, dispName: "アプリ情報", icon: "bi bi-info-circle" },
   ];
 
   export const FUNCS: NavItem<Func>[] = [
