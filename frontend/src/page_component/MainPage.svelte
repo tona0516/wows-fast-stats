@@ -4,16 +4,46 @@
   import ColorDescription from "src/other_component/ColorDescription.svelte";
   import Ofuse from "src/other_component/Ofuse.svelte";
   import StatisticsTable from "src/other_component/StatisticsTable.svelte";
+  import SummaryGraph from "src/other_component/SummaryGraph.svelte";
   import { storedBattle, storedUserConfig, storedSummary } from "src/stores";
 
   const formattedDate = (unixtime: number): string => {
     return format(fromUnixTime(unixtime), "yyyy/MM/dd HH:mm:ss");
   };
+
+  let battleMetas: {
+    icon: string;
+    text: string;
+  }[] = [];
+  $: {
+    if ($storedBattle) {
+      battleMetas = [
+        {
+          icon: "bi bi-clock-fill",
+          text: formattedDate($storedBattle.meta.unixtime),
+        },
+        { icon: "bi bi-tag-fill", text: $storedBattle.meta.type },
+        { icon: "bi bi-geo-alt-fill", text: $storedBattle.meta.arena },
+      ];
+    } else {
+      battleMetas = [];
+    }
+  }
 </script>
 
 <div id={MAIN_PAGE_ID}>
+  {#if battleMetas}
+    <div class="d-flex mt-1 mx-2">
+      {#each battleMetas as meta}
+        <div class="me-2">
+          <i class={meta.icon}></i>{meta.text}
+        </div>
+      {/each}
+    </div>
+  {/if}
+
   {#if $storedBattle}
-    <div class="mt-2 mx-2">
+    <div class="mt-1 mx-2">
       <StatisticsTable
         teams={$storedBattle.teams}
         userConfig={$storedUserConfig}
@@ -22,71 +52,12 @@
         on:CheckPlayer
       />
     </div>
+  {/if}
 
-    {#if $storedSummary}
-      <div class="d-flex justify-content-center">
-        <div class="center mx-2">
-          <table class="table table-sm table-text-color w-auto td-multiple">
-            <tbody>
-              <tr>
-                <td>日時</td>
-                <td>{formattedDate($storedBattle.meta.unixtime)}</td>
-              </tr>
-
-              <tr>
-                <td>戦闘タイプ</td>
-                <td>{$storedBattle.meta.type}</td>
-              </tr>
-
-              <tr>
-                <td>マップ</td>
-                <td>{$storedBattle.meta.arena}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="center mx-2">
-          <table class="table table-sm table-text-color w-auto td-multiple">
-            <thead>
-              <tr>
-                <th />
-                <th colspan={$storedSummary.shipColspan}>艦成績</th>
-                <th colspan={$storedSummary.overallColspan}>総合成績</th>
-              </tr>
-              <tr>
-                <th />
-                {#each $storedSummary.labels as label}
-                  <th>{label}</th>
-                {/each}
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>{$storedBattle.teams[0].name}</td>
-                {#each $storedSummary.friends as friend}
-                  <td>{friend}</td>
-                {/each}
-              </tr>
-
-              <tr>
-                <td>{$storedBattle.teams[1].name}</td>
-                {#each $storedSummary.enemies as enemy}
-                  <td>{enemy}</td>
-                {/each}
-              </tr>
-
-              <tr>
-                <td>差</td>
-                {#each $storedSummary.diffs as diff}
-                  <td class={diff.colorClass}>{diff.value}</td>
-                {/each}
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    {/if}
+  {#if $storedSummary}
+    <div class="mt-1 mx-2">
+      <SummaryGraph summary={$storedSummary} />
+    </div>
   {/if}
 
   <ColorDescription userConfig={$storedUserConfig} />

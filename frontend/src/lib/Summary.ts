@@ -1,5 +1,4 @@
 import { Damage } from "src/lib/column/Damage";
-import { KDRate } from "src/lib/column/KDRate";
 import { PR } from "src/lib/column/PR";
 import { WinRate } from "src/lib/column/WinRate";
 import { AbstractSingleColumn } from "src/lib/column/intetface/AbstractSingleColumn";
@@ -10,12 +9,8 @@ import { domain } from "wailsjs/go/models";
 
 export class Summary {
   constructor(
-    readonly shipColspan: number,
-    readonly overallColspan: number,
-    readonly labels: string[],
-    readonly friends: string[],
-    readonly enemies: string[],
-    readonly diffs: { value: string; colorClass: string }[],
+    readonly friends: { [label: string]: number },
+    readonly enemies: { [label: string]: number },
   ) {}
 
   static calculate(
@@ -31,18 +26,15 @@ export class Summary {
       new PR(userConfig, "ship"),
       new Damage(userConfig, "ship"),
       new WinRate(userConfig, "ship"),
-      new KDRate(userConfig, "ship"),
+      new PR(userConfig, "overall"),
       new Damage(userConfig, "overall"),
       new WinRate(userConfig, "overall"),
-      new KDRate(userConfig, "overall"),
     ];
 
     const teams = [battle.teams[0], battle.teams[1]];
 
-    const labels: string[] = [];
-    const friends: string[] = [];
-    const enemies: string[] = [];
-    const diffs: { value: string; colorClass: string }[] = [];
+    const friends: { [label: string]: number } = {};
+    const enemies: { [label: string]: number } = {};
 
     columns.forEach((column) => {
       const [filteredFriends, filteredEnemies] = teams.map((team) => {
@@ -78,25 +70,17 @@ export class Summary {
         },
       );
 
-      const diff = friendMean - enemyMean;
-      const sign = diff > 0 ? "+" : "";
-      const colorClass = diff > 0 ? "higher" : "lower";
       const digit = column.digit();
 
-      labels.push(column.minDisplayName());
-      friends.push(friendMean.toFixed(digit));
-      enemies.push(enemyMean.toFixed(digit));
-      diffs.push({ value: sign + diff.toFixed(digit), colorClass: colorClass });
+      const label = `${column.category()}:${column.minDisplayName()}`;
+
+      friends[label] = Number(friendMean.toFixed(digit));
+      enemies[label] = Number(enemyMean.toFixed(digit));
     });
 
     return {
-      shipColspan: columns.filter((it) => it.category() === "ship").length,
-      overallColspan: columns.filter((it) => it.category() === "overall")
-        .length,
-      labels: labels,
       friends: friends,
       enemies: enemies,
-      diffs: diffs,
     };
   }
 }

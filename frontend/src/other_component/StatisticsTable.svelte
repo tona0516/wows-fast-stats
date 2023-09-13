@@ -37,7 +37,7 @@
   };
 </script>
 
-<table class="table table-sm table-bordered table-text-color">
+<table class="table table-sm table-text-color">
   {#each teams as team}
     <thead>
       <tr>
