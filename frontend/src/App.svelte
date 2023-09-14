@@ -7,7 +7,7 @@
   import Navigation from "src/other_component/Navigation.svelte";
 
   import "bootstrap-icons/font/bootstrap-icons.css";
-  import "charts.css"
+  import "charts.css";
 
   import {
     Battle,

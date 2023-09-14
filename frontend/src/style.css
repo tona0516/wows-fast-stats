@@ -69,6 +69,10 @@ body {
   text-align: center;
 }
 
+.table-responsive {
+  max-width: 100%;
+}
+
 .td-link {
   color: var(--app-text-color);
 }

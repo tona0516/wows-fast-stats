@@ -43,7 +43,7 @@
   {/if}
 
   {#if $storedBattle}
-    <div class="mt-1 mx-2">
+    <div class="mt-1 mx-2 center">
       <StatisticsTable
         teams={$storedBattle.teams}
         userConfig={$storedUserConfig}
