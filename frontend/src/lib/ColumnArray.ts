@@ -11,14 +11,12 @@ export class ColumnArray<T> extends Array<IColumn<any>> {
   }
 
   dispName(): string {
-    const label = DispName.COLUMN_CATEGORIES.find(
-      (cc) => cc.key === this.category,
-    );
+    const label = DispName.COLUMN_CATEGORIES.get(this.category);
     if (!label) {
       throw Error(`unexpected error: ColumnCategory: ${this.category}`);
     }
 
-    return label.value;
+    return label;
   }
 
   columnCount(): number {

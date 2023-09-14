@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { MAX_MEMO_LENGTH } from "src/const";
+  import { MAX_MEMO_LENGTH } from "src/lib/types";
 
   // @ts-ignore
   import Svelecte from "svelecte";

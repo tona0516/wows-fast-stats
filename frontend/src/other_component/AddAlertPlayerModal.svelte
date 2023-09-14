@@ -18,7 +18,7 @@
     UpdateAlertPlayer,
   } from "wailsjs/go/main/App";
   import type { domain } from "wailsjs/go/models";
-  import { MAX_MEMO_LENGTH } from "src/const";
+  import { MAX_MEMO_LENGTH } from "src/lib/types";
 
   export const toggle = () => (open = !open);
 

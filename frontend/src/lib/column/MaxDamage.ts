@@ -1,6 +1,9 @@
-import { BASE_NUMBERS_URL } from "src/const";
 import { type IColumn } from "src/lib/column/intetface/IColumn";
-import { type CommonKey, type StatsCategory } from "src/lib/types";
+import {
+  BASE_NUMBERS_URL,
+  type CommonKey,
+  type StatsCategory,
+} from "src/lib/types";
 import { tierString, toPlayerStats } from "src/lib/util";
 import MaxDamageTableData from "src/tabledata_component/MaxDamageTableData.svelte";
 import type { domain } from "wailsjs/go/models";

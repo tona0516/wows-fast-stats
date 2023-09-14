@@ -1,7 +1,10 @@
-import { BASE_NUMBERS_URL } from "src/const";
 import type { IColumn } from "src/lib/column/intetface/IColumn";
 import { RatingConverterFactory } from "src/lib/rating/RatingConverter";
-import type { BasicKey, StatsCategory } from "src/lib/types";
+import {
+  BASE_NUMBERS_URL,
+  type BasicKey,
+  type StatsCategory,
+} from "src/lib/types";
 import { toPlayerStats } from "src/lib/util";
 import PlayerNameTableData from "src/tabledata_component/PlayerNameTableData.svelte";
 import type { domain } from "wailsjs/go/models";

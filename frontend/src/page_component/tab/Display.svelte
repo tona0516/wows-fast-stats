@@ -40,7 +40,7 @@
     bind:value={inputUserConfig.font_size}
     on:change={() => dispatch("Change")}
   >
-    {#each DispName.FONT_SIZES as fs}
+    {#each DispName.FONT_SIZES.toArray() as fs}
       <option selected={fs.key === $storedUserConfig.font_size} value={fs.key}
         >{fs.value}</option
       >
@@ -125,7 +125,7 @@
       </tr>
     </thead>
     <tbody>
-      {#each DispName.SKILL_LEVELS as sl}
+      {#each DispName.SKILL_LEVELS.toArray() as sl}
         <tr>
           <td>{sl.value}</td>
           <td>
@@ -160,7 +160,7 @@
       </tr>
     </thead>
     <tbody>
-      {#each DispName.TIER_GROUPS as tg}
+      {#each DispName.TIER_GROUPS.toArray() as tg}
         <tr>
           <td>{tg.value}</td>
           <td>
@@ -195,7 +195,7 @@
       </tr>
     </thead>
     <tbody>
-      {#each DispName.SHIP_TYPES as st}
+      {#each DispName.SHIP_TYPES.toArray() as st}
         <tr>
           <td>{st.value}</td>
           <td>
@@ -226,7 +226,7 @@
     bind:value={inputUserConfig.custom_color.player_name}
     on:change={() => dispatch("Change")}
   >
-    {#each DispName.PLAYER_NAME_COLORS as pnc}
+    {#each DispName.PLAYER_NAME_COLORS.toArray() as pnc}
       <option
         selected={pnc.key === $storedUserConfig.custom_color.player_name}
         value={pnc.key}>{pnc.value}</option

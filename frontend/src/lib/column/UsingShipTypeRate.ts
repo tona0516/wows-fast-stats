@@ -37,11 +37,11 @@ export class UsingShipTypeRate extends AbstractGraphColumn<OverallKey> {
     const colors = this.userConfig.custom_color.ship_type;
 
     let items: StackedBarGraphItem[] = [];
-    DispName.SHIP_TYPES.forEach((st) => {
-      const value = shipTypeGroup[st.key];
+    DispName.SHIP_TYPES.forEach((value, key) => {
+      const rate = shipTypeGroup[key];
       const colorCode =
-        st.key === ownShipType ? colors.own[st.key] : colors.other[st.key];
-      items.push({ label: st.value, colorCode: colorCode, value: value });
+        key === ownShipType ? colors.own[key] : colors.other[key];
+      items.push({ label: value, colorCode: colorCode, value: rate });
     });
 
     return { digit: digit, items: items };

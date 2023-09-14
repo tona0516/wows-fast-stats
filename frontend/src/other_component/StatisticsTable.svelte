@@ -124,3 +124,9 @@
     {/each}
   </table>
 </div>
+
+<style>
+  :global(.table-responsive) {
+    max-width: 100%;
+  }
+</style>

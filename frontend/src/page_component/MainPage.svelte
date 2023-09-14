@@ -1,6 +1,6 @@
 <script lang="ts">
   import { format, fromUnixTime } from "date-fns";
-  import { MAIN_PAGE_ID } from "src/const";
+  import { MAIN_PAGE_ID } from "src/lib/types";
   import ColorDescription from "src/other_component/ColorDescription.svelte";
   import Ofuse from "src/other_component/Ofuse.svelte";
   import StatisticsTable from "src/other_component/StatisticsTable.svelte";
@@ -64,3 +64,10 @@
 </div>
 
 <Ofuse />
+
+<style>
+  :global(#mainpage) {
+    background-color: var(--app-background-color);
+    color: var(--app-text-color);
+  }
+</style>

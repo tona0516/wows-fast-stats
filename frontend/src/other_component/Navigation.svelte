@@ -135,7 +135,7 @@
             bind:value={selectedStatsPattern}
             on:change={onStatsPatternChanged}
           >
-            {#each DispName.STATS_PATTERNS as sp}
+            {#each DispName.STATS_PATTERNS.toArray() as sp}
               <option
                 selected={sp.key == $storedUserConfig.stats_pattern}
                 value={sp.key}>{sp.value}</option

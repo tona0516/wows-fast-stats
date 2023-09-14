@@ -1,6 +1,10 @@
 import type { Summary } from "src/lib/Summary";
 import { domain } from "wailsjs/go/models";
 
+export const BASE_NUMBERS_URL = "https://asia.wows-numbers.com/";
+export const MAX_MEMO_LENGTH = 100;
+export const MAIN_PAGE_ID = "mainpage";
+
 const FONT_SIZES = ["x-small", "small", "medium", "large", "x-large"] as const;
 export type FontSize = (typeof FONT_SIZES)[number];
 

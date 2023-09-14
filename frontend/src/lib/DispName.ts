@@ -1,3 +1,4 @@
+import { ArrayMap } from "src/lib/ArrayMap";
 import {
   Func,
   Page,
@@ -9,59 +10,58 @@ import {
   type StatsExtra,
   type TierGroup,
 } from "src/lib/types";
-import { type KeyValue } from "src/lib/value_object/KeyValue";
 import { type NavItem } from "src/lib/value_object/NavItem";
 
 export namespace DispName {
-  export const STATS_PATTERNS: KeyValue<StatsExtra, string>[] = [
-    { key: "pvp_solo", value: "ランダム戦(ソロ)" },
-    { key: "pvp_all", value: "ランダム戦" },
-  ];
+  export const STATS_PATTERNS = new ArrayMap<StatsExtra, string>([
+    ["pvp_all", "ランダム戦"],
+    ["pvp_solo", "ランダム戦(ソロ)"],
+  ]);
 
-  export const COLUMN_CATEGORIES: KeyValue<ColumnCategory, string>[] = [
-    { key: "basic", value: "基本情報" },
-    { key: "ship", value: "艦成績" },
-    { key: "overall", value: "総合成績" },
-  ];
+  export const COLUMN_CATEGORIES = new ArrayMap<ColumnCategory, string>([
+    ["basic", "基本情報"],
+    ["ship", "艦成績"],
+    ["overall", "総合成績"],
+  ]);
 
-  export const SKILL_LEVELS: KeyValue<Rating, string>[] = [
-    { key: "bad", value: "Bad" },
-    { key: "below_avg", value: "Below Average" },
-    { key: "avg", value: "Average" },
-    { key: "good", value: "Good" },
-    { key: "very_good", value: "Very Good" },
-    { key: "great", value: "Great" },
-    { key: "unicum", value: "Unicum" },
-    { key: "super_unicum", value: "Super Unicum" },
-  ];
+  export const SKILL_LEVELS = new ArrayMap<Rating, string>([
+    ["bad", "Bad"],
+    ["below_avg", "Below Average"],
+    ["avg", "Average"],
+    ["good", "Good"],
+    ["very_good", "Very Good"],
+    ["great", "Great"],
+    ["unicum", "Unicum"],
+    ["super_unicum", "Super Unicum"],
+  ]);
 
-  export const FONT_SIZES: KeyValue<FontSize, string>[] = [
-    { key: "x-small", value: "極小" },
-    { key: "small", value: "小" },
-    { key: "medium", value: "中" },
-    { key: "large", value: "大" },
-    { key: "x-large", value: "極大" },
-  ];
+  export const FONT_SIZES = new ArrayMap<FontSize, string>([
+    ["x-small", "極小"],
+    ["small", "小"],
+    ["medium", "中"],
+    ["large", "大"],
+    ["x-large", "極大"],
+  ]);
 
-  export const PLAYER_NAME_COLORS: KeyValue<PlayerNameColor, string>[] = [
-    { key: "ship", value: "艦成績のPR" },
-    { key: "overall", value: "総合成績のPR" },
-    { key: "none", value: "なし" },
-  ];
+  export const PLAYER_NAME_COLORS = new ArrayMap<PlayerNameColor, string>([
+    ["ship", "艦成績のPR"],
+    ["overall", "総合成績のPR"],
+    ["none", "なし"],
+  ]);
 
-  export const SHIP_TYPES: KeyValue<ShipType, string>[] = [
-    { key: "ss", value: "潜水艦" },
-    { key: "dd", value: "駆逐艦" },
-    { key: "cl", value: "巡洋艦" },
-    { key: "bb", value: "戦艦" },
-    { key: "cv", value: "空母" },
-  ];
+  export const SHIP_TYPES = new ArrayMap<ShipType, string>([
+    ["ss", "潜水艦"],
+    ["dd", "駆逐艦"],
+    ["cl", "巡洋艦"],
+    ["bb", "戦艦"],
+    ["cv", "空母"],
+  ]);
 
-  export const TIER_GROUPS: KeyValue<TierGroup, string>[] = [
-    { key: "low", value: "1~4" },
-    { key: "middle", value: "5~7" },
-    { key: "high", value: "8~★" },
-  ];
+  export const TIER_GROUPS = new ArrayMap<TierGroup, string>([
+    ["low", "1~4"],
+    ["middle", "5~7"],
+    ["high", "8~★"],
+  ]);
 
   export const PAGES: NavItem<Page>[] = [
     { type: Page.MAIN, dispName: "ホーム", icon: "bi bi-house" },
