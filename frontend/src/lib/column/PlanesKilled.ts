@@ -29,7 +29,7 @@ export class PlanesKilled extends AbstractSingleColumn<ShipKey> {
   }
 
   displayValue(player: domain.Player): string {
-    const digit = this.userConfig.custom_digit.battles;
+    const digit = this.userConfig.custom_digit.planes_killed;
     const value = toPlayerStats(player, this.userConfig.stats_pattern).ship
       .planes_killed;
     return value.toFixed(digit);
