@@ -3,12 +3,13 @@
   import { storedUserConfig } from "src/stores";
   import { createEventDispatcher } from "svelte";
   import {
-    Alert,
-    Badge,
     Button,
+    Col,
+    Container,
     FormGroup,
     Input,
     Label,
+    Row,
     Spinner,
   } from "sveltestrap";
   import {
@@ -60,46 +61,67 @@
   };
 </script>
 
-<FormGroup>
-  <Label
-    >World of Warshipsインストールフォルダ <Badge color="danger">必須</Badge>
-  </Label>
-  <div class="d-flex justify-content-center">
-    <Input type="text" bind:value={inputUserConfig.install_path} />
-    <Button color="secondary" on:click={selectDirectory}>選択</Button>
-  </div>
+<Container fluid class="mt-2">
+  <FormGroup>
+    <Row>
+      <Col><Label>World of Warshipsインストールフォルダ</Label></Col>
+    </Row>
+    <Row>
+      <Col>
+        <div class="d-flex justify-content-center">
+          <Input
+            bind:value={inputUserConfig.install_path}
+            feedback={validatedResult?.install_path}
+            invalid={validatedResult !== undefined &&
+              validatedResult.install_path !== ""}
+          />
+          <Button color="secondary" on:click={selectDirectory}>選択</Button>
+        </div></Col
+      >
+    </Row>
+    <Row>
+      <Col
+        ><i class="bi bi-info-circle-fill" /> ゲームクライアントの実行ファイルがあるフォルダを選択してください。</Col
+      >
+    </Row>
+  </FormGroup>
 
-  {#if validatedResult?.install_path}
-    <Alert color="danger" class="m-1">
-      {validatedResult?.install_path}
-    </Alert>
-  {/if}
-</FormGroup>
+  <FormGroup>
+    <Row>
+      <Col><Label>アプリケーションID</Label></Col>
+    </Row>
+    <Row>
+      <Col
+        ><Input
+          bind:value={inputUserConfig.appid}
+          feedback={validatedResult?.appid}
+          invalid={validatedResult !== undefined &&
+            validatedResult.appid !== ""}
+        /></Col
+      >
+    </Row>
+    <Row>
+      <Col
+        ><i class="bi bi-info-circle-fill" />
+        <ExternalLink
+          url="https://developers.wargaming.net/"
+          text="Developer Room"
+        />で作成したIDを入力してください。</Col
+      >
+    </Row>
+  </FormGroup>
 
-<FormGroup>
-  <Label>アプリケーションID <Badge color="danger">必須</Badge></Label>
-  <Input type="text" bind:value={inputUserConfig.appid} />
-  <div>
-    <ExternalLink
-      url="https://developers.wargaming.net/"
-      text="Developer Room"
-    />で作成したIDを入力してください。
-  </div>
-
-  {#if validatedResult?.appid}
-    <Alert color="danger" class="m-1">
-      {validatedResult?.appid}
-    </Alert>
-  {/if}
-</FormGroup>
-
-<!-- apply -->
-<FormGroup class="center">
-  <Button size="sm" color="primary" disabled={isLoading} on:click={clickApply}>
-    {#if isLoading}
-      <Spinner size="sm" />更新中...
-    {:else}
-      保存
-    {/if}
-  </Button>
-</FormGroup>
+  <FormGroup>
+    <Row>
+      <Col sm={{ size: 2, offset: 5 }}>
+        <Button color="primary" disabled={isLoading} on:click={clickApply}>
+          {#if isLoading}
+            <Spinner size="sm" /> 更新中...
+          {:else}
+            保存
+          {/if}
+        </Button>
+      </Col>
+    </Row>
+  </FormGroup>
+</Container>

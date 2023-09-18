@@ -64,10 +64,6 @@ body {
   text-align: center;
 }
 
-.table-responsive {
-  max-width: 100%;
-}
-
 .td-link {
   color: var(--app-text-color);
 }
@@ -154,9 +150,4 @@ body {
 
 .modal-color {
   background-color: var(--app-background-color);
-}
-
-.logging {
-  width: 50em;
-  height: 25em;
 }

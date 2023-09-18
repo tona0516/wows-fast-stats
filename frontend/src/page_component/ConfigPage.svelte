@@ -8,7 +8,7 @@
   import Other from "./tab/Other.svelte";
   import TeamSummary from "./tab/TeamSummary.svelte";
   import Display from "./tab/Display.svelte";
-  import { TabContent, TabPane } from "sveltestrap";
+  import { Container, TabContent, TabPane } from "sveltestrap";
 
   export let defaultUserConfig: domain.UserConfig;
 
@@ -32,21 +32,23 @@
   };
 </script>
 
-<TabContent>
-  <TabPane tabId="required" tab="必須設定" active>
-    <Required {inputUserConfig} on:UpdateSuccess on:Failure />
-  </TabPane>
-  <TabPane tabId="display" tab="表示設定">
-    <Display {inputUserConfig} {defaultUserConfig} on:Change={silentApply} />
-  </TabPane>
-  <TabPane tabId="team-summary" tab="チームサマリー設定">
-    <TeamSummary
-      {inputUserConfig}
-      {defaultUserConfig}
-      on:Change={silentApply}
-    />
-  </TabPane>
-  <TabPane tabId="other" tab="その他設定">
-    <Other {inputUserConfig} on:Change={silentApply} on:Failure />
-  </TabPane>
-</TabContent>
+<Container fluid class="mt-2">
+  <TabContent>
+    <TabPane tabId="required" tab="必須設定" active>
+      <Required {inputUserConfig} on:UpdateSuccess on:Failure />
+    </TabPane>
+    <TabPane tabId="display" tab="表示設定">
+      <Display {inputUserConfig} {defaultUserConfig} on:Change={silentApply} />
+    </TabPane>
+    <TabPane tabId="team-summary" tab="チームサマリー設定">
+      <TeamSummary
+        {inputUserConfig}
+        {defaultUserConfig}
+        on:Change={silentApply}
+      />
+    </TabPane>
+    <TabPane tabId="other" tab="その他設定">
+      <Other {inputUserConfig} on:Change={silentApply} on:Failure />
+    </TabPane>
+  </TabContent>
+</Container>

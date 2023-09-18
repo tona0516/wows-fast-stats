@@ -1,6 +1,7 @@
 <script lang="ts">
   import { RowPattern } from "src/lib/types";
   import { tableColumns, toPlayerStats } from "src/lib/util";
+  import { Table } from "sveltestrap";
   import type { domain } from "wailsjs/go/models";
 
   export let teams: domain.Team[];
@@ -38,7 +39,7 @@
 </script>
 
 <div class="table-responsive">
-  <table class="table table-sm table-text-color">
+  <Table size="sm" class="table-text-color">
     {#each teams as team}
       <thead>
         <tr>
@@ -122,7 +123,7 @@
         {/each}
       </tbody>
     {/each}
-  </table>
+  </Table>
 </div>
 
 <style>

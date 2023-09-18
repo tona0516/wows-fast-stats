@@ -14,11 +14,9 @@
   });
 </script>
 
-<div class="center">
-  <div class="logging overflow-scroll bg-dark p-1 mx-1" id={elementID}>
-    {#each logs as log}
-      {log}
-      <br />
-    {/each}
-  </div>
+<div class="overflow-scroll bg-dark p-1" id={elementID}>
+  {#each logs as log}
+    {log}
+    <br />
+  {/each}
 </div>

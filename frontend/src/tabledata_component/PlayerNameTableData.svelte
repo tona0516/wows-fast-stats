@@ -113,9 +113,9 @@
       </ul>
     {/if}
   </div>
-  {#if alertPlayer}
+  {#if alertPlayer?.message}
     <Tooltip target={`player-${player.player_info.name}`} placement="top">
-      メモ: {alertPlayer.message}
+      {alertPlayer.message}
     </Tooltip>
   {/if}
 </td>
