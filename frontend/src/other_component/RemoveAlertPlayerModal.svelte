@@ -4,10 +4,12 @@
   import { RemoveAlertPlayer } from "wailsjs/go/main/App";
   import type { domain } from "wailsjs/go/models";
 
-  export const toggle = () => (open = !open);
-  export const setTarget = (p: domain.AlertPlayer) => (target = p);
+  export const open = (p: domain.AlertPlayer) => {
+    target = p;
+    isOpen = true;
+  };
 
-  let open = false;
+  let isOpen = false;
   let target: domain.AlertPlayer;
 
   const dispatch = createEventDispatcher();
@@ -20,17 +22,19 @@
       dispatch("Failure", { message: error });
       return;
     } finally {
-      toggle();
+      isOpen = false;
     }
   };
 </script>
 
-<Modal isOpen={open} {toggle}>
+<Modal {isOpen}>
   <ModalBody class="modal-color">
     「{target.name}」を削除しますか？
   </ModalBody>
   <ModalFooter class="modal-color">
-    <Button size="sm" color="secondary" on:click={toggle}>キャンセル</Button>
+    <Button size="sm" color="secondary" on:click={() => (isOpen = false)}
+      >キャンセル</Button
+    >
     <Button size="sm" color="danger" on:click={() => remove(target.account_id)}
       >削除</Button
     >

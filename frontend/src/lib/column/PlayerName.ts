@@ -59,7 +59,7 @@ export class PlayerName implements IColumn<BasicKey> {
     }
 
     if (!statsCategory) {
-      return "";
+      return "#000000";
     }
 
     const pr = toPlayerStats(player, this.userConfig.stats_pattern)[

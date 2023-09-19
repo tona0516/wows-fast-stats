@@ -34,17 +34,13 @@
     storedUserConfig,
     storedCurrentPage,
   } from "src/stores";
-  import AddAlertPlayerModal from "src/other_component/AddAlertPlayerModal.svelte";
-  import UpdateAlertPlayerModal from "src/other_component/UpdateAlertPlayerModal.svelte";
-  import RemoveAlertPlayerModal from "src/other_component/RemoveAlertPlayerModal.svelte";
-  import { AppEvent, Page, ScreenshotType, ToastKey } from "./lib/types";
-  import { Summary } from "./lib/Summary";
+  import { AppEvent, Page, ScreenshotType, ToastKey } from "src/lib/types";
+  import { Summary } from "src/lib/Summary";
+  import Modals from "src/other_component/Modals.svelte";
 
   let defaultUserConfig: domain.UserConfig;
   let notification: Notification;
-  let addAlertPlayerModal: AddAlertPlayerModal;
-  let updateAlertPlayerModal: UpdateAlertPlayerModal;
-  let removeAlertPlayerModal: RemoveAlertPlayerModal;
+  let modals: Modals;
 
   let screenshot = new Screenshot();
 
@@ -107,33 +103,6 @@
   EventsOn(AppEvent.BATTLE_ERR, (error: string) => {
     notification.showToastWithKey(error, "error", ToastKey.ERROR);
   });
-
-  const onAlertPlayerUpdated = async () => {
-    try {
-      const players = await AlertPlayers();
-      storedAlertPlayers.set(players);
-    } catch (error) {
-      notification.showErrorToast(error);
-    }
-  };
-
-  const onAlertPlayerUpdateFailed = (event: CustomEvent<any>) => {
-    notification.showErrorToast(event.detail.message);
-  };
-
-  const showAddAlertPlayerModal = (_: CustomEvent<any>) => {
-    addAlertPlayerModal.toggle();
-  };
-
-  const showUpdateAlertPlayerModal = (event: CustomEvent<any>) => {
-    updateAlertPlayerModal.setTarget(event.detail.target);
-    updateAlertPlayerModal.toggle();
-  };
-
-  const showRemoveAlertPlayerModal = (event: CustomEvent<any>) => {
-    removeAlertPlayerModal.setTarget(event.detail.target);
-    removeAlertPlayerModal.toggle();
-  };
 
   async function main() {
     EventsEmit("ONLOAD");
@@ -198,22 +167,16 @@
 
 <main>
   <div style="font-size: {$storedUserConfig.font_size};">
-    <AddAlertPlayerModal
-      bind:this={addAlertPlayerModal}
-      on:Success={onAlertPlayerUpdated}
-      on:Failure={(event) => onAlertPlayerUpdateFailed(event)}
-    />
-
-    <UpdateAlertPlayerModal
-      bind:this={updateAlertPlayerModal}
-      on:Success={onAlertPlayerUpdated}
-      on:Failure={(event) => onAlertPlayerUpdateFailed(event)}
-    />
-
-    <RemoveAlertPlayerModal
-      bind:this={removeAlertPlayerModal}
-      on:Success={onAlertPlayerUpdated}
-      on:Failure={(event) => onAlertPlayerUpdateFailed(event)}
+    <Modals
+      bind:this={modals}
+      on:AlertPlayerUpdated={async () => {
+        try {
+          storedAlertPlayers.set(await AlertPlayers());
+        } catch (error) {
+          notification.showErrorToast(error);
+        }
+      }}
+      on:Failure={(event) => notification.showErrorToast(event.detail.message)}
     />
 
     <Navigation
@@ -225,8 +188,8 @@
 
     {#if $storedCurrentPage === Page.MAIN}
       <MainPage
-        on:UpdateAlertPlayer={(e) => showUpdateAlertPlayerModal(e)}
-        on:RemoveAlertPlayer={(e) => showRemoveAlertPlayerModal(e)}
+        on:EditAlertPlayer={(e) => modals.editAlertPlayer(e.detail.target)}
+        on:RemoveAlertPlayer={(e) => modals.removeAlertPlayer(e.detail.target)}
         on:CheckPlayer={async () =>
           storedExcludePlayerIDs.set(await ExcludePlayerIDs())}
       />
@@ -257,9 +220,9 @@
 
     {#if $storedCurrentPage === Page.ALERT_PLAYER}
       <AlertPlayerPage
-        on:AddAlertPlayer={showAddAlertPlayerModal}
-        on:UpdateAlertPlayer={(e) => showUpdateAlertPlayerModal(e)}
-        on:RemoveAlertPlayer={(e) => showRemoveAlertPlayerModal(e)}
+        on:AddAlertPlayer={modals.addAlertPlayer}
+        on:EditAlertPlayer={(e) => modals.editAlertPlayer(e.detail.target)}
+        on:RemoveAlertPlayer={(e) => modals.removeAlertPlayer(e.detail.target)}
         on:Failure={(event) =>
           notification.showErrorToast(event.detail.message)}
       />

@@ -14,7 +14,7 @@
   });
 </script>
 
-<div class="overflow-scroll bg-dark p-1" id={elementID}>
+<div class="overflow-scroll p-1" id={elementID}>
   {#each logs as log}
     {log}
     <br />

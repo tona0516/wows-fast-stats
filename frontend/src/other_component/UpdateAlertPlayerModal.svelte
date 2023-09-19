@@ -1,31 +1,65 @@
 <script lang="ts">
-  import { MAX_MEMO_LENGTH } from "src/lib/types";
-
   // @ts-ignore
   import Svelecte from "svelecte";
   import { createEventDispatcher } from "svelte";
   import {
-    Button,
-    FormGroup,
-    Input,
-    Label,
     Modal,
     ModalBody,
+    FormGroup,
+    Label,
+    Input,
     ModalFooter,
+    Button,
   } from "sveltestrap";
-  import { AlertPatterns, UpdateAlertPlayer } from "wailsjs/go/main/App";
+  import {
+    SearchPlayer,
+    AlertPatterns,
+    UpdateAlertPlayer,
+  } from "wailsjs/go/main/App";
   import type { domain } from "wailsjs/go/models";
+  import { MAX_MEMO_LENGTH } from "src/lib/types";
+  import clone from "clone";
 
-  export const toggle = () => (open = !open);
-  export const setTarget = (p: domain.AlertPlayer) => (target = p);
+  const EMPTY_ALERT_PLAYER: domain.AlertPlayer = {
+    account_id: 0,
+    name: "",
+    pattern: "bi-check-circle-fill",
+    message: "",
+  };
 
-  let open = false;
+  export const openAsAdd = () => {
+    target = clone(EMPTY_ALERT_PLAYER);
+    searchResult = undefined;
+    disablePlayerSearch = false;
+    isOpen = true;
+  };
+
+  export const openAsEdit = (p: domain.AlertPlayer) => {
+    target = p;
+    searchResult = {
+      account_id: p.account_id,
+      nickname: p.name,
+    };
+    disablePlayerSearch = true;
+    isOpen = true;
+  };
+
+  let isOpen = false;
+  let disablePlayerSearch = false;
   let target: domain.AlertPlayer;
+  let searchResult: domain.WGAccountListData | undefined;
 
   const dispatch = createEventDispatcher();
 
   const update = async (player: domain.AlertPlayer) => {
     try {
+      if (!searchResult) {
+        dispatch("Failure", { message: "不正な入力です" });
+        return;
+      }
+      player.account_id = searchResult.account_id;
+      player.name = searchResult.nickname;
+
       if (!validate(player)) {
         dispatch("Failure", { message: "不正な入力です" });
         return;
@@ -37,7 +71,7 @@
       dispatch("Failure", { message: error });
       return;
     } finally {
-      toggle();
+      isOpen = false;
     }
   };
 
@@ -48,15 +82,18 @@
   };
 </script>
 
-<Modal isOpen={open} {toggle}>
+<Modal {isOpen}>
   <ModalBody class="modal-color">
     <FormGroup>
       <Label>プレイヤー名</Label>
       <Svelecte
-        style="color: #2d2c2c;"
-        id="player"
-        placeholder={target.name}
-        disabled={true}
+        valueAsObject
+        fetch={SearchPlayer}
+        placeholder=""
+        minQuery="3"
+        labelField="nickname"
+        bind:value={searchResult}
+        disabled={disablePlayerSearch}
       />
     </FormGroup>
 
@@ -89,8 +126,11 @@
       <span>{target.message.length}/{MAX_MEMO_LENGTH}</span>
     </FormGroup>
   </ModalBody>
+
   <ModalFooter class="modal-color">
-    <Button size="sm" color="secondary" on:click={toggle}>キャンセル</Button>
+    <Button size="sm" color="secondary" on:click={() => (isOpen = false)}
+      >キャンセル</Button
+    >
     <Button size="sm" color="primary" on:click={() => update(target)}
       >更新</Button
     >

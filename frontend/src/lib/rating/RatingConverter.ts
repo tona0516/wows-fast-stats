@@ -17,9 +17,9 @@ export class RatingConverter {
 
   bgColorCode(): string {
     if (!this.rating) {
-      return "";
+      return "#000000";
     }
-    return this.config.custom_color.skill.background[this.rating];
+    return this.config.custom_color.skill.background[this.rating] ?? "#000000";
   }
 }
 

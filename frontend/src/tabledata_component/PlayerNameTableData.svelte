@@ -89,6 +89,13 @@
             <a
               class="dropdown-item"
               href="#"
+              on:click={() => {
+                dispatch("EditAlertPlayer", { target: clone(alertPlayer) });
+              }}>プレイヤーリストを編集する</a
+            >
+            <a
+              class="dropdown-item"
+              href="#"
               on:click={() =>
                 dispatch("RemoveAlertPlayer", { target: clone(alertPlayer) })}
               >プレイヤーリストから削除する</a
@@ -98,7 +105,7 @@
               class="dropdown-item"
               href="#"
               on:click={() => {
-                dispatch("UpdateAlertPlayer", {
+                dispatch("EditAlertPlayer", {
                   target: {
                     account_id: player.player_info.id,
                     name: player.player_info.name,

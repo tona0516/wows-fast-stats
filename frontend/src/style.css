@@ -1,16 +1,5 @@
-:root {
-  --app-background-color: #2d2c2c;
-  --app-text-color: #ffffff;
-}
-
-html {
-  background-color: var(--app-background-color);
-  color: var(--app-text-color);
-}
-
 body {
   margin: 0;
-  color: var(--app-text-color);
   font-family:
     "Nunito",
     -apple-system,
@@ -24,7 +13,6 @@ body {
     "Droid Sans",
     "Helvetica Neue",
     sans-serif;
-  background-color: var(--app-background-color);
 }
 
 @font-face {
@@ -36,17 +24,9 @@ body {
     url("assets/fonts/nunito-v16-latin-regular.woff2") format("woff2");
 }
 
-#app {
-  height: 100vh;
-}
-
 .btn {
   white-space: nowrap;
   text-align: center;
-}
-
-.table-text-color {
-  color: var(--app-text-color);
 }
 
 .table td {
@@ -62,10 +42,6 @@ body {
   white-space: nowrap;
   vertical-align: middle;
   text-align: center;
-}
-
-.td-link {
-  color: var(--app-text-color);
 }
 
 .td-string {
@@ -104,8 +80,6 @@ body {
 .omit {
   overflow: hidden;
   text-overflow: ellipsis;
-  -webkit-text-overflow: ellipsis;
-  -ms-text-overflow: ellipsis;
   white-space: nowrap;
 }
 
@@ -121,14 +95,6 @@ body {
   align-items: center;
 }
 
-.higher {
-  color: #99d02b;
-}
-
-.lower {
-  color: #fc4e32;
-}
-
 .alert-player {
   text-align: center;
 }
@@ -142,12 +108,4 @@ body {
 
 .text-form {
   min-width: 480px;
-}
-
-.nav-link {
-  color: var(--app-text-color);
-}
-
-.modal-color {
-  background-color: var(--app-background-color);
 }

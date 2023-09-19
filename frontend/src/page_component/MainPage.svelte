@@ -23,7 +23,7 @@
         <StatisticsTable
           teams={$storedBattle.teams}
           userConfig={$storedUserConfig}
-          on:UpdateAlertPlayer
+          on:EditAlertPlayer
           on:RemoveAlertPlayer
           on:CheckPlayer
         />
@@ -48,10 +48,3 @@
     </Col>
   </Row>
 </Container>
-
-<style>
-  :global(#mainpage) {
-    background-color: var(--app-background-color);
-    color: var(--app-text-color);
-  }
-</style>

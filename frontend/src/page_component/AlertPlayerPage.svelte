@@ -1,9 +1,9 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
   import clone from "clone";
-  import { storedAlertPlayers, storedUserConfig } from "src/stores";
+  import { storedAlertPlayers } from "src/stores";
   import type { domain } from "wailsjs/go/models";
-  import { Alert, Button, Col, Container, Icon, Row, Table } from "sveltestrap";
+  import { Alert, Button, Col, Container, Row, Table } from "sveltestrap";
 
   const dispatch = createEventDispatcher();
 
@@ -15,7 +15,7 @@
 
   function onClickEdit(player: domain.AlertPlayer) {
     const target = clone(player);
-    dispatch("UpdateAlertPlayer", { target: target });
+    dispatch("EditAlertPlayer", { target: target });
   }
 
   function onClickRemove(player: domain.AlertPlayer) {
@@ -89,7 +89,6 @@
 
 <style>
   :global(.alert-player-table) {
-    color: var(--app-text-color);
     text-align: center;
   }
   :global(.alert-player-table) th {

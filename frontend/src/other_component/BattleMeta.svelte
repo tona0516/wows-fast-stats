@@ -20,7 +20,7 @@
 </script>
 
 {#if battleMetas}
-  <Card body color="dark" class="center p-2">
+  <Card body class="center p-2">
     <div class="d-flex">
       {#each battleMetas as meta}
         <div class="me-2">

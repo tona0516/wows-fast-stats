@@ -75,7 +75,7 @@
                 this={column.svelteComponent()}
                 {column}
                 {player}
-                on:UpdateAlertPlayer
+                on:EditAlertPlayer
                 on:RemoveAlertPlayer
                 on:CheckPlayer
               />

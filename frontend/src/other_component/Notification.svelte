@@ -2,14 +2,13 @@
   import { toasts, ToastContainer, FlatToast } from "svelte-toasts";
   import type {
     Placement,
-    Theme,
+    // Theme,
     ToastProps,
     ToastType,
   } from "svelte-toasts/types/common";
 
   const DURATION_MS = 5000;
   const PLACEMENT: Placement = "bottom-right";
-  const THEME: Theme = "dark";
 
   let toastDict: { [key: string]: ToastProps } = {};
 
@@ -19,7 +18,7 @@
       duration: DURATION_MS,
       placement: PLACEMENT,
       type: "success",
-      theme: THEME,
+      // theme: THEME,
     });
   }
 
@@ -29,7 +28,7 @@
       duration: DURATION_MS,
       placement: PLACEMENT,
       type: "error",
-      theme: THEME,
+      // theme: THEME,
     });
   }
 
@@ -52,7 +51,7 @@
       duration: 0,
       placement: PLACEMENT,
       type: type,
-      theme: THEME,
+      // theme: THEME,
       onClick: onClick,
     });
     toastDict[key] = toast;
