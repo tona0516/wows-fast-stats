@@ -1,17 +1,8 @@
 <script lang="ts">
+  import clone from "clone";
   import ExternalLink from "src/other_component/ExternalLink.svelte";
   import { storedUserConfig } from "src/stores";
   import { createEventDispatcher } from "svelte";
-  import {
-    Button,
-    Col,
-    Container,
-    FormGroup,
-    Input,
-    Label,
-    Row,
-    Spinner,
-  } from "sveltestrap";
   import {
     ApplyRequiredUserConfig,
     SelectDirectory,
@@ -26,7 +17,7 @@
 
   const dispatch = createEventDispatcher();
 
-  const selectDirectory = async () => {
+  const clickSelectDirectory = async () => {
     try {
       const path = await SelectDirectory();
       if (!path) return;
@@ -37,23 +28,24 @@
   };
 
   const clickApply = async () => {
-    isLoading = true;
     try {
+      isLoading = true;
       validatedResult = await ApplyRequiredUserConfig(
         inputUserConfig.install_path,
         inputUserConfig.appid,
       );
 
-      const errorTexts = Object.values(validatedResult);
-      const isValid =
-        errorTexts.filter((it) => it == "").length === errorTexts.length;
-      if (isValid) {
-        const latest = await UserConfig();
-        storedUserConfig.set(latest);
-        dispatch("UpdateSuccess", { message: "設定を更新しました。" });
+      const results = Object.values(validatedResult);
+      const isValid = results.filter((it) => !it).length === results.length;
+      if (!isValid) {
+        return;
       }
+
+      const latest = await UserConfig();
+      storedUserConfig.set(latest);
+      dispatch("UpdateSuccess");
     } catch (error) {
-      inputUserConfig = $storedUserConfig;
+      inputUserConfig = clone($storedUserConfig);
       dispatch("Failure", { message: error });
     } finally {
       isLoading = false;
@@ -61,67 +53,61 @@
   };
 </script>
 
-<Container fluid class="mt-2">
-  <FormGroup>
-    <Row>
-      <Col><Label>World of Warshipsインストールフォルダ</Label></Col>
-    </Row>
-    <Row>
-      <Col>
-        <div class="d-flex justify-content-center">
-          <Input
-            bind:value={inputUserConfig.install_path}
-            feedback={validatedResult?.install_path}
-            invalid={validatedResult !== undefined &&
-              validatedResult.install_path !== ""}
-          />
-          <Button color="secondary" on:click={selectDirectory}>選択</Button>
-        </div></Col
-      >
-    </Row>
-    <Row>
-      <Col
-        ><i class="bi bi-info-circle-fill" /> ゲームクライアントの実行ファイルがあるフォルダを選択してください。</Col
-      >
-    </Row>
-  </FormGroup>
+<div class="uk-padding-small">
+  <div class="uk-flex">
+    <input
+      class="uk-input"
+      type="text"
+      placeholder="World of Warshipsインストールフォルダ"
+      bind:value={inputUserConfig.install_path}
+    />
+    <button
+      class="uk-button uk-button-default uk-text-nowrap"
+      on:click={clickSelectDirectory}>フォルダ選択</button
+    >
+  </div>
+  <span>ゲームクライアントの実行ファイルがあるフォルダを選択してください。</span
+  >
+  {#if validatedResult?.install_path}
+    <div class="uk-text-danger">
+      <span uk-icon="icon: warning" />
+      <span class="uk-text-middle">{validatedResult.install_path}</span>
+    </div>
+  {/if}
+</div>
 
-  <FormGroup>
-    <Row>
-      <Col><Label>アプリケーションID</Label></Col>
-    </Row>
-    <Row>
-      <Col
-        ><Input
-          bind:value={inputUserConfig.appid}
-          feedback={validatedResult?.appid}
-          invalid={validatedResult !== undefined &&
-            validatedResult.appid !== ""}
-        /></Col
-      >
-    </Row>
-    <Row>
-      <Col
-        ><i class="bi bi-info-circle-fill" />
-        <ExternalLink
-          url="https://developers.wargaming.net/"
-          text="Developer Room"
-        />で作成したIDを入力してください。</Col
-      >
-    </Row>
-  </FormGroup>
+<div class="uk-padding-small">
+  <input
+    class="uk-input"
+    type="text"
+    placeholder="アプリケーションID"
+    bind:value={inputUserConfig.appid}
+  />
+  <span>
+    <ExternalLink url="https://developers.wargaming.net/"
+      >Developer Room</ExternalLink
+    >で作成したIDを入力してください。</span
+  >
+  {#if validatedResult?.appid}
+    <div class="uk-text-danger">
+      <span uk-icon="icon: warning"></span>
+      <span class="uk-text-middle">{validatedResult.appid}</span>
+    </div>
+  {/if}
+</div>
 
-  <FormGroup>
-    <Row>
-      <Col sm={{ size: 2, offset: 5 }}>
-        <Button color="primary" disabled={isLoading} on:click={clickApply}>
-          {#if isLoading}
-            <Spinner size="sm" /> 更新中...
-          {:else}
-            保存
-          {/if}
-        </Button>
-      </Col>
-    </Row>
-  </FormGroup>
-</Container>
+<div class="uk-padding-small">
+  <div class="uk-flex">
+    <button
+      class="uk-button uk-button-primary uk-text-nowrap"
+      disabled={isLoading}
+      on:click={clickApply}
+    >
+      {#if isLoading}
+        <div uk-spinner />
+      {:else}
+        保存
+      {/if}
+    </button>
+  </div>
+</div>

@@ -7,17 +7,24 @@
   export let player: domain.Player;
 </script>
 
-<td class="td-icon">
-  <img alt="" src={column.nationIconPath(player)} class="nation-icon" />
+<td>
+  <!-- svelte-ignore a11y-missing-attribute -->
+  <img
+    src={column.nationIconPath(player)}
+    class="nation-icon uk-preserve-width"
+  />
 </td>
 
-<td class="td-icon" style="background-color: {column.bgColorCode(player)}">
-  <img alt="" src={column.shipTypeIconPath(player)} class="ship-icon" />
+<td style="background-color: {column.bgColorCode(player)}">
+  <!-- svelte-ignore a11y-missing-attribute -->
+  <img
+    src={column.shipTypeIconPath(player)}
+    class="ship-icon uk-preserve-width"
+  />
 </td>
 
 <td class="td-string omit">
-  <ExternalLink
-    url={column.shipURL(player)}
-    text={column.displayValue(player)}
-  />
+  <ExternalLink url={column.shipURL(player)}
+    >{column.displayValue(player)}</ExternalLink
+  >
 </td>

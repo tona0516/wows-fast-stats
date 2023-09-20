@@ -1,7 +1,5 @@
 import { ArrayMap } from "src/lib/ArrayMap";
 import {
-  Func,
-  Page,
   type ColumnCategory,
   type FontSize,
   type PlayerNameColor,
@@ -10,7 +8,6 @@ import {
   type StatsExtra,
   type TierGroup,
 } from "src/lib/types";
-import { type NavItem } from "src/lib/value_object/NavItem";
 
 export namespace DispName {
   export const STATS_PATTERNS = new ArrayMap<StatsExtra, string>([
@@ -36,11 +33,13 @@ export namespace DispName {
   ]);
 
   export const FONT_SIZES = new ArrayMap<FontSize, string>([
-    ["x-small", "極小"],
-    ["small", "小"],
-    ["medium", "中"],
-    ["large", "大"],
-    ["x-large", "極大"],
+    ["xx-large", "3"],
+    ["x-large", "2"],
+    ["large", "1"],
+    ["medium", "0(デフォルト)"],
+    ["small", "-1"],
+    ["x-small", "-2"],
+    ["xx-small", "-3"],
   ]);
 
   export const PLAYER_NAME_COLORS = new ArrayMap<PlayerNameColor, string>([
@@ -62,24 +61,4 @@ export namespace DispName {
     ["middle", "5~7"],
     ["high", "8~★"],
   ]);
-
-  export const PAGES: NavItem<Page>[] = [
-    { type: Page.MAIN, dispName: "ホーム", icon: "bi bi-house" },
-    { type: Page.CONFIG, dispName: "設定", icon: "bi bi-gear" },
-    {
-      type: Page.ALERT_PLAYER,
-      dispName: "プレイヤーリスト",
-      icon: "bi bi-person-lines-fill",
-    },
-    { type: Page.APPINFO, dispName: "アプリ情報", icon: "bi bi-info-circle" },
-  ];
-
-  export const FUNCS: NavItem<Func>[] = [
-    { type: Func.RELOAD, dispName: "リロード", icon: "bi bi-arrow-clockwise" },
-    {
-      type: Func.SCREENSHOT,
-      dispName: "スクリーンショット",
-      icon: "bi bi-camera",
-    },
-  ];
 }

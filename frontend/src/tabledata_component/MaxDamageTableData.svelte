@@ -14,6 +14,6 @@
 {#if column.countInnerColumn() > 1}
   {@const [url, text] = column.shipInfo(player)}
   <td class="td-string omit">
-    <ExternalLink {url} {text} />
+    <ExternalLink {url}>{text}</ExternalLink>
   </td>
 {/if}

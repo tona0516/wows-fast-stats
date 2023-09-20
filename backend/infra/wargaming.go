@@ -65,6 +65,7 @@ func (w *Wargaming) AccountListForSearch(prefix string) (domain.WGAccountList, e
 		vo.NewPair("application_id", w.appid),
 		vo.NewPair("search", prefix),
 		vo.NewPair("fields", response.WGAccountList{}.Field()),
+		vo.NewPair("limit", "10"),
 	)
 
 	return res.Data, failure.Wrap(err)

@@ -1,9 +1,7 @@
 <script lang="ts">
-  import clone from "clone";
   import type { PlayerName } from "src/lib/column/PlayerName";
   import { storedAlertPlayers, storedExcludePlayerIDs } from "src/stores";
   import { createEventDispatcher } from "svelte";
-  import { Tooltip } from "sveltestrap";
   import {
     AddExcludePlayerID,
     RemoveExcludePlayerID,
@@ -15,6 +13,8 @@
   export let player: domain.Player;
 
   $: accountID = player.player_info.id;
+  $: isNPC = accountID === 0;
+  $: isBelongToClan = player.player_info.clan.id !== 0;
   $: isChecked = !$storedExcludePlayerIDs.includes(accountID);
   $: alertPlayer = $storedAlertPlayers.find(
     (it) => it.account_id === accountID,
@@ -32,10 +32,10 @@
   };
 </script>
 
-<td class="td-checkbox">
+<td>
   {#if column.isShowCheckBox(player)}
     <input
-      class="form-check-input"
+      class="uk-checkbox"
       type="checkbox"
       on:click={onCheck}
       checked={isChecked}
@@ -44,85 +44,76 @@
 </td>
 
 <td style="background-color: {column.bgColorCode(player)}">
-  <div id={`player-${player.player_info.name}`} class="td-string omit">
-    {#if accountID === 0}
+  <div class="td-string omit">
+    {#if isNPC}
       {column.displayValue(player)}
     {:else}
-      {#if alertPlayer}
-        <i class="bi {alertPlayer.pattern}" />
-      {/if}
-
       <!-- svelte-ignore a11y-invalid-attribute -->
-      <a
-        class="td-link dropdown-toggle"
-        href="#"
-        id="dropdownMenuLink"
-        data-bs-toggle="dropdown"
-      >
+      <a href="#" uk-tooltip={alertPlayer?.message}>
+        {#if alertPlayer}
+          <i class="bi {alertPlayer.pattern}" />
+        {/if}
         {column.displayValue(player)}
+        <span uk-drop-parent-icon></span>
       </a>
+    {/if}
+  </div>
 
-      <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-        {#if player.player_info.clan.id}
-          <!-- svelte-ignore a11y-invalid-attribute -->
+  {#if !isNPC}
+    <div uk-dropdown="mode: click" uk-toggle>
+      <ul class="uk-nav uk-dropdown-nav">
+        {#if isBelongToClan}
           <li>
-            <a
-              class="dropdown-item"
-              href="#"
-              on:click={() => BrowserOpenURL(column.clanURL(player))}
+            <!-- svelte-ignore a11y-invalid-attribute -->
+            <a href="#" on:click={() => BrowserOpenURL(column.clanURL(player))}
               >クラン詳細(WoWS Stats & Numbers)</a
             >
           </li>
         {/if}
-        <!-- svelte-ignore a11y-invalid-attribute -->
+
         <li>
-          <a
-            class="dropdown-item"
-            href="#"
-            on:click={() => BrowserOpenURL(column.playerURL(player))}
+          <!-- svelte-ignore a11y-invalid-attribute -->
+          <a href="#" on:click={() => BrowserOpenURL(column.playerURL(player))}
             >プレイヤー詳細(WoWS Stats & Numbers)</a
           >
         </li>
-        <!-- svelte-ignore a11y-invalid-attribute -->
-        <li>
-          {#if alertPlayer}
+
+        {#if alertPlayer}
+          {@const target = alertPlayer}
+          <li>
+            <!-- svelte-ignore a11y-invalid-attribute -->
             <a
-              class="dropdown-item"
               href="#"
-              on:click={() => {
-                dispatch("EditAlertPlayer", { target: clone(alertPlayer) });
-              }}>プレイヤーリストを編集する</a
+              on:click={() => dispatch("EditAlertPlayer", { target: target })}
+              >プレイヤーリストを編集する</a
             >
+          </li>
+          <li>
+            <!-- svelte-ignore a11y-invalid-attribute -->
             <a
-              class="dropdown-item"
               href="#"
-              on:click={() =>
-                dispatch("RemoveAlertPlayer", { target: clone(alertPlayer) })}
+              on:click={() => dispatch("RemoveAlertPlayer", { target: target })}
               >プレイヤーリストから削除する</a
             >
-          {:else}
+          </li>
+        {:else}
+          <li>
+            <!-- svelte-ignore a11y-invalid-attribute -->
             <a
-              class="dropdown-item"
               href="#"
-              on:click={() => {
+              on:click={() =>
                 dispatch("EditAlertPlayer", {
                   target: {
-                    account_id: player.player_info.id,
+                    account_id: accountID,
                     name: player.player_info.name,
                     pattern: "bi-check-circle-fill",
                     message: "",
                   },
-                });
-              }}>プレイヤーリストへ追加する</a
+                })}>プレイヤーリストへ追加する</a
             >
-          {/if}
-        </li>
+          </li>
+        {/if}
       </ul>
-    {/if}
-  </div>
-  {#if alertPlayer?.message}
-    <Tooltip target={`player-${player.player_info.name}`} placement="top">
-      {alertPlayer.message}
-    </Tooltip>
+    </div>
   {/if}
 </td>

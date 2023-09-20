@@ -1,3 +1,4 @@
+import { ArrayMap } from "src/lib/ArrayMap";
 import type { Summary } from "src/lib/Summary";
 import { domain } from "wailsjs/go/models";
 
@@ -5,9 +6,37 @@ export const BASE_NUMBERS_URL = "https://asia.wows-numbers.com/";
 export const MAX_MEMO_LENGTH = 100;
 export const MAIN_PAGE_ID = "mainpage";
 
-const FONT_SIZES = ["x-small", "small", "medium", "large", "x-large"] as const;
-export type FontSize = (typeof FONT_SIZES)[number];
+export const ADD_ALERT_PLAYER_MODAL_ID = "add-alert-player-modal";
+export const EDIT_ALERT_PLAYER_MODAL_ID = "edit-alert-player-modal";
+export const REMOVE_ALERT_PLAYER_MODAL_ID = "remove-alert-player-modal";
+export const CONFIRM_MODAL_ID = "confirm-modal";
 
+export const EMPTY_ALERT_PLAYER: domain.AlertPlayer = {
+  account_id: 0,
+  name: "",
+  pattern: "bi-check-circle-fill",
+  message: "",
+} as const;
+
+const FONT_SIZES = [
+  "xx-small",
+  "x-small",
+  "small",
+  "medium",
+  "large",
+  "x-large",
+  "xx-large",
+] as const;
+export type FontSize = (typeof FONT_SIZES)[number];
+export const ZOOM_RATIO = new ArrayMap<FontSize, number>([
+  ["xx-small", 0.55],
+  ["x-small", 0.7],
+  ["small", 0.85],
+  ["medium", 1.0],
+  ["large", 1.15],
+  ["x-large", 1.3],
+  ["xx-large", 1.55],
+]);
 const PLAYER_NAME_COLORS = ["ship", "overall", "none"] as const;
 export type PlayerNameColor = (typeof PLAYER_NAME_COLORS)[number];
 
@@ -15,7 +44,6 @@ export const Page = {
   MAIN: "main",
   CONFIG: "config",
   APPINFO: "appinfo",
-  ALERT_PLAYER: "updatable",
 };
 export type Page = (typeof Page)[keyof typeof Page];
 
@@ -27,8 +55,6 @@ export type Func = (typeof Func)[keyof typeof Func];
 
 export const ToastKey = {
   NEED_CONFIG: "need_config",
-  WAIT: "wait",
-  FETCHING: "fetching",
   UPDATABLE: "updatable",
   ERROR: "error",
 };
@@ -37,7 +63,6 @@ export type ToastKey = (typeof ToastKey)[keyof typeof ToastKey];
 // Note: see watcher.go
 export const AppEvent = {
   BATTLE_START: "BATTLE_START",
-  BATTLE_END: "BATTLE_END",
   BATTLE_ERR: "BATTLE_ERR",
   LOG: "LOG",
   ONLOAD: "ONLOAD",

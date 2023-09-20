@@ -1,17 +1,16 @@
 <script lang="ts">
   import { format, fromUnixTime } from "date-fns";
-  import { Card } from "sveltestrap";
   import type { domain } from "wailsjs/go/models";
 
   export let meta: domain.Meta;
 
   $: battleMetas = [
     {
-      icon: "bi bi-clock-fill",
+      icon: "clock",
       text: formattedDate(meta.unixtime),
     },
-    { icon: "bi bi-tag-fill", text: meta.type },
-    { icon: "bi bi-geo-alt-fill", text: meta.arena },
+    { icon: "tag", text: meta.type },
+    { icon: "location", text: meta.arena },
   ];
 
   const formattedDate = (unixtime: number): string => {
@@ -19,14 +18,11 @@
   };
 </script>
 
-{#if battleMetas}
-  <Card body class="center p-2">
-    <div class="d-flex">
-      {#each battleMetas as meta}
-        <div class="me-2">
-          <i class={meta.icon}></i>{meta.text}
-        </div>
-      {/each}
+<div class="uk-flex uk-flex-center">
+  {#each battleMetas as meta}
+    <div class="uk-margin-small-right uk-text-nowrap">
+      <span uk-icon="icon: {meta.icon}" />
+      <span class="uk-text-middle">{meta.text}</span>
     </div>
-  </Card>
-{/if}
+  {/each}
+</div>

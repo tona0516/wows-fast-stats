@@ -9,13 +9,21 @@ import { domain } from "wailsjs/go/models";
 
 export class Summary {
   constructor(
-    readonly friends: { [label: string]: number },
-    readonly enemies: { [label: string]: number },
+    readonly tableInfo: {
+      shipColspan: number;
+      overallColspan: number;
+    },
+    readonly values: {
+      label: string;
+      friend: string;
+      enemy: string;
+      diff: { value: string; color: string };
+    }[],
   ) {}
 
   static calculate(
     battle: OptionalBattle,
-    excludes: number[],
+    excludedIDs: number[],
     userConfig: domain.UserConfig,
   ): OptionalSummary {
     if (!battle) {
@@ -30,11 +38,23 @@ export class Summary {
       new Damage(userConfig, "overall"),
       new WinRate(userConfig, "overall"),
     ];
+    const shipColspan = columns.filter((it) => it.category() === "ship").length;
+    const overallColspan = columns.filter(
+      (it) => it.category() === "overall",
+    ).length;
+
+    if (battle.teams.length < 2) {
+      return undefined;
+    }
 
     const teams = [battle.teams[0], battle.teams[1]];
 
-    const friends: { [label: string]: number } = {};
-    const enemies: { [label: string]: number } = {};
+    let values: {
+      label: string;
+      friend: string;
+      enemy: string;
+      diff: { value: string; color: string };
+    }[] = [];
 
     columns.forEach((column) => {
       const [filteredFriends, filteredEnemies] = teams.map((team) => {
@@ -55,7 +75,7 @@ export class Summary {
           const accountID = player.player_info.id;
           return (
             accountID !== 0 &&
-            !excludes.includes(accountID) &&
+            !excludedIDs.includes(accountID) &&
             battles >= minBattles
           );
         });
@@ -72,15 +92,30 @@ export class Summary {
 
       const digit = column.digit();
 
-      const label = `${column.category()}:${column.minDisplayName()}`;
+      const diffNum = friendMean - enemyMean;
+      let sign = diffNum > 0 ? "+" : "";
+      let colorCode = "";
+      if (diffNum > 0) {
+        colorCode = "#99d02b";
+      } else if (diffNum < 0) {
+        colorCode = "#fc4e32";
+      }
+      const diffStr = sign + diffNum.toFixed(digit);
 
-      friends[label] = Number(friendMean.toFixed(digit));
-      enemies[label] = Number(enemyMean.toFixed(digit));
+      values.push({
+        label: column.minDisplayName(),
+        friend: friendMean.toFixed(digit),
+        enemy: enemyMean.toFixed(digit),
+        diff: { value: diffStr, color: colorCode },
+      });
     });
 
     return {
-      friends: friends,
-      enemies: enemies,
+      tableInfo: {
+        shipColspan: shipColspan,
+        overallColspan: overallColspan,
+      },
+      values: values,
     };
   }
 }
