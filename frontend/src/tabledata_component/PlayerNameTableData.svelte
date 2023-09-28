@@ -1,132 +1,119 @@
 <script lang="ts">
-  import clone from "clone";
-  import { SkillLevelConverter } from "src/RankConverter";
-  import { StatsCategory } from "src/enums";
-  import { storedUserConfig } from "src/stores";
-  import { values, clanURL, playerURL } from "src/util";
+  import type { PlayerName } from "src/lib/column/PlayerName";
+  import { storedAlertPlayers, storedExcludePlayerIDs } from "src/stores";
   import { createEventDispatcher } from "svelte";
+  import {
+    AddExcludePlayerID,
+    RemoveExcludePlayerID,
+  } from "wailsjs/go/main/App";
   import type { domain } from "wailsjs/go/models";
   import { BrowserOpenURL } from "wailsjs/runtime/runtime";
 
+  export let column: PlayerName;
   export let player: domain.Player;
-  export let userConfig: domain.UserConfig;
-  export let statsPattern: string;
-  export let alertPlayers: domain.AlertPlayer[];
+
+  $: accountID = player.player_info.id;
+  $: isNPC = accountID === 0;
+  $: isBelongToClan = player.player_info.clan.id !== 0;
+  $: isChecked = !$storedExcludePlayerIDs.includes(accountID);
+  $: alertPlayer = $storedAlertPlayers.find(
+    (it) => it.account_id === accountID,
+  );
 
   const dispatch = createEventDispatcher();
 
-  $: alertPlayer = alertPlayers.find(
-    (it) => it.account_id === player.player_info.id
-  );
-  $: bgcolor = bgColor(player, userConfig, statsPattern);
-  $: playerLabel = isBelongToClan(player)
-    ? `[${player.player_info.clan.tag}] ${player.player_info.name}`
-    : player.player_info.name;
-
-  function isBelongToClan(player: domain.Player): boolean {
-    return player.player_info.clan.id !== 0;
-  }
-
-  function bgColor(
-    player: domain.Player,
-    userConfig: domain.UserConfig,
-    statsPattern: string
-  ): string {
-    let statsCategory: StatsCategory;
-    if (userConfig.custom_color.player_name === "ship") {
-      statsCategory = StatsCategory.Ship;
+  const onCheck = async (e: any) => {
+    if (e.target.checked) {
+      await RemoveExcludePlayerID(accountID);
+    } else {
+      await AddExcludePlayerID(accountID);
     }
-    if (userConfig.custom_color.player_name === "overall") {
-      statsCategory = StatsCategory.Overall;
-    }
-
-    if (!statsCategory) {
-      return "";
-    }
-
-    const pr = values(player, statsPattern, statsCategory, "pr");
-    return SkillLevelConverter.fromPR(
-      pr,
-      userConfig.custom_color.skill
-    ).toBgColorCode();
-  }
+    dispatch("CheckPlayer");
+  };
 </script>
 
-<td class="td-string omit" style="background-color: {bgcolor}">
-  {#if player.player_info.id === 0}
-    {playerLabel}
-  {:else}
-    {#if alertPlayer}
-      <i class="bi {alertPlayer.pattern}" />
-    {/if}
+<td>
+  {#if column.isShowCheckBox(player)}
+    <input
+      class="uk-checkbox"
+      type="checkbox"
+      on:click={onCheck}
+      checked={isChecked}
+    />
+  {/if}
+</td>
 
-    <!-- svelte-ignore a11y-invalid-attribute -->
-    <a
-      class="td-link dropdown-toggle"
-      href="#"
-      id="dropdownMenuLink"
-      data-bs-toggle="dropdown"
-    >
-      {playerLabel}
-    </a>
-
-    <ul
-      class="dropdown-menu"
-      aria-labelledby="dropdownMenuLink"
-      style="font-size: {$storedUserConfig.font_size};"
-    >
-      {#if isBelongToClan(player)}
-        <!-- svelte-ignore a11y-invalid-attribute -->
-        <li>
-          <a
-            class="dropdown-item"
-            href="#"
-            on:click={() => BrowserOpenURL(clanURL(player))}
-            >クラン詳細(WoWS Stats & Numbers)</a
-          >
-        </li>
-      {/if}
+<td style="background-color: {column.bgColorCode(player)}">
+  <div class="td-string omit">
+    {#if isNPC}
+      {column.displayValue(player)}
+    {:else}
       <!-- svelte-ignore a11y-invalid-attribute -->
-      <li>
-        <a
-          class="dropdown-item"
-          href="#"
-          on:click={() => BrowserOpenURL(playerURL(player))}
-          >プレイヤー詳細(WoWS Stats & Numbers)</a
-        >
-      </li>
-      <!-- svelte-ignore a11y-invalid-attribute -->
-      <li>
+      <a href="#" uk-tooltip={alertPlayer?.message}>
         {#if alertPlayer}
-          <a
-            class="dropdown-item"
-            href="#"
-            on:click={() =>
-              dispatch("RemoveAlertPlayer", { target: clone(alertPlayer) })}
-            >プレイヤーリストから削除する</a
-          >
-        {:else}
-          <a
-            class="dropdown-item"
-            href="#"
-            on:click={() => {
-              dispatch("UpdateAlertPlayer", {
-                target: {
-                  account_id: player.player_info.id,
-                  name: player.player_info.name,
-                  pattern: "bi-check-circle-fill",
-                  message: "",
-                },
-              });
-            }}>プレイヤーリストへ追加する</a
-          >
+          <i class="bi {alertPlayer.pattern}" />
         {/if}
-      </li>
-      {#if alertPlayer}
+        {column.displayValue(player)}
+        <span uk-drop-parent-icon></span>
+      </a>
+    {/if}
+  </div>
+
+  {#if !isNPC}
+    <div uk-dropdown="mode: click" uk-toggle>
+      <ul class="uk-nav uk-dropdown-nav">
+        {#if isBelongToClan}
+          <li>
+            <!-- svelte-ignore a11y-invalid-attribute -->
+            <a href="#" on:click={() => BrowserOpenURL(column.clanURL(player))}
+              >クラン詳細(WoWS Stats & Numbers)</a
+            >
+          </li>
+        {/if}
+
         <li>
-          <div class="dropdown-item">メモ: {alertPlayer.message}</div>
+          <!-- svelte-ignore a11y-invalid-attribute -->
+          <a href="#" on:click={() => BrowserOpenURL(column.playerURL(player))}
+            >プレイヤー詳細(WoWS Stats & Numbers)</a
+          >
         </li>
-      {/if}
-    </ul>
+
+        {#if alertPlayer}
+          {@const target = alertPlayer}
+          <li>
+            <!-- svelte-ignore a11y-invalid-attribute -->
+            <a
+              href="#"
+              on:click={() => dispatch("EditAlertPlayer", { target: target })}
+              >プレイヤーリストを編集する</a
+            >
+          </li>
+          <li>
+            <!-- svelte-ignore a11y-invalid-attribute -->
+            <a
+              href="#"
+              on:click={() => dispatch("RemoveAlertPlayer", { target: target })}
+              >プレイヤーリストから削除する</a
+            >
+          </li>
+        {:else}
+          <li>
+            <!-- svelte-ignore a11y-invalid-attribute -->
+            <a
+              href="#"
+              on:click={() =>
+                dispatch("EditAlertPlayer", {
+                  target: {
+                    account_id: accountID,
+                    name: player.player_info.name,
+                    pattern: "bi-check-circle-fill",
+                    message: "",
+                  },
+                })}>プレイヤーリストへ追加する</a
+            >
+          </li>
+        {/if}
+      </ul>
+    </div>
   {/if}
 </td>

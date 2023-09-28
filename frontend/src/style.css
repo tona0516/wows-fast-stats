@@ -1,65 +1,40 @@
-:root {
-  --app-background-color: #2d2c2c;
-  --app-text-color: #ffffff;
-}
-
-html {
-  background-color: var(--app-background-color);
-  color: var(--app-text-color);
-}
-
 body {
-  margin: 0;
-  color: var(--app-text-color);
-  font-family: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
-    "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+  font-family:
+    "Nunito",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    "Roboto",
+    "Oxygen",
+    "Ubuntu",
+    "Cantarell",
+    "Fira Sans",
+    "Droid Sans",
+    "Helvetica Neue",
     sans-serif;
-  background-color: var(--app-background-color);
 }
 
 @font-face {
   font-family: "Nunito";
   font-style: normal;
   font-weight: 400;
-  src: local(""),
+  src:
+    local(""),
     url("assets/fonts/nunito-v16-latin-regular.woff2") format("woff2");
 }
 
-#app {
-  height: 100vh;
+.uk-table td {
+  padding-top: 2px;
+  padding-bottom: 2px;
+  padding-left: 4px;
+  padding-right: 4px;
 }
 
-#mainpage {
-  background-color: var(--app-background-color);
-  color: var(--app-text-color);
-}
-
-.btn {
-  white-space: nowrap;
-  text-align: center;
-}
-
-.table-text-color {
-  color: var(--app-text-color);
-}
-
-.table td {
-  padding-top: 1px;
-  padding-bottom: 1px;
-  white-space: nowrap;
-  vertical-align: middle;
-}
-
-.table th {
-  padding-top: 1px;
-  padding-bottom: 1px;
-  white-space: nowrap;
-  vertical-align: middle;
-  text-align: center;
-}
-
-.td-link {
-  color: var(--app-text-color);
+.uk-table th {
+  padding-top: 2px;
+  padding-bottom: 2px;
+  padding-left: 4px;
+  padding-right: 4px;
 }
 
 .td-string {
@@ -76,18 +51,8 @@ body {
 }
 
 .td-graph {
-  min-width: 6em;
-  max-width: 6em;
-}
-
-.td-checkbox {
-  padding: 1px;
-  width: 1em;
-  height: 1em;
-}
-
-.td-icon {
-  width: 1em;
+  min-width: 5em;
+  max-width: 5em;
 }
 
 .no_data {
@@ -98,8 +63,6 @@ body {
 .omit {
   overflow: hidden;
   text-overflow: ellipsis;
-  -webkit-text-overflow: ellipsis;
-  -ms-text-overflow: ellipsis;
   white-space: nowrap;
 }
 
@@ -113,40 +76,4 @@ body {
   width: 1.25em;
   display: flex;
   align-items: center;
-}
-
-.higher {
-  color: #99d02b;
-}
-
-.lower {
-  color: #fc4e32;
-}
-
-.alert-player {
-  text-align: center;
-}
-
-.center {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-
-.text-form {
-  min-width: 480px;
-}
-
-.nav-link {
-  color: var(--app-text-color);
-}
-
-.modal-color {
-  background-color: var(--app-background-color);
-}
-
-.logging {
-  width: 50em;
-  height: 25em;
 }

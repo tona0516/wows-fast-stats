@@ -45,7 +45,7 @@ func NewStats(
 func (s *Stats) PR(category StatsCategory, pattern StatsPattern) float64 {
 	switch category {
 	case StatsCategoryShip:
-		values := s.statsValues(StatsCategoryShip, pattern)
+		values, _ := s.statsValues(pattern)
 		battles := values.Battles
 
 		return s.pr(
@@ -97,63 +97,171 @@ func (s *Stats) PR(category StatsCategory, pattern StatsPattern) float64 {
 }
 
 func (s *Stats) Battles(category StatsCategory, pattern StatsPattern) uint {
-	return s.statsValues(category, pattern).Battles
+	ship, player := s.statsValues(pattern)
+	switch category {
+	case StatsCategoryShip:
+		return ship.Battles
+	case StatsCategoryOverall:
+		return player.Battles
+	}
+
+	logger.Error(failure.New(apperr.UnexpectedError))
+	return 0
 }
 
 func (s *Stats) AvgDamage(category StatsCategory, pattern StatsPattern) float64 {
-	values := s.statsValues(category, pattern)
-	return avgDamage(values.DamageDealt, values.Battles)
+	ship, player := s.statsValues(pattern)
+	switch category {
+	case StatsCategoryShip:
+		return avgDamage(ship.DamageDealt, ship.Battles)
+	case StatsCategoryOverall:
+		return avgDamage(player.DamageDealt, player.Battles)
+	}
+
+	logger.Error(failure.New(apperr.UnexpectedError))
+	return 0
+}
+
+func (s *Stats) MaxDamage(category StatsCategory, pattern StatsPattern) MaxDamage {
+	ship, player := s.statsValues(pattern)
+	switch category {
+	case StatsCategoryShip:
+		return MaxDamage{
+			Damage: ship.MaxDamageDealt,
+		}
+	case StatsCategoryOverall:
+		shipID := player.MaxDamageDealtShipID
+		warship := s.warships[shipID]
+		return MaxDamage{
+			ShipID:   shipID,
+			ShipName: warship.Name,
+			ShipTier: warship.Tier,
+			Damage:   player.MaxDamageDealt,
+		}
+	}
+
+	logger.Error(failure.New(apperr.UnexpectedError))
+	return MaxDamage{}
 }
 
 func (s *Stats) KdRate(category StatsCategory, pattern StatsPattern) float64 {
-	values := s.statsValues(category, pattern)
-	death := values.Battles - values.SurvivedBattles
+	var (
+		survivedBattles uint
+		frags           uint
+		battles         uint
+	)
+
+	ship, player := s.statsValues(pattern)
+	switch category {
+	case StatsCategoryShip:
+		survivedBattles = ship.SurvivedBattles
+		frags = ship.Frags
+		battles = ship.Battles
+	case StatsCategoryOverall:
+		survivedBattles = player.SurvivedBattles
+		frags = player.Frags
+		battles = player.Battles
+	}
+
+	death := battles - survivedBattles
 	if death < 1 {
 		death = 1
 	}
 
-	return float64(values.Frags) / float64(death)
+	return float64(frags) / float64(death)
 }
 
 func (s *Stats) AvgKill(category StatsCategory, pattern StatsPattern) float64 {
-	values := s.statsValues(category, pattern)
-	return avgKill(values.Frags, values.Battles)
+	ship, player := s.statsValues(pattern)
+	switch category {
+	case StatsCategoryShip:
+		return avgKill(ship.Frags, ship.Battles)
+	case StatsCategoryOverall:
+		return avgKill(player.Frags, player.Battles)
+	}
+
+	logger.Error(failure.New(apperr.UnexpectedError))
+	return 0
 }
 
 func (s *Stats) AvgExp(category StatsCategory, pattern StatsPattern) float64 {
-	values := s.statsValues(category, pattern)
-	return div(values.Xp, values.Battles)
+	ship, player := s.statsValues(pattern)
+	switch category {
+	case StatsCategoryShip:
+		return div(ship.Xp, ship.Battles)
+	case StatsCategoryOverall:
+		return div(player.Xp, player.Battles)
+	}
+
+	logger.Error(failure.New(apperr.UnexpectedError))
+	return 0
 }
 
 func (s *Stats) WinRate(category StatsCategory, pattern StatsPattern) float64 {
-	values := s.statsValues(category, pattern)
-	return winRate(values.Wins, values.Battles)
+	ship, player := s.statsValues(pattern)
+	switch category {
+	case StatsCategoryShip:
+		return winRate(ship.Wins, ship.Battles)
+	case StatsCategoryOverall:
+		return winRate(player.Wins, player.Battles)
+	}
+
+	logger.Error(failure.New(apperr.UnexpectedError))
+	return 0
 }
 
 func (s *Stats) WinSurvivedRate(category StatsCategory, pattern StatsPattern) float64 {
-	values := s.statsValues(category, pattern)
-	return percentage(values.SurvivedWins, values.Wins)
+	ship, player := s.statsValues(pattern)
+	switch category {
+	case StatsCategoryShip:
+		return percentage(ship.SurvivedWins, ship.Wins)
+	case StatsCategoryOverall:
+		return percentage(player.SurvivedWins, player.Wins)
+	}
+
+	logger.Error(failure.New(apperr.UnexpectedError))
+	return 0
 }
 
 func (s *Stats) LoseSurvivedRate(category StatsCategory, pattern StatsPattern) float64 {
-	values := s.statsValues(category, pattern)
-	loses := values.Battles - values.Wins
-	return percentage(values.SurvivedBattles-values.SurvivedWins, loses)
+	var (
+		battles         uint
+		wins            uint
+		survivedBattles uint
+		survivedWins    uint
+	)
+
+	ship, player := s.statsValues(pattern)
+	switch category {
+	case StatsCategoryShip:
+		battles = ship.Battles
+		wins = ship.Wins
+		survivedBattles = ship.SurvivedBattles
+		survivedWins = ship.SurvivedWins
+	case StatsCategoryOverall:
+		battles = player.Battles
+		wins = player.Wins
+		survivedBattles = player.SurvivedBattles
+		survivedWins = player.SurvivedWins
+	}
+
+	loses := battles - wins
+	return percentage(survivedBattles-survivedWins, loses)
 }
 
-func (s *Stats) MainBatteryHitRate(category StatsCategory, pattern StatsPattern) float64 {
-	values := s.statsValues(category, pattern)
-	return percentage(values.MainBattery.Hits, values.MainBattery.Shots)
+func (s *Stats) MainBatteryHitRate(pattern StatsPattern) float64 {
+	ship, _ := s.statsValues(pattern)
+	return percentage(ship.MainBattery.Hits, ship.MainBattery.Shots)
 }
 
-func (s *Stats) TorpedoesHitRate(category StatsCategory, pattern StatsPattern) float64 {
-	values := s.statsValues(category, pattern)
-	return percentage(values.Torpedoes.Hits, values.Torpedoes.Shots)
+func (s *Stats) TorpedoesHitRate(pattern StatsPattern) float64 {
+	ship, _ := s.statsValues(pattern)
+	return percentage(ship.Torpedoes.Hits, ship.Torpedoes.Shots)
 }
 
-func (s *Stats) PlanesKilled(category StatsCategory, pattern StatsPattern) float64 {
-	values := s.statsValues(category, pattern)
-	return div(values.PlanesKilled, values.Battles)
+func (s *Stats) PlanesKilled(pattern StatsPattern) float64 {
+	ship, _ := s.statsValues(pattern)
+	return div(ship.PlanesKilled, ship.Battles)
 }
 
 func (s *Stats) AvgTier(
@@ -243,29 +351,19 @@ func (s *Stats) UsingShipTypeRate(
 	}
 }
 
-func (s *Stats) statsValues(category StatsCategory, pattern StatsPattern) WGStatsValues {
-	switch category {
-	case StatsCategoryShip:
-		switch pattern {
-		case StatsPatternPvPAll:
-			return s.useShipStats.Pvp
-		case StatsPatternPvPSolo:
-			return s.useShipStats.PvpSolo
-		}
-	case StatsCategoryOverall:
-		switch pattern {
-		case StatsPatternPvPAll:
-			return s.accountInfo.Statistics.Pvp
-		case StatsPatternPvPSolo:
-			return s.accountInfo.Statistics.PvpSolo
-		}
+func (s *Stats) statsValues(pattern StatsPattern) (WGShipStatsValues, WGPlayerStatsValues) {
+	switch pattern {
+	case StatsPatternPvPAll:
+		return s.useShipStats.Pvp, s.accountInfo.Statistics.Pvp
+	case StatsPatternPvPSolo:
+		return s.useShipStats.PvpSolo, s.accountInfo.Statistics.PvpSolo
 	}
 
 	logger.Error(failure.New(apperr.UnexpectedError))
-	return WGStatsValues{}
+	return WGShipStatsValues{}, WGPlayerStatsValues{}
 }
 
-func (s *Stats) statsValuesForm(statsData WGShipsStatsData, pattern StatsPattern) WGStatsValues {
+func (s *Stats) statsValuesForm(statsData WGShipsStatsData, pattern StatsPattern) WGShipStatsValues {
 	switch pattern {
 	case StatsPatternPvPAll:
 		return statsData.Pvp
@@ -274,7 +372,7 @@ func (s *Stats) statsValuesForm(statsData WGShipsStatsData, pattern StatsPattern
 	}
 
 	logger.Error(failure.New(apperr.UnexpectedError))
-	return WGStatsValues{}
+	return WGShipStatsValues{}
 }
 
 func (s *Stats) pr(

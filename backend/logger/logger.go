@@ -9,7 +9,6 @@ import (
 
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/pkgerrors"
-	wailsLogger "github.com/wailsapp/wails/v2/pkg/logger"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
@@ -26,9 +25,6 @@ func Init(
 	env vo.Env,
 	report repository.ReportInterface,
 ) {
-	// wails logger setting
-	runtime.LogSetLogLevel(appCtx, wailsLogger.ERROR)
-
 	// zerolog setting
 	zerolog.ErrorStackMarshaler = pkgerrors.MarshalStack
 

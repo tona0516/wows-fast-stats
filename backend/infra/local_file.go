@@ -36,11 +36,6 @@ var DefaultUserConfig domain.UserConfig = domain.UserConfig{
 	NotifyUpdatable: true,
 	StatsPattern:    domain.StatsPatternPvPAll,
 	Displays: domain.Displays{
-		Basic: domain.Basic{
-			IsInAvg:    true,
-			PlayerName: true,
-			ShipInfo:   true,
-		},
 		Ship: domain.Ship{
 			PR:      true,
 			Damage:  true,

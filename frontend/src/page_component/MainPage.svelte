@@ -1,96 +1,60 @@
 <script lang="ts">
+  import type { Screenshot } from "src/lib/Screenshot";
+  import { MAIN_PAGE_ID } from "src/lib/types";
+  import BattleMeta from "src/other_component/BattleMeta.svelte";
   import ColorDescription from "src/other_component/ColorDescription.svelte";
+  import Function from "src/other_component/Function.svelte";
   import Ofuse from "src/other_component/Ofuse.svelte";
   import StatisticsTable from "src/other_component/StatisticsTable.svelte";
-  import { toDateForDisplay } from "src/util";
-  import {
-    storedBattle,
-    storedUserConfig,
-    storedAlertPlayers,
-    storedSummaryResult,
-  } from "src/stores";
+  import Summary from "src/other_component/Summary.svelte";
+  import { storedBattle, storedUserConfig, storedSummary } from "src/stores";
+
+  export let isLoading: boolean;
+  export let screenshot: Screenshot;
 </script>
 
-<div id="stats">
-  {#if $storedBattle}
-    <div class="mt-2 mx-2">
+<!-- Note: Use the same color as that of body.  -->
+<div
+  id={MAIN_PAGE_ID}
+  class="uk-padding-small uk-light uk-background-secondary"
+>
+  <div class="uk-margin-small">
+    <Function {screenshot} on:ScreenshotSaved on:Failure />
+  </div>
+
+  <div class="uk-margin-small">
+    {#if $storedBattle}
       <StatisticsTable
         teams={$storedBattle.teams}
         userConfig={$storedUserConfig}
-        alertPlayers={$storedAlertPlayers}
-        on:UpdateAlertPlayer
+        on:EditAlertPlayer
         on:RemoveAlertPlayer
         on:CheckPlayer
       />
-    </div>
 
-    {#if $storedSummaryResult}
-      <div class="d-flex justify-content-center">
-        <div class="center mx-2">
-          <table class="table table-sm table-text-color w-auto td-multiple">
-            <tbody>
-              <tr>
-                <td>日時</td>
-                <td>{toDateForDisplay($storedBattle.meta.unixtime)}</td>
-              </tr>
+      <BattleMeta meta={$storedBattle.meta} />
 
-              <tr>
-                <td>戦闘タイプ</td>
-                <td>{$storedBattle.meta.type}</td>
-              </tr>
+      {#if $storedSummary}
+        <Summary summary={$storedSummary} />
+      {/if}
 
-              <tr>
-                <td>マップ</td>
-                <td>{$storedBattle.meta.arena}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="center mx-2">
-          <table class="table table-sm table-text-color w-auto td-multiple">
-            <thead>
-              <tr>
-                <th />
-                <th colspan={$storedSummaryResult.shipColspan}>艦成績</th>
-                <th colspan={$storedSummaryResult.overallColspan}>総合成績</th>
-              </tr>
-              <tr>
-                <th />
-                {#each $storedSummaryResult.labels as label}
-                  <th>{label}</th>
-                {/each}
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>{$storedBattle.teams[0].name}</td>
-                {#each $storedSummaryResult.friends as friend}
-                  <td>{friend}</td>
-                {/each}
-              </tr>
-
-              <tr>
-                <td>{$storedBattle.teams[1].name}</td>
-                {#each $storedSummaryResult.enemies as enemy}
-                  <td>{enemy}</td>
-                {/each}
-              </tr>
-
-              <tr>
-                <td>差</td>
-                {#each $storedSummaryResult.diffs as diff}
-                  <td class={diff.colorClass}>{diff.value}</td>
-                {/each}
-              </tr>
-            </tbody>
-          </table>
-        </div>
+      <ColorDescription userConfig={$storedUserConfig} />
+    {:else}
+      <div class="uk-text-center">
+        <p>戦闘中ではありません。開始時に自動的にリロードします。</p>
       </div>
     {/if}
+  </div>
+
+  <div class="uk-margin-small">
+    <Ofuse />
+  </div>
+
+  {#if isLoading}
+    <div class="uk-overlay-default">
+      <div class="uk-position-center">
+        <div uk-spinner />
+      </div>
+    </div>
   {/if}
-
-  <ColorDescription userConfig={$storedUserConfig} />
 </div>
-
-<Ofuse />

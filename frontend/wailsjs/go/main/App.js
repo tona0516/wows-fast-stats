@@ -38,10 +38,6 @@ export function ExcludePlayerIDs() {
   return window['go']['main']['App']['ExcludePlayerIDs']();
 }
 
-export function FontSizes() {
-  return window['go']['main']['App']['FontSizes']();
-}
-
 export function LatestRelease() {
   return window['go']['main']['App']['LatestRelease']();
 }
@@ -56,10 +52,6 @@ export function ManualScreenshot(arg1, arg2) {
 
 export function OpenDirectory(arg1) {
   return window['go']['main']['App']['OpenDirectory'](arg1);
-}
-
-export function PlayerNameColors() {
-  return window['go']['main']['App']['PlayerNameColors']();
 }
 
 export function RemoveAlertPlayer(arg1) {
@@ -84,10 +76,6 @@ export function Semver() {
 
 export function StartWatching() {
   return window['go']['main']['App']['StartWatching']();
-}
-
-export function StatsPatterns() {
-  return window['go']['main']['App']['StatsPatterns']();
 }
 
 export function UpdateAlertPlayer(arg1) {

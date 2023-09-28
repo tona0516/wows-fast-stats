@@ -20,20 +20,14 @@ type UserConfig struct {
 }
 
 type Displays struct {
-	Basic   Basic   `json:"basic"`
 	Ship    Ship    `json:"ship"`
 	Overall Overall `json:"overall"`
-}
-
-type Basic struct {
-	IsInAvg    bool `json:"is_in_avg"`
-	PlayerName bool `json:"player_name"`
-	ShipInfo   bool `json:"ship_info"`
 }
 
 type Ship struct {
 	PR           bool `json:"pr"`
 	Damage       bool `json:"damage"`
+	MaxDamage    bool `json:"max_damage"`
 	WinRate      bool `json:"win_rate"`
 	KdRate       bool `json:"kd_rate"`
 	Kill         bool `json:"kill"`
@@ -47,6 +41,7 @@ type Ship struct {
 type Overall struct {
 	PR                bool `json:"pr"`
 	Damage            bool `json:"damage"`
+	MaxDamage         bool `json:"max_damage"`
 	WinRate           bool `json:"win_rate"`
 	KdRate            bool `json:"kd_rate"`
 	Kill              bool `json:"kill"`
@@ -108,6 +103,7 @@ type ShipTypeColorCode struct {
 type CustomDigit struct {
 	PR                uint `json:"pr"`
 	Damage            uint `json:"damage"`
+	MaxDamage         uint `json:"max_damage"`
 	WinRate           uint `json:"win_rate"`
 	KdRate            uint `json:"kd_rate"`
 	Kill              uint `json:"kill"`

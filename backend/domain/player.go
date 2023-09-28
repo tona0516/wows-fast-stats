@@ -23,23 +23,25 @@ type PlayerStats struct {
 }
 
 type ShipStats struct {
-	Battles            uint    `json:"battles"`
-	Damage             float64 `json:"damage"`
-	WinRate            float64 `json:"win_rate"`
-	WinSurvivedRate    float64 `json:"win_survived_rate"`
-	LoseSurvivedRate   float64 `json:"lose_survived_rate"`
-	KdRate             float64 `json:"kd_rate"`
-	Kill               float64 `json:"kill"`
-	Exp                float64 `json:"exp"`
-	PR                 float64 `json:"pr"`
-	MainBatteryHitRate float64 `json:"main_battery_hit_rate"`
-	TorpedoesHitRate   float64 `json:"torpedoes_hit_rate"`
-	PlanesKilled       float64 `json:"planes_killed"`
+	Battles            uint      `json:"battles"`
+	Damage             float64   `json:"damage"`
+	MaxDamage          MaxDamage `json:"max_damage"`
+	WinRate            float64   `json:"win_rate"`
+	WinSurvivedRate    float64   `json:"win_survived_rate"`
+	LoseSurvivedRate   float64   `json:"lose_survived_rate"`
+	KdRate             float64   `json:"kd_rate"`
+	Kill               float64   `json:"kill"`
+	Exp                float64   `json:"exp"`
+	PR                 float64   `json:"pr"`
+	MainBatteryHitRate float64   `json:"main_battery_hit_rate"`
+	TorpedoesHitRate   float64   `json:"torpedoes_hit_rate"`
+	PlanesKilled       float64   `json:"planes_killed"`
 }
 
 type OverallStats struct {
 	Battles           uint          `json:"battles"`
 	Damage            float64       `json:"damage"`
+	MaxDamage         MaxDamage     `json:"max_damage"`
 	WinRate           float64       `json:"win_rate"`
 	WinSurvivedRate   float64       `json:"win_survived_rate"`
 	LoseSurvivedRate  float64       `json:"lose_survived_rate"`

@@ -1,5 +1,5 @@
 APP_NAME := wows-fast-stats
-SEMVER := 0.9.0
+SEMVER := 0.10.0
 EXE := $(APP_NAME)-$(SEMVER).exe
 ZIP := $(APP_NAME).zip
 DISCORD_WEBHOOK_URL_PROD := $(shell cat discord_webhook_url_prod)
@@ -25,7 +25,7 @@ setup: check-prerequisite
 	go install github.com/wailsapp/wails/v2/cmd/wails@latest
 	go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 	go install golang.org/x/tools/cmd/stringer@latest
-	npm ci
+	cd frontend && npm ci
 
 .PHONY: build
 build: gen lint test

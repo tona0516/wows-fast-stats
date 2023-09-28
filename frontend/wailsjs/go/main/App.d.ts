@@ -21,8 +21,6 @@ export function DefaultUserConfig():Promise<domain.UserConfig>;
 
 export function ExcludePlayerIDs():Promise<Array<number>>;
 
-export function FontSizes():Promise<Array<string>>;
-
 export function LatestRelease():Promise<domain.GHLatestRelease>;
 
 export function LogError(arg1:string):Promise<void>;
@@ -30,8 +28,6 @@ export function LogError(arg1:string):Promise<void>;
 export function ManualScreenshot(arg1:string,arg2:string):Promise<void>;
 
 export function OpenDirectory(arg1:string):Promise<void>;
-
-export function PlayerNameColors():Promise<Array<string>>;
 
 export function RemoveAlertPlayer(arg1:number):Promise<void>;
 
@@ -44,8 +40,6 @@ export function SelectDirectory():Promise<string>;
 export function Semver():Promise<string>;
 
 export function StartWatching():Promise<void>;
-
-export function StatsPatterns():Promise<Array<string>>;
 
 export function UpdateAlertPlayer(arg1:domain.AlertPlayer):Promise<void>;
 
