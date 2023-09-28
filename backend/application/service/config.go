@@ -21,6 +21,8 @@ type Config struct {
 	wargaming               repository.WargamingInterface
 	WindowGetSizeFunc       WindowGetSizeFunc
 	WindowSetSizeFunc       WindowSetSizeFunc
+	WindowGetPositionFunc   WindowGetPosition
+	WindowSetPositionFunc   WindowSetPosition
 	OpenDirectoryDialogFunc OpenDirectoryDialogFunc
 	OpenWithDefaultAppFunc  OpenWithDefaultAppFunc
 }
@@ -34,6 +36,8 @@ func NewConfig(
 		wargaming:               wargaming,
 		WindowGetSizeFunc:       runtime.WindowGetSize,
 		WindowSetSizeFunc:       runtime.WindowSetSize,
+		WindowGetPositionFunc:   runtime.WindowGetPosition,
+		WindowSetPositionFunc:   runtime.WindowSetPosition,
 		OpenDirectoryDialogFunc: runtime.OpenDirectoryDialog,
 		OpenWithDefaultAppFunc:  open.Run,
 	}
@@ -88,10 +92,13 @@ func (c *Config) ApplyAppConfig(appCtx context.Context) error {
 		return failure.Wrap(err)
 	}
 
-	// Set window size
+	// Set window size and position
 	window := config.Window
 	if window.Width > 0 && window.Height > 0 {
 		c.WindowSetSizeFunc(appCtx, window.Width, window.Height)
+	}
+	if window.X >= 0 || window.Y >= 0 {
+		c.WindowSetPositionFunc(appCtx, window.X, window.Y)
 	}
 
 	return nil
@@ -100,10 +107,14 @@ func (c *Config) ApplyAppConfig(appCtx context.Context) error {
 func (c *Config) SaveAppConfig(appCtx context.Context) error {
 	config, _ := c.localFile.App()
 
-	// Save windows size
+	// Save windows size and position
 	width, height := c.WindowGetSizeFunc(appCtx)
 	config.Window.Width = width
 	config.Window.Height = height
+	x, y := c.WindowGetPositionFunc(appCtx)
+	config.Window.X = x
+	config.Window.Y = y
+
 	return failure.Wrap(c.localFile.UpdateApp(config))
 }
 
