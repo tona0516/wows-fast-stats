@@ -1,3 +1,4 @@
+import PlayerNameTableData from "src/component/main/internal/table_data/PlayerNameTableData.svelte";
 import type { IColumn } from "src/lib/column/intetface/IColumn";
 import { RatingConverterFactory } from "src/lib/rating/RatingConverter";
 import {
@@ -6,7 +7,6 @@ import {
   type StatsCategory,
 } from "src/lib/types";
 import { toPlayerStats } from "src/lib/util";
-import PlayerNameTableData from "src/tabledata_component/PlayerNameTableData.svelte";
 import type { domain } from "wailsjs/go/models";
 
 export class PlayerName implements IColumn<BasicKey> {

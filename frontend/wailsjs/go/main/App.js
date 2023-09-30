@@ -85,3 +85,7 @@ export function UpdateAlertPlayer(arg1) {
 export function UserConfig() {
   return window['go']['main']['App']['UserConfig']();
 }
+
+export function ValidateRequiredConfig(arg1, arg2) {
+  return window['go']['main']['App']['ValidateRequiredConfig'](arg1, arg2);
+}

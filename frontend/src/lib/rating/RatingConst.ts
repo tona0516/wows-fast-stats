@@ -1,3 +1,5 @@
+import { DispName } from "src/lib/DispName";
+import { RatingConverterFactory } from "src/lib/rating/RatingConverter";
 import { RatingFactor } from "src/lib/rating/RatingFactor";
 import type { domain } from "wailsjs/go/models";
 
@@ -110,4 +112,42 @@ export const sampleTeam = (): domain.Team => {
   });
 
   return { players: players } as domain.Team;
+};
+
+export const colorDescriptions = (userConfig: domain.UserConfig) => {
+  return ratingFactors().map((rating) => {
+    return {
+      level: { text: DispName.SKILL_LEVELS.get(rating.level) },
+      playerName: {
+        text: "player_name",
+        bgColor: RatingConverterFactory.fromPR(
+          rating.minPR,
+          userConfig,
+        ).bgColorCode(),
+      },
+      pr: {
+        text: `${rating.minPR} ~ ${rating.maxPR}`,
+        textColor: RatingConverterFactory.fromDamage(
+          rating.minDamage,
+          1.0,
+          userConfig,
+        ).textColorCode(),
+      },
+      damage: {
+        text: `${rating.minDamage}倍 ~ ${rating.maxDamage}倍`,
+        textColor: RatingConverterFactory.fromDamage(
+          rating.minDamage,
+          1.0,
+          userConfig,
+        ).textColorCode(),
+      },
+      win: {
+        text: `${rating.minWin}% ~ ${rating.maxWin}%`,
+        textColor: RatingConverterFactory.fromWinRate(
+          rating.minWin,
+          userConfig,
+        ).textColorCode(),
+      },
+    };
+  });
 };

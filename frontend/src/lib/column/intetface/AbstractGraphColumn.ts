@@ -1,6 +1,6 @@
+import StackedBarGraphTableData from "src/component/main/internal/table_data/StackedBarGraphTableData.svelte";
 import type { IColumn } from "src/lib/column/intetface/IColumn";
 import type { StackedBarGraphParam } from "src/lib/value_object/StackedBarGraphParam";
-import StackedBarGraphTableData from "src/tabledata_component/StackedBarGraphTableData.svelte";
 import type { domain } from "wailsjs/go/models";
 
 export abstract class AbstractGraphColumn<T> implements IColumn<T> {

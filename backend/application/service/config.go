@@ -48,13 +48,39 @@ func (c *Config) User() (domain.UserConfig, error) {
 	return config, failure.Wrap(err)
 }
 
+func (c *Config) ValidateRequired(
+	installPath string,
+	appid string,
+) vo.RequiredConfigError {
+	result := vo.RequiredConfigError{}
+
+	if installPath == "" {
+		result.InstallPath = apperr.EmptyInstallPath.ErrorCode()
+	} else {
+		if _, err := os.Stat(filepath.Join(installPath, GameExeName)); err != nil {
+			result.InstallPath = apperr.InvalidInstallPath.ErrorCode()
+		}
+	}
+
+	if appid == "" {
+		result.AppID = apperr.EmptyAppID.ErrorCode()
+	} else {
+		if ok, _ := c.wargaming.Test(appid); !ok {
+			result.AppID = apperr.InvalidAppID.ErrorCode()
+		}
+	}
+
+	result.Valid = result.InstallPath == "" && result.AppID == ""
+	return result
+}
+
 func (c *Config) UpdateRequired(
 	installPath string,
 	appid string,
-) (vo.ValidatedResult, error) {
+) (vo.RequiredConfigError, error) {
 	// validate
-	validatedResult := c.validateRequired(installPath, appid)
-	if !validatedResult.Valid() {
+	validatedResult := c.ValidateRequired(installPath, appid)
+	if !validatedResult.Valid {
 		return validatedResult, nil
 	}
 
@@ -154,21 +180,4 @@ func (c *Config) OpenDirectory(path string) error {
 	}
 
 	return nil
-}
-
-func (c *Config) validateRequired(
-	installPath string,
-	appid string,
-) vo.ValidatedResult {
-	result := vo.ValidatedResult{}
-
-	if _, err := os.Stat(filepath.Join(installPath, GameExeName)); err != nil {
-		result.InstallPath = apperr.InvalidInstallPath.ErrorCode()
-	}
-
-	if ok, _ := c.wargaming.Test(appid); !ok {
-		result.AppID = apperr.InvalidAppID.ErrorCode()
-	}
-
-	return result
 }

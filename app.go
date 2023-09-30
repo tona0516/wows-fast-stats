@@ -144,10 +144,17 @@ func (a *App) ApplyUserConfig(config domain.UserConfig) error {
 	return apperr.Unwrap(err)
 }
 
+func (a *App) ValidateRequiredConfig(
+	installPath string,
+	appid string,
+) vo.RequiredConfigError {
+	return a.configService.ValidateRequired(installPath, appid)
+}
+
 func (a *App) ApplyRequiredUserConfig(
 	installPath string,
 	appid string,
-) (vo.ValidatedResult, error) {
+) (vo.RequiredConfigError, error) {
 	validatedResult, err := a.configService.UpdateRequired(installPath, appid)
 	if err != nil {
 		logger.Error(err)

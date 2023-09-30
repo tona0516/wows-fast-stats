@@ -9,7 +9,7 @@ export function AlertPatterns():Promise<Array<string>>;
 
 export function AlertPlayers():Promise<Array<domain.AlertPlayer>>;
 
-export function ApplyRequiredUserConfig(arg1:string,arg2:string):Promise<vo.ValidatedResult>;
+export function ApplyRequiredUserConfig(arg1:string,arg2:string):Promise<vo.RequiredConfigError>;
 
 export function ApplyUserConfig(arg1:domain.UserConfig):Promise<void>;
 
@@ -44,3 +44,5 @@ export function StartWatching():Promise<void>;
 export function UpdateAlertPlayer(arg1:domain.AlertPlayer):Promise<void>;
 
 export function UserConfig():Promise<domain.UserConfig>;
+
+export function ValidateRequiredConfig(arg1:string,arg2:string):Promise<vo.RequiredConfigError>;

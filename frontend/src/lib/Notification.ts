@@ -30,7 +30,7 @@ export class Notification {
 
   private injectMessage(icon: string, message: string): string {
     return `<div class="uk-text-small">
-        <span uk-icon="icon: ${icon}"></span>
+        <UkIcon name=${icon} />
         <span class="uk-text-middle">${message}</span>
     </div>`;
   }

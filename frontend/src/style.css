@@ -23,20 +23,6 @@ body {
     url("assets/fonts/nunito-v16-latin-regular.woff2") format("woff2");
 }
 
-.uk-table td {
-  padding-top: 2px;
-  padding-bottom: 2px;
-  padding-left: 4px;
-  padding-right: 4px;
-}
-
-.uk-table th {
-  padding-top: 2px;
-  padding-bottom: 2px;
-  padding-left: 4px;
-  padding-right: 4px;
-}
-
 .td-string {
   text-align: left;
   max-width: 180px;
@@ -50,30 +36,8 @@ body {
   text-align: center;
 }
 
-.td-graph {
-  min-width: 5em;
-  max-width: 5em;
-}
-
-.no_data {
-  max-width: 0px;
-  text-align: center;
-}
-
 .omit {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.nation-icon {
-  width: 1.5em;
-  display: flex;
-  align-items: center;
-}
-
-.ship-icon {
-  width: 1.25em;
-  display: flex;
-  align-items: center;
 }

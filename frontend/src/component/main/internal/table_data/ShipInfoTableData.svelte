@@ -1,30 +1,45 @@
 <script lang="ts">
   import type { ShipInfo } from "src/lib/column/ShipInfo";
-  import ExternalLink from "src/other_component/ExternalLink.svelte";
+  import ExternalLink from "src/component/common/ExternalLink.svelte";
   import type { domain } from "wailsjs/go/models";
+  import { CssClass } from "src/lib/types";
 
   export let column: ShipInfo;
   export let player: domain.Player;
 </script>
 
 <td>
-  <!-- svelte-ignore a11y-missing-attribute -->
   <img
+    alt=""
     src={column.nationIconPath(player)}
     class="nation-icon uk-preserve-width"
   />
 </td>
 
 <td style="background-color: {column.bgColorCode(player)}">
-  <!-- svelte-ignore a11y-missing-attribute -->
   <img
+    alt=""
     src={column.shipTypeIconPath(player)}
     class="ship-icon uk-preserve-width"
   />
 </td>
 
-<td class="td-string omit">
+<td class="{CssClass.TD_STR} {CssClass.OMIT}">
   <ExternalLink url={column.shipURL(player)}
     >{column.displayValue(player)}</ExternalLink
   >
 </td>
+
+<style>
+  :global(.nation-icon) {
+    width: 1.5em;
+    display: flex;
+    align-items: center;
+  }
+
+  :global(.ship-icon) {
+    width: 1.25em;
+    display: flex;
+    align-items: center;
+  }
+</style>

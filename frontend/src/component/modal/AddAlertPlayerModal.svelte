@@ -14,6 +14,7 @@
   import clone from "clone";
   import ModalCommon from "./ModalCommon.svelte";
   import UIkit from "uikit";
+  import UkIcon from "../common/uikit/UkIcon.svelte";
 
   let target: domain.AlertPlayer = clone(EMPTY_ALERT_PLAYER);
   let isSearching: boolean = false;
@@ -87,7 +88,7 @@
   <div slot="body">
     <div class="uk-margin-small">
       <form class="uk-search uk-search-default">
-        <span uk-search-icon></span>
+        <UkIcon name="search" />
         <input
           class="uk-search-input"
           type="search"
@@ -99,7 +100,7 @@
 
       {#if searchResult}
         <span class="uk-margin-small">
-          <span uk-icon="check"></span>
+          <UkIcon name="check" />
           {searchResult.nickname}
         </span>
       {/if}

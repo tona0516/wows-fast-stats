@@ -1,3 +1,4 @@
+import MaxDamageTableData from "src/component/main/internal/table_data/MaxDamageTableData.svelte";
 import { type IColumn } from "src/lib/column/intetface/IColumn";
 import {
   BASE_NUMBERS_URL,
@@ -5,7 +6,6 @@ import {
   type StatsCategory,
 } from "src/lib/types";
 import { tierString, toPlayerStats } from "src/lib/util";
-import MaxDamageTableData from "src/tabledata_component/MaxDamageTableData.svelte";
 import type { domain } from "wailsjs/go/models";
 
 export class MaxDamage implements IColumn<CommonKey> {

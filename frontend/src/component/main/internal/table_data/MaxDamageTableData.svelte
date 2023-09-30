@@ -1,19 +1,20 @@
 <script lang="ts">
   import type { MaxDamage } from "src/lib/column/MaxDamage";
-  import ExternalLink from "src/other_component/ExternalLink.svelte";
+  import ExternalLink from "src/component/common/ExternalLink.svelte";
   import type { domain } from "wailsjs/go/models";
+  import { CssClass } from "src/lib/types";
 
   export let column: MaxDamage;
   export let player: domain.Player;
 </script>
 
-<td class="td-number">
+<td class={CssClass.TD_NUM}>
   {column.damage(player)}
 </td>
 
 {#if column.countInnerColumn() > 1}
   {@const [url, text] = column.shipInfo(player)}
-  <td class="td-string omit">
+  <td class="{CssClass.TD_STR} {CssClass.OMIT}">
     <ExternalLink {url}>{text}</ExternalLink>
   </td>
 {/if}

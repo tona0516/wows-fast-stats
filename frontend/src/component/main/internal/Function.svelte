@@ -1,5 +1,7 @@
 <script lang="ts">
   import clone from "clone";
+  import UkIcon from "src/component/common/uikit/UkIcon.svelte";
+  import UkSpinner from "src/component/common/uikit/UkSpinner.svelte";
   import { DispName } from "src/lib/DispName";
   import type { Screenshot } from "src/lib/Screenshot";
   import { ScreenshotType } from "src/lib/types";
@@ -47,35 +49,32 @@
   };
 </script>
 
-<div class="uk-flex uk-flex-center">
-  <select
-    class="uk-select uk-form-width-medium uk-form-small
+<select
+  class="uk-select uk-form-width-medium uk-form-small
     "
-    bind:value={selectedStatsPattern}
-    on:change={onStatsPatternChanged}
-  >
-    {#each DispName.STATS_PATTERNS.toArray() as sp}
-      <option
-        selected={sp.key == $storedUserConfig.stats_pattern}
-        value={sp.key}>{sp.value}</option
-      >
-    {/each}
-  </select>
-  <button
-    class="uk-button uk-button-primary uk-button-small"
-    disabled={disableScreenshot}
-    on:click={() => takeScreenshot()}
-  >
-    {#if isScreenshotting}
-      <div uk-spinner />
-    {:else}
-      <span uk-icon="icon: camera" />
-    {/if}
-  </button>
-  <button
-    class="uk-button uk-button-primary uk-button-small"
-    on:click={() => WindowReloadApp()}
-  >
-    <span uk-icon="icon: refresh" />
-  </button>
-</div>
+  bind:value={selectedStatsPattern}
+  on:change={onStatsPatternChanged}
+>
+  {#each DispName.STATS_PATTERNS.toArray() as sp}
+    <option selected={sp.key == $storedUserConfig.stats_pattern} value={sp.key}
+      >{sp.value}</option
+    >
+  {/each}
+</select>
+<button
+  class="uk-button uk-button-primary uk-button-small"
+  disabled={disableScreenshot}
+  on:click={() => takeScreenshot()}
+>
+  {#if isScreenshotting}
+    <UkSpinner />
+  {:else}
+    <UkIcon name="camera" />
+  {/if}
+</button>
+<button
+  class="uk-button uk-button-primary uk-button-small"
+  on:click={() => WindowReloadApp()}
+>
+  <UkIcon name="refresh" />
+</button>

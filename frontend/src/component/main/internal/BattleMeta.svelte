@@ -1,5 +1,6 @@
 <script lang="ts">
   import { format, fromUnixTime } from "date-fns";
+  import UkIcon from "src/component/common/uikit/UkIcon.svelte";
   import type { domain } from "wailsjs/go/models";
 
   export let meta: domain.Meta;
@@ -7,21 +8,23 @@
   $: battleMetas = [
     {
       icon: "clock",
-      text: formattedDate(meta.unixtime),
+      text: format(fromUnixTime(meta.unixtime), "yyyy/MM/dd HH:mm:ss"),
     },
-    { icon: "tag", text: meta.type },
-    { icon: "location", text: meta.arena },
+    {
+      icon: "tag",
+      text: meta.type,
+    },
+    {
+      icon: "location",
+      text: meta.arena,
+    },
   ];
-
-  const formattedDate = (unixtime: number): string => {
-    return format(fromUnixTime(unixtime), "yyyy/MM/dd HH:mm:ss");
-  };
 </script>
 
 <div class="uk-flex uk-flex-center">
   {#each battleMetas as meta}
     <div class="uk-margin-small-right uk-text-nowrap">
-      <span uk-icon="icon: {meta.icon}" />
+      <UkIcon name={meta.icon} />
       <span class="uk-text-middle">{meta.text}</span>
     </div>
   {/each}

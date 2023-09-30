@@ -1,5 +1,8 @@
 <script lang="ts">
+  import ExternalLink from "src/component/common/ExternalLink.svelte";
+  import UkIcon from "src/component/common/uikit/UkIcon.svelte";
   import type { PlayerName } from "src/lib/column/PlayerName";
+  import { CssClass } from "src/lib/types";
   import { storedAlertPlayers, storedExcludePlayerIDs } from "src/stores";
   import { createEventDispatcher } from "svelte";
   import {
@@ -7,7 +10,6 @@
     RemoveExcludePlayerID,
   } from "wailsjs/go/main/App";
   import type { domain } from "wailsjs/go/models";
-  import { BrowserOpenURL } from "wailsjs/runtime/runtime";
 
   export let column: PlayerName;
   export let player: domain.Player;
@@ -44,7 +46,7 @@
 </td>
 
 <td style="background-color: {column.bgColorCode(player)}">
-  <div class="td-string omit">
+  <div class="{CssClass.TD_STR} {CssClass.OMIT}">
     {#if isNPC}
       {column.displayValue(player)}
     {:else}
@@ -54,7 +56,7 @@
           <i class="bi {alertPlayer.pattern}" />
         {/if}
         {column.displayValue(player)}
-        <span uk-drop-parent-icon></span>
+        <UkIcon name="chevron-down" />
       </a>
     {/if}
   </div>
@@ -64,17 +66,15 @@
       <ul class="uk-nav uk-dropdown-nav">
         {#if isBelongToClan}
           <li>
-            <!-- svelte-ignore a11y-invalid-attribute -->
-            <a href="#" on:click={() => BrowserOpenURL(column.clanURL(player))}
-              >クラン詳細(WoWS Stats & Numbers)</a
+            <ExternalLink url={column.clanURL(player)}
+              >クラン詳細(WoWS Stats & Numbers)</ExternalLink
             >
           </li>
         {/if}
 
         <li>
-          <!-- svelte-ignore a11y-invalid-attribute -->
-          <a href="#" on:click={() => BrowserOpenURL(column.playerURL(player))}
-            >プレイヤー詳細(WoWS Stats & Numbers)</a
+          <ExternalLink url={column.playerURL(player)}
+            >プレイヤー詳細(WoWS Stats & Numbers)</ExternalLink
           >
         </li>
 

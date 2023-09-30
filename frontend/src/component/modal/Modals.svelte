@@ -1,6 +1,6 @@
 <script lang="ts">
-  import RemoveAlertPlayerModal from "src/other_component/modal/RemoveAlertPlayerModal.svelte";
-  import EditAlertPlayerModal from "src/other_component/modal/EditAlertPlayerModal.svelte";
+  import RemoveAlertPlayerModal from "src/component/modal/RemoveAlertPlayerModal.svelte";
+  import EditAlertPlayerModal from "src/component/modal/EditAlertPlayerModal.svelte";
   import { createEventDispatcher } from "svelte";
   import AddAlertPlayerModal from "./AddAlertPlayerModal.svelte";
   import type { domain } from "wailsjs/go/models";

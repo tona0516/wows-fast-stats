@@ -855,16 +855,18 @@ export namespace domain {
 
 export namespace vo {
 	
-	export class ValidatedResult {
+	export class RequiredConfigError {
+	    valid: boolean;
 	    install_path: string;
 	    appid: string;
 	
 	    static createFrom(source: any = {}) {
-	        return new ValidatedResult(source);
+	        return new RequiredConfigError(source);
 	    }
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.valid = source["valid"];
 	        this.install_path = source["install_path"];
 	        this.appid = source["appid"];
 	    }

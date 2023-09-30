@@ -29,3 +29,10 @@
     </tbody>
   </table>
 </td>
+
+<style>
+  :global(.td-graph) {
+    min-width: 5em;
+    max-width: 5em;
+  }
+</style>

@@ -1,5 +1,5 @@
+import SingleTableData from "src/component/main/internal/table_data/SingleTableData.svelte";
 import type { IColumn } from "src/lib/column/intetface/IColumn";
-import SingleTableData from "src/tabledata_component/SingleTableData.svelte";
 import type { domain } from "wailsjs/go/models";
 
 export abstract class AbstractSingleColumn<T> implements IColumn<T> {
