@@ -12,9 +12,9 @@
     MAX_MEMO_LENGTH,
   } from "src/lib/types";
   import clone from "clone";
-  import ModalCommon from "./ModalCommon.svelte";
   import UIkit from "uikit";
-  import UkIcon from "../common/uikit/UkIcon.svelte";
+  import UkModal from "src/component/common/uikit/UkModal.svelte";
+  import UkIcon from "src/component/common/uikit/UkIcon.svelte";
 
   let target: domain.AlertPlayer = clone(EMPTY_ALERT_PLAYER);
   let isSearching: boolean = false;
@@ -84,11 +84,10 @@
   };
 </script>
 
-<ModalCommon id={ADD_ALERT_PLAYER_MODAL_ID}>
+<UkModal id={ADD_ALERT_PLAYER_MODAL_ID}>
   <div slot="body">
     <div class="uk-margin-small">
       <form class="uk-search uk-search-default">
-        <UkIcon name="search" />
         <input
           class="uk-search-input"
           type="search"
@@ -162,4 +161,4 @@
       on:click={() => add(target)}>追加</button
     >
   </div>
-</ModalCommon>
+</UkModal>

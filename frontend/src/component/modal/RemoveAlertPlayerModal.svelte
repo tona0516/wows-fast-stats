@@ -6,7 +6,7 @@
   import { createEventDispatcher } from "svelte";
   import { RemoveAlertPlayer } from "wailsjs/go/main/App";
   import type { domain } from "wailsjs/go/models";
-  import ModalCommon from "./ModalCommon.svelte";
+  import UkModal from "src/component/common/uikit/UkModal.svelte";
   import UIkit from "uikit";
   import clone from "clone";
 
@@ -31,7 +31,7 @@
   };
 </script>
 
-<ModalCommon id={REMOVE_ALERT_PLAYER_MODAL_ID}>
+<UkModal id={REMOVE_ALERT_PLAYER_MODAL_ID}>
   <div slot="body">
     <p>「{target.name}」を削除しますか？</p>
   </div>
@@ -43,4 +43,4 @@
       on:click={() => remove()}>削除</button
     >
   </div>
-</ModalCommon>
+</UkModal>

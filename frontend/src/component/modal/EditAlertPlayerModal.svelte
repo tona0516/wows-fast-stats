@@ -7,7 +7,7 @@
     EDIT_ALERT_PLAYER_MODAL_ID,
     EMPTY_ALERT_PLAYER,
   } from "src/lib/types";
-  import ModalCommon from "./ModalCommon.svelte";
+  import UkModal from "src/component/common/uikit/UkModal.svelte";
   import UIkit from "uikit";
   import clone from "clone";
 
@@ -35,7 +35,7 @@
   };
 </script>
 
-<ModalCommon id={EDIT_ALERT_PLAYER_MODAL_ID}>
+<UkModal id={EDIT_ALERT_PLAYER_MODAL_ID}>
   <div slot="body">
     <div class="uk-margin-small">
       <input
@@ -84,4 +84,4 @@
       on:click={() => update()}>更新</button
     >
   </div>
-</ModalCommon>
+</UkModal>

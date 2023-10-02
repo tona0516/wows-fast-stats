@@ -28,6 +28,7 @@
   import UkIcon from "./component/common/uikit/UkIcon.svelte";
   import ExternalLink from "./component/common/ExternalLink.svelte";
   import UkSpinner from "./component/common/uikit/UkSpinner.svelte";
+  import UkTab from "./component/common/uikit/UkTab.svelte";
 
   const PAGE_TAB_ID = "page-tab";
 
@@ -117,10 +118,7 @@
   {/if}
 
   {#if initialized}
-    <ul
-      class="uk-margin-remove"
-      uk-tab="connect: #{PAGE_TAB_ID}; animation: uk-animation-fade"
-    >
+    <UkTab clazz="uk-margin-remove" id={PAGE_TAB_ID}>
       <li>
         <!-- svelte-ignore a11y-invalid-attribute -->
         <a href="#"><UkIcon name="home" /></a>
@@ -136,7 +134,7 @@
           {/if}
         </a>
       </li>
-    </ul>
+    </UkTab>
     <ul id={PAGE_TAB_ID} class="uk-switcher">
       <li>
         <MainPage

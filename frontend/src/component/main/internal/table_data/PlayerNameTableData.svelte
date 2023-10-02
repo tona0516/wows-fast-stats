@@ -1,6 +1,8 @@
 <script lang="ts">
   import ExternalLink from "src/component/common/ExternalLink.svelte";
+  import UkDowndown from "src/component/common/uikit/UkDowndown.svelte";
   import UkIcon from "src/component/common/uikit/UkIcon.svelte";
+  import UkTooltip from "src/component/common/uikit/UkTooltip.svelte";
   import type { PlayerName } from "src/lib/column/PlayerName";
   import { CssClass } from "src/lib/types";
   import { storedAlertPlayers, storedExcludePlayerIDs } from "src/stores";
@@ -50,19 +52,21 @@
     {#if isNPC}
       {column.displayValue(player)}
     {:else}
-      <!-- svelte-ignore a11y-invalid-attribute -->
-      <a href="#" uk-tooltip={alertPlayer?.message}>
-        {#if alertPlayer}
-          <i class="bi {alertPlayer.pattern}" />
-        {/if}
-        {column.displayValue(player)}
-        <UkIcon name="chevron-down" />
-      </a>
+      <UkTooltip tooltip={alertPlayer?.message}>
+        <!-- svelte-ignore a11y-invalid-attribute -->
+        <a href="#">
+          {#if alertPlayer}
+            <i class="bi {alertPlayer.pattern}" />
+          {/if}
+          {column.displayValue(player)}
+          <UkIcon name="chevron-down" />
+        </a>
+      </UkTooltip>
     {/if}
   </div>
 
   {#if !isNPC}
-    <div uk-dropdown="mode: click" uk-toggle>
+    <UkDowndown>
       <ul class="uk-nav uk-dropdown-nav">
         {#if isBelongToClan}
           <li>
@@ -114,6 +118,6 @@
           </li>
         {/if}
       </ul>
-    </div>
+    </UkDowndown>
   {/if}
 </td>
