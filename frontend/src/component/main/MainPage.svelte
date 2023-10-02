@@ -25,6 +25,10 @@
   export const fetchBattle = async () => {
     try {
       isLoading = true;
+
+      // Note: 過去のデータが影響してか値が0になってしまうためクリーンする
+      storedBattle.set(undefined);
+
       const start = new Date().getTime();
       const battle = await Battle();
       const elapsed = (new Date().getTime() - start) / 1000;
