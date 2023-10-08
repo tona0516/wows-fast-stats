@@ -68,8 +68,10 @@ export class Summary {
           switch (column.category()) {
             case "ship":
               minBattles = teamAverage.min_ship_battles;
+              break;
             case "overall":
               minBattles = teamAverage.min_overall_battles;
+              break;
           }
 
           const accountID = player.player_info.id;
