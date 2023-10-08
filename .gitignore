@@ -1,12 +1,20 @@
-build/bin
-node_modules
-frontend/dist
-cache/
-config/
-screenshot/
-temp_arena_info/
-log/
-test_install_dir/replays/tempArenaInfo.json
-wows-fast-stats.zip
+# build
+/build/bin
+/frontend/node_modules
+/frontend/dist
+/wows-fast-stats.zip
+
+# created directories by app
+/config/
+/screenshot/
+/temp_arena_info/
+/cache/
+
+# credential
+/discord_webhook_url_*
+
+# test
+/test_install_dir/replays/tempArenaInfo.json
+
+# other
 .DS_Store
-discord_webhook_url_*

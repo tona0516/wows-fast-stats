@@ -1,0 +1,89 @@
+<script lang="ts">
+  import { storedUserConfig, storedRequiredConfigError } from "src/stores";
+  import { UserConfig, ApplyUserConfig } from "wailsjs/go/main/App";
+  import Required from "./internal/Required.svelte";
+  import Other from "./internal/Other.svelte";
+  import TeamSummary from "./internal/TeamSummary.svelte";
+  import Display from "./internal/Display.svelte";
+  import AlertPlayer from "./internal/AlertPlayer.svelte";
+  import AppInfo from "./internal/AppInfo.svelte";
+  import Logging from "./internal/Logging.svelte";
+  import { createEventDispatcher } from "svelte";
+  import UkIcon from "../common/uikit/UkIcon.svelte";
+  import UkTab from "../common/uikit/UkTab.svelte";
+  import clone from "clone";
+
+  const dispatch = createEventDispatcher();
+  const CONFIG_MENU_ID = "config-menu-id";
+
+  let inputUserConfig = clone($storedUserConfig);
+  storedUserConfig.subscribe((it) => {
+    inputUserConfig = clone(it);
+  });
+
+  const silentApply = async () => {
+    try {
+      await ApplyUserConfig(inputUserConfig);
+      const latest = await UserConfig();
+      storedUserConfig.set(latest);
+    } catch (error) {
+      inputUserConfig = clone($storedUserConfig);
+      dispatch("Failure", { message: error });
+    }
+  };
+</script>
+
+<div class="uk-padding-small uk-grid">
+  <div class="uk-width-auto@m">
+    <UkTab clazz="uk-tab-left" id={CONFIG_MENU_ID}>
+      <li>
+        <!-- svelte-ignore a11y-invalid-attribute -->
+        <a href="#">
+          必須設定
+          {#if !$storedRequiredConfigError.valid}
+            <span class="uk-text-warning uk-text-small">
+              <UkIcon name="warning" />
+            </span>
+          {/if}
+        </a>
+      </li>
+      {#each ["表示設定", "チームサマリー設定", "プレイヤーリスト設定", "その他設定", "ログ", "アプリ情報"] as menu}
+        <!-- svelte-ignore a11y-invalid-attribute -->
+        <li><a href="#">{menu}</a></li>
+      {/each}
+    </UkTab>
+  </div>
+  <div class="uk-width-expand@m">
+    <ul id={CONFIG_MENU_ID} class="uk-switcher">
+      <li>
+        <Required
+          {inputUserConfig}
+          on:UpdateSuccess={() => dispatch("UpdateRequired")}
+          on:Failure
+        />
+      </li>
+      <li>
+        <Display {inputUserConfig} on:UpdateSuccess on:Change={silentApply} />
+      </li>
+      <li>
+        <TeamSummary {inputUserConfig} on:UpdateSuccess on:Failure />
+      </li>
+      <li>
+        <AlertPlayer
+          on:AddAlertPlayer
+          on:EditAlertPlayer
+          on:RemoveAlertPlayer
+        />
+      </li>
+      <li>
+        <Other {inputUserConfig} on:Change={silentApply} on:Failure />
+      </li>
+      <li>
+        <Logging />
+      </li>
+      <li>
+        <AppInfo />
+      </li>
+    </ul>
+  </div>
+</div>
