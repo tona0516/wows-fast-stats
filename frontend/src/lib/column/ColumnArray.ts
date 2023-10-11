@@ -1,13 +1,13 @@
 import { DispName } from "src/lib/DispName";
-import type { IColumn } from "src/lib/column/intetface/IColumn";
+import type { AbstractColumn } from "src/lib/column/intetface/AbstractColumn";
 import type { ColumnCategory } from "src/lib/types";
 
-export class ColumnArray<T> extends Array<IColumn<any>> {
+export class ColumnArray extends Array<AbstractColumn<any>> {
   constructor(
     private category: ColumnCategory,
-    private items: Array<IColumn<any>>,
+    private columns: AbstractColumn<any>[],
   ) {
-    super(...items);
+    super(...columns);
   }
 
   dispName(): string {
@@ -20,8 +20,8 @@ export class ColumnArray<T> extends Array<IColumn<any>> {
   }
 
   columnCount(): number {
-    return this.items
+    return this.columns
       .filter((it) => it.shouldShowColumn())
-      .reduce((a, it) => a + it.countInnerColumn(), 0);
+      .reduce((a, it) => a + it.getInnerColumnNumber(), 0);
   }
 }

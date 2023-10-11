@@ -1,11 +1,11 @@
 <script lang="ts">
-  import type { AbstractGraphColumn } from "src/lib/column/intetface/AbstractGraphColumn";
+  import type { IGraphColumn } from "src/lib/column/intetface/IGraphColumn";
   import type { domain } from "wailsjs/go/models";
 
-  export let column: AbstractGraphColumn<any>;
+  export let column: IGraphColumn;
   export let player: domain.Player;
 
-  $: param = column.displayValue(player);
+  $: param = column.getGraphParam(player);
 </script>
 
 <td class="td-graph">

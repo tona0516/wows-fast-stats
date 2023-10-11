@@ -13,8 +13,8 @@
     UserConfig,
   } from "wailsjs/go/main/App";
   import { domain } from "wailsjs/go/models";
-  import { displayItems } from "src/lib/util";
   import clone from "clone";
+  import { ColumnProvider } from "src/lib/column/ColumnProvider";
 
   export let inputUserConfig: domain.UserConfig;
 
@@ -40,7 +40,7 @@
     }
   };
 
-  $: displays = displayItems();
+  $: displays = ColumnProvider.displayItems();
 </script>
 
 <ConfirmModal message="表示設定をリセットしますか？" on:Confirmed={reset} />

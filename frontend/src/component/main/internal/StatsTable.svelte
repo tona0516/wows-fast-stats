@@ -1,13 +1,14 @@
 <script lang="ts">
   import UkTable from "src/component/common/uikit/UkTable.svelte";
+  import { ColumnProvider } from "src/lib/column/ColumnProvider";
   import { CssClass, RowPattern } from "src/lib/types";
-  import { tableColumns, toPlayerStats } from "src/lib/util";
+  import { toPlayerStats } from "src/lib/util";
   import type { domain } from "wailsjs/go/models";
 
   export let teams: domain.Team[];
   export let userConfig: domain.UserConfig;
 
-  $: categories = tableColumns(userConfig);
+  $: categories = ColumnProvider.tableColumns(userConfig);
   $: [basicColumns, shipColumns, overallColumns] = categories;
   $: shipColumnCount = shipColumns.columnCount();
   $: allColumnCount = shipColumnCount + overallColumns.columnCount();
@@ -54,8 +55,8 @@
         {#each categories as category}
           {#each category as column}
             {#if column.shouldShowColumn()}
-              <th class="uk-text-center" colspan={column.countInnerColumn()}
-                >{column.minDisplayName()}</th
+              <th class="uk-text-center" colspan={column.getInnerColumnNumber()}
+                >{column.getMinDisplayName()}</th
               >
             {/if}
           {/each}
@@ -74,7 +75,7 @@
         <tr>
           {#each basicColumns as column}
             <svelte:component
-              this={column.svelteComponent()}
+              this={column.getSvelteComponent()}
               {column}
               {player}
               on:EditAlertPlayer
@@ -97,7 +98,7 @@
             {#each overallColumns as column}
               {#if column.shouldShowColumn()}
                 <svelte:component
-                  this={column.svelteComponent()}
+                  this={column.getSvelteComponent()}
                   {column}
                   {player}
                 />
@@ -107,7 +108,7 @@
             {#each shipColumns as column}
               {#if column.shouldShowColumn()}
                 <svelte:component
-                  this={column.svelteComponent()}
+                  this={column.getSvelteComponent()}
                   {column}
                   {player}
                 />
@@ -117,7 +118,7 @@
             {#each overallColumns as column}
               {#if column.shouldShowColumn()}
                 <svelte:component
-                  this={column.svelteComponent()}
+                  this={column.getSvelteComponent()}
                   {column}
                   {player}
                 />

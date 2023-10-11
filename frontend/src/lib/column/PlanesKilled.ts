@@ -1,41 +1,36 @@
-import { AbstractSingleColumn } from "src/lib/column/intetface/AbstractSingleColumn";
+import { AbstractColumn } from "src/lib/column/intetface/AbstractColumn";
+import type { ISingleColumn } from "src/lib/column/intetface/ISingleColumn";
 import { CssClass, type ShipKey } from "src/lib/types";
 import { toPlayerStats } from "src/lib/util";
 import type { domain } from "wailsjs/go/models";
 
-export class PlanesKilled extends AbstractSingleColumn<ShipKey> {
-  constructor(private userConfig: domain.UserConfig) {
-    super();
-  }
-
-  displayKey(): ShipKey {
-    return "planes_killed";
-  }
-
-  minDisplayName(): string {
-    return "撃墜";
-  }
-
-  fullDisplayName(): string {
-    return "平均撃墜数";
+export class PlanesKilled
+  extends AbstractColumn<ShipKey>
+  implements ISingleColumn
+{
+  constructor(
+    svelteComponent: any,
+    private config: domain.UserConfig,
+  ) {
+    super("planes_killed", "撃墜", "平均撃墜数", 1, svelteComponent);
   }
 
   shouldShowColumn(): boolean {
-    return this.userConfig.displays.ship.planes_killed;
+    return this.config.displays.ship.planes_killed;
   }
 
-  tdClass(player: domain.Player): string {
+  getTdClass(_: domain.Player): string {
     return CssClass.TD_NUM;
   }
 
-  displayValue(player: domain.Player): string {
-    const digit = this.userConfig.custom_digit.planes_killed;
-    const value = toPlayerStats(player, this.userConfig.stats_pattern).ship
+  getDisplayValue(player: domain.Player): string {
+    const digit = this.config.custom_digit.planes_killed;
+    const value = toPlayerStats(player, this.config.stats_pattern).ship
       .planes_killed;
     return value.toFixed(digit);
   }
 
-  textColorCode(player: domain.Player): string {
+  getTextColorCode(player: domain.Player): string {
     return "";
   }
 }

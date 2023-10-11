@@ -1,10 +1,12 @@
 <script lang="ts">
-  import { colorDescriptions } from "src/lib/rating/RatingConst";
+  import { RATING_FACTORS } from "src/lib/rating/RatingConst";
   import type { domain } from "wailsjs/go/models";
   import ExternalLink from "src/component/common/ExternalLink.svelte";
   import UkTable from "src/component/common/uikit/UkTable.svelte";
+  import { DispName } from "src/lib/DispName";
+  import { RatingConverterFactory } from "src/lib/rating/RatingConverter";
 
-  export let userConfig: domain.UserConfig;
+  export let config: domain.UserConfig;
 
   const COLUMNS = [
     { text: "スキル", colspan: 1 },
@@ -23,9 +25,45 @@
       text: "艦種別平均値について",
     },
   ];
+
+  const descriptions = RATING_FACTORS.map((rating) => {
+    return {
+      ratingText: DispName.SKILL_LEVELS.get(rating.level),
+      playerName: {
+        text: "player_name",
+        bgColor: RatingConverterFactory.fromPR(
+          rating.pr.min,
+          config,
+        ).getBgColorCode(),
+      },
+      pr: {
+        text: `${rating.pr.min} ~ ${rating.pr.max}`,
+        textColor: RatingConverterFactory.fromDamage(
+          rating.damage.min,
+          1.0,
+          config,
+        ).getTextColorCode(),
+      },
+      damage: {
+        text: `${rating.damage.min}倍 ~ ${rating.damage.max}倍`,
+        textColor: RatingConverterFactory.fromDamage(
+          rating.damage.min,
+          1.0,
+          config,
+        ).getTextColorCode(),
+      },
+      win: {
+        text: `${rating.winRate.min}% ~ ${rating.winRate.max}%`,
+        textColor: RatingConverterFactory.fromWinRate(
+          rating.winRate.min,
+          config,
+        ).getTextColorCode(),
+      },
+    };
+  });
 </script>
 
-{#if userConfig.custom_color}
+{#if config.custom_color}
   <div class="uk-flex uk-flex-center">
     <UkTable>
       <thead>
@@ -35,9 +73,9 @@
       </thead>
 
       <tbody>
-        {#each colorDescriptions(userConfig) as desc}
+        {#each descriptions as desc}
           <tr>
-            <td class="uk-text-center">{desc.level.text}</td>
+            <td class="uk-text-center">{desc.ratingText}</td>
             <td
               class="uk-text-center"
               style="background-color: {desc.playerName.bgColor};"

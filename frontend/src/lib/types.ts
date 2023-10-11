@@ -103,7 +103,13 @@ type CommonMethod = "convertValues";
 
 export type StatsCategory = Exclude<keyof domain.PlayerStats, CommonMethod>;
 export type ColumnCategory = Readonly<"basic" | StatsCategory>;
+
 export type ShipType = Readonly<keyof domain.ShipTypeGroup>;
+const shipTypes = Object.keys(new domain.ShipTypeGroup());
+export const isShipType = (type: string): type is ShipType => {
+  return shipTypes.includes(type);
+};
+
 export type TierGroup = Readonly<keyof domain.TierGroup>;
 export type StatsExtra = Exclude<
   keyof domain.Player,
@@ -113,13 +119,13 @@ export type Rating = Readonly<keyof domain.SkillColorCode>;
 
 export type ShipKey = Readonly<keyof domain.Ship>;
 const ships = Object.keys(new domain.Ship());
-export const includesShips = (key: string): boolean => {
+export const isShipKey = (key: string): key is ShipKey => {
   return ships.includes(key);
 };
 
 export type OverallKey = Readonly<keyof domain.Overall>;
 const overalls = Object.keys(new domain.Overall());
-export const includesOveralls = (key: string): boolean => {
+export const isOverallKey = (key: string): key is OverallKey => {
   return overalls.includes(key);
 };
 

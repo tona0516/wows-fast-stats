@@ -1,51 +1,60 @@
-import { ratingFactors } from "src/lib/rating/RatingConst";
+import { RATING_FACTORS } from "src/lib/rating/RatingConst";
 import type { Rating } from "src/lib/types";
 import type { domain } from "wailsjs/go/models";
 
+const NONE_COLOR = "#000000";
+
 export class RatingConverter {
   constructor(
-    private rating: Rating | undefined,
+    public rating: Rating | undefined,
     private config: domain.UserConfig,
   ) {}
 
-  textColorCode(): string {
+  getTextColorCode(): string {
     if (!this.rating) {
       return "";
     }
     return this.config.custom_color.skill.text[this.rating];
   }
 
-  bgColorCode(): string {
+  getBgColorCode(): string {
     if (!this.rating) {
-      return "#000000";
+      return NONE_COLOR;
     }
-    return this.config.custom_color.skill.background[this.rating] ?? "#000000";
+    return this.config.custom_color.skill.background[this.rating];
   }
 }
 
-export class RatingConverterFactory {
-  static fromPR(value: number, config: domain.UserConfig): RatingConverter {
-    const item = ratingFactors().findLast(
-      (it) => value >= 0 && value >= it.minPR,
+export namespace RatingConverterFactory {
+  export const fromPR = (
+    value: number,
+    config: domain.UserConfig,
+  ): RatingConverter => {
+    const rf = RATING_FACTORS.findLast(
+      (it) => value >= 0 && value >= it.pr.min,
     );
-    return new RatingConverter(item?.level, config);
-  }
+    return new RatingConverter(rf?.level, config);
+  };
 
-  static fromDamage(
+  export const fromDamage = (
     value: number,
     expected: number,
     config: domain.UserConfig,
-  ): RatingConverter {
-    const ratio = value / expected ?? 0;
-    const item = ratingFactors().findLast((it) => ratio >= it.minDamage);
-    return new RatingConverter(item?.level, config);
-  }
+  ): RatingConverter => {
+    if (expected === 0) {
+      return new RatingConverter(undefined, config);
+    }
 
-  static fromWinRate(
+    const ratio = value / expected;
+    const rf = RATING_FACTORS.findLast((it) => ratio >= it.damage.min);
+    return new RatingConverter(rf?.level, config);
+  };
+
+  export const fromWinRate = (
     value: number,
     config: domain.UserConfig,
-  ): RatingConverter {
-    const item = ratingFactors().findLast((it) => value >= it.minWin);
-    return new RatingConverter(item?.level, config);
-  }
+  ): RatingConverter => {
+    const rf = RATING_FACTORS.findLast((it) => value >= it.winRate.min);
+    return new RatingConverter(rf?.level, config);
+  };
 }

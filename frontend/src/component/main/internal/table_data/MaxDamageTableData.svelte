@@ -12,7 +12,7 @@
   {column.damage(player)}
 </td>
 
-{#if column.countInnerColumn() > 1}
+{#if column.getInnerColumnNumber() > 1}
   {@const [url, text] = column.shipInfo(player)}
   <td class="{CssClass.TD_STR} {CssClass.OMIT}">
     <ExternalLink {url}>{text}</ExternalLink>

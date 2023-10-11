@@ -23,7 +23,7 @@
     "src/**/*.ts",
     "src/**/*.js",
     "src/**/*.svelte"
-  ],
+, "src/lib/column/ColumnProviderts"  ],
   "references": [
     {
       "path": "./tsconfig.node.json"

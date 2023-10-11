@@ -1,5 +1,5 @@
-import type { IColumn } from "src/lib/column/intetface/IColumn";
-import { BASE_NUMBERS_URL, type BasicKey } from "src/lib/types";
+import { AbstractColumn } from "src/lib/column/intetface/AbstractColumn";
+import { BASE_NUMBERS_URL, isShipType, type BasicKey } from "src/lib/types";
 import type { domain } from "wailsjs/go/models";
 
 import FlagCommonWealth from "src/assets/images/flag_Commonwealth.png";
@@ -27,8 +27,7 @@ import ShipPremiumDD from "src/assets/images/ship_dd_premium.png";
 import ShipSS from "src/assets/images/ship_ss.png";
 import ShipPremiumSS from "src/assets/images/ship_ss_premium.png";
 
-import ShipInfoTableData from "src/component/main/internal/table_data/ShipInfoTableData.svelte";
-import { isShipType, tierString } from "src/lib/util";
+import { tierString } from "src/lib/util";
 
 const FLAGS: { [key: string]: string } = {
   japan: FlagJapan,
@@ -62,31 +61,16 @@ const PREMIUM_SHIP_ICONS: { [key: string]: string } = {
   ss: ShipPremiumSS,
 };
 
-export class ShipInfo implements IColumn<BasicKey> {
-  constructor(private userConfig: domain.UserConfig) {}
-
-  displayKey(): BasicKey {
-    return "ship_info";
-  }
-
-  minDisplayName(): string {
-    return "艦";
-  }
-
-  fullDisplayName(): string {
-    return "艦情報";
+export class ShipInfo extends AbstractColumn<BasicKey> {
+  constructor(
+    svelteComponent: any,
+    private config: domain.UserConfig,
+  ) {
+    super("ship_info", "艦", "艦情報", 3, svelteComponent);
   }
 
   shouldShowColumn(): boolean {
     return true;
-  }
-
-  countInnerColumn(): number {
-    return 3;
-  }
-
-  svelteComponent() {
-    return ShipInfoTableData;
   }
 
   displayValue(player: domain.Player): string {
@@ -94,7 +78,7 @@ export class ShipInfo implements IColumn<BasicKey> {
   }
 
   bgColorCode(player: domain.Player): string {
-    const ownColor = this.userConfig.custom_color.ship_type.own;
+    const ownColor = this.config.custom_color.ship_type.own;
     const type = player.ship_info.type;
 
     if (!isShipType(type)) {

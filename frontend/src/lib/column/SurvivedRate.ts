@@ -1,39 +1,38 @@
-import { AbstractSingleColumn } from "src/lib/column/intetface/AbstractSingleColumn";
+import { AbstractColumn } from "src/lib/column/intetface/AbstractColumn";
+import type { ISingleColumn } from "src/lib/column/intetface/ISingleColumn";
 import { CssClass, type CommonKey, type StatsCategory } from "src/lib/types";
 import { toPlayerStats } from "src/lib/util";
 import type { domain } from "wailsjs/go/models";
 
-export class SurvivedRate extends AbstractSingleColumn<CommonKey> {
+export class SurvivedRate
+  extends AbstractColumn<CommonKey>
+  implements ISingleColumn
+{
   constructor(
-    private userConfig: domain.UserConfig,
+    svelteComponent: any,
+    private config: domain.UserConfig,
     private category: StatsCategory,
   ) {
-    super();
-  }
-
-  displayKey(): CommonKey {
-    return "survived_rate";
-  }
-
-  minDisplayName(): string {
-    return "生存率(勝|負)";
-  }
-
-  fullDisplayName(): string {
-    return "生存率 (勝利|敗北)";
+    super(
+      "survived_rate",
+      "生存率(勝|負)",
+      "生存率 (勝利|敗北)",
+      1,
+      svelteComponent,
+    );
   }
 
   shouldShowColumn(): boolean {
-    return this.userConfig.displays[this.category].survived_rate;
+    return this.config.displays[this.category].survived_rate;
   }
 
-  tdClass(player: domain.Player): string {
+  getTdClass(_: domain.Player): string {
     return CssClass.TD_MULTI;
   }
 
-  displayValue(player: domain.Player): string {
-    const digit = this.userConfig.custom_digit.survived_rate;
-    const stats = toPlayerStats(player, this.userConfig.stats_pattern)[
+  getDisplayValue(player: domain.Player): string {
+    const digit = this.config.custom_digit.survived_rate;
+    const stats = toPlayerStats(player, this.config.stats_pattern)[
       this.category
     ];
     return `${stats.win_survived_rate.toFixed(
@@ -41,7 +40,7 @@ export class SurvivedRate extends AbstractSingleColumn<CommonKey> {
     )}% | ${stats.lose_survived_rate.toFixed(digit)}%`;
   }
 
-  textColorCode(player: domain.Player): string {
+  getTextColorCode(_: domain.Player): string {
     return "";
   }
 }

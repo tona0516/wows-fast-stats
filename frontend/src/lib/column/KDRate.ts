@@ -1,58 +1,36 @@
-import { AbstractSingleColumn } from "src/lib/column/intetface/AbstractSingleColumn";
-import type { ISummaryColumn } from "src/lib/column/intetface/ISummaryColumn";
+import { AbstractColumn } from "src/lib/column/intetface/AbstractColumn";
+import type { ISingleColumn } from "src/lib/column/intetface/ISingleColumn";
 import { CssClass, type CommonKey, type StatsCategory } from "src/lib/types";
 import { toPlayerStats } from "src/lib/util";
 import type { domain } from "wailsjs/go/models";
 
-export class KDRate
-  extends AbstractSingleColumn<CommonKey>
-  implements ISummaryColumn
-{
+export class KDRate extends AbstractColumn<CommonKey> implements ISingleColumn {
   constructor(
-    private userConfig: domain.UserConfig,
-    private _category: StatsCategory,
+    svelteComponent: any,
+    private config: domain.UserConfig,
+    private category: StatsCategory,
   ) {
-    super();
-  }
-
-  displayKey(): CommonKey {
-    return "kd_rate";
-  }
-
-  minDisplayName(): string {
-    return "K/D";
-  }
-
-  fullDisplayName(): string {
-    return "キルデス比";
+    super("kd_rate", "K/D", "キル/デス比", 1, svelteComponent);
   }
 
   shouldShowColumn(): boolean {
-    return this.userConfig.displays[this._category].kd_rate;
+    return this.config.displays[this.category].kd_rate;
   }
 
-  tdClass(player: domain.Player): string {
+  getTdClass(_: domain.Player): string {
     return CssClass.TD_NUM;
   }
 
-  displayValue(player: domain.Player): string {
-    return this.value(player).toFixed(this.digit());
+  getDisplayValue(player: domain.Player): string {
+    const value = toPlayerStats(player, this.config.stats_pattern)[
+      this.category
+    ].kd_rate;
+    const digit = this.config.custom_digit.kd_rate;
+
+    return value.toFixed(digit);
   }
 
-  textColorCode(player: domain.Player): string {
+  getTextColorCode(player: domain.Player): string {
     return "";
-  }
-
-  value(player: domain.Player): number {
-    return toPlayerStats(player, this.userConfig.stats_pattern)[this._category]
-      .kd_rate;
-  }
-
-  digit(): number {
-    return this.userConfig.custom_digit.kd_rate;
-  }
-
-  category(): StatsCategory {
-    return this._category;
   }
 }

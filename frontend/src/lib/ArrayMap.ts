@@ -1,4 +1,7 @@
-import type { KeyValue } from "src/lib/value_object/KeyValue";
+interface KeyValue<K, V> {
+  key: K;
+  value: V;
+}
 
 export class ArrayMap<K, V> extends Map<K, V> {
   toArray(): KeyValue<K, V>[] {

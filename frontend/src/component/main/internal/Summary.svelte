@@ -3,25 +3,20 @@
   import type { Summary } from "src/lib/Summary";
 
   export let summary: Summary;
-
-  const COLUMNS = [
-    { colspan: summary.tableInfo.shipColspan, text: "艦成績" },
-    { colspan: summary.tableInfo.overallColspan, text: "総合成績" },
-  ];
 </script>
 
 <UkTable>
   <thead>
     <tr>
       <th />
-      {#each COLUMNS as column}
-        <th class="uk-text-center" colspan={column.colspan}>{column.text}</th>
+      {#each summary.meta.headers as header}
+        <th class="uk-text-center" colspan={header.colspan}>{header.title}</th>
       {/each}
     </tr>
     <tr>
       <th />
-      {#each summary.values.map((it) => it.label) as label}
-        <th class="uk-text-center">{label}</th>
+      {#each summary.meta.columnNames as name}
+        <th class="uk-text-center">{name}</th>
       {/each}
     </tr>
   </thead>
@@ -29,22 +24,24 @@
   <tbody>
     <tr>
       <td class="uk-text-center">味方チーム平均</td>
-      {#each summary.values.map((it) => it.friend) as friend}
+      {#each summary.values.friends as friend}
         <td class="uk-text-center">{friend}</td>
       {/each}
     </tr>
 
     <tr>
       <td class="uk-text-center">敵チーム平均</td>
-      {#each summary.values.map((it) => it.enemy) as enemy}
+      {#each summary.values.enemies as enemy}
         <td class="uk-text-center">{enemy}</td>
       {/each}
     </tr>
 
     <tr>
       <td class="uk-text-center">差</td>
-      {#each summary.values.map((it) => it.diff) as diff}
-        <td class="uk-text-center" style="color: {diff.color}">{diff.value}</td>
+      {#each summary.values.diffs as diff}
+        <td class="uk-text-center" style="color: {diff.colorCode}"
+          >{diff.diff}</td
+        >
       {/each}
     </tr>
   </tbody>

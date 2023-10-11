@@ -2,7 +2,7 @@ import type { StatsCategory } from "src/lib/types";
 import type { domain } from "wailsjs/go/models";
 
 export interface ISummaryColumn {
-  value(player: domain.Player): number;
-  digit(): number;
-  category(): StatsCategory;
+  getValue(player: domain.Player): number;
+  getDigit(): number;
+  getCategory(): StatsCategory;
 }

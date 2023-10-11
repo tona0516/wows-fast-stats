@@ -1,45 +1,35 @@
-import { AbstractSingleColumn } from "src/lib/column/intetface/AbstractSingleColumn";
+import { AbstractColumn } from "src/lib/column/intetface/AbstractColumn";
+import type { ISingleColumn } from "src/lib/column/intetface/ISingleColumn";
 import { CssClass, type CommonKey, type StatsCategory } from "src/lib/types";
 import { toPlayerStats } from "src/lib/util";
 import type { domain } from "wailsjs/go/models";
 
-export class Kill extends AbstractSingleColumn<CommonKey> {
+export class Kill extends AbstractColumn<CommonKey> implements ISingleColumn {
   constructor(
-    private userConfig: domain.UserConfig,
+    svelteComponent: any,
+    private config: domain.UserConfig,
     private category: StatsCategory,
   ) {
-    super();
-  }
-
-  displayKey(): CommonKey {
-    return "kill";
-  }
-
-  minDisplayName(): string {
-    return "撃沈";
-  }
-
-  fullDisplayName(): string {
-    return "平均撃沈数";
+    super("kill", "撃沈", "平均撃沈数", 1, svelteComponent);
   }
 
   shouldShowColumn(): boolean {
-    return this.userConfig.displays[this.category].kill;
+    return this.config.displays[this.category].kill;
   }
 
-  tdClass(player: domain.Player): string {
+  getTdClass(_: domain.Player): string {
     return CssClass.TD_NUM;
   }
 
-  displayValue(player: domain.Player): string {
-    const digit = this.userConfig.custom_digit.kill;
-    const value = toPlayerStats(player, this.userConfig.stats_pattern)[
+  getDisplayValue(player: domain.Player): string {
+    const digit = this.config.custom_digit.kill;
+    const value = toPlayerStats(player, this.config.stats_pattern)[
       this.category
     ].kill;
     return value.toFixed(digit);
   }
 
-  textColorCode(player: domain.Player): string {
+  getTextColorCode(_: domain.Player): string {
     return "";
   }
 }

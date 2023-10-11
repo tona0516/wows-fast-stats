@@ -1,5 +1,4 @@
-import PlayerNameTableData from "src/component/main/internal/table_data/PlayerNameTableData.svelte";
-import type { IColumn } from "src/lib/column/intetface/IColumn";
+import { AbstractColumn } from "src/lib/column/intetface/AbstractColumn";
 import { RatingConverterFactory } from "src/lib/rating/RatingConverter";
 import {
   BASE_NUMBERS_URL,
@@ -9,31 +8,16 @@ import {
 import { toPlayerStats } from "src/lib/util";
 import type { domain } from "wailsjs/go/models";
 
-export class PlayerName implements IColumn<BasicKey> {
-  constructor(private userConfig: domain.UserConfig) {}
-
-  displayKey(): BasicKey {
-    return "player_name";
-  }
-
-  minDisplayName(): string {
-    return "プレイヤー";
-  }
-
-  fullDisplayName(): string {
-    return "プレイヤー";
+export class PlayerName extends AbstractColumn<BasicKey> {
+  constructor(
+    svelteComponent: any,
+    private config: domain.UserConfig,
+  ) {
+    super("player_name", "プレイヤー", "プレイヤー", 2, svelteComponent);
   }
 
   shouldShowColumn(): boolean {
     return true;
-  }
-
-  countInnerColumn(): number {
-    return 2;
-  }
-
-  svelteComponent() {
-    return PlayerNameTableData;
   }
 
   displayValue(player: domain.Player): string {
@@ -51,10 +35,10 @@ export class PlayerName implements IColumn<BasicKey> {
   bgColorCode(player: domain.Player): string {
     let statsCategory: StatsCategory | undefined;
 
-    if (this.userConfig.custom_color.player_name === "ship") {
+    if (this.config.custom_color.player_name === "ship") {
       statsCategory = "ship";
     }
-    if (this.userConfig.custom_color.player_name === "overall") {
+    if (this.config.custom_color.player_name === "overall") {
       statsCategory = "overall";
     }
 
@@ -62,11 +46,10 @@ export class PlayerName implements IColumn<BasicKey> {
       return "#000000";
     }
 
-    const pr = toPlayerStats(player, this.userConfig.stats_pattern)[
-      statsCategory
-    ].pr;
+    const pr = toPlayerStats(player, this.config.stats_pattern)[statsCategory]
+      .pr;
 
-    return RatingConverterFactory.fromPR(pr, this.userConfig).bgColorCode();
+    return RatingConverterFactory.fromPR(pr, this.config).getBgColorCode();
   }
 
   clanURL(player: domain.Player): string {

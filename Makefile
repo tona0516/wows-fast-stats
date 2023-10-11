@@ -61,6 +61,7 @@ fmt:
 .PHONY: test
 test:
 	go test -cover ./...
+	cd frontend/ && npm test
 
 .PHONY: put-temp-arema-info
 put-temp-arema-info:

@@ -1,5 +1,4 @@
-import MaxDamageTableData from "src/component/main/internal/table_data/MaxDamageTableData.svelte";
-import { type IColumn } from "src/lib/column/intetface/IColumn";
+import { AbstractColumn } from "src/lib/column/intetface/AbstractColumn";
 import {
   BASE_NUMBERS_URL,
   type CommonKey,
@@ -8,51 +7,46 @@ import {
 import { tierString, toPlayerStats } from "src/lib/util";
 import type { domain } from "wailsjs/go/models";
 
-export class MaxDamage implements IColumn<CommonKey> {
+export class MaxDamage extends AbstractColumn<CommonKey> {
   constructor(
-    private userConfig: domain.UserConfig,
+    svelteComponent: any,
+    private config: domain.UserConfig,
     private category: StatsCategory,
-  ) {}
-  displayKey(): CommonKey {
-    return "max_damage";
-  }
+  ) {
+    let innerColumnNumber: number;
+    switch (category) {
+      case "ship":
+        innerColumnNumber = 1;
+        break;
+      case "overall":
+        innerColumnNumber = 2;
+        break;
+    }
 
-  minDisplayName(): string {
-    return "最大Dmg";
-  }
-
-  fullDisplayName(): string {
-    return "最大ダメージ";
+    super(
+      "max_damage",
+      "最大Dmg",
+      "最大ダメージ",
+      innerColumnNumber,
+      svelteComponent,
+    );
   }
 
   shouldShowColumn(): boolean {
-    return this.userConfig.displays[this.category].max_damage;
-  }
-
-  countInnerColumn(): number {
-    switch (this.category) {
-      case "ship":
-        return 1;
-      case "overall":
-        return 2;
-    }
-  }
-
-  svelteComponent() {
-    return MaxDamageTableData;
+    return this.config.displays[this.category].max_damage;
   }
 
   damage(player: domain.Player): string {
-    const value = toPlayerStats(player, this.userConfig.stats_pattern)[
+    const value = toPlayerStats(player, this.config.stats_pattern)[
       this.category
     ].max_damage.damage;
-    const digit = this.userConfig.custom_digit.max_damage;
+    const digit = this.config.custom_digit.max_damage;
     return value.toFixed(digit);
   }
 
   shipInfo(player: domain.Player): [url: string, text: string] {
-    const maxDamage = toPlayerStats(player, this.userConfig.stats_pattern)
-      .overall.max_damage;
+    const maxDamage = toPlayerStats(player, this.config.stats_pattern).overall
+      .max_damage;
     const url =
       BASE_NUMBERS_URL +
       "ship/" +

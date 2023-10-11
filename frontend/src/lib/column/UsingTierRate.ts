@@ -1,47 +1,41 @@
 import { DispName } from "src/lib/DispName";
-import { AbstractGraphColumn } from "src/lib/column/intetface/AbstractGraphColumn";
+import type { StackedBarGraphParam } from "src/lib/column/StackedBarGraphParam";
+import { AbstractColumn } from "src/lib/column/intetface/AbstractColumn";
+import type { IGraphColumn } from "src/lib/column/intetface/IGraphColumn";
 import type { OverallKey, TierGroup } from "src/lib/types";
 import { toPlayerStats } from "src/lib/util";
-import type {
-  StackedBarGraphItem,
-  StackedBarGraphParam,
-} from "src/lib/value_object/StackedBarGraphParam";
 import type { domain } from "wailsjs/go/models";
 
-export class UsingTierRate extends AbstractGraphColumn<OverallKey> {
-  constructor(private userConfig: domain.UserConfig) {
-    super();
-  }
-
-  displayKey(): OverallKey {
-    return "using_tier_rate";
-  }
-
-  minDisplayName(): string {
-    return "T割合";
-  }
-
-  fullDisplayName(): string {
-    return "ティア別プレイ割合";
+export class UsingTierRate
+  extends AbstractColumn<OverallKey>
+  implements IGraphColumn
+{
+  constructor(
+    svelteComponent: any,
+    private config: domain.UserConfig,
+  ) {
+    super("using_tier_rate", "T割合", "ティア別プレイ割合", 1, svelteComponent);
   }
 
   shouldShowColumn(): boolean {
-    return this.userConfig.displays.overall.using_tier_rate;
+    return this.config.displays.overall.using_tier_rate;
   }
 
-  displayValue(player: domain.Player): StackedBarGraphParam {
-    const digit = this.userConfig.custom_digit.using_tier_rate;
-    const tierRateGroup = toPlayerStats(player, this.userConfig.stats_pattern)
+  getGraphParam(player: domain.Player): StackedBarGraphParam {
+    const digit = this.config.custom_digit.using_tier_rate;
+    const tierRateGroup = toPlayerStats(player, this.config.stats_pattern)
       .overall.using_tier_rate;
     const ownTierGroup = this.toTierGroup(player.ship_info.tier);
-    const colors = this.userConfig.custom_color.tier;
+    const colors = this.config.custom_color.tier;
 
-    let items: StackedBarGraphItem[] = [];
-    DispName.TIER_GROUPS.forEach((value, key) => {
-      const rate = tierRateGroup[key];
+    const items = DispName.TIER_GROUPS.toArray().map((tier) => {
       const colorCode =
-        key === ownTierGroup ? colors.own[key] : colors.other[key];
-      items.push({ label: value, colorCode: colorCode, value: rate });
+        tier.key === ownTierGroup
+          ? colors.own[tier.key]
+          : colors.other[tier.key];
+      const rate = tierRateGroup[tier.key];
+
+      return { label: tier.value, colorCode: colorCode, value: rate };
     });
 
     return { digit: digit, items: items };

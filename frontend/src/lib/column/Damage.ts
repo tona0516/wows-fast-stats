@@ -1,4 +1,5 @@
-import { AbstractSingleColumn } from "src/lib/column/intetface/AbstractSingleColumn";
+import { AbstractColumn } from "src/lib/column/intetface/AbstractColumn";
+import type { ISingleColumn } from "src/lib/column/intetface/ISingleColumn";
 import type { ISummaryColumn } from "src/lib/column/intetface/ISummaryColumn";
 import { RatingConverterFactory } from "src/lib/rating/RatingConverter";
 import { CssClass, type CommonKey, type StatsCategory } from "src/lib/types";
@@ -6,62 +7,50 @@ import { toPlayerStats } from "src/lib/util";
 import type { domain } from "wailsjs/go/models";
 
 export class Damage
-  extends AbstractSingleColumn<CommonKey>
-  implements ISummaryColumn
+  extends AbstractColumn<CommonKey>
+  implements ISingleColumn, ISummaryColumn
 {
   constructor(
-    private userConfig: domain.UserConfig,
-    private _category: StatsCategory,
+    svelteComponent: any,
+    private config: domain.UserConfig,
+    private category: StatsCategory,
   ) {
-    super();
-  }
-
-  displayKey(): CommonKey {
-    return "damage";
-  }
-
-  minDisplayName(): string {
-    return "Dmg";
-  }
-
-  fullDisplayName(): string {
-    return "平均ダメージ";
+    super("damage", "Dmg", "平均ダメージ", 1, svelteComponent);
   }
 
   shouldShowColumn(): boolean {
-    return this.userConfig.displays[this._category].damage;
+    return this.config.displays[this.category].damage;
   }
 
-  tdClass(player: domain.Player): string {
+  getTdClass(_: domain.Player): string {
     return CssClass.TD_NUM;
   }
 
-  displayValue(player: domain.Player): string {
-    return this.value(player).toFixed(this.digit());
+  getDisplayValue(player: domain.Player): string {
+    return this.getValue(player).toFixed(this.getDigit());
   }
 
-  textColorCode(player: domain.Player): string {
-    if (this._category !== "ship") return "";
-    const value = toPlayerStats(player, this.userConfig.stats_pattern).ship
-      .damage;
+  getTextColorCode(player: domain.Player): string {
+    if (this.category !== "ship") return "";
+    const value = toPlayerStats(player, this.config.stats_pattern).ship.damage;
 
     return RatingConverterFactory.fromDamage(
       value,
       player.ship_info.avg_damage,
-      this.userConfig,
-    ).textColorCode();
+      this.config,
+    ).getTextColorCode();
   }
 
-  value(player: domain.Player): number {
-    return toPlayerStats(player, this.userConfig.stats_pattern)[this._category]
+  getValue(player: domain.Player): number {
+    return toPlayerStats(player, this.config.stats_pattern)[this.category]
       .damage;
   }
 
-  digit(): number {
-    return this.userConfig.custom_digit.damage;
+  getDigit(): number {
+    return this.config.custom_digit.damage;
   }
 
-  category(): StatsCategory {
-    return this._category;
+  getCategory(): StatsCategory {
+    return this.category;
   }
 }

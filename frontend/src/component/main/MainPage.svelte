@@ -85,7 +85,7 @@
         </div>
       {/if}
 
-      <ColorDescription {userConfig} />
+      <ColorDescription config={userConfig} />
     {:else}
       <p class="uk-text-center">
         {#if $storedRequiredConfigError.valid}
