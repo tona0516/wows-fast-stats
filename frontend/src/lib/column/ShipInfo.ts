@@ -1,5 +1,5 @@
 import { AbstractColumn } from "src/lib/column/intetface/AbstractColumn";
-import { BASE_NUMBERS_URL, isShipType, type BasicKey } from "src/lib/types";
+import { BASE_NUMBERS_URL, type BasicKey } from "src/lib/types";
 import type { domain } from "wailsjs/go/models";
 
 import FlagCommonWealth from "src/assets/images/flag_Commonwealth.png";
@@ -27,7 +27,7 @@ import ShipPremiumDD from "src/assets/images/ship_dd_premium.png";
 import ShipSS from "src/assets/images/ship_ss.png";
 import ShipPremiumSS from "src/assets/images/ship_ss_premium.png";
 
-import { tierString } from "src/lib/util";
+import { isShipType, tierString } from "src/lib/util";
 
 const FLAGS: { [key: string]: string } = {
   japan: FlagJapan,

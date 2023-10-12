@@ -21,13 +21,8 @@ import { SurvivedRate } from "src/lib/column/SurvivedRate";
 import { UsingShipTypeRate } from "src/lib/column/UsingShipTypeRate";
 import { UsingTierRate } from "src/lib/column/UsingTierRate";
 import { WinRate } from "src/lib/column/WinRate";
-import {
-  isOverallKey,
-  isShipKey,
-  type DigitKey,
-  type OverallKey,
-  type ShipKey,
-} from "src/lib/types";
+import { type DigitKey, type OverallKey, type ShipKey } from "src/lib/types";
+import { isOverallKey, isShipKey } from "src/lib/util";
 import { domain } from "wailsjs/go/models";
 
 interface DisplayItem {

@@ -1,5 +1,6 @@
+import clone from "clone";
 import type { Rating, ShipType } from "src/lib/types";
-import type { domain } from "wailsjs/go/models";
+import { domain } from "wailsjs/go/models";
 
 interface RatingRange {
   min: number;
@@ -66,108 +67,105 @@ export const RATING_FACTORS: RatingFactor[] = [
   ),
 ];
 
-const SHIP_INFO_FOR_SAMPLE: { shipType: ShipType; tier: number }[] = [
-  { shipType: "cv", tier: 11 },
-  { shipType: "bb", tier: 10 },
-  { shipType: "bb", tier: 9 },
-  { shipType: "cl", tier: 8 },
-  { shipType: "cl", tier: 7 },
-  { shipType: "dd", tier: 6 },
-  { shipType: "dd", tier: 5 },
-  { shipType: "ss", tier: 4 },
+const SHIP_INFO_SAMPLES: { type: ShipType; tier: number }[] = [
+  { type: "cv", tier: 11 },
+  { type: "bb", tier: 10 },
+  { type: "bb", tier: 9 },
+  { type: "cl", tier: 8 },
+  { type: "cl", tier: 7 },
+  { type: "dd", tier: 6 },
+  { type: "dd", tier: 5 },
+  { type: "ss", tier: 4 },
 ];
-
-const convertValues = (_a: any, _classs: any, _asMap?: boolean) => {
-  throw new Error("Function not implemented.");
-};
 
 export const sampleTeam = (): domain.Team => {
   const SAMPLE_AVG_DAMAGE = 10000;
 
   const players: domain.Player[] = RATING_FACTORS.map((value, i, _) => {
-    const shipStats: domain.ShipStats = {
-      battles: 10,
-      damage: value.damage.min * SAMPLE_AVG_DAMAGE,
-      max_damage: {
-        ship_id: 0,
-        ship_name: "",
-        ship_tier: 0,
-        damage: value.damage.min * SAMPLE_AVG_DAMAGE * 1.5,
-      },
-      win_rate: value.winRate.min,
-      win_survived_rate: 50,
-      lose_survived_rate: 50,
-      kd_rate: 1,
-      kill: 1,
-      exp: 1000,
-      pr: value.pr.min,
-      main_battery_hit_rate: 50,
-      torpedoes_hit_rate: 5,
-      planes_killed: 5,
-      convertValues,
+    const ss = new domain.ShipStats();
+    ss.battles = 10;
+    ss.damage = value.damage.min * SAMPLE_AVG_DAMAGE;
+    ss.max_damage = {
+      ship_id: 0,
+      ship_name: "",
+      ship_tier: 0,
+      damage: value.damage.min * SAMPLE_AVG_DAMAGE * 1.5,
     };
-    const overallStats: domain.OverallStats = {
-      battles: 10,
-      damage: value.damage.min * SAMPLE_AVG_DAMAGE,
-      max_damage: {
-        ship_id: 0,
-        ship_name: "Test Ship",
-        ship_tier: 5,
-        damage: value.damage.min * SAMPLE_AVG_DAMAGE * 1.5,
-      },
-      win_rate: value.winRate.min,
-      win_survived_rate: 50,
-      lose_survived_rate: 50,
-      kd_rate: 1,
-      kill: 1,
-      exp: 1000,
-      pr: value.pr.min,
-      avg_tier: 5,
-      using_ship_type_rate: {
-        ss: 20,
-        dd: 20,
-        cl: 20,
-        bb: 20,
-        cv: 20,
-      },
-      using_tier_rate: {
-        low: 33.3,
-        middle: 33.3,
-        high: 33.4,
-      },
-      convertValues,
+    ss.win_rate = value.winRate.min;
+    ss.win_survived_rate = 50;
+    ss.lose_survived_rate = 50;
+    ss.kd_rate = 1;
+    ss.kill = 1;
+    ss.exp = 1000;
+    ss.pr = value.pr.min;
+    ss.main_battery_hit_rate = 50;
+    ss.torpedoes_hit_rate = 5;
+    ss.planes_killed = 5;
+
+    const os = new domain.OverallStats();
+    os.battles = 10;
+    os.damage = value.damage.min * SAMPLE_AVG_DAMAGE;
+    os.max_damage = {
+      ship_id: 0,
+      ship_name: "Test Ship",
+      ship_tier: 5,
+      damage: value.damage.min * SAMPLE_AVG_DAMAGE * 1.5,
+    };
+    os.win_rate = value.winRate.min;
+    os.win_survived_rate = 50;
+    os.lose_survived_rate = 50;
+    os.kd_rate = 1;
+    os.kill = 1;
+    os.exp = 1000;
+    os.pr = value.pr.min;
+    os.avg_tier = 5;
+    os.using_ship_type_rate = {
+      ss: 20,
+      dd: 20,
+      cl: 20,
+      bb: 20,
+      cv: 20,
+    };
+    os.using_tier_rate = {
+      low: 33.3,
+      middle: 33.3,
+      high: 33.4,
     };
 
-    return {
-      player_info: {
-        id: 1,
-        name: "player_name" + i + 1,
-        clan: { tag: "TEST" } as domain.Clan,
-        is_hidden: false,
-        convertValues,
-      },
-      ship_info: {
-        id: 1,
-        name: "Test Ship",
-        nation: "japan",
-        tier: SHIP_INFO_FOR_SAMPLE[i].tier,
-        type: SHIP_INFO_FOR_SAMPLE[i].shipType,
-        avg_damage: SAMPLE_AVG_DAMAGE,
-        is_premium: false,
-      },
-      pvp_solo: {
-        ship: shipStats,
-        overall: overallStats,
-        convertValues,
-      },
-      pvp_all: {
-        ship: shipStats,
-        overall: overallStats,
-        convertValues,
-      },
-      convertValues,
-    };
+    const pi = new domain.PlayerInfo();
+    pi.id = 1;
+    pi.name = "player_name" + i + 1;
+    pi.clan = { tag: "TEST", id: 1 };
+    pi.is_hidden = false;
+
+    const si = new domain.ShipInfo();
+    si.id = 1;
+    si.name = "Test Ship";
+    si.nation = "japan";
+    si.tier = SHIP_INFO_SAMPLES[i].tier;
+    si.type = SHIP_INFO_SAMPLES[i].type;
+    si.avg_damage = SAMPLE_AVG_DAMAGE;
+    si.is_premium = false;
+
+    const pvpSolo = new domain.PlayerStats();
+    pvpSolo.ship = clone(ss);
+    pvpSolo.overall = clone(os);
+
+    const pvpAll = new domain.PlayerStats();
+    pvpAll.ship = clone(ss);
+    pvpAll.overall = clone(os);
+
+    const player = new domain.Player();
+    player.player_info = pi;
+    player.ship_info = si;
+    player.pvp_solo = pvpSolo;
+    player.pvp_all = pvpAll;
+
+    return player;
   });
 
-  return { name: "", players: players, convertValues };
+  const team = new domain.Team();
+  team.players = players;
+
+  return team;
 };

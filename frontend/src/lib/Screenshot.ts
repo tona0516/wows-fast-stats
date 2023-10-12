@@ -1,4 +1,3 @@
-// @ts-ignore
 import { format, fromUnixTime } from "date-fns";
 import * as htmlToImage from "html-to-image";
 import { MAIN_PAGE_ID, ScreenshotType } from "src/lib/types";

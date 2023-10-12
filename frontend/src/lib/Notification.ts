@@ -5,7 +5,7 @@ const POSITION = "top-right";
 export class Notification {
   success(message: string, durationMs: number = 3000) {
     UIkit.notification({
-      message: this.injectMessage("check", message),
+      message: toMessageHTML("check", message),
       timeout: durationMs,
       pos: POSITION,
     });
@@ -22,16 +22,16 @@ export class Notification {
     }
 
     UIkit.notification({
-      message: this.injectMessage("ban", message),
+      message: toMessageHTML("ban", message),
       timeout: durationMs,
       pos: POSITION,
     });
   }
-
-  private injectMessage(icon: string, message: string): string {
-    return `<div class="uk-text-small">
-        <UkIcon name=${icon} />
-        <span class="uk-text-middle">${message}</span>
-    </div>`;
-  }
 }
+
+const toMessageHTML = (icon: string, message: string): string => {
+  return `<div class="uk-text-small">
+    <UkIcon name=${icon} />
+    <span class="uk-text-middle">${message}</span>
+  </div>`;
+};
