@@ -3,6 +3,7 @@
   import UkDowndown from "src/component/common/uikit/UkDowndown.svelte";
   import UkIcon from "src/component/common/uikit/UkIcon.svelte";
   import UkTooltip from "src/component/common/uikit/UkTooltip.svelte";
+  import { NumbersURL } from "src/lib/NumbersURL";
   import type { PlayerName } from "src/lib/column/PlayerName";
   import { CssClass } from "src/lib/types";
   import { storedAlertPlayers, storedExcludePlayerIDs } from "src/stores";
@@ -70,14 +71,14 @@
       <ul class="uk-nav uk-dropdown-nav">
         {#if isBelongToClan}
           <li>
-            <ExternalLink url={column.clanURL(player)}
+            <ExternalLink url={NumbersURL.clan(player)}
               >クラン詳細(WoWS Stats & Numbers)</ExternalLink
             >
           </li>
         {/if}
 
         <li>
-          <ExternalLink url={column.playerURL(player)}
+          <ExternalLink url={NumbersURL.player(player)}
             >プレイヤー詳細(WoWS Stats & Numbers)</ExternalLink
           >
         </li>

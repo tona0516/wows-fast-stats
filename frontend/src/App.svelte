@@ -22,13 +22,21 @@
     storedRequiredConfigError,
     storedLogs,
   } from "src/stores";
-  import { AppEvent, ZOOM_RATIO, type FontSize } from "src/lib/types";
-  import Modals from "src/component/modal/Modals.svelte";
+  import Modals from "src/component/modal/AlertModals.svelte";
   import { domain } from "wailsjs/go/models";
   import UkIcon from "./component/common/uikit/UkIcon.svelte";
   import ExternalLink from "./component/common/ExternalLink.svelte";
   import UkSpinner from "./component/common/uikit/UkSpinner.svelte";
   import UkTab from "./component/common/uikit/UkTab.svelte";
+  import { FontSize } from "./lib/FontSize";
+
+  // Note: see watcher.go
+  enum AppEvent {
+    BATTLE_START = "BATTLE_START",
+    BATTLE_ERR = "BATTLE_ERR",
+    LOG = "LOG",
+    ONLOAD = "ONLOAD",
+  }
 
   const PAGE_TAB_ID = "page-tab";
 
@@ -39,15 +47,7 @@
   let updatableRelease: domain.GHLatestRelease;
 
   $: {
-    const fontSize = $storedUserConfig.font_size as FontSize;
-    const zoomRatio = ZOOM_RATIO.get(fontSize);
-    if (zoomRatio) {
-      // @ts-ignore
-      document.body.style.zoom = zoomRatio;
-    } else {
-      // @ts-ignore
-      document.body.style.zoom = 1.0;
-    }
+    FontSize.apply($storedUserConfig);
   }
 
   EventsOn(AppEvent.LOG, (log: string) =>

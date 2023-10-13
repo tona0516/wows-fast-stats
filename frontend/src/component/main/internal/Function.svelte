@@ -3,8 +3,8 @@
   import UkIcon from "src/component/common/uikit/UkIcon.svelte";
   import UkSpinner from "src/component/common/uikit/UkSpinner.svelte";
   import { DispName } from "src/lib/DispName";
-  import type { Screenshot } from "src/lib/Screenshot";
-  import { ScreenshotType } from "src/lib/types";
+  import type { Screenshot } from "src/lib/screenshot/Screenshot";
+  import { ScreenshotType } from "src/lib/screenshot/ScreenshotType";
   import { storedBattle, storedUserConfig } from "src/stores";
   import { createEventDispatcher } from "svelte";
   import { ApplyUserConfig } from "wailsjs/go/main/App";
@@ -25,7 +25,7 @@
 
     try {
       isScreenshotting = true;
-      if (await screenshot.take(ScreenshotType.manual, $storedBattle.meta)) {
+      if (await screenshot.take(ScreenshotType.MANUAL, $storedBattle.meta)) {
         dispatch("ScreenshotSaved");
       }
     } catch (error) {
@@ -50,8 +50,7 @@
 </script>
 
 <select
-  class="uk-select uk-form-width-medium uk-form-small
-    "
+  class="uk-select uk-form-width-medium uk-form-small"
   bind:value={selectedStatsPattern}
   on:change={onStatsPatternChanged}
 >

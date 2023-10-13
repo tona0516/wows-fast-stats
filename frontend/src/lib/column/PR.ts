@@ -1,7 +1,7 @@
 import { AbstractColumn } from "src/lib/column/intetface/AbstractColumn";
 import type { ISingleColumn } from "src/lib/column/intetface/ISingleColumn";
 import type { ISummaryColumn } from "src/lib/column/intetface/ISummaryColumn";
-import { RatingConverterFactory } from "src/lib/rating/RatingConverter";
+import { RatingColorFactory } from "src/lib/rating/RatingColorFactory";
 import { CssClass, type CommonKey, type StatsCategory } from "src/lib/types";
 import { toPlayerStats } from "src/lib/util";
 import type { domain } from "wailsjs/go/models";
@@ -36,7 +36,7 @@ export class PR
   }
 
   getTextColorCode(player: domain.Player): string {
-    return RatingConverterFactory.fromPR(
+    return RatingColorFactory.fromPR(
       this.getValue(player),
       this.config,
     ).getTextColorCode();

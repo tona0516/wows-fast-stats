@@ -1,8 +1,8 @@
 <script lang="ts">
   import UkTable from "src/component/common/uikit/UkTable.svelte";
+  import { RowPattern } from "src/lib/RowPattern";
   import { ColumnProvider } from "src/lib/column/ColumnProvider";
-  import { CssClass, RowPattern } from "src/lib/types";
-  import { toPlayerStats } from "src/lib/util";
+  import { CssClass } from "src/lib/types";
   import type { domain } from "wailsjs/go/models";
 
   export let teams: domain.Team[];
@@ -12,31 +12,6 @@
   $: [basicColumns, shipColumns, overallColumns] = categories;
   $: shipColumnCount = shipColumns.columnCount();
   $: allColumnCount = shipColumnCount + overallColumns.columnCount();
-
-  const decideRowPattern = (
-    player: domain.Player,
-    statsPattern: string,
-    allColumnCount: number,
-  ): RowPattern => {
-    if (allColumnCount === 0) {
-      return RowPattern.NO_COLUMN;
-    }
-
-    if (player.player_info.is_hidden === true) {
-      return RowPattern.PRIVATE;
-    }
-
-    const stats = toPlayerStats(player, statsPattern);
-    if (player.player_info.id === 0 || stats.overall.battles === 0) {
-      return RowPattern.NO_DATA;
-    }
-
-    if (stats.ship.battles === 0) {
-      return RowPattern.NO_SHIP_STATS;
-    }
-
-    return RowPattern.FULL;
-  };
 </script>
 
 <UkTable>
@@ -67,7 +42,7 @@
     <tbody>
       {#each team.players as player}
         {@const statsPattern = userConfig.stats_pattern}
-        {@const rowPattern = decideRowPattern(
+        {@const rowPattern = RowPattern.derive(
           player,
           statsPattern,
           allColumnCount,

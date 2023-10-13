@@ -1,6 +1,6 @@
 import { format, fromUnixTime } from "date-fns";
 import * as htmlToImage from "html-to-image";
-import { MAIN_PAGE_ID, ScreenshotType } from "src/lib/types";
+import { ScreenshotType } from "src/lib/screenshot/ScreenshotType";
 import {
   AutoScreenshot,
   LogError,
@@ -11,9 +11,11 @@ import type { domain } from "wailsjs/go/models";
 export class Screenshot {
   private isFirst: boolean = true;
 
+  constructor(private targetElementID: string) {}
+
   async take(type: ScreenshotType, meta: domain.Meta): Promise<boolean> {
     try {
-      const element = document.getElementById(MAIN_PAGE_ID);
+      const element = document.getElementById(this.targetElementID);
 
       // Workaround: first screenshot can't draw values in table.
       if (this.isFirst) {
@@ -28,10 +30,10 @@ export class Screenshot {
       )}_${meta.own_ship.replaceAll(" ", "-")}_${meta.arena}_${meta.type}.png`;
 
       switch (type) {
-        case ScreenshotType.manual:
+        case ScreenshotType.MANUAL:
           await ManualScreenshot(filename, base64Data);
           break;
-        case ScreenshotType.auto:
+        case ScreenshotType.AUTO:
           await AutoScreenshot(filename, base64Data);
           break;
       }

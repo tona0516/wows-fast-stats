@@ -19,13 +19,6 @@ const makePlayer = (): domain.Player => {
   return player;
 };
 
-const makeTeam = (players: domain.Player[]): domain.Team => {
-  const team = new domain.Team();
-  team.players = players;
-
-  return team;
-};
-
 test("undefined", () => {
   expect(
     Summary.calculate(undefined, [], new domain.UserConfig()),
@@ -57,8 +50,13 @@ test("normal", () => {
   enemy2.player_info.id = 12;
   enemy2.pvp_all.ship.battles = 100;
 
+  const friendTeam = new domain.Team();
+  friendTeam.players = [friend1, friend2];
+  const enemyTeam = new domain.Team();
+  enemyTeam.players = [enemy1, enemy2];
+
   const battle = new domain.Battle();
-  battle.teams = [makeTeam([friend1, friend2]), makeTeam([enemy1, enemy2])];
+  battle.teams = [friendTeam, enemyTeam];
 
   const customDigit = new domain.CustomDigit();
   customDigit.pr = 0;

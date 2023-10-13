@@ -1,18 +1,14 @@
 import clone from "clone";
+import { RatingAdapter } from "src/lib/rating/RatingColor";
 import type { Rating, ShipType } from "src/lib/types";
 import { domain } from "wailsjs/go/models";
-
-interface RatingRange {
-  min: number;
-  max: number;
-}
 
 class RatingFactor {
   constructor(
     public level: Rating,
-    public pr: RatingRange,
-    public damage: RatingRange,
-    public winRate: RatingRange,
+    public pr: { min: number; max: number },
+    public damage: { min: number; max: number },
+    public winRate: { min: number; max: number },
   ) {}
 }
 
@@ -67,21 +63,20 @@ export const RATING_FACTORS: RatingFactor[] = [
   ),
 ];
 
-const SHIP_INFO_SAMPLES: { type: ShipType; tier: number }[] = [
-  { type: "cv", tier: 11 },
-  { type: "bb", tier: 10 },
-  { type: "bb", tier: 9 },
-  { type: "cl", tier: 8 },
-  { type: "cl", tier: 7 },
-  { type: "dd", tier: 6 },
-  { type: "dd", tier: 5 },
-  { type: "ss", tier: 4 },
-];
-
-export const sampleTeam = (): domain.Team => {
+const getSampleTeam = (): domain.Team => {
   const SAMPLE_AVG_DAMAGE = 10000;
+  const SHIP_INFO_SAMPLES: { type: ShipType; tier: number }[] = [
+    { type: "cv", tier: 11 },
+    { type: "bb", tier: 10 },
+    { type: "bb", tier: 9 },
+    { type: "cl", tier: 8 },
+    { type: "cl", tier: 7 },
+    { type: "dd", tier: 6 },
+    { type: "dd", tier: 5 },
+    { type: "ss", tier: 4 },
+  ];
 
-  const players: domain.Player[] = RATING_FACTORS.map((value, i, _) => {
+  const players = RATING_FACTORS.map((value, i, _) => {
     const ss = new domain.ShipStats();
     ss.battles = 10;
     ss.damage = value.damage.min * SAMPLE_AVG_DAMAGE;
@@ -169,3 +164,39 @@ export const sampleTeam = (): domain.Team => {
 
   return team;
 };
+
+export const SAMPLE_TEAM = getSampleTeam();
+
+export namespace RatingColorFactory {
+  export const fromPR = (
+    value: number,
+    config: domain.UserConfig,
+  ): RatingAdapter => {
+    const rf = RATING_FACTORS.findLast(
+      (it) => value >= 0 && value >= it.pr.min,
+    );
+    return new RatingAdapter(rf?.level, config);
+  };
+
+  export const fromDamage = (
+    value: number,
+    expected: number,
+    config: domain.UserConfig,
+  ): RatingAdapter => {
+    if (expected === 0) {
+      return new RatingAdapter(undefined, config);
+    }
+
+    const ratio = value / expected;
+    const rf = RATING_FACTORS.findLast((it) => ratio >= it.damage.min);
+    return new RatingAdapter(rf?.level, config);
+  };
+
+  export const fromWinRate = (
+    value: number,
+    config: domain.UserConfig,
+  ): RatingAdapter => {
+    const rf = RATING_FACTORS.findLast((it) => value >= it.winRate.min);
+    return new RatingAdapter(rf?.level, config);
+  };
+}

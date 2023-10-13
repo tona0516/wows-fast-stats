@@ -1,7 +1,5 @@
 <script lang="ts">
   import { DispName } from "src/lib/DispName";
-  import { sampleTeam } from "src/lib/rating/RatingConst";
-  import { CONFIRM_MODAL_ID } from "src/lib/types";
   import StatisticsTable from "src/component/main/internal/StatsTable.svelte";
   import ConfirmModal from "src/component/modal/ConfirmModal.svelte";
   import { storedUserConfig } from "src/stores";
@@ -15,6 +13,8 @@
   import { domain } from "wailsjs/go/models";
   import clone from "clone";
   import { ColumnProvider } from "src/lib/column/ColumnProvider";
+  import { SAMPLE_TEAM } from "src/lib/rating/RatingColorFactory";
+  import { ModalElementID } from "src/component/modal/ModalElementID";
 
   export let inputUserConfig: domain.UserConfig;
 
@@ -261,14 +261,14 @@
 
 <div class="uk-padding-small">
   <div>プレビュー</div>
-  <StatisticsTable teams={[sampleTeam()]} userConfig={inputUserConfig} />
+  <StatisticsTable teams={[SAMPLE_TEAM]} userConfig={inputUserConfig} />
 </div>
 
 <div class="uk-padding-small">
   <button
     class="uk-button uk-button-danger uk-text-nowrap"
     on:click={() => {
-      const elem = document.getElementById(CONFIRM_MODAL_ID);
+      const elem = document.getElementById(ModalElementID.CONFIRM);
       if (elem) {
         UIkit.modal(elem).show();
       }

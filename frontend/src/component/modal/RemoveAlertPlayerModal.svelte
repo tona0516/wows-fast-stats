@@ -1,25 +1,21 @@
 <script lang="ts">
-  import {
-    EMPTY_ALERT_PLAYER,
-    REMOVE_ALERT_PLAYER_MODAL_ID,
-  } from "src/lib/types";
   import { createEventDispatcher } from "svelte";
   import { RemoveAlertPlayer } from "wailsjs/go/main/App";
   import type { domain } from "wailsjs/go/models";
   import UkModal from "src/component/common/uikit/UkModal.svelte";
   import UIkit from "uikit";
+  import { ModalElementID } from "./ModalElementID";
   import clone from "clone";
 
-  let target: domain.AlertPlayer = clone(EMPTY_ALERT_PLAYER);
+  export let defaultAlertPlayer: domain.AlertPlayer;
+  const dispatch = createEventDispatcher();
 
   export const show = (_target: domain.AlertPlayer) => {
     target = _target;
 
-    const elem = document.getElementById(REMOVE_ALERT_PLAYER_MODAL_ID);
+    const elem = document.getElementById(ModalElementID.REMOVE_ALERT_PLAYER);
     UIkit.modal(elem!).show();
   };
-
-  const dispatch = createEventDispatcher();
 
   const remove = async () => {
     try {
@@ -29,9 +25,11 @@
       dispatch("Failure", { message: error });
     }
   };
+
+  let target: domain.AlertPlayer = clone(defaultAlertPlayer);
 </script>
 
-<UkModal id={REMOVE_ALERT_PLAYER_MODAL_ID}>
+<UkModal id={ModalElementID.REMOVE_ALERT_PLAYER}>
   <div slot="body">
     <p>「{target.name}」を削除しますか？</p>
   </div>

@@ -1,14 +1,14 @@
 <script lang="ts">
-  import { CONFIRM_MODAL_ID } from "src/lib/types";
   import { createEventDispatcher } from "svelte";
   import UkModal from "src/component/common/uikit/UkModal.svelte";
+  import { ModalElementID } from "./ModalElementID";
 
   export let message: string;
 
   const dispatch = createEventDispatcher();
 </script>
 
-<UkModal id={CONFIRM_MODAL_ID}>
+<UkModal id={ModalElementID.CONFIRM}>
   <div slot="body">
     <p>{message}</p>
   </div>

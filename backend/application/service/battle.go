@@ -369,14 +369,8 @@ func (b *Battle) compose(
 	sort.Sort(enemies)
 
 	teams := []domain.Team{
-		{
-			Players: friends,
-			Name:    "味方チーム",
-		},
-		{
-			Players: enemies,
-			Name:    "敵チーム",
-		},
+		{Players: friends},
+		{Players: enemies},
 	}
 
 	battle := domain.Battle{

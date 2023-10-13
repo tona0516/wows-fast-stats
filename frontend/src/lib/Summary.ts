@@ -57,10 +57,8 @@ export namespace Summary {
       values: { friends: [], enemies: [], diffs: [] },
     };
     columns.forEach((column) => {
-      const raw = battle.teams.map((team) => team.players);
-
-      const filtered = raw.map((players) => {
-        return players.filter(
+      const filtered = battle.teams.map((team) => {
+        return team.players.filter(
           (player) =>
             !isExcluded(player, excludedIDs) &&
             isMinBattlesOrMore(player, config, column.getCategory()),

@@ -1,10 +1,6 @@
 import { AbstractColumn } from "src/lib/column/intetface/AbstractColumn";
-import { RatingConverterFactory } from "src/lib/rating/RatingConverter";
-import {
-  BASE_NUMBERS_URL,
-  type BasicKey,
-  type StatsCategory,
-} from "src/lib/types";
+import { RatingColorFactory } from "src/lib/rating/RatingColorFactory";
+import { type BasicKey, type StatsCategory } from "src/lib/types";
 import { toPlayerStats } from "src/lib/util";
 import type { domain } from "wailsjs/go/models";
 
@@ -49,26 +45,6 @@ export class PlayerName extends AbstractColumn<BasicKey> {
     const pr = toPlayerStats(player, this.config.stats_pattern)[statsCategory]
       .pr;
 
-    return RatingConverterFactory.fromPR(pr, this.config).getBgColorCode();
-  }
-
-  clanURL(player: domain.Player): string {
-    return (
-      BASE_NUMBERS_URL +
-      "clan/" +
-      player.player_info.clan.id +
-      "," +
-      player.player_info.clan.tag
-    );
-  }
-
-  playerURL(player: domain.Player): string {
-    return (
-      BASE_NUMBERS_URL +
-      "player/" +
-      player.player_info.id +
-      "," +
-      player.player_info.name
-    );
+    return RatingColorFactory.fromPR(pr, this.config).getBgColorCode();
   }
 }

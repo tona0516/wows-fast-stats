@@ -2,28 +2,23 @@
   import { createEventDispatcher } from "svelte";
   import { AlertPatterns, UpdateAlertPlayer } from "wailsjs/go/main/App";
   import type { domain } from "wailsjs/go/models";
-  import {
-    MAX_MEMO_LENGTH,
-    EDIT_ALERT_PLAYER_MODAL_ID,
-    EMPTY_ALERT_PLAYER,
-  } from "src/lib/types";
   import UkModal from "src/component/common/uikit/UkModal.svelte";
   import UIkit from "uikit";
+  import { ModalElementID } from "./ModalElementID";
   import clone from "clone";
 
+  export let defaultAlertPlayer: domain.AlertPlayer;
+  export let maxMemoLength: number;
+  const dispatch = createEventDispatcher();
+  let target: domain.AlertPlayer = clone(defaultAlertPlayer);
   $: disableUpdateButton =
-    target.account_id === 0 || target.name === "" || target.pattern === "";
-
-  let target: domain.AlertPlayer = clone(EMPTY_ALERT_PLAYER);
+  target.account_id === 0 || target.name === "" || target.pattern === "";
 
   export const show = (_target: domain.AlertPlayer) => {
     target = _target;
-
-    const elem = document.getElementById(EDIT_ALERT_PLAYER_MODAL_ID);
+    const elem = document.getElementById(ModalElementID.EDIT_ALERT_PLAYER);
     UIkit.modal(elem!).show();
   };
-
-  const dispatch = createEventDispatcher();
 
   const update = async () => {
     try {
@@ -35,7 +30,7 @@
   };
 </script>
 
-<UkModal id={EDIT_ALERT_PLAYER_MODAL_ID}>
+<UkModal id={ModalElementID.EDIT_ALERT_PLAYER}>
   <div slot="body">
     <div class="uk-margin-small">
       <input
@@ -69,10 +64,10 @@
       <textarea
         class="uk-textarea"
         placeholder="メモ(任意)"
-        maxlength={MAX_MEMO_LENGTH}
+        maxlength={maxMemoLength}
         bind:value={target.message}
       />
-      <div>{target.message.length}/{MAX_MEMO_LENGTH}</div>
+      <div>{target.message.length}/{maxMemoLength}</div>
     </div>
   </div>
 

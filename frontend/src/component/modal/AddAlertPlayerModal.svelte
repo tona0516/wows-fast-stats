@@ -6,39 +6,24 @@
     UpdateAlertPlayer,
   } from "wailsjs/go/main/App";
   import type { domain } from "wailsjs/go/models";
-  import {
-    ADD_ALERT_PLAYER_MODAL_ID,
-    EMPTY_ALERT_PLAYER,
-    MAX_MEMO_LENGTH,
-  } from "src/lib/types";
   import clone from "clone";
   import UIkit from "uikit";
   import UkModal from "src/component/common/uikit/UkModal.svelte";
   import UkIcon from "src/component/common/uikit/UkIcon.svelte";
+  import { ModalElementID } from "./ModalElementID";
 
-  let target: domain.AlertPlayer = clone(EMPTY_ALERT_PLAYER);
-  let isSearching: boolean = false;
-  let searchInput: string = "";
-  let searchPlayers: domain.WGAccountListData[] = [];
-  let searchResult: domain.WGAccountListData | undefined = undefined;
-
-  $: disableAddButton =
-    searchResult === undefined ||
-    searchResult.account_id === 0 ||
-    searchResult.nickname === "" ||
-    target.pattern === "";
-
+  export let defaultAlertPlayer: domain.AlertPlayer;
+  export let maxMemoLength: number;
   const dispatch = createEventDispatcher();
 
   export const show = () => {
     clean();
-
-    const elem = document.getElementById(ADD_ALERT_PLAYER_MODAL_ID);
+    const elem = document.getElementById(ModalElementID.ADD_ALERT_PLAYER);
     UIkit.modal(elem!).show();
   };
 
   const clean = () => {
-    target = clone(EMPTY_ALERT_PLAYER);
+    target = clone(defaultAlertPlayer);
     isSearching = false;
     searchInput = "";
     searchPlayers = [];
@@ -82,9 +67,21 @@
       isSearching = false;
     }
   };
+
+  let target: domain.AlertPlayer = clone(defaultAlertPlayer);
+  let isSearching: boolean = false;
+  let searchInput: string = "";
+  let searchPlayers: domain.WGAccountListData[] = [];
+  let searchResult: domain.WGAccountListData | undefined = undefined;
+
+  $: disableAddButton =
+    searchResult === undefined ||
+    searchResult.account_id === 0 ||
+    searchResult.nickname === "" ||
+    target.pattern === "";
 </script>
 
-<UkModal id={ADD_ALERT_PLAYER_MODAL_ID}>
+<UkModal id={ModalElementID.ADD_ALERT_PLAYER}>
   <div slot="body">
     <div class="uk-margin-small">
       <form class="uk-search uk-search-default">
@@ -146,10 +143,10 @@
       <textarea
         class="uk-textarea"
         placeholder="メモ(任意)"
-        maxlength={MAX_MEMO_LENGTH}
+        maxlength={maxMemoLength}
         bind:value={target.message}
       />
-      <div>{target.message.length}/{MAX_MEMO_LENGTH}</div>
+      <div>{target.message.length}/{maxMemoLength}</div>
     </div>
   </div>
 

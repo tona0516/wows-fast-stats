@@ -1,10 +1,12 @@
 <script lang="ts">
-  import { RATING_FACTORS } from "src/lib/rating/RatingConst";
   import type { domain } from "wailsjs/go/models";
   import ExternalLink from "src/component/common/ExternalLink.svelte";
   import UkTable from "src/component/common/uikit/UkTable.svelte";
   import { DispName } from "src/lib/DispName";
-  import { RatingConverterFactory } from "src/lib/rating/RatingConverter";
+  import {
+    RATING_FACTORS,
+    RatingColorFactory,
+  } from "src/lib/rating/RatingColorFactory";
 
   export let config: domain.UserConfig;
 
@@ -31,14 +33,14 @@
       ratingText: DispName.SKILL_LEVELS.get(rating.level),
       playerName: {
         text: "player_name",
-        bgColor: RatingConverterFactory.fromPR(
+        bgColor: RatingColorFactory.fromPR(
           rating.pr.min,
           config,
         ).getBgColorCode(),
       },
       pr: {
         text: `${rating.pr.min} ~ ${rating.pr.max}`,
-        textColor: RatingConverterFactory.fromDamage(
+        textColor: RatingColorFactory.fromDamage(
           rating.damage.min,
           1.0,
           config,
@@ -46,7 +48,7 @@
       },
       damage: {
         text: `${rating.damage.min}倍 ~ ${rating.damage.max}倍`,
-        textColor: RatingConverterFactory.fromDamage(
+        textColor: RatingColorFactory.fromDamage(
           rating.damage.min,
           1.0,
           config,
@@ -54,7 +56,7 @@
       },
       win: {
         text: `${rating.winRate.min}% ~ ${rating.winRate.max}%`,
-        textColor: RatingConverterFactory.fromWinRate(
+        textColor: RatingColorFactory.fromWinRate(
           rating.winRate.min,
           config,
         ).getTextColorCode(),

@@ -324,7 +324,6 @@ export namespace domain {
 	}
 	export class Team {
 	    players: Player[];
-	    name: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new Team(source);
@@ -333,7 +332,6 @@ export namespace domain {
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.players = this.convertValues(source["players"], Player);
-	        this.name = source["name"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

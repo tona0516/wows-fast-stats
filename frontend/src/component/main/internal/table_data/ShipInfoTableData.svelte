@@ -3,6 +3,7 @@
   import ExternalLink from "src/component/common/ExternalLink.svelte";
   import type { domain } from "wailsjs/go/models";
   import { CssClass } from "src/lib/types";
+  import { NumbersURL } from "src/lib/NumbersURL";
 
   export let column: ShipInfo;
   export let player: domain.Player;
@@ -25,7 +26,8 @@
 </td>
 
 <td class="{CssClass.TD_STR} {CssClass.OMIT}">
-  <ExternalLink url={column.shipURL(player)}
+  <ExternalLink
+    url={NumbersURL.ship(player.ship_info.id, player.ship_info.name)}
     >{column.displayValue(player)}</ExternalLink
   >
 </td>

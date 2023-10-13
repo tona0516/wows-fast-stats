@@ -1,5 +1,5 @@
 import { AbstractColumn } from "src/lib/column/intetface/AbstractColumn";
-import { BASE_NUMBERS_URL, type BasicKey } from "src/lib/types";
+import { type BasicKey } from "src/lib/types";
 import type { domain } from "wailsjs/go/models";
 
 import FlagCommonWealth from "src/assets/images/flag_Commonwealth.png";
@@ -86,16 +86,6 @@ export class ShipInfo extends AbstractColumn<BasicKey> {
     }
 
     return ownColor[type];
-  }
-
-  shipURL(player: domain.Player): string {
-    return (
-      BASE_NUMBERS_URL +
-      "ship/" +
-      player.ship_info.id +
-      "," +
-      player.ship_info.name.replaceAll(" ", "-")
-    );
   }
 
   shipTypeIconPath(player: domain.Player): string {

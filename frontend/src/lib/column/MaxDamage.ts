@@ -1,9 +1,6 @@
 import { AbstractColumn } from "src/lib/column/intetface/AbstractColumn";
-import {
-  BASE_NUMBERS_URL,
-  type CommonKey,
-  type StatsCategory,
-} from "src/lib/types";
+import { NumbersURL } from "src/lib/NumbersURL";
+import { type CommonKey, type StatsCategory } from "src/lib/types";
 import { tierString, toPlayerStats } from "src/lib/util";
 import type { domain } from "wailsjs/go/models";
 
@@ -47,12 +44,7 @@ export class MaxDamage extends AbstractColumn<CommonKey> {
   shipInfo(player: domain.Player): [url: string, text: string] {
     const maxDamage = toPlayerStats(player, this.config.stats_pattern).overall
       .max_damage;
-    const url =
-      BASE_NUMBERS_URL +
-      "ship/" +
-      maxDamage.ship_id +
-      "," +
-      maxDamage.ship_name.replaceAll(" ", "-");
+    const url = NumbersURL.ship(maxDamage.ship_id, maxDamage.ship_name);
 
     const text = `${tierString(maxDamage.ship_tier)} ${maxDamage.ship_name}`;
 

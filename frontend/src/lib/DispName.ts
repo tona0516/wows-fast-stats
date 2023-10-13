@@ -1,13 +1,18 @@
 import { ArrayMap } from "src/lib/ArrayMap";
+import { FontSize } from "src/lib/FontSize";
 import {
   type ColumnCategory,
-  type FontSize,
-  type PlayerNameColor,
   type Rating,
   type ShipType,
   type StatsExtra,
   type TierGroup,
 } from "src/lib/types";
+
+enum PlayerNameColor {
+  SHIP = "ship",
+  OVERALL = "overall",
+  NONE = "none",
+}
 
 export namespace DispName {
   export const STATS_PATTERNS = new ArrayMap<StatsExtra, string>([
@@ -33,19 +38,19 @@ export namespace DispName {
   ]);
 
   export const FONT_SIZES = new ArrayMap<FontSize, string>([
-    ["xx-large", "3"],
-    ["x-large", "2"],
-    ["large", "1"],
-    ["medium", "0(デフォルト)"],
-    ["small", "-1"],
-    ["x-small", "-2"],
-    ["xx-small", "-3"],
+    [FontSize.XX_SMALL, "3"],
+    [FontSize.X_SMALL, "2"],
+    [FontSize.SMALL, "1"],
+    [FontSize.MEDIUM, "0(デフォルト)"],
+    [FontSize.LARGE, "-1"],
+    [FontSize.X_LARGE, "-2"],
+    [FontSize.XX_LARGE, "-3"],
   ]);
 
   export const PLAYER_NAME_COLORS = new ArrayMap<PlayerNameColor, string>([
-    ["ship", "艦成績のPR"],
-    ["overall", "総合成績のPR"],
-    ["none", "なし"],
+    [PlayerNameColor.SHIP, "艦成績のPR"],
+    [PlayerNameColor.OVERALL, "総合成績のPR"],
+    [PlayerNameColor.NONE, "なし"],
   ]);
 
   export const SHIP_TYPES = new ArrayMap<ShipType, string>([
