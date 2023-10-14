@@ -12,7 +12,7 @@
   const dispatch = createEventDispatcher();
   let target: domain.AlertPlayer = clone(defaultAlertPlayer);
   $: disableUpdateButton =
-  target.account_id === 0 || target.name === "" || target.pattern === "";
+    target.account_id === 0 || target.name === "" || target.pattern === "";
 
   export const show = (_target: domain.AlertPlayer) => {
     target = _target;

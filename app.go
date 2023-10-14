@@ -63,12 +63,14 @@ func (a *App) onStartup(ctx context.Context) {
 	}
 }
 
-func (a *App) onShutdown(ctx context.Context) {
-	logger.Info("application will shutdown...")
+func (a *App) onBeforeClose(ctx context.Context) bool {
+	logger.Info("application will close...")
 
 	if err := a.configService.SaveAppConfig(ctx); err != nil {
 		logger.Error(err)
 	}
+
+	return false
 }
 
 func (a *App) StartWatching() error {
