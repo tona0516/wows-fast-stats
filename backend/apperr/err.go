@@ -19,7 +19,6 @@ const (
 	EmptyInstallPath            failure.StringCode = "インストールフォルダが空です。"
 	InvalidAppID                failure.StringCode = "WG APIと通信できません。アプリケーションIDが間違っている可能性があります。"
 	EmptyAppID                  failure.StringCode = "アプリケーションIDが空です。"
-	UserCanceled                failure.StringCode = "ユーザキャンセル"
 	OpenDirectoryError          failure.StringCode = "フォルダが開けません。存在しない可能性があります。"
 	FrontendError               failure.StringCode = "フロントエンドエラー"
 	WailsError                  failure.StringCode = "Wailsエラー"

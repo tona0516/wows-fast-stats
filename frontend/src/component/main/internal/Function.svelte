@@ -3,8 +3,7 @@
   import UkIcon from "src/component/common/uikit/UkIcon.svelte";
   import UkSpinner from "src/component/common/uikit/UkSpinner.svelte";
   import { DispName } from "src/lib/DispName";
-  import type { Screenshot } from "src/lib/screenshot/Screenshot";
-  import { ScreenshotType } from "src/lib/screenshot/ScreenshotType";
+  import type { Screenshot } from "src/lib/Screenshot";
   import { storedBattle, storedUserConfig } from "src/stores";
   import { createEventDispatcher } from "svelte";
   import { ApplyUserConfig } from "wailsjs/go/main/App";
@@ -25,7 +24,7 @@
 
     try {
       isScreenshotting = true;
-      if (await screenshot.take(ScreenshotType.MANUAL, $storedBattle.meta)) {
+      if (await screenshot.manual($storedBattle.meta)) {
         dispatch("ScreenshotSaved");
       }
     } catch (error) {

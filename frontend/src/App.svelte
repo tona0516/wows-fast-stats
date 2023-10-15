@@ -14,7 +14,6 @@
     ValidateRequiredConfig,
   } from "wailsjs/go/main/App";
   import { EventsOn, EventsEmit } from "wailsjs/runtime/runtime";
-  import { Notification } from "src/lib/Notification";
   import {
     storedExcludePlayerIDs,
     storedAlertPlayers,
@@ -24,11 +23,12 @@
   } from "src/stores";
   import Modals from "src/component/modal/AlertModals.svelte";
   import { domain } from "wailsjs/go/models";
-  import UkIcon from "./component/common/uikit/UkIcon.svelte";
-  import ExternalLink from "./component/common/ExternalLink.svelte";
-  import UkSpinner from "./component/common/uikit/UkSpinner.svelte";
-  import UkTab from "./component/common/uikit/UkTab.svelte";
-  import { FontSize } from "./lib/FontSize";
+  import UkIcon from "src/component/common/uikit/UkIcon.svelte";
+  import ExternalLink from "src/component/common/ExternalLink.svelte";
+  import UkSpinner from "src/component/common/uikit/UkSpinner.svelte";
+  import UkTab from "src/component/common/uikit/UkTab.svelte";
+  import { FontSize } from "src/lib/FontSize";
+  import { Notification } from "src/lib/Notification";
 
   // Note: see watcher.go
   enum AppEvent {
@@ -42,7 +42,6 @@
 
   let modals: Modals;
   let mainPage: MainPage | undefined;
-  let notification = new Notification();
   let initialized = false;
   let updatableRelease: domain.GHLatestRelease;
 
@@ -57,7 +56,7 @@
     }),
   );
   EventsOn(AppEvent.BATTLE_START, () => mainPage?.fetchBattle());
-  EventsOn(AppEvent.BATTLE_ERR, (error: string) => notification.failure(error));
+  EventsOn(AppEvent.BATTLE_ERR, (error: string) => Notification.failure(error));
 
   async function main() {
     try {
@@ -84,7 +83,7 @@
         StartWatching();
       }
     } catch (error) {
-      notification.failure(error);
+      Notification.failure(error);
     }
   }
 
@@ -102,10 +101,10 @@
       try {
         storedAlertPlayers.set(await AlertPlayers());
       } catch (error) {
-        notification.failure(error);
+        Notification.failure(error);
       }
     }}
-    on:Failure={(event) => notification.failure(event.detail.message)}
+    on:Failure={(event) => Notification.failure(event.detail.message)}
   />
 
   {#if updatableRelease}
@@ -140,7 +139,7 @@
         <MainPage
           bind:this={mainPage}
           on:FetchSuccess={(event) =>
-            notification.success(event.detail.message)}
+            Notification.success(event.detail.message)}
           on:EditAlertPlayer={(e) =>
             modals.showEditAlertPlayer(e.detail.target)}
           on:RemoveAlertPlayer={(e) =>
@@ -149,25 +148,25 @@
             storedExcludePlayerIDs.set(await ExcludePlayerIDs());
           }}
           on:ScreenshotSaved={() =>
-            notification.success("スクリーンショットを保存しました")}
-          on:Failure={(event) => notification.failure(event.detail.message)}
+            Notification.success("スクリーンショットを保存しました")}
+          on:Failure={(event) => Notification.failure(event.detail.message)}
         />
       </li>
       <li>
         <ConfigPage
           on:UpdateRequired={() => {
-            notification.success("設定を更新しました");
+            Notification.success("設定を更新しました");
             StartWatching();
           }}
           on:UpdateSuccess={async () => {
-            notification.success("設定を更新しました");
+            Notification.success("設定を更新しました");
           }}
           on:AddAlertPlayer={() => modals.showAddAlertPlayer()}
           on:EditAlertPlayer={(e) =>
             modals.showEditAlertPlayer(e.detail.target)}
           on:RemoveAlertPlayer={(e) =>
             modals.showRemoveAlertPlayer(e.detail.target)}
-          on:Failure={(event) => notification.failure(event.detail.message)}
+          on:Failure={(event) => Notification.failure(event.detail.message)}
         />
       </li>
     </ul>

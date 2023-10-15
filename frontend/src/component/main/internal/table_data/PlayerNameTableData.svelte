@@ -5,7 +5,7 @@
   import UkTooltip from "src/component/common/uikit/UkTooltip.svelte";
   import { NumbersURL } from "src/lib/NumbersURL";
   import type { PlayerName } from "src/lib/column/PlayerName";
-  import { CssClass } from "src/lib/types";
+  import { CssClass } from "src/lib/CssClass";
   import { storedAlertPlayers, storedExcludePlayerIDs } from "src/stores";
   import { createEventDispatcher } from "svelte";
   import {

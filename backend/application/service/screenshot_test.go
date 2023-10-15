@@ -52,9 +52,10 @@ func TestScreenshot_SaveWithDialog_正常系(t *testing.T) {
 	}
 
 	// テスト実行
-	err := s.SaveWithDialog(context.Background(), filename, base64Data)
+	saved, err := s.SaveWithDialog(context.Background(), filename, base64Data)
 
 	// 結果の検証
+	assert.True(t, saved)
 	assert.NoError(t, err)
 }
 
@@ -69,9 +70,10 @@ func TestScreenshot_SaveWithDialog_異常系(t *testing.T) {
 	}
 
 	// テスト実行
-	err := s.SaveWithDialog(context.Background(), filename, base64Data)
+	saved, err := s.SaveWithDialog(context.Background(), filename, base64Data)
 
 	// 結果の検証
+	assert.False(t, saved)
 	code, ok := failure.CodeOf(err)
 	assert.True(t, ok)
 	assert.Equal(t, code, apperr.WailsError)
@@ -89,11 +91,10 @@ func TestScreenshot_SaveWithDialog_異常系_キャンセル(t *testing.T) {
 	}
 
 	// テスト実行
-	err := s.SaveWithDialog(context.Background(), filename, base64Data)
+	saved, err := s.SaveWithDialog(context.Background(), filename, base64Data)
 
 	// 結果の検証
-	code, ok := failure.CodeOf(err)
-	assert.True(t, ok)
-	assert.Equal(t, code, apperr.UserCanceled)
+	assert.False(t, saved)
+	assert.NoError(t, err)
 	mockLocalFile.AssertNotCalled(t, "SaveScreenshot")
 }

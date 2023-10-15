@@ -2,7 +2,7 @@
   import type { ShipInfo } from "src/lib/column/ShipInfo";
   import ExternalLink from "src/component/common/ExternalLink.svelte";
   import type { domain } from "wailsjs/go/models";
-  import { CssClass } from "src/lib/types";
+  import { CssClass } from "src/lib/CssClass";
   import { NumbersURL } from "src/lib/NumbersURL";
 
   export let column: ShipInfo;

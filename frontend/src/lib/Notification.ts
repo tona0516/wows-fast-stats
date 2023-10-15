@@ -2,16 +2,12 @@ import UIkit from "uikit";
 
 const POSITION = "top-right";
 
-export class Notification {
-  success(message: string, durationMs: number = 3000) {
-    UIkit.notification({
-      message: toMessageHTML("check", message),
-      timeout: durationMs,
-      pos: POSITION,
-    });
-  }
+export namespace Notification {
+  export const success = (message: string, durationMs: number = 3000) => {
+    notify(message, "check", durationMs);
+  };
 
-  failure(error: unknown, durationMs: number = 0) {
+  export const failure = (error: unknown, durationMs: number = 0) => {
     let message: string = "";
     if (error instanceof Error) {
       message = `${error.name}: ${error.message}`;
@@ -21,17 +17,17 @@ export class Notification {
       message = JSON.stringify(error);
     }
 
-    UIkit.notification({
-      message: toMessageHTML("ban", message),
-      timeout: durationMs,
-      pos: POSITION,
-    });
-  }
+    notify(message, "ban", durationMs);
+  };
 }
 
-const toMessageHTML = (icon: string, message: string): string => {
-  return `<div class="uk-text-small">
-    <UkIcon name=${icon} />
-    <span class="uk-text-middle">${message}</span>
-  </div>`;
+const notify = (message: string, icon: string, durationMs: number) => {
+  UIkit.notification({
+    message: `<div class="uk-text-small">
+                <UkIcon name=${icon} />
+                <span class="uk-text-middle">${message}</span>
+              </div>`,
+    timeout: durationMs,
+    pos: POSITION,
+  });
 };

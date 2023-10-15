@@ -2,7 +2,7 @@
   import type { MaxDamage } from "src/lib/column/MaxDamage";
   import ExternalLink from "src/component/common/ExternalLink.svelte";
   import type { domain } from "wailsjs/go/models";
-  import { CssClass } from "src/lib/types";
+  import { CssClass } from "src/lib/CssClass";
 
   export let column: MaxDamage;
   export let player: domain.Player;

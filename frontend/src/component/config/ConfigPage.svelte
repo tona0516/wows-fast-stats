@@ -9,8 +9,8 @@
   import AppInfo from "./internal/AppInfo.svelte";
   import Logging from "./internal/Logging.svelte";
   import { createEventDispatcher } from "svelte";
-  import UkIcon from "../common/uikit/UkIcon.svelte";
-  import UkTab from "../common/uikit/UkTab.svelte";
+  import UkIcon from "src/component/common/uikit/UkIcon.svelte";
+  import UkTab from "src/component/common/uikit/UkTab.svelte";
   import clone from "clone";
 
   const dispatch = createEventDispatcher();

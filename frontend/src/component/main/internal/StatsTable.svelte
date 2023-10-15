@@ -2,7 +2,7 @@
   import UkTable from "src/component/common/uikit/UkTable.svelte";
   import { RowPattern } from "src/lib/RowPattern";
   import { ColumnProvider } from "src/lib/column/ColumnProvider";
-  import { CssClass } from "src/lib/types";
+  import { CssClass } from "src/lib/CssClass";
   import type { domain } from "wailsjs/go/models";
 
   export let teams: domain.Team[];

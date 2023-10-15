@@ -25,7 +25,7 @@ export function LatestRelease():Promise<domain.GHLatestRelease>;
 
 export function LogError(arg1:string):Promise<void>;
 
-export function ManualScreenshot(arg1:string,arg2:string):Promise<void>;
+export function ManualScreenshot(arg1:string,arg2:string):Promise<boolean>;
 
 export function OpenDirectory(arg1:string):Promise<void>;
 

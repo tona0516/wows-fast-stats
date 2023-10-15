@@ -28,18 +28,21 @@ func (s *Screenshot) SaveForAuto(filename string, base64Data string) error {
 	return failure.Wrap(err)
 }
 
-func (s *Screenshot) SaveWithDialog(ctx context.Context, filename string, base64Data string) error {
+func (s *Screenshot) SaveWithDialog(ctx context.Context, filename string, base64Data string) (bool, error) {
 	path, err := s.SaveFileDialogFunc(ctx, runtime.SaveDialogOptions{
 		DefaultFilename: filename,
 	})
 
 	if err != nil {
-		return failure.New(apperr.WailsError, failure.Messagef("%s", err.Error()))
+		return false, failure.New(apperr.WailsError, failure.Messagef("%s", err.Error()))
 	}
 	if path == "" {
-		return failure.New(apperr.UserCanceled)
+		return false, nil
 	}
 
-	err = s.localFile.SaveScreenshot(path, base64Data)
-	return failure.Wrap(err)
+	if err := s.localFile.SaveScreenshot(path, base64Data); err != nil {
+		return false, failure.Wrap(err)
+	}
+
+	return true, nil
 }

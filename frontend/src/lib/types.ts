@@ -1,14 +1,6 @@
 import type { Summary } from "src/lib/Summary";
 import { domain } from "wailsjs/go/models";
 
-export const CssClass = {
-  TD_NUM: "td-number",
-  TD_MULTI: "td-multiple",
-  TD_STR: "td-string",
-  OMIT: "omit",
-};
-export type CssClass = (typeof CssClass)[keyof typeof CssClass];
-
 export const BasicKey = {
   player_info: "player_info",
   ship_info: "ship_info",

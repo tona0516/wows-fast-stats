@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Screenshot } from "src/lib/screenshot/Screenshot";
+  import { Screenshot } from "src/lib/Screenshot";
   import BattleMeta from "src/component/main/internal/BattleMeta.svelte";
   import StatisticsTable from "src/component/main/internal/StatsTable.svelte";
   import {
@@ -15,7 +15,6 @@
   import UkSpinner from "../common/uikit/UkSpinner.svelte";
   import { Battle } from "wailsjs/go/main/App";
   import { createEventDispatcher } from "svelte";
-  import { ScreenshotType } from "src/lib/screenshot/ScreenshotType";
 
   const MAIN_PAGE_ID = "mainpage";
   const screenshot = new Screenshot(MAIN_PAGE_ID);
@@ -40,7 +39,7 @@
       });
 
       if ($storedUserConfig.save_screenshot) {
-        screenshot.take(ScreenshotType.AUTO, battle.meta);
+        screenshot.auto(battle.meta);
       }
     } catch (error) {
       dispatch("Failure", error);
