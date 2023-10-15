@@ -4,11 +4,11 @@ import { derived, writable, type Writable } from "svelte/store";
 import { domain, vo } from "wailsjs/go/models";
 
 export const storedBattle = writable(undefined) as Writable<OptionalBattle>;
-export const storedExcludePlayerIDs = writable([]) as Writable<number[]>;
-export const storedUserConfig = writable({}) as Writable<domain.UserConfig>;
+export const storedExcludedPlayers = writable([]) as Writable<number[]>;
+export const storedConfig = writable({}) as Writable<domain.UserConfig>;
 
 export const storedSummary = derived(
-  [storedBattle, storedExcludePlayerIDs, storedUserConfig],
+  [storedBattle, storedExcludedPlayers, storedConfig],
   ([$storedBattle, $storedExcludePlayerIDs, $storedUserConfig]) =>
     Summary.calculate(
       $storedBattle,

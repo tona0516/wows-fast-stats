@@ -2,7 +2,7 @@
   import { DispName } from "src/lib/DispName";
   import StatisticsTable from "src/component/main/internal/StatsTable.svelte";
   import ConfirmModal from "src/component/modal/ConfirmModal.svelte";
-  import { storedUserConfig } from "src/stores";
+  import { storedConfig } from "src/stores";
   import { createEventDispatcher } from "svelte";
   import UIkit from "uikit";
   import {
@@ -12,11 +12,11 @@
   } from "wailsjs/go/main/App";
   import { domain } from "wailsjs/go/models";
   import clone from "clone";
-  import { ColumnProvider } from "src/lib/column/ColumnProvider";
   import { SAMPLE_TEAM } from "src/lib/rating/RatingColorFactory";
   import { ModalElementID } from "src/component/modal/ModalElementID";
+  import { ColumnProvider } from "src/lib/column/ColumnProvider";
 
-  export let inputUserConfig: domain.UserConfig;
+  export let inputConfig: domain.UserConfig;
 
   const dispatch = createEventDispatcher();
 
@@ -24,23 +24,23 @@
     try {
       const defaultConfig = await DefaultUserConfig();
 
-      inputUserConfig.font_size = defaultConfig.font_size;
-      inputUserConfig.displays = defaultConfig.displays;
-      inputUserConfig.custom_color = defaultConfig.custom_color;
-      inputUserConfig.custom_digit = defaultConfig.custom_digit;
+      inputConfig.font_size = defaultConfig.font_size;
+      inputConfig.displays = defaultConfig.displays;
+      inputConfig.custom_color = defaultConfig.custom_color;
+      inputConfig.custom_digit = defaultConfig.custom_digit;
 
-      await ApplyUserConfig(inputUserConfig);
+      await ApplyUserConfig(inputConfig);
 
       const latest = await UserConfig();
-      storedUserConfig.set(latest);
+      storedConfig.set(latest);
       dispatch("UpdateSuccess");
     } catch (error) {
-      inputUserConfig = clone($storedUserConfig);
+      inputConfig = clone($storedConfig);
       dispatch("Failure", { message: error });
     }
   };
 
-  $: displays = ColumnProvider.displayItems();
+  $: displays = ColumnProvider.getDisplayableColumns();
 </script>
 
 <ConfirmModal message="表示設定をリセットしますか？" on:Confirmed={reset} />
@@ -49,11 +49,11 @@
   <div>UIサイズ</div>
   <select
     class="uk-select uk-form-width-small"
-    bind:value={inputUserConfig.font_size}
+    bind:value={inputConfig.font_size}
     on:change={() => dispatch("Change")}
   >
     {#each DispName.FONT_SIZES.toArray() as fs}
-      <option selected={fs.key === $storedUserConfig.font_size} value={fs.key}
+      <option selected={fs.key === $storedConfig.font_size} value={fs.key}
         >{fs.value}</option
       >
     {/each}
@@ -84,7 +84,7 @@
               <input
                 class="uk-checkbox"
                 type="checkbox"
-                bind:checked={inputUserConfig.displays.ship[display.shipKey]}
+                bind:checked={inputConfig.displays.ship[display.shipKey]}
                 on:change={() => dispatch("Change")}
               />
             </td>
@@ -97,9 +97,7 @@
               <input
                 class="uk-checkbox"
                 type="checkbox"
-                bind:checked={inputUserConfig.displays.overall[
-                  display.overallKey
-                ]}
+                bind:checked={inputConfig.displays.overall[display.overallKey]}
                 on:change={() => dispatch("Change")}
               />
             </td>
@@ -111,13 +109,13 @@
             <td class="uk-text-center">
               <select
                 class="uk-select uk-form-small uk-form-width-xsmall"
-                bind:value={inputUserConfig.custom_digit[display.digitKey]}
+                bind:value={inputConfig.custom_digit[display.digitKey]}
                 on:change={() => dispatch("Change")}
               >
                 {#each [0, 1, 2] as digit}
                   <option
                     selected={digit ===
-                      inputUserConfig.custom_digit[display.digitKey]}
+                      inputConfig.custom_digit[display.digitKey]}
                     value={digit}>{digit}</option
                   >
                 {/each}
@@ -152,7 +150,7 @@
             <input
               class="uk-input"
               type="color"
-              bind:value={inputUserConfig.custom_color.skill.text[sl.key]}
+              bind:value={inputConfig.custom_color.skill.text[sl.key]}
               on:input={() => dispatch("Change")}
             />
           </td>
@@ -161,7 +159,7 @@
             <input
               class="uk-input"
               type="color"
-              bind:value={inputUserConfig.custom_color.skill.background[sl.key]}
+              bind:value={inputConfig.custom_color.skill.background[sl.key]}
               on:input={() => dispatch("Change")}
             />
           </td>
@@ -188,7 +186,7 @@
             <input
               class="uk-input"
               type="color"
-              bind:value={inputUserConfig.custom_color.tier.own[tg.key]}
+              bind:value={inputConfig.custom_color.tier.own[tg.key]}
               on:input={() => dispatch("Change")}
             />
           </td>
@@ -197,7 +195,7 @@
             <input
               class="uk-input"
               type="color"
-              bind:value={inputUserConfig.custom_color.tier.other[tg.key]}
+              bind:value={inputConfig.custom_color.tier.other[tg.key]}
               on:input={() => dispatch("Change")}
             />
           </td>
@@ -224,7 +222,7 @@
             <input
               class="uk-input"
               type="color"
-              bind:value={inputUserConfig.custom_color.ship_type.own[st.key]}
+              bind:value={inputConfig.custom_color.ship_type.own[st.key]}
               on:input={() => dispatch("Change")}
             />
           </td>
@@ -233,7 +231,7 @@
             <input
               class="uk-input"
               type="color"
-              bind:value={inputUserConfig.custom_color.ship_type.other[st.key]}
+              bind:value={inputConfig.custom_color.ship_type.other[st.key]}
               on:input={() => dispatch("Change")}
             />
           </td>
@@ -247,12 +245,12 @@
   <div>プレイヤー名の背景色</div>
   <select
     class="uk-select uk-form-width-medium"
-    bind:value={inputUserConfig.custom_color.player_name}
+    bind:value={inputConfig.custom_color.player_name}
     on:change={() => dispatch("Change")}
   >
     {#each DispName.PLAYER_NAME_COLORS.toArray() as pnc}
       <option
-        selected={pnc.key === $storedUserConfig.custom_color.player_name}
+        selected={pnc.key === $storedConfig.custom_color.player_name}
         value={pnc.key}>{pnc.value}</option
       >
     {/each}
@@ -261,7 +259,7 @@
 
 <div class="uk-padding-small">
   <div>プレビュー</div>
-  <StatisticsTable teams={[SAMPLE_TEAM]} userConfig={inputUserConfig} />
+  <StatisticsTable teams={[SAMPLE_TEAM]} config={inputConfig} />
 </div>
 
 <div class="uk-padding-small">

@@ -1,9 +1,9 @@
 <script lang="ts">
-  import type { ShipInfo } from "src/lib/column/ShipInfo";
   import ExternalLink from "src/component/common/ExternalLink.svelte";
   import type { domain } from "wailsjs/go/models";
   import { CssClass } from "src/lib/CssClass";
   import { NumbersURL } from "src/lib/NumbersURL";
+  import type { ShipInfo } from "src/lib/column/model/ShipInfo";
 
   export let column: ShipInfo;
   export let player: domain.Player;

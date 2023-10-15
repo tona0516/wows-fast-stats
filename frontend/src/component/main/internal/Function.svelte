@@ -4,7 +4,7 @@
   import UkSpinner from "src/component/common/uikit/UkSpinner.svelte";
   import { DispName } from "src/lib/DispName";
   import type { Screenshot } from "src/lib/Screenshot";
-  import { storedBattle, storedUserConfig } from "src/stores";
+  import { storedBattle, storedConfig } from "src/stores";
   import { createEventDispatcher } from "svelte";
   import { ApplyUserConfig } from "wailsjs/go/main/App";
   import { WindowReloadApp } from "wailsjs/runtime/runtime";
@@ -13,7 +13,7 @@
 
   $: isScreenshotting = false;
   $: disableScreenshot = isScreenshotting || $storedBattle?.meta === undefined;
-  let selectedStatsPattern: string = $storedUserConfig.stats_pattern;
+  let selectedStatsPattern: string = $storedConfig.stats_pattern;
 
   const dispatch = createEventDispatcher();
 
@@ -36,12 +36,12 @@
 
   const onStatsPatternChanged = async () => {
     try {
-      let config = clone($storedUserConfig);
+      let config = clone($storedConfig);
       config.stats_pattern = selectedStatsPattern;
       await ApplyUserConfig(config);
-      storedUserConfig.set(config);
+      storedConfig.set(config);
     } catch (error) {
-      selectedStatsPattern = $storedUserConfig.stats_pattern;
+      selectedStatsPattern = $storedConfig.stats_pattern;
       dispatch("Failure", { message: error });
       return;
     }
@@ -54,7 +54,7 @@
   on:change={onStatsPatternChanged}
 >
   {#each DispName.STATS_PATTERNS.toArray() as sp}
-    <option selected={sp.key == $storedUserConfig.stats_pattern} value={sp.key}
+    <option selected={sp.key == $storedConfig.stats_pattern} value={sp.key}
       >{sp.value}</option
     >
   {/each}

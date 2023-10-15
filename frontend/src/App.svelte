@@ -15,9 +15,9 @@
   } from "wailsjs/go/main/App";
   import { EventsOn, EventsEmit } from "wailsjs/runtime/runtime";
   import {
-    storedExcludePlayerIDs,
+    storedExcludedPlayers,
     storedAlertPlayers,
-    storedUserConfig,
+    storedConfig,
     storedRequiredConfigError,
     storedLogs,
   } from "src/stores";
@@ -30,16 +30,6 @@
   import { FontSize } from "src/lib/FontSize";
   import { Notification } from "src/lib/Notification";
 
-  // Note: see watcher.go
-  enum AppEvent {
-    BATTLE_START = "BATTLE_START",
-    BATTLE_ERR = "BATTLE_ERR",
-    LOG = "LOG",
-    ONLOAD = "ONLOAD",
-  }
-
-  const PAGE_TAB_ID = "page-tab";
-
   let modals: Modals;
   let mainPage: MainPage | undefined;
   let initialized = false;
@@ -47,33 +37,33 @@
 
   $: {
     // @ts-ignore
-    document.body.style.zoom = FontSize.getZoomRate($storedUserConfig);
+    document.body.style.zoom = FontSize.getZoomRate($storedConfig);
   }
 
-  EventsOn(AppEvent.LOG, (log: string) =>
+  EventsOn("LOG", (log: string) =>
     storedLogs.update((logs) => {
       logs.push(log);
       return logs;
     }),
   );
-  EventsOn(AppEvent.BATTLE_START, () => mainPage?.fetchBattle());
-  EventsOn(AppEvent.BATTLE_ERR, (error: string) => Notification.failure(error));
+  EventsOn("BATTLE_START", () => mainPage?.fetchBattle());
+  EventsOn("BATTLE_ERR", (error: string) => Notification.failure(error));
 
   async function main() {
     try {
-      const userConfig = await UserConfig();
+      const config = await UserConfig();
       const requiredConfigError = await ValidateRequiredConfig(
-        userConfig.install_path,
-        userConfig.appid,
+        config.install_path,
+        config.appid,
       );
 
-      storedUserConfig.set(userConfig);
+      storedConfig.set(config);
       storedRequiredConfigError.set(requiredConfigError);
       storedAlertPlayers.set(await AlertPlayers());
 
       initialized = true;
 
-      if (userConfig.notify_updatable) {
+      if (config.notify_updatable) {
         const latestRelease = await LatestRelease();
         if (latestRelease.updatable) {
           updatableRelease = latestRelease;
@@ -89,7 +79,7 @@
   }
 
   window.onload = function () {
-    EventsEmit(AppEvent.ONLOAD);
+    EventsEmit("ONLOAD");
   };
 
   main();
@@ -118,7 +108,8 @@
   {/if}
 
   {#if initialized}
-    <UkTab clazz="uk-margin-remove" id={PAGE_TAB_ID}>
+    {@const tabID = "page-tab"}
+    <UkTab clazz="uk-margin-remove" id={tabID}>
       <li>
         <!-- svelte-ignore a11y-invalid-attribute -->
         <a href="#"><UkIcon name="home" /></a>
@@ -135,7 +126,7 @@
         </a>
       </li>
     </UkTab>
-    <ul id={PAGE_TAB_ID} class="uk-switcher">
+    <ul id={tabID} class="uk-switcher">
       <li>
         <MainPage
           bind:this={mainPage}
@@ -146,7 +137,7 @@
           on:RemoveAlertPlayer={(e) =>
             modals.showRemoveAlertPlayer(e.detail.target)}
           on:CheckPlayer={async () => {
-            storedExcludePlayerIDs.set(await ExcludePlayerIDs());
+            storedExcludedPlayers.set(await ExcludePlayerIDs());
           }}
           on:ScreenshotSaved={() =>
             Notification.success("スクリーンショットを保存しました")}

@@ -3,37 +3,54 @@ import PlayerNameTableData from "src/component/main/internal/table_data/PlayerNa
 import ShipInfoTableData from "src/component/main/internal/table_data/ShipInfoTableData.svelte";
 import SingleTableData from "src/component/main/internal/table_data/SingleTableData.svelte";
 import StackedBarGraphTableData from "src/component/main/internal/table_data/StackedBarGraphTableData.svelte";
-import { AvgTier } from "src/lib/column/AvgTier";
-import { Battles } from "src/lib/column/Battles";
-import { ColumnArray } from "src/lib/column/ColumnArray";
-import { Damage } from "src/lib/column/Damage";
-import { Exp } from "src/lib/column/Exp";
-import { HitRate } from "src/lib/column/HitRate";
+import { DispName } from "src/lib/DispName";
 import type { AbstractColumn } from "src/lib/column/intetface/AbstractColumn";
-import { KDRate } from "src/lib/column/KDRate";
-import { Kill } from "src/lib/column/Kill";
-import { MaxDamage } from "src/lib/column/MaxDamage";
-import { PlanesKilled } from "src/lib/column/PlanesKilled";
-import { PlayerName } from "src/lib/column/PlayerName";
-import { PR } from "src/lib/column/PR";
-import { ShipInfo } from "src/lib/column/ShipInfo";
-import { SurvivedRate } from "src/lib/column/SurvivedRate";
-import { UsingShipTypeRate } from "src/lib/column/UsingShipTypeRate";
-import { UsingTierRate } from "src/lib/column/UsingTierRate";
-import { WinRate } from "src/lib/column/WinRate";
-import { type DigitKey, type OverallKey, type ShipKey } from "src/lib/types";
-import { isOverallKey, isShipKey } from "src/lib/util";
+import { AvgTier } from "src/lib/column/model/AvgTier";
+import { Battles } from "src/lib/column/model/Battles";
+import { Damage } from "src/lib/column/model/Damage";
+import { Exp } from "src/lib/column/model/Exp";
+import { HitRate } from "src/lib/column/model/HitRate";
+import { KDRate } from "src/lib/column/model/KDRate";
+import { Kill } from "src/lib/column/model/Kill";
+import { MaxDamage } from "src/lib/column/model/MaxDamage";
+import { PR } from "src/lib/column/model/PR";
+import { PlanesKilled } from "src/lib/column/model/PlanesKilled";
+import { PlayerName } from "src/lib/column/model/PlayerName";
+import { ShipInfo } from "src/lib/column/model/ShipInfo";
+import { SurvivedRate } from "src/lib/column/model/SurvivedRate";
+import { UsingShipTypeRate } from "src/lib/column/model/UsingShipTypeRate";
+import { UsingTierRate } from "src/lib/column/model/UsingTierRate";
+import { WinRate } from "src/lib/column/model/WinRate";
+import {
+  type ColumnCategory,
+  type DigitKey,
+  type OverallKey,
+  type ShipKey,
+} from "src/lib/types";
+import { isDigitKey, isOverallKey, isShipKey } from "src/lib/util";
 import { domain } from "wailsjs/go/models";
 
-interface DisplayItem {
-  name: string;
-  digitKey: DigitKey;
-  shipKey?: ShipKey;
-  overallKey?: OverallKey;
+class ColumnArray extends Array<AbstractColumn<any>> {
+  constructor(
+    private category: ColumnCategory,
+    private columns: AbstractColumn<any>[],
+  ) {
+    super(...columns);
+  }
+
+  dispName(): string {
+    return DispName.COLUMN_CATEGORIES.get(this.category)!;
+  }
+
+  columnCount(): number {
+    return this.columns
+      .filter((it) => it.shouldShowColumn())
+      .reduce((a, it) => a + it.innerColumnNumber, 0);
+  }
 }
 
 export namespace ColumnProvider {
-  export const tableColumns = (
+  export const getAllColumns = (
     config: domain.UserConfig,
   ): [basic: ColumnArray, ship: ColumnArray, overall: ColumnArray] => {
     return [
@@ -71,34 +88,34 @@ export namespace ColumnProvider {
     ];
   };
 
-  export const displayItems = (): DisplayItem[] => {
+  interface DisplayableColumn {
+    name: string;
+    digitKey?: DigitKey;
+    shipKey?: ShipKey;
+    overallKey?: OverallKey;
+  }
+
+  export const getDisplayableColumns = (): DisplayableColumn[] => {
     const config = new domain.UserConfig();
-    const [_, shipColumns, overallColumns] = tableColumns(config);
+    const [_, shipColumns, overallColumns] = getAllColumns(config);
     const columns: AbstractColumn<any>[] = [...shipColumns, ...overallColumns];
 
-    let items: DisplayItem[] = [];
+    let result: DisplayableColumn[] = [];
     columns.forEach((column) => {
-      const displayKey = column.getDisplayKey();
-      if (items.filter((it) => it.digitKey === displayKey).length !== 0) {
+      const key = column.displayKey;
+      if (result.find((it) => it.digitKey === key)) {
         return;
       }
 
-      const item: DisplayItem = {
-        name: column.getFullDisplayName(),
-        digitKey: displayKey,
-      };
+      const dc: DisplayableColumn = { name: column.fullDisplayName };
 
-      if (isShipKey(displayKey)) {
-        item.shipKey = displayKey;
-      }
+      if (isDigitKey(key)) dc.digitKey = key;
+      if (isShipKey(key)) dc.shipKey = key;
+      if (isOverallKey(key)) dc.overallKey = key;
 
-      if (isOverallKey(displayKey)) {
-        item.overallKey = displayKey;
-      }
-
-      items.push(item);
+      result.push(dc);
     });
 
-    return Array.from(items);
+    return result;
   };
 }

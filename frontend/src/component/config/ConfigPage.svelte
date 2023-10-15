@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { storedUserConfig, storedRequiredConfigError } from "src/stores";
+  import { storedConfig, storedRequiredConfigError } from "src/stores";
   import { UserConfig, ApplyUserConfig } from "wailsjs/go/main/App";
   import Required from "./internal/Required.svelte";
   import Other from "./internal/Other.svelte";
@@ -16,18 +16,18 @@
   const dispatch = createEventDispatcher();
   const CONFIG_MENU_ID = "config-menu-id";
 
-  let inputUserConfig = clone($storedUserConfig);
-  storedUserConfig.subscribe((it) => {
-    inputUserConfig = clone(it);
+  let inputConfig = clone($storedConfig);
+  storedConfig.subscribe((it) => {
+    inputConfig = clone(it);
   });
 
   const silentApply = async () => {
     try {
-      await ApplyUserConfig(inputUserConfig);
+      await ApplyUserConfig(inputConfig);
       const latest = await UserConfig();
-      storedUserConfig.set(latest);
+      storedConfig.set(latest);
     } catch (error) {
-      inputUserConfig = clone($storedUserConfig);
+      inputConfig = clone($storedConfig);
       dispatch("Failure", { message: error });
     }
   };
@@ -57,16 +57,16 @@
     <ul id={CONFIG_MENU_ID} class="uk-switcher">
       <li>
         <Required
-          {inputUserConfig}
+          {inputConfig}
           on:UpdateSuccess={() => dispatch("UpdateRequired")}
           on:Failure
         />
       </li>
       <li>
-        <Display {inputUserConfig} on:UpdateSuccess on:Change={silentApply} />
+        <Display {inputConfig} on:UpdateSuccess on:Change={silentApply} />
       </li>
       <li>
-        <TeamSummary {inputUserConfig} on:UpdateSuccess on:Failure />
+        <TeamSummary {inputConfig} on:UpdateSuccess on:Failure />
       </li>
       <li>
         <AlertPlayer
@@ -76,7 +76,7 @@
         />
       </li>
       <li>
-        <Other {inputUserConfig} on:Change={silentApply} on:Failure />
+        <Other {inputConfig} on:Change={silentApply} on:Failure />
       </li>
       <li>
         <Logging />

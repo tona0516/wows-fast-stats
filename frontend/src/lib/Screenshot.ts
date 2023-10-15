@@ -14,17 +14,17 @@ export class Screenshot {
 
   async manual(meta: domain.Meta): Promise<boolean> {
     const filename = deriveFileName(meta);
-    const image = await this.getBase64Image(meta);
+    const image = await this.getBase64Image();
     return await ManualScreenshot(filename, image);
   }
 
   async auto(meta: domain.Meta) {
     const filename = deriveFileName(meta);
-    const image = await this.getBase64Image(meta);
+    const image = await this.getBase64Image();
     await AutoScreenshot(filename, image);
   }
 
-  private async getBase64Image(meta: domain.Meta): Promise<string> {
+  private async getBase64Image(): Promise<string> {
     try {
       const element = document.getElementById(this.targetElementID);
 
@@ -35,14 +35,19 @@ export class Screenshot {
       }
       return (await htmlToImage.toPng(element!)).split(",")[1];
     } catch (error) {
-      LogError(JSON.stringify(error));
+      LogError(`${this.getBase64Image.name}: ${JSON.stringify(error)}`);
       throw error;
     }
   }
 }
 
-const deriveFileName = (meta: domain.Meta): string =>
-  `${format(
-    fromUnixTime(meta.unixtime),
-    "yyyy-MM-dd-HH-mm-ss",
-  )}_${meta.own_ship.replaceAll(" ", "-")}_${meta.arena}_${meta.type}.png`;
+const deriveFileName = (meta: domain.Meta): string => {
+  const items = [
+    format(fromUnixTime(meta.unixtime), "yyyy-MM-dd-HH-mm-ss"),
+    meta.own_ship.replaceAll(" ", "-"),
+    meta.arena,
+    meta.type,
+  ];
+
+  return `${items.join("_")}.png`;
+};

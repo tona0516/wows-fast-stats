@@ -1,15 +1,15 @@
 <script lang="ts">
   import clone from "clone";
   import UkSpinner from "src/component/common/uikit/UkSpinner.svelte";
-  import { storedUserConfig } from "src/stores";
+  import { storedConfig } from "src/stores";
   import { createEventDispatcher } from "svelte";
   import { ApplyUserConfig, UserConfig } from "wailsjs/go/main/App";
   import { domain } from "wailsjs/go/models";
 
-  export let inputUserConfig: domain.UserConfig;
+  export let inputConfig: domain.UserConfig;
 
   let isLoading = false;
-  let teamAverage: domain.TeamAverage = inputUserConfig.team_average;
+  let teamAverage: domain.TeamAverage = inputConfig.team_average;
 
   $: isValidMinShipBattles =
     teamAverage.min_ship_battles > 0 &&
@@ -28,14 +28,14 @@
 
     try {
       isLoading = true;
-      inputUserConfig.team_average = teamAverage;
-      await ApplyUserConfig(inputUserConfig);
+      inputConfig.team_average = teamAverage;
+      await ApplyUserConfig(inputConfig);
 
       const latest = await UserConfig();
-      storedUserConfig.set(latest);
+      storedConfig.set(latest);
       dispatch("UpdateSuccess");
     } catch (error) {
-      inputUserConfig = clone($storedUserConfig);
+      inputConfig = clone($storedConfig);
       dispatch("Failure", { message: error });
     } finally {
       isLoading = false;

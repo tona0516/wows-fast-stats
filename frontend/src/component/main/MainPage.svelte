@@ -4,7 +4,7 @@
   import StatisticsTable from "src/component/main/internal/StatsTable.svelte";
   import {
     storedBattle,
-    storedUserConfig,
+    storedConfig,
     storedSummary,
     storedRequiredConfigError,
   } from "src/stores";
@@ -38,7 +38,7 @@
         message: `データ取得完了: ${elapsed.toFixed(1)}秒`,
       });
 
-      if ($storedUserConfig.save_screenshot) {
+      if ($storedConfig.save_screenshot) {
         screenshot.auto(battle.meta);
       }
     } catch (error) {
@@ -62,12 +62,12 @@
     {#if $storedBattle}
       {@const teams = $storedBattle.teams}
       {@const meta = $storedBattle.meta}
-      {@const userConfig = $storedUserConfig}
+      {@const config = $storedConfig}
 
       <div class="uk-flex uk-flex-center">
         <StatisticsTable
           {teams}
-          {userConfig}
+          {config}
           on:EditAlertPlayer
           on:RemoveAlertPlayer
           on:CheckPlayer
@@ -85,7 +85,7 @@
         </div>
       {/if}
 
-      <ColorDescription config={userConfig} />
+      <ColorDescription {config} />
     {:else}
       <p class="uk-text-center">
         {#if $storedRequiredConfigError.valid}

@@ -1,7 +1,13 @@
-import { isOverallKey, isShipKey, isShipType, tierString } from "src/lib/util";
+import {
+  isDigitKey,
+  isOverallKey,
+  isShipKey,
+  isShipType,
+  tierString,
+} from "src/lib/util";
 
 test("tierString", () => {
-  const expecteds = [
+  [
     "",
     "I",
     "II",
@@ -14,38 +20,55 @@ test("tierString", () => {
     "IX",
     "X",
     "★",
-  ];
-  expecteds.forEach((expected, i) => {
+  ].forEach((expected, i) => {
     expect(tierString(i)).toBe(expected);
   });
 });
 
-test("isShipType", () => {
-  const validTypes = ["cv", "bb", "cl", "dd", "ss"];
-  validTypes.forEach((type) => {
+test("isShipType - 正常系", () => {
+  ["cv", "bb", "cl", "dd", "ss"].forEach((type) => {
     if (!isShipType(type)) fail();
   });
+});
 
-  const invalidTypes = ["", "aux"];
-  invalidTypes.forEach((type) => {
+test("isShipType - 異常系", () => {
+  ["", "aux"].forEach((type) => {
     if (isShipType(type)) fail();
   });
 });
 
-test("isShipKey", () => {
-  const validKeys = ["battles", "hit_rate"];
-  validKeys.forEach((key) => {
-    if (!isShipKey(key)) fail();
+test("isDigitKey - 正常系", () => {
+  ["pr", "hit_rate"].forEach((key) => {
+    if (!isDigitKey(key)) fail();
   });
-
-  if (isShipKey("avg_tier")) fail();
 });
 
-test("isOverallKey", () => {
-  const validKeys = ["battles", "avg_tier"];
-  validKeys.forEach((key) => {
+test("isDigitKey - 異常系", () => {
+  ["", "invalid"].forEach((key) => {
+    if (isDigitKey(key)) fail();
+  });
+});
+
+test("isShipKey - 正常系", () => {
+  ["battles", "hit_rate"].forEach((key) => {
+    if (!isShipKey(key)) fail();
+  });
+});
+
+test("isShipKey - 異常系", () => {
+  ["", "avg_tier"].forEach((key) => {
+    if (isShipKey(key)) fail();
+  });
+});
+
+test("isOverallKey - 正常系", () => {
+  ["battles", "avg_tier"].forEach((key) => {
     if (!isOverallKey(key)) fail();
   });
+});
 
-  if (isOverallKey("hit_rate")) fail();
+test("isOverallKey - 異常系", () => {
+  ["", "hit_rate"].forEach((key) => {
+    if (isOverallKey(key)) fail();
+  });
 });

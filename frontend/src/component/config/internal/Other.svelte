@@ -4,7 +4,7 @@
   import { OpenDirectory } from "wailsjs/go/main/App";
   import { domain } from "wailsjs/go/models";
 
-  export let inputUserConfig: domain.UserConfig;
+  export let inputConfig: domain.UserConfig;
 
   const dispatch = createEventDispatcher();
 
@@ -23,7 +23,7 @@
       ><input
         class="uk-checkbox"
         type="checkbox"
-        bind:checked={inputUserConfig.save_screenshot}
+        bind:checked={inputConfig.save_screenshot}
         on:change={() => dispatch("Change")}
       /> 自動でスクリーンショットを保存する</label
     >
@@ -41,7 +41,7 @@
       ><input
         class="uk-checkbox"
         type="checkbox"
-        bind:checked={inputUserConfig.save_temp_arena_info}
+        bind:checked={inputConfig.save_temp_arena_info}
         on:change={() => dispatch("Change")}
       /> 【開発用】自動で戦闘情報(tempArenaInfo.json)を保存する</label
     >
@@ -63,7 +63,7 @@
       ><input
         class="uk-checkbox"
         type="checkbox"
-        bind:checked={inputUserConfig.send_report}
+        bind:checked={inputConfig.send_report}
         on:change={() => dispatch("Change")}
       /> アプリ改善のためのデータ送信を許可する</label
     >
@@ -82,7 +82,7 @@
       ><input
         class="uk-checkbox"
         type="checkbox"
-        bind:checked={inputUserConfig.notify_updatable}
+        bind:checked={inputConfig.notify_updatable}
         on:change={() => dispatch("Change")}
       /> 新しいバージョンがある場合に通知する</label
     >

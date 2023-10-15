@@ -3,7 +3,7 @@
   import ExternalLink from "src/component/common/ExternalLink.svelte";
   import UkIcon from "src/component/common/uikit/UkIcon.svelte";
   import UkSpinner from "src/component/common/uikit/UkSpinner.svelte";
-  import { storedRequiredConfigError, storedUserConfig } from "src/stores";
+  import { storedRequiredConfigError, storedConfig } from "src/stores";
   import { createEventDispatcher } from "svelte";
   import {
     ApplyRequiredUserConfig,
@@ -12,7 +12,7 @@
   } from "wailsjs/go/main/App";
   import { domain, vo } from "wailsjs/go/models";
 
-  export let inputUserConfig: domain.UserConfig;
+  export let inputConfig: domain.UserConfig;
 
   let isLoading = false;
   let requiredConfigError: vo.RequiredConfigError;
@@ -23,7 +23,7 @@
     try {
       const path = await SelectDirectory();
       if (!path) return;
-      inputUserConfig.install_path = path;
+      inputConfig.install_path = path;
     } catch (error) {
       dispatch("Failure", { message: error });
     }
@@ -33,8 +33,8 @@
     try {
       isLoading = true;
       requiredConfigError = await ApplyRequiredUserConfig(
-        inputUserConfig.install_path,
-        inputUserConfig.appid,
+        inputConfig.install_path,
+        inputConfig.appid,
       );
 
       if (!requiredConfigError.valid) {
@@ -42,11 +42,11 @@
       }
 
       const latest = await UserConfig();
-      storedUserConfig.set(latest);
+      storedConfig.set(latest);
       storedRequiredConfigError.set(requiredConfigError);
       dispatch("UpdateSuccess");
     } catch (error) {
-      inputUserConfig = clone($storedUserConfig);
+      inputConfig = clone($storedConfig);
       dispatch("Failure", { message: error });
     } finally {
       isLoading = false;
@@ -60,7 +60,7 @@
       class="uk-input"
       type="text"
       placeholder="World of Warshipsインストールフォルダ"
-      bind:value={inputUserConfig.install_path}
+      bind:value={inputConfig.install_path}
     />
     <button
       class="uk-button uk-button-default uk-text-nowrap"
@@ -82,7 +82,7 @@
     class="uk-input"
     type="text"
     placeholder="アプリケーションID"
-    bind:value={inputUserConfig.appid}
+    bind:value={inputConfig.appid}
   />
   <span>
     <ExternalLink url="https://developers.wargaming.net/"

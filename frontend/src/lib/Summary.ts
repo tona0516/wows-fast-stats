@@ -1,9 +1,9 @@
 import { DispName } from "src/lib/DispName";
-import { Damage } from "src/lib/column/Damage";
-import { PR } from "src/lib/column/PR";
-import { WinRate } from "src/lib/column/WinRate";
 import type { AbstractColumn } from "src/lib/column/intetface/AbstractColumn";
 import { type ISummaryColumn } from "src/lib/column/intetface/ISummaryColumn";
+import { Damage } from "src/lib/column/model/Damage";
+import { PR } from "src/lib/column/model/PR";
+import { WinRate } from "src/lib/column/model/WinRate";
 import {
   type OptionalBattle,
   type OptionalSummary,
@@ -71,7 +71,7 @@ export namespace Summary {
 
       const digit = column.getDigit();
 
-      result.meta.columnNames.push(column.getMinDisplayName());
+      result.meta.columnNames.push(column.minDisplayName);
       result.values.friends.push(friendMean.toFixed(digit));
       result.values.enemies.push(enemyMean.toFixed(digit));
       result.values.diffs.push(deriveDiff(friendMean, enemyMean, digit));

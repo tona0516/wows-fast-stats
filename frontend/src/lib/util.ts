@@ -41,6 +41,10 @@ export const isShipType = (type: string): type is ShipType => {
   return Object.keys(new domain.ShipTypeGroup()).includes(type);
 };
 
+export const isDigitKey = (key: string): key is ShipKey => {
+  return Object.keys(new domain.CustomDigit()).includes(key);
+};
+
 export const isShipKey = (key: string): key is ShipKey => {
   return Object.keys(new domain.Ship()).includes(key);
 };

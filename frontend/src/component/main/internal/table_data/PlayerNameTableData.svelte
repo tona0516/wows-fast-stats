@@ -4,15 +4,15 @@
   import UkIcon from "src/component/common/uikit/UkIcon.svelte";
   import UkTooltip from "src/component/common/uikit/UkTooltip.svelte";
   import { NumbersURL } from "src/lib/NumbersURL";
-  import type { PlayerName } from "src/lib/column/PlayerName";
   import { CssClass } from "src/lib/CssClass";
-  import { storedAlertPlayers, storedExcludePlayerIDs } from "src/stores";
+  import { storedAlertPlayers, storedExcludedPlayers } from "src/stores";
   import { createEventDispatcher } from "svelte";
   import {
     AddExcludePlayerID,
     RemoveExcludePlayerID,
   } from "wailsjs/go/main/App";
   import type { domain } from "wailsjs/go/models";
+  import type { PlayerName } from "src/lib/column/model/PlayerName";
 
   export let column: PlayerName;
   export let player: domain.Player;
@@ -20,7 +20,7 @@
   $: accountID = player.player_info.id;
   $: isNPC = accountID === 0;
   $: isBelongToClan = player.player_info.clan.id !== 0;
-  $: isChecked = !$storedExcludePlayerIDs.includes(accountID);
+  $: isChecked = !$storedExcludedPlayers.includes(accountID);
   $: alertPlayer = $storedAlertPlayers.find(
     (it) => it.account_id === accountID,
   );
