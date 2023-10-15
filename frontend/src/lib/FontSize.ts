@@ -21,11 +21,10 @@ const ZOOM_RATIO = new Map<FontSize, number>([
 ]);
 
 export namespace FontSize {
-  export const apply = (config: domain.UserConfig) => {
+  export const getZoomRate = (config: domain.UserConfig): number => {
     const fontSize = config.font_size as FontSize;
     const zoomRatio = ZOOM_RATIO.get(fontSize);
 
-    // @ts-ignore
-    document.body.style.zoom = zoomRatio || 1.0;
+    return zoomRatio || 1.0;
   };
 }

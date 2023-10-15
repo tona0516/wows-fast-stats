@@ -46,7 +46,8 @@
   let updatableRelease: domain.GHLatestRelease;
 
   $: {
-    FontSize.apply($storedUserConfig);
+    // @ts-ignore
+    document.body.style.zoom = FontSize.getZoomRate($storedUserConfig);
   }
 
   EventsOn(AppEvent.LOG, (log: string) =>
