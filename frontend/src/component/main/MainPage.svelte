@@ -13,12 +13,11 @@
   import ColorDescription from "./internal/ColorDescription.svelte";
   import Ofuse from "./internal/Ofuse.svelte";
   import UkSpinner from "../common/uikit/UkSpinner.svelte";
-  import { Battle } from "wailsjs/go/main/App";
-  import { createEventDispatcher } from "svelte";
+  import { FetchProxy } from "src/lib/FetchProxy";
+  import { Notifier } from "src/lib/Notifier";
 
   const MAIN_PAGE_ID = "mainpage";
   const screenshot = new Screenshot(MAIN_PAGE_ID);
-  const dispatch = createEventDispatcher();
 
   let isLoading = false;
 
@@ -26,23 +25,19 @@
     try {
       isLoading = true;
 
+      const start = new Date().getTime();
       // Note: 過去のデータが影響してか値が0になってしまうためクリーンする
       storedBattle.set(undefined);
-
-      const start = new Date().getTime();
-      const battle = await Battle();
+      const battle = await FetchProxy.getBattle();
       const elapsed = (new Date().getTime() - start) / 1000;
 
-      storedBattle.set(battle);
-      dispatch("FetchSuccess", {
-        message: `データ取得完了: ${elapsed.toFixed(1)}秒`,
-      });
+      Notifier.success(`データ取得完了: ${elapsed.toFixed(1)}秒`);
 
       if ($storedConfig.save_screenshot) {
         screenshot.auto(battle.meta);
       }
     } catch (error) {
-      dispatch("Failure", error);
+      Notifier.failure(error);
     } finally {
       isLoading = false;
     }
@@ -55,7 +50,7 @@
   class="uk-padding-small uk-light uk-background-secondary"
 >
   <div class="uk-margin-small uk-flex uk-flex-center">
-    <Function {screenshot} on:ScreenshotSaved on:Failure />
+    <Function {screenshot} />
   </div>
 
   <div class="uk-margin-small">
@@ -70,7 +65,6 @@
           {config}
           on:EditAlertPlayer
           on:RemoveAlertPlayer
-          on:CheckPlayer
         />
       </div>
 

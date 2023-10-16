@@ -1,6 +1,8 @@
 <script lang="ts">
   import clone from "clone";
   import UkSpinner from "src/component/common/uikit/UkSpinner.svelte";
+  import { FetchProxy } from "src/lib/FetchProxy";
+  import { Notifier } from "src/lib/Notifier";
   import { storedConfig } from "src/stores";
   import { createEventDispatcher } from "svelte";
   import { ApplyUserConfig, UserConfig } from "wailsjs/go/main/App";
@@ -19,8 +21,6 @@
     Number.isSafeInteger(teamAverage.min_overall_battles);
   $: isValidAll = isValidMinShipBattles && isValidMinOverallBattles;
 
-  const dispatch = createEventDispatcher();
-
   const clickApply = async () => {
     if (!isValidAll) {
       return;
@@ -30,13 +30,11 @@
       isLoading = true;
       inputConfig.team_average = teamAverage;
       await ApplyUserConfig(inputConfig);
-
-      const latest = await UserConfig();
-      storedConfig.set(latest);
-      dispatch("UpdateSuccess");
+      await FetchProxy.getConfig();
+      Notifier.success("設定を更新しました");
     } catch (error) {
       inputConfig = clone($storedConfig);
-      dispatch("Failure", { message: error });
+      Notifier.failure(error);
     } finally {
       isLoading = false;
     }

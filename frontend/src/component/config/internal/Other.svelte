@@ -1,5 +1,6 @@
 <script lang="ts">
   import UkIcon from "src/component/common/uikit/UkIcon.svelte";
+  import { Notifier } from "src/lib/Notifier";
   import { createEventDispatcher } from "svelte";
   import { OpenDirectory } from "wailsjs/go/main/App";
   import { domain } from "wailsjs/go/models";
@@ -12,7 +13,7 @@
     try {
       await OpenDirectory(path);
     } catch (error) {
-      dispatch("Failure", { message: error });
+      Notifier.failure(error);
     }
   };
 </script>

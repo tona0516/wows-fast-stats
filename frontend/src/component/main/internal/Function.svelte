@@ -3,6 +3,7 @@
   import UkIcon from "src/component/common/uikit/UkIcon.svelte";
   import UkSpinner from "src/component/common/uikit/UkSpinner.svelte";
   import { DispName } from "src/lib/DispName";
+  import { Notifier } from "src/lib/Notifier";
   import type { Screenshot } from "src/lib/Screenshot";
   import { storedBattle, storedConfig } from "src/stores";
   import { createEventDispatcher } from "svelte";
@@ -25,10 +26,10 @@
     try {
       isScreenshotting = true;
       if (await screenshot.manual($storedBattle.meta)) {
-        dispatch("ScreenshotSaved");
+        Notifier.success("スクリーンショットを保存しました");
       }
     } catch (error) {
-      dispatch("Failure", { message: error });
+      Notifier.failure(error);
     } finally {
       isScreenshotting = false;
     }
@@ -42,7 +43,7 @@
       storedConfig.set(config);
     } catch (error) {
       selectedStatsPattern = $storedConfig.stats_pattern;
-      dispatch("Failure", { message: error });
+      Notifier.failure(error);
       return;
     }
   };

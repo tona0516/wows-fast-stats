@@ -28,7 +28,7 @@ setup: check-prerequisite
 	cd frontend && npm ci
 
 .PHONY: build
-build: gen lint test
+build: gen test
 	wails build -ldflags "$(LDFLAGS_PROD)" -platform windows/amd64 -o $(EXE) -trimpath
 
 .PHONY: build-nolint
@@ -59,7 +59,7 @@ fmt:
 	cd frontend/ && npx prettier --write "src/**/*.{ts,svelte,css}" index.html
 
 .PHONY: test
-test:
+test: fmt lint
 	go test -cover ./...
 	cd frontend/ && npm test
 

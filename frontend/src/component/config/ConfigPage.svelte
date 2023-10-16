@@ -1,6 +1,6 @@
 <script lang="ts">
   import { storedConfig, storedRequiredConfigError } from "src/stores";
-  import { UserConfig, ApplyUserConfig } from "wailsjs/go/main/App";
+  import { ApplyUserConfig } from "wailsjs/go/main/App";
   import Required from "./internal/Required.svelte";
   import Other from "./internal/Other.svelte";
   import TeamSummary from "./internal/TeamSummary.svelte";
@@ -8,12 +8,12 @@
   import AlertPlayer from "./internal/AlertPlayer.svelte";
   import AppInfo from "./internal/AppInfo.svelte";
   import Logging from "./internal/Logging.svelte";
-  import { createEventDispatcher } from "svelte";
   import UkIcon from "src/component/common/uikit/UkIcon.svelte";
   import UkTab from "src/component/common/uikit/UkTab.svelte";
   import clone from "clone";
+  import { FetchProxy } from "src/lib/FetchProxy";
+  import { Notifier } from "src/lib/Notifier";
 
-  const dispatch = createEventDispatcher();
   const CONFIG_MENU_ID = "config-menu-id";
 
   let inputConfig = clone($storedConfig);
@@ -24,11 +24,10 @@
   const silentApply = async () => {
     try {
       await ApplyUserConfig(inputConfig);
-      const latest = await UserConfig();
-      storedConfig.set(latest);
+      await FetchProxy.getConfig();
     } catch (error) {
       inputConfig = clone($storedConfig);
-      dispatch("Failure", { message: error });
+      Notifier.failure(error);
     }
   };
 </script>
@@ -56,17 +55,13 @@
   <div class="uk-width-expand@m">
     <ul id={CONFIG_MENU_ID} class="uk-switcher">
       <li>
-        <Required
-          {inputConfig}
-          on:UpdateSuccess={() => dispatch("UpdateRequired")}
-          on:Failure
-        />
+        <Required {inputConfig} />
       </li>
       <li>
-        <Display {inputConfig} on:UpdateSuccess on:Change={silentApply} />
+        <Display {inputConfig} on:Change={silentApply} />
       </li>
       <li>
-        <TeamSummary {inputConfig} on:UpdateSuccess on:Failure />
+        <TeamSummary {inputConfig} />
       </li>
       <li>
         <AlertPlayer
@@ -76,7 +71,7 @@
         />
       </li>
       <li>
-        <Other {inputConfig} on:Change={silentApply} on:Failure />
+        <Other {inputConfig} on:Change={silentApply} />
       </li>
       <li>
         <Logging />

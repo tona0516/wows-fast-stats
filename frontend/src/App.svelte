@@ -5,22 +5,9 @@
   import "bootstrap-icons/font/bootstrap-icons.css";
   import "charts.css";
 
-  import {
-    ExcludePlayerIDs,
-    AlertPlayers,
-    UserConfig,
-    LatestRelease,
-    StartWatching,
-    ValidateRequiredConfig,
-  } from "wailsjs/go/main/App";
+  import { LatestRelease, StartWatching } from "wailsjs/go/main/App";
   import { EventsOn, EventsEmit } from "wailsjs/runtime/runtime";
-  import {
-    storedExcludedPlayers,
-    storedAlertPlayers,
-    storedConfig,
-    storedRequiredConfigError,
-    storedLogs,
-  } from "src/stores";
+  import { storedConfig, storedRequiredConfigError } from "src/stores";
   import Modals from "src/component/modal/AlertModals.svelte";
   import { domain } from "wailsjs/go/models";
   import UkIcon from "src/component/common/uikit/UkIcon.svelte";
@@ -28,7 +15,8 @@
   import UkSpinner from "src/component/common/uikit/UkSpinner.svelte";
   import UkTab from "src/component/common/uikit/UkTab.svelte";
   import { FontSize } from "src/lib/FontSize";
-  import { Notification } from "src/lib/Notification";
+  import { FetchProxy } from "./lib/FetchProxy";
+  import { Notifier } from "./lib/Notifier";
 
   let modals: Modals;
   let mainPage: MainPage | undefined;
@@ -40,26 +28,17 @@
     document.body.style.zoom = FontSize.getZoomRate($storedConfig);
   }
 
-  EventsOn("LOG", (log: string) =>
-    storedLogs.update((logs) => {
-      logs.push(log);
-      return logs;
-    }),
-  );
   EventsOn("BATTLE_START", () => mainPage?.fetchBattle());
-  EventsOn("BATTLE_ERR", (error: string) => Notification.failure(error));
+  EventsOn("BATTLE_ERR", (error: string) => Notifier.failure(error));
 
   async function main() {
     try {
-      const config = await UserConfig();
-      const requiredConfigError = await ValidateRequiredConfig(
+      const config = await FetchProxy.getConfig();
+      const requiredConfigError = await FetchProxy.validateRequiredConfig(
         config.install_path,
         config.appid,
       );
-
-      storedConfig.set(config);
-      storedRequiredConfigError.set(requiredConfigError);
-      storedAlertPlayers.set(await AlertPlayers());
+      await FetchProxy.getAlertPlayers();
 
       initialized = true;
 
@@ -74,7 +53,7 @@
         StartWatching();
       }
     } catch (error) {
-      Notification.failure(error);
+      Notifier.failure(error);
     }
   }
 
@@ -86,17 +65,7 @@
 </script>
 
 <main>
-  <Modals
-    bind:this={modals}
-    on:AlertPlayerUpdated={async () => {
-      try {
-        storedAlertPlayers.set(await AlertPlayers());
-      } catch (error) {
-        Notification.failure(error);
-      }
-    }}
-    on:Failure={(event) => Notification.failure(event.detail.message)}
-  />
+  <Modals bind:this={modals} />
 
   {#if updatableRelease}
     <div class="uk-flex uk-flex-center uk-background-secondary">
@@ -130,35 +99,19 @@
       <li>
         <MainPage
           bind:this={mainPage}
-          on:FetchSuccess={(event) =>
-            Notification.success(event.detail.message)}
           on:EditAlertPlayer={(e) =>
             modals.showEditAlertPlayer(e.detail.target)}
           on:RemoveAlertPlayer={(e) =>
             modals.showRemoveAlertPlayer(e.detail.target)}
-          on:CheckPlayer={async () => {
-            storedExcludedPlayers.set(await ExcludePlayerIDs());
-          }}
-          on:ScreenshotSaved={() =>
-            Notification.success("スクリーンショットを保存しました")}
-          on:Failure={(event) => Notification.failure(event.detail.message)}
         />
       </li>
       <li>
         <ConfigPage
-          on:UpdateRequired={() => {
-            Notification.success("設定を更新しました");
-            StartWatching();
-          }}
-          on:UpdateSuccess={async () => {
-            Notification.success("設定を更新しました");
-          }}
           on:AddAlertPlayer={() => modals.showAddAlertPlayer()}
           on:EditAlertPlayer={(e) =>
             modals.showEditAlertPlayer(e.detail.target)}
           on:RemoveAlertPlayer={(e) =>
             modals.showRemoveAlertPlayer(e.detail.target)}
-          on:Failure={(event) => Notification.failure(event.detail.message)}
         />
       </li>
     </ul>

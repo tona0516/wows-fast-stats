@@ -3,13 +3,10 @@
   import ExternalLink from "src/component/common/ExternalLink.svelte";
   import UkIcon from "src/component/common/uikit/UkIcon.svelte";
   import UkSpinner from "src/component/common/uikit/UkSpinner.svelte";
-  import { storedRequiredConfigError, storedConfig } from "src/stores";
-  import { createEventDispatcher } from "svelte";
-  import {
-    ApplyRequiredUserConfig,
-    SelectDirectory,
-    UserConfig,
-  } from "wailsjs/go/main/App";
+  import { FetchProxy } from "src/lib/FetchProxy";
+  import { Notifier } from "src/lib/Notifier";
+  import { storedConfig } from "src/stores";
+  import { SelectDirectory, StartWatching } from "wailsjs/go/main/App";
   import { domain, vo } from "wailsjs/go/models";
 
   export let inputConfig: domain.UserConfig;
@@ -17,37 +14,30 @@
   let isLoading = false;
   let requiredConfigError: vo.RequiredConfigError;
 
-  const dispatch = createEventDispatcher();
-
   const clickSelectDirectory = async () => {
     try {
       const path = await SelectDirectory();
       if (!path) return;
       inputConfig.install_path = path;
     } catch (error) {
-      dispatch("Failure", { message: error });
+      Notifier.failure(error);
     }
   };
 
   const clickApply = async () => {
     try {
       isLoading = true;
-      requiredConfigError = await ApplyRequiredUserConfig(
+
+      await FetchProxy.applyRequiredConfig(
         inputConfig.install_path,
         inputConfig.appid,
       );
 
-      if (!requiredConfigError.valid) {
-        return;
-      }
-
-      const latest = await UserConfig();
-      storedConfig.set(latest);
-      storedRequiredConfigError.set(requiredConfigError);
-      dispatch("UpdateSuccess");
+      Notifier.success("設定を更新しました");
+      StartWatching();
     } catch (error) {
       inputConfig = clone($storedConfig);
-      dispatch("Failure", { message: error });
+      Notifier.failure(error);
     } finally {
       isLoading = false;
     }

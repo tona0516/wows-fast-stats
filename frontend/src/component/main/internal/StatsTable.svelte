@@ -4,6 +4,7 @@
   import { CssClass } from "src/lib/CssClass";
   import type { domain } from "wailsjs/go/models";
   import { ColumnProvider } from "src/lib/column/ColumnProvider";
+  import { FetchProxy } from "src/lib/FetchProxy";
 
   export let teams: domain.Team[];
   export let config: domain.UserConfig;
@@ -55,7 +56,7 @@
               {player}
               on:EditAlertPlayer
               on:RemoveAlertPlayer
-              on:CheckPlayer
+              on:CheckPlayer={FetchProxy.getExcludedPlayers()}
             />
           {/each}
 

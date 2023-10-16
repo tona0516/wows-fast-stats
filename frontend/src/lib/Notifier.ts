@@ -2,7 +2,7 @@ import UIkit from "uikit";
 
 const POSITION = "top-right";
 
-export namespace Notification {
+export namespace Notifier {
   export const success = (message: string, durationMs: number = 3000) => {
     notify(message, "check", durationMs);
   };

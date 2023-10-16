@@ -5,16 +5,14 @@
   import { storedConfig } from "src/stores";
   import { createEventDispatcher } from "svelte";
   import UIkit from "uikit";
-  import {
-    ApplyUserConfig,
-    DefaultUserConfig,
-    UserConfig,
-  } from "wailsjs/go/main/App";
+  import { ApplyUserConfig, DefaultUserConfig } from "wailsjs/go/main/App";
   import { domain } from "wailsjs/go/models";
   import clone from "clone";
   import { SAMPLE_TEAM } from "src/lib/rating/RatingColorFactory";
   import { ModalElementID } from "src/component/modal/ModalElementID";
   import { ColumnProvider } from "src/lib/column/ColumnProvider";
+  import { FetchProxy } from "src/lib/FetchProxy";
+  import { Notifier } from "src/lib/Notifier";
 
   export let inputConfig: domain.UserConfig;
 
@@ -30,13 +28,12 @@
       inputConfig.custom_digit = defaultConfig.custom_digit;
 
       await ApplyUserConfig(inputConfig);
+      await FetchProxy.getConfig();
 
-      const latest = await UserConfig();
-      storedConfig.set(latest);
-      dispatch("UpdateSuccess");
+      Notifier.success("設定を更新しました");
     } catch (error) {
       inputConfig = clone($storedConfig);
-      dispatch("Failure", { message: error });
+      Notifier.failure(error);
     }
   };
 
