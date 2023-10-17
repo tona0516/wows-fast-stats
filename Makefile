@@ -51,6 +51,7 @@ gen:
 lint:
 	golangci-lint run
 	cd frontend/ && npm run check
+	cd frontend/ && npx eslint "src/**/*.{ts,svelte}"
 
 .PHONY: fmt
 fmt:
