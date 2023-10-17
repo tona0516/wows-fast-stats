@@ -167,13 +167,17 @@ func (a *App) ApplyRequiredUserConfig(
 
 func (a *App) ManualScreenshot(filename string, base64Data string) (bool, error) {
 	saved, err := a.screenshotService.SaveWithDialog(a.ctx, filename, base64Data)
-	// Note: output error log in frontend
+	if err != nil {
+		logger.Error(err)
+	}
 	return saved, apperr.Unwrap(err)
 }
 
 func (a *App) AutoScreenshot(filename string, base64Data string) error {
 	err := a.screenshotService.SaveForAuto(filename, base64Data)
-	// Note: output error log in frontend
+	if err != nil {
+		logger.Error(err)
+	}
 	return apperr.Unwrap(err)
 }
 
