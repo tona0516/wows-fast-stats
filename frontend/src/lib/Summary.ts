@@ -12,6 +12,7 @@ import {
 import { toPlayerStats } from "src/lib/util";
 import { domain } from "wailsjs/go/models";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type SummaryColumn = AbstractColumn<any> & ISummaryColumn;
 
 export interface Summary {
@@ -100,15 +101,15 @@ const deriveColumns = (
   headers: SummaryHeader[];
 } => {
   const shipCols: SummaryColumn[] = [
-    new PR(undefined, config, "ship"),
-    new Damage(undefined, config, "ship"),
-    new WinRate(undefined, config, "ship"),
+    new PR(config, "ship"),
+    new Damage(config, "ship"),
+    new WinRate(config, "ship"),
   ];
 
   const overallCols: SummaryColumn[] = [
-    new PR(undefined, config, "overall"),
-    new Damage(undefined, config, "overall"),
-    new WinRate(undefined, config, "overall"),
+    new PR(config, "overall"),
+    new Damage(config, "overall"),
+    new WinRate(config, "overall"),
   ];
 
   const columns = shipCols.concat(overallCols);

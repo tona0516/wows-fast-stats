@@ -4,8 +4,7 @@
   import { FetchProxy } from "src/lib/FetchProxy";
   import { Notifier } from "src/lib/Notifier";
   import { storedConfig } from "src/stores";
-  import { createEventDispatcher } from "svelte";
-  import { ApplyUserConfig, UserConfig } from "wailsjs/go/main/App";
+  import { ApplyUserConfig } from "wailsjs/go/main/App";
   import { domain } from "wailsjs/go/models";
 
   export let inputConfig: domain.UserConfig;

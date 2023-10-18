@@ -6,7 +6,6 @@
   import { Notifier } from "src/lib/Notifier";
   import type { Screenshot } from "src/lib/Screenshot";
   import { storedBattle, storedConfig } from "src/stores";
-  import { createEventDispatcher } from "svelte";
   import { ApplyUserConfig } from "wailsjs/go/main/App";
   import { WindowReloadApp } from "wailsjs/runtime/runtime";
 
@@ -15,8 +14,6 @@
   $: isScreenshotting = false;
   $: disableScreenshot = isScreenshotting || $storedBattle?.meta === undefined;
   let selectedStatsPattern: string = $storedConfig.stats_pattern;
-
-  const dispatch = createEventDispatcher();
 
   const takeScreenshot = async () => {
     if (!$storedBattle?.meta) {

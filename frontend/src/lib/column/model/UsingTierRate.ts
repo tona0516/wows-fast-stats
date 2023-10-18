@@ -1,3 +1,4 @@
+import StackedBarGraphTableData from "src/component/main/internal/table_data/StackedBarGraphTableData.svelte";
 import { DispName } from "src/lib/DispName";
 import type { StackedBarGraphParam } from "src/lib/column/StackedBarGraphParam";
 import { AbstractColumn } from "src/lib/column/intetface/AbstractColumn";
@@ -10,11 +11,12 @@ export class UsingTierRate
   extends AbstractColumn<OverallKey>
   implements IGraphColumn
 {
-  constructor(
-    svelteComponent: any,
-    private config: domain.UserConfig,
-  ) {
-    super("using_tier_rate", "T割合", "ティア別プレイ割合", 1, svelteComponent);
+  constructor(private config: domain.UserConfig) {
+    super("using_tier_rate", "T割合", "ティア別プレイ割合", 1);
+  }
+
+  getSvelteComponent() {
+    return StackedBarGraphTableData;
   }
 
   shouldShowColumn(): boolean {

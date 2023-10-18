@@ -1,3 +1,4 @@
+import SingleTableData from "src/component/main/internal/table_data/SingleTableData.svelte";
 import { CssClass } from "src/lib/CssClass";
 import { AbstractColumn } from "src/lib/column/intetface/AbstractColumn";
 import type { ISingleColumn } from "src/lib/column/intetface/ISingleColumn";
@@ -10,17 +11,14 @@ export class SurvivedRate
   implements ISingleColumn
 {
   constructor(
-    svelteComponent: any,
     private config: domain.UserConfig,
     private category: StatsCategory,
   ) {
-    super(
-      "survived_rate",
-      "生存率(勝|負)",
-      "生存率 (勝利|敗北)",
-      1,
-      svelteComponent,
-    );
+    super("survived_rate", "生存率(勝|負)", "生存率 (勝利|敗北)", 1);
+  }
+
+  getSvelteComponent() {
+    return SingleTableData;
   }
 
   shouldShowColumn(): boolean {

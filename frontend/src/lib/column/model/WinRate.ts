@@ -1,3 +1,4 @@
+import SingleTableData from "src/component/main/internal/table_data/SingleTableData.svelte";
 import { CssClass } from "src/lib/CssClass";
 import { AbstractColumn } from "src/lib/column/intetface/AbstractColumn";
 import type { ISingleColumn } from "src/lib/column/intetface/ISingleColumn";
@@ -12,11 +13,14 @@ export class WinRate
   implements ISingleColumn, ISummaryColumn
 {
   constructor(
-    svelteComponent: any,
     private config: domain.UserConfig,
     private category: StatsCategory,
   ) {
-    super("win_rate", "勝率", "勝率", 1, svelteComponent);
+    super("win_rate", "勝率", "勝率", 1);
+  }
+
+  getSvelteComponent() {
+    return SingleTableData;
   }
 
   shouldShowColumn(): boolean {

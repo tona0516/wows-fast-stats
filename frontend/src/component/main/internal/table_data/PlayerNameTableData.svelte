@@ -27,6 +27,7 @@
 
   const dispatch = createEventDispatcher();
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onCheck = async (e: any) => {
     if (e.target.checked) {
       await RemoveExcludePlayerID(accountID);

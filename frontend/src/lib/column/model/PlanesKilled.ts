@@ -9,11 +9,12 @@ export class PlanesKilled
   extends AbstractColumn<ShipKey>
   implements ISingleColumn
 {
-  constructor(
-    svelteComponent: any,
-    private config: domain.UserConfig,
-  ) {
-    super("planes_killed", "撃墜", "平均撃墜数", 1, svelteComponent);
+  constructor(private config: domain.UserConfig) {
+    super("planes_killed", "撃墜", "平均撃墜数", 1);
+  }
+
+  getSvelteComponent() {
+    return PlanesKilled;
   }
 
   shouldShowColumn(): boolean {
@@ -31,7 +32,7 @@ export class PlanesKilled
     return value.toFixed(digit);
   }
 
-  getTextColorCode(player: domain.Player): string {
+  getTextColorCode(_: domain.Player): string {
     return "";
   }
 }

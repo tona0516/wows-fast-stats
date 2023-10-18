@@ -1,3 +1,4 @@
+import SingleTableData from "src/component/main/internal/table_data/SingleTableData.svelte";
 import { CssClass } from "src/lib/CssClass";
 import { AbstractColumn } from "src/lib/column/intetface/AbstractColumn";
 import type { ISingleColumn } from "src/lib/column/intetface/ISingleColumn";
@@ -12,11 +13,14 @@ export class PR
   implements ISingleColumn, ISummaryColumn
 {
   constructor(
-    svelteComponent: any,
     private config: domain.UserConfig,
     private category: StatsCategory,
   ) {
-    super("pr", "PR", "Personal Rating", 1, svelteComponent);
+    super("pr", "PR", "Personal Rating", 1);
+  }
+
+  getSvelteComponent() {
+    return SingleTableData;
   }
 
   shouldShowColumn(): boolean {

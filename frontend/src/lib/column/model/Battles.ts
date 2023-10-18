@@ -1,3 +1,4 @@
+import SingleTableData from "src/component/main/internal/table_data/SingleTableData.svelte";
 import { CssClass } from "src/lib/CssClass";
 import { AbstractColumn } from "src/lib/column/intetface/AbstractColumn";
 import type { ISingleColumn } from "src/lib/column/intetface/ISingleColumn";
@@ -10,11 +11,14 @@ export class Battles
   implements ISingleColumn
 {
   constructor(
-    svelteComponent: any,
     private config: domain.UserConfig,
     private category: StatsCategory,
   ) {
-    super("battles", "戦闘数", "戦闘数", 1, svelteComponent);
+    super("battles", "戦闘数", "戦闘数", 1);
+  }
+
+  getSvelteComponent() {
+    return SingleTableData;
   }
 
   shouldShowColumn(): boolean {
@@ -33,7 +37,7 @@ export class Battles
     return value.toFixed(digit);
   }
 
-  getTextColorCode(player: domain.Player): string {
+  getTextColorCode(_: domain.Player): string {
     return "";
   }
 }

@@ -51,7 +51,7 @@
         <tr>
           {#each basicColumns as column}
             <svelte:component
-              this={column.svelteComponent}
+              this={column.getSvelteComponent()}
               {column}
               {player}
               on:EditAlertPlayer
@@ -74,7 +74,7 @@
             {#each overallColumns as column}
               {#if column.shouldShowColumn()}
                 <svelte:component
-                  this={column.svelteComponent}
+                  this={column.getSvelteComponent()}
                   {column}
                   {player}
                 />
@@ -84,7 +84,7 @@
             {#each shipColumns as column}
               {#if column.shouldShowColumn()}
                 <svelte:component
-                  this={column.svelteComponent}
+                  this={column.getSvelteComponent()}
                   {column}
                   {player}
                 />
@@ -94,7 +94,7 @@
             {#each overallColumns as column}
               {#if column.shouldShowColumn()}
                 <svelte:component
-                  this={column.svelteComponent}
+                  this={column.getSvelteComponent()}
                   {column}
                   {player}
                 />

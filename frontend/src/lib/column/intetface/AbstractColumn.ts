@@ -4,8 +4,9 @@ export abstract class AbstractColumn<T> {
     readonly minDisplayName: string,
     readonly fullDisplayName: string,
     readonly innerColumnNumber: number,
-    readonly svelteComponent: any,
   ) {}
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  abstract getSvelteComponent(): any;
   abstract shouldShowColumn(): boolean;
 }

@@ -179,12 +179,13 @@ export default {
   // A map from regular expressions to paths to transformers
   // transform: undefined,
   transform: {
+    "^.+\\.svelte$": "jest-transform-stub",
     // '^.+\\.[tj]sx?$' to process js/ts with `ts-jest`
     // '^.+\\.m?[tj]sx?$' to process js/ts/mjs/mts with `ts-jest`
-    '^.+\\.tsx?$': [
-      'ts-jest',
+    "^.+\\.ts$": [
+      "ts-jest",
       {
-        tsconfig: "./tsconfig.test.json"
+        tsconfig: "./tsconfig.test.json",
       },
     ],
   },

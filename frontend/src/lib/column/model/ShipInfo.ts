@@ -28,6 +28,7 @@ import ShipSS from "src/assets/images/ship_ss.png";
 import ShipPremiumSS from "src/assets/images/ship_ss_premium.png";
 
 import { isShipType, tierString } from "src/lib/util";
+import ShipInfoTableData from "src/component/main/internal/table_data/ShipInfoTableData.svelte";
 
 const FLAGS: { [key: string]: string } = {
   japan: FlagJapan,
@@ -62,11 +63,12 @@ const PREMIUM_SHIP_ICONS: { [key: string]: string } = {
 };
 
 export class ShipInfo extends AbstractColumn<BasicKey> {
-  constructor(
-    svelteComponent: any,
-    private config: domain.UserConfig,
-  ) {
-    super("ship_info", "艦", "艦情報", 3, svelteComponent);
+  constructor(private config: domain.UserConfig) {
+    super("ship_info", "艦", "艦情報", 3);
+  }
+
+  getSvelteComponent() {
+    return ShipInfoTableData;
   }
 
   shouldShowColumn(): boolean {

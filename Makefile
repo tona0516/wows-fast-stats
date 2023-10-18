@@ -60,7 +60,7 @@ fmt:
 	cd frontend/ && npx prettier --write "src/**/*.{ts,svelte,css}" index.html
 
 .PHONY: test
-test: fmt lint
+test:
 	go test -cover ./...
 	cd frontend/ && npm test
 

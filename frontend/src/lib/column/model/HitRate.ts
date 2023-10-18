@@ -1,3 +1,4 @@
+import SingleTableData from "src/component/main/internal/table_data/SingleTableData.svelte";
 import { CssClass } from "src/lib/CssClass";
 import { AbstractColumn } from "src/lib/column/intetface/AbstractColumn";
 import type { ISingleColumn } from "src/lib/column/intetface/ISingleColumn";
@@ -6,11 +7,12 @@ import { toPlayerStats } from "src/lib/util";
 import type { domain } from "wailsjs/go/models";
 
 export class HitRate extends AbstractColumn<ShipKey> implements ISingleColumn {
-  constructor(
-    svelteComponent: any,
-    private config: domain.UserConfig,
-  ) {
-    super("hit_rate", "Hit率(主|魚)", "命中率 (主砲|魚雷)", 1, svelteComponent);
+  constructor(private config: domain.UserConfig) {
+    super("hit_rate", "Hit率(主|魚)", "命中率 (主砲|魚雷)", 1);
+  }
+
+  getSvelteComponent() {
+    return SingleTableData;
   }
 
   shouldShowColumn(): boolean {

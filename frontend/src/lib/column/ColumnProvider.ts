@@ -1,8 +1,3 @@
-import MaxDamageTableData from "src/component/main/internal/table_data/MaxDamageTableData.svelte";
-import PlayerNameTableData from "src/component/main/internal/table_data/PlayerNameTableData.svelte";
-import ShipInfoTableData from "src/component/main/internal/table_data/ShipInfoTableData.svelte";
-import SingleTableData from "src/component/main/internal/table_data/SingleTableData.svelte";
-import StackedBarGraphTableData from "src/component/main/internal/table_data/StackedBarGraphTableData.svelte";
 import { DispName } from "src/lib/DispName";
 import type { AbstractColumn } from "src/lib/column/intetface/AbstractColumn";
 import { AvgTier } from "src/lib/column/model/AvgTier";
@@ -30,9 +25,11 @@ import {
 import { isDigitKey, isOverallKey, isShipKey } from "src/lib/util";
 import { domain } from "wailsjs/go/models";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 class ColumnArray extends Array<AbstractColumn<any>> {
   constructor(
     private category: ColumnCategory,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private columns: AbstractColumn<any>[],
   ) {
     super(...columns);
@@ -54,36 +51,33 @@ export namespace ColumnProvider {
     config: domain.UserConfig,
   ): [basic: ColumnArray, ship: ColumnArray, overall: ColumnArray] => {
     return [
-      new ColumnArray("basic", [
-        new PlayerName(PlayerNameTableData, config),
-        new ShipInfo(ShipInfoTableData, config),
-      ]),
+      new ColumnArray("basic", [new PlayerName(config), new ShipInfo(config)]),
       new ColumnArray("ship", [
-        new PR(SingleTableData, config, "ship"),
-        new Damage(SingleTableData, config, "ship"),
-        new MaxDamage(MaxDamageTableData, config, "ship"),
-        new WinRate(SingleTableData, config, "ship"),
-        new KDRate(SingleTableData, config, "ship"),
-        new Kill(SingleTableData, config, "ship"),
-        new Exp(SingleTableData, config, "ship"),
-        new Battles(SingleTableData, config, "ship"),
-        new SurvivedRate(SingleTableData, config, "ship"),
-        new PlanesKilled(SingleTableData, config),
-        new HitRate(SingleTableData, config),
+        new PR(config, "ship"),
+        new Damage(config, "ship"),
+        new MaxDamage(config, "ship"),
+        new WinRate(config, "ship"),
+        new KDRate(config, "ship"),
+        new Kill(config, "ship"),
+        new Exp(config, "ship"),
+        new Battles(config, "ship"),
+        new SurvivedRate(config, "ship"),
+        new PlanesKilled(config),
+        new HitRate(config),
       ]),
       new ColumnArray("overall", [
-        new PR(SingleTableData, config, "overall"),
-        new Damage(SingleTableData, config, "overall"),
-        new MaxDamage(MaxDamageTableData, config, "overall"),
-        new WinRate(SingleTableData, config, "overall"),
-        new KDRate(SingleTableData, config, "overall"),
-        new Kill(SingleTableData, config, "overall"),
-        new Exp(SingleTableData, config, "overall"),
-        new Battles(SingleTableData, config, "overall"),
-        new SurvivedRate(SingleTableData, config, "overall"),
-        new AvgTier(SingleTableData, config),
-        new UsingShipTypeRate(StackedBarGraphTableData, config),
-        new UsingTierRate(StackedBarGraphTableData, config),
+        new PR(config, "overall"),
+        new Damage(config, "overall"),
+        new MaxDamage(config, "overall"),
+        new WinRate(config, "overall"),
+        new KDRate(config, "overall"),
+        new Kill(config, "overall"),
+        new Exp(config, "overall"),
+        new Battles(config, "overall"),
+        new SurvivedRate(config, "overall"),
+        new AvgTier(config),
+        new UsingShipTypeRate(config),
+        new UsingTierRate(config),
       ]),
     ];
   };
@@ -98,9 +92,12 @@ export namespace ColumnProvider {
   export const getDisplayableColumns = (): DisplayableColumn[] => {
     const config = new domain.UserConfig();
     const [_, shipColumns, overallColumns] = getAllColumns(config);
-    const columns: AbstractColumn<any>[] = [...shipColumns, ...overallColumns];
+    const columns: AbstractColumn<string>[] = [
+      ...shipColumns,
+      ...overallColumns,
+    ];
 
-    let result: DisplayableColumn[] = [];
+    const result: DisplayableColumn[] = [];
     columns.forEach((column) => {
       const key = column.displayKey;
       if (result.find((it) => it.digitKey === key)) {

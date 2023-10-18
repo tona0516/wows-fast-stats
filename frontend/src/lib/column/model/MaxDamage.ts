@@ -1,3 +1,4 @@
+import MaxDamageTableData from "src/component/main/internal/table_data/MaxDamageTableData.svelte";
 import { AbstractColumn } from "src/lib/column/intetface/AbstractColumn";
 import { NumbersURL } from "src/lib/NumbersURL";
 import { type CommonKey, type StatsCategory } from "src/lib/types";
@@ -6,7 +7,6 @@ import type { domain } from "wailsjs/go/models";
 
 export class MaxDamage extends AbstractColumn<CommonKey> {
   constructor(
-    svelteComponent: any,
     private config: domain.UserConfig,
     private category: StatsCategory,
   ) {
@@ -20,13 +20,11 @@ export class MaxDamage extends AbstractColumn<CommonKey> {
         break;
     }
 
-    super(
-      "max_damage",
-      "最大Dmg",
-      "最大ダメージ",
-      innerColumnNumber,
-      svelteComponent,
-    );
+    super("max_damage", "最大Dmg", "最大ダメージ", innerColumnNumber);
+  }
+
+  getSvelteComponent() {
+    return MaxDamageTableData;
   }
 
   shouldShowColumn(): boolean {

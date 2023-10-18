@@ -1,3 +1,4 @@
+import SingleTableData from "src/component/main/internal/table_data/SingleTableData.svelte";
 import { CssClass } from "src/lib/CssClass";
 import { AbstractColumn } from "src/lib/column/intetface/AbstractColumn";
 import type { ISingleColumn } from "src/lib/column/intetface/ISingleColumn";
@@ -7,11 +8,14 @@ import type { domain } from "wailsjs/go/models";
 
 export class KDRate extends AbstractColumn<CommonKey> implements ISingleColumn {
   constructor(
-    svelteComponent: any,
     private config: domain.UserConfig,
     private category: StatsCategory,
   ) {
-    super("kd_rate", "K/D", "キル/デス比", 1, svelteComponent);
+    super("kd_rate", "K/D", "キル/デス比", 1);
+  }
+
+  getSvelteComponent() {
+    return SingleTableData;
   }
 
   shouldShowColumn(): boolean {
@@ -31,7 +35,7 @@ export class KDRate extends AbstractColumn<CommonKey> implements ISingleColumn {
     return value.toFixed(digit);
   }
 
-  getTextColorCode(player: domain.Player): string {
+  getTextColorCode(_: domain.Player): string {
     return "";
   }
 }
