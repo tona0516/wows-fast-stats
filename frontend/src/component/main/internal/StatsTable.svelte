@@ -56,7 +56,7 @@
               {player}
               on:EditAlertPlayer
               on:RemoveAlertPlayer
-              on:CheckPlayer={FetchProxy.getExcludedPlayers()}
+              on:CheckPlayer={() => FetchProxy.getExcludedPlayers()}
             />
           {/each}
 

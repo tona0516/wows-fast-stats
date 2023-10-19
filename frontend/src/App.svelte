@@ -31,7 +31,7 @@
   EventsOn("BATTLE_START", () => mainPage?.fetchBattle());
   EventsOn("BATTLE_ERR", (error: string) => Notifier.failure(error));
 
-  async function main() {
+  const initialize = async (): Promise<domain.UserConfig | undefined> => {
     try {
       const config = await FetchProxy.getConfig();
       const requiredConfigError = await FetchProxy.validateRequiredConfig(
@@ -42,20 +42,39 @@
 
       initialized = true;
 
+      if (requiredConfigError.valid) {
+        StartWatching();
+      }
+
+      return config;
+    } catch (error) {
+      Notifier.failure(error);
+      return undefined;
+    }
+  };
+
+  const checkUpdate = async (config: domain.UserConfig) => {
+    try {
       if (config.notify_updatable) {
         const latestRelease = await LatestRelease();
         if (latestRelease.updatable) {
           updatableRelease = latestRelease;
         }
       }
-
-      if (requiredConfigError.valid) {
-        StartWatching();
-      }
     } catch (error) {
       Notifier.failure(error);
+      return;
     }
-  }
+  };
+
+  const main = async () => {
+    const config = await initialize();
+    if (!config) {
+      return;
+    }
+
+    await checkUpdate(config);
+  };
 
   window.onload = function () {
     EventsEmit("ONLOAD");

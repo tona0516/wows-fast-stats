@@ -9,12 +9,8 @@ export const storedConfig = writable({}) as Writable<domain.UserConfig>;
 
 export const storedSummary = derived(
   [storedBattle, storedExcludedPlayers, storedConfig],
-  ([$storedBattle, $storedExcludePlayerIDs, $storedUserConfig]) =>
-    Summary.calculate(
-      $storedBattle,
-      $storedExcludePlayerIDs,
-      $storedUserConfig,
-    ),
+  ([$storedBattle, $storedExcludedPlayers, $storedConfig]) =>
+    Summary.calculate($storedBattle, $storedExcludedPlayers, $storedConfig),
 );
 export const storedAlertPlayers = writable([]) as Writable<
   domain.AlertPlayer[]
