@@ -38,13 +38,13 @@ export namespace DispName {
   ]);
 
   export const FONT_SIZES = new ArrayMap<FontSize, string>([
-    [FontSize.XX_SMALL, "3"],
-    [FontSize.X_SMALL, "2"],
-    [FontSize.SMALL, "1"],
+    [FontSize.XX_LARGE, "3"],
+    [FontSize.X_LARGE, "2"],
+    [FontSize.LARGE, "1"],
     [FontSize.MEDIUM, "0(デフォルト)"],
-    [FontSize.LARGE, "-1"],
-    [FontSize.X_LARGE, "-2"],
-    [FontSize.XX_LARGE, "-3"],
+    [FontSize.SMALL, "-1"],
+    [FontSize.X_SMALL, "-2"],
+    [FontSize.XX_SMALL, "-3"],
   ]);
 
   export const PLAYER_NAME_COLORS = new ArrayMap<PlayerNameColor, string>([
