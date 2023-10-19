@@ -41,6 +41,6 @@ func TestGithub_LatestRelease(t *testing.T) {
 		})
 
 		_, err := github.LatestRelease()
-		assert.EqualError(t, apperr.Unwrap(err), apperr.GithubAPIError.ErrorCode())
+		assert.EqualError(t, apperr.Unwrap(err), apperr.GithubAPICheckUpdateError.ErrorCode())
 	})
 }

@@ -55,7 +55,7 @@ func (d *Discord) Upload(filename string, text string, message string) error {
 
 	if res.StatusCode != http.StatusOK {
 		return failure.New(
-			apperr.DiscordAPIError,
+			apperr.DiscordAPISendLogError,
 			failure.Context{
 				"status_code": strconv.Itoa(res.StatusCode),
 				"body":        string(res.ByteBody),

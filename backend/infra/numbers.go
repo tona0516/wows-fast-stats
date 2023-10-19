@@ -31,7 +31,7 @@ func (n *Numbers) ExpectedStats() (domain.NSExpectedStats, error) {
 
 	if res.StatusCode != http.StatusOK {
 		return res.Body, failure.New(
-			apperr.NumbersAPIError,
+			apperr.NumbersAPIFetchExpectedStatsError,
 			failure.Context{
 				"status_code": strconv.Itoa(res.StatusCode),
 				"body":        string(res.ByteBody),

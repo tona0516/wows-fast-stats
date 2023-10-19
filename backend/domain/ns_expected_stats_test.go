@@ -70,6 +70,6 @@ func TestNSExpectedStats_UnmarshalJSON(t *testing.T) {
         }`
 
 		err := json.Unmarshal([]byte(jsonData), &NSExpectedStats{})
-		assert.EqualError(t, apperr.Unwrap(err), apperr.ExpectedStatsParseError.ErrorCode())
+		assert.EqualError(t, apperr.Unwrap(err), apperr.ParseExpectedStatsError.ErrorCode())
 	})
 }

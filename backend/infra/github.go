@@ -33,7 +33,7 @@ func (g *Github) LatestRelease() (domain.GHLatestRelease, error) {
 
 	if res.StatusCode != http.StatusOK {
 		return res.Body, failure.New(
-			apperr.GithubAPIError,
+			apperr.GithubAPICheckUpdateError,
 			failure.Context{
 				"status_code": strconv.Itoa(res.StatusCode),
 				"body":        string(res.ByteBody),

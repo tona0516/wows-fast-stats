@@ -63,6 +63,6 @@ func TestNumbers_ExpectedStats(t *testing.T) {
 		// テスト
 		numbers := NewNumbers(RequestConfig{URL: server.URL})
 		_, err := numbers.ExpectedStats()
-		assert.EqualError(t, apperr.Unwrap(err), apperr.NumbersAPIError.ErrorCode())
+		assert.EqualError(t, apperr.Unwrap(err), apperr.NumbersAPIFetchExpectedStatsError.ErrorCode())
 	})
 }
