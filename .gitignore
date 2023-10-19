@@ -10,6 +10,9 @@
 /temp_arena_info/
 /cache/
 
+# created files by app
+/wows-fast-stats.log
+
 # credential
 /discord_webhook_url_*
 

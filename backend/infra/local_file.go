@@ -21,6 +21,7 @@ const (
 	replaysDir       string = "replays"
 	tempArenaInfoDir string = "temp_arena_info"
 	cacheDir         string = "cache"
+
 	// file.
 	userConfigFile      string = "user.json"
 	appConfigFile       string = "app.json"

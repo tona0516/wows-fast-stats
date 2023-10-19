@@ -43,7 +43,13 @@ func Init(
 		Out:        &FrontendWriter{appCtx: appCtx},
 		NoColor:    true,
 	}
-	multi := zerolog.MultiLevelWriter(consoleWriter, frontendWriter)
+	logFile, _ := os.OpenFile(
+		env.AppName+".log",
+		os.O_APPEND|os.O_CREATE|os.O_WRONLY,
+		0664,
+	)
+
+	multi := zerolog.MultiLevelWriter(consoleWriter, frontendWriter, logFile)
 
 	instance.zlog = zerolog.New(multi).
 		With().
