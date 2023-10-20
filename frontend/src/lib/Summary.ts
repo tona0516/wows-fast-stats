@@ -1,3 +1,4 @@
+import { ArrayMap } from "src/lib/ArrayMap";
 import { DispName } from "src/lib/DispName";
 import type { AbstractColumn } from "src/lib/column/intetface/AbstractColumn";
 import { type ISummaryColumn } from "src/lib/column/intetface/ISummaryColumn";
@@ -7,6 +8,7 @@ import { WinRate } from "src/lib/column/model/WinRate";
 import {
   type OptionalBattle,
   type OptionalSummary,
+  type ShipType,
   type StatsCategory,
 } from "src/lib/types";
 import { toPlayerStats } from "src/lib/util";
@@ -14,10 +16,11 @@ import { domain } from "wailsjs/go/models";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type SummaryColumn = AbstractColumn<any> & ISummaryColumn;
+export type SummaryShipType = ShipType | "all";
 
 export interface Summary {
   meta: SummaryMeta;
-  values: SummaryValues;
+  values: ArrayMap<SummaryShipType, SummaryValues>;
 }
 
 interface SummaryMeta {
@@ -52,12 +55,21 @@ export namespace Summary {
     }
 
     const { columns, headers } = deriveColumns(config);
-
     const result: Summary = {
       meta: { headers, columnNames: [] },
-      values: { friends: [], enemies: [], diffs: [] },
+      values: new ArrayMap([
+        ["all", { friends: [], enemies: [], diffs: [] }],
+        ["cv", { friends: [], enemies: [], diffs: [] }],
+        ["bb", { friends: [], enemies: [], diffs: [] }],
+        ["cl", { friends: [], enemies: [], diffs: [] }],
+        ["dd", { friends: [], enemies: [], diffs: [] }],
+        ["ss", { friends: [], enemies: [], diffs: [] }],
+      ]),
     };
+
     columns.forEach((column) => {
+      result.meta.columnNames.push(column.minDisplayName);
+
       const filtered = battle.teams.map((team) => {
         return team.players.filter(
           (player) =>
@@ -66,16 +78,27 @@ export namespace Summary {
         );
       });
 
-      const [friendMean, enemyMean] = filtered.map((players) =>
-        mean(players, column),
-      );
+      [...result.values.keys()].forEach((shipType) => {
+        let origin: domain.Player[][];
+        if (shipType.toString() === "all") {
+          origin = filtered;
+        } else {
+          origin = filtered.map((it) =>
+            it.filter((it) => it.ship_info.type === shipType.toString()),
+          );
+        }
 
-      const digit = column.getDigit();
+        const [friendMean, enemyMean] = origin.map((players) =>
+          mean(players, column),
+        );
 
-      result.meta.columnNames.push(column.minDisplayName);
-      result.values.friends.push(friendMean.toFixed(digit));
-      result.values.enemies.push(enemyMean.toFixed(digit));
-      result.values.diffs.push(deriveDiff(friendMean, enemyMean, digit));
+        const digit = column.getDigit();
+        result.values.get(shipType)!.friends.push(friendMean.toFixed(digit));
+        result.values.get(shipType)!.enemies.push(enemyMean.toFixed(digit));
+        result.values
+          .get(shipType)!
+          .diffs.push(deriveDiff(friendMean, enemyMean, digit));
+      });
     });
 
     return result;
