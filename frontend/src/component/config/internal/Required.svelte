@@ -28,10 +28,16 @@
     try {
       isLoading = true;
 
-      await FetchProxy.applyRequiredConfig(
+      requiredConfigError = await FetchProxy.applyRequiredConfig(
         inputConfig.install_path,
         inputConfig.appid,
       );
+
+      if (!requiredConfigError.valid) {
+        return;
+      }
+
+      await FetchProxy.getConfig();
 
       Notifier.success("設定を更新しました");
       StartWatching();

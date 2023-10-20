@@ -11,7 +11,7 @@ export class AvgTier
   implements ISingleColumn
 {
   constructor(private config: domain.UserConfig) {
-    super("avg_tier", "平均T", "平均Tier", 11);
+    super("avg_tier", "平均T", "平均Tier", 1);
   }
 
   getSvelteComponent() {

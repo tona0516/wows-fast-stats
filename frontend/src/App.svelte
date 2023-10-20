@@ -8,7 +8,7 @@
   import { LatestRelease, StartWatching } from "wailsjs/go/main/App";
   import { EventsOn, EventsEmit } from "wailsjs/runtime/runtime";
   import { storedConfig, storedRequiredConfigError } from "src/stores";
-  import Modals from "src/component/modal/AlertModals.svelte";
+  import AlertModals from "src/component/modal/AlertModals.svelte";
   import { domain } from "wailsjs/go/models";
   import UkIcon from "src/component/common/uikit/UkIcon.svelte";
   import ExternalLink from "src/component/common/ExternalLink.svelte";
@@ -18,7 +18,7 @@
   import { FetchProxy } from "./lib/FetchProxy";
   import { Notifier } from "./lib/Notifier";
 
-  let modals: Modals;
+  let modals: AlertModals;
   let mainPage: MainPage | undefined;
   let initialized = false;
   let updatableRelease: domain.GHLatestRelease;
@@ -84,7 +84,7 @@
 </script>
 
 <main>
-  <Modals bind:this={modals} />
+  <AlertModals bind:this={modals} />
 
   {#if updatableRelease}
     <div class="uk-flex uk-flex-center uk-background-secondary">
@@ -118,19 +118,15 @@
       <li>
         <MainPage
           bind:this={mainPage}
-          on:EditAlertPlayer={(e) =>
-            modals.showEditAlertPlayer(e.detail.target)}
-          on:RemoveAlertPlayer={(e) =>
-            modals.showRemoveAlertPlayer(e.detail.target)}
+          on:EditAlertPlayer={(e) => modals.showEdit(e.detail.target)}
+          on:RemoveAlertPlayer={(e) => modals.showRemove(e.detail.target)}
         />
       </li>
       <li>
         <ConfigPage
-          on:AddAlertPlayer={() => modals.showAddAlertPlayer()}
-          on:EditAlertPlayer={(e) =>
-            modals.showEditAlertPlayer(e.detail.target)}
-          on:RemoveAlertPlayer={(e) =>
-            modals.showRemoveAlertPlayer(e.detail.target)}
+          on:AddAlertPlayer={() => modals.showAdd()}
+          on:EditAlertPlayer={(e) => modals.showEdit(e.detail.target)}
+          on:RemoveAlertPlayer={(e) => modals.showRemove(e.detail.target)}
         />
       </li>
     </ul>

@@ -1,3 +1,4 @@
+import SingleTableData from "src/component/main/internal/table_data/SingleTableData.svelte";
 import { CssClass } from "src/lib/CssClass";
 import { AbstractColumn } from "src/lib/column/intetface/AbstractColumn";
 import type { ISingleColumn } from "src/lib/column/intetface/ISingleColumn";
@@ -14,7 +15,7 @@ export class PlanesKilled
   }
 
   getSvelteComponent() {
-    return PlanesKilled;
+    return SingleTableData;
   }
 
   shouldShowColumn(): boolean {
