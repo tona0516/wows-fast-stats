@@ -25,7 +25,7 @@ func Init(
 	env vo.Env,
 	report repository.ReportInterface,
 ) {
-	// zerolog setting
+	//nolint:reassign
 	zerolog.ErrorStackMarshaler = pkgerrors.MarshalStack
 
 	if env.IsDev {
@@ -101,6 +101,7 @@ func addContext(e *zerolog.Event, contexts ...vo.Pair) {
 	}
 }
 
+//nolint:containedctx
 type FrontendWriter struct {
 	appCtx context.Context
 }

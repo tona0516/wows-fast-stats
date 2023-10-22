@@ -35,9 +35,9 @@ func TestWatcher_Start_戦闘開始(t *testing.T) {
 	interval := 10 * time.Millisecond
 
 	watcher := NewWatcher(interval, mockLocalFile, emitFunc)
-	err := watcher.Prepare(ctx)
+	err := watcher.Prepare()
 	assert.NoError(t, err)
-	go watcher.Start(ctx)
+	go watcher.Start(ctx, ctx)
 
 	time.Sleep(20 * time.Millisecond)
 	assert.Contains(t, events, EventStart)
@@ -71,9 +71,9 @@ func TestWatcher_Start_戦闘終了(t *testing.T) {
 	interval := 10 * time.Millisecond
 
 	watcher := NewWatcher(interval, mockLocalFile, emitFunc)
-	err := watcher.Prepare(ctx)
+	err := watcher.Prepare()
 	assert.NoError(t, err)
-	go watcher.Start(ctx)
+	go watcher.Start(ctx, ctx)
 
 	time.Sleep(20 * time.Millisecond)
 	assert.Contains(t, events, EventEnd)
@@ -110,9 +110,9 @@ func TestWatcher_Start_エラー発生(t *testing.T) {
 	interval := 10 * time.Millisecond
 
 	watcher := NewWatcher(interval, mockLocalFile, emitFunc)
-	err := watcher.Prepare(ctx)
+	err := watcher.Prepare()
 	assert.NoError(t, err)
-	go watcher.Start(ctx)
+	go watcher.Start(ctx, ctx)
 
 	time.Sleep(20 * time.Millisecond)
 	assert.Contains(t, events, EventErr)
@@ -146,9 +146,9 @@ func TestWatcher_Start_キャンセル(t *testing.T) {
 
 	watcher := NewWatcher(interval, mockLocalFile, emitFunc)
 
-	err := watcher.Prepare(ctx)
+	err := watcher.Prepare()
 	assert.NoError(t, err)
-	go watcher.Start(ctx)
+	go watcher.Start(ctx, ctx)
 	cancel()
 
 	time.Sleep(100 * time.Millisecond)

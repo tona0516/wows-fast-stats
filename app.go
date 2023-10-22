@@ -16,6 +16,7 @@ import (
 
 const EventOnload = "ONLOAD"
 
+//nolint:containedctx
 type App struct {
 	ctx               context.Context
 	env               vo.Env
@@ -74,7 +75,7 @@ func (a *App) onBeforeClose(ctx context.Context) bool {
 }
 
 func (a *App) StartWatching() error {
-	if err := a.watcherService.Prepare(a.ctx); err != nil {
+	if err := a.watcherService.Prepare(); err != nil {
 		logger.Error(err)
 		return apperr.Unwrap(err)
 	}
@@ -82,28 +83,30 @@ func (a *App) StartWatching() error {
 	if a.cancelWatcher != nil {
 		a.cancelWatcher()
 	}
-	ctx, cancel := context.WithCancel(context.Background())
+	cancelCtx, cancel := context.WithCancel(context.Background())
 	a.cancelWatcher = cancel
 
-	go a.watcherService.Start(ctx)
+	go a.watcherService.Start(a.ctx, cancelCtx)
 
 	return nil
 }
 
-func (a *App) Battle() (battle domain.Battle, err error) {
+func (a *App) Battle() (domain.Battle, error) {
+	result := domain.Battle{}
+
 	userConfig, err := a.configService.User()
 	if err != nil {
 		logger.Error(err)
-		return battle, apperr.Unwrap(err)
+		return result, apperr.Unwrap(err)
 	}
 
-	battle, err = a.battleService.Battle(userConfig)
+	result, err = a.battleService.Battle(userConfig)
 	if err != nil {
 		logger.Error(err)
-		return battle, apperr.Unwrap(err)
+		return result, apperr.Unwrap(err)
 	}
 
-	return battle, nil
+	return result, nil
 }
 
 func (a *App) SelectDirectory() (string, error) {

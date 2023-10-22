@@ -24,7 +24,6 @@ type Watcher struct {
 	interval       time.Duration
 	localFile      repository.LocalFileInterface
 	eventsEmitFunc vo.EventEmit
-	appCtx         context.Context
 	userConfig     domain.UserConfig
 }
 
@@ -40,7 +39,7 @@ func NewWatcher(
 	}
 }
 
-func (w *Watcher) Prepare(appCtx context.Context) error {
+func (w *Watcher) Prepare() error {
 	userConfig, err := w.localFile.User()
 	if err != nil {
 		return failure.Wrap(err)
@@ -50,17 +49,16 @@ func (w *Watcher) Prepare(appCtx context.Context) error {
 		return failure.New(apperr.InvalidInstallPath)
 	}
 
-	w.appCtx = appCtx
 	w.userConfig = userConfig
 	return nil
 }
 
-func (w *Watcher) Start(ctx context.Context) {
+func (w *Watcher) Start(appCtx context.Context, cancelCtx context.Context) {
 	var latestHash string
 
 	for {
 		select {
-		case <-ctx.Done():
+		case <-cancelCtx.Done():
 			return
 		default:
 			time.Sleep(w.interval)
@@ -68,12 +66,12 @@ func (w *Watcher) Start(ctx context.Context) {
 			tempArenaInfo, err := w.localFile.TempArenaInfo(w.userConfig.InstallPath)
 			if err != nil {
 				if failure.Is(err, apperr.FileNotExist) {
-					w.eventsEmitFunc(w.appCtx, EventEnd)
+					w.eventsEmitFunc(appCtx, EventEnd)
 					continue
 				}
 
 				logger.Error(err)
-				w.eventsEmitFunc(w.appCtx, EventErr, apperr.Unwrap(err))
+				w.eventsEmitFunc(appCtx, EventErr, apperr.Unwrap(err))
 				return
 			}
 
@@ -84,7 +82,7 @@ func (w *Watcher) Start(ctx context.Context) {
 			}
 
 			latestHash = hash
-			w.eventsEmitFunc(w.appCtx, EventStart)
+			w.eventsEmitFunc(appCtx, EventStart)
 		}
 	}
 }
