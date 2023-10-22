@@ -2,11 +2,10 @@ package infra
 
 import (
 	"testing"
-
-	"github.com/stretchr/testify/assert"
-
 	"wfs/backend/apperr"
 	"wfs/backend/domain"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestNumbers_ExpectedStats(t *testing.T) {

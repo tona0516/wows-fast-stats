@@ -262,7 +262,6 @@ func (l *LocalFile) TempArenaInfo(installPath string) (domain.TempArenaInfo, err
 		tempArenaInfoPaths = append(tempArenaInfoPaths, path)
 		return nil
 	})
-
 	if err != nil {
 		return tempArenaInfo, failure.Wrap(err)
 	}

@@ -43,7 +43,8 @@ func TestWargaming_AccountList(t *testing.T) {
 			Status: "",
 			Error:  response.WGError{},
 			Data:   []domain.WGAccountListData{},
-		}})
+		},
+	})
 	defer server.Close()
 
 	wargaming := NewWargaming(RequestConfig{

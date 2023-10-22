@@ -46,7 +46,7 @@ func Init(
 	logFile, _ := os.OpenFile(
 		env.AppName+".log",
 		os.O_APPEND|os.O_CREATE|os.O_WRONLY,
-		0664,
+		0o664,
 	)
 
 	multi := zerolog.MultiLevelWriter(consoleWriter, frontendWriter, logFile)

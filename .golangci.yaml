@@ -24,7 +24,7 @@ linters:
     - noctx
     - nlreturn
     - gci # Conflict goimports
-    - gofumpt # Conflict goimports
+    - goimports # Conflict goimports
     - testpackage
     - asciicheck
     - interfacebloat

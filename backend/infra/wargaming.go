@@ -5,9 +5,8 @@ import (
 	"strings"
 	"wfs/backend/apperr"
 	"wfs/backend/application/vo"
-	"wfs/backend/infra/response"
-
 	"wfs/backend/domain"
+	"wfs/backend/infra/response"
 
 	"github.com/cenkalti/backoff/v4"
 	"github.com/morikuni/failure"
@@ -189,7 +188,6 @@ func request[T response.WGResponse](
 	b := backoff.WithMaxRetries(backoff.NewExponentialBackOff(), retry)
 	operation := func() (APIResponse[T], error) {
 		res, err := getRequest[T](rawURL, query...)
-
 		if err != nil {
 			return res, failure.Wrap(err)
 		}

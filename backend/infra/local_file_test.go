@@ -5,11 +5,10 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
-
 	"wfs/backend/application/vo"
 	"wfs/backend/domain"
+
+	"github.com/stretchr/testify/assert"
 )
 
 const testInstallPath = "testdata"

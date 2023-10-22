@@ -2,10 +2,9 @@ package infra
 
 import (
 	"testing"
+	"wfs/backend/domain"
 
 	"github.com/stretchr/testify/assert"
-
-	"wfs/backend/domain"
 )
 
 func TestUnregistered_Warship(t *testing.T) {

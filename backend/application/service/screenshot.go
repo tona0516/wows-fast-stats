@@ -16,7 +16,8 @@ type Screenshot struct {
 }
 
 func NewScreenshot(
-	localFile repository.LocalFileInterface) *Screenshot {
+	localFile repository.LocalFileInterface,
+) *Screenshot {
 	return &Screenshot{
 		localFile:          localFile,
 		SaveFileDialogFunc: runtime.SaveFileDialog,
@@ -32,7 +33,6 @@ func (s *Screenshot) SaveWithDialog(ctx context.Context, filename string, base64
 	path, err := s.SaveFileDialogFunc(ctx, runtime.SaveDialogOptions{
 		DefaultFilename: filename,
 	})
-
 	if err != nil {
 		return false, failure.New(apperr.WailsError, failure.Messagef("%s", err.Error()))
 	}
