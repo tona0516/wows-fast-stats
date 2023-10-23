@@ -1,3 +1,4 @@
+//nolint:forcetypeassert
 package service
 
 import (
@@ -13,7 +14,6 @@ type mockLocalFile struct {
 
 func (m *mockLocalFile) User() (domain.UserConfig, error) {
 	args := m.Called()
-	//nolint:forcetypeassert
 	return args.Get(0).(domain.UserConfig), args.Error(1)
 }
 
@@ -24,7 +24,6 @@ func (m *mockLocalFile) UpdateUser(config domain.UserConfig) error {
 
 func (m *mockLocalFile) App() (vo.AppConfig, error) {
 	args := m.Called()
-	//nolint:forcetypeassert
 	return args.Get(0).(vo.AppConfig), args.Error(1)
 }
 
@@ -35,7 +34,6 @@ func (m *mockLocalFile) UpdateApp(config vo.AppConfig) error {
 
 func (m *mockLocalFile) AlertPlayers() ([]domain.AlertPlayer, error) {
 	args := m.Called()
-	//nolint:forcetypeassert
 	return args.Get(0).([]domain.AlertPlayer), args.Error(1)
 }
 
@@ -56,7 +54,6 @@ func (m *mockLocalFile) SaveScreenshot(path string, base64Data string) error {
 
 func (m *mockLocalFile) TempArenaInfo(installPath string) (domain.TempArenaInfo, error) {
 	args := m.Called(installPath)
-	//nolint:forcetypeassert
 	return args.Get(0).(domain.TempArenaInfo), args.Error(1)
 }
 
@@ -67,7 +64,6 @@ func (m *mockLocalFile) SaveTempArenaInfo(tempArenaInfo domain.TempArenaInfo) er
 
 func (m *mockLocalFile) CachedNSExpectedStats() (domain.NSExpectedStats, error) {
 	args := m.Called()
-	//nolint:forcetypeassert
 	return args.Get(0).(domain.NSExpectedStats), args.Error(1)
 }
 
@@ -86,61 +82,51 @@ func (m *mockWargaming) SetAppID(appID string) {
 
 func (m *mockWargaming) AccountInfo(accountIDs []int) (domain.WGAccountInfo, error) {
 	args := m.Called(accountIDs)
-	//nolint:forcetypeassert
 	return args.Get(0).(domain.WGAccountInfo), args.Error(1)
 }
 
 func (m *mockWargaming) AccountList(accountNames []string) (domain.WGAccountList, error) {
 	args := m.Called(accountNames)
-	//nolint:forcetypeassert
 	return args.Get(0).(domain.WGAccountList), args.Error(1)
 }
 
 func (m *mockWargaming) AccountListForSearch(prefix string) (domain.WGAccountList, error) {
 	args := m.Called(prefix)
-	//nolint:forcetypeassert
 	return args.Get(0).(domain.WGAccountList), args.Error(1)
 }
 
 func (m *mockWargaming) ClansAccountInfo(accountIDs []int) (domain.WGClansAccountInfo, error) {
 	args := m.Called(accountIDs)
-	//nolint:forcetypeassert
 	return args.Get(0).(domain.WGClansAccountInfo), args.Error(1)
 }
 
 func (m *mockWargaming) ClansInfo(clanIDs []int) (domain.WGClansInfo, error) {
 	args := m.Called(clanIDs)
-	//nolint:forcetypeassert
 	return args.Get(0).(domain.WGClansInfo), args.Error(1)
 }
 
 func (m *mockWargaming) EncycShips(pageNo int) (domain.WGEncycShips, int, error) {
 	args := m.Called(pageNo)
-	//nolint:forcetypeassert
 	return args.Get(0).(domain.WGEncycShips), args.Int(1), args.Error(2)
 }
 
 func (m *mockWargaming) ShipsStats(accountID int) (domain.WGShipsStats, error) {
 	args := m.Called(accountID)
-	//nolint:forcetypeassert
 	return args.Get(0).(domain.WGShipsStats), args.Error(1)
 }
 
 func (m *mockWargaming) BattleArenas() (domain.WGBattleArenas, error) {
 	args := m.Called()
-	//nolint:forcetypeassert
 	return args.Get(0).(domain.WGBattleArenas), args.Error(1)
 }
 
 func (m *mockWargaming) BattleTypes() (domain.WGBattleTypes, error) {
 	args := m.Called()
-	//nolint:forcetypeassert
 	return args.Get(0).(domain.WGBattleTypes), args.Error(1)
 }
 
 func (m *mockWargaming) Test(appid string) (bool, error) {
 	args := m.Called(appid)
-	//nolint:forcetypeassert
 	return args.Get(0).(bool), args.Error(1)
 }
 
@@ -150,7 +136,6 @@ type mockNumbers struct {
 
 func (m *mockNumbers) ExpectedStats() (domain.NSExpectedStats, error) {
 	args := m.Called()
-	//nolint:forcetypeassert
 	return args.Get(0).(domain.NSExpectedStats), args.Error(1)
 }
 
@@ -160,7 +145,6 @@ type mockUnregistered struct {
 
 func (m *mockUnregistered) Warship() (domain.Warships, error) {
 	args := m.Called()
-	//nolint:forcetypeassert
 	return args.Get(0).(domain.Warships), args.Error(1)
 }
 
@@ -170,6 +154,5 @@ type mockGithub struct {
 
 func (m *mockGithub) LatestRelease() (domain.GHLatestRelease, error) {
 	args := m.Called()
-	//nolint:forcetypeassert
 	return args.Get(0).(domain.GHLatestRelease), args.Error(1)
 }

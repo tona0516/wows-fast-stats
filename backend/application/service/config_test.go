@@ -1,3 +1,4 @@
+//nolint:paralleltest
 package service
 
 import (
@@ -22,7 +23,6 @@ const (
 
 var errWargaming = failure.New(apperr.WGAPIError)
 
-//nolint:paralleltest
 func TestConfig_UpdateRequired_正常系(t *testing.T) {
 	err := createGameClientPath()
 	assert.NoError(t, err)
@@ -50,7 +50,6 @@ func TestConfig_UpdateRequired_正常系(t *testing.T) {
 	mockLocalFile.AssertCalled(t, "UpdateUser", config)
 }
 
-//nolint:paralleltest
 func TestConfig_UpdateRequired_異常系_不正なインストールパス(t *testing.T) {
 	err := createGameClientPath()
 	assert.NoError(t, err)
@@ -77,7 +76,6 @@ func TestConfig_UpdateRequired_異常系_不正なインストールパス(t *te
 	mockLocalFile.AssertNotCalled(t, "UpdateUser", config)
 }
 
-//nolint:paralleltest
 func TestConfig_UpdateRequired_異常系_不正なAppID(t *testing.T) {
 	err := createGameClientPath()
 	assert.NoError(t, err)
@@ -102,7 +100,6 @@ func TestConfig_UpdateRequired_異常系_不正なAppID(t *testing.T) {
 	mockLocalFile.AssertNotCalled(t, "UpdateUser", config)
 }
 
-//nolint:paralleltest
 func TestConfig_UpdateOptional_正常系(t *testing.T) {
 	err := createGameClientPath()
 	assert.NoError(t, err)

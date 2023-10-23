@@ -1,3 +1,4 @@
+//nolint:paralleltest
 package infra
 
 import (
@@ -13,7 +14,6 @@ import (
 
 const testInstallPath = "testdata"
 
-//nolint:paralleltest
 func TestLocalFile_User(t *testing.T) {
 	// テストで生成したディレクトリを削除
 	defer os.RemoveAll(configDir)
@@ -50,7 +50,6 @@ func TestLocalFile_User(t *testing.T) {
 	assert.Equal(t, DefaultUserConfig, actual)
 }
 
-//nolint:paralleltest
 func TestLocalFile_User_異常系_ファイルに新規パラメータが存在しない(t *testing.T) {
 	// テストで生成したディレクトリを削除
 	defer os.RemoveAll(configDir)
@@ -75,7 +74,6 @@ func TestLocalFile_User_異常系_ファイルに新規パラメータが存在�
 	assert.Equal(t, expected, actual)
 }
 
-//nolint:paralleltest
 func TestLocalFile_App(t *testing.T) {
 	// テストで生成したディレクトリを削除
 	defer os.RemoveAll(configDir)
@@ -107,7 +105,6 @@ func TestLocalFile_App(t *testing.T) {
 	assert.Equal(t, vo.AppConfig{}, actual)
 }
 
-//nolint:paralleltest
 func TestLocalFile_AlertPlayers(t *testing.T) {
 	// テストで生成したディレクトリを削除
 	defer os.RemoveAll(configDir)
@@ -179,7 +176,6 @@ func TestLocalFile_SaveScreenshot_正常系(t *testing.T) {
 	assert.Equal(t, content, []byte(rawData))
 }
 
-//nolint:paralleltest
 func TestLocalFile_GetTempArenaInfo_正常系(t *testing.T) {
 	localFile := NewLocalFile()
 	expected := domain.TempArenaInfo{
@@ -213,7 +209,6 @@ func TestLocalFile_GetTempArenaInfo_正常系(t *testing.T) {
 	}
 }
 
-//nolint:paralleltest
 func TestLocalFile_GetTempArenaInfo_正常系_該当ファイルが複数存在する場合_最新を返す(t *testing.T) {
 	localFile := NewLocalFile()
 
@@ -254,7 +249,6 @@ func TestLocalFile_GetTempArenaInfo_正常系_該当ファイルが複数存在�
 	assert.Equal(t, expected, actual)
 }
 
-//nolint:paralleltest
 func TestLocalFile_GetTempArenaInfo_異常系_該当ファイルなし(t *testing.T) {
 	localFile := NewLocalFile()
 

@@ -14,7 +14,7 @@ type Discord struct {
 	config RequestConfig
 }
 
-type DisCordRequestBody struct {
+type DiscordRequestBody struct {
 	Content string `json:"content"`
 }
 
@@ -42,7 +42,7 @@ func (d *Discord) Upload(filename string, text string, message string) error {
 
 	// upload file
 	//nolint:errchkjson
-	payload, _ := json.Marshal(DisCordRequestBody{Content: message})
+	payload, _ := json.Marshal(DiscordRequestBody{Content: message})
 	forms := []Form{
 		{name: "payload_json", content: string(payload), isFile: false},
 		{name: "file", content: filename, isFile: true},
