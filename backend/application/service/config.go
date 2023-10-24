@@ -17,14 +17,14 @@ import (
 const GameExeName = "WorldOfWarships.exe"
 
 type Config struct {
-	localFile               repository.LocalFileInterface
-	wargaming               repository.WargamingInterface
-	WindowGetSizeFunc       WindowGetSizeFunc
-	WindowSetSizeFunc       WindowSetSizeFunc
-	WindowGetPositionFunc   WindowGetPosition
-	WindowSetPositionFunc   WindowSetPosition
-	OpenDirectoryDialogFunc OpenDirectoryDialogFunc
-	OpenWithDefaultAppFunc  OpenWithDefaultAppFunc
+	localFile           repository.LocalFileInterface
+	wargaming           repository.WargamingInterface
+	WindowGetSize       WindowGetSize
+	WindowSetSize       WindowSetSize
+	WindowGetPosition   WindowGetPosition
+	WindowSetPosition   WindowSetPosition
+	OpenDirectoryDialog OpenDirectoryDialog
+	OpenWithDefaultApp  OpenWithDefaultApp
 }
 
 func NewConfig(
@@ -32,14 +32,14 @@ func NewConfig(
 	wargaming repository.WargamingInterface,
 ) *Config {
 	return &Config{
-		localFile:               localFile,
-		wargaming:               wargaming,
-		WindowGetSizeFunc:       runtime.WindowGetSize,
-		WindowSetSizeFunc:       runtime.WindowSetSize,
-		WindowGetPositionFunc:   runtime.WindowGetPosition,
-		WindowSetPositionFunc:   runtime.WindowSetPosition,
-		OpenDirectoryDialogFunc: runtime.OpenDirectoryDialog,
-		OpenWithDefaultAppFunc:  open.Run,
+		localFile:           localFile,
+		wargaming:           wargaming,
+		WindowGetSize:       runtime.WindowGetSize,
+		WindowSetSize:       runtime.WindowSetSize,
+		WindowGetPosition:   runtime.WindowGetPosition,
+		WindowSetPosition:   runtime.WindowSetPosition,
+		OpenDirectoryDialog: runtime.OpenDirectoryDialog,
+		OpenWithDefaultApp:  open.Run,
 	}
 }
 
@@ -121,10 +121,10 @@ func (c *Config) ApplyAppConfig(appCtx context.Context) error {
 	// Set window size and position
 	window := config.Window
 	if window.Width > 0 && window.Height > 0 {
-		c.WindowSetSizeFunc(appCtx, window.Width, window.Height)
+		c.WindowSetSize(appCtx, window.Width, window.Height)
 	}
 	if window.X >= 0 || window.Y >= 0 {
-		c.WindowSetPositionFunc(appCtx, window.X, window.Y)
+		c.WindowSetPosition(appCtx, window.X, window.Y)
 	}
 
 	return nil
@@ -134,10 +134,10 @@ func (c *Config) SaveAppConfig(appCtx context.Context) error {
 	config, _ := c.localFile.App()
 
 	// Save windows size and position
-	width, height := c.WindowGetSizeFunc(appCtx)
+	width, height := c.WindowGetSize(appCtx)
 	config.Window.Width = width
 	config.Window.Height = height
-	x, y := c.WindowGetPositionFunc(appCtx)
+	x, y := c.WindowGetPosition(appCtx)
 	config.Window.X = x
 	config.Window.Y = y
 
@@ -165,7 +165,7 @@ func (c *Config) SearchPlayer(prefix string) (domain.WGAccountList, error) {
 }
 
 func (c *Config) SelectDirectory(appCtx context.Context) (string, error) {
-	selected, err := c.OpenDirectoryDialogFunc(appCtx, runtime.OpenDialogOptions{})
+	selected, err := c.OpenDirectoryDialog(appCtx, runtime.OpenDialogOptions{})
 	if err != nil {
 		return selected, failure.New(apperr.WailsError, failure.Messagef("%s", err.Error()))
 	}
@@ -174,7 +174,7 @@ func (c *Config) SelectDirectory(appCtx context.Context) (string, error) {
 }
 
 func (c *Config) OpenDirectory(path string) error {
-	err := c.OpenWithDefaultAppFunc(path)
+	err := c.OpenWithDefaultApp(path)
 	if err != nil {
 		return failure.New(apperr.OpenDirectoryError, failure.Context{"path": path}, failure.Messagef("%s", err.Error()))
 	}

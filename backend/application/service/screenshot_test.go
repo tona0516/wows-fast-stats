@@ -26,7 +26,7 @@ func TestScreenshot_SaveForAuto_正常系(t *testing.T) {
 
 	// Screenshot インスタンスの作成
 	s := NewScreenshot(mockLocalFile)
-	s.SaveFileDialogFunc = func(ctx context.Context, dialogOptions runtime.SaveDialogOptions) (string, error) {
+	s.SaveFileDialog = func(ctx context.Context, dialogOptions runtime.SaveDialogOptions) (string, error) {
 		return screenshotPath, nil
 	}
 
@@ -47,7 +47,7 @@ func TestScreenshot_SaveWithDialog_正常系(t *testing.T) {
 
 	// Screenshot インスタンスの作成
 	s := NewScreenshot(mockLocalFile)
-	s.SaveFileDialogFunc = func(ctx context.Context, dialogOptions runtime.SaveDialogOptions) (string, error) {
+	s.SaveFileDialog = func(ctx context.Context, dialogOptions runtime.SaveDialogOptions) (string, error) {
 		return screenshotPath, nil
 	}
 
@@ -65,7 +65,7 @@ func TestScreenshot_SaveWithDialog_異常系(t *testing.T) {
 	// Screenshot インスタンスの作成
 	mockLocalFile := &mockLocalFile{}
 	s := NewScreenshot(mockLocalFile)
-	s.SaveFileDialogFunc = func(ctx context.Context, dialogOptions runtime.SaveDialogOptions) (string, error) {
+	s.SaveFileDialog = func(ctx context.Context, dialogOptions runtime.SaveDialogOptions) (string, error) {
 		return "", failure.New(apperr.WailsError)
 	}
 
@@ -86,7 +86,7 @@ func TestScreenshot_SaveWithDialog_異常系_キャンセル(t *testing.T) {
 	// Screenshot インスタンスの作成
 	mockLocalFile := &mockLocalFile{}
 	s := NewScreenshot(mockLocalFile)
-	s.SaveFileDialogFunc = func(ctx context.Context, dialogOptions runtime.SaveDialogOptions) (string, error) {
+	s.SaveFileDialog = func(ctx context.Context, dialogOptions runtime.SaveDialogOptions) (string, error) {
 		return "", nil
 	}
 
