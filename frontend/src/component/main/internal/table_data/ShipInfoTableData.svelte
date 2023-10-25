@@ -26,8 +26,7 @@
 </td>
 
 <td class="{CssClass.TD_STR} {CssClass.OMIT}">
-  <ExternalLink
-    url={NumbersURL.ship(player.ship_info.id, player.ship_info.name)}
+  <ExternalLink url={NumbersURL.ship(player.ship_info.id)}
     >{column.displayValue(player)}</ExternalLink
   >
 </td>

@@ -72,14 +72,14 @@
       <ul class="uk-nav uk-dropdown-nav">
         {#if isBelongToClan}
           <li>
-            <ExternalLink url={NumbersURL.clan(player)}
+            <ExternalLink url={NumbersURL.clan(player.player_info.clan.id)}
               >クラン詳細(WoWS Stats & Numbers)</ExternalLink
             >
           </li>
         {/if}
 
         <li>
-          <ExternalLink url={NumbersURL.player(player)}
+          <ExternalLink url={NumbersURL.player(player.player_info.id)}
             >プレイヤー詳細(WoWS Stats & Numbers)</ExternalLink
           >
         </li>

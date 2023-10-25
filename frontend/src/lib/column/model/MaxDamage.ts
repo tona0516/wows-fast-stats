@@ -42,7 +42,7 @@ export class MaxDamage extends AbstractColumn<CommonKey> {
   shipInfo(player: domain.Player): [url: string, text: string] {
     const maxDamage = toPlayerStats(player, this.config.stats_pattern).overall
       .max_damage;
-    const url = NumbersURL.ship(maxDamage.ship_id, maxDamage.ship_name);
+    const url = NumbersURL.ship(maxDamage.ship_id);
 
     const text = `${tierString(maxDamage.ship_tier)} ${maxDamage.ship_name}`;
 
