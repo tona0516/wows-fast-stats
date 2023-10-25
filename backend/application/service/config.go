@@ -19,10 +19,6 @@ const GameExeName = "WorldOfWarships.exe"
 type Config struct {
 	localFile           repository.LocalFileInterface
 	wargaming           repository.WargamingInterface
-	WindowGetSize       WindowGetSize
-	WindowSetSize       WindowSetSize
-	WindowGetPosition   WindowGetPosition
-	WindowSetPosition   WindowSetPosition
 	OpenDirectoryDialog OpenDirectoryDialog
 	OpenWithDefaultApp  OpenWithDefaultApp
 }
@@ -34,10 +30,6 @@ func NewConfig(
 	return &Config{
 		localFile:           localFile,
 		wargaming:           wargaming,
-		WindowGetSize:       runtime.WindowGetSize,
-		WindowSetSize:       runtime.WindowSetSize,
-		WindowGetPosition:   runtime.WindowGetPosition,
-		WindowSetPosition:   runtime.WindowSetPosition,
 		OpenDirectoryDialog: runtime.OpenDirectoryDialog,
 		OpenWithDefaultApp:  open.Run,
 	}
@@ -110,38 +102,6 @@ func (c *Config) UpdateOptional(config domain.UserConfig) error {
 	// write
 	err = c.localFile.UpdateUser(config)
 	return failure.Wrap(err)
-}
-
-func (c *Config) ApplyAppConfig(appCtx context.Context) error {
-	config, err := c.localFile.App()
-	if err != nil {
-		return failure.Wrap(err)
-	}
-
-	// Set window size and position
-	window := config.Window
-	if window.Width > 0 && window.Height > 0 {
-		c.WindowSetSize(appCtx, window.Width, window.Height)
-	}
-	if window.X >= 0 || window.Y >= 0 {
-		c.WindowSetPosition(appCtx, window.X, window.Y)
-	}
-
-	return nil
-}
-
-func (c *Config) SaveAppConfig(appCtx context.Context) error {
-	config, _ := c.localFile.App()
-
-	// Save windows size and position
-	width, height := c.WindowGetSize(appCtx)
-	config.Window.Width = width
-	config.Window.Height = height
-	x, y := c.WindowGetPosition(appCtx)
-	config.Window.X = x
-	config.Window.Y = y
-
-	return failure.Wrap(c.localFile.UpdateApp(config))
 }
 
 func (c *Config) AlertPlayers() ([]domain.AlertPlayer, error) {

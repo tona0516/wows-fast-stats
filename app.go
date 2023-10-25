@@ -58,20 +58,6 @@ func (a *App) onStartup(ctx context.Context) {
 	runtime.EventsOn(ctx, EventOnload, func(optionalData ...interface{}) {
 		logger.Info("application started")
 	})
-
-	if err := a.configService.ApplyAppConfig(ctx); err != nil {
-		logger.Error(err)
-	}
-}
-
-func (a *App) onBeforeClose(ctx context.Context) bool {
-	logger.Info("application will close...")
-
-	if err := a.configService.SaveAppConfig(ctx); err != nil {
-		logger.Error(err)
-	}
-
-	return false
 }
 
 func (a *App) StartWatching() error {

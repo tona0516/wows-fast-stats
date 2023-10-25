@@ -6,7 +6,6 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
-	"wfs/backend/application/vo"
 	"wfs/backend/domain"
 
 	"github.com/stretchr/testify/assert"
@@ -72,37 +71,6 @@ func TestLocalFile_User_異常系_ファイルに新規パラメータが存在�
 	expected.InstallPath = installPath
 	expected.Appid = appid
 	assert.Equal(t, expected, actual)
-}
-
-func TestLocalFile_App(t *testing.T) {
-	// テストで生成したディレクトリを削除
-	defer os.RemoveAll(configDir)
-
-	expected := vo.AppConfig{
-		Window: vo.WindowConfig{
-			Width:  100,
-			Height: 100,
-		},
-	}
-
-	localFile := NewLocalFile()
-
-	// 書き込み：正常系
-	err := localFile.UpdateApp(expected)
-	assert.NoError(t, err)
-
-	// 取得：正常系
-	actual, err := localFile.App()
-	assert.NoError(t, err)
-	assert.Equal(t, expected, actual)
-
-	// 取得：異常系 存在しない場合 デフォルト値を返却する
-	err = os.Remove(filepath.Join(configDir, appConfigFile))
-	assert.NoError(t, err)
-
-	actual, err = localFile.App()
-	assert.NoError(t, err)
-	assert.Equal(t, vo.AppConfig{}, actual)
 }
 
 func TestLocalFile_AlertPlayers(t *testing.T) {

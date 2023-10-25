@@ -9,7 +9,6 @@ import (
 	"path/filepath"
 	"strconv"
 	"wfs/backend/apperr"
-	"wfs/backend/application/vo"
 	"wfs/backend/domain"
 
 	"github.com/morikuni/failure"
@@ -24,7 +23,6 @@ const (
 
 	// file.
 	userConfigFile      string = "user.json"
-	appConfigFile       string = "app.json"
 	alertPlayerFile     string = "alert_player.json"
 	tempArenaInfoFile   string = "tempArenaInfo.json"
 	nsExpectedStatsFile string = "ns_expected_stats.json"
@@ -125,7 +123,6 @@ var DefaultUserConfig domain.UserConfig = domain.UserConfig{
 
 type LocalFile struct {
 	userConfigPath      string
-	appConfigPath       string
 	alertPlayerPath     string
 	nsExpectedStatsPath string
 }
@@ -133,7 +130,6 @@ type LocalFile struct {
 func NewLocalFile() *LocalFile {
 	return &LocalFile{
 		userConfigPath:      filepath.Join(configDir, userConfigFile),
-		appConfigPath:       filepath.Join(configDir, appConfigFile),
 		alertPlayerPath:     filepath.Join(configDir, alertPlayerFile),
 		nsExpectedStatsPath: filepath.Join(cacheDir, nsExpectedStatsFile),
 	}
@@ -150,20 +146,6 @@ func (l *LocalFile) User() (domain.UserConfig, error) {
 
 func (l *LocalFile) UpdateUser(config domain.UserConfig) error {
 	err := writeJSON(l.userConfigPath, config)
-	return failure.Wrap(err)
-}
-
-func (l *LocalFile) App() (vo.AppConfig, error) {
-	config, err := readJSON(l.appConfigPath, vo.AppConfig{})
-	if err != nil && failure.Is(err, apperr.FileNotExist) {
-		return vo.AppConfig{}, nil
-	}
-
-	return config, failure.Wrap(err)
-}
-
-func (l *LocalFile) UpdateApp(config vo.AppConfig) error {
-	err := writeJSON(l.appConfigPath, config)
 	return failure.Wrap(err)
 }
 

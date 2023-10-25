@@ -2,7 +2,6 @@
 package service
 
 import (
-	"wfs/backend/application/vo"
 	"wfs/backend/domain"
 
 	"github.com/stretchr/testify/mock"
@@ -18,16 +17,6 @@ func (m *mockLocalFile) User() (domain.UserConfig, error) {
 }
 
 func (m *mockLocalFile) UpdateUser(config domain.UserConfig) error {
-	args := m.Called(config)
-	return args.Error(0)
-}
-
-func (m *mockLocalFile) App() (vo.AppConfig, error) {
-	args := m.Called()
-	return args.Get(0).(vo.AppConfig), args.Error(1)
-}
-
-func (m *mockLocalFile) UpdateApp(config vo.AppConfig) error {
 	args := m.Called(config)
 	return args.Error(0)
 }
