@@ -321,7 +321,7 @@ func (b *Battle) compose(
 			warship = domain.Warship{
 				Name:   "Unknown",
 				Tier:   0,
-				Type:   domain.NONE,
+				Type:   domain.ShipTypeNONE,
 				Nation: "",
 			}
 		}

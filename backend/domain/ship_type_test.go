@@ -8,22 +8,22 @@ import (
 
 func TestNewShipType(t *testing.T) {
 	t.Parallel()
-	assert.Equal(t, CV, NewShipType("AirCarrier"))
-	assert.Equal(t, BB, NewShipType("Battleship"))
-	assert.Equal(t, CL, NewShipType("Cruiser"))
-	assert.Equal(t, DD, NewShipType("Destroyer"))
-	assert.Equal(t, SS, NewShipType("Submarine"))
-	assert.Equal(t, AUX, NewShipType("Auxiliary"))
-	assert.Equal(t, NONE, NewShipType("UnknownType"))
+	assert.Equal(t, ShipTypeCV, NewShipType("AirCarrier"))
+	assert.Equal(t, ShipTypeBB, NewShipType("Battleship"))
+	assert.Equal(t, ShipTypeCL, NewShipType("Cruiser"))
+	assert.Equal(t, ShipTypeDD, NewShipType("Destroyer"))
+	assert.Equal(t, ShipTypeSS, NewShipType("Submarine"))
+	assert.Equal(t, ShipTypeAUX, NewShipType("Auxiliary"))
+	assert.Equal(t, ShipTypeNONE, NewShipType("UnknownType"))
 }
 
 func TestShipType_Priority(t *testing.T) {
 	t.Parallel()
-	assert.Equal(t, 0, CV.Priority())
-	assert.Equal(t, 1, BB.Priority())
-	assert.Equal(t, 2, CL.Priority())
-	assert.Equal(t, 3, DD.Priority())
-	assert.Equal(t, 4, SS.Priority())
-	assert.Equal(t, 5, AUX.Priority())
-	assert.Equal(t, 999, NONE.Priority())
+	assert.Equal(t, 0, ShipTypeCV.Priority())
+	assert.Equal(t, 1, ShipTypeBB.Priority())
+	assert.Equal(t, 2, ShipTypeCL.Priority())
+	assert.Equal(t, 3, ShipTypeDD.Priority())
+	assert.Equal(t, 4, ShipTypeSS.Priority())
+	assert.Equal(t, 5, ShipTypeAUX.Priority())
+	assert.Equal(t, 999, ShipTypeNONE.Priority())
 }

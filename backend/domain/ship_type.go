@@ -3,39 +3,39 @@ package domain
 type ShipType string
 
 const (
-	CV   ShipType = "cv"
-	BB   ShipType = "bb"
-	CL   ShipType = "cl"
-	DD   ShipType = "dd"
-	SS   ShipType = "ss"
-	AUX  ShipType = "aux"
-	NONE ShipType = "none"
+	ShipTypeCV   ShipType = "cv"
+	ShipTypeBB   ShipType = "bb"
+	ShipTypeCL   ShipType = "cl"
+	ShipTypeDD   ShipType = "dd"
+	ShipTypeSS   ShipType = "ss"
+	ShipTypeAUX  ShipType = "aux"
+	ShipTypeNONE ShipType = "none"
 )
 
 //nolint:gochecknoglobals
 var (
 	shipTypeNames = map[string]ShipType{
-		"AirCarrier": CV,
-		"Battleship": BB,
-		"Cruiser":    CL,
-		"Destroyer":  DD,
-		"Submarine":  SS,
-		"Auxiliary":  AUX,
+		"AirCarrier": ShipTypeCV,
+		"Battleship": ShipTypeBB,
+		"Cruiser":    ShipTypeCL,
+		"Destroyer":  ShipTypeDD,
+		"Submarine":  ShipTypeSS,
+		"Auxiliary":  ShipTypeAUX,
 	}
 	shipTypePriorities = []ShipType{
-		CV,
-		BB,
-		CL,
-		DD,
-		SS,
-		AUX,
+		ShipTypeCV,
+		ShipTypeBB,
+		ShipTypeCL,
+		ShipTypeDD,
+		ShipTypeSS,
+		ShipTypeAUX,
 	}
 )
 
 func NewShipType(raw string) ShipType {
 	shipType, ok := shipTypeNames[raw]
 	if !ok {
-		return NONE
+		return ShipTypeNONE
 	}
 
 	return shipType

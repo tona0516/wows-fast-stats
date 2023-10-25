@@ -343,11 +343,11 @@ func (s *Stats) UsingShipTypeRate(
 	}
 
 	return ShipTypeGroup{
-		SS: percentage(shipTypeMap[SS], allBattles),
-		DD: percentage(shipTypeMap[DD], allBattles),
-		CL: percentage(shipTypeMap[CL], allBattles),
-		BB: percentage(shipTypeMap[BB], allBattles),
-		CV: percentage(shipTypeMap[CV], allBattles),
+		SS: percentage(shipTypeMap[ShipTypeSS], allBattles),
+		DD: percentage(shipTypeMap[ShipTypeDD], allBattles),
+		CL: percentage(shipTypeMap[ShipTypeCL], allBattles),
+		BB: percentage(shipTypeMap[ShipTypeBB], allBattles),
+		CV: percentage(shipTypeMap[ShipTypeCV], allBattles),
 	}
 }
 

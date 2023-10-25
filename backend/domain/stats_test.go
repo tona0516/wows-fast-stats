@@ -621,10 +621,10 @@ func TestStats_UsingShipTypeRate(t *testing.T) {
 		},
 		emptyExpectedStats,
 		Warships{
-			100: {Type: DD},
-			200: {Type: CL},
-			300: {Type: BB},
-			400: {Type: CV},
+			100: {Type: ShipTypeDD},
+			200: {Type: ShipTypeCL},
+			300: {Type: ShipTypeBB},
+			400: {Type: ShipTypeCV},
 		},
 	)
 
