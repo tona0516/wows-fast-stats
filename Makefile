@@ -1,5 +1,5 @@
 APP_NAME := wows-fast-stats
-SEMVER := 0.11.0
+SEMVER := 0.11.1
 EXE := $(APP_NAME)-$(SEMVER).exe
 ZIP := $(APP_NAME).zip
 DISCORD_WEBHOOK_URL_PROD := $(shell cat discord_webhook_url_prod)
