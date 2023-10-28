@@ -6,6 +6,7 @@ import (
 
 	"github.com/morikuni/failure"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestUtil_makeRange(t *testing.T) {
@@ -28,8 +29,8 @@ func TestUtil_doParallel_正常系(t *testing.T) {
 		return nil
 	})
 
-	assert.Nil(t, err)
-	assert.Equal(t, len(values), calls)
+	require.NoError(t, err)
+	assert.Len(t, values, calls)
 }
 
 func TestUtil_doParallel_異常系(t *testing.T) {
@@ -47,5 +48,5 @@ func TestUtil_doParallel_異常系(t *testing.T) {
 
 	code, ok := failure.CodeOf(err)
 	assert.True(t, ok)
-	assert.Equal(t, code, expected)
+	assert.Equal(t, expected, code)
 }

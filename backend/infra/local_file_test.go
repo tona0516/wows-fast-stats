@@ -9,6 +9,7 @@ import (
 	"wfs/backend/domain"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 const testInstallPath = "testdata"
@@ -33,19 +34,19 @@ func TestLocalFile_User(t *testing.T) {
 
 	// 書き込み：正常系
 	err := localFile.UpdateUser(expected)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	// 取得：正常系
 	actual, err := localFile.User()
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, expected, actual)
 
 	// 取得：異常系 存在しない場合 デフォルト値を返却する
 	err = os.Remove(filepath.Join(configDir, userConfigFile))
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	actual, err = localFile.User()
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, DefaultUserConfig, actual)
 }
 
@@ -58,19 +59,19 @@ func TestLocalFile_User_異常系_ファイルに新規パラメータが存在�
 	appid := "abc"
 	saved := fmt.Sprintf(`{"install_path": "%s","appid": "%s"}`, installPath, appid)
 	err := os.Mkdir(configDir, os.ModePerm)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	err = os.WriteFile(filepath.Join(configDir, userConfigFile), []byte(saved), os.ModePerm)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	localFile := NewLocalFile()
 	actual, err := localFile.User()
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	// 存在するパラメータはその値、存在しないパラメータはデフォルト値が格納されていること
 	expected := DefaultUserConfig
 	expected.InstallPath = installPath
 	expected.Appid = appid
-	assert.Equal(t, expected, actual)
+	require.Equal(t, expected, actual)
 }
 
 func TestLocalFile_AlertPlayers(t *testing.T) {
@@ -94,30 +95,30 @@ func TestLocalFile_AlertPlayers(t *testing.T) {
 
 	// 書き込み：正常系
 	err := localFile.UpdateAlertPlayer(expected1)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	err = localFile.UpdateAlertPlayer(expected2)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	// 取得：正常系
 	actual, err := localFile.AlertPlayers()
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, []domain.AlertPlayer{expected1, expected2}, actual)
 
 	// 削除：正常系
 	err = localFile.RemoveAlertPlayer(100)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	// 取得
 	actual, err = localFile.AlertPlayers()
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, []domain.AlertPlayer{expected2}, actual)
 
 	// 取得：異常系 存在しない場合 デフォルト値を返却する
 	err = os.Remove(filepath.Join(configDir, alertPlayerFile))
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	actual, err = localFile.AlertPlayers()
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, []domain.AlertPlayer{}, actual)
 }
 
@@ -137,10 +138,10 @@ func TestLocalFile_SaveScreenshot_正常系(t *testing.T) {
 	err := localFile.SaveScreenshot(path, base64Data)
 
 	// アサーション
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.FileExists(t, path)
 	content, err := os.ReadFile(path)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, content, []byte(rawData))
 }
 
@@ -168,10 +169,10 @@ func TestLocalFile_GetTempArenaInfo_正常系(t *testing.T) {
 			defer os.RemoveAll(testInstallPath)
 
 			err := writeJSON(path, expected)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 
 			actual, err := localFile.TempArenaInfo(testInstallPath)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.Equal(t, expected, actual)
 		}(path)
 	}
@@ -208,12 +209,12 @@ func TestLocalFile_GetTempArenaInfo_正常系_該当ファイルが複数存在�
 	defer os.RemoveAll(installPath)
 
 	err := writeJSON(filepath.Join(installPath, replaysDir, tempArenaInfoFile), older)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	err = writeJSON(filepath.Join(installPath, replaysDir, "12.4.0", tempArenaInfoFile), expected)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	actual, err := localFile.TempArenaInfo(installPath)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, expected, actual)
 }
 
@@ -231,10 +232,10 @@ func TestLocalFile_GetTempArenaInfo_異常系_該当ファイルなし(t *testin
 			defer os.RemoveAll(testInstallPath)
 
 			err := writeJSON(path, domain.TempArenaInfo{})
-			assert.NoError(t, err)
+			require.NoError(t, err)
 
 			_, err = localFile.TempArenaInfo(installPath)
-			assert.Error(t, err)
+			require.Error(t, err)
 		}(path)
 	}
 }

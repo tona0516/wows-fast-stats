@@ -6,6 +6,7 @@ import (
 	"wfs/backend/apperr"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestNSExpectedStats_UnmarshalJSON(t *testing.T) {
@@ -43,7 +44,7 @@ func TestNSExpectedStats_UnmarshalJSON(t *testing.T) {
 
 		var actual NSExpectedStats
 		err := json.Unmarshal([]byte(jsonData), &actual)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		assert.Equal(t, NSExpectedStats{
 			Time: int64(1621845600),
 			Data: AllExpectedStats{
@@ -70,6 +71,6 @@ func TestNSExpectedStats_UnmarshalJSON(t *testing.T) {
         }`
 
 		err := json.Unmarshal([]byte(jsonData), &NSExpectedStats{})
-		assert.EqualError(t, apperr.Unwrap(err), apperr.ParseExpectedStatsError.ErrorCode())
+		require.EqualError(t, apperr.Unwrap(err), apperr.ParseExpectedStatsError.ErrorCode())
 	})
 }

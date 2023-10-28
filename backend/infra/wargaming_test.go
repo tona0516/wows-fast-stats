@@ -12,6 +12,7 @@ import (
 
 	"github.com/morikuni/failure"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestWargaming_AccountInfo(t *testing.T) {
@@ -31,7 +32,7 @@ func TestWargaming_AccountInfo(t *testing.T) {
 	})
 
 	result, err := wargaming.AccountInfo([]int{123, 456})
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, domain.WGAccountInfo{}, result)
 }
 
@@ -53,7 +54,7 @@ func TestWargaming_AccountList(t *testing.T) {
 
 	result, err := wargaming.AccountList([]string{"player_1", "player_2"})
 
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, domain.WGAccountList{}, result)
 }
 
@@ -75,7 +76,7 @@ func TestWargaming_AccountListForSearch(t *testing.T) {
 
 	result, err := wargaming.AccountListForSearch("player")
 
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, domain.WGAccountList{}, result)
 }
 
@@ -97,7 +98,7 @@ func TestWargaming_ClansAccountInfo(t *testing.T) {
 
 	result, err := wargaming.ClansAccountInfo([]int{123, 456})
 
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, domain.WGClansAccountInfo{}, result)
 }
 
@@ -119,7 +120,7 @@ func TestWargaming_ClansInfo(t *testing.T) {
 
 	result, err := wargaming.ClansInfo([]int{123, 456})
 
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, domain.WGClansInfo{}, result)
 }
 
@@ -141,7 +142,7 @@ func TestWargaming_ShipsStats(t *testing.T) {
 
 	result, err := wargaming.ShipsStats(123)
 
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, domain.WGShipsStats{}, result)
 }
 
@@ -168,7 +169,7 @@ func TestWargaming_EncycShips(t *testing.T) {
 
 	result, pageTotal, err := wargaming.EncycShips(1)
 
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, domain.WGEncycShips{}, result)
 	assert.Equal(t, expectedPageTotal, pageTotal)
 }
@@ -185,7 +186,7 @@ func TestWargaming_EncycInfo(t *testing.T) {
 
 	result, err := wargaming.EncycInfo()
 
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, domain.WGEncycInfoData{}, result)
 }
 
@@ -207,7 +208,7 @@ func TestWargaming_BattleArena(t *testing.T) {
 
 	result, err := wargaming.BattleArenas()
 
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, domain.WGBattleArenas{}, result)
 }
 
@@ -228,7 +229,7 @@ func TestWargaming_BattleTypes(t *testing.T) {
 	})
 	result, err := wargaming.BattleTypes()
 
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, domain.WGBattleTypes{}, result)
 }
 
@@ -244,7 +245,7 @@ func TestWargaming_Test(t *testing.T) {
 
 	valid, err := wargaming.Test("hoge")
 	assert.True(t, valid)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 }
 
 func TestWargaming_AccountInfo_異常系_リトライなし(t *testing.T) {
@@ -276,7 +277,7 @@ func TestWargaming_AccountInfo_異常系_リトライなし(t *testing.T) {
 	_, err := wargaming.AccountInfo([]int{123, 456})
 	code, ok := failure.CodeOf(err)
 	assert.True(t, ok)
-	assert.Equal(t, code, apperr.WGAPIError)
+	assert.Equal(t, apperr.WGAPIError, code)
 	assert.Equal(t, 1, calls)
 }
 
@@ -321,7 +322,7 @@ func TestWargaming_AccountInfo_正常系_最大リトライ(t *testing.T) {
 
 		_, err := wargaming.AccountInfo([]int{123, 456})
 
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		assert.Equal(t, int(retry+1), calls)
 	}
 }
@@ -361,7 +362,7 @@ func TestWargaming_AccountInfo_異常系_最大リトライ(t *testing.T) {
 
 		code, ok := failure.CodeOf(err)
 		assert.True(t, ok)
-		assert.Equal(t, code, apperr.WGAPITemporaryUnavaillalble)
+		assert.Equal(t, apperr.WGAPITemporaryUnavaillalble, code)
 		assert.Equal(t, int(retry+1), calls)
 	}
 }

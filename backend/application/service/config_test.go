@@ -14,6 +14,7 @@ import (
 	"github.com/morikuni/failure"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
 )
 
 const (
@@ -25,7 +26,7 @@ var errWargaming = failure.New(apperr.WGAPIError)
 
 func TestConfig_UpdateRequired_正常系(t *testing.T) {
 	err := createGameClientPath()
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	defer os.RemoveAll(DefaultInstallPath)
 
 	// テストデータ
@@ -44,7 +45,7 @@ func TestConfig_UpdateRequired_正常系(t *testing.T) {
 
 	// アサーション
 	assert.Equal(t, vo.RequiredConfigError{Valid: true}, actual)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	mockWargaming.AssertCalled(t, "Test", config.Appid)
 	mockLocalFile.AssertCalled(t, "User")
 	mockLocalFile.AssertCalled(t, "UpdateUser", config)
@@ -52,7 +53,7 @@ func TestConfig_UpdateRequired_正常系(t *testing.T) {
 
 func TestConfig_UpdateRequired_異常系_不正なインストールパス(t *testing.T) {
 	err := createGameClientPath()
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	defer os.RemoveAll(DefaultInstallPath)
 
 	// テストデータ
@@ -71,14 +72,14 @@ func TestConfig_UpdateRequired_異常系_不正なインストールパス(t *te
 
 	// アサーション
 	assert.Equal(t, vo.RequiredConfigError{InstallPath: apperr.InvalidInstallPath.ErrorCode()}, actual)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	mockWargaming.AssertCalled(t, "Test", config.Appid)
 	mockLocalFile.AssertNotCalled(t, "UpdateUser", config)
 }
 
 func TestConfig_UpdateRequired_異常系_不正なAppID(t *testing.T) {
 	err := createGameClientPath()
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	defer os.RemoveAll(DefaultInstallPath)
 
 	// テストデータ
@@ -95,14 +96,14 @@ func TestConfig_UpdateRequired_異常系_不正なAppID(t *testing.T) {
 
 	// アサーション
 	assert.Equal(t, vo.RequiredConfigError{AppID: apperr.InvalidAppID.ErrorCode()}, actual)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	mockWargaming.AssertCalled(t, "Test", config.Appid)
 	mockLocalFile.AssertNotCalled(t, "UpdateUser", config)
 }
 
 func TestConfig_UpdateOptional_正常系(t *testing.T) {
 	err := createGameClientPath()
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	defer os.RemoveAll(DefaultInstallPath)
 
 	// テストデータ
@@ -124,7 +125,7 @@ func TestConfig_UpdateOptional_正常系(t *testing.T) {
 	err = c.UpdateOptional(config)
 
 	// アサーション
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	mockLocalFile.AssertCalled(t, "User")
 	mockLocalFile.AssertCalled(t, "UpdateUser", actualWritten)
 	mockWargaming.AssertNotCalled(t, "Test", config.Appid)

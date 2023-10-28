@@ -8,6 +8,7 @@ import (
 	"github.com/morikuni/failure"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
 )
 
 func initMocksForBattle() (*mockWargaming, *mockNumbers, *mockUnregistered, *mockLocalFile) {
@@ -57,7 +58,7 @@ func TestBattle_Battle_正常系_初回(t *testing.T) {
 	_, err := b.Battle(domain.UserConfig{})
 
 	// アサーション
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mockWargaming.AssertCalled(t, "SetAppID", mock.Anything)
 	mockWargaming.AssertCalled(t, "AccountList", mock.Anything)
@@ -89,7 +90,7 @@ func TestBattle_Battle_正常系_2回目以降(t *testing.T) {
 	_, err := b.Battle(domain.UserConfig{})
 
 	// アサーション
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mockWargaming.AssertCalled(t, "SetAppID", mock.Anything)
 	mockWargaming.AssertCalled(t, "AccountList", mock.Anything)
@@ -127,7 +128,7 @@ func TestBattle_Battle_異常系(t *testing.T) {
 	// アサーション
 	code, ok := failure.CodeOf(err)
 	assert.True(t, ok)
-	assert.Equal(t, code, apperr.FileNotExist)
+	assert.Equal(t, apperr.FileNotExist, code)
 
 	mockWargaming.AssertCalled(t, "SetAppID", mock.Anything)
 	mockWargaming.AssertNotCalled(t, "AccountList", mock.Anything)

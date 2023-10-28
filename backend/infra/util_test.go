@@ -8,6 +8,7 @@ import (
 	"wfs/backend/application/vo"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 // テスト用のデータ型.
@@ -31,7 +32,7 @@ func TestUtil_getRequest_正常系_クエリなし(t *testing.T) {
 	actual, err := getRequest[TestData](server.URL)
 
 	assert.Equal(t, expected, actual)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 }
 
 func TestUtil_getRequest_正常系_クエリあり(t *testing.T) {
@@ -50,7 +51,7 @@ func TestUtil_getRequest_正常系_クエリあり(t *testing.T) {
 	actual, err := getRequest[TestData](server.URL, vo.NewPair("hoge", "fuga"))
 
 	assert.Equal(t, expected, actual)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 }
 
 func TestUtil_getRequest_異常系_不正なレスポンス(t *testing.T) {
@@ -85,8 +86,8 @@ func TestUtil_getRequest_異常系_不正なレスポンス(t *testing.T) {
 
 			actual, err := getRequest[TestData](server.URL)
 
-			assert.Error(t, err)
-			assert.Equal(t, expected, actual)
+			require.Error(t, err)
+			require.Equal(t, expected, actual)
 		})
 	}
 }

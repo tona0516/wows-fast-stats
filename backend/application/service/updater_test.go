@@ -8,6 +8,7 @@ import (
 
 	"github.com/morikuni/failure"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestUpdater_Updatable_正常系_アップデートあり(t *testing.T) {
@@ -25,7 +26,7 @@ func TestUpdater_Updatable_正常系_アップデートあり(t *testing.T) {
 	expected.Updatable = true
 
 	assert.Equal(t, expected, actual)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	mockGithub.AssertCalled(t, "LatestRelease")
 }
 
@@ -44,7 +45,7 @@ func TestUpdater_Updatable_正常系_アップデートなし(t *testing.T) {
 	expected.Updatable = false
 
 	assert.Equal(t, expected, actual)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	mockGithub.AssertCalled(t, "LatestRelease")
 }
 
@@ -62,7 +63,7 @@ func TestUpdater_Updatable_異常系(t *testing.T) {
 
 	code, ok := failure.CodeOf(err)
 	assert.True(t, ok)
-	assert.Equal(t, code, apperr.HTTPRequestError)
+	assert.Equal(t, apperr.HTTPRequestError, code)
 
 	mockGithub.AssertCalled(t, "LatestRelease")
 }

@@ -8,6 +8,7 @@ import (
 
 	"github.com/morikuni/failure"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
@@ -34,7 +35,7 @@ func TestScreenshot_SaveForAuto_正常系(t *testing.T) {
 	err := s.SaveForAuto(filename, base64Data)
 
 	// 結果の検証
-	assert.NoError(t, err)
+	require.NoError(t, err)
 }
 
 func TestScreenshot_SaveWithDialog_正常系(t *testing.T) {
@@ -55,8 +56,8 @@ func TestScreenshot_SaveWithDialog_正常系(t *testing.T) {
 	saved, err := s.SaveWithDialog(context.Background(), filename, base64Data)
 
 	// 結果の検証
-	assert.True(t, saved)
-	assert.NoError(t, err)
+	require.True(t, saved)
+	require.NoError(t, err)
 }
 
 func TestScreenshot_SaveWithDialog_異常系(t *testing.T) {
@@ -76,7 +77,7 @@ func TestScreenshot_SaveWithDialog_異常系(t *testing.T) {
 	assert.False(t, saved)
 	code, ok := failure.CodeOf(err)
 	assert.True(t, ok)
-	assert.Equal(t, code, apperr.WailsError)
+	assert.Equal(t, apperr.WailsError, code)
 	mockLocalFile.AssertNotCalled(t, "SaveScreenshot")
 }
 
@@ -95,6 +96,6 @@ func TestScreenshot_SaveWithDialog_異常系_キャンセル(t *testing.T) {
 
 	// 結果の検証
 	assert.False(t, saved)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	mockLocalFile.AssertNotCalled(t, "SaveScreenshot")
 }

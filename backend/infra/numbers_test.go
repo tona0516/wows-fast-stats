@@ -6,6 +6,7 @@ import (
 	"wfs/backend/domain"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestNumbers_ExpectedStats(t *testing.T) {
@@ -29,7 +30,7 @@ func TestNumbers_ExpectedStats(t *testing.T) {
 		// テスト
 		numbers := NewNumbers(RequestConfig{URL: server.URL})
 		actual, err := numbers.ExpectedStats()
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
 		// アサーション
 		expected := domain.NSExpectedStats{
@@ -62,6 +63,6 @@ func TestNumbers_ExpectedStats(t *testing.T) {
 		// テスト
 		numbers := NewNumbers(RequestConfig{URL: server.URL})
 		_, err := numbers.ExpectedStats()
-		assert.EqualError(t, apperr.Unwrap(err), apperr.NumbersAPIFetchExpectedStatsError.ErrorCode())
+		require.EqualError(t, apperr.Unwrap(err), apperr.NumbersAPIFetchExpectedStatsError.ErrorCode())
 	})
 }

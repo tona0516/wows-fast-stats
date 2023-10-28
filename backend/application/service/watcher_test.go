@@ -9,6 +9,7 @@ import (
 
 	"github.com/morikuni/failure"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestWatcher_Start_戦闘開始(t *testing.T) {
@@ -36,7 +37,7 @@ func TestWatcher_Start_戦闘開始(t *testing.T) {
 
 	watcher := NewWatcher(interval, mockLocalFile, emitFunc)
 	err := watcher.Prepare()
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	go watcher.Start(ctx, ctx)
 
 	time.Sleep(20 * time.Millisecond)
@@ -72,7 +73,7 @@ func TestWatcher_Start_戦闘終了(t *testing.T) {
 
 	watcher := NewWatcher(interval, mockLocalFile, emitFunc)
 	err := watcher.Prepare()
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	go watcher.Start(ctx, ctx)
 
 	time.Sleep(20 * time.Millisecond)
@@ -111,7 +112,7 @@ func TestWatcher_Start_エラー発生(t *testing.T) {
 
 	watcher := NewWatcher(interval, mockLocalFile, emitFunc)
 	err := watcher.Prepare()
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	go watcher.Start(ctx, ctx)
 
 	time.Sleep(20 * time.Millisecond)
@@ -147,7 +148,7 @@ func TestWatcher_Start_キャンセル(t *testing.T) {
 	watcher := NewWatcher(interval, mockLocalFile, emitFunc)
 
 	err := watcher.Prepare()
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	go watcher.Start(ctx, ctx)
 	cancel()
 

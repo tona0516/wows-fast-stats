@@ -6,6 +6,7 @@ import (
 	"wfs/backend/domain"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestGithub_LatestRelease(t *testing.T) {
@@ -26,7 +27,7 @@ func TestGithub_LatestRelease(t *testing.T) {
 		})
 
 		actual, err := github.LatestRelease()
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		assert.Equal(t, expected, actual)
 	})
 
@@ -41,6 +42,6 @@ func TestGithub_LatestRelease(t *testing.T) {
 		})
 
 		_, err := github.LatestRelease()
-		assert.EqualError(t, apperr.Unwrap(err), apperr.GithubAPICheckUpdateError.ErrorCode())
+		require.EqualError(t, apperr.Unwrap(err), apperr.GithubAPICheckUpdateError.ErrorCode())
 	})
 }
