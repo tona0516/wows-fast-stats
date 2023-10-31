@@ -16,10 +16,13 @@ import (
 )
 
 const (
-	APP_NAME             = "wows-fast-stats"
-	SEMVER               = "0.11.1"
-	TEST_DIR             = "test_install_dir/replays/"
-	TEMP_ARENA_INFO_FILE = "tempArenaInfo.json"
+	APP_NAME          = "wows-fast-stats"
+	SEMVER            = "0.11.1"
+	TEST_DIR          = "./test_install_dir/replays/"
+	TEMP_ARENA_INFO   = "tempArenaInfo.json"
+	CMD_GO            = "go"
+	CMD_WAILS         = "wails"
+	CMD_GOLANGCI_LINT = "golangci-lint"
 )
 
 var (
@@ -39,26 +42,27 @@ var (
 )
 
 func ldflags(isDev bool) string {
-	var flags []string
+	add := func(slice []string, elems map[string]string) []string {
+		for k, v := range elems {
+			slice = append(slice, fmt.Sprintf("-X %s=%s", k, v))
+		}
 
-	for k, v := range LDFlagsCommon {
-		flags = append(flags, fmt.Sprintf("-X %s=%s", k, v))
+		return slice
 	}
 
+	flags := make([]string, 0)
+	flags = add(flags, LDFlagsCommon)
+
 	if isDev {
-		for k, v := range LDFlagsDev {
-			flags = append(flags, fmt.Sprintf("-X %s=%s", k, v))
-		}
+		flags = add(flags, LDFlagsDev)
 	} else {
-		for k, v := range LDFlagsProd {
-			flags = append(flags, fmt.Sprintf("-X %s=%s", k, v))
-		}
+		flags = add(flags, LDFlagsProd)
 	}
 
 	return strings.Join(flags, " ")
 }
 
-func execNPM(additionals ...string) error {
+func npm(additionals ...string) error {
 	args := []string{
 		"--prefix",
 		"./frontend",
@@ -127,19 +131,19 @@ func createZip(dst string, src string) error {
 }
 
 func Gen() error {
-	return sh.RunV("go", "generate", "./...")
+	return sh.RunV(CMD_GO, "generate", "./...")
 }
 
 func Lint() error {
-	if err := sh.RunV("golangci-lint", "run"); err != nil {
+	if err := sh.RunV(CMD_GOLANGCI_LINT, "run"); err != nil {
 		return err
 	}
 
-	if err := execNPM("run", "check"); err != nil {
+	if err := npm("run", "check"); err != nil {
 		return err
 	}
 
-	if err := execNPM("run", "lint"); err != nil {
+	if err := npm("run", "lint"); err != nil {
 		return err
 	}
 
@@ -147,15 +151,15 @@ func Lint() error {
 }
 
 func Fmt() error {
-	if err := sh.RunV("golangci-lint", "run", "--fix"); err != nil {
+	if err := sh.RunV(CMD_GOLANGCI_LINT, "run", "--fix"); err != nil {
 		return err
 	}
 
-	if err := sh.RunV("go", "fmt"); err != nil {
+	if err := sh.RunV(CMD_GO, "fmt"); err != nil {
 		return err
 	}
 
-	if err := execNPM("run", "fmt"); err != nil {
+	if err := npm("run", "fmt"); err != nil {
 		return err
 	}
 
@@ -163,11 +167,11 @@ func Fmt() error {
 }
 
 func Test() error {
-	if err := sh.RunV("go", "test", "-cover", "./..."); err != nil {
+	if err := sh.RunV(CMD_GO, "test", "-cover", "./..."); err != nil {
 		return err
 	}
 
-	if err := execNPM("run", "test"); err != nil {
+	if err := npm("run", "test"); err != nil {
 		return err
 	}
 
@@ -177,7 +181,10 @@ func Test() error {
 func Dev() error {
 	mg.Deps(Gen)
 
-	return sh.RunV("wails", "dev", "-ldflags", ldflags(true))
+	return sh.RunV(
+		CMD_WAILS, "dev",
+		"-ldflags", ldflags(true),
+	)
 }
 
 func Setup() error {
@@ -188,12 +195,12 @@ func Setup() error {
 	}
 
 	for _, pkg := range pkgs {
-		if err := sh.RunV("go", "install", pkg); err != nil {
+		if err := sh.RunV(CMD_GO, "install", pkg); err != nil {
 			return err
 		}
 	}
 
-	if err := execNPM("ci", "./frontend"); err != nil {
+	if err := npm("ci", "./frontend"); err != nil {
 		return err
 	}
 
@@ -203,7 +210,13 @@ func Setup() error {
 func Build() error {
 	mg.SerialDeps(Gen, Test)
 
-	return sh.RunV("wails", "build", "-ldflags", ldflags(false), "-platform", "windows/amd64", "-o", AppExeName, "-trimpath")
+	return sh.RunV(
+		CMD_WAILS, "build",
+		"-ldflags", ldflags(false),
+		"-platform", "windows/amd64",
+		"-o", AppExeName,
+		"-trimpath",
+	)
 }
 
 func Pkg() error {
@@ -230,8 +243,8 @@ func Pkg() error {
 	return nil
 }
 
-func PutTempArenaInfo() error {
-	jsons := []string{}
+func PutTestData() error {
+	testDataFiles := []string{}
 	err := filepath.Walk(TEST_DIR, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
@@ -242,11 +255,11 @@ func PutTempArenaInfo() error {
 		}
 
 		fileName := filepath.Base(path)
-		if !strings.HasPrefix(fileName, TEMP_ARENA_INFO_FILE) {
+		if !strings.HasPrefix(fileName, TEMP_ARENA_INFO) {
 			return nil
 		}
 
-		jsons = append(jsons, fileName)
+		testDataFiles = append(testDataFiles, fileName)
 
 		return nil
 	})
@@ -255,8 +268,8 @@ func PutTempArenaInfo() error {
 		return err
 	}
 
-	for i, json := range jsons {
-		fmt.Println(i, json)
+	for i, file := range testDataFiles {
+		fmt.Println(i, file)
 	}
 
 	var input string
@@ -270,7 +283,10 @@ func PutTempArenaInfo() error {
 		return err
 	}
 
-	return sh.Copy(filepath.Join(TEST_DIR, TEMP_ARENA_INFO_FILE), filepath.Join(TEST_DIR, jsons[index]))
+	return sh.Copy(
+		filepath.Join(TEST_DIR, TEMP_ARENA_INFO),
+		filepath.Join(TEST_DIR, testDataFiles[index]),
+	)
 }
 
 func Clean() error {
