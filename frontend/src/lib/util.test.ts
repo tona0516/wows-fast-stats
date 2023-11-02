@@ -38,7 +38,7 @@ test("isShipType - 異常系", () => {
 });
 
 test("isDigitKey - 正常系", () => {
-  ["pr", "hit_rate"].forEach((key) => {
+  ["battles", "hit_rate", "avg_tier"].forEach((key) => {
     if (!isDigitKey(key)) fail();
   });
 });

@@ -1,4 +1,4 @@
-import type { OverallKey, ShipKey, ShipType } from "src/lib/types";
+import type { DigitKey, OverallKey, ShipKey, ShipType } from "src/lib/types";
 import { domain } from "wailsjs/go/models";
 
 const ROMAN_NUMERALS: { decimal: number; numeral: string }[] = [
@@ -41,7 +41,7 @@ export const isShipType = (type: string): type is ShipType => {
   return Object.keys(new domain.ShipTypeGroup()).includes(type);
 };
 
-export const isDigitKey = (key: string): key is ShipKey => {
+export const isDigitKey = (key: string): key is DigitKey => {
   return Object.keys(new domain.CustomDigit()).includes(key);
 };
 
