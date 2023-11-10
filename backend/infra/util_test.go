@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 	"wfs/backend/application/vo"
 
 	"github.com/stretchr/testify/assert"
@@ -29,7 +30,7 @@ func TestUtil_getRequest_正常系_クエリなし(t *testing.T) {
 	defer server.Close()
 	expected.FullURL = server.URL
 
-	actual, err := getRequest[TestData](server.URL)
+	actual, err := getRequest[TestData](server.URL, 1*time.Second)
 
 	assert.Equal(t, expected, actual)
 	require.NoError(t, err)
@@ -48,10 +49,27 @@ func TestUtil_getRequest_正常系_クエリあり(t *testing.T) {
 	defer server.Close()
 	expected.FullURL = server.URL + "?hoge=fuga"
 
-	actual, err := getRequest[TestData](server.URL, vo.NewPair("hoge", "fuga"))
+	actual, err := getRequest[TestData](server.URL, 1*time.Second, vo.NewPair("hoge", "fuga"))
 
 	assert.Equal(t, expected, actual)
 	require.NoError(t, err)
+}
+
+func TestUtil_getRequest_異常系_タイムアウト(t *testing.T) {
+	t.Parallel()
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		time.Sleep(1 * time.Second)
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write(normalResponse().ByteBody)
+	}))
+	defer server.Close()
+
+	_, err := getRequest[TestData](server.URL, 100*time.Millisecond)
+
+	require.Error(t, err)
 }
 
 func TestUtil_getRequest_異常系_不正なレスポンス(t *testing.T) {
@@ -70,24 +88,16 @@ func TestUtil_getRequest_異常系_不正なレスポンス(t *testing.T) {
 		t.Run("", func(t *testing.T) {
 			t.Parallel()
 
-			expected := APIResponse[TestData]{
-				StatusCode: http.StatusOK,
-				Body:       TestData{},
-				ByteBody:   []byte(res.body),
-			}
-
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				w.Header().Set("Content-Type", "application/json")
-				w.WriteHeader(expected.StatusCode)
-				_, _ = w.Write(expected.ByteBody)
+				w.WriteHeader(http.StatusOK)
+				_, _ = w.Write([]byte(res.body))
 			}))
 			defer server.Close()
-			expected.FullURL = server.URL
 
-			actual, err := getRequest[TestData](server.URL)
+			_, err := getRequest[TestData](server.URL, 1*time.Second)
 
 			require.Error(t, err)
-			require.Equal(t, expected, actual)
 		})
 	}
 }

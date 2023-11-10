@@ -22,7 +22,7 @@ func NewNumbers(config RequestConfig) *Numbers {
 func (n *Numbers) ExpectedStats() (domain.NSExpectedStats, error) {
 	b := backoff.WithMaxRetries(backoff.NewExponentialBackOff(), n.config.Retry)
 	operation := func() (APIResponse[domain.NSExpectedStats], error) {
-		return getRequest[domain.NSExpectedStats](n.config.URL + "/personal/rating/expected/json/")
+		return getRequest[domain.NSExpectedStats](n.config.URL+"/personal/rating/expected/json/", n.config.Timeout)
 	}
 
 	res, err := backoff.RetryWithData(operation, b)

@@ -9,6 +9,7 @@ import (
 	"net/url"
 	"os"
 	"strconv"
+	"time"
 	"wfs/backend/application/vo"
 
 	"github.com/morikuni/failure"
@@ -29,6 +30,7 @@ type Form struct {
 
 func getRequest[T any](
 	rawURL string,
+	timeout time.Duration,
 	queries ...vo.Pair,
 ) (APIResponse[T], error) {
 	var response APIResponse[T]
@@ -48,7 +50,10 @@ func getRequest[T any](
 	errCtx["url"] = u.String()
 
 	// request
-	res, err := http.Get(u.String())
+	client := http.Client{}
+	client.Timeout = timeout
+
+	res, err := client.Get(u.String())
 	if err != nil {
 		return response, failure.Wrap(err, errCtx)
 	}
@@ -74,6 +79,7 @@ func getRequest[T any](
 //nolint:cyclop
 func postMultipartFormData[T any](
 	rawURL string,
+	timeout time.Duration,
 	forms []Form,
 ) (APIResponse[T], error) {
 	var response APIResponse[T]
@@ -116,7 +122,10 @@ func postMultipartFormData[T any](
 	mw.Close()
 
 	// request
-	res, err := http.Post(u.String(), mw.FormDataContentType(), requestBody)
+	client := http.Client{}
+	client.Timeout = timeout
+
+	res, err := client.Post(u.String(), mw.FormDataContentType(), requestBody)
 	if err != nil {
 		return response, failure.Wrap(err)
 	}

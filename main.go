@@ -69,23 +69,28 @@ func main() {
 func initApp(env vo.Env) *App {
 	// infra
 	var maxRetry uint64 = 2
+	timeout := 10 * time.Second
 	wargaming := infra.NewWargaming(infra.RequestConfig{
-		URL:   "https://api.worldofwarships.asia",
-		Retry: maxRetry,
+		URL:     "https://api.worldofwarships.asia",
+		Retry:   maxRetry,
+		Timeout: timeout,
 	})
 	numbers := infra.NewNumbers(infra.RequestConfig{
-		URL:   "https://api.wows-numbers.com",
-		Retry: maxRetry,
+		URL:     "https://api.wows-numbers.com",
+		Retry:   maxRetry,
+		Timeout: timeout,
 	})
 	localFile := infra.NewLocalFile()
 	unregistered := infra.NewUnregistered()
 	github := infra.NewGithub(infra.RequestConfig{
-		URL:   "https://api.github.com",
-		Retry: maxRetry,
+		URL:     "https://api.github.com",
+		Retry:   maxRetry,
+		Timeout: timeout,
 	})
 	discord := infra.NewDiscord(infra.RequestConfig{
-		URL:   DiscordWebhookURL,
-		Retry: maxRetry,
+		URL:     DiscordWebhookURL,
+		Retry:   maxRetry,
+		Timeout: timeout,
 	})
 	report := infra.NewReport(env, *localFile, *discord)
 

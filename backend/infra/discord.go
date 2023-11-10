@@ -48,7 +48,7 @@ func (d *Discord) Upload(filename string, text string, message string) error {
 		{name: "file", content: filename, isFile: true},
 	}
 
-	res, err := postMultipartFormData[any](d.config.URL, forms)
+	res, err := postMultipartFormData[any](d.config.URL, d.config.Timeout, forms)
 	if err != nil {
 		return failure.Wrap(err)
 	}

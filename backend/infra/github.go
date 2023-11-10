@@ -23,7 +23,8 @@ func (g *Github) LatestRelease() (domain.GHLatestRelease, error) {
 	b := backoff.WithMaxRetries(backoff.NewExponentialBackOff(), g.config.Retry)
 	operation := func() (APIResponse[domain.GHLatestRelease], error) {
 		return getRequest[domain.GHLatestRelease](
-			g.config.URL + "/repos/tona0516/wows-fast-stats/releases/latest",
+			g.config.URL+"/repos/tona0516/wows-fast-stats/releases/latest",
+			g.config.Timeout,
 		)
 	}
 
