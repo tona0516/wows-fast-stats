@@ -1,6 +1,6 @@
 # build
 /build/bin
-/frontend/node_modules
+node_modules
 /frontend/dist
 /wows-fast-stats.zip
 
