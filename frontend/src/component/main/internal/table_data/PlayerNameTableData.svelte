@@ -13,6 +13,8 @@
   } from "wailsjs/go/main/App";
   import type { domain } from "wailsjs/go/models";
   import type { PlayerName } from "src/lib/column/model/PlayerName";
+  import { ClipboardSetText } from "wailsjs/runtime/runtime";
+  import { Notifier } from "src/lib/Notifier";
 
   export let column: PlayerName;
   export let player: domain.Player;
@@ -35,6 +37,14 @@
       await AddExcludePlayerID(accountID);
     }
     dispatch("CheckPlayer");
+  };
+
+  const setPlayerNameToClipboard = async () => {
+    const isSuccess = await ClipboardSetText(player.player_info.name);
+
+    isSuccess
+      ? Notifier.success("コピーしました！")
+      : Notifier.failure("コピーに失敗しました");
   };
 </script>
 
@@ -119,6 +129,12 @@
             >
           </li>
         {/if}
+        <li>
+          <!-- svelte-ignore a11y-invalid-attribute -->
+          <a href="#" on:click={setPlayerNameToClipboard}
+            >プレイヤー名をクリップボードにコピーする</a
+          >
+        </li>
       </ul>
     </UkDowndown>
   {/if}
