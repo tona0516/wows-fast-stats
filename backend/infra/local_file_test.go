@@ -6,8 +6,10 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+	"wfs/backend/apperr"
 	"wfs/backend/domain"
 
+	"github.com/morikuni/failure"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -191,15 +193,14 @@ func TestLocalFile_GetTempArenaInfo_正常系_該当ファイルが複数存在�
 		PlayerName: "player_1",
 	}
 
-	installPath := "testdata"
-	defer os.RemoveAll(installPath)
+	defer os.RemoveAll(testInstallPath)
 
-	err := writeJSON(filepath.Join(installPath, replaysDir, tempArenaInfoFile), older)
+	err := writeJSON(filepath.Join(testInstallPath, replaysDir, tempArenaInfoFile), older)
 	require.NoError(t, err)
-	err = writeJSON(filepath.Join(installPath, replaysDir, "12.4.0", tempArenaInfoFile), expected)
+	err = writeJSON(filepath.Join(testInstallPath, replaysDir, "12.4.0", tempArenaInfoFile), expected)
 	require.NoError(t, err)
 
-	actual, err := localFile.TempArenaInfo(installPath)
+	actual, err := localFile.TempArenaInfo(testInstallPath)
 	require.NoError(t, err)
 	assert.Equal(t, expected, actual)
 }
@@ -207,10 +208,9 @@ func TestLocalFile_GetTempArenaInfo_正常系_該当ファイルが複数存在�
 func TestLocalFile_GetTempArenaInfo_異常系_該当ファイルなし(t *testing.T) {
 	localFile := NewLocalFile()
 
-	installPath := "testdata"
 	paths := []string{
-		filepath.Join(installPath, replaysDir, "hoge.wowsreplay"),
-		filepath.Join(installPath, replaysDir, "12.4.0", "hoge.wowsreplay"),
+		filepath.Join(testInstallPath, replaysDir, "hoge.wowsreplay"),
+		filepath.Join(testInstallPath, replaysDir, "12.4.0", "hoge.wowsreplay"),
 	}
 
 	for _, path := range paths {
@@ -220,8 +220,22 @@ func TestLocalFile_GetTempArenaInfo_異常系_該当ファイルなし(t *testin
 			err := writeJSON(path, domain.TempArenaInfo{})
 			require.NoError(t, err)
 
-			_, err = localFile.TempArenaInfo(installPath)
+			_, err = localFile.TempArenaInfo(testInstallPath)
 			require.Error(t, err)
 		}(path)
 	}
+}
+
+func TestLocalFile_GetTempArenaInfo_異常系_replayフォルダなし(t *testing.T) {
+	localFile := NewLocalFile()
+
+	err := os.Mkdir(testInstallPath, os.ModePerm)
+	require.NoError(t, err)
+	defer os.RemoveAll(testInstallPath)
+
+	_, err = localFile.TempArenaInfo(testInstallPath)
+
+	code, ok := failure.CodeOf(err)
+	assert.True(t, ok)
+	assert.Equal(t, apperr.ReplayDirNotFoundError, code)
 }

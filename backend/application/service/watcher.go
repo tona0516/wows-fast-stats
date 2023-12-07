@@ -68,7 +68,7 @@ func (w *Watcher) Start(appCtx context.Context, cancelCtx context.Context) {
 
 			tempArenaInfo, err := w.localFile.TempArenaInfo(w.userConfig.InstallPath)
 			if err != nil {
-				if failure.Is(err, apperr.FileNotExist) {
+				if failure.Is(err, apperr.FileNotExist) || failure.Is(err, apperr.ReplayDirNotFoundError) {
 					w.eventsEmitFunc(appCtx, EventEnd)
 					continue
 				}

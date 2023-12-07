@@ -80,6 +80,10 @@ func (l *LocalFile) TempArenaInfo(installPath string) (domain.TempArenaInfo, err
 
 	tempArenaInfoPaths := []string{}
 	root := filepath.Join(installPath, replaysDir)
+	if _, err := os.Stat(root); err != nil {
+		return tempArenaInfo, failure.New(apperr.ReplayDirNotFoundError, failure.Messagef("%s", err.Error()))
+	}
+
 	err := filepath.WalkDir(root, func(path string, info fs.DirEntry, err error) error {
 		if err != nil {
 			return failure.Wrap(err)

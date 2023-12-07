@@ -23,6 +23,7 @@ const (
 	FrontendError                     failure.StringCode = "フロントエンドエラー"
 	WailsError                        failure.StringCode = "Wailsエラー"
 	MigrationError                    failure.StringCode = "データマイグレーションに失敗しました。configフォルダを削除して再起動してください。"
+	ReplayDirNotFoundError            failure.StringCode = "replayフォルダが存在しません。"
 	UnexpectedError                   failure.StringCode = "予期しないエラーが発生しました。"
 
 	FailSafeProccess failure.StringCode = "フェイルセーフ用の処理が実行されました。"
