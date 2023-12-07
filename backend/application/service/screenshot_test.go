@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 	"wfs/backend/apperr"
+	"wfs/backend/mocks"
 
 	"github.com/morikuni/failure"
 	"github.com/stretchr/testify/assert"
@@ -22,7 +23,7 @@ func TestScreenshot_SaveForAuto_正常系(t *testing.T) {
 
 	// 期待されるメソッド呼び出しと戻り値の設定
 	screenshotPath := filepath.Join("screenshot", filename)
-	mockLocalFile := &mockLocalFile{}
+	mockLocalFile := &mocks.LocalFileInterface{}
 	mockLocalFile.On("SaveScreenshot", screenshotPath, base64Data).Return(nil)
 
 	// Screenshot インスタンスの作成
@@ -43,7 +44,7 @@ func TestScreenshot_SaveWithDialog_正常系(t *testing.T) {
 
 	// 期待されるメソッド呼び出しと戻り値の設定
 	screenshotPath := filepath.Join("directory", filename)
-	mockLocalFile := &mockLocalFile{}
+	mockLocalFile := &mocks.LocalFileInterface{}
 	mockLocalFile.On("SaveScreenshot", screenshotPath, base64Data).Return(nil)
 
 	// Screenshot インスタンスの作成
@@ -64,7 +65,7 @@ func TestScreenshot_SaveWithDialog_異常系(t *testing.T) {
 	t.Parallel()
 
 	// Screenshot インスタンスの作成
-	mockLocalFile := &mockLocalFile{}
+	mockLocalFile := &mocks.LocalFileInterface{}
 	s := NewScreenshot(mockLocalFile)
 	s.SaveFileDialog = func(ctx context.Context, dialogOptions runtime.SaveDialogOptions) (string, error) {
 		return "", failure.New(apperr.WailsError)
@@ -85,7 +86,7 @@ func TestScreenshot_SaveWithDialog_異常系_キャンセル(t *testing.T) {
 	t.Parallel()
 
 	// Screenshot インスタンスの作成
-	mockLocalFile := &mockLocalFile{}
+	mockLocalFile := &mocks.LocalFileInterface{}
 	s := NewScreenshot(mockLocalFile)
 	s.SaveFileDialog = func(ctx context.Context, dialogOptions runtime.SaveDialogOptions) (string, error) {
 		return "", nil

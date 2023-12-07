@@ -16,137 +16,35 @@ import (
 
 const (
 	// directory.
-	configDir        string = "config"
+	ConfigDir        string = "config"
 	replaysDir       string = "replays"
 	tempArenaInfoDir string = "temp_arena_info"
-	cacheDir         string = "cache"
 
 	// file.
-	userConfigFile      string = "user.json"
-	alertPlayerFile     string = "alert_player.json"
-	tempArenaInfoFile   string = "tempArenaInfo.json"
-	nsExpectedStatsFile string = "ns_expected_stats.json"
+	UserConfigFile    string = "user.json"
+	AlertPlayerFile   string = "alert_player.json"
+	tempArenaInfoFile string = "tempArenaInfo.json"
 )
 
-//nolint:gochecknoglobals
-var DefaultUserConfig domain.UserConfig = domain.UserConfig{
-	FontSize:        "medium",
-	SendReport:      true,
-	NotifyUpdatable: true,
-	StatsPattern:    domain.StatsPatternPvPAll,
-	Displays: domain.Displays{
-		Ship: domain.Ship{
-			PR:      true,
-			Damage:  true,
-			WinRate: true,
-			Battles: true,
-		},
-		Overall: domain.Overall{
-			Damage:  true,
-			WinRate: true,
-			Battles: true,
-		},
-	},
-	CustomColor: domain.CustomColor{
-		Skill: domain.SkillColor{
-			Text: domain.SkillColorCode{
-				Bad:         "#ff382d",
-				BelowAvg:    "#fd9234",
-				Avg:         "#ffd351",
-				Good:        "#57e500",
-				VeryGood:    "#44b200",
-				Great:       "#02f7da",
-				Unicum:      "#da6ff5",
-				SuperUnicum: "#bf15ee",
-			},
-			Background: domain.SkillColorCode{
-				Bad:         "#a41200",
-				BelowAvg:    "#a34a02",
-				Avg:         "#a38204",
-				Good:        "#518517",
-				VeryGood:    "#2f6f41",
-				Great:       "#04436d",
-				Unicum:      "#232166",
-				SuperUnicum: "#531460",
-			},
-		},
-		Tier: domain.TierColor{
-			Own: domain.TierColorCode{
-				Low:    "#8CA113",
-				Middle: "#205B85",
-				High:   "#990F4F",
-			},
-			Other: domain.TierColorCode{
-				Low:    "#E6F5B0",
-				Middle: "#B3D7DD",
-				High:   "#E3ADD5",
-			},
-		},
-		ShipType: domain.ShipTypeColor{
-			Own: domain.ShipTypeColorCode{
-				CV: "#5E2883",
-				BB: "#CA1028",
-				CL: "#27853F",
-				DD: "#D9760F",
-				SS: "#233B8B",
-			},
-			Other: domain.ShipTypeColorCode{
-				CV: "#CAB2D6",
-				BB: "#FBB4C4",
-				CL: "#CCEBC5",
-				DD: "#FEE6AA",
-				SS: "#B3CDE3",
-			},
-		},
-		PlayerName: domain.PlayerNameColorShip,
-	},
-	CustomDigit: domain.CustomDigit{
-		PR:                0,
-		Damage:            0,
-		WinRate:           1,
-		KdRate:            2,
-		Kill:              2,
-		PlanesKilled:      1,
-		Exp:               0,
-		Battles:           0,
-		SurvivedRate:      1,
-		HitRate:           1,
-		AvgTier:           2,
-		UsingShipTypeRate: 1,
-		UsingTierRate:     1,
-	},
-	TeamAverage: domain.TeamAverage{
-		MinShipBattles:    1,
-		MinOverallBattles: 10,
-	},
-}
-
 type LocalFile struct {
-	userConfigPath      string
-	alertPlayerPath     string
-	nsExpectedStatsPath string
+	userConfigPath  string
+	alertPlayerPath string
 }
 
 func NewLocalFile() *LocalFile {
 	return &LocalFile{
-		userConfigPath:      filepath.Join(configDir, userConfigFile),
-		alertPlayerPath:     filepath.Join(configDir, alertPlayerFile),
-		nsExpectedStatsPath: filepath.Join(cacheDir, nsExpectedStatsFile),
+		userConfigPath:  filepath.Join(ConfigDir, UserConfigFile),
+		alertPlayerPath: filepath.Join(ConfigDir, AlertPlayerFile),
 	}
 }
 
 func (l *LocalFile) User() (domain.UserConfig, error) {
-	config, err := readJSON(l.userConfigPath, DefaultUserConfig)
+	config, err := readJSON(l.userConfigPath, domain.DefaultUserConfig)
 	if err != nil && failure.Is(err, apperr.FileNotExist) {
-		return DefaultUserConfig, nil
+		return domain.DefaultUserConfig, nil
 	}
 
 	return config, failure.Wrap(err)
-}
-
-func (l *LocalFile) UpdateUser(config domain.UserConfig) error {
-	err := writeJSON(l.userConfigPath, config)
-	return failure.Wrap(err)
 }
 
 func (l *LocalFile) AlertPlayers() ([]domain.AlertPlayer, error) {
@@ -156,52 +54,6 @@ func (l *LocalFile) AlertPlayers() ([]domain.AlertPlayer, error) {
 	}
 
 	return players, failure.Wrap(err)
-}
-
-func (l *LocalFile) UpdateAlertPlayer(player domain.AlertPlayer) error {
-	players, err := l.AlertPlayers()
-	if err != nil {
-		return failure.Wrap(err)
-	}
-
-	var isMatched bool
-	for i, v := range players {
-		if player.AccountID == v.AccountID {
-			players[i] = player
-			isMatched = true
-			break
-		}
-	}
-
-	if !isMatched {
-		players = append(players, player)
-	}
-
-	err = writeJSON(l.alertPlayerPath, players)
-	return failure.Wrap(err)
-}
-
-func (l *LocalFile) RemoveAlertPlayer(accountID int) error {
-	players, err := l.AlertPlayers()
-	if err != nil {
-		return failure.Wrap(err)
-	}
-
-	var isMatched bool
-	for i, v := range players {
-		if accountID == v.AccountID {
-			players = players[:i+copy(players[i:], players[i+1:])]
-			isMatched = true
-			break
-		}
-	}
-
-	if !isMatched {
-		return nil
-	}
-
-	err = writeJSON(l.alertPlayerPath, players)
-	return failure.Wrap(err)
 }
 
 func (l *LocalFile) SaveScreenshot(path string, base64Data string) error {
@@ -258,14 +110,22 @@ func (l *LocalFile) SaveTempArenaInfo(tempArenaInfo domain.TempArenaInfo) error 
 	return failure.Wrap(err)
 }
 
-func (l *LocalFile) CachedNSExpectedStats() (domain.NSExpectedStats, error) {
-	expectedStats, err := readJSON(l.nsExpectedStatsPath, domain.NSExpectedStats{})
-	return expectedStats, failure.Wrap(err)
+func (l *LocalFile) IsExistUser() bool {
+	_, err := os.Stat(l.userConfigPath)
+	return err == nil
 }
 
-func (l *LocalFile) SaveNSExpectedStats(expectedStats domain.NSExpectedStats) error {
-	err := writeJSON(l.nsExpectedStatsPath, expectedStats)
-	return failure.Wrap(err)
+func (l *LocalFile) DeleteUser() error {
+	return os.RemoveAll(l.userConfigPath)
+}
+
+func (l *LocalFile) IsExistAlertPlayers() bool {
+	_, err := os.Stat(l.alertPlayerPath)
+	return err == nil
+}
+
+func (l *LocalFile) DeleteAlertPlayers() error {
+	return os.RemoveAll(l.alertPlayerPath)
 }
 
 func decideTempArenaInfo(paths []string) (domain.TempArenaInfo, error) {

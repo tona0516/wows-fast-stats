@@ -6,7 +6,6 @@ import (
 	"wfs/backend/application/service"
 	"wfs/backend/application/vo"
 	"wfs/backend/domain"
-	"wfs/backend/infra"
 	"wfs/backend/logger"
 	"wfs/backend/logger/repository"
 
@@ -18,16 +17,17 @@ const EventOnload = "ONLOAD"
 
 //nolint:containedctx
 type App struct {
-	ctx               context.Context
-	env               vo.Env
-	cancelWatcher     context.CancelFunc
-	reportRepo        repository.ReportInterface
-	configService     service.Config
-	screenshotService service.Screenshot
-	watcherService    service.Watcher
-	battleService     service.Battle
-	updaterService    service.Updater
-	excludePlayers    domain.ExcludedPlayers
+	ctx                   context.Context
+	env                   vo.Env
+	cancelWatcher         context.CancelFunc
+	reportRepo            repository.ReportInterface
+	configService         service.Config
+	screenshotService     service.Screenshot
+	watcherService        service.Watcher
+	battleService         service.Battle
+	updaterService        service.Updater
+	configMigratorService service.ConfigMigrator
+	excludePlayers        domain.ExcludedPlayers
 }
 
 func NewApp(
@@ -38,16 +38,18 @@ func NewApp(
 	watcherService service.Watcher,
 	battleService service.Battle,
 	updaterService service.Updater,
+	configMigratorService service.ConfigMigrator,
 ) *App {
 	return &App{
-		env:               env,
-		reportRepo:        reportRepo,
-		configService:     configService,
-		screenshotService: screenshotService,
-		watcherService:    watcherService,
-		battleService:     battleService,
-		updaterService:    updaterService,
-		excludePlayers:    domain.ExcludedPlayers{},
+		env:                   env,
+		reportRepo:            reportRepo,
+		configService:         configService,
+		screenshotService:     screenshotService,
+		watcherService:        watcherService,
+		battleService:         battleService,
+		updaterService:        updaterService,
+		configMigratorService: configMigratorService,
+		excludePlayers:        domain.ExcludedPlayers{},
 	}
 }
 
@@ -58,6 +60,15 @@ func (a *App) onStartup(ctx context.Context) {
 	runtime.EventsOn(ctx, EventOnload, func(optionalData ...interface{}) {
 		logger.Info("application started")
 	})
+}
+
+func (a *App) Migrate() error {
+	if err := a.configMigratorService.Execute(); err != nil {
+		logger.Error(err)
+		return apperr.Unwrap(err)
+	}
+
+	return nil
 }
 
 func (a *App) StartWatching() error {
@@ -114,7 +125,7 @@ func (a *App) OpenDirectory(path string) error {
 }
 
 func (a *App) DefaultUserConfig() domain.UserConfig {
-	return infra.DefaultUserConfig
+	return domain.DefaultUserConfig
 }
 
 func (a *App) UserConfig() (domain.UserConfig, error) {

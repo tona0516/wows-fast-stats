@@ -14,23 +14,26 @@ type Report struct {
 	env       vo.Env
 	localFile LocalFile
 	discord   Discord
+	storage   Storage
 }
 
 func NewReport(
 	env vo.Env,
 	localFile LocalFile,
 	discord Discord,
+	storage Storage,
 ) *Report {
 	return &Report{
 		env:       env,
 		localFile: localFile,
 		discord:   discord,
+		storage:   storage,
 	}
 }
 
 func (r *Report) Send(message string, content error) {
 	// get UserConfig
-	userConfig, err := r.localFile.User()
+	userConfig, err := r.storage.ReadUserConfig()
 	if err != nil || !userConfig.SendReport {
 		return
 	}

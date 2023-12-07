@@ -19,6 +19,7 @@ const GameExeName = "WorldOfWarships.exe"
 type Config struct {
 	localFile           repository.LocalFileInterface
 	wargaming           repository.WargamingInterface
+	storage             repository.StorageInterface
 	OpenDirectoryDialog OpenDirectoryDialog
 	OpenWithDefaultApp  OpenWithDefaultApp
 }
@@ -26,17 +27,19 @@ type Config struct {
 func NewConfig(
 	localFile repository.LocalFileInterface,
 	wargaming repository.WargamingInterface,
+	storage repository.StorageInterface,
 ) *Config {
 	return &Config{
 		localFile:           localFile,
 		wargaming:           wargaming,
+		storage:             storage,
 		OpenDirectoryDialog: runtime.OpenDirectoryDialog,
 		OpenWithDefaultApp:  open.Run,
 	}
 }
 
 func (c *Config) User() (domain.UserConfig, error) {
-	config, err := c.localFile.User()
+	config, err := c.storage.ReadUserConfig()
 	return config, failure.Wrap(err)
 }
 
@@ -77,7 +80,7 @@ func (c *Config) UpdateRequired(
 	}
 
 	// Note: overwrite only required setting
-	config, err := c.localFile.User()
+	config, err := c.storage.ReadUserConfig()
 	if err != nil {
 		return validatedResult, failure.Wrap(err)
 	}
@@ -85,14 +88,14 @@ func (c *Config) UpdateRequired(
 	config.Appid = appid
 
 	// write
-	err = c.localFile.UpdateUser(config)
+	err = c.storage.WriteUserConfig(config)
 
 	return validatedResult, failure.Wrap(err)
 }
 
 func (c *Config) UpdateOptional(config domain.UserConfig) error {
 	// Note: exclulde required setting
-	saved, err := c.localFile.User()
+	saved, err := c.storage.ReadUserConfig()
 	if err != nil {
 		return failure.Wrap(err)
 	}
@@ -100,22 +103,58 @@ func (c *Config) UpdateOptional(config domain.UserConfig) error {
 	config.Appid = saved.Appid
 
 	// write
-	err = c.localFile.UpdateUser(config)
+	err = c.storage.WriteUserConfig(config)
 	return failure.Wrap(err)
 }
 
 func (c *Config) AlertPlayers() ([]domain.AlertPlayer, error) {
-	players, err := c.localFile.AlertPlayers()
+	players, err := c.storage.ReadAlertPlayers()
 	return players, failure.Wrap(err)
 }
 
 func (c *Config) UpdateAlertPlayer(player domain.AlertPlayer) error {
-	err := c.localFile.UpdateAlertPlayer(player)
+	players, err := c.storage.ReadAlertPlayers()
+	if err != nil {
+		return failure.Wrap(err)
+	}
+
+	var isMatched bool
+	for i, v := range players {
+		if player.AccountID == v.AccountID {
+			players[i] = player
+			isMatched = true
+			break
+		}
+	}
+
+	if !isMatched {
+		players = append(players, player)
+	}
+
+	err = c.storage.WriteAlertPlayers(players)
 	return failure.Wrap(err)
 }
 
 func (c *Config) RemoveAlertPlayer(accountID int) error {
-	err := c.localFile.RemoveAlertPlayer(accountID)
+	players, err := c.storage.ReadAlertPlayers()
+	if err != nil {
+		return failure.Wrap(err)
+	}
+
+	var isMatched bool
+	for i, v := range players {
+		if accountID == v.AccountID {
+			players = players[:i+copy(players[i:], players[i+1:])]
+			isMatched = true
+			break
+		}
+	}
+
+	if !isMatched {
+		return nil
+	}
+
+	err = c.storage.WriteAlertPlayers(players)
 	return failure.Wrap(err)
 }
 

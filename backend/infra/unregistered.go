@@ -12,6 +12,15 @@ import (
 //go:embed resource/ships.json
 var shipsByte []byte
 
+type unregisteredShip struct {
+	En      string `json:"en"`
+	ID      int    `json:"id"`
+	Ja      string `json:"ja"`
+	Level   uint   `json:"level"`
+	Nation  string `json:"nation"`
+	Species string `json:"Species"`
+}
+
 type Unregistered struct{}
 
 func NewUnregistered() *Unregistered {
@@ -45,13 +54,4 @@ func toOfficialNation(input string) string {
 	}
 
 	return nation
-}
-
-type unregisteredShip struct {
-	En      string `json:"en"`
-	ID      int    `json:"id"`
-	Ja      string `json:"ja"`
-	Level   uint   `json:"level"`
-	Nation  string `json:"nation"`
-	Species string `json:"Species"`
 }

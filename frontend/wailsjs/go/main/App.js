@@ -50,6 +50,10 @@ export function ManualScreenshot(arg1, arg2) {
   return window['go']['main']['App']['ManualScreenshot'](arg1, arg2);
 }
 
+export function Migrate() {
+  return window['go']['main']['App']['Migrate']();
+}
+
 export function OpenDirectory(arg1) {
   return window['go']['main']['App']['OpenDirectory'](arg1);
 }

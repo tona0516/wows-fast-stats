@@ -9,7 +9,7 @@ import (
 	"wfs/backend/apperr"
 	"wfs/backend/application/vo"
 	"wfs/backend/domain"
-	"wfs/backend/infra"
+	"wfs/backend/mocks"
 
 	"github.com/morikuni/failure"
 	"github.com/stretchr/testify/assert"
@@ -33,22 +33,24 @@ func TestConfig_UpdateRequired_正常系(t *testing.T) {
 	config := createInputConfig()
 
 	// モックの設定
-	mockLocalFile := &mockLocalFile{}
+	mockLocalFile := &mocks.LocalFileInterface{}
 	mockLocalFile.On("UpdateUser", config).Return(nil)
-	mockLocalFile.On("User").Return(infra.DefaultUserConfig, nil)
-	mockWargaming := &mockWargaming{}
+	mockWargaming := &mocks.WargamingInterface{}
 	mockWargaming.On("Test", mock.Anything).Return(true, nil)
+	mockStorage := &mocks.StorageInterface{}
+	mockStorage.On("ReadUserConfig").Return(domain.DefaultUserConfig, nil)
+	mockStorage.On("WriteUserConfig", mock.Anything).Return(nil)
 
 	// テスト実行
-	c := NewConfig(mockLocalFile, mockWargaming)
+	c := NewConfig(mockLocalFile, mockWargaming, mockStorage)
 	actual, err := c.UpdateRequired(config.InstallPath, config.Appid)
 
 	// アサーション
 	assert.Equal(t, vo.RequiredConfigError{Valid: true}, actual)
 	require.NoError(t, err)
 	mockWargaming.AssertCalled(t, "Test", config.Appid)
-	mockLocalFile.AssertCalled(t, "User")
-	mockLocalFile.AssertCalled(t, "UpdateUser", config)
+	mockStorage.AssertCalled(t, "ReadUserConfig")
+	mockStorage.AssertCalled(t, "WriteUserConfig", config)
 }
 
 func TestConfig_UpdateRequired_異常系_不正なインストールパス(t *testing.T) {
@@ -57,24 +59,25 @@ func TestConfig_UpdateRequired_異常系_不正なインストールパス(t *te
 	defer os.RemoveAll(DefaultInstallPath)
 
 	// テストデータ
-	config := infra.DefaultUserConfig
+	config := domain.DefaultUserConfig
 	config.InstallPath = "invalid/path" // Note: 不正なパス
 	config.Appid = "abc123"
 
 	// モックの設定
-	mockLocalFile := &mockLocalFile{}
-	mockWargaming := &mockWargaming{}
+	mockLocalFile := &mocks.LocalFileInterface{}
+	mockWargaming := &mocks.WargamingInterface{}
 	mockWargaming.On("Test", mock.Anything).Return(true, nil)
+	mockStorage := &mocks.StorageInterface{}
 
 	// テスト実行
-	c := NewConfig(mockLocalFile, mockWargaming)
+	c := NewConfig(mockLocalFile, mockWargaming, mockStorage)
 	actual, err := c.UpdateRequired(config.InstallPath, config.Appid)
 
 	// アサーション
 	assert.Equal(t, vo.RequiredConfigError{InstallPath: apperr.InvalidInstallPath.ErrorCode()}, actual)
 	require.NoError(t, err)
 	mockWargaming.AssertCalled(t, "Test", config.Appid)
-	mockLocalFile.AssertNotCalled(t, "UpdateUser", config)
+	mockStorage.AssertNotCalled(t, "WriteUserConfig", mock.Anything)
 }
 
 func TestConfig_UpdateRequired_異常系_不正なAppID(t *testing.T) {
@@ -86,19 +89,20 @@ func TestConfig_UpdateRequired_異常系_不正なAppID(t *testing.T) {
 	config := createInputConfig()
 
 	// モックの設定
-	mockLocalFile := &mockLocalFile{}
-	mockWargaming := &mockWargaming{}
+	mockLocalFile := &mocks.LocalFileInterface{}
+	mockWargaming := &mocks.WargamingInterface{}
 	mockWargaming.On("Test", mock.Anything).Return(false, errWargaming) // Note: WG APIでエラー
+	mockStorage := &mocks.StorageInterface{}
 
 	// テスト実行
-	c := NewConfig(mockLocalFile, mockWargaming)
+	c := NewConfig(mockLocalFile, mockWargaming, mockStorage)
 	actual, err := c.UpdateRequired(config.InstallPath, config.Appid)
 
 	// アサーション
 	assert.Equal(t, vo.RequiredConfigError{AppID: apperr.InvalidAppID.ErrorCode()}, actual)
 	require.NoError(t, err)
 	mockWargaming.AssertCalled(t, "Test", config.Appid)
-	mockLocalFile.AssertNotCalled(t, "UpdateUser", config)
+	mockStorage.AssertNotCalled(t, "WriteUserConfig", mock.Anything)
 }
 
 func TestConfig_UpdateOptional_正常系(t *testing.T) {
@@ -111,28 +115,30 @@ func TestConfig_UpdateOptional_正常系(t *testing.T) {
 	config.FontSize = "small"
 
 	// モックの設定
-	mockLocalFile := &mockLocalFile{}
+	mockLocalFile := &mocks.LocalFileInterface{}
 	// Note: requiredな値を与えてもこれらの値はUpdateUserでは含まれない
-	actualWritten := infra.DefaultUserConfig
+	actualWritten := domain.DefaultUserConfig
 	actualWritten.FontSize = "small"
-	mockLocalFile.On("UpdateUser", actualWritten).Return(nil)
-	mockLocalFile.On("User").Return(infra.DefaultUserConfig, nil)
-	mockWargaming := &mockWargaming{}
+	mockWargaming := &mocks.WargamingInterface{}
 	mockWargaming.On("Test", mock.Anything).Return(true, nil)
+	mockStorage := &mocks.StorageInterface{}
+	mockStorage.On("ReadUserConfig").Return(domain.DefaultUserConfig, nil)
+	mockStorage.On("WriteUserConfig", actualWritten).Return(nil)
 
 	// テスト実行
-	c := NewConfig(mockLocalFile, mockWargaming)
+	c := NewConfig(mockLocalFile, mockWargaming, mockStorage)
 	err = c.UpdateOptional(config)
 
 	// アサーション
 	require.NoError(t, err)
-	mockLocalFile.AssertCalled(t, "User")
-	mockLocalFile.AssertCalled(t, "UpdateUser", actualWritten)
+
 	mockWargaming.AssertNotCalled(t, "Test", config.Appid)
+	mockStorage.AssertCalled(t, "ReadUserConfig")
+	mockStorage.AssertCalled(t, "WriteUserConfig", actualWritten)
 }
 
 func createInputConfig() domain.UserConfig {
-	config := infra.DefaultUserConfig
+	config := domain.DefaultUserConfig
 	config.InstallPath = "install_path_test"
 	config.Appid = "abc123"
 

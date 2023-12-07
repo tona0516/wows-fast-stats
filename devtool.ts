@@ -47,11 +47,18 @@ function setup() {
   const goPkgs = [
     "github.com/wailsapp/wails/v2/cmd/wails@latest",
     "github.com/golangci/golangci-lint/cmd/golangci-lint@latest",
+    "github.com/vektra/mockery/v2@v2.38.0",
   ];
   goPkgs.forEach((pkg) => {
     exec(`go install ${pkg}`);
   });
   exec(`${FRONTEND_NPM_COMMAND} ci`);
+}
+
+function genmock() {
+  exec(
+    "mockery --all --dir ./backend/application/repository --output ./backend/mocks"
+  );
 }
 
 function lint() {
@@ -142,6 +149,7 @@ function main() {
     .command("setup")
     .description("Install dependencies for development.")
     .action(setup);
+  program.command("genmock").description("Generate mocks").action(genmock);
   program
     .command("lint")
     .description("Lint for golang and typescript codes.")

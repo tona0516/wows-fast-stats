@@ -15,8 +15,7 @@ import (
 const testInstallPath = "testdata"
 
 func TestLocalFile_User(t *testing.T) {
-	// テストで生成したディレクトリを削除
-	defer os.RemoveAll(configDir)
+	defer os.RemoveAll(ConfigDir)
 
 	expected := domain.UserConfig{
 		FontSize: "large",
@@ -31,9 +30,7 @@ func TestLocalFile_User(t *testing.T) {
 	}
 
 	localFile := NewLocalFile()
-
-	// 書き込み：正常系
-	err := localFile.UpdateUser(expected)
+	err := writeJSON(localFile.userConfigPath, expected)
 	require.NoError(t, err)
 
 	// 取得：正常系
@@ -42,25 +39,25 @@ func TestLocalFile_User(t *testing.T) {
 	assert.Equal(t, expected, actual)
 
 	// 取得：異常系 存在しない場合 デフォルト値を返却する
-	err = os.Remove(filepath.Join(configDir, userConfigFile))
+	err = os.Remove(localFile.userConfigPath)
 	require.NoError(t, err)
 
 	actual, err = localFile.User()
 	require.NoError(t, err)
-	assert.Equal(t, DefaultUserConfig, actual)
+	assert.Equal(t, domain.DefaultUserConfig, actual)
 }
 
 func TestLocalFile_User_異常系_ファイルに新規パラメータが存在しない(t *testing.T) {
 	// テストで生成したディレクトリを削除
-	defer os.RemoveAll(configDir)
+	defer os.RemoveAll(ConfigDir)
 
 	// 必須項目のみconfig.jsonに書き込む
 	installPath := "dir/"
 	appid := "abc"
 	saved := fmt.Sprintf(`{"install_path": "%s","appid": "%s"}`, installPath, appid)
-	err := os.Mkdir(configDir, os.ModePerm)
+	err := os.Mkdir(ConfigDir, os.ModePerm)
 	require.NoError(t, err)
-	err = os.WriteFile(filepath.Join(configDir, userConfigFile), []byte(saved), os.ModePerm)
+	err = os.WriteFile(filepath.Join(ConfigDir, UserConfigFile), []byte(saved), os.ModePerm)
 	require.NoError(t, err)
 
 	localFile := NewLocalFile()
@@ -68,7 +65,7 @@ func TestLocalFile_User_異常系_ファイルに新規パラメータが存在�
 	require.NoError(t, err)
 
 	// 存在するパラメータはその値、存在しないパラメータはデフォルト値が格納されていること
-	expected := DefaultUserConfig
+	expected := domain.DefaultUserConfig
 	expected.InstallPath = installPath
 	expected.Appid = appid
 	require.Equal(t, expected, actual)
@@ -76,45 +73,34 @@ func TestLocalFile_User_異常系_ファイルに新規パラメータが存在�
 
 func TestLocalFile_AlertPlayers(t *testing.T) {
 	// テストで生成したディレクトリを削除
-	defer os.RemoveAll(configDir)
+	defer os.RemoveAll(ConfigDir)
 
-	expected1 := domain.AlertPlayer{
-		AccountID: 100,
-		Name:      "test",
-		Pattern:   "bi-check-circle-fill",
-		Message:   "hello",
-	}
-	expected2 := domain.AlertPlayer{
-		AccountID: 200,
-		Name:      "hoge",
-		Pattern:   "bi-check-circle-fill",
-		Message:   "memo",
+	expected := []domain.AlertPlayer{
+		{
+			AccountID: 100,
+			Name:      "test",
+			Pattern:   "bi-check-circle-fill",
+			Message:   "hello",
+		},
+		{
+			AccountID: 200,
+			Name:      "hoge",
+			Pattern:   "bi-check-circle-fill",
+			Message:   "memo",
+		},
 	}
 
 	localFile := NewLocalFile()
-
-	// 書き込み：正常系
-	err := localFile.UpdateAlertPlayer(expected1)
-	require.NoError(t, err)
-	err = localFile.UpdateAlertPlayer(expected2)
+	err := writeJSON(localFile.alertPlayerPath, expected)
 	require.NoError(t, err)
 
 	// 取得：正常系
 	actual, err := localFile.AlertPlayers()
 	require.NoError(t, err)
-	assert.Equal(t, []domain.AlertPlayer{expected1, expected2}, actual)
-
-	// 削除：正常系
-	err = localFile.RemoveAlertPlayer(100)
-	require.NoError(t, err)
-
-	// 取得
-	actual, err = localFile.AlertPlayers()
-	require.NoError(t, err)
-	assert.Equal(t, []domain.AlertPlayer{expected2}, actual)
+	assert.Equal(t, expected, actual)
 
 	// 取得：異常系 存在しない場合 デフォルト値を返却する
-	err = os.Remove(filepath.Join(configDir, alertPlayerFile))
+	err = os.Remove(filepath.Join(ConfigDir, AlertPlayerFile))
 	require.NoError(t, err)
 
 	actual, err = localFile.AlertPlayers()

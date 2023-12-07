@@ -9,6 +9,7 @@ node_modules
 /screenshot/
 /temp_arena_info/
 /cache/
+/persistent_data/
 
 # created files by app
 /wows-fast-stats.log

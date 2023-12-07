@@ -5,6 +5,7 @@ import (
 	"wfs/backend/apperr"
 	"wfs/backend/application/vo"
 	"wfs/backend/domain"
+	"wfs/backend/mocks"
 
 	"github.com/morikuni/failure"
 	"github.com/stretchr/testify/assert"
@@ -15,7 +16,7 @@ func TestUpdater_Updatable_正常系_アップデートあり(t *testing.T) {
 	t.Parallel()
 
 	env := vo.Env{Semver: "1.0.0"}
-	mockGithub := &mockGithub{}
+	mockGithub := &mocks.GithubInterface{}
 	updater := NewUpdater(env, mockGithub)
 
 	response := domain.GHLatestRelease{TagName: "2.0.0", HTMLURL: "https://hoge.com"}
@@ -34,7 +35,7 @@ func TestUpdater_Updatable_正常系_アップデートなし(t *testing.T) {
 	t.Parallel()
 
 	env := vo.Env{Semver: "1.0.0"}
-	mockGithub := &mockGithub{}
+	mockGithub := &mocks.GithubInterface{}
 	updater := NewUpdater(env, mockGithub)
 
 	response := domain.GHLatestRelease{TagName: "1.0.0", HTMLURL: "https://hoge.com"}
@@ -53,7 +54,7 @@ func TestUpdater_Updatable_異常系(t *testing.T) {
 	t.Parallel()
 
 	env := vo.Env{Semver: "1.0.0"}
-	mockGithub := &mockGithub{}
+	mockGithub := &mocks.GithubInterface{}
 	updater := NewUpdater(env, mockGithub)
 
 	expected := failure.New(apperr.HTTPRequestError)

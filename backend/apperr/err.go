@@ -22,6 +22,7 @@ const (
 	OpenDirectoryError                failure.StringCode = "フォルダが開けません。存在しない可能性があります。"
 	FrontendError                     failure.StringCode = "フロントエンドエラー"
 	WailsError                        failure.StringCode = "Wailsエラー"
+	MigrationError                    failure.StringCode = "データマイグレーションに失敗しました。configフォルダを削除して再起動してください。"
 	UnexpectedError                   failure.StringCode = "予期しないエラーが発生しました。"
 
 	FailSafeProccess failure.StringCode = "フェイルセーフ用の処理が実行されました。"

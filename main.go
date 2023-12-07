@@ -10,6 +10,7 @@ import (
 	"wfs/backend/application/vo"
 	"wfs/backend/infra"
 
+	"github.com/dgraph-io/badger/v4"
 	"github.com/mitchellh/go-ps"
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
@@ -92,16 +93,24 @@ func initApp(env vo.Env) *App {
 		Retry:   maxRetry,
 		Timeout: timeout,
 	})
-	report := infra.NewReport(env, *localFile, *discord)
+	db, err := badger.Open(badger.DefaultOptions("./persistent_data"))
+	storage := infra.NewStorage(db)
+	report := infra.NewReport(env, *localFile, *discord, *storage)
+
+	if err != nil {
+		report.Send("fatal has occurred!", err)
+		panic(err)
+	}
 
 	// service
 	var parallels uint = 5
 	watchInterval := 1 * time.Second
-	configService := service.NewConfig(localFile, wargaming)
+	configService := service.NewConfig(localFile, wargaming, storage)
 	screenshotService := service.NewScreenshot(localFile)
-	battleService := service.NewBattle(parallels, wargaming, localFile, numbers, unregistered)
-	watcherService := service.NewWatcher(watchInterval, localFile, runtime.EventsEmit)
+	battleService := service.NewBattle(parallels, wargaming, localFile, numbers, unregistered, storage)
+	watcherService := service.NewWatcher(watchInterval, localFile, storage, runtime.EventsEmit)
 	updaterService := service.NewUpdater(env, github)
+	configMigratorService := service.NewConfigMigrator(localFile, storage)
 
 	return NewApp(
 		env,
@@ -111,6 +120,7 @@ func initApp(env vo.Env) *App {
 		*watcherService,
 		*battleService,
 		*updaterService,
+		*configMigratorService,
 	)
 }
 

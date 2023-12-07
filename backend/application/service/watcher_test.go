@@ -6,6 +6,7 @@ import (
 	"time"
 	"wfs/backend/apperr"
 	"wfs/backend/domain"
+	"wfs/backend/mocks"
 
 	"github.com/morikuni/failure"
 	"github.com/stretchr/testify/assert"
@@ -24,9 +25,10 @@ func TestWatcher_Start_戦闘開始(t *testing.T) {
 		FontSize:    "medium",
 	}
 
-	mockLocalFile := &mockLocalFile{}
-	mockLocalFile.On("User").Return(config, nil)
+	mockLocalFile := &mocks.LocalFileInterface{}
 	mockLocalFile.On("TempArenaInfo", config.InstallPath).Return(domain.TempArenaInfo{}, nil)
+	mockStorage := &mocks.StorageInterface{}
+	mockStorage.On("ReadUserConfig").Return(config, nil)
 
 	var events []string
 	emitFunc := func(ctx context.Context, eventName string, optionalData ...interface{}) {
@@ -35,7 +37,7 @@ func TestWatcher_Start_戦闘開始(t *testing.T) {
 
 	interval := 10 * time.Millisecond
 
-	watcher := NewWatcher(interval, mockLocalFile, emitFunc)
+	watcher := NewWatcher(interval, mockLocalFile, mockStorage, emitFunc)
 	err := watcher.Prepare()
 	require.NoError(t, err)
 	go watcher.Start(ctx, ctx)
@@ -60,9 +62,10 @@ func TestWatcher_Start_戦闘終了(t *testing.T) {
 		FontSize:    "medium",
 	}
 
-	mockLocalFile := &mockLocalFile{}
-	mockLocalFile.On("User").Return(config, nil)
+	mockLocalFile := &mocks.LocalFileInterface{}
 	mockLocalFile.On("TempArenaInfo", config.InstallPath).Return(domain.TempArenaInfo{}, failure.New(apperr.FileNotExist))
+	mockStorage := &mocks.StorageInterface{}
+	mockStorage.On("ReadUserConfig").Return(config, nil)
 
 	var events []string
 	emitFunc := func(ctx context.Context, eventName string, optionalData ...interface{}) {
@@ -71,7 +74,7 @@ func TestWatcher_Start_戦闘終了(t *testing.T) {
 
 	interval := 10 * time.Millisecond
 
-	watcher := NewWatcher(interval, mockLocalFile, emitFunc)
+	watcher := NewWatcher(interval, mockLocalFile, mockStorage, emitFunc)
 	err := watcher.Prepare()
 	require.NoError(t, err)
 	go watcher.Start(ctx, ctx)
@@ -96,12 +99,13 @@ func TestWatcher_Start_エラー発生(t *testing.T) {
 		FontSize:    "medium",
 	}
 
-	mockLocalFile := &mockLocalFile{}
-	mockLocalFile.On("User").Return(config, nil)
+	mockLocalFile := &mocks.LocalFileInterface{}
 	mockLocalFile.On("TempArenaInfo", config.InstallPath).Return(
 		domain.TempArenaInfo{},
 		failure.New(apperr.UnexpectedError),
 	)
+	mockStorage := &mocks.StorageInterface{}
+	mockStorage.On("ReadUserConfig").Return(config, nil)
 
 	var events []string
 	emitFunc := func(ctx context.Context, eventName string, optionalData ...interface{}) {
@@ -110,7 +114,7 @@ func TestWatcher_Start_エラー発生(t *testing.T) {
 
 	interval := 10 * time.Millisecond
 
-	watcher := NewWatcher(interval, mockLocalFile, emitFunc)
+	watcher := NewWatcher(interval, mockLocalFile, mockStorage, emitFunc)
 	err := watcher.Prepare()
 	require.NoError(t, err)
 	go watcher.Start(ctx, ctx)
@@ -135,9 +139,10 @@ func TestWatcher_Start_キャンセル(t *testing.T) {
 		FontSize:    "medium",
 	}
 
-	mockLocalFile := &mockLocalFile{}
-	mockLocalFile.On("User").Return(config, nil)
+	mockLocalFile := &mocks.LocalFileInterface{}
 	mockLocalFile.On("TempArenaInfo", config.InstallPath).Return(domain.TempArenaInfo{}, nil)
+	mockStorage := &mocks.StorageInterface{}
+	mockStorage.On("ReadUserConfig").Return(config, nil)
 
 	var events []string
 	emitFunc := func(ctx context.Context, eventName string, optionalData ...interface{}) {
@@ -145,7 +150,7 @@ func TestWatcher_Start_キャンセル(t *testing.T) {
 	}
 	interval := 10 * time.Millisecond
 
-	watcher := NewWatcher(interval, mockLocalFile, emitFunc)
+	watcher := NewWatcher(interval, mockLocalFile, mockStorage, emitFunc)
 
 	err := watcher.Prepare()
 	require.NoError(t, err)

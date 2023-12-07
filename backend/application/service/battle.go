@@ -18,6 +18,7 @@ type Battle struct {
 	numbers       repository.NumbersInterface
 	unregistered  repository.UnregisteredInterface
 	localFile     repository.LocalFileInterface
+	storage       repository.StorageInterface
 	isFirstBattle bool
 
 	warship          domain.Warships
@@ -32,6 +33,7 @@ func NewBattle(
 	localFile repository.LocalFileInterface,
 	numbers repository.NumbersInterface,
 	unregistered repository.UnregisteredInterface,
+	storage repository.StorageInterface,
 ) *Battle {
 	return &Battle{
 		parallels:     parallels,
@@ -39,6 +41,7 @@ func NewBattle(
 		localFile:     localFile,
 		numbers:       numbers,
 		unregistered:  unregistered,
+		storage:       storage,
 		isFirstBattle: true,
 	}
 }
@@ -213,7 +216,7 @@ func (b *Battle) fetchExpectedStats(channel chan vo.Result[domain.AllExpectedSta
 
 	expectedStats, errFetch := b.numbers.ExpectedStats()
 	if errFetch == nil {
-		_ = b.localFile.SaveNSExpectedStats(expectedStats)
+		_ = b.storage.WriteNSExpectedStats(expectedStats)
 		result.Value = expectedStats.Data
 		channel <- result
 		return
@@ -221,7 +224,7 @@ func (b *Battle) fetchExpectedStats(channel chan vo.Result[domain.AllExpectedSta
 
 	logger.Warn(failure.New(apperr.FailSafeProccess))
 
-	expectedStats, errCache := b.localFile.CachedNSExpectedStats()
+	expectedStats, errCache := b.storage.ReadNSExpectedStats()
 	if errCache == nil {
 		result.Value = expectedStats.Data
 		channel <- result
