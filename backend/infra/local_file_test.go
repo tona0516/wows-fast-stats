@@ -147,19 +147,21 @@ func TestLocalFile_GetTempArenaInfo_正常系(t *testing.T) {
 		PlayerName: "player_1",
 	}
 
-	paths := []string{
-		filepath.Join(testInstallPath, replaysDir, tempArenaInfoFile),
-		filepath.Join(testInstallPath, replaysDir, "12.4.0", tempArenaInfoFile),
+	paths := [][]string{
+		{testInstallPath, replaysDir, tempArenaInfoFile},
+		{testInstallPath, replaysDir, "12.4.0", tempArenaInfoFile},
+		{"ほげほげ", replaysDir, tempArenaInfoFile},
 	}
 
 	for _, path := range paths {
-		func(path string) {
-			defer os.RemoveAll(testInstallPath)
+		func(path []string) {
+			defer os.RemoveAll(path[0])
 
-			err := writeJSON(path, expected)
+			filePath := filepath.Join(path...)
+			err := writeJSON(filePath, expected)
 			require.NoError(t, err)
 
-			actual, err := localFile.TempArenaInfo(testInstallPath)
+			actual, err := localFile.TempArenaInfo(path[0])
 			require.NoError(t, err)
 			assert.Equal(t, expected, actual)
 		}(path)
