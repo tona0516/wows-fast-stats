@@ -54,6 +54,7 @@ func TestStorage_UserConfig(t *testing.T) {
 	actual, err := storage.ReadUserConfig()
 	require.NoError(t, err)
 	assert.Equal(t, domain.DefaultUserConfig, actual)
+	assert.False(t, storage.IsExistUserConfig())
 
 	// 書き込み：正常系
 	expected := domain.UserConfig{
@@ -65,6 +66,7 @@ func TestStorage_UserConfig(t *testing.T) {
 	}
 	err = storage.WriteUserConfig(expected)
 	require.NoError(t, err)
+	assert.True(t, storage.IsExistUserConfig())
 
 	// 取得：正常系
 	actual, err = storage.ReadUserConfig()
@@ -79,6 +81,7 @@ func TestStorage_AlertPlayers(t *testing.T) {
 	actual, err := storage.ReadAlertPlayers()
 	require.NoError(t, err)
 	assert.Equal(t, []domain.AlertPlayer{}, actual)
+	assert.False(t, storage.IsExistAlertPlayers())
 
 	// 書き込み：正常系
 	expected := []domain.AlertPlayer{
@@ -97,6 +100,7 @@ func TestStorage_AlertPlayers(t *testing.T) {
 	}
 	err = storage.WriteAlertPlayers(expected)
 	require.NoError(t, err)
+	assert.True(t, storage.IsExistAlertPlayers())
 
 	// 取得：正常系
 	actual, err = storage.ReadAlertPlayers()

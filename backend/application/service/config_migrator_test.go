@@ -12,26 +12,18 @@ import (
 func TestConfigMigrator_Migrate_正常系(t *testing.T) {
 	t.Parallel()
 
-	// モックの設定
+	// mockling
 	expectedUserConfig := domain.UserConfig{
-		FontSize: "large",
-		Displays: domain.Displays{
-			Ship:    domain.Ship{PR: true},
-			Overall: domain.Overall{PR: false},
-		},
+		InstallPath: "a",
+		Appid:       "a",
+		FontSize:    "large",
 	}
 	expectedAlertPlayers := []domain.AlertPlayer{
 		{
-			AccountID: 100,
-			Name:      "test",
+			AccountID: 1,
+			Name:      "a",
 			Pattern:   "bi-check-circle-fill",
-			Message:   "hello",
-		},
-		{
-			AccountID: 200,
-			Name:      "hoge",
-			Pattern:   "bi-check-circle-fill",
-			Message:   "memo",
+			Message:   "a",
 		},
 	}
 	mockLocalFile := &mocks.LocalFileInterface{}
@@ -43,22 +35,65 @@ func TestConfigMigrator_Migrate_正常系(t *testing.T) {
 	mockLocalFile.On("DeleteAlertPlayers").Return(nil)
 	mockStorage := &mocks.StorageInterface{}
 	mockStorage.On("ReadDataVersion").Return(uint(0), nil)
-	mockStorage.On("IsExistUserConfig", mock.Anything).Return(false)
+	mockStorage.On("IsExistUserConfig").Return(false)
 	mockStorage.On("WriteUserConfig", mock.Anything).Return(nil)
-	mockStorage.On("IsExistAlertPlayers", mock.Anything).Return(false)
+	mockStorage.On("IsExistAlertPlayers").Return(false)
 	mockStorage.On("WriteAlertPlayers", mock.Anything).Return(nil)
 	mockStorage.On("WriteDataVersion", mock.Anything).Return(nil)
 
-	// テスト実行
+	// test
 	cm := NewConfigMigrator(mockLocalFile, mockStorage)
 	err := cm.Execute()
 
-	// アサーション
+	// assertion
 	require.NoError(t, err)
 	mockLocalFile.AssertCalled(t, "User")
 	mockLocalFile.AssertCalled(t, "AlertPlayers")
 	mockStorage.AssertCalled(t, "ReadDataVersion")
 	mockStorage.AssertCalled(t, "WriteUserConfig", expectedUserConfig)
 	mockStorage.AssertCalled(t, "WriteAlertPlayers", expectedAlertPlayers)
+	mockStorage.AssertCalled(t, "WriteDataVersion", uint(1))
+}
+
+func TestConfigMigrator_Migrate_正常系_マイグレ不要_バージョン1以上(t *testing.T) {
+	t.Parallel()
+
+	// mocking
+	mockLocalFile := &mocks.LocalFileInterface{}
+	mockStorage := &mocks.StorageInterface{}
+	mockStorage.On("ReadDataVersion").Return(uint(1), nil)
+
+	// test
+	cm := NewConfigMigrator(mockLocalFile, mockStorage)
+	err := cm.Execute()
+
+	// assertion
+	require.NoError(t, err)
+	mockStorage.AssertNotCalled(t, "WriteUserConfig")
+	mockStorage.AssertNotCalled(t, "WriteAlertPlayers")
+	mockStorage.AssertNotCalled(t, "WriteDataVersion")
+}
+
+func TestConfigMigrator_Migrate_正常系_マイグレ不要_すでにストレージに存在(t *testing.T) {
+	t.Parallel()
+
+	// mocking
+	mockLocalFile := &mocks.LocalFileInterface{}
+	mockLocalFile.On("IsExistUser").Return(true)
+	mockLocalFile.On("IsExistAlertPlayers").Return(true)
+	mockStorage := &mocks.StorageInterface{}
+	mockStorage.On("ReadDataVersion").Return(uint(0), nil)
+	mockStorage.On("IsExistUserConfig").Return(true)
+	mockStorage.On("IsExistAlertPlayers").Return(true)
+	mockStorage.On("WriteDataVersion", mock.Anything).Return(nil)
+
+	// test
+	cm := NewConfigMigrator(mockLocalFile, mockStorage)
+	err := cm.Execute()
+
+	// assertion
+	require.NoError(t, err)
+	mockStorage.AssertNotCalled(t, "WriteUserConfig")
+	mockStorage.AssertNotCalled(t, "WriteAlertPlayers")
 	mockStorage.AssertCalled(t, "WriteDataVersion", uint(1))
 }
