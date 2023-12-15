@@ -82,7 +82,7 @@ function dev() {
   exec(`wails dev -ldflags "${getFormattedLDFlags(true)}"`);
 }
 
-function devPut() {
+function chbtl() {
   const testDir = "./test_install_dir/replays/";
   const tempArenaInfoName = "tempArenaInfo.json";
 
@@ -164,9 +164,9 @@ function main() {
     .description("Launch the application for developer mode.")
     .action(dev);
   program
-    .command("dev:put")
+    .command("chbtl")
     .description("Replace 'tempArenaInfo.json' in test install directory.")
-    .action(devPut);
+    .action(chbtl);
   program
     .command("build")
     .description("Make binary for Windows.")

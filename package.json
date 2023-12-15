@@ -2,7 +2,17 @@
   "name": "devtool",
   "version": "0.0.0",
   "scripts": {
-    "devtool": "ts-node devtool.ts"
+    "devtool": "ts-node devtool.ts",
+    "setup": "ts-node devtool.ts setup",
+    "genmock": "ts-node devtool.ts genmock",
+    "lint": "ts-node devtool.ts lint",
+    "fmt": "ts-node devtool.ts fmt",
+    "test": "ts-node devtool.ts test",
+    "dev": "ts-node devtool.ts dev",
+    "chbtl": "ts-node devtool.ts chbtl",
+    "build": "ts-node devtool.ts build",
+    "pkg": "ts-node devtool.ts pkg",
+    "clean": "ts-node devtool.ts clean"
   },
   "dependencies": {
     "@types/archiver": "^6.0.1",
