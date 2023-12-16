@@ -135,6 +135,34 @@ func (_m *StorageInterface) ReadNSExpectedStats() (domain.NSExpectedStats, error
 	return r0, r1
 }
 
+// ReadOwnIGN provides a mock function with given fields:
+func (_m *StorageInterface) ReadOwnIGN() (string, error) {
+	ret := _m.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for ReadOwnIGN")
+	}
+
+	var r0 string
+	var r1 error
+	if rf, ok := ret.Get(0).(func() (string, error)); ok {
+		return rf()
+	}
+	if rf, ok := ret.Get(0).(func() string); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	if rf, ok := ret.Get(1).(func() error); ok {
+		r1 = rf()
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // ReadUserConfig provides a mock function with given fields:
 func (_m *StorageInterface) ReadUserConfig() (domain.UserConfig, error) {
 	ret := _m.Called()
@@ -210,6 +238,24 @@ func (_m *StorageInterface) WriteNSExpectedStats(nsExpectedStats domain.NSExpect
 	var r0 error
 	if rf, ok := ret.Get(0).(func(domain.NSExpectedStats) error); ok {
 		r0 = rf(nsExpectedStats)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// WriteOwnIGN provides a mock function with given fields: ign
+func (_m *StorageInterface) WriteOwnIGN(ign string) error {
+	ret := _m.Called(ign)
+
+	if len(ret) == 0 {
+		panic("no return value specified for WriteOwnIGN")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string) error); ok {
+		r0 = rf(ign)
 	} else {
 		r0 = ret.Error(0)
 	}

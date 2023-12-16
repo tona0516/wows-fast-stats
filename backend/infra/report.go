@@ -39,6 +39,9 @@ func (r *Report) Send(message string, content error) {
 	}
 	jsonUserConfig := prettryJSON(userConfig)
 
+	// get IGN
+	ign, _ := r.storage.ReadOwnIGN()
+
 	// get TempArenaInfo
 	tempArenaInfo, err := r.localFile.TempArenaInfo(userConfig.InstallPath)
 	var jsonTempArenaInfo string
@@ -52,12 +55,14 @@ func (r *Report) Send(message string, content error) {
 	targets := []string{
 		"Semver:",
 		fmt.Sprintf("%+v\n", r.env.Semver),
+		"IGN:",
+		ign,
 		"Error:",
 		fmt.Sprintf("%+v\n", content),
-		"UserConfig:",
-		jsonUserConfig,
 		"TempArenaInfo:",
 		jsonTempArenaInfo,
+		"UserConfig:",
+		jsonUserConfig,
 	}
 
 	sb := strings.Builder{}

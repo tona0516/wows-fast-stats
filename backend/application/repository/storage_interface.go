@@ -13,4 +13,6 @@ type StorageInterface interface {
 	WriteAlertPlayers(players []domain.AlertPlayer) error
 	ReadNSExpectedStats() (domain.NSExpectedStats, error)
 	WriteNSExpectedStats(nsExpectedStats domain.NSExpectedStats) error
+	ReadOwnIGN() (string, error)
+	WriteOwnIGN(ign string) error
 }

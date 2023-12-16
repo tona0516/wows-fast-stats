@@ -15,6 +15,7 @@ const (
 	userConfigKey      = "user_config"
 	alertPlayersKey    = "alert_players"
 	nsExpectedStatsKey = "ns_expected_stats"
+	ownIGNKey          = "own_ign"
 )
 
 type Storage struct {
@@ -82,6 +83,14 @@ func (s *Storage) ReadNSExpectedStats() (domain.NSExpectedStats, error) {
 
 func (s *Storage) WriteNSExpectedStats(nsExpectedStats domain.NSExpectedStats) error {
 	return write(s.db, nsExpectedStatsKey, nsExpectedStats)
+}
+
+func (s *Storage) ReadOwnIGN() (string, error) {
+	return read[string](s.db, ownIGNKey)
+}
+
+func (s *Storage) WriteOwnIGN(ign string) error {
+	return write(s.db, ownIGNKey, ign)
 }
 
 func read[T any](db *badger.DB, key string) (T, error) {

@@ -51,6 +51,8 @@ func initMocksForBattle() (
 		},
 	}, nil)
 	mockLocalFile.On("SaveTempArenaInfo", mock.Anything).Return(nil)
+
+	mockStorage.On("WriteOwnIGN", mock.Anything).Return(nil)
 	mockStorage.On("WriteNSExpectedStats", mock.Anything).Return(nil)
 
 	return mockWargaming, mockNumbers, mockUnregistered, mockLocalFile, mockStorage
@@ -82,9 +84,11 @@ func TestBattle_Battle_正常系_初回(t *testing.T) {
 
 	mockUnregistered.AssertCalled(t, "Warship")
 
-	mockStorage.AssertCalled(t, "WriteNSExpectedStats", mock.Anything)
 	mockLocalFile.AssertCalled(t, "TempArenaInfo", mock.Anything)
 	mockLocalFile.AssertNotCalled(t, "SaveTempArenaInfo", mock.Anything)
+
+	mockStorage.AssertCalled(t, "WriteOwnIGN", mock.Anything)
+	mockStorage.AssertCalled(t, "WriteNSExpectedStats", mock.Anything)
 }
 
 func TestBattle_Battle_正常系_2回目以降(t *testing.T) {
@@ -114,9 +118,11 @@ func TestBattle_Battle_正常系_2回目以降(t *testing.T) {
 
 	mockUnregistered.AssertNotCalled(t, "Warship")
 
-	mockStorage.AssertNotCalled(t, "WriteNSExpectedStats", mock.Anything)
 	mockLocalFile.AssertCalled(t, "TempArenaInfo", mock.Anything)
 	mockLocalFile.AssertNotCalled(t, "SaveTempArenaInfo", mock.Anything)
+
+	mockStorage.AssertCalled(t, "WriteOwnIGN", mock.Anything)
+	mockStorage.AssertNotCalled(t, "WriteNSExpectedStats", mock.Anything)
 }
 
 func TestBattle_Battle_異常系(t *testing.T) {
@@ -152,7 +158,9 @@ func TestBattle_Battle_異常系(t *testing.T) {
 
 	mockUnregistered.AssertNotCalled(t, "Warship")
 
-	mockStorage.AssertNotCalled(t, "WriteNSExpectedStats", mock.Anything)
 	mockLocalFile.AssertCalled(t, "TempArenaInfo", mock.Anything)
 	mockLocalFile.AssertNotCalled(t, "SaveTempArenaInfo", mock.Anything)
+
+	mockStorage.AssertNotCalled(t, "WriteOwnIGN", mock.Anything)
+	mockStorage.AssertNotCalled(t, "WriteNSExpectedStats", mock.Anything)
 }

@@ -68,6 +68,9 @@ func (b *Battle) Battle(userConfig domain.UserConfig) (domain.Battle, error) {
 		return result, failure.Wrap(err)
 	}
 
+	// persist own ign for reporting
+	_ = b.storage.WriteOwnIGN(tempArenaInfo.PlayerName)
+
 	// Get Account ID list
 	accountNames := tempArenaInfo.AccountNames()
 	accountList, err := b.wargaming.AccountList(accountNames)
