@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"wfs/backend/apperr"
 	"wfs/backend/domain"
+	"wfs/backend/infra/webapi"
 
 	"github.com/cenkalti/backoff/v4"
 	"github.com/morikuni/failure"
@@ -21,8 +22,8 @@ func NewNumbers(config RequestConfig) *Numbers {
 
 func (n *Numbers) ExpectedStats() (domain.NSExpectedStats, error) {
 	b := backoff.WithMaxRetries(backoff.NewExponentialBackOff(), n.config.Retry)
-	operation := func() (APIResponse[domain.NSExpectedStats], error) {
-		return getRequest[domain.NSExpectedStats](n.config.URL+"/personal/rating/expected/json/", n.config.Timeout)
+	operation := func() (webapi.Response[domain.NSExpectedStats], error) {
+		return webapi.GetRequest[domain.NSExpectedStats](n.config.URL+"/personal/rating/expected/json/", n.config.Timeout)
 	}
 
 	res, err := backoff.RetryWithData(operation, b)

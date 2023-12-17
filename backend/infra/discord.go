@@ -6,6 +6,7 @@ import (
 	"os"
 	"strconv"
 	"wfs/backend/apperr"
+	"wfs/backend/infra/webapi"
 
 	"github.com/morikuni/failure"
 )
@@ -43,12 +44,12 @@ func (d *Discord) Upload(filename string, text string, message string) error {
 	// upload file
 	//nolint:errchkjson
 	payload, _ := json.Marshal(DiscordRequestBody{Content: message})
-	forms := []Form{
-		{name: "payload_json", content: string(payload), isFile: false},
-		{name: "file", content: filename, isFile: true},
+	forms := []webapi.Form{
+		webapi.NewForm("payload_json", string(payload), false),
+		webapi.NewForm("file", filename, true),
 	}
 
-	res, err := postMultipartFormData[any](d.config.URL, d.config.Timeout, forms)
+	res, err := webapi.PostMultipartFormData[any](d.config.URL, d.config.Timeout, forms)
 	if err != nil {
 		return failure.Wrap(err)
 	}

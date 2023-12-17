@@ -1,4 +1,4 @@
-package service
+package usecase
 
 import (
 	"context"
@@ -20,8 +20,8 @@ type Config struct {
 	localFile           repository.LocalFileInterface
 	wargaming           repository.WargamingInterface
 	storage             repository.StorageInterface
-	OpenDirectoryDialog OpenDirectoryDialog
-	OpenWithDefaultApp  OpenWithDefaultApp
+	OpenDirectoryDialog vo.OpenDirectoryDialog
+	OpenWithDefaultApp  vo.OpenWithDefaultApp
 }
 
 func NewConfig(

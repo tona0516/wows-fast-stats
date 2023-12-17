@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"wfs/backend/apperr"
 	"wfs/backend/domain"
+	"wfs/backend/infra/webapi"
 
 	"github.com/cenkalti/backoff/v4"
 	"github.com/morikuni/failure"
@@ -21,8 +22,8 @@ func NewGithub(config RequestConfig) *Github {
 
 func (g *Github) LatestRelease() (domain.GHLatestRelease, error) {
 	b := backoff.WithMaxRetries(backoff.NewExponentialBackOff(), g.config.Retry)
-	operation := func() (APIResponse[domain.GHLatestRelease], error) {
-		return getRequest[domain.GHLatestRelease](
+	operation := func() (webapi.Response[domain.GHLatestRelease], error) {
+		return webapi.GetRequest[domain.GHLatestRelease](
 			g.config.URL+"/repos/tona0516/wows-fast-stats/releases/latest",
 			g.config.Timeout,
 		)

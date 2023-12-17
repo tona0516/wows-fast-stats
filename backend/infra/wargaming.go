@@ -8,6 +8,7 @@ import (
 	"wfs/backend/application/vo"
 	"wfs/backend/domain"
 	"wfs/backend/infra/response"
+	"wfs/backend/infra/webapi"
 
 	"github.com/cenkalti/backoff/v4"
 	"github.com/morikuni/failure"
@@ -199,8 +200,8 @@ func request[T response.WGResponse](
 	query ...vo.Pair,
 ) (T, error) {
 	b := backoff.WithMaxRetries(backoff.NewExponentialBackOff(), retry)
-	operation := func() (APIResponse[T], error) {
-		res, err := getRequest[T](rawURL, timeout, query...)
+	operation := func() (webapi.Response[T], error) {
+		res, err := webapi.GetRequest[T](rawURL, timeout, query...)
 		if err != nil {
 			return res, failure.Wrap(err)
 		}

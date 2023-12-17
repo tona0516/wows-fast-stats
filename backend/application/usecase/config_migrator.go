@@ -1,4 +1,4 @@
-package service
+package usecase
 
 import (
 	"wfs/backend/apperr"

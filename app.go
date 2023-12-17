@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"wfs/backend/apperr"
-	"wfs/backend/application/service"
+	"wfs/backend/application/usecase"
 	"wfs/backend/application/vo"
 	"wfs/backend/domain"
 	"wfs/backend/logger"
@@ -17,39 +17,39 @@ const EventOnload = "ONLOAD"
 
 //nolint:containedctx
 type App struct {
-	ctx                   context.Context
-	env                   vo.Env
-	cancelWatcher         context.CancelFunc
-	reportRepo            repository.ReportInterface
-	configService         service.Config
-	screenshotService     service.Screenshot
-	watcherService        service.Watcher
-	battleService         service.Battle
-	updaterService        service.Updater
-	configMigratorService service.ConfigMigrator
-	excludePlayers        domain.ExcludedPlayers
+	ctx            context.Context
+	env            vo.Env
+	cancelWatcher  context.CancelFunc
+	reportRepo     repository.ReportInterface
+	config         usecase.Config
+	screenshot     usecase.Screenshot
+	watcher        usecase.Watcher
+	battle         usecase.Battle
+	updater        usecase.Updater
+	configMigrator usecase.ConfigMigrator
+	excludePlayers domain.ExcludedPlayers
 }
 
 func NewApp(
 	env vo.Env,
-	reportRepo repository.ReportInterface,
-	configService service.Config,
-	screenshotService service.Screenshot,
-	watcherService service.Watcher,
-	battleService service.Battle,
-	updaterService service.Updater,
-	configMigratorService service.ConfigMigrator,
+	report repository.ReportInterface,
+	config usecase.Config,
+	screenshot usecase.Screenshot,
+	watcher usecase.Watcher,
+	battle usecase.Battle,
+	updater usecase.Updater,
+	configMigrator usecase.ConfigMigrator,
 ) *App {
 	return &App{
-		env:                   env,
-		reportRepo:            reportRepo,
-		configService:         configService,
-		screenshotService:     screenshotService,
-		watcherService:        watcherService,
-		battleService:         battleService,
-		updaterService:        updaterService,
-		configMigratorService: configMigratorService,
-		excludePlayers:        domain.ExcludedPlayers{},
+		env:            env,
+		reportRepo:     report,
+		config:         config,
+		screenshot:     screenshot,
+		watcher:        watcher,
+		battle:         battle,
+		updater:        updater,
+		configMigrator: configMigrator,
+		excludePlayers: domain.ExcludedPlayers{},
 	}
 }
 
@@ -63,7 +63,7 @@ func (a *App) onStartup(ctx context.Context) {
 }
 
 func (a *App) Migrate() error {
-	if err := a.configMigratorService.Execute(); err != nil {
+	if err := a.configMigrator.Execute(); err != nil {
 		logger.Error(err)
 		return apperr.Unwrap(err)
 	}
@@ -72,7 +72,7 @@ func (a *App) Migrate() error {
 }
 
 func (a *App) StartWatching() error {
-	if err := a.watcherService.Prepare(); err != nil {
+	if err := a.watcher.Prepare(); err != nil {
 		logger.Error(err)
 		return apperr.Unwrap(err)
 	}
@@ -83,7 +83,7 @@ func (a *App) StartWatching() error {
 	cancelCtx, cancel := context.WithCancel(context.Background())
 	a.cancelWatcher = cancel
 
-	go a.watcherService.Start(a.ctx, cancelCtx)
+	go a.watcher.Start(a.ctx, cancelCtx)
 
 	return nil
 }
@@ -91,13 +91,13 @@ func (a *App) StartWatching() error {
 func (a *App) Battle() (domain.Battle, error) {
 	result := domain.Battle{}
 
-	userConfig, err := a.configService.User()
+	userConfig, err := a.config.User()
 	if err != nil {
 		logger.Error(err)
 		return result, apperr.Unwrap(err)
 	}
 
-	result, err = a.battleService.Battle(userConfig)
+	result, err = a.battle.Get(userConfig)
 	if err != nil {
 		logger.Error(err)
 		return result, apperr.Unwrap(err)
@@ -107,7 +107,7 @@ func (a *App) Battle() (domain.Battle, error) {
 }
 
 func (a *App) SelectDirectory() (string, error) {
-	path, err := a.configService.SelectDirectory(a.ctx)
+	path, err := a.config.SelectDirectory(a.ctx)
 	if err != nil {
 		logger.Error(err)
 	}
@@ -116,7 +116,7 @@ func (a *App) SelectDirectory() (string, error) {
 }
 
 func (a *App) OpenDirectory(path string) error {
-	err := a.configService.OpenDirectory(path)
+	err := a.config.OpenDirectory(path)
 	if err != nil {
 		logger.Warn(err)
 	}
@@ -129,7 +129,7 @@ func (a *App) DefaultUserConfig() domain.UserConfig {
 }
 
 func (a *App) UserConfig() (domain.UserConfig, error) {
-	config, err := a.configService.User()
+	config, err := a.config.User()
 	if err != nil {
 		logger.Error(err)
 	}
@@ -138,7 +138,7 @@ func (a *App) UserConfig() (domain.UserConfig, error) {
 }
 
 func (a *App) ApplyUserConfig(config domain.UserConfig) error {
-	err := a.configService.UpdateOptional(config)
+	err := a.config.UpdateOptional(config)
 	if err != nil {
 		logger.Error(err)
 	}
@@ -150,14 +150,14 @@ func (a *App) ValidateRequiredConfig(
 	installPath string,
 	appid string,
 ) vo.RequiredConfigError {
-	return a.configService.ValidateRequired(installPath, appid)
+	return a.config.ValidateRequired(installPath, appid)
 }
 
 func (a *App) ApplyRequiredUserConfig(
 	installPath string,
 	appid string,
 ) (vo.RequiredConfigError, error) {
-	validatedResult, err := a.configService.UpdateRequired(installPath, appid)
+	validatedResult, err := a.config.UpdateRequired(installPath, appid)
 	if err != nil {
 		logger.Error(err)
 	}
@@ -166,7 +166,7 @@ func (a *App) ApplyRequiredUserConfig(
 }
 
 func (a *App) ManualScreenshot(filename string, base64Data string) (bool, error) {
-	saved, err := a.screenshotService.SaveWithDialog(a.ctx, filename, base64Data)
+	saved, err := a.screenshot.SaveWithDialog(a.ctx, filename, base64Data)
 	if err != nil {
 		logger.Error(err)
 	}
@@ -174,7 +174,7 @@ func (a *App) ManualScreenshot(filename string, base64Data string) (bool, error)
 }
 
 func (a *App) AutoScreenshot(filename string, base64Data string) error {
-	err := a.screenshotService.SaveForAuto(filename, base64Data)
+	err := a.screenshot.SaveForAuto(filename, base64Data)
 	if err != nil {
 		logger.Error(err)
 	}
@@ -198,7 +198,7 @@ func (a *App) RemoveExcludePlayerID(playerID int) {
 }
 
 func (a *App) AlertPlayers() ([]domain.AlertPlayer, error) {
-	players, err := a.configService.AlertPlayers()
+	players, err := a.config.AlertPlayers()
 	if err != nil {
 		logger.Error(err)
 	}
@@ -207,7 +207,7 @@ func (a *App) AlertPlayers() ([]domain.AlertPlayer, error) {
 }
 
 func (a *App) UpdateAlertPlayer(player domain.AlertPlayer) error {
-	err := a.configService.UpdateAlertPlayer(player)
+	err := a.config.UpdateAlertPlayer(player)
 	if err != nil {
 		logger.Error(err)
 	}
@@ -216,7 +216,7 @@ func (a *App) UpdateAlertPlayer(player domain.AlertPlayer) error {
 }
 
 func (a *App) RemoveAlertPlayer(accountID int) error {
-	err := a.configService.RemoveAlertPlayer(accountID)
+	err := a.config.RemoveAlertPlayer(accountID)
 	if err != nil {
 		logger.Error(err)
 	}
@@ -225,7 +225,7 @@ func (a *App) RemoveAlertPlayer(accountID int) error {
 }
 
 func (a *App) SearchPlayer(prefix string) (domain.WGAccountList, error) {
-	accountList, err := a.configService.SearchPlayer(prefix)
+	accountList, err := a.config.SearchPlayer(prefix)
 	if err != nil {
 		logger.Error(err)
 	}
@@ -243,6 +243,6 @@ func (a *App) LogError(errString string) {
 }
 
 func (a *App) LatestRelease() (domain.GHLatestRelease, error) {
-	latestRelease, err := a.updaterService.Updatable()
+	latestRelease, err := a.updater.IsUpdatable()
 	return latestRelease, apperr.Unwrap(err)
 }

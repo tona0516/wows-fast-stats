@@ -1,4 +1,4 @@
-package service
+package usecase
 
 import (
 	"sort"
@@ -46,7 +46,7 @@ func NewBattle(
 	}
 }
 
-func (b *Battle) Battle(userConfig domain.UserConfig) (domain.Battle, error) {
+func (b *Battle) Get(userConfig domain.UserConfig) (domain.Battle, error) {
 	b.wargaming.SetAppID(userConfig.Appid)
 	var result domain.Battle
 

@@ -1,4 +1,4 @@
-package infra
+package webapi
 
 import (
 	"bytes"
@@ -15,25 +15,12 @@ import (
 	"github.com/morikuni/failure"
 )
 
-type APIResponse[T any] struct {
-	FullURL    string
-	StatusCode int
-	Body       T
-	ByteBody   []byte
-}
-
-type Form struct {
-	name    string
-	content string
-	isFile  bool
-}
-
-func getRequest[T any](
+func GetRequest[T any](
 	rawURL string,
 	timeout time.Duration,
 	queries ...vo.Pair,
-) (APIResponse[T], error) {
-	var response APIResponse[T]
+) (Response[T], error) {
+	var response Response[T]
 	errCtx := failure.Context{}
 
 	// build URL
@@ -77,18 +64,19 @@ func getRequest[T any](
 }
 
 //nolint:cyclop
-func postMultipartFormData[T any](
+func PostMultipartFormData[T any](
 	rawURL string,
 	timeout time.Duration,
 	forms []Form,
-) (APIResponse[T], error) {
-	var response APIResponse[T]
+) (Response[T], error) {
+	var response Response[T]
 
 	// build URL
 	u, err := url.Parse(rawURL)
 	if err != nil {
 		return response, failure.Wrap(err)
 	}
+	response.FullURL = u.String()
 
 	// build request
 	requestBody := &bytes.Buffer{}

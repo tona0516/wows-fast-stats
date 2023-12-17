@@ -1,10 +1,11 @@
-package service
+package usecase
 
 import (
 	"context"
 	"path/filepath"
 	"wfs/backend/apperr"
 	"wfs/backend/application/repository"
+	"wfs/backend/application/vo"
 
 	"github.com/morikuni/failure"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
@@ -12,7 +13,7 @@ import (
 
 type Screenshot struct {
 	localFile      repository.LocalFileInterface
-	SaveFileDialog SaveFileDialog
+	SaveFileDialog vo.SaveFileDialog
 }
 
 func NewScreenshot(

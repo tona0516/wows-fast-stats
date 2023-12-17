@@ -1,4 +1,4 @@
-package service
+package usecase
 
 import (
 	"testing"
@@ -65,7 +65,7 @@ func TestBattle_Battle_正常系_初回(t *testing.T) {
 
 	// テスト
 	b := NewBattle(5, mockWargaming, mockLocalFile, mockNumbers, mockUnregistered, mockStorage)
-	_, err := b.Battle(domain.UserConfig{})
+	_, err := b.Get(domain.UserConfig{})
 
 	// アサーション
 	require.NoError(t, err)
@@ -99,7 +99,7 @@ func TestBattle_Battle_正常系_2回目以降(t *testing.T) {
 	// テスト
 	b := NewBattle(5, mockWargaming, mockLocalFile, mockNumbers, mockUnregistered, mockStorage)
 	b.isFirstBattle = false
-	_, err := b.Battle(domain.UserConfig{})
+	_, err := b.Get(domain.UserConfig{})
 
 	// アサーション
 	require.NoError(t, err)
@@ -137,7 +137,7 @@ func TestBattle_Battle_異常系(t *testing.T) {
 	// テスト
 	b := NewBattle(5, mockWargaming, mockLocalFile, mockNumbers, mockUnregistered, mockStorage)
 	b.isFirstBattle = false
-	_, err := b.Battle(domain.UserConfig{})
+	_, err := b.Get(domain.UserConfig{})
 
 	// アサーション
 	code, ok := failure.CodeOf(err)

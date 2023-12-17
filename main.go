@@ -6,7 +6,7 @@ import (
 	"os"
 	"strconv"
 	"time"
-	"wfs/backend/application/service"
+	"wfs/backend/application/usecase"
 	"wfs/backend/application/vo"
 	"wfs/backend/infra"
 
@@ -102,25 +102,25 @@ func initApp(env vo.Env) *App {
 		panic(err)
 	}
 
-	// service
+	// usecase
 	var parallels uint = 5
 	watchInterval := 1 * time.Second
-	configService := service.NewConfig(localFile, wargaming, storage)
-	screenshotService := service.NewScreenshot(localFile)
-	battleService := service.NewBattle(parallels, wargaming, localFile, numbers, unregistered, storage)
-	watcherService := service.NewWatcher(watchInterval, localFile, storage, runtime.EventsEmit)
-	updaterService := service.NewUpdater(env, github)
-	configMigratorService := service.NewConfigMigrator(localFile, storage)
+	config := usecase.NewConfig(localFile, wargaming, storage)
+	screenshot := usecase.NewScreenshot(localFile)
+	battle := usecase.NewBattle(parallels, wargaming, localFile, numbers, unregistered, storage)
+	watcher := usecase.NewWatcher(watchInterval, localFile, storage, runtime.EventsEmit)
+	updater := usecase.NewUpdater(env, github)
+	configMigrator := usecase.NewConfigMigrator(localFile, storage)
 
 	return NewApp(
 		env,
 		report,
-		*configService,
-		*screenshotService,
-		*watcherService,
-		*battleService,
-		*updaterService,
-		*configMigratorService,
+		*config,
+		*screenshot,
+		*watcher,
+		*battle,
+		*updater,
+		*configMigrator,
 	)
 }
 

@@ -1,4 +1,4 @@
-package service
+package usecase
 
 import (
 	"fmt"
@@ -25,7 +25,7 @@ func NewUpdater(
 	}
 }
 
-func (u *Updater) Updatable() (domain.GHLatestRelease, error) {
+func (u *Updater) IsUpdatable() (domain.GHLatestRelease, error) {
 	var latestRelease domain.GHLatestRelease
 
 	c, err := semver.NewConstraint(fmt.Sprintf("> %s", u.env.Semver))
