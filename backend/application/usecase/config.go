@@ -1,4 +1,4 @@
-package service
+package usecase
 
 import (
 	"context"
@@ -20,8 +20,8 @@ type Config struct {
 	localFile           repository.LocalFileInterface
 	wargaming           repository.WargamingInterface
 	storage             repository.StorageInterface
-	OpenDirectoryDialog OpenDirectoryDialog
-	OpenWithDefaultApp  OpenWithDefaultApp
+	OpenDirectoryDialog vo.OpenDirectoryDialog
+	OpenWithDefaultApp  vo.OpenWithDefaultApp
 }
 
 func NewConfig(
@@ -39,8 +39,7 @@ func NewConfig(
 }
 
 func (c *Config) User() (domain.UserConfig, error) {
-	config, err := c.storage.ReadUserConfig()
-	return config, failure.Wrap(err)
+	return c.storage.ReadUserConfig()
 }
 
 func (c *Config) ValidateRequired(
@@ -82,7 +81,7 @@ func (c *Config) UpdateRequired(
 	// Note: overwrite only required setting
 	config, err := c.storage.ReadUserConfig()
 	if err != nil {
-		return validatedResult, failure.Wrap(err)
+		return validatedResult, err
 	}
 	config.InstallPath = installPath
 	config.Appid = appid
@@ -90,32 +89,32 @@ func (c *Config) UpdateRequired(
 	// write
 	err = c.storage.WriteUserConfig(config)
 
-	return validatedResult, failure.Wrap(err)
+	return validatedResult, err
 }
 
 func (c *Config) UpdateOptional(config domain.UserConfig) error {
 	// Note: exclulde required setting
 	saved, err := c.storage.ReadUserConfig()
 	if err != nil {
-		return failure.Wrap(err)
+		return err
 	}
 	config.InstallPath = saved.InstallPath
 	config.Appid = saved.Appid
 
 	// write
 	err = c.storage.WriteUserConfig(config)
-	return failure.Wrap(err)
+	return err
 }
 
 func (c *Config) AlertPlayers() ([]domain.AlertPlayer, error) {
 	players, err := c.storage.ReadAlertPlayers()
-	return players, failure.Wrap(err)
+	return players, err
 }
 
 func (c *Config) UpdateAlertPlayer(player domain.AlertPlayer) error {
 	players, err := c.storage.ReadAlertPlayers()
 	if err != nil {
-		return failure.Wrap(err)
+		return err
 	}
 
 	var isMatched bool
@@ -131,14 +130,13 @@ func (c *Config) UpdateAlertPlayer(player domain.AlertPlayer) error {
 		players = append(players, player)
 	}
 
-	err = c.storage.WriteAlertPlayers(players)
-	return failure.Wrap(err)
+	return c.storage.WriteAlertPlayers(players)
 }
 
 func (c *Config) RemoveAlertPlayer(accountID int) error {
 	players, err := c.storage.ReadAlertPlayers()
 	if err != nil {
-		return failure.Wrap(err)
+		return err
 	}
 
 	var isMatched bool
@@ -154,13 +152,11 @@ func (c *Config) RemoveAlertPlayer(accountID int) error {
 		return nil
 	}
 
-	err = c.storage.WriteAlertPlayers(players)
-	return failure.Wrap(err)
+	return c.storage.WriteAlertPlayers(players)
 }
 
 func (c *Config) SearchPlayer(prefix string) (domain.WGAccountList, error) {
-	list, err := c.wargaming.AccountListForSearch(prefix)
-	return list, failure.Wrap(err)
+	return c.wargaming.AccountListForSearch(prefix)
 }
 
 func (c *Config) SelectDirectory(appCtx context.Context) (string, error) {

@@ -1,5 +1,5 @@
 //nolint:paralleltest
-package service
+package usecase
 
 import (
 	"io/fs"

@@ -34,7 +34,7 @@ func (s *Storage) ReadDataVersion() (uint, error) {
 		return 0, nil
 	}
 
-	return version, failure.Wrap(err)
+	return version, err
 }
 
 func (s *Storage) WriteDataVersion(version uint) error {
@@ -52,7 +52,7 @@ func (s *Storage) ReadUserConfig() (domain.UserConfig, error) {
 		return domain.DefaultUserConfig, nil
 	}
 
-	return config, failure.Wrap(err)
+	return config, err
 }
 
 func (s *Storage) WriteUserConfig(config domain.UserConfig) error {
@@ -70,7 +70,7 @@ func (s *Storage) ReadAlertPlayers() ([]domain.AlertPlayer, error) {
 		return make([]domain.AlertPlayer, 0), nil
 	}
 
-	return players, failure.Wrap(err)
+	return players, err
 }
 
 func (s *Storage) WriteAlertPlayers(players []domain.AlertPlayer) error {
@@ -109,7 +109,7 @@ func read[T any](db *badger.DB, key string) (T, error) {
 		return failure.Wrap(err)
 	})
 
-	return result, failure.Wrap(err)
+	return result, err
 }
 
 func write[T any](db *badger.DB, key string, target T) error {
@@ -124,7 +124,7 @@ func write[T any](db *badger.DB, key string, target T) error {
 		return failure.Wrap(txn.SetEntry(entry))
 	})
 
-	return failure.Wrap(err)
+	return err
 }
 
 func isErrKeyNotFound(err error) bool {

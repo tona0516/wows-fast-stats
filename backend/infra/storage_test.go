@@ -136,3 +136,17 @@ func TestStorage_NSExpectedStats(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, expected, actual)
 }
+
+func TestStorage_OwnIGN(t *testing.T) {
+	t.Parallel()
+
+	expected := "tonango"
+	// 書き込み：正常系
+	err := storage.WriteOwnIGN(expected)
+	require.NoError(t, err)
+
+	// 取得：正常系
+	actual, err := storage.ReadOwnIGN()
+	require.NoError(t, err)
+	assert.Equal(t, expected, actual)
+}

@@ -1,10 +1,11 @@
-package service
+package usecase
 
 import (
 	"context"
 	"path/filepath"
 	"wfs/backend/apperr"
 	"wfs/backend/application/repository"
+	"wfs/backend/application/vo"
 
 	"github.com/morikuni/failure"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
@@ -12,7 +13,7 @@ import (
 
 type Screenshot struct {
 	localFile      repository.LocalFileInterface
-	SaveFileDialog SaveFileDialog
+	SaveFileDialog vo.SaveFileDialog
 }
 
 func NewScreenshot(
@@ -25,8 +26,7 @@ func NewScreenshot(
 }
 
 func (s *Screenshot) SaveForAuto(filename string, base64Data string) error {
-	err := s.localFile.SaveScreenshot(filepath.Join("screenshot", filename), base64Data)
-	return failure.Wrap(err)
+	return s.localFile.SaveScreenshot(filepath.Join("screenshot", filename), base64Data)
 }
 
 func (s *Screenshot) SaveWithDialog(ctx context.Context, filename string, base64Data string) (bool, error) {
@@ -41,7 +41,7 @@ func (s *Screenshot) SaveWithDialog(ctx context.Context, filename string, base64
 	}
 
 	if err := s.localFile.SaveScreenshot(path, base64Data); err != nil {
-		return false, failure.Wrap(err)
+		return false, err
 	}
 
 	return true, nil

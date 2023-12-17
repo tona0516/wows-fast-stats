@@ -8,6 +8,7 @@ import (
 	"wfs/backend/application/vo"
 	"wfs/backend/domain"
 	"wfs/backend/infra/response"
+	"wfs/backend/infra/webapi"
 
 	"github.com/cenkalti/backoff/v4"
 	"github.com/morikuni/failure"
@@ -43,7 +44,7 @@ func (w *Wargaming) AccountInfo(accountIDs []int) (domain.WGAccountInfo, error) 
 		vo.NewPair("extra", "statistics.pvp_solo"),
 	)
 
-	return res.Data, failure.Wrap(err)
+	return res.Data, err
 }
 
 func (w *Wargaming) AccountList(accountNames []string) (domain.WGAccountList, error) {
@@ -57,7 +58,7 @@ func (w *Wargaming) AccountList(accountNames []string) (domain.WGAccountList, er
 		vo.NewPair("type", "exact"),
 	)
 
-	return res.Data, failure.Wrap(err)
+	return res.Data, err
 }
 
 func (w *Wargaming) AccountListForSearch(prefix string) (domain.WGAccountList, error) {
@@ -71,7 +72,7 @@ func (w *Wargaming) AccountListForSearch(prefix string) (domain.WGAccountList, e
 		vo.NewPair("limit", "10"),
 	)
 
-	return res.Data, failure.Wrap(err)
+	return res.Data, err
 }
 
 func (w *Wargaming) ClansAccountInfo(accountIDs []int) (domain.WGClansAccountInfo, error) {
@@ -89,7 +90,7 @@ func (w *Wargaming) ClansAccountInfo(accountIDs []int) (domain.WGClansAccountInf
 		vo.NewPair("fields", response.WGClansAccountInfo{}.Field()),
 	)
 
-	return res.Data, failure.Wrap(err)
+	return res.Data, err
 }
 
 func (w *Wargaming) ClansInfo(clanIDs []int) (domain.WGClansInfo, error) {
@@ -111,7 +112,7 @@ func (w *Wargaming) ClansInfo(clanIDs []int) (domain.WGClansInfo, error) {
 		vo.NewPair("fields", response.WGClansInfo{}.Field()),
 	)
 
-	return res.Data, failure.Wrap(err)
+	return res.Data, err
 }
 
 func (w *Wargaming) ShipsStats(accountID int) (domain.WGShipsStats, error) {
@@ -125,7 +126,7 @@ func (w *Wargaming) ShipsStats(accountID int) (domain.WGShipsStats, error) {
 		vo.NewPair("extra", "pvp_solo"),
 	)
 
-	return res.Data, failure.Wrap(err)
+	return res.Data, err
 }
 
 func (w *Wargaming) EncycShips(pageNo int) (domain.WGEncycShips, int, error) {
@@ -139,7 +140,7 @@ func (w *Wargaming) EncycShips(pageNo int) (domain.WGEncycShips, int, error) {
 		vo.NewPair("page_no", strconv.Itoa(pageNo)),
 	)
 
-	return res.Data, res.Meta.PageTotal, failure.Wrap(err)
+	return res.Data, res.Meta.PageTotal, err
 }
 
 func (w *Wargaming) EncycInfo() (domain.WGEncycInfoData, error) {
@@ -151,7 +152,7 @@ func (w *Wargaming) EncycInfo() (domain.WGEncycInfoData, error) {
 		vo.NewPair("fields", response.WGEncycInfo{}.Field()),
 	)
 
-	return res.Data, failure.Wrap(err)
+	return res.Data, err
 }
 
 func (w *Wargaming) BattleArenas() (domain.WGBattleArenas, error) {
@@ -164,7 +165,7 @@ func (w *Wargaming) BattleArenas() (domain.WGBattleArenas, error) {
 		vo.NewPair("language", "ja"),
 	)
 
-	return res.Data, failure.Wrap(err)
+	return res.Data, err
 }
 
 func (w *Wargaming) BattleTypes() (domain.WGBattleTypes, error) {
@@ -177,7 +178,7 @@ func (w *Wargaming) BattleTypes() (domain.WGBattleTypes, error) {
 		vo.NewPair("language", "ja"),
 	)
 
-	return res.Data, failure.Wrap(err)
+	return res.Data, err
 }
 
 func (w *Wargaming) Test(appid string) (bool, error) {
@@ -189,7 +190,7 @@ func (w *Wargaming) Test(appid string) (bool, error) {
 		vo.NewPair("fields", response.WGEncycInfo{}.Field()),
 	)
 
-	return err == nil, failure.Wrap(err)
+	return err == nil, err
 }
 
 func request[T response.WGResponse](
@@ -199,10 +200,10 @@ func request[T response.WGResponse](
 	query ...vo.Pair,
 ) (T, error) {
 	b := backoff.WithMaxRetries(backoff.NewExponentialBackOff(), retry)
-	operation := func() (APIResponse[T], error) {
-		res, err := getRequest[T](rawURL, timeout, query...)
+	operation := func() (webapi.Response[T], error) {
+		res, err := webapi.GetRequest[T](rawURL, timeout, query...)
 		if err != nil {
-			return res, failure.Wrap(err)
+			return res, err
 		}
 
 		if res.Body.GetStatus() == "error" {
@@ -213,18 +214,12 @@ func request[T response.WGResponse](
 				return res, failure.New(apperr.WGAPITemporaryUnavaillalble)
 			}
 
-			return res, failure.New(apperr.WGAPIError)
+			return res, backoff.Permanent(failure.New(apperr.WGAPIError))
 		}
 
 		return res, nil
 	}
 	res, err := backoff.RetryWithData(operation, b)
 
-	errCtx := failure.Context{
-		"url":         res.FullURL,
-		"status_code": strconv.Itoa(res.StatusCode),
-		"body":        string(res.ByteBody),
-	}
-
-	return res.Body, failure.Wrap(err, errCtx)
+	return res.Body, failure.Wrap(err, apperr.ToRequestErrorContext(res))
 }

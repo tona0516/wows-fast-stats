@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 	"os"
-	"strconv"
 	"wfs/backend/apperr"
+	"wfs/backend/infra/webapi"
 
 	"github.com/morikuni/failure"
 )
@@ -43,24 +43,18 @@ func (d *Discord) Upload(filename string, text string, message string) error {
 	// upload file
 	//nolint:errchkjson
 	payload, _ := json.Marshal(DiscordRequestBody{Content: message})
-	forms := []Form{
-		{name: "payload_json", content: string(payload), isFile: false},
-		{name: "file", content: filename, isFile: true},
+	forms := []webapi.Form{
+		webapi.NewForm("payload_json", string(payload), false),
+		webapi.NewForm("file", filename, true),
 	}
 
-	res, err := postMultipartFormData[any](d.config.URL, d.config.Timeout, forms)
+	res, err := webapi.PostMultipartFormData[any](d.config.URL, d.config.Timeout, forms)
 	if err != nil {
-		return failure.Wrap(err)
+		return err
 	}
 
 	if res.StatusCode != http.StatusOK {
-		return failure.New(
-			apperr.DiscordAPISendLogError,
-			failure.Context{
-				"status_code": strconv.Itoa(res.StatusCode),
-				"body":        string(res.ByteBody),
-			},
-		)
+		return failure.New(apperr.DiscordAPISendLogError, apperr.ToRequestErrorContext(res))
 	}
 
 	return nil

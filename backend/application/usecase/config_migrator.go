@@ -1,4 +1,4 @@
-package service
+package usecase
 
 import (
 	"wfs/backend/apperr"
@@ -34,7 +34,7 @@ func (m *ConfigMigrator) Execute() error {
 func (m *ConfigMigrator) toV1() error {
 	version, err := m.storage.ReadDataVersion()
 	if err != nil {
-		return failure.Wrap(err)
+		return err
 	}
 
 	if version > 0 {
@@ -44,11 +44,11 @@ func (m *ConfigMigrator) toV1() error {
 	if m.localFile.IsExistUser() && !m.storage.IsExistUserConfig() {
 		userConfig, err := m.localFile.User()
 		if err != nil {
-			return failure.Wrap(err)
+			return err
 		}
 
 		if err := m.storage.WriteUserConfig(userConfig); err != nil {
-			return failure.Wrap(err)
+			return err
 		}
 
 		//nolint:errcheck
@@ -58,11 +58,11 @@ func (m *ConfigMigrator) toV1() error {
 	if m.localFile.IsExistAlertPlayers() && !m.storage.IsExistAlertPlayers() {
 		alertPlayers, err := m.localFile.AlertPlayers()
 		if err != nil {
-			return failure.Wrap(err)
+			return err
 		}
 
 		if err := m.storage.WriteAlertPlayers(alertPlayers); err != nil {
-			return failure.Wrap(err)
+			return err
 		}
 
 		//nolint:errcheck
@@ -70,7 +70,7 @@ func (m *ConfigMigrator) toV1() error {
 	}
 
 	if err := m.storage.WriteDataVersion(1); err != nil {
-		return failure.Wrap(err)
+		return err
 	}
 
 	return nil

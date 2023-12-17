@@ -1,4 +1,4 @@
-package service
+package usecase
 
 import (
 	"testing"
@@ -22,7 +22,7 @@ func TestUpdater_Updatable_正常系_アップデートあり(t *testing.T) {
 	response := domain.GHLatestRelease{TagName: "2.0.0", HTMLURL: "https://hoge.com"}
 	mockGithub.On("LatestRelease").Return(response, nil)
 
-	actual, err := updater.Updatable()
+	actual, err := updater.IsUpdatable()
 	expected := response
 	expected.Updatable = true
 
@@ -41,7 +41,7 @@ func TestUpdater_Updatable_正常系_アップデートなし(t *testing.T) {
 	response := domain.GHLatestRelease{TagName: "1.0.0", HTMLURL: "https://hoge.com"}
 	mockGithub.On("LatestRelease").Return(response, nil)
 
-	actual, err := updater.Updatable()
+	actual, err := updater.IsUpdatable()
 	expected := response
 	expected.Updatable = false
 
@@ -60,7 +60,7 @@ func TestUpdater_Updatable_異常系(t *testing.T) {
 	expected := failure.New(apperr.HTTPRequestError)
 	mockGithub.On("LatestRelease").Return(domain.GHLatestRelease{}, expected)
 
-	_, err := updater.Updatable()
+	_, err := updater.IsUpdatable()
 
 	code, ok := failure.CodeOf(err)
 	assert.True(t, ok)

@@ -2,6 +2,8 @@ package apperr
 
 import (
 	"errors"
+	"strconv"
+	"wfs/backend/infra/webapi"
 
 	"github.com/morikuni/failure"
 )
@@ -41,4 +43,12 @@ func Unwrap(err error) error {
 
 	//nolint:goerr113
 	return errors.New(code.ErrorCode())
+}
+
+func ToRequestErrorContext[T any](res webapi.Response[T]) failure.Context {
+	return failure.Context{
+		"url":         res.FullURL,
+		"status_code": strconv.Itoa(res.StatusCode),
+		"body":        string(res.ByteBody),
+	}
 }

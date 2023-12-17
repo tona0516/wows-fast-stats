@@ -1,4 +1,4 @@
-package service
+package usecase
 
 import (
 	"sort"
@@ -46,7 +46,7 @@ func NewBattle(
 	}
 }
 
-func (b *Battle) Battle(userConfig domain.UserConfig) (domain.Battle, error) {
+func (b *Battle) Get(userConfig domain.UserConfig) (domain.Battle, error) {
 	b.wargaming.SetAppID(userConfig.Appid)
 	var result domain.Battle
 
@@ -65,7 +65,7 @@ func (b *Battle) Battle(userConfig domain.UserConfig) (domain.Battle, error) {
 	// Get tempArenaInfo.json
 	tempArenaInfo, err := b.getTempArenaInfo(userConfig)
 	if err != nil {
-		return result, failure.Wrap(err)
+		return result, err
 	}
 
 	// persist own ign for reporting
@@ -75,7 +75,7 @@ func (b *Battle) Battle(userConfig domain.UserConfig) (domain.Battle, error) {
 	accountNames := tempArenaInfo.AccountNames()
 	accountList, err := b.wargaming.AccountList(accountNames)
 	if err != nil {
-		return result, failure.Wrap(err)
+		return result, err
 	}
 	accountIDs := accountList.AccountIDs()
 
@@ -118,7 +118,7 @@ func (b *Battle) Battle(userConfig domain.UserConfig) (domain.Battle, error) {
 
 	for _, err := range errs {
 		if err != nil {
-			return result, failure.Wrap(err)
+			return result, err
 		}
 	}
 
@@ -142,12 +142,12 @@ func (b *Battle) Battle(userConfig domain.UserConfig) (domain.Battle, error) {
 func (b *Battle) getTempArenaInfo(userConfig domain.UserConfig) (domain.TempArenaInfo, error) {
 	tempArenaInfo, err := b.localFile.TempArenaInfo(userConfig.InstallPath)
 	if err != nil {
-		return tempArenaInfo, failure.Wrap(err)
+		return tempArenaInfo, err
 	}
 
 	if userConfig.SaveTempArenaInfo {
 		if err := b.localFile.SaveTempArenaInfo(tempArenaInfo); err != nil {
-			return tempArenaInfo, failure.Wrap(err)
+			return tempArenaInfo, err
 		}
 	}
 
@@ -176,7 +176,7 @@ func (b *Battle) fetchWarships(channel chan vo.Result[domain.Warships]) {
 	first := 1
 	encycShips, pageTotal, err := b.wargaming.EncycShips(first)
 	if err != nil {
-		result.Error = failure.Wrap(err)
+		result.Error = err
 		channel <- result
 		return
 	}
@@ -193,14 +193,14 @@ func (b *Battle) fetchWarships(channel chan vo.Result[domain.Warships]) {
 		return nil
 	})
 	if err != nil {
-		result.Error = failure.Wrap(err)
+		result.Error = err
 		channel <- result
 		return
 	}
 
 	unregisteredShipInfo, err := b.unregistered.Warship()
 	if err != nil {
-		result.Error = failure.Wrap(err)
+		result.Error = err
 		channel <- result
 		return
 	}
@@ -234,23 +234,23 @@ func (b *Battle) fetchExpectedStats(channel chan vo.Result[domain.AllExpectedSta
 		return
 	}
 
-	result.Error = failure.Wrap(errFetch)
+	result.Error = errFetch
 	channel <- result
 }
 
 func (b *Battle) fetchBattleArenas(channel chan vo.Result[domain.WGBattleArenas]) {
 	battleArenas, err := b.wargaming.BattleArenas()
-	channel <- vo.Result[domain.WGBattleArenas]{Value: battleArenas, Error: failure.Wrap(err)}
+	channel <- vo.Result[domain.WGBattleArenas]{Value: battleArenas, Error: err}
 }
 
 func (b *Battle) fetchBattleTypes(channel chan vo.Result[domain.WGBattleTypes]) {
 	battleTypes, err := b.wargaming.BattleTypes()
-	channel <- vo.Result[domain.WGBattleTypes]{Value: battleTypes, Error: failure.Wrap(err)}
+	channel <- vo.Result[domain.WGBattleTypes]{Value: battleTypes, Error: err}
 }
 
 func (b *Battle) accountInfo(accountIDs []int, channel chan vo.Result[domain.WGAccountInfo]) {
 	accountInfo, err := b.wargaming.AccountInfo(accountIDs)
-	channel <- vo.Result[domain.WGAccountInfo]{Value: accountInfo, Error: failure.Wrap(err)}
+	channel <- vo.Result[domain.WGAccountInfo]{Value: accountInfo, Error: err}
 }
 
 func (b *Battle) fetchAllPlayerShipsStats(accountIDs []int, channel chan vo.Result[domain.AllPlayerShipsStats]) {
@@ -269,7 +269,7 @@ func (b *Battle) fetchAllPlayerShipsStats(accountIDs []int, channel chan vo.Resu
 		return nil
 	})
 
-	channel <- vo.Result[domain.AllPlayerShipsStats]{Value: shipStatsMap, Error: failure.Wrap(err)}
+	channel <- vo.Result[domain.AllPlayerShipsStats]{Value: shipStatsMap, Error: err}
 }
 
 func (b *Battle) fetchClanTag(accountIDs []int, channel chan vo.Result[domain.Clans]) {
@@ -278,7 +278,7 @@ func (b *Battle) fetchClanTag(accountIDs []int, channel chan vo.Result[domain.Cl
 
 	clansAccountInfo, err := b.wargaming.ClansAccountInfo(accountIDs)
 	if err != nil {
-		result.Error = failure.Wrap(err)
+		result.Error = err
 		channel <- result
 		return
 	}
@@ -286,7 +286,7 @@ func (b *Battle) fetchClanTag(accountIDs []int, channel chan vo.Result[domain.Cl
 	clanIDs := clansAccountInfo.ClanIDs()
 	clansInfo, err := b.wargaming.ClansInfo(clanIDs)
 	if err != nil {
-		result.Error = failure.Wrap(err)
+		result.Error = err
 		channel <- result
 		return
 	}

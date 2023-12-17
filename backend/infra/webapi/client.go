@@ -1,4 +1,4 @@
-package infra
+package webapi
 
 import (
 	"bytes"
@@ -15,25 +15,12 @@ import (
 	"github.com/morikuni/failure"
 )
 
-type APIResponse[T any] struct {
-	FullURL    string
-	StatusCode int
-	Body       T
-	ByteBody   []byte
-}
-
-type Form struct {
-	name    string
-	content string
-	isFile  bool
-}
-
-func getRequest[T any](
+func GetRequest[T any](
 	rawURL string,
 	timeout time.Duration,
 	queries ...vo.Pair,
-) (APIResponse[T], error) {
-	var response APIResponse[T]
+) (Response[T], error) {
+	var response Response[T]
 	errCtx := failure.Context{}
 
 	// build URL
@@ -77,18 +64,21 @@ func getRequest[T any](
 }
 
 //nolint:cyclop
-func postMultipartFormData[T any](
+func PostMultipartFormData[T any](
 	rawURL string,
 	timeout time.Duration,
 	forms []Form,
-) (APIResponse[T], error) {
-	var response APIResponse[T]
+) (Response[T], error) {
+	var response Response[T]
+	errCtx := failure.Context{}
 
 	// build URL
 	u, err := url.Parse(rawURL)
 	if err != nil {
-		return response, failure.Wrap(err)
+		return response, failure.Wrap(err, errCtx)
 	}
+	response.FullURL = u.String()
+	errCtx["url"] = u.String()
 
 	// build request
 	requestBody := &bytes.Buffer{}
@@ -99,21 +89,21 @@ func postMultipartFormData[T any](
 		if form.isFile {
 			f, err := os.Open(form.content)
 			if err != nil {
-				return response, failure.Wrap(err)
+				return response, failure.Wrap(err, errCtx)
 			}
 
 			fw, err := mw.CreateFormFile(form.name, form.content)
 			if err != nil {
-				return response, failure.Wrap(err)
+				return response, failure.Wrap(err, errCtx)
 			}
 
 			_, err = io.Copy(fw, f)
 			if err != nil {
-				return response, failure.Wrap(err)
+				return response, failure.Wrap(err, errCtx)
 			}
 		} else {
 			if err := mw.WriteField(form.name, form.content); err != nil {
-				return response, failure.Wrap(err)
+				return response, failure.Wrap(err, errCtx)
 			}
 		}
 	}
@@ -127,20 +117,22 @@ func postMultipartFormData[T any](
 
 	res, err := client.Post(u.String(), mw.FormDataContentType(), requestBody)
 	if err != nil {
-		return response, failure.Wrap(err)
+		return response, failure.Wrap(err, errCtx)
 	}
 	defer res.Body.Close()
 	response.StatusCode = res.StatusCode
+	errCtx["status_code"] = strconv.Itoa(res.StatusCode)
 
 	response.ByteBody, err = io.ReadAll(res.Body)
 	if err != nil {
-		return response, failure.Wrap(err)
+		return response, failure.Wrap(err, errCtx)
 	}
+	errCtx["body"] = string(response.ByteBody)
 
-	// serialize
+	// deserialize
 	err = json.Unmarshal(response.ByteBody, &response.Body)
 	if err != nil {
-		return response, failure.Wrap(err)
+		return response, failure.Wrap(err, errCtx)
 	}
 
 	return response, nil

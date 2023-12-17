@@ -1,4 +1,4 @@
-package service
+package usecase
 
 import (
 	"context"
@@ -45,7 +45,7 @@ func NewWatcher(
 func (w *Watcher) Prepare() error {
 	userConfig, err := w.storage.ReadUserConfig()
 	if err != nil {
-		return failure.Wrap(err)
+		return err
 	}
 
 	if userConfig.InstallPath == "" {

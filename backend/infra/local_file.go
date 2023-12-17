@@ -44,7 +44,7 @@ func (l *LocalFile) User() (domain.UserConfig, error) {
 		return domain.DefaultUserConfig, nil
 	}
 
-	return config, failure.Wrap(err)
+	return config, err
 }
 
 func (l *LocalFile) AlertPlayers() ([]domain.AlertPlayer, error) {
@@ -53,7 +53,7 @@ func (l *LocalFile) AlertPlayers() ([]domain.AlertPlayer, error) {
 		return []domain.AlertPlayer{}, nil
 	}
 
-	return players, failure.Wrap(err)
+	return players, err
 }
 
 func (l *LocalFile) SaveScreenshot(path string, base64Data string) error {
@@ -86,7 +86,7 @@ func (l *LocalFile) TempArenaInfo(installPath string) (domain.TempArenaInfo, err
 
 	err := filepath.WalkDir(root, func(path string, info fs.DirEntry, err error) error {
 		if err != nil {
-			return failure.Wrap(err)
+			return err
 		}
 
 		if info.IsDir() {
@@ -104,14 +104,12 @@ func (l *LocalFile) TempArenaInfo(installPath string) (domain.TempArenaInfo, err
 		return tempArenaInfo, failure.Wrap(err)
 	}
 
-	tempArenaInfo, err = decideTempArenaInfo(tempArenaInfoPaths)
-	return tempArenaInfo, failure.Wrap(err)
+	return decideTempArenaInfo(tempArenaInfoPaths)
 }
 
 func (l *LocalFile) SaveTempArenaInfo(tempArenaInfo domain.TempArenaInfo) error {
 	path := filepath.Join(tempArenaInfoDir, "tempArenaInfo_"+strconv.FormatInt(tempArenaInfo.Unixtime(), 10)+".json")
-	err := writeJSON(path, tempArenaInfo)
-	return failure.Wrap(err)
+	return writeJSON(path, tempArenaInfo)
 }
 
 func (l *LocalFile) IsExistUser() bool {
@@ -141,8 +139,7 @@ func decideTempArenaInfo(paths []string) (domain.TempArenaInfo, error) {
 	}
 
 	if size == 1 {
-		result, err := readJSON(paths[0], domain.TempArenaInfo{})
-		return result, failure.Wrap(err)
+		return readJSON(paths[0], domain.TempArenaInfo{})
 	}
 
 	var latest domain.TempArenaInfo
