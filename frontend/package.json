@@ -10,7 +10,7 @@
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "lint": "eslint src/**/*.{ts,svelte}",
     "fmt": "prettier --write src/**/*.{ts,svelte,css} index.html",
-    "test": "jest"
+    "test": "jest --coverage=false"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^1.4.0",
