@@ -55,7 +55,7 @@ func TestConfigMigrator_Migrate_正常系(t *testing.T) {
 	mockStorage.AssertCalled(t, "WriteDataVersion", uint(1))
 }
 
-func TestConfigMigrator_Migrate_正常系_マイグレ不要_バージョン1以上(t *testing.T) {
+func TestConfigMigrator_toV1_正常系_マイグレ不要_バージョン1以上(t *testing.T) {
 	t.Parallel()
 
 	// mocking
@@ -65,7 +65,7 @@ func TestConfigMigrator_Migrate_正常系_マイグレ不要_バージョン1以
 
 	// test
 	cm := NewConfigMigrator(mockLocalFile, mockStorage)
-	err := cm.Execute()
+	err := cm.toV1()
 
 	// assertion
 	require.NoError(t, err)
@@ -74,7 +74,7 @@ func TestConfigMigrator_Migrate_正常系_マイグレ不要_バージョン1以
 	mockStorage.AssertNotCalled(t, "WriteDataVersion")
 }
 
-func TestConfigMigrator_Migrate_正常系_マイグレ不要_すでにストレージに存在(t *testing.T) {
+func TestConfigMigrator_toV1_正常系_マイグレ不要_すでにストレージに存在(t *testing.T) {
 	t.Parallel()
 
 	// mocking
@@ -89,7 +89,7 @@ func TestConfigMigrator_Migrate_正常系_マイグレ不要_すでにストレ�
 
 	// test
 	cm := NewConfigMigrator(mockLocalFile, mockStorage)
-	err := cm.Execute()
+	err := cm.toV1()
 
 	// assertion
 	require.NoError(t, err)
