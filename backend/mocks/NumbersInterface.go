@@ -14,22 +14,24 @@ type NumbersInterface struct {
 }
 
 // ExpectedStats provides a mock function with given fields:
-func (_m *NumbersInterface) ExpectedStats() (domain.NSExpectedStats, error) {
+func (_m *NumbersInterface) ExpectedStats() (domain.ExpectedStats, error) {
 	ret := _m.Called()
 
 	if len(ret) == 0 {
 		panic("no return value specified for ExpectedStats")
 	}
 
-	var r0 domain.NSExpectedStats
+	var r0 domain.ExpectedStats
 	var r1 error
-	if rf, ok := ret.Get(0).(func() (domain.NSExpectedStats, error)); ok {
+	if rf, ok := ret.Get(0).(func() (domain.ExpectedStats, error)); ok {
 		return rf()
 	}
-	if rf, ok := ret.Get(0).(func() domain.NSExpectedStats); ok {
+	if rf, ok := ret.Get(0).(func() domain.ExpectedStats); ok {
 		r0 = rf()
 	} else {
-		r0 = ret.Get(0).(domain.NSExpectedStats)
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(domain.ExpectedStats)
+		}
 	}
 
 	if rf, ok := ret.Get(1).(func() error); ok {

@@ -10,58 +10,26 @@ import (
 
 	"github.com/morikuni/failure"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 )
 
-func TestWatcher_Start_戦闘開始(t *testing.T) {
+func TestWatcher_Start(t *testing.T) {
 	t.Parallel()
 
-	mockLocalFile := &mocks.LocalFileInterface{}
-	mockLocalFile.On("TempArenaInfo", mock.Anything).Return(domain.TempArenaInfo{}, nil)
+	t.Run("正常系_戦闘開始", func(t *testing.T) {
+		t.Parallel()
 
-	mockStorage := &mocks.StorageInterface{}
-	mockStorage.On("ReadUserConfig").Return(domain.UserConfig{
-		InstallPath: "install_path_test",
-		Appid:       "abc123",
-		FontSize:    "medium",
-	}, nil)
-
-	var events []string
-	emitFunc := func(ctx context.Context, eventName string, optionalData ...interface{}) {
-		events = append(events, eventName)
-	}
-
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
-	watcher := NewWatcher(10*time.Millisecond, mockLocalFile, mockStorage, emitFunc)
-	err := watcher.Prepare()
-	require.NoError(t, err)
-	go watcher.Start(ctx, ctx)
-
-	time.Sleep(100 * time.Millisecond)
-	assert.Len(t, events, 1)
-	assert.Contains(t, events, EventStart)
-}
-
-func TestWatcher_Start_戦闘終了(t *testing.T) {
-	t.Parallel()
-
-	ignoreErrs := []failure.StringCode{
-		apperr.FileNotExist,
-		apperr.ReplayDirNotFoundError,
-	}
-
-	for _, ie := range ignoreErrs {
-		mockLocalFile := &mocks.LocalFileInterface{}
-		mockLocalFile.On("TempArenaInfo", mock.Anything).Return(domain.TempArenaInfo{}, failure.New(ie))
-		mockStorage := &mocks.StorageInterface{}
-		mockStorage.On("ReadUserConfig").Return(domain.UserConfig{
+		// 準備
+		config := domain.UserConfig{
 			InstallPath: "install_path_test",
 			Appid:       "abc123",
 			FontSize:    "medium",
-		}, nil)
+		}
+		mockStorage := &mocks.StorageInterface{}
+		mockLocalFile := &mocks.LocalFileInterface{}
+
+		mockStorage.On("ReadUserConfig").Return(config, nil)
+		mockLocalFile.On("TempArenaInfo", config.InstallPath).Return(domain.TempArenaInfo{}, nil)
 
 		var events []string
 		emitFunc := func(ctx context.Context, eventName string, optionalData ...interface{}) {
@@ -71,77 +39,134 @@ func TestWatcher_Start_戦闘終了(t *testing.T) {
 		ctx, cancel := context.WithCancel(context.Background())
 		defer cancel()
 
+		// テスト
 		watcher := NewWatcher(10*time.Millisecond, mockLocalFile, mockStorage, emitFunc)
 		err := watcher.Prepare()
-		require.NoError(t, err)
-
 		go watcher.Start(ctx, ctx)
 
-		events = nil
+		// アサーション
+		require.NoError(t, err)
 		time.Sleep(100 * time.Millisecond)
-		assert.Contains(t, events, EventEnd)
-	}
-}
 
-func TestWatcher_Start_エラー発生(t *testing.T) {
-	t.Parallel()
+		assert.Len(t, events, 1)
+		assert.Contains(t, events, EventStart)
 
-	mockLocalFile := &mocks.LocalFileInterface{}
-	mockLocalFile.On("TempArenaInfo", mock.Anything).Return(
-		domain.TempArenaInfo{},
-		failure.New(apperr.UnexpectedError),
-	)
-	mockStorage := &mocks.StorageInterface{}
-	mockStorage.On("ReadUserConfig").Return(domain.UserConfig{
-		InstallPath: "install_path_test",
-		Appid:       "abc123",
-		FontSize:    "medium",
-	}, nil)
+		mockStorage.AssertExpectations(t)
+		mockLocalFile.AssertExpectations(t)
+	})
+	t.Run("正常系_戦闘終了", func(t *testing.T) {
+		t.Parallel()
 
-	var events []string
-	emitFunc := func(ctx context.Context, eventName string, optionalData ...interface{}) {
-		events = append(events, eventName)
-	}
+		ignoreErrs := []failure.StringCode{
+			apperr.FileNotExist,
+			apperr.ReplayDirNotFoundError,
+		}
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+		for _, ie := range ignoreErrs {
+			// 準備
+			config := domain.UserConfig{
+				InstallPath: "install_path_test",
+				Appid:       "abc123",
+				FontSize:    "medium",
+			}
+			mockStorage := &mocks.StorageInterface{}
+			mockLocalFile := &mocks.LocalFileInterface{}
 
-	watcher := NewWatcher(10*time.Millisecond, mockLocalFile, mockStorage, emitFunc)
-	err := watcher.Prepare()
-	require.NoError(t, err)
+			mockStorage.On("ReadUserConfig").Return(config, nil)
+			mockLocalFile.On("TempArenaInfo", config.InstallPath).Return(domain.TempArenaInfo{}, failure.New(ie))
 
-	go watcher.Start(ctx, ctx)
+			var events []string
+			emitFunc := func(ctx context.Context, eventName string, optionalData ...interface{}) {
+				events = append(events, eventName)
+			}
 
-	time.Sleep(100 * time.Millisecond)
-	assert.Len(t, events, 1)
-	assert.Contains(t, events, EventErr)
-}
+			ctx, cancel := context.WithCancel(context.Background())
+			defer cancel()
 
-func TestWatcher_Start_キャンセル(t *testing.T) {
-	t.Parallel()
+			// テスト
+			watcher := NewWatcher(10*time.Millisecond, mockLocalFile, mockStorage, emitFunc)
+			go watcher.Start(ctx, ctx)
 
-	mockLocalFile := &mocks.LocalFileInterface{}
-	mockLocalFile.On("TempArenaInfo", mock.Anything).Return(domain.TempArenaInfo{}, nil)
-	mockStorage := &mocks.StorageInterface{}
-	mockStorage.On("ReadUserConfig").Return(domain.UserConfig{
-		InstallPath: "install_path_test",
-		Appid:       "abc123",
-		FontSize:    "medium",
-	}, nil)
+			// アサーション
+			err := watcher.Prepare()
+			require.NoError(t, err)
 
-	var events []string
-	emitFunc := func(ctx context.Context, eventName string, optionalData ...interface{}) {
-		events = append(events, eventName)
-	}
-	ctx, cancel := context.WithCancel(context.Background())
+			events = nil
+			time.Sleep(100 * time.Millisecond)
+			assert.Contains(t, events, EventEnd)
+		}
+	})
+	t.Run("正常系_キャンセル", func(t *testing.T) {
+		t.Parallel()
 
-	watcher := NewWatcher(10*time.Millisecond, mockLocalFile, mockStorage, emitFunc)
-	err := watcher.Prepare()
-	require.NoError(t, err)
+		// 準備
+		config := domain.UserConfig{
+			InstallPath: "install_path_test",
+			Appid:       "abc123",
+			FontSize:    "medium",
+		}
+		mockStorage := &mocks.StorageInterface{}
+		mockStorage.On("ReadUserConfig").Return(config, nil)
 
-	go watcher.Start(ctx, ctx)
-	cancel()
+		var events []string
+		emitFunc := func(ctx context.Context, eventName string, optionalData ...interface{}) {
+			events = append(events, eventName)
+		}
+		ctx, cancel := context.WithCancel(context.Background())
 
-	time.Sleep(100 * time.Millisecond)
-	assert.Empty(t, events)
+		// テスト
+		watcher := NewWatcher(10*time.Millisecond, nil, mockStorage, emitFunc)
+		err := watcher.Prepare()
+		go watcher.Start(ctx, ctx)
+		cancel()
+
+		// アサーション
+		require.NoError(t, err)
+		time.Sleep(100 * time.Millisecond)
+
+		assert.Empty(t, events)
+
+		mockStorage.AssertExpectations(t)
+	})
+	t.Run("異常系_エラー発生", func(t *testing.T) {
+		t.Parallel()
+
+		// 準備
+		config := domain.UserConfig{
+			InstallPath: "install_path_test",
+			Appid:       "abc123",
+			FontSize:    "medium",
+		}
+		mockStorage := &mocks.StorageInterface{}
+		mockLocalFile := &mocks.LocalFileInterface{}
+
+		mockStorage.On("ReadUserConfig").Return(config, nil)
+		mockLocalFile.On("TempArenaInfo", config.InstallPath).Return(
+			domain.TempArenaInfo{},
+			failure.New(apperr.UnexpectedError),
+		)
+
+		var events []string
+		emitFunc := func(ctx context.Context, eventName string, optionalData ...interface{}) {
+			events = append(events, eventName)
+		}
+
+		ctx, cancel := context.WithCancel(context.Background())
+		defer cancel()
+
+		// テスト
+		watcher := NewWatcher(10*time.Millisecond, mockLocalFile, mockStorage, emitFunc)
+		err := watcher.Prepare()
+		go watcher.Start(ctx, ctx)
+
+		// アサーション
+		require.NoError(t, err)
+		time.Sleep(100 * time.Millisecond)
+
+		assert.Len(t, events, 1)
+		assert.Contains(t, events, EventErr)
+
+		mockStorage.AssertExpectations(t)
+		mockLocalFile.AssertExpectations(t)
+	})
 }

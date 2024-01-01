@@ -1,4 +1,3 @@
-//nolint:dupl
 package infra
 
 import (
@@ -19,7 +18,7 @@ func NewNumbers(config RequestConfig) *Numbers {
 	return &Numbers{config: config}
 }
 
-func (n *Numbers) ExpectedStats() (domain.NSExpectedStats, error) {
+func (n *Numbers) ExpectedStats() (domain.ExpectedStats, error) {
 	b := backoff.WithMaxRetries(backoff.NewExponentialBackOff(), n.config.Retry)
 	operation := func() (webapi.Response[domain.NSExpectedStats], error) {
 		res, err := webapi.GetRequest[domain.NSExpectedStats](
@@ -39,5 +38,5 @@ func (n *Numbers) ExpectedStats() (domain.NSExpectedStats, error) {
 
 	res, err := backoff.RetryWithData(operation, b)
 
-	return res.Body, failure.Wrap(err, apperr.ToRequestErrorContext(res))
+	return res.Body.Data, failure.Wrap(err, apperr.ToRequestErrorContext(res))
 }

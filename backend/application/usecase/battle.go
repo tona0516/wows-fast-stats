@@ -22,7 +22,7 @@ type Battle struct {
 	isFirstBattle bool
 
 	warship          domain.Warships
-	allExpectedStats domain.AllExpectedStats
+	allExpectedStats domain.ExpectedStats
 	battleArenas     domain.WGBattleArenas
 	battleTypes      domain.WGBattleTypes
 }
@@ -52,7 +52,7 @@ func (b *Battle) Get(userConfig domain.UserConfig) (domain.Battle, error) {
 
 	// Fetch on-memory stored data
 	warshipResult := make(chan vo.Result[domain.Warships])
-	allExpectedStatsResult := make(chan vo.Result[domain.AllExpectedStats])
+	allExpectedStatsResult := make(chan vo.Result[domain.ExpectedStats])
 	battleArenasResult := make(chan vo.Result[domain.WGBattleArenas])
 	battleTypesResult := make(chan vo.Result[domain.WGBattleTypes])
 	if b.isFirstBattle {
@@ -213,22 +213,22 @@ func (b *Battle) fetchWarships(channel chan vo.Result[domain.Warships]) {
 	channel <- result
 }
 
-func (b *Battle) fetchExpectedStats(channel chan vo.Result[domain.AllExpectedStats]) {
-	var result vo.Result[domain.AllExpectedStats]
+func (b *Battle) fetchExpectedStats(channel chan vo.Result[domain.ExpectedStats]) {
+	var result vo.Result[domain.ExpectedStats]
 
 	expectedStats, errFetch := b.numbers.ExpectedStats()
 	if errFetch == nil {
-		_ = b.storage.WriteNSExpectedStats(expectedStats)
-		result.Value = expectedStats.Data
+		_ = b.storage.WriteExpectedStats(expectedStats)
+		result.Value = expectedStats
 		channel <- result
 		return
 	}
 
 	logger.Warn(failure.New(apperr.FailSafeProccess))
 
-	expectedStats, errCache := b.storage.ReadNSExpectedStats()
+	expectedStats, errCache := b.storage.ReadExpectedStats()
 	if errCache == nil {
-		result.Value = expectedStats.Data
+		result.Value = expectedStats
 		channel <- result
 		return
 	}
@@ -307,7 +307,7 @@ func (b *Battle) compose(
 	clans domain.Clans,
 	allPlayerShipsStats domain.AllPlayerShipsStats,
 	warships domain.Warships,
-	allExpectedStats domain.AllExpectedStats,
+	allExpectedStats domain.ExpectedStats,
 	battleArenas domain.WGBattleArenas,
 	battleTypes domain.WGBattleTypes,
 ) domain.Battle {

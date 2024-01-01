@@ -11,11 +11,11 @@ import (
 )
 
 const (
-	dataVersionKey     = "data_version"
-	userConfigKey      = "user_config"
-	alertPlayersKey    = "alert_players"
-	nsExpectedStatsKey = "ns_expected_stats"
-	ownIGNKey          = "own_ign"
+	dataVersionKey   = "data_version"
+	userConfigKey    = "user_config"
+	alertPlayersKey  = "alert_players"
+	expectedStatsKey = "expected_stats"
+	ownIGNKey        = "own_ign"
 )
 
 type Storage struct {
@@ -77,12 +77,12 @@ func (s *Storage) WriteAlertPlayers(players []domain.AlertPlayer) error {
 	return write(s.db, alertPlayersKey, players)
 }
 
-func (s *Storage) ReadNSExpectedStats() (domain.NSExpectedStats, error) {
-	return read[domain.NSExpectedStats](s.db, nsExpectedStatsKey)
+func (s *Storage) ReadExpectedStats() (domain.ExpectedStats, error) {
+	return read[domain.ExpectedStats](s.db, expectedStatsKey)
 }
 
-func (s *Storage) WriteNSExpectedStats(nsExpectedStats domain.NSExpectedStats) error {
-	return write(s.db, nsExpectedStatsKey, nsExpectedStats)
+func (s *Storage) WriteExpectedStats(expectedStats domain.ExpectedStats) error {
+	return write(s.db, expectedStatsKey, expectedStats)
 }
 
 func (s *Storage) ReadOwnIGN() (string, error) {

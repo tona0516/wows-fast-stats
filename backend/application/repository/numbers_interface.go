@@ -3,5 +3,5 @@ package repository
 import "wfs/backend/domain"
 
 type NumbersInterface interface {
-	ExpectedStats() (domain.NSExpectedStats, error)
+	ExpectedStats() (domain.ExpectedStats, error)
 }

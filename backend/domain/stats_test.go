@@ -14,7 +14,7 @@ const (
 var (
 	emptyAccountInfo   = WGAccountInfoData{}
 	emptyShipsStats    = []WGShipsStatsData{}
-	emptyExpectedStats = AllExpectedStats{}
+	emptyExpectedStats = ExpectedStats{}
 	emptyWarships      = Warships{}
 )
 
@@ -46,7 +46,7 @@ func TestStats_PR_Ship(t *testing.T) {
 					ShipID: useShipID,
 				},
 			},
-			AllExpectedStats{
+			ExpectedStats{
 				useShipID: {
 					AverageDamageDealt: 8000,
 					AverageFrags:       1,
@@ -106,7 +106,7 @@ func TestStats_PR_Overall(t *testing.T) {
 				ShipID: 4,
 			},
 		},
-		AllExpectedStats{
+		ExpectedStats{
 			1: {
 				AverageDamageDealt: 53792.23172971,
 				WinRate:            50.092406353286,

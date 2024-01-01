@@ -56,7 +56,7 @@ func (r *Report) Send(message string, content error) {
 		"Semver:",
 		fmt.Sprintf("%+v\n", r.env.Semver),
 		"IGN:",
-		ign,
+		fmt.Sprintf("%+v\n", ign),
 		"Error:",
 		fmt.Sprintf("%+v\n", content),
 		"TempArenaInfo:",

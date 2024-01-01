@@ -1,4 +1,3 @@
-//nolint:paralleltest
 package usecase
 
 import (
@@ -18,212 +17,218 @@ import (
 )
 
 const (
-	DefaultInstallPath = "install_path_test"
-	DefaultAppID       = "abc123"
+	validInstallPath = "install_path_test"
+	validAppID       = "abc123"
 )
 
 var errWargaming = failure.New(apperr.WGAPIError)
 
-func TestConfig_UpdateRequired_正常系(t *testing.T) {
+//nolint:paralleltest
+func TestConfig_UpdateRequired(t *testing.T) {
+	// 準備
 	err := createGameClientPath()
 	require.NoError(t, err)
-	defer os.RemoveAll(DefaultInstallPath)
+	defer os.RemoveAll(validInstallPath)
 
-	// テストデータ
-	config := createInputConfig()
+	t.Run("正常系", func(t *testing.T) {
+		config := createInputConfig()
 
-	// モックの設定
-	mockLocalFile := &mocks.LocalFileInterface{}
-	mockLocalFile.On("UpdateUser", config).Return(nil)
-	mockWargaming := &mocks.WargamingInterface{}
-	mockWargaming.On("Test", mock.Anything).Return(true, nil)
-	mockStorage := &mocks.StorageInterface{}
-	mockStorage.On("ReadUserConfig").Return(domain.DefaultUserConfig, nil)
-	mockStorage.On("WriteUserConfig", mock.Anything).Return(nil)
+		mockWargaming := &mocks.WargamingInterface{}
+		mockStorage := &mocks.StorageInterface{}
+		mockWargaming.On("Test", config.Appid).Return(true, nil)
+		mockStorage.On("ReadUserConfig").Return(domain.DefaultUserConfig, nil)
+		mockStorage.On("WriteUserConfig", config).Return(nil)
 
-	// テスト実行
-	c := NewConfig(mockLocalFile, mockWargaming, mockStorage)
-	actual, err := c.UpdateRequired(config.InstallPath, config.Appid)
+		// テスト
+		c := NewConfig(nil, mockWargaming, mockStorage)
+		actual, err := c.UpdateRequired(config.InstallPath, config.Appid)
 
-	// アサーション
-	assert.Equal(t, vo.RequiredConfigError{Valid: true}, actual)
-	require.NoError(t, err)
-	mockWargaming.AssertCalled(t, "Test", config.Appid)
-	mockStorage.AssertCalled(t, "ReadUserConfig")
-	mockStorage.AssertCalled(t, "WriteUserConfig", config)
+		// アサーション
+		assert.Equal(t, vo.RequiredConfigError{Valid: true}, actual)
+		require.NoError(t, err)
+		mockWargaming.AssertExpectations(t)
+		mockStorage.AssertExpectations(t)
+	})
+
+	t.Run("異常系_不正なインストールパス", func(t *testing.T) {
+		config := domain.DefaultUserConfig
+		config.InstallPath = "invalid/path" // Note: 不正なパス
+		config.Appid = "abc123"
+
+		mockWargaming := &mocks.WargamingInterface{}
+		mockWargaming.On("Test", config.Appid).Return(true, nil)
+
+		// テスト
+		c := NewConfig(nil, mockWargaming, nil)
+		actual, err := c.UpdateRequired(config.InstallPath, config.Appid)
+
+		// アサーション
+		assert.Equal(t, vo.RequiredConfigError{InstallPath: apperr.InvalidInstallPath.ErrorCode()}, actual)
+		require.NoError(t, err)
+		mockWargaming.AssertExpectations(t)
+	})
+
+	t.Run("異常系_不正なAppID", func(t *testing.T) {
+		config := createInputConfig()
+
+		mockWargaming := &mocks.WargamingInterface{}
+		mockWargaming.On("Test", config.Appid).Return(false, errWargaming) // Note: WG APIでエラー
+
+		// テスト
+		c := NewConfig(nil, mockWargaming, nil)
+		actual, err := c.UpdateRequired(config.InstallPath, config.Appid)
+
+		// アサーション
+		assert.Equal(t, vo.RequiredConfigError{AppID: apperr.InvalidAppID.ErrorCode()}, actual)
+		require.NoError(t, err)
+		mockWargaming.AssertExpectations(t)
+	})
 }
 
-func TestConfig_UpdateRequired_異常系_不正なインストールパス(t *testing.T) {
+//nolint:paralleltest
+func TestConfig_UpdateOptional(t *testing.T) {
+	// 準備
 	err := createGameClientPath()
 	require.NoError(t, err)
-	defer os.RemoveAll(DefaultInstallPath)
+	defer os.RemoveAll(validInstallPath)
 
-	// テストデータ
-	config := domain.DefaultUserConfig
-	config.InstallPath = "invalid/path" // Note: 不正なパス
-	config.Appid = "abc123"
+	t.Run("正常系", func(t *testing.T) {
+		config := createInputConfig()
+		config.FontSize = "small"
+		// Note: requiredな値を与えてもこれらの値はWriteUserConfigでは含まれない
+		actualWritten := domain.DefaultUserConfig
+		actualWritten.FontSize = "small"
 
-	// モックの設定
-	mockLocalFile := &mocks.LocalFileInterface{}
-	mockWargaming := &mocks.WargamingInterface{}
-	mockWargaming.On("Test", mock.Anything).Return(true, nil)
-	mockStorage := &mocks.StorageInterface{}
+		mockStorage := &mocks.StorageInterface{}
+		mockStorage.On("ReadUserConfig").Return(domain.DefaultUserConfig, nil)
+		mockStorage.On("WriteUserConfig", actualWritten).Return(nil)
 
-	// テスト実行
-	c := NewConfig(mockLocalFile, mockWargaming, mockStorage)
-	actual, err := c.UpdateRequired(config.InstallPath, config.Appid)
+		// テスト実行
+		c := NewConfig(nil, nil, mockStorage)
+		err = c.UpdateOptional(config)
 
-	// アサーション
-	assert.Equal(t, vo.RequiredConfigError{InstallPath: apperr.InvalidInstallPath.ErrorCode()}, actual)
-	require.NoError(t, err)
-	mockWargaming.AssertCalled(t, "Test", config.Appid)
-	mockStorage.AssertNotCalled(t, "WriteUserConfig", mock.Anything)
+		// アサーション
+		require.NoError(t, err)
+		mockStorage.AssertExpectations(t)
+	})
 }
 
-func TestConfig_UpdateRequired_異常系_不正なAppID(t *testing.T) {
-	err := createGameClientPath()
-	require.NoError(t, err)
-	defer os.RemoveAll(DefaultInstallPath)
+func TestConfig_AlertPlayers(t *testing.T) {
+	t.Parallel()
 
-	// テストデータ
-	config := createInputConfig()
+	t.Run("正常系", func(t *testing.T) {
+		t.Parallel()
 
-	// モックの設定
-	mockLocalFile := &mocks.LocalFileInterface{}
-	mockWargaming := &mocks.WargamingInterface{}
-	mockWargaming.On("Test", mock.Anything).Return(false, errWargaming) // Note: WG APIでエラー
-	mockStorage := &mocks.StorageInterface{}
+		// 準備
+		expected := []domain.AlertPlayer{
+			{AccountID: 1, Name: "Player1"},
+			{AccountID: 2, Name: "Player2"},
+		}
+		mockStorage := &mocks.StorageInterface{}
+		mockStorage.On("ReadAlertPlayers").Return(expected, nil)
 
-	// テスト実行
-	c := NewConfig(mockLocalFile, mockWargaming, mockStorage)
-	actual, err := c.UpdateRequired(config.InstallPath, config.Appid)
+		// テスト
+		config := NewConfig(nil, nil, mockStorage)
+		actual, err := config.AlertPlayers()
 
-	// アサーション
-	assert.Equal(t, vo.RequiredConfigError{AppID: apperr.InvalidAppID.ErrorCode()}, actual)
-	require.NoError(t, err)
-	mockWargaming.AssertCalled(t, "Test", config.Appid)
-	mockStorage.AssertNotCalled(t, "WriteUserConfig", mock.Anything)
+		// アサーション
+		require.NoError(t, err)
+		assert.Equal(t, expected, actual)
+		mockStorage.AssertExpectations(t)
+	})
 }
 
-func TestConfig_UpdateOptional_正常系(t *testing.T) {
-	err := createGameClientPath()
-	require.NoError(t, err)
-	defer os.RemoveAll(DefaultInstallPath)
+func TestConfig_UpdateAlertPlayer(t *testing.T) {
+	t.Parallel()
 
-	// テストデータ
-	config := createInputConfig()
-	config.FontSize = "small"
-
-	// モックの設定
-	mockLocalFile := &mocks.LocalFileInterface{}
-	// Note: requiredな値を与えてもこれらの値はUpdateUserでは含まれない
-	actualWritten := domain.DefaultUserConfig
-	actualWritten.FontSize = "small"
-	mockWargaming := &mocks.WargamingInterface{}
-	mockWargaming.On("Test", mock.Anything).Return(true, nil)
-	mockStorage := &mocks.StorageInterface{}
-	mockStorage.On("ReadUserConfig").Return(domain.DefaultUserConfig, nil)
-	mockStorage.On("WriteUserConfig", actualWritten).Return(nil)
-
-	// テスト実行
-	c := NewConfig(mockLocalFile, mockWargaming, mockStorage)
-	err = c.UpdateOptional(config)
-
-	// アサーション
-	require.NoError(t, err)
-
-	mockWargaming.AssertNotCalled(t, "Test", config.Appid)
-	mockStorage.AssertCalled(t, "ReadUserConfig")
-	mockStorage.AssertCalled(t, "WriteUserConfig", actualWritten)
-}
-
-func TestConfig_AlertPlayers_正常系(t *testing.T) {
-	expected := []domain.AlertPlayer{
-		{AccountID: 1, Name: "Player1"},
-		{AccountID: 2, Name: "Player2"},
-	}
-	mockStorage := &mocks.StorageInterface{}
-	mockStorage.On("ReadAlertPlayers").Return(expected, nil)
-
-	config := NewConfig(nil, nil, mockStorage)
-	actual, err := config.AlertPlayers()
-
-	require.NoError(t, err)
-	assert.Equal(t, expected, actual)
-	mockStorage.AssertExpectations(t)
-}
-
-func TestConfig_UpdateAlertPlayer_正常系_追加(t *testing.T) {
-	existingPlayers := []domain.AlertPlayer{
-		{AccountID: 1, Name: "Player1"},
-		{AccountID: 2, Name: "Player2"},
-	}
-	newPlayer := domain.AlertPlayer{AccountID: 3, Name: "Player3"}
-	mockStorage := &mocks.StorageInterface{}
-	mockStorage.On("ReadAlertPlayers").Return(existingPlayers, nil)
-	mockStorage.On("WriteAlertPlayers", append(existingPlayers, newPlayer)).Return(nil)
-
-	config := NewConfig(nil, nil, mockStorage)
-	err := config.UpdateAlertPlayer(newPlayer)
-
-	require.NoError(t, err)
-	mockStorage.AssertExpectations(t)
-}
-
-func TestConfig_UpdateAlertPlayer_正常系_更新(t *testing.T) {
-	existingPlayers := []domain.AlertPlayer{
-		{AccountID: 1, Name: "Player1"},
-		{AccountID: 2, Name: "Player2"},
-	}
-	playerToUpdate := domain.AlertPlayer{AccountID: 1, Name: "UpdatedPlayer"}
-
-	mockStorage := &mocks.StorageInterface{}
-	mockStorage.On("ReadAlertPlayers").Return(existingPlayers, nil)
-	mockStorage.On("WriteAlertPlayers", []domain.AlertPlayer{
-		{AccountID: 1, Name: "UpdatedPlayer"},
-		{AccountID: 2, Name: "Player2"},
-	}).Return(nil)
-
-	config := NewConfig(nil, nil, mockStorage)
-	err := config.UpdateAlertPlayer(playerToUpdate)
-
-	require.NoError(t, err)
-	mockStorage.AssertExpectations(t)
-}
-
-func TestConfig_RemoveAlertPlayer_正常系(t *testing.T) {
-	accountIDToRemove := 1
 	existingPlayers := []domain.AlertPlayer{
 		{AccountID: 1, Name: "Player1"},
 		{AccountID: 2, Name: "Player2"},
 	}
 
-	mockStorage := &mocks.StorageInterface{}
-	mockStorage.On("ReadAlertPlayers").Return(existingPlayers, nil)
-	mockStorage.On("WriteAlertPlayers", mock.Anything).Return(nil)
+	t.Run("正常系_追加", func(t *testing.T) {
+		t.Parallel()
 
-	config := NewConfig(nil, nil, mockStorage)
-	err := config.RemoveAlertPlayer(accountIDToRemove)
+		// 準備
+		newPlayer := domain.AlertPlayer{AccountID: 3, Name: "Player3"}
 
-	// Assert
-	require.NoError(t, err)
-	mockStorage.AssertExpectations(t)
+		mockStorage := &mocks.StorageInterface{}
+		mockStorage.On("ReadAlertPlayers").Return(existingPlayers, nil)
+		mockStorage.On("WriteAlertPlayers", append(existingPlayers, newPlayer)).Return(nil)
+
+		// テスト
+		config := NewConfig(nil, nil, mockStorage)
+		err := config.UpdateAlertPlayer(newPlayer)
+
+		// アサーション
+		require.NoError(t, err)
+		mockStorage.AssertExpectations(t)
+	})
+
+	t.Run("正常系_更新", func(t *testing.T) {
+		t.Parallel()
+
+		// 準備
+		playerToUpdate := domain.AlertPlayer{AccountID: 1, Name: "UpdatedPlayer"}
+
+		mockStorage := &mocks.StorageInterface{}
+		mockStorage.On("ReadAlertPlayers").Return(existingPlayers, nil)
+		mockStorage.On("WriteAlertPlayers", []domain.AlertPlayer{
+			{AccountID: 1, Name: "UpdatedPlayer"},
+			{AccountID: 2, Name: "Player2"},
+		}).Return(nil)
+
+		// テスト
+		config := NewConfig(nil, nil, mockStorage)
+		err := config.UpdateAlertPlayer(playerToUpdate)
+
+		// アサーション
+		require.NoError(t, err)
+		mockStorage.AssertExpectations(t)
+	})
+}
+
+func TestConfig_RemoveAlertPlayer(t *testing.T) {
+	t.Parallel()
+
+	t.Run("正常系", func(t *testing.T) {
+		t.Parallel()
+
+		// 準備
+		accountIDToRemove := 1
+		existingPlayers := []domain.AlertPlayer{
+			{AccountID: 1, Name: "Player1"},
+			{AccountID: 2, Name: "Player2"},
+		}
+
+		mockStorage := &mocks.StorageInterface{}
+		mockStorage.On("ReadAlertPlayers").Return(existingPlayers, nil)
+		mockStorage.On("WriteAlertPlayers", mock.Anything).Return(nil)
+
+		// テスト
+		config := NewConfig(nil, nil, mockStorage)
+		err := config.RemoveAlertPlayer(accountIDToRemove)
+
+		// アサーション
+		require.NoError(t, err)
+		mockStorage.AssertExpectations(t)
+	})
 }
 
 func createInputConfig() domain.UserConfig {
 	config := domain.DefaultUserConfig
-	config.InstallPath = "install_path_test"
-	config.Appid = "abc123"
+	config.InstallPath = validInstallPath
+	config.Appid = validAppID
 
 	return config
 }
 
 func createGameClientPath() error {
-	if err := os.MkdirAll(DefaultInstallPath, fs.ModePerm); err != nil {
+	if err := os.MkdirAll(validInstallPath, fs.ModePerm); err != nil {
 		return err
 	}
 
-	gameExePath := filepath.Join(DefaultInstallPath, GameExeName)
+	gameExePath := filepath.Join(validInstallPath, GameExeName)
 
 	return os.WriteFile(gameExePath, []byte{}, fs.ModePerm)
 }

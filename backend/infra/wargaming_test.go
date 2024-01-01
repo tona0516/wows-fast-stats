@@ -18,44 +18,141 @@ import (
 func TestWargaming_AccountInfo(t *testing.T) {
 	t.Parallel()
 
-	server := simpleMockServer(200, response.WGAccountInfo{
-		WGResponseCommon: response.WGResponseCommon[domain.WGAccountInfo]{
-			Status: "",
-			Error:  response.WGError{},
-			Data:   map[int]domain.WGAccountInfoData{},
-		},
-	})
-	defer server.Close()
+	t.Run("正常系", func(t *testing.T) {
+		t.Parallel()
+		server := simpleMockServer(200, response.WGAccountInfo{
+			WGResponseCommon: response.WGResponseCommon[domain.WGAccountInfo]{
+				Status: "",
+				Error:  response.WGError{},
+				Data:   map[int]domain.WGAccountInfoData{},
+			},
+		})
+		defer server.Close()
 
-	wargaming := NewWargaming(RequestConfig{
-		URL: server.URL,
-	})
+		wargaming := NewWargaming(RequestConfig{
+			URL: server.URL,
+		})
 
-	result, err := wargaming.AccountInfo([]int{123, 456})
-	require.NoError(t, err)
-	assert.Equal(t, domain.WGAccountInfo{}, result)
-}
-
-func TestWargaming_AccountList(t *testing.T) {
-	t.Parallel()
-
-	server := simpleMockServer(200, response.WGAccountList{
-		WGResponseCommon: response.WGResponseCommon[domain.WGAccountList]{
-			Status: "",
-			Error:  response.WGError{},
-			Data:   []domain.WGAccountListData{},
-		},
-	})
-	defer server.Close()
-
-	wargaming := NewWargaming(RequestConfig{
-		URL: server.URL,
+		result, err := wargaming.AccountInfo([]int{123, 456})
+		require.NoError(t, err)
+		assert.Equal(t, domain.WGAccountInfo{}, result)
 	})
 
-	result, err := wargaming.AccountList([]string{"player_1", "player_2"})
+	t.Run("異常系_リトライなし", func(t *testing.T) {
+		t.Parallel()
+		body := `{
+            "status":"error",
+            "error":{
+                "field":null,
+                "message":"INVALID_APPLICATION_ID",
+                "code":407,
+                "value":null
+            }
+        }`
 
-	require.NoError(t, err)
-	assert.Equal(t, domain.WGAccountList{}, result)
+		var calls int
+		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			calls++
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(body))
+		}))
+		defer server.Close()
+
+		wargaming := NewWargaming(RequestConfig{
+			URL: server.URL,
+		})
+
+		_, err := wargaming.AccountInfo([]int{123, 456})
+		code, ok := failure.CodeOf(err)
+		assert.True(t, ok)
+		assert.Equal(t, apperr.WGAPIError, code)
+		assert.Equal(t, 1, calls)
+	})
+
+	t.Run("正常系_最大リトライ", func(t *testing.T) {
+		t.Parallel()
+		messages := []string{
+			"REQUEST_LIMIT_EXCEEDED",
+			"SOURCE_NOT_AVAILABLE",
+		}
+
+		for _, message := range messages {
+			body := fmt.Sprintf(`{
+                "status":"error",
+                "error":{
+                    "field":null,
+                    "message":"%s",
+                    "code":407,
+                    "value":null
+                }
+            }`, message)
+
+			var retry uint64 = 1
+			var calls int
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				calls++
+
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(http.StatusOK)
+
+				if calls < int(retry+1) {
+					_, _ = w.Write([]byte(body))
+					return
+				}
+
+				body, _ := json.Marshal(response.WGAccountInfo{})
+				_, _ = w.Write(body)
+			}))
+			defer server.Close()
+
+			wargaming := NewWargaming(RequestConfig{URL: server.URL, Retry: retry})
+
+			_, err := wargaming.AccountInfo([]int{123, 456})
+
+			require.NoError(t, err)
+			assert.Equal(t, int(retry+1), calls)
+		}
+	})
+
+	t.Run("異常系_最大リトライ", func(t *testing.T) {
+		t.Parallel()
+		messages := []string{
+			"REQUEST_LIMIT_EXCEEDED",
+			"SOURCE_NOT_AVAILABLE",
+		}
+
+		for _, message := range messages {
+			body := fmt.Sprintf(`{
+                "status":"error",
+                "error":{
+                    "field":null,
+                    "message":"%s",
+                    "code":407,
+                    "value":null
+                }
+            }`, message)
+
+			var retry uint64 = 1
+			var calls int
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				calls++
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(http.StatusOK)
+				_, _ = w.Write([]byte(body))
+			}))
+			defer server.Close()
+
+			wargaming := NewWargaming(RequestConfig{URL: server.URL, Retry: retry})
+
+			_, err := wargaming.AccountInfo([]int{123, 456})
+
+			code, ok := failure.CodeOf(err)
+			assert.True(t, ok)
+			assert.Equal(t, apperr.WGAPITemporaryUnavaillalble, code)
+			assert.Equal(t, int(retry+1), calls)
+		}
+	})
 }
 
 func TestWargaming_AccountListForSearch(t *testing.T) {
@@ -246,123 +343,4 @@ func TestWargaming_Test(t *testing.T) {
 	valid, err := wargaming.Test("hoge")
 	assert.True(t, valid)
 	require.NoError(t, err)
-}
-
-func TestWargaming_AccountInfo_異常系_リトライなし(t *testing.T) {
-	t.Parallel()
-
-	body := `{
-        "status":"error",
-        "error":{
-            "field":null,
-            "message":"INVALID_APPLICATION_ID",
-            "code":407,
-            "value":null
-        }
-    }`
-
-	var calls int
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		calls++
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		_, _ = w.Write([]byte(body))
-	}))
-	defer server.Close()
-
-	wargaming := NewWargaming(RequestConfig{
-		URL: server.URL,
-	})
-
-	_, err := wargaming.AccountInfo([]int{123, 456})
-	code, ok := failure.CodeOf(err)
-	assert.True(t, ok)
-	assert.Equal(t, apperr.WGAPIError, code)
-	assert.Equal(t, 1, calls)
-}
-
-func TestWargaming_AccountInfo_正常系_最大リトライ(t *testing.T) {
-	t.Parallel()
-
-	messages := []string{
-		"REQUEST_LIMIT_EXCEEDED",
-		"SOURCE_NOT_AVAILABLE",
-	}
-
-	for _, message := range messages {
-		body := fmt.Sprintf(`{
-            "status":"error",
-            "error":{
-                "field":null,
-                "message":"%s",
-                "code":407,
-                "value":null
-            }
-        }`, message)
-
-		var retry uint64 = 1
-		var calls int
-		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			calls++
-
-			w.Header().Set("Content-Type", "application/json")
-			w.WriteHeader(http.StatusOK)
-
-			if calls < int(retry+1) {
-				_, _ = w.Write([]byte(body))
-				return
-			}
-
-			body, _ := json.Marshal(response.WGAccountInfo{})
-			_, _ = w.Write(body)
-		}))
-		defer server.Close()
-
-		wargaming := NewWargaming(RequestConfig{URL: server.URL, Retry: retry})
-
-		_, err := wargaming.AccountInfo([]int{123, 456})
-
-		require.NoError(t, err)
-		assert.Equal(t, int(retry+1), calls)
-	}
-}
-
-func TestWargaming_AccountInfo_異常系_最大リトライ(t *testing.T) {
-	t.Parallel()
-
-	messages := []string{
-		"REQUEST_LIMIT_EXCEEDED",
-		"SOURCE_NOT_AVAILABLE",
-	}
-
-	for _, message := range messages {
-		body := fmt.Sprintf(`{
-            "status":"error",
-            "error":{
-                "field":null,
-                "message":"%s",
-                "code":407,
-                "value":null
-            }
-        }`, message)
-
-		var retry uint64 = 1
-		var calls int
-		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			calls++
-			w.Header().Set("Content-Type", "application/json")
-			w.WriteHeader(http.StatusOK)
-			_, _ = w.Write([]byte(body))
-		}))
-		defer server.Close()
-
-		wargaming := NewWargaming(RequestConfig{URL: server.URL, Retry: retry})
-
-		_, err := wargaming.AccountInfo([]int{123, 456})
-
-		code, ok := failure.CodeOf(err)
-		assert.True(t, ok)
-		assert.Equal(t, apperr.WGAPITemporaryUnavaillalble, code)
-		assert.Equal(t, int(retry+1), calls)
-	}
 }

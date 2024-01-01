@@ -186,7 +186,7 @@ func (a *App) Semver() string {
 }
 
 func (a *App) ExcludePlayerIDs() []int {
-	return a.excludePlayers.PlayerIDs()
+	return a.excludePlayers.IDs()
 }
 
 func (a *App) AddExcludePlayerID(playerID int) {

@@ -32,25 +32,21 @@ func TestWGAccountList_AccountID(t *testing.T) {
 		{NickName: "Bob", AccountID: 789},
 	}
 
-	nickname := "Alice"
-	expectedID := 456
-	actualID := w.AccountID(nickname)
+	t.Run("正常系", func(t *testing.T) {
+		t.Parallel()
 
-	assert.Equal(t, expectedID, actualID)
-}
+		expectedID := 456
+		actualID := w.AccountID("Alice")
 
-func TestWGAccountList_AccountID_NotExist(t *testing.T) {
-	t.Parallel()
+		assert.Equal(t, expectedID, actualID)
+	})
 
-	w := WGAccountList{
-		{NickName: "John", AccountID: 123},
-		{NickName: "Alice", AccountID: 456},
-		{NickName: "Bob", AccountID: 789},
-	}
+	t.Run("異常系_存在しない場合は0を返す", func(t *testing.T) {
+		t.Parallel()
 
-	nickname := "Unknown"
-	expectedID := 0
-	actualID := w.AccountID(nickname)
+		expectedID := 0
+		actualID := w.AccountID("Unknown")
 
-	assert.Equal(t, expectedID, actualID)
+		assert.Equal(t, expectedID, actualID)
+	})
 }

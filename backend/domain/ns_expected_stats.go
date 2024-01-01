@@ -14,11 +14,16 @@ const (
 	NumbersWinrate   = "win_rate"
 )
 
-type AllExpectedStats map[int]ExpectedStats
+type ExpectedValues struct {
+	AverageDamageDealt float64 `json:"average_damage_dealt"`
+	AverageFrags       float64 `json:"average_frags"`
+	WinRate            float64 `json:"win_rate"`
+}
+
+type ExpectedStats map[int]ExpectedValues
 
 type NSExpectedStats struct {
-	Time int64            `json:"time"`
-	Data AllExpectedStats `json:"data"`
+	Data ExpectedStats `json:"data"`
 }
 
 func (n *NSExpectedStats) UnmarshalJSON(b []byte) error {
@@ -29,16 +34,12 @@ func (n *NSExpectedStats) UnmarshalJSON(b []byte) error {
 		return failure.New(apperr.ParseExpectedStatsError, errCtx, failure.Messagef("%s", err.Error()))
 	}
 
-	time, ok := root["time"].(float64)
-	if !ok {
-		return failure.New(apperr.ParseExpectedStatsError, errCtx, failure.Messagef("%s", "no time key"))
-	}
 	data, ok := root["data"].(map[string]interface{})
 	if !ok {
 		return failure.New(apperr.ParseExpectedStatsError, errCtx, failure.Messagef("%s", "no data key"))
 	}
 
-	esd := make(AllExpectedStats)
+	es := make(ExpectedStats)
 	for key, value := range data {
 		shipID, err := strconv.Atoi(key)
 		if err != nil {
@@ -65,7 +66,7 @@ func (n *NSExpectedStats) UnmarshalJSON(b []byte) error {
 			continue
 		}
 
-		esd[shipID] = ExpectedStats{
+		es[shipID] = ExpectedValues{
 			AverageDamageDealt: damage,
 			AverageFrags:       frags,
 			WinRate:            wr,
@@ -73,15 +74,8 @@ func (n *NSExpectedStats) UnmarshalJSON(b []byte) error {
 	}
 
 	*n = NSExpectedStats{
-		Time: int64(time),
-		Data: esd,
+		Data: es,
 	}
 
 	return nil
-}
-
-type ExpectedStats struct {
-	AverageDamageDealt float64 `json:"average_damage_dealt"`
-	AverageFrags       float64 `json:"average_frags"`
-	WinRate            float64 `json:"win_rate"`
 }

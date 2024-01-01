@@ -3,7 +3,6 @@ package infra
 import (
 	"os"
 	"testing"
-	"time"
 	"wfs/backend/domain"
 
 	"github.com/dgraph-io/badger/v4"
@@ -108,31 +107,28 @@ func TestStorage_AlertPlayers(t *testing.T) {
 	assert.Equal(t, expected, actual)
 }
 
-func TestStorage_NSExpectedStats(t *testing.T) {
+func TestStorage_ExpectedStats(t *testing.T) {
 	t.Parallel()
 
-	expected := domain.NSExpectedStats{
-		Time: time.Now().Unix(),
-		Data: domain.AllExpectedStats{
-			1: domain.ExpectedStats{
-				AverageDamageDealt: 123,
-				AverageFrags:       456,
-				WinRate:            789,
-			},
-			10: domain.ExpectedStats{
-				AverageDamageDealt: 1,
-				AverageFrags:       2,
-				WinRate:            3,
-			},
+	expected := domain.ExpectedStats{
+		1: domain.ExpectedValues{
+			AverageDamageDealt: 123,
+			AverageFrags:       456,
+			WinRate:            789,
+		},
+		10: domain.ExpectedValues{
+			AverageDamageDealt: 1,
+			AverageFrags:       2,
+			WinRate:            3,
 		},
 	}
 
 	// 書き込み：正常系
-	err := storage.WriteNSExpectedStats(expected)
+	err := storage.WriteExpectedStats(expected)
 	require.NoError(t, err)
 
 	// 取得：正常系
-	actual, err := storage.ReadNSExpectedStats()
+	actual, err := storage.ReadExpectedStats()
 	require.NoError(t, err)
 	assert.Equal(t, expected, actual)
 }

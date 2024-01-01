@@ -107,23 +107,25 @@ func (_m *StorageInterface) ReadDataVersion() (uint, error) {
 	return r0, r1
 }
 
-// ReadNSExpectedStats provides a mock function with given fields:
-func (_m *StorageInterface) ReadNSExpectedStats() (domain.NSExpectedStats, error) {
+// ReadExpectedStats provides a mock function with given fields:
+func (_m *StorageInterface) ReadExpectedStats() (domain.ExpectedStats, error) {
 	ret := _m.Called()
 
 	if len(ret) == 0 {
-		panic("no return value specified for ReadNSExpectedStats")
+		panic("no return value specified for ReadExpectedStats")
 	}
 
-	var r0 domain.NSExpectedStats
+	var r0 domain.ExpectedStats
 	var r1 error
-	if rf, ok := ret.Get(0).(func() (domain.NSExpectedStats, error)); ok {
+	if rf, ok := ret.Get(0).(func() (domain.ExpectedStats, error)); ok {
 		return rf()
 	}
-	if rf, ok := ret.Get(0).(func() domain.NSExpectedStats); ok {
+	if rf, ok := ret.Get(0).(func() domain.ExpectedStats); ok {
 		r0 = rf()
 	} else {
-		r0 = ret.Get(0).(domain.NSExpectedStats)
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(domain.ExpectedStats)
+		}
 	}
 
 	if rf, ok := ret.Get(1).(func() error); ok {
@@ -227,17 +229,17 @@ func (_m *StorageInterface) WriteDataVersion(version uint) error {
 	return r0
 }
 
-// WriteNSExpectedStats provides a mock function with given fields: nsExpectedStats
-func (_m *StorageInterface) WriteNSExpectedStats(nsExpectedStats domain.NSExpectedStats) error {
-	ret := _m.Called(nsExpectedStats)
+// WriteExpectedStats provides a mock function with given fields: expectedStats
+func (_m *StorageInterface) WriteExpectedStats(expectedStats domain.ExpectedStats) error {
+	ret := _m.Called(expectedStats)
 
 	if len(ret) == 0 {
-		panic("no return value specified for WriteNSExpectedStats")
+		panic("no return value specified for WriteExpectedStats")
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(domain.NSExpectedStats) error); ok {
-		r0 = rf(nsExpectedStats)
+	if rf, ok := ret.Get(0).(func(domain.ExpectedStats) error); ok {
+		r0 = rf(expectedStats)
 	} else {
 		r0 = ret.Error(0)
 	}

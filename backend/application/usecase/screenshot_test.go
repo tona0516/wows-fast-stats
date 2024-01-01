@@ -18,85 +18,86 @@ const (
 	base64Data = "abc123"
 )
 
-func TestScreenshot_SaveForAuto_正常系(t *testing.T) {
+func TestScreenshot_SaveForAuto(t *testing.T) {
 	t.Parallel()
 
-	// 期待されるメソッド呼び出しと戻り値の設定
-	screenshotPath := filepath.Join("screenshot", filename)
-	mockLocalFile := &mocks.LocalFileInterface{}
-	mockLocalFile.On("SaveScreenshot", screenshotPath, base64Data).Return(nil)
+	t.Run("正常系", func(t *testing.T) {
+		t.Parallel()
 
-	// Screenshot インスタンスの作成
-	s := NewScreenshot(mockLocalFile)
-	s.SaveFileDialog = func(ctx context.Context, dialogOptions runtime.SaveDialogOptions) (string, error) {
-		return screenshotPath, nil
-	}
+		// 準備
+		screenshotPath := filepath.Join("screenshot", filename)
+		mockLocalFile := &mocks.LocalFileInterface{}
+		mockLocalFile.On("SaveScreenshot", screenshotPath, base64Data).Return(nil)
 
-	// テスト実行
-	err := s.SaveForAuto(filename, base64Data)
+		s := NewScreenshot(mockLocalFile)
+		s.SaveFileDialog = func(ctx context.Context, dialogOptions runtime.SaveDialogOptions) (string, error) {
+			return screenshotPath, nil
+		}
 
-	// 結果の検証
-	require.NoError(t, err)
+		// テスト
+		err := s.SaveForAuto(filename, base64Data)
+
+		// アサーション
+		require.NoError(t, err)
+		mockLocalFile.AssertExpectations(t)
+	})
 }
 
-func TestScreenshot_SaveWithDialog_正常系(t *testing.T) {
+func TestScreenshot_SaveWithDialog(t *testing.T) {
 	t.Parallel()
 
-	// 期待されるメソッド呼び出しと戻り値の設定
-	screenshotPath := filepath.Join("directory", filename)
-	mockLocalFile := &mocks.LocalFileInterface{}
-	mockLocalFile.On("SaveScreenshot", screenshotPath, base64Data).Return(nil)
+	t.Run("正常系", func(t *testing.T) {
+		t.Parallel()
+		// 準備
+		screenshotPath := filepath.Join("directory", filename)
+		mockLocalFile := &mocks.LocalFileInterface{}
+		mockLocalFile.On("SaveScreenshot", screenshotPath, base64Data).Return(nil)
 
-	// Screenshot インスタンスの作成
-	s := NewScreenshot(mockLocalFile)
-	s.SaveFileDialog = func(ctx context.Context, dialogOptions runtime.SaveDialogOptions) (string, error) {
-		return screenshotPath, nil
-	}
+		s := NewScreenshot(mockLocalFile)
+		s.SaveFileDialog = func(ctx context.Context, dialogOptions runtime.SaveDialogOptions) (string, error) {
+			return screenshotPath, nil
+		}
 
-	// テスト実行
-	saved, err := s.SaveWithDialog(context.Background(), filename, base64Data)
+		// テスト
+		saved, err := s.SaveWithDialog(context.Background(), filename, base64Data)
 
-	// 結果の検証
-	require.True(t, saved)
-	require.NoError(t, err)
-}
+		// アサーション
+		require.True(t, saved)
+		require.NoError(t, err)
+		mockLocalFile.AssertExpectations(t)
+	})
 
-func TestScreenshot_SaveWithDialog_異常系(t *testing.T) {
-	t.Parallel()
+	t.Run("異常系", func(t *testing.T) {
+		t.Parallel()
+		// 準備
+		s := NewScreenshot(nil)
+		s.SaveFileDialog = func(ctx context.Context, dialogOptions runtime.SaveDialogOptions) (string, error) {
+			return "", failure.New(apperr.WailsError)
+		}
 
-	// Screenshot インスタンスの作成
-	mockLocalFile := &mocks.LocalFileInterface{}
-	s := NewScreenshot(mockLocalFile)
-	s.SaveFileDialog = func(ctx context.Context, dialogOptions runtime.SaveDialogOptions) (string, error) {
-		return "", failure.New(apperr.WailsError)
-	}
+		// テスト
+		saved, err := s.SaveWithDialog(context.Background(), filename, base64Data)
 
-	// テスト実行
-	saved, err := s.SaveWithDialog(context.Background(), filename, base64Data)
+		// アサーション
+		assert.False(t, saved)
+		code, ok := failure.CodeOf(err)
+		assert.True(t, ok)
+		assert.Equal(t, apperr.WailsError, code)
+	})
 
-	// 結果の検証
-	assert.False(t, saved)
-	code, ok := failure.CodeOf(err)
-	assert.True(t, ok)
-	assert.Equal(t, apperr.WailsError, code)
-	mockLocalFile.AssertNotCalled(t, "SaveScreenshot")
-}
+	t.Run("異常系_キャンセル", func(t *testing.T) {
+		t.Parallel()
+		// 準備
+		s := NewScreenshot(nil)
+		s.SaveFileDialog = func(ctx context.Context, dialogOptions runtime.SaveDialogOptions) (string, error) {
+			return "", nil
+		}
 
-func TestScreenshot_SaveWithDialog_異常系_キャンセル(t *testing.T) {
-	t.Parallel()
+		// テスト
+		saved, err := s.SaveWithDialog(context.Background(), filename, base64Data)
 
-	// Screenshot インスタンスの作成
-	mockLocalFile := &mocks.LocalFileInterface{}
-	s := NewScreenshot(mockLocalFile)
-	s.SaveFileDialog = func(ctx context.Context, dialogOptions runtime.SaveDialogOptions) (string, error) {
-		return "", nil
-	}
-
-	// テスト実行
-	saved, err := s.SaveWithDialog(context.Background(), filename, base64Data)
-
-	// 結果の検証
-	assert.False(t, saved)
-	require.NoError(t, err)
-	mockLocalFile.AssertNotCalled(t, "SaveScreenshot")
+		// アサーション
+		assert.False(t, saved)
+		require.NoError(t, err)
+	})
 }

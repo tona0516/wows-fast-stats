@@ -18,35 +18,38 @@ func TestUtil_makeRange(t *testing.T) {
 	assert.Equal(t, []int{}, makeRange(0, -1))
 }
 
-func TestUtil_doParallel_正常系(t *testing.T) {
+func TestUtil_doParallel(t *testing.T) {
 	t.Parallel()
 
-	values := makeRange(1, 5)
+	t.Run("正常系", func(t *testing.T) {
+		t.Parallel()
 
-	var calls int
-	err := doParallel(2, values, func(value int) error {
-		calls++
-		return nil
+		values := makeRange(1, 5)
+
+		var calls int
+		err := doParallel(2, values, func(value int) error {
+			calls++
+			return nil
+		})
+
+		require.NoError(t, err)
+		assert.Len(t, values, calls)
 	})
+	t.Run("異常系", func(t *testing.T) {
+		t.Parallel()
 
-	require.NoError(t, err)
-	assert.Len(t, values, calls)
-}
+		values := makeRange(1, 5)
 
-func TestUtil_doParallel_異常系(t *testing.T) {
-	t.Parallel()
+		expected := apperr.HTTPRequestError
+		err := doParallel(2, values, func(value int) error {
+			if value == values[len(values)-1] {
+				return failure.New(expected)
+			}
+			return nil
+		})
 
-	values := makeRange(1, 5)
-
-	expected := apperr.HTTPRequestError
-	err := doParallel(2, values, func(value int) error {
-		if value == values[len(values)-1] {
-			return failure.New(expected)
-		}
-		return nil
+		code, ok := failure.CodeOf(err)
+		assert.True(t, ok)
+		assert.Equal(t, expected, code)
 	})
-
-	code, ok := failure.CodeOf(err)
-	assert.True(t, ok)
-	assert.Equal(t, expected, code)
 }

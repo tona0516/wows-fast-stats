@@ -11,8 +11,8 @@ type StorageInterface interface {
 	IsExistAlertPlayers() bool
 	ReadAlertPlayers() ([]domain.AlertPlayer, error)
 	WriteAlertPlayers(players []domain.AlertPlayer) error
-	ReadNSExpectedStats() (domain.NSExpectedStats, error)
-	WriteNSExpectedStats(nsExpectedStats domain.NSExpectedStats) error
+	ReadExpectedStats() (domain.ExpectedStats, error)
+	WriteExpectedStats(expectedStats domain.ExpectedStats) error
 	ReadOwnIGN() (string, error)
 	WriteOwnIGN(ign string) error
 }

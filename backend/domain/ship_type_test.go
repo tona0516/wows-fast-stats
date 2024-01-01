@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestNewShipType(t *testing.T) {
+func TestShipType_New(t *testing.T) {
 	t.Parallel()
 	assert.Equal(t, ShipTypeCV, NewShipType("AirCarrier"))
 	assert.Equal(t, ShipTypeBB, NewShipType("Battleship"))

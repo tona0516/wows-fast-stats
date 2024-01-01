@@ -18,120 +18,128 @@ type TestData struct {
 	Name string `json:"name"`
 }
 
-func TestGetRequest_正常系_クエリなし(t *testing.T) {
+func TestGetRequest(t *testing.T) {
 	t.Parallel()
 
-	expected := normalResponse()
+	t.Run("正常系_クエリなし", func(t *testing.T) {
+		t.Parallel()
 
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(expected.StatusCode)
-		_, _ = w.Write(expected.ByteBody)
-	}))
-	defer server.Close()
-	expected.FullURL = server.URL
+		expected := normalResponse()
 
-	actual, err := GetRequest[TestData](server.URL, 1*time.Second)
+		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(expected.StatusCode)
+			_, _ = w.Write(expected.ByteBody)
+		}))
+		defer server.Close()
+		expected.FullURL = server.URL
 
-	assert.Equal(t, expected, actual)
-	require.NoError(t, err)
+		actual, err := GetRequest[TestData](server.URL, 1*time.Second)
+
+		assert.Equal(t, expected, actual)
+		require.NoError(t, err)
+	})
+
+	t.Run("正常系_クエリあり", func(t *testing.T) {
+		t.Parallel()
+
+		expected := normalResponse()
+
+		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(expected.StatusCode)
+			_, _ = w.Write(expected.ByteBody)
+		}))
+		defer server.Close()
+		expected.FullURL = server.URL + "?hoge=fuga"
+
+		actual, err := GetRequest[TestData](server.URL, 1*time.Second, vo.NewPair("hoge", "fuga"))
+
+		assert.Equal(t, expected, actual)
+		require.NoError(t, err)
+	})
+
+	t.Run("異常系_タイムアウト", func(t *testing.T) {
+		t.Parallel()
+
+		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			time.Sleep(1 * time.Second)
+
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write(normalResponse().ByteBody)
+		}))
+		defer server.Close()
+
+		_, err := GetRequest[TestData](server.URL, 100*time.Millisecond)
+
+		require.Error(t, err)
+	})
+
+	t.Run("異常系_不正なレスポンス", func(t *testing.T) {
+		t.Parallel()
+
+		responses := []struct {
+			name string
+			body string
+		}{
+			{name: "HTML", body: "<html></html>"},
+			{name: "不正なJSON", body: `{"name":}`},
+		}
+
+		for _, res := range responses {
+			res := res
+
+			t.Run(res.name, func(t *testing.T) {
+				t.Parallel()
+
+				server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					w.Header().Set("Content-Type", "application/json")
+					w.WriteHeader(http.StatusOK)
+					_, _ = w.Write([]byte(res.body))
+				}))
+				defer server.Close()
+
+				_, err := GetRequest[TestData](server.URL, 1*time.Second)
+
+				require.Error(t, err)
+			})
+		}
+	})
 }
 
-func TestGetRequest_正常系_クエリあり(t *testing.T) {
+func TestPostMultipartFormData(t *testing.T) {
 	t.Parallel()
+	t.Run("正常系", func(t *testing.T) {
+		t.Parallel()
 
-	expected := normalResponse()
+		expected := normalResponse()
 
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(expected.StatusCode)
-		_, _ = w.Write(expected.ByteBody)
-	}))
-	defer server.Close()
-	expected.FullURL = server.URL + "?hoge=fuga"
+		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(expected.StatusCode)
+			_, _ = w.Write(expected.ByteBody)
+		}))
+		defer server.Close()
+		expected.FullURL = server.URL
 
-	actual, err := GetRequest[TestData](server.URL, 1*time.Second, vo.NewPair("hoge", "fuga"))
+		filename := "testfile.txt"
+		_, err := os.Create(filename)
+		defer os.Remove(filename)
+		require.NoError(t, err)
 
-	assert.Equal(t, expected, actual)
-	require.NoError(t, err)
-}
+		actual, err := PostMultipartFormData[TestData](
+			server.URL,
+			1*time.Second,
+			[]Form{
+				NewForm("content_name", "content_value", false),
+				NewForm("file", filename, true),
+			},
+		)
 
-func TestGetRequest_異常系_タイムアウト(t *testing.T) {
-	t.Parallel()
-
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		time.Sleep(1 * time.Second)
-
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		_, _ = w.Write(normalResponse().ByteBody)
-	}))
-	defer server.Close()
-
-	_, err := GetRequest[TestData](server.URL, 100*time.Millisecond)
-
-	require.Error(t, err)
-}
-
-func TestGetRequest_異常系_不正なレスポンス(t *testing.T) {
-	t.Parallel()
-
-	responses := []struct {
-		body string
-	}{
-		{body: "<html></html>"},
-		{body: `{"name":}`},
-	}
-
-	for _, res := range responses {
-		res := res
-
-		t.Run("", func(t *testing.T) {
-			t.Parallel()
-
-			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				w.Header().Set("Content-Type", "application/json")
-				w.WriteHeader(http.StatusOK)
-				_, _ = w.Write([]byte(res.body))
-			}))
-			defer server.Close()
-
-			_, err := GetRequest[TestData](server.URL, 1*time.Second)
-
-			require.Error(t, err)
-		})
-	}
-}
-
-func TestPostMultipartFormData_正常系(t *testing.T) {
-	t.Parallel()
-
-	expected := normalResponse()
-
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(expected.StatusCode)
-		_, _ = w.Write(expected.ByteBody)
-	}))
-	defer server.Close()
-	expected.FullURL = server.URL
-
-	filename := "testfile.txt"
-	_, err := os.Create(filename)
-	defer os.Remove(filename)
-	require.NoError(t, err)
-
-	actual, err := PostMultipartFormData[TestData](
-		server.URL,
-		1*time.Second,
-		[]Form{
-			NewForm("content_name", "content_value", false),
-			NewForm("file", filename, true),
-		},
-	)
-
-	assert.Equal(t, expected, actual)
-	require.NoError(t, err)
+		assert.Equal(t, expected, actual)
+		require.NoError(t, err)
+	})
 }
 
 func normalResponse() Response[TestData] {

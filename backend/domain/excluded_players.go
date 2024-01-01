@@ -2,7 +2,7 @@ package domain
 
 type ExcludedPlayers map[int]bool
 
-func (ep ExcludedPlayers) PlayerIDs() []int {
+func (ep ExcludedPlayers) IDs() []int {
 	ids := make([]int, 0, len(ep))
 	for id := range ep {
 		ids = append(ids, id)

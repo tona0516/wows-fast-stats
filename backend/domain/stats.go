@@ -13,7 +13,7 @@ type Stats struct {
 	accountInfo      WGAccountInfoData
 	useShipStats     WGShipsStatsData
 	allShipsStats    []WGShipsStatsData
-	allExpectedStats AllExpectedStats
+	allExpectedStats ExpectedStats
 	warships         Warships
 }
 
@@ -21,7 +21,7 @@ func NewStats(
 	useShipID int,
 	accountInfo WGAccountInfoData,
 	allShipsStats []WGShipsStatsData,
-	expectedStats AllExpectedStats,
+	expectedStats ExpectedStats,
 	warships Warships,
 ) *Stats {
 	var useShipStats WGShipsStatsData

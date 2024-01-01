@@ -12,59 +12,70 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestUpdater_Updatable_正常系_アップデートあり(t *testing.T) {
+func TestUpdater_IsUpdatable(t *testing.T) {
 	t.Parallel()
+	t.Run("正常系_アップデートあり", func(t *testing.T) {
+		t.Parallel()
 
-	env := vo.Env{Semver: "1.0.0"}
-	mockGithub := &mocks.GithubInterface{}
-	updater := NewUpdater(env, mockGithub)
+		// 準備
+		mockGithub := &mocks.GithubInterface{}
+		response := domain.GHLatestRelease{TagName: "2.0.0", HTMLURL: "https://hoge.com"}
+		mockGithub.On("LatestRelease").Return(response, nil)
 
-	response := domain.GHLatestRelease{TagName: "2.0.0", HTMLURL: "https://hoge.com"}
-	mockGithub.On("LatestRelease").Return(response, nil)
+		env := vo.Env{Semver: "1.0.0"}
+		updater := NewUpdater(env, mockGithub)
 
-	actual, err := updater.IsUpdatable()
-	expected := response
-	expected.Updatable = true
+		// テスト
+		actual, err := updater.IsUpdatable()
+		expected := response
+		expected.Updatable = true
 
-	assert.Equal(t, expected, actual)
-	require.NoError(t, err)
-	mockGithub.AssertCalled(t, "LatestRelease")
-}
+		// アサーション
+		assert.Equal(t, expected, actual)
+		require.NoError(t, err)
+		mockGithub.AssertExpectations(t)
+	})
 
-func TestUpdater_Updatable_正常系_アップデートなし(t *testing.T) {
-	t.Parallel()
+	t.Run("正常系_アップデートなし", func(t *testing.T) {
+		t.Parallel()
 
-	env := vo.Env{Semver: "1.0.0"}
-	mockGithub := &mocks.GithubInterface{}
-	updater := NewUpdater(env, mockGithub)
+		// 準備
+		mockGithub := &mocks.GithubInterface{}
+		response := domain.GHLatestRelease{TagName: "1.0.0", HTMLURL: "https://hoge.com"}
+		mockGithub.On("LatestRelease").Return(response, nil)
 
-	response := domain.GHLatestRelease{TagName: "1.0.0", HTMLURL: "https://hoge.com"}
-	mockGithub.On("LatestRelease").Return(response, nil)
+		env := vo.Env{Semver: "1.0.0"}
+		updater := NewUpdater(env, mockGithub)
 
-	actual, err := updater.IsUpdatable()
-	expected := response
-	expected.Updatable = false
+		// テスト
+		actual, err := updater.IsUpdatable()
+		expected := response
+		expected.Updatable = false
 
-	assert.Equal(t, expected, actual)
-	require.NoError(t, err)
-	mockGithub.AssertCalled(t, "LatestRelease")
-}
+		// アサーション
+		assert.Equal(t, expected, actual)
+		require.NoError(t, err)
+		mockGithub.AssertExpectations(t)
+	})
 
-func TestUpdater_Updatable_異常系(t *testing.T) {
-	t.Parallel()
+	t.Run("異常系", func(t *testing.T) {
+		t.Parallel()
 
-	env := vo.Env{Semver: "1.0.0"}
-	mockGithub := &mocks.GithubInterface{}
-	updater := NewUpdater(env, mockGithub)
+		// 準備
+		mockGithub := &mocks.GithubInterface{}
+		expected := failure.New(apperr.HTTPRequestError)
+		mockGithub.On("LatestRelease").Return(domain.GHLatestRelease{}, expected)
 
-	expected := failure.New(apperr.HTTPRequestError)
-	mockGithub.On("LatestRelease").Return(domain.GHLatestRelease{}, expected)
+		env := vo.Env{Semver: "1.0.0"}
+		updater := NewUpdater(env, mockGithub)
 
-	_, err := updater.IsUpdatable()
+		// テスト
+		_, err := updater.IsUpdatable()
 
-	code, ok := failure.CodeOf(err)
-	assert.True(t, ok)
-	assert.Equal(t, apperr.HTTPRequestError, code)
-
-	mockGithub.AssertCalled(t, "LatestRelease")
+		// アサーション
+		code, ok := failure.CodeOf(err)
+		assert.True(t, ok)
+		assert.Equal(t, apperr.HTTPRequestError, code)
+		mockGithub.AssertExpectations(t)
+	})
 }
