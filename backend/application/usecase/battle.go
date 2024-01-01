@@ -72,8 +72,7 @@ func (b *Battle) Get(userConfig domain.UserConfig) (domain.Battle, error) {
 	_ = b.storage.WriteOwnIGN(tempArenaInfo.PlayerName)
 
 	// Get Account ID list
-	accountNames := tempArenaInfo.AccountNames()
-	accountList, err := b.wargaming.AccountList(accountNames)
+	accountList, err := b.wargaming.AccountList(tempArenaInfo.AccountNames())
 	if err != nil {
 		return result, err
 	}
@@ -83,7 +82,7 @@ func (b *Battle) Get(userConfig domain.UserConfig) (domain.Battle, error) {
 	accountInfoResult := make(chan vo.Result[domain.WGAccountInfo])
 	shipStatsResult := make(chan vo.Result[domain.AllPlayerShipsStats])
 	clanResult := make(chan vo.Result[domain.Clans])
-	go b.accountInfo(accountIDs, accountInfoResult)
+	go b.fetchAccountInfo(accountIDs, accountInfoResult)
 	go b.fetchAllPlayerShipsStats(accountIDs, shipStatsResult)
 	go b.fetchClanTag(accountIDs, clanResult)
 
@@ -248,7 +247,7 @@ func (b *Battle) fetchBattleTypes(channel chan vo.Result[domain.WGBattleTypes]) 
 	channel <- vo.Result[domain.WGBattleTypes]{Value: battleTypes, Error: err}
 }
 
-func (b *Battle) accountInfo(accountIDs []int, channel chan vo.Result[domain.WGAccountInfo]) {
+func (b *Battle) fetchAccountInfo(accountIDs []int, channel chan vo.Result[domain.WGAccountInfo]) {
 	accountInfo, err := b.wargaming.AccountInfo(accountIDs)
 	channel <- vo.Result[domain.WGAccountInfo]{Value: accountInfo, Error: err}
 }
