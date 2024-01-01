@@ -7,5 +7,7 @@ type WGAccountInfoData struct {
 	Statistics    struct {
 		Pvp     WGPlayerStatsValues `json:"pvp"`
 		PvpSolo WGPlayerStatsValues `json:"pvp_solo"`
+		PvpDiv2 WGPlayerStatsValues `json:"pvp_div2"`
+		PvpDiv3 WGPlayerStatsValues `json:"pvp_div3"`
 	} `json:"statistics"`
 }

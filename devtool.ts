@@ -83,11 +83,11 @@ function dev() {
 }
 
 function chbtl() {
-  const testDir = "./test_install_dir/replays/";
+  const testReplayDir = "./テストフォルダ/replays";
   const tempArenaInfoName = "tempArenaInfo.json";
 
   const files = fs
-    .readdirSync(testDir)
+    .readdirSync(testReplayDir)
     .filter(
       (file) => file.startsWith(tempArenaInfoName) && file !== tempArenaInfoName
     );
@@ -97,8 +97,8 @@ function chbtl() {
 
   const index = readlineSync.question("index? > ");
   fs.copyFileSync(
-    path.join(testDir, files[Number(index)]),
-    path.join(testDir, tempArenaInfoName)
+    path.join(testReplayDir, files[Number(index)]),
+    path.join(testReplayDir, tempArenaInfoName)
   );
 }
 

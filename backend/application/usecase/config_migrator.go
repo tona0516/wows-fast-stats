@@ -51,8 +51,7 @@ func (m *ConfigMigrator) toV1() error {
 			return err
 		}
 
-		//nolint:errcheck
-		m.localFile.DeleteUser()
+		_ = m.localFile.DeleteUser()
 	}
 
 	if m.localFile.IsExistAlertPlayers() && !m.storage.IsExistAlertPlayers() {
@@ -65,8 +64,7 @@ func (m *ConfigMigrator) toV1() error {
 			return err
 		}
 
-		//nolint:errcheck
-		m.localFile.DeleteAlertPlayers()
+		_ = m.localFile.DeleteAlertPlayers()
 	}
 
 	if err := m.storage.WriteDataVersion(1); err != nil {

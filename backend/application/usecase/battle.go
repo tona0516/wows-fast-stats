@@ -410,6 +410,7 @@ func playerStats(
 			MainBatteryHitRate: stats.MainBatteryHitRate(statsPattern),
 			TorpedoesHitRate:   stats.TorpedoesHitRate(statsPattern),
 			PlanesKilled:       stats.PlanesKilled(statsPattern),
+			PlatoonRate:        stats.PlatoonRate(domain.StatsCategoryShip),
 		},
 		OverallStats: domain.OverallStats{
 			Battles:           stats.Battles(domain.StatsCategoryOverall, statsPattern),
@@ -425,6 +426,7 @@ func playerStats(
 			AvgTier:           stats.AvgTier(statsPattern),
 			UsingShipTypeRate: stats.UsingShipTypeRate(statsPattern),
 			UsingTierRate:     stats.UsingTierRate(statsPattern),
+			PlatoonRate:       stats.PlatoonRate(domain.StatsCategoryOverall),
 		},
 	}
 }

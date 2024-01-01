@@ -351,6 +351,32 @@ func (s *Stats) UsingShipTypeRate(
 	}
 }
 
+func (s *Stats) PlatoonRate(
+	category StatsCategory,
+) float64 {
+	switch category {
+	case StatsCategoryShip:
+		stats := s.useShipStats
+		return platoonRate(
+			stats.Pvp.Battles,
+			stats.PvpSolo.Battles,
+			stats.PvpDiv2.Battles,
+			stats.PvpDiv3.Battles,
+		)
+	case StatsCategoryOverall:
+		stats := s.accountInfo.Statistics
+		return platoonRate(
+			stats.Pvp.Battles,
+			stats.PvpSolo.Battles,
+			stats.PvpDiv2.Battles,
+			stats.PvpDiv3.Battles,
+		)
+	}
+
+	logger.Error(failure.New(apperr.UnexpectedError))
+	return 0
+}
+
 func (s *Stats) statsValues(pattern StatsPattern) (WGShipStatsValues, WGPlayerStatsValues) {
 	switch pattern {
 	case StatsPatternPvPAll:
@@ -413,6 +439,13 @@ func avgKill(frags uint, battles uint) float64 {
 
 func winRate(wins uint, battles uint) float64 {
 	return percentage(wins, battles)
+}
+
+func platoonRate(allBattles uint, soloBattles uint, div2Battles uint, div3Battles uint) float64 {
+	soloRate := div(soloBattles, allBattles) * 1
+	div2Rate := div(div2Battles, allBattles) * 2
+	div3Rate := div(div3Battles, allBattles) * 3
+	return soloRate + div2Rate + div3Rate
 }
 
 func div(a uint, b uint) float64 {

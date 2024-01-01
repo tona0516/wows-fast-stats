@@ -10,6 +10,7 @@ import { Kill } from "src/lib/column/model/Kill";
 import { MaxDamage } from "src/lib/column/model/MaxDamage";
 import { PR } from "src/lib/column/model/PR";
 import { PlanesKilled } from "src/lib/column/model/PlanesKilled";
+import { PlatoonRate } from "src/lib/column/model/PlatoonRate";
 import { PlayerName } from "src/lib/column/model/PlayerName";
 import { ShipInfo } from "src/lib/column/model/ShipInfo";
 import { SurvivedRate } from "src/lib/column/model/SurvivedRate";
@@ -62,6 +63,7 @@ export namespace ColumnProvider {
         new Exp(config, "ship"),
         new Battles(config, "ship"),
         new SurvivedRate(config, "ship"),
+        new PlatoonRate(config, "ship"),
         new PlanesKilled(config),
         new HitRate(config),
       ]),
@@ -75,6 +77,7 @@ export namespace ColumnProvider {
         new Exp(config, "overall"),
         new Battles(config, "overall"),
         new SurvivedRate(config, "overall"),
+        new PlatoonRate(config, "overall"),
         new AvgTier(config),
         new UsingShipTypeRate(config),
         new UsingTierRate(config),

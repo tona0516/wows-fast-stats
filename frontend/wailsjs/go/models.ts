@@ -68,6 +68,7 @@ export namespace domain {
 	    avg_tier: number;
 	    using_ship_type_rate: ShipTypeGroup;
 	    using_tier_rate: TierGroup;
+	    platoon_rate: number;
 	
 	    static createFrom(source: any = {}) {
 	        return new OverallStats(source);
@@ -88,6 +89,7 @@ export namespace domain {
 	        this.avg_tier = source["avg_tier"];
 	        this.using_ship_type_rate = this.convertValues(source["using_ship_type_rate"], ShipTypeGroup);
 	        this.using_tier_rate = this.convertValues(source["using_tier_rate"], TierGroup);
+	        this.platoon_rate = source["platoon_rate"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -140,6 +142,7 @@ export namespace domain {
 	    main_battery_hit_rate: number;
 	    torpedoes_hit_rate: number;
 	    planes_killed: number;
+	    platoon_rate: number;
 	
 	    static createFrom(source: any = {}) {
 	        return new ShipStats(source);
@@ -160,6 +163,7 @@ export namespace domain {
 	        this.main_battery_hit_rate = source["main_battery_hit_rate"];
 	        this.torpedoes_hit_rate = source["torpedoes_hit_rate"];
 	        this.planes_killed = source["planes_killed"];
+	        this.platoon_rate = source["platoon_rate"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -612,6 +616,7 @@ export namespace domain {
 	    avg_tier: number;
 	    using_ship_type_rate: number;
 	    using_tier_rate: number;
+	    platoon_rate: number;
 	
 	    static createFrom(source: any = {}) {
 	        return new CustomDigit(source);
@@ -633,6 +638,7 @@ export namespace domain {
 	        this.avg_tier = source["avg_tier"];
 	        this.using_ship_type_rate = source["using_ship_type_rate"];
 	        this.using_tier_rate = source["using_tier_rate"];
+	        this.platoon_rate = source["platoon_rate"];
 	    }
 	}
 	export class Overall {
@@ -648,6 +654,7 @@ export namespace domain {
 	    avg_tier: boolean;
 	    using_ship_type_rate: boolean;
 	    using_tier_rate: boolean;
+	    platoon_rate: boolean;
 	
 	    static createFrom(source: any = {}) {
 	        return new Overall(source);
@@ -667,6 +674,7 @@ export namespace domain {
 	        this.avg_tier = source["avg_tier"];
 	        this.using_ship_type_rate = source["using_ship_type_rate"];
 	        this.using_tier_rate = source["using_tier_rate"];
+	        this.platoon_rate = source["platoon_rate"];
 	    }
 	}
 	export class Ship {
@@ -681,6 +689,7 @@ export namespace domain {
 	    battles: boolean;
 	    survived_rate: boolean;
 	    hit_rate: boolean;
+	    platoon_rate: boolean;
 	
 	    static createFrom(source: any = {}) {
 	        return new Ship(source);
@@ -699,6 +708,7 @@ export namespace domain {
 	        this.battles = source["battles"];
 	        this.survived_rate = source["survived_rate"];
 	        this.hit_rate = source["hit_rate"];
+	        this.platoon_rate = source["platoon_rate"];
 	    }
 	}
 	export class Displays {

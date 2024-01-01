@@ -41,7 +41,7 @@ func (w *Wargaming) AccountInfo(accountIDs []int) (domain.WGAccountInfo, error) 
 		vo.NewPair("application_id", w.appid),
 		vo.NewPair("account_id", strings.Join(strAccountIDs, ",")),
 		vo.NewPair("fields", response.WGAccountInfo{}.Field()),
-		vo.NewPair("extra", "statistics.pvp_solo"),
+		vo.NewPair("extra", "statistics.pvp_solo,statistics.pvp_div2,statistics.pvp_div3"),
 	)
 
 	return res.Data, err
@@ -123,7 +123,7 @@ func (w *Wargaming) ShipsStats(accountID int) (domain.WGShipsStats, error) {
 		vo.NewPair("application_id", w.appid),
 		vo.NewPair("account_id", strconv.Itoa(accountID)),
 		vo.NewPair("fields", response.WGShipsStats{}.Field()),
-		vo.NewPair("extra", "pvp_solo"),
+		vo.NewPair("extra", "pvp_solo,pvp_div2,pvp_div3"),
 	)
 
 	return res.Data, err

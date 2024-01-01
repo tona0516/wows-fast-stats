@@ -36,6 +36,7 @@ type ShipStats struct {
 	MainBatteryHitRate float64   `json:"main_battery_hit_rate"`
 	TorpedoesHitRate   float64   `json:"torpedoes_hit_rate"`
 	PlanesKilled       float64   `json:"planes_killed"`
+	PlatoonRate        float64   `json:"platoon_rate"`
 }
 
 type OverallStats struct {
@@ -52,6 +53,7 @@ type OverallStats struct {
 	AvgTier           float64       `json:"avg_tier"`
 	UsingShipTypeRate ShipTypeGroup `json:"using_ship_type_rate"`
 	UsingTierRate     TierGroup     `json:"using_tier_rate"`
+	PlatoonRate       float64       `json:"platoon_rate"`
 }
 
 type Player struct {

@@ -86,6 +86,7 @@ var DefaultUserConfig = UserConfig{
 		AvgTier:           2,
 		UsingShipTypeRate: 1,
 		UsingTierRate:     1,
+		PlatoonRate:       1,
 	},
 	TeamAverage: TeamAverage{
 		MinShipBattles:    1,
@@ -129,6 +130,7 @@ type Ship struct {
 	Battles      bool `json:"battles"`
 	SurvivedRate bool `json:"survived_rate"`
 	HitRate      bool `json:"hit_rate"`
+	PlatoonRate  bool `json:"platoon_rate"`
 }
 
 type Overall struct {
@@ -144,6 +146,7 @@ type Overall struct {
 	AvgTier           bool `json:"avg_tier"`
 	UsingShipTypeRate bool `json:"using_ship_type_rate"`
 	UsingTierRate     bool `json:"using_tier_rate"`
+	PlatoonRate       bool `json:"platoon_rate"`
 }
 
 type CustomColor struct {
@@ -208,6 +211,7 @@ type CustomDigit struct {
 	AvgTier           uint `json:"avg_tier"`
 	UsingShipTypeRate uint `json:"using_ship_type_rate"`
 	UsingTierRate     uint `json:"using_tier_rate"`
+	PlatoonRate       uint `json:"platoon_rate"`
 }
 
 type TeamAverage struct {

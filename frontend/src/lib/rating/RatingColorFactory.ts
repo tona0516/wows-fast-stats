@@ -96,6 +96,7 @@ const getSampleTeam = (): domain.Team => {
     ss.main_battery_hit_rate = 50;
     ss.torpedoes_hit_rate = 5;
     ss.planes_killed = 5;
+    ss.platoon_rate = 3.00;
 
     const os = new domain.OverallStats();
     os.battles = 10;
@@ -126,6 +127,7 @@ const getSampleTeam = (): domain.Team => {
       middle: 33.3,
       high: 33.4,
     };
+    os.platoon_rate = 3.00;
 
     const pi = new domain.PlayerInfo();
     pi.id = 1;
