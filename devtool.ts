@@ -6,7 +6,7 @@ import shelljs from "shelljs";
 import readlineSync from "readline-sync";
 
 const APP_NAME = "wows-fast-stats";
-const SEMVER = "0.11.1";
+const SEMVER = "0.12.0";
 const BINARY_NAME = `${APP_NAME}-${SEMVER}.exe`;
 const FRONTEND_NPM_COMMAND = "npm --prefix ./frontend";
 
