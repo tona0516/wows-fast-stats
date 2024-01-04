@@ -40,7 +40,7 @@ func TestWatcher_Start(t *testing.T) {
 		defer cancel()
 
 		// テスト
-		watcher := NewWatcher(10*time.Millisecond, mockLocalFile, mockStorage, emitFunc)
+		watcher := NewWatcher(10*time.Millisecond, mockLocalFile, mockStorage, &mocks.LoggerInterface{}, emitFunc)
 		err := watcher.Prepare()
 		go watcher.Start(ctx, ctx)
 
@@ -84,7 +84,7 @@ func TestWatcher_Start(t *testing.T) {
 			defer cancel()
 
 			// テスト
-			watcher := NewWatcher(10*time.Millisecond, mockLocalFile, mockStorage, emitFunc)
+			watcher := NewWatcher(10*time.Millisecond, mockLocalFile, mockStorage, &mocks.LoggerInterface{}, emitFunc)
 			go watcher.Start(ctx, ctx)
 
 			// アサーション
@@ -115,7 +115,7 @@ func TestWatcher_Start(t *testing.T) {
 		ctx, cancel := context.WithCancel(context.Background())
 
 		// テスト
-		watcher := NewWatcher(10*time.Millisecond, nil, mockStorage, emitFunc)
+		watcher := NewWatcher(10*time.Millisecond, nil, mockStorage, &mocks.LoggerInterface{}, emitFunc)
 		err := watcher.Prepare()
 		go watcher.Start(ctx, ctx)
 		cancel()
@@ -155,7 +155,7 @@ func TestWatcher_Start(t *testing.T) {
 		defer cancel()
 
 		// テスト
-		watcher := NewWatcher(10*time.Millisecond, mockLocalFile, mockStorage, emitFunc)
+		watcher := NewWatcher(10*time.Millisecond, mockLocalFile, mockStorage, &mocks.LoggerInterface{}, emitFunc)
 		err := watcher.Prepare()
 		go watcher.Start(ctx, ctx)
 

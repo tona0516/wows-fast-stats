@@ -3,8 +3,8 @@ package usecase
 import (
 	"context"
 	"path/filepath"
+	"wfs/backend/adapter"
 	"wfs/backend/apperr"
-	"wfs/backend/application/repository"
 	"wfs/backend/application/vo"
 
 	"github.com/morikuni/failure"
@@ -12,15 +12,18 @@ import (
 )
 
 type Screenshot struct {
-	localFile      repository.LocalFileInterface
+	localFile      adapter.LocalFileInterface
+	logger         adapter.LoggerInterface
 	SaveFileDialog vo.SaveFileDialog
 }
 
 func NewScreenshot(
-	localFile repository.LocalFileInterface,
+	localFile adapter.LocalFileInterface,
+	logger adapter.LoggerInterface,
 ) *Screenshot {
 	return &Screenshot{
 		localFile:      localFile,
+		logger:         logger,
 		SaveFileDialog: runtime.SaveFileDialog,
 	}
 }

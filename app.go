@@ -2,12 +2,11 @@ package main
 
 import (
 	"context"
+	"wfs/backend/adapter"
 	"wfs/backend/apperr"
 	"wfs/backend/application/usecase"
 	"wfs/backend/application/vo"
 	"wfs/backend/domain"
-	"wfs/backend/logger"
-	"wfs/backend/logger/repository"
 
 	"github.com/morikuni/failure"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
@@ -20,7 +19,7 @@ type App struct {
 	ctx            context.Context
 	env            vo.Env
 	cancelWatcher  context.CancelFunc
-	reportRepo     repository.ReportInterface
+	logger         adapter.LoggerInterface
 	config         usecase.Config
 	screenshot     usecase.Screenshot
 	watcher        usecase.Watcher
@@ -32,7 +31,7 @@ type App struct {
 
 func NewApp(
 	env vo.Env,
-	report repository.ReportInterface,
+	logger adapter.LoggerInterface,
 	config usecase.Config,
 	screenshot usecase.Screenshot,
 	watcher usecase.Watcher,
@@ -42,7 +41,7 @@ func NewApp(
 ) *App {
 	return &App{
 		env:            env,
-		reportRepo:     report,
+		logger:         logger,
 		config:         config,
 		screenshot:     screenshot,
 		watcher:        watcher,
@@ -55,16 +54,16 @@ func NewApp(
 
 func (a *App) onStartup(ctx context.Context) {
 	a.ctx = ctx
-	logger.Init(ctx, a.env, a.reportRepo)
+	a.logger.Init(ctx)
 
 	runtime.EventsOn(ctx, EventOnload, func(optionalData ...interface{}) {
-		logger.Info("application started")
+		a.logger.Info("application started")
 	})
 }
 
 func (a *App) Migrate() error {
 	if err := a.configMigrator.Execute(); err != nil {
-		logger.Error(err)
+		a.logger.Error(err)
 		return apperr.Unwrap(err)
 	}
 
@@ -73,7 +72,7 @@ func (a *App) Migrate() error {
 
 func (a *App) StartWatching() error {
 	if err := a.watcher.Prepare(); err != nil {
-		logger.Error(err)
+		a.logger.Error(err)
 		return apperr.Unwrap(err)
 	}
 
@@ -93,13 +92,13 @@ func (a *App) Battle() (domain.Battle, error) {
 
 	userConfig, err := a.config.User()
 	if err != nil {
-		logger.Error(err)
+		a.logger.Error(err)
 		return result, apperr.Unwrap(err)
 	}
 
 	result, err = a.battle.Get(userConfig)
 	if err != nil {
-		logger.Error(err)
+		a.logger.Error(err)
 		return result, apperr.Unwrap(err)
 	}
 
@@ -109,7 +108,7 @@ func (a *App) Battle() (domain.Battle, error) {
 func (a *App) SelectDirectory() (string, error) {
 	path, err := a.config.SelectDirectory(a.ctx)
 	if err != nil {
-		logger.Error(err)
+		a.logger.Error(err)
 	}
 
 	return path, apperr.Unwrap(err)
@@ -118,7 +117,7 @@ func (a *App) SelectDirectory() (string, error) {
 func (a *App) OpenDirectory(path string) error {
 	err := a.config.OpenDirectory(path)
 	if err != nil {
-		logger.Warn(err)
+		a.logger.Warn(err)
 	}
 
 	return apperr.Unwrap(err)
@@ -131,7 +130,7 @@ func (a *App) DefaultUserConfig() domain.UserConfig {
 func (a *App) UserConfig() (domain.UserConfig, error) {
 	config, err := a.config.User()
 	if err != nil {
-		logger.Error(err)
+		a.logger.Error(err)
 	}
 
 	return config, apperr.Unwrap(err)
@@ -140,7 +139,7 @@ func (a *App) UserConfig() (domain.UserConfig, error) {
 func (a *App) ApplyUserConfig(config domain.UserConfig) error {
 	err := a.config.UpdateOptional(config)
 	if err != nil {
-		logger.Error(err)
+		a.logger.Error(err)
 	}
 
 	return apperr.Unwrap(err)
@@ -159,7 +158,7 @@ func (a *App) ApplyRequiredUserConfig(
 ) (vo.RequiredConfigError, error) {
 	validatedResult, err := a.config.UpdateRequired(installPath, appid)
 	if err != nil {
-		logger.Error(err)
+		a.logger.Error(err)
 	}
 
 	return validatedResult, apperr.Unwrap(err)
@@ -168,7 +167,7 @@ func (a *App) ApplyRequiredUserConfig(
 func (a *App) ManualScreenshot(filename string, base64Data string) (bool, error) {
 	saved, err := a.screenshot.SaveWithDialog(a.ctx, filename, base64Data)
 	if err != nil {
-		logger.Error(err)
+		a.logger.Error(err)
 	}
 	return saved, apperr.Unwrap(err)
 }
@@ -176,7 +175,7 @@ func (a *App) ManualScreenshot(filename string, base64Data string) (bool, error)
 func (a *App) AutoScreenshot(filename string, base64Data string) error {
 	err := a.screenshot.SaveForAuto(filename, base64Data)
 	if err != nil {
-		logger.Error(err)
+		a.logger.Error(err)
 	}
 	return apperr.Unwrap(err)
 }
@@ -200,7 +199,7 @@ func (a *App) RemoveExcludePlayerID(playerID int) {
 func (a *App) AlertPlayers() ([]domain.AlertPlayer, error) {
 	players, err := a.config.AlertPlayers()
 	if err != nil {
-		logger.Error(err)
+		a.logger.Error(err)
 	}
 
 	return players, apperr.Unwrap(err)
@@ -209,7 +208,7 @@ func (a *App) AlertPlayers() ([]domain.AlertPlayer, error) {
 func (a *App) UpdateAlertPlayer(player domain.AlertPlayer) error {
 	err := a.config.UpdateAlertPlayer(player)
 	if err != nil {
-		logger.Error(err)
+		a.logger.Error(err)
 	}
 
 	return apperr.Unwrap(err)
@@ -218,7 +217,7 @@ func (a *App) UpdateAlertPlayer(player domain.AlertPlayer) error {
 func (a *App) RemoveAlertPlayer(accountID int) error {
 	err := a.config.RemoveAlertPlayer(accountID)
 	if err != nil {
-		logger.Error(err)
+		a.logger.Error(err)
 	}
 
 	return apperr.Unwrap(err)
@@ -227,7 +226,7 @@ func (a *App) RemoveAlertPlayer(accountID int) error {
 func (a *App) SearchPlayer(prefix string) (domain.WGAccountList, error) {
 	accountList, err := a.config.SearchPlayer(prefix)
 	if err != nil {
-		logger.Error(err)
+		a.logger.Error(err)
 	}
 
 	return accountList, apperr.Unwrap(err)
@@ -239,7 +238,7 @@ func (a *App) AlertPatterns() []string {
 
 func (a *App) LogError(errString string) {
 	err := failure.New(apperr.FrontendError, failure.Messagef("%s", errString))
-	logger.Error(err)
+	a.logger.Error(err)
 }
 
 func (a *App) LatestRelease() (domain.GHLatestRelease, error) {

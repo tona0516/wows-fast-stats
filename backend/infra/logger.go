@@ -1,34 +1,38 @@
-package logger
+package infra
 
 import (
 	"context"
 	"os"
 	"time"
+	"wfs/backend/adapter"
 	"wfs/backend/application/vo"
-	"wfs/backend/logger/repository"
 
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/pkgerrors"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
-//nolint:gochecknoglobals
-var instance = &Logger{}
-
 type Logger struct {
 	zlog   zerolog.Logger
-	report repository.ReportInterface
+	env    vo.Env
+	report adapter.ReportInterface
 }
 
-func Init(
-	appCtx context.Context,
+func NewLogger(
 	env vo.Env,
-	report repository.ReportInterface,
-) {
+	report adapter.ReportInterface,
+) *Logger {
+	return &Logger{
+		env:    env,
+		report: report,
+	}
+}
+
+func (l *Logger) Init(appCtx context.Context) {
 	//nolint:reassign
 	zerolog.ErrorStackMarshaler = pkgerrors.MarshalStack
 
-	if env.IsDev {
+	if l.env.IsDev {
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)
 	} else {
 		zerolog.SetGlobalLevel(zerolog.InfoLevel)
@@ -40,56 +44,54 @@ func Init(
 	}
 	frontendWriter := zerolog.ConsoleWriter{
 		TimeFormat: time.DateTime,
-		Out:        &FrontendWriter{appCtx: appCtx},
+		Out:        &frontendWriter{appCtx: appCtx},
 		NoColor:    true,
 	}
 	logFile, _ := os.OpenFile(
-		env.AppName+".log",
+		l.env.AppName+".log",
 		os.O_APPEND|os.O_CREATE|os.O_WRONLY,
 		0o664,
 	)
 
 	multi := zerolog.MultiLevelWriter(consoleWriter, frontendWriter, logFile)
 
-	instance.zlog = zerolog.New(multi).
+	l.zlog = zerolog.New(multi).
 		With().
 		Timestamp().
 		Stack().
-		Str("semver", env.Semver).
+		Str("semver", l.env.Semver).
 		Logger()
-
-	instance.report = report
 }
 
-func Debug(message string, contexts ...vo.Pair) {
-	e := instance.zlog.Debug()
+func (l *Logger) Debug(message string, contexts ...vo.Pair) {
+	e := l.zlog.Debug()
 	addContext(e, contexts...)
 	e.Msg(message)
 }
 
-func Info(message string, contexts ...vo.Pair) {
-	e := instance.zlog.Info()
+func (l *Logger) Info(message string, contexts ...vo.Pair) {
+	e := l.zlog.Info()
 	addContext(e, contexts...)
 	e.Msg(message)
 }
 
-func Warn(err error, contexts ...vo.Pair) {
-	e := instance.zlog.Warn().Err(err)
+func (l *Logger) Warn(err error, contexts ...vo.Pair) {
+	e := l.zlog.Warn().Err(err)
 	addContext(e, contexts...)
 	e.Send()
 
-	if instance.report != nil {
-		instance.report.Send("warn has occurred!", err)
+	if l.report != nil {
+		l.report.Send("warn has occurred!", err)
 	}
 }
 
-func Error(err error, contexts ...vo.Pair) {
-	e := instance.zlog.Error().Err(err)
+func (l *Logger) Error(err error, contexts ...vo.Pair) {
+	e := l.zlog.Error().Err(err)
 	addContext(e, contexts...)
 	e.Send()
 
-	if instance.report != nil {
-		instance.report.Send("error has occurred!", err)
+	if l.report != nil {
+		l.report.Send("error has occurred!", err)
 	}
 }
 
@@ -102,11 +104,11 @@ func addContext(e *zerolog.Event, contexts ...vo.Pair) {
 }
 
 //nolint:containedctx
-type FrontendWriter struct {
+type frontendWriter struct {
 	appCtx context.Context
 }
 
-func (w *FrontendWriter) Write(p []byte) (int, error) {
+func (w *frontendWriter) Write(p []byte) (int, error) {
 	runtime.EventsEmit(w.appCtx, "LOG", string(p))
 	return len(p), nil
 }

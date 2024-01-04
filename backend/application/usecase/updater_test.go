@@ -23,7 +23,7 @@ func TestUpdater_IsUpdatable(t *testing.T) {
 		mockGithub.On("LatestRelease").Return(response, nil)
 
 		env := vo.Env{Semver: "1.0.0"}
-		updater := NewUpdater(env, mockGithub)
+		updater := NewUpdater(env, mockGithub, &mocks.LoggerInterface{})
 
 		// テスト
 		actual, err := updater.IsUpdatable()
@@ -45,7 +45,7 @@ func TestUpdater_IsUpdatable(t *testing.T) {
 		mockGithub.On("LatestRelease").Return(response, nil)
 
 		env := vo.Env{Semver: "1.0.0"}
-		updater := NewUpdater(env, mockGithub)
+		updater := NewUpdater(env, mockGithub, &mocks.LoggerInterface{})
 
 		// テスト
 		actual, err := updater.IsUpdatable()
@@ -67,7 +67,7 @@ func TestUpdater_IsUpdatable(t *testing.T) {
 		mockGithub.On("LatestRelease").Return(domain.GHLatestRelease{}, expected)
 
 		env := vo.Env{Semver: "1.0.0"}
-		updater := NewUpdater(env, mockGithub)
+		updater := NewUpdater(env, mockGithub, &mocks.LoggerInterface{})
 
 		// テスト
 		_, err := updater.IsUpdatable()

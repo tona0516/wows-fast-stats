@@ -5,11 +5,10 @@ import (
 	"crypto/sha256"
 	"fmt"
 	"time"
+	"wfs/backend/adapter"
 	"wfs/backend/apperr"
-	"wfs/backend/application/repository"
 	"wfs/backend/application/vo"
 	"wfs/backend/domain"
-	"wfs/backend/logger"
 
 	"github.com/morikuni/failure"
 )
@@ -22,22 +21,25 @@ const (
 
 type Watcher struct {
 	interval       time.Duration
-	localFile      repository.LocalFileInterface
-	storage        repository.StorageInterface
+	localFile      adapter.LocalFileInterface
+	storage        adapter.StorageInterface
+	logger         adapter.LoggerInterface
 	eventsEmitFunc vo.EventEmit
 	userConfig     domain.UserConfig
 }
 
 func NewWatcher(
 	interval time.Duration,
-	localFile repository.LocalFileInterface,
-	storage repository.StorageInterface,
+	localFile adapter.LocalFileInterface,
+	storage adapter.StorageInterface,
+	logger adapter.LoggerInterface,
 	eventsEmitFunc vo.EventEmit,
 ) *Watcher {
 	return &Watcher{
 		interval:       interval,
 		localFile:      localFile,
 		storage:        storage,
+		logger:         logger,
 		eventsEmitFunc: eventsEmitFunc,
 	}
 }
@@ -73,7 +75,7 @@ func (w *Watcher) Start(appCtx context.Context, cancelCtx context.Context) {
 					continue
 				}
 
-				logger.Error(err)
+				w.logger.Error(err)
 				w.eventsEmitFunc(appCtx, EventErr, apperr.Unwrap(err))
 				return
 			}

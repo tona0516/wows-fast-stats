@@ -14,7 +14,7 @@ export class PlatoonRate
     private config: domain.UserConfig,
     private category: StatsCategory,
   ) {
-    super("platoon_rate", "プラ比率", "分艦隊比率", 1);
+    super("platoon_rate", "プラ率", "分艦隊比率", 1);
   }
 
   getSvelteComponent() {

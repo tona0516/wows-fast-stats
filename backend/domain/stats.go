@@ -2,10 +2,6 @@ package domain
 
 import (
 	"math"
-	"wfs/backend/apperr"
-	"wfs/backend/logger"
-
-	"github.com/morikuni/failure"
 )
 
 type Stats struct {
@@ -92,7 +88,6 @@ func (s *Stats) PR(category StatsCategory, pattern StatsPattern) float64 {
 		return s.pr(actual, expected, allBattles)
 	}
 
-	logger.Error(failure.New(apperr.UnexpectedError))
 	return -1
 }
 
@@ -105,7 +100,6 @@ func (s *Stats) Battles(category StatsCategory, pattern StatsPattern) uint {
 		return player.Battles
 	}
 
-	logger.Error(failure.New(apperr.UnexpectedError))
 	return 0
 }
 
@@ -118,7 +112,6 @@ func (s *Stats) AvgDamage(category StatsCategory, pattern StatsPattern) float64 
 		return avgDamage(player.DamageDealt, player.Battles)
 	}
 
-	logger.Error(failure.New(apperr.UnexpectedError))
 	return 0
 }
 
@@ -140,7 +133,6 @@ func (s *Stats) MaxDamage(category StatsCategory, pattern StatsPattern) MaxDamag
 		}
 	}
 
-	logger.Error(failure.New(apperr.UnexpectedError))
 	return MaxDamage{}
 }
 
@@ -180,7 +172,6 @@ func (s *Stats) AvgKill(category StatsCategory, pattern StatsPattern) float64 {
 		return avgKill(player.Frags, player.Battles)
 	}
 
-	logger.Error(failure.New(apperr.UnexpectedError))
 	return 0
 }
 
@@ -193,7 +184,6 @@ func (s *Stats) AvgExp(category StatsCategory, pattern StatsPattern) float64 {
 		return div(player.Xp, player.Battles)
 	}
 
-	logger.Error(failure.New(apperr.UnexpectedError))
 	return 0
 }
 
@@ -206,7 +196,6 @@ func (s *Stats) WinRate(category StatsCategory, pattern StatsPattern) float64 {
 		return winRate(player.Wins, player.Battles)
 	}
 
-	logger.Error(failure.New(apperr.UnexpectedError))
 	return 0
 }
 
@@ -219,7 +208,6 @@ func (s *Stats) WinSurvivedRate(category StatsCategory, pattern StatsPattern) fl
 		return percentage(player.SurvivedWins, player.Wins)
 	}
 
-	logger.Error(failure.New(apperr.UnexpectedError))
 	return 0
 }
 
@@ -373,7 +361,6 @@ func (s *Stats) PlatoonRate(
 		)
 	}
 
-	logger.Error(failure.New(apperr.UnexpectedError))
 	return 0
 }
 
@@ -385,7 +372,6 @@ func (s *Stats) statsValues(pattern StatsPattern) (WGShipStatsValues, WGPlayerSt
 		return s.useShipStats.PvpSolo, s.accountInfo.Statistics.PvpSolo
 	}
 
-	logger.Error(failure.New(apperr.UnexpectedError))
 	return WGShipStatsValues{}, WGPlayerStatsValues{}
 }
 
@@ -397,7 +383,6 @@ func (s *Stats) statsValuesForm(statsData WGShipsStatsData, pattern StatsPattern
 		return statsData.PvpSolo
 	}
 
-	logger.Error(failure.New(apperr.UnexpectedError))
 	return WGShipStatsValues{}
 }
 

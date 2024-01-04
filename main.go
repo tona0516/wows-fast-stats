@@ -96,6 +96,7 @@ func initApp(env vo.Env) *App {
 	db, err := badger.Open(badger.DefaultOptions("./persistent_data"))
 	storage := infra.NewStorage(db)
 	report := infra.NewReport(env, *localFile, *discord, *storage)
+	logger := infra.NewLogger(env, report)
 
 	if err != nil {
 		report.Send("fatal has occurred!", err)
@@ -105,16 +106,16 @@ func initApp(env vo.Env) *App {
 	// usecase
 	var parallels uint = 5
 	watchInterval := 1 * time.Second
-	config := usecase.NewConfig(localFile, wargaming, storage)
-	screenshot := usecase.NewScreenshot(localFile)
-	battle := usecase.NewBattle(parallels, wargaming, localFile, numbers, unregistered, storage)
-	watcher := usecase.NewWatcher(watchInterval, localFile, storage, runtime.EventsEmit)
-	updater := usecase.NewUpdater(env, github)
-	configMigrator := usecase.NewConfigMigrator(localFile, storage)
+	config := usecase.NewConfig(localFile, wargaming, storage, logger)
+	screenshot := usecase.NewScreenshot(localFile, logger)
+	battle := usecase.NewBattle(parallels, wargaming, localFile, numbers, unregistered, storage, logger)
+	watcher := usecase.NewWatcher(watchInterval, localFile, storage, logger, runtime.EventsEmit)
+	updater := usecase.NewUpdater(env, github, logger)
+	configMigrator := usecase.NewConfigMigrator(localFile, storage, logger)
 
 	return NewApp(
 		env,
-		report,
+		logger,
 		*config,
 		*screenshot,
 		*watcher,

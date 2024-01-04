@@ -29,7 +29,7 @@ func TestScreenshot_SaveForAuto(t *testing.T) {
 		mockLocalFile := &mocks.LocalFileInterface{}
 		mockLocalFile.On("SaveScreenshot", screenshotPath, base64Data).Return(nil)
 
-		s := NewScreenshot(mockLocalFile)
+		s := NewScreenshot(mockLocalFile, &mocks.LoggerInterface{})
 		s.SaveFileDialog = func(ctx context.Context, dialogOptions runtime.SaveDialogOptions) (string, error) {
 			return screenshotPath, nil
 		}
@@ -53,7 +53,7 @@ func TestScreenshot_SaveWithDialog(t *testing.T) {
 		mockLocalFile := &mocks.LocalFileInterface{}
 		mockLocalFile.On("SaveScreenshot", screenshotPath, base64Data).Return(nil)
 
-		s := NewScreenshot(mockLocalFile)
+		s := NewScreenshot(mockLocalFile, &mocks.LoggerInterface{})
 		s.SaveFileDialog = func(ctx context.Context, dialogOptions runtime.SaveDialogOptions) (string, error) {
 			return screenshotPath, nil
 		}
@@ -70,7 +70,7 @@ func TestScreenshot_SaveWithDialog(t *testing.T) {
 	t.Run("異常系", func(t *testing.T) {
 		t.Parallel()
 		// 準備
-		s := NewScreenshot(nil)
+		s := NewScreenshot(nil, &mocks.LoggerInterface{})
 		s.SaveFileDialog = func(ctx context.Context, dialogOptions runtime.SaveDialogOptions) (string, error) {
 			return "", failure.New(apperr.WailsError)
 		}
@@ -88,7 +88,7 @@ func TestScreenshot_SaveWithDialog(t *testing.T) {
 	t.Run("異常系_キャンセル", func(t *testing.T) {
 		t.Parallel()
 		// 準備
-		s := NewScreenshot(nil)
+		s := NewScreenshot(nil, &mocks.LoggerInterface{})
 		s.SaveFileDialog = func(ctx context.Context, dialogOptions runtime.SaveDialogOptions) (string, error) {
 			return "", nil
 		}

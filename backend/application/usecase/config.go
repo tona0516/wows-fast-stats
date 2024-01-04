@@ -4,8 +4,8 @@ import (
 	"context"
 	"os"
 	"path/filepath"
+	"wfs/backend/adapter"
 	"wfs/backend/apperr"
-	"wfs/backend/application/repository"
 	"wfs/backend/application/vo"
 	"wfs/backend/domain"
 
@@ -17,22 +17,25 @@ import (
 const GameExeName = "WorldOfWarships.exe"
 
 type Config struct {
-	localFile           repository.LocalFileInterface
-	wargaming           repository.WargamingInterface
-	storage             repository.StorageInterface
+	localFile           adapter.LocalFileInterface
+	wargaming           adapter.WargamingInterface
+	storage             adapter.StorageInterface
+	logger              adapter.LoggerInterface
 	OpenDirectoryDialog vo.OpenDirectoryDialog
 	OpenWithDefaultApp  vo.OpenWithDefaultApp
 }
 
 func NewConfig(
-	localFile repository.LocalFileInterface,
-	wargaming repository.WargamingInterface,
-	storage repository.StorageInterface,
+	localFile adapter.LocalFileInterface,
+	wargaming adapter.WargamingInterface,
+	storage adapter.StorageInterface,
+	logger adapter.LoggerInterface,
 ) *Config {
 	return &Config{
 		localFile:           localFile,
 		wargaming:           wargaming,
 		storage:             storage,
+		logger:              logger,
 		OpenDirectoryDialog: runtime.OpenDirectoryDialog,
 		OpenWithDefaultApp:  open.Run,
 	}

@@ -3,22 +3,22 @@ package usecase
 import (
 	"sort"
 	"sync"
+	"wfs/backend/adapter"
 	"wfs/backend/apperr"
-	"wfs/backend/application/repository"
 	"wfs/backend/application/vo"
 	"wfs/backend/domain"
-	"wfs/backend/logger"
 
 	"github.com/morikuni/failure"
 )
 
 type Battle struct {
 	parallels     uint
-	wargaming     repository.WargamingInterface
-	numbers       repository.NumbersInterface
-	unregistered  repository.UnregisteredInterface
-	localFile     repository.LocalFileInterface
-	storage       repository.StorageInterface
+	wargaming     adapter.WargamingInterface
+	numbers       adapter.NumbersInterface
+	unregistered  adapter.UnregisteredInterface
+	localFile     adapter.LocalFileInterface
+	storage       adapter.StorageInterface
+	logger        adapter.LoggerInterface
 	isFirstBattle bool
 
 	warship          domain.Warships
@@ -29,11 +29,12 @@ type Battle struct {
 
 func NewBattle(
 	parallels uint,
-	wargaming repository.WargamingInterface,
-	localFile repository.LocalFileInterface,
-	numbers repository.NumbersInterface,
-	unregistered repository.UnregisteredInterface,
-	storage repository.StorageInterface,
+	wargaming adapter.WargamingInterface,
+	localFile adapter.LocalFileInterface,
+	numbers adapter.NumbersInterface,
+	unregistered adapter.UnregisteredInterface,
+	storage adapter.StorageInterface,
+	logger adapter.LoggerInterface,
 ) *Battle {
 	return &Battle{
 		parallels:     parallels,
@@ -42,6 +43,7 @@ func NewBattle(
 		numbers:       numbers,
 		unregistered:  unregistered,
 		storage:       storage,
+		logger:        logger,
 		isFirstBattle: true,
 	}
 }
@@ -224,7 +226,7 @@ func (b *Battle) fetchExpectedStats(channel chan vo.Result[domain.ExpectedStats]
 		return
 	}
 
-	logger.Warn(failure.New(apperr.FailSafeProccess))
+	b.logger.Warn(failure.New(apperr.FailSafeProccess))
 
 	expectedStats, errCache := b.storage.ReadExpectedStats()
 	if errCache == nil {

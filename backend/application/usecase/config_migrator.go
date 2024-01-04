@@ -1,24 +1,27 @@
 package usecase
 
 import (
+	"wfs/backend/adapter"
 	"wfs/backend/apperr"
-	"wfs/backend/application/repository"
 
 	"github.com/morikuni/failure"
 )
 
 type ConfigMigrator struct {
-	localFile repository.LocalFileInterface
-	storage   repository.StorageInterface
+	localFile adapter.LocalFileInterface
+	storage   adapter.StorageInterface
+	logger    adapter.LoggerInterface
 }
 
 func NewConfigMigrator(
-	localFile repository.LocalFileInterface,
-	storage repository.StorageInterface,
+	localFile adapter.LocalFileInterface,
+	storage adapter.StorageInterface,
+	logger adapter.LoggerInterface,
 ) *ConfigMigrator {
 	return &ConfigMigrator{
 		localFile: localFile,
 		storage:   storage,
+		logger:    logger,
 	}
 }
 
