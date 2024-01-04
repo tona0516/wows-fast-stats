@@ -40,7 +40,7 @@ func TestConfig_UpdateRequired(t *testing.T) {
 		mockStorage.On("WriteUserConfig", config).Return(nil)
 
 		// テスト
-		c := NewConfig(nil, mockWargaming, mockStorage, &mocks.LoggerInterface{})
+		c := NewConfig(nil, mockWargaming, mockStorage, nil)
 		actual, err := c.UpdateRequired(config.InstallPath, config.Appid)
 
 		// アサーション
@@ -59,7 +59,7 @@ func TestConfig_UpdateRequired(t *testing.T) {
 		mockWargaming.On("Test", config.Appid).Return(true, nil)
 
 		// テスト
-		c := NewConfig(nil, mockWargaming, nil, &mocks.LoggerInterface{})
+		c := NewConfig(nil, mockWargaming, nil, nil)
 		actual, err := c.UpdateRequired(config.InstallPath, config.Appid)
 
 		// アサーション
@@ -75,7 +75,7 @@ func TestConfig_UpdateRequired(t *testing.T) {
 		mockWargaming.On("Test", config.Appid).Return(false, errWargaming) // Note: WG APIでエラー
 
 		// テスト
-		c := NewConfig(nil, mockWargaming, nil, &mocks.LoggerInterface{})
+		c := NewConfig(nil, mockWargaming, nil, nil)
 		actual, err := c.UpdateRequired(config.InstallPath, config.Appid)
 
 		// アサーション
@@ -104,7 +104,7 @@ func TestConfig_UpdateOptional(t *testing.T) {
 		mockStorage.On("WriteUserConfig", actualWritten).Return(nil)
 
 		// テスト実行
-		c := NewConfig(nil, nil, mockStorage, &mocks.LoggerInterface{})
+		c := NewConfig(nil, nil, mockStorage, nil)
 		err = c.UpdateOptional(config)
 
 		// アサーション
@@ -128,7 +128,7 @@ func TestConfig_AlertPlayers(t *testing.T) {
 		mockStorage.On("ReadAlertPlayers").Return(expected, nil)
 
 		// テスト
-		config := NewConfig(nil, nil, mockStorage, &mocks.LoggerInterface{})
+		config := NewConfig(nil, nil, mockStorage, nil)
 		actual, err := config.AlertPlayers()
 
 		// アサーション
@@ -157,7 +157,7 @@ func TestConfig_UpdateAlertPlayer(t *testing.T) {
 		mockStorage.On("WriteAlertPlayers", append(existingPlayers, newPlayer)).Return(nil)
 
 		// テスト
-		config := NewConfig(nil, nil, mockStorage, &mocks.LoggerInterface{})
+		config := NewConfig(nil, nil, mockStorage, nil)
 		err := config.UpdateAlertPlayer(newPlayer)
 
 		// アサーション
@@ -179,7 +179,7 @@ func TestConfig_UpdateAlertPlayer(t *testing.T) {
 		}).Return(nil)
 
 		// テスト
-		config := NewConfig(nil, nil, mockStorage, &mocks.LoggerInterface{})
+		config := NewConfig(nil, nil, mockStorage, nil)
 		err := config.UpdateAlertPlayer(playerToUpdate)
 
 		// アサーション
@@ -206,7 +206,7 @@ func TestConfig_RemoveAlertPlayer(t *testing.T) {
 		mockStorage.On("WriteAlertPlayers", mock.Anything).Return(nil)
 
 		// テスト
-		config := NewConfig(nil, nil, mockStorage, &mocks.LoggerInterface{})
+		config := NewConfig(nil, nil, mockStorage, nil)
 		err := config.RemoveAlertPlayer(accountIDToRemove)
 
 		// アサーション

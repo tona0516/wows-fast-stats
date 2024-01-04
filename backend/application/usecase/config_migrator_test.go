@@ -43,7 +43,7 @@ func TestConfigMigrator_Migrate(t *testing.T) {
 		mockStorage.On("WriteDataVersion", uint(1)).Return(nil)
 
 		// テスト
-		cm := NewConfigMigrator(mockLocalFile, mockStorage, &mocks.LoggerInterface{})
+		cm := NewConfigMigrator(mockLocalFile, mockStorage, nil)
 		err := cm.Execute()
 
 		// アサーション
@@ -63,7 +63,7 @@ func TestConfigMigrator_toV1(t *testing.T) {
 		mockStorage.On("ReadDataVersion").Return(uint(1), nil)
 
 		// テスト
-		cm := NewConfigMigrator(nil, mockStorage, &mocks.LoggerInterface{})
+		cm := NewConfigMigrator(nil, mockStorage, nil)
 		err := cm.toV1()
 
 		// アサーション
@@ -87,7 +87,7 @@ func TestConfigMigrator_toV1(t *testing.T) {
 		mockStorage.On("WriteDataVersion", uint(1)).Return(nil)
 
 		// テスト
-		cm := NewConfigMigrator(mockLocalFile, mockStorage, &mocks.LoggerInterface{})
+		cm := NewConfigMigrator(mockLocalFile, mockStorage, nil)
 		err := cm.toV1()
 
 		// アサーション

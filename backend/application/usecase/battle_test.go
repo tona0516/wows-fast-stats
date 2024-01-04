@@ -58,7 +58,7 @@ func TestBattle_Get_正常系_初回(t *testing.T) {
 	mockStorage.On("WriteExpectedStats", mock.Anything).Return(nil)
 
 	// テスト
-	b := NewBattle(5, mockWargaming, mockLocalFile, mockNumbers, mockUnregistered, mockStorage, &mocks.LoggerInterface{})
+	b := NewBattle(5, mockWargaming, mockLocalFile, mockNumbers, mockUnregistered, mockStorage, nil)
 	_, err := b.Get(domain.UserConfig{})
 
 	// アサーション
@@ -100,7 +100,7 @@ func TestBattle_Get_正常系_2回目以降(t *testing.T) {
 	mockStorage.On("WriteOwnIGN", mock.Anything).Return(nil)
 
 	// テスト
-	b := NewBattle(5, mockWargaming, mockLocalFile, mockNumbers, mockUnregistered, mockStorage, &mocks.LoggerInterface{})
+	b := NewBattle(5, mockWargaming, mockLocalFile, mockNumbers, mockUnregistered, mockStorage, nil)
 	b.isFirstBattle = false
 	_, err := b.Get(domain.UserConfig{})
 
@@ -129,7 +129,7 @@ func TestBattle_Get_異常系(t *testing.T) {
 	mockLocalFile.On("TempArenaInfo", mock.Anything).Return(domain.TempArenaInfo{}, expectedError)
 
 	// テスト
-	b := NewBattle(5, mockWargaming, mockLocalFile, mockNumbers, mockUnregistered, mockStorage, &mocks.LoggerInterface{})
+	b := NewBattle(5, mockWargaming, mockLocalFile, mockNumbers, mockUnregistered, mockStorage, nil)
 	b.isFirstBattle = false
 	_, err := b.Get(domain.UserConfig{})
 

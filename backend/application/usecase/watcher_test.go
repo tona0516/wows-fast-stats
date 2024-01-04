@@ -10,6 +10,7 @@ import (
 
 	"github.com/morikuni/failure"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 )
 
@@ -40,7 +41,7 @@ func TestWatcher_Start(t *testing.T) {
 		defer cancel()
 
 		// テスト
-		watcher := NewWatcher(10*time.Millisecond, mockLocalFile, mockStorage, &mocks.LoggerInterface{}, emitFunc)
+		watcher := NewWatcher(10*time.Millisecond, mockLocalFile, mockStorage, nil, emitFunc)
 		err := watcher.Prepare()
 		go watcher.Start(ctx, ctx)
 
@@ -84,7 +85,7 @@ func TestWatcher_Start(t *testing.T) {
 			defer cancel()
 
 			// テスト
-			watcher := NewWatcher(10*time.Millisecond, mockLocalFile, mockStorage, &mocks.LoggerInterface{}, emitFunc)
+			watcher := NewWatcher(10*time.Millisecond, mockLocalFile, mockStorage, nil, emitFunc)
 			go watcher.Start(ctx, ctx)
 
 			// アサーション
@@ -115,7 +116,7 @@ func TestWatcher_Start(t *testing.T) {
 		ctx, cancel := context.WithCancel(context.Background())
 
 		// テスト
-		watcher := NewWatcher(10*time.Millisecond, nil, mockStorage, &mocks.LoggerInterface{}, emitFunc)
+		watcher := NewWatcher(10*time.Millisecond, nil, mockStorage, nil, emitFunc)
 		err := watcher.Prepare()
 		go watcher.Start(ctx, ctx)
 		cancel()
@@ -139,12 +140,14 @@ func TestWatcher_Start(t *testing.T) {
 		}
 		mockStorage := &mocks.StorageInterface{}
 		mockLocalFile := &mocks.LocalFileInterface{}
+		mockLogger := &mocks.LoggerInterface{}
 
 		mockStorage.On("ReadUserConfig").Return(config, nil)
 		mockLocalFile.On("TempArenaInfo", config.InstallPath).Return(
 			domain.TempArenaInfo{},
 			failure.New(apperr.UnexpectedError),
 		)
+		mockLogger.On("Error", mock.Anything).Return()
 
 		var events []string
 		emitFunc := func(ctx context.Context, eventName string, optionalData ...interface{}) {
@@ -155,7 +158,7 @@ func TestWatcher_Start(t *testing.T) {
 		defer cancel()
 
 		// テスト
-		watcher := NewWatcher(10*time.Millisecond, mockLocalFile, mockStorage, &mocks.LoggerInterface{}, emitFunc)
+		watcher := NewWatcher(10*time.Millisecond, mockLocalFile, mockStorage, mockLogger, emitFunc)
 		err := watcher.Prepare()
 		go watcher.Start(ctx, ctx)
 
@@ -168,5 +171,6 @@ func TestWatcher_Start(t *testing.T) {
 
 		mockStorage.AssertExpectations(t)
 		mockLocalFile.AssertExpectations(t)
+		mockLogger.AssertExpectations(t)
 	})
 }
