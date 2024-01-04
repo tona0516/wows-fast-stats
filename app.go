@@ -14,11 +14,22 @@ import (
 
 const EventOnload = "ONLOAD"
 
+type volatileData struct {
+	cancelWatcher  context.CancelFunc
+	excludePlayers domain.ExcludedPlayers
+}
+
+func newVolatileData() volatileData {
+	return volatileData{
+		cancelWatcher:  nil,
+		excludePlayers: make(domain.ExcludedPlayers),
+	}
+}
+
 //nolint:containedctx
 type App struct {
 	ctx            context.Context
 	env            vo.Env
-	cancelWatcher  context.CancelFunc
 	logger         adapter.LoggerInterface
 	config         usecase.Config
 	screenshot     usecase.Screenshot
@@ -26,7 +37,7 @@ type App struct {
 	battle         usecase.Battle
 	updater        usecase.Updater
 	configMigrator usecase.ConfigMigrator
-	excludePlayers domain.ExcludedPlayers
+	volatileData   volatileData
 }
 
 func NewApp(
@@ -48,7 +59,7 @@ func NewApp(
 		battle:         battle,
 		updater:        updater,
 		configMigrator: configMigrator,
-		excludePlayers: domain.ExcludedPlayers{},
+		volatileData:   newVolatileData(),
 	}
 }
 
@@ -76,11 +87,11 @@ func (a *App) StartWatching() error {
 		return apperr.Unwrap(err)
 	}
 
-	if a.cancelWatcher != nil {
-		a.cancelWatcher()
+	if a.volatileData.cancelWatcher != nil {
+		a.volatileData.cancelWatcher()
 	}
 	cancelCtx, cancel := context.WithCancel(context.Background())
-	a.cancelWatcher = cancel
+	a.volatileData.cancelWatcher = cancel
 
 	go a.watcher.Start(a.ctx, cancelCtx)
 
@@ -185,15 +196,15 @@ func (a *App) Semver() string {
 }
 
 func (a *App) ExcludePlayerIDs() []int {
-	return a.excludePlayers.IDs()
+	return a.volatileData.excludePlayers.IDs()
 }
 
 func (a *App) AddExcludePlayerID(playerID int) {
-	a.excludePlayers.Add(playerID)
+	a.volatileData.excludePlayers.Add(playerID)
 }
 
 func (a *App) RemoveExcludePlayerID(playerID int) {
-	a.excludePlayers.Remove(playerID)
+	a.volatileData.excludePlayers.Remove(playerID)
 }
 
 func (a *App) AlertPlayers() ([]domain.AlertPlayer, error) {
