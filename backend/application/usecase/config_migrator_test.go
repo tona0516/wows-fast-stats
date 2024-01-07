@@ -27,13 +27,13 @@ func TestConfigMigrator_Migrate(t *testing.T) {
 				Message:   "a",
 			},
 		}
-		mockLocalFile := &mocks.LocalFileInterface{}
-		mockLocalFile.On("IsExistUser").Return(true)
-		mockLocalFile.On("User").Return(expectedUserConfig, nil)
-		mockLocalFile.On("DeleteUser").Return(nil)
-		mockLocalFile.On("IsExistAlertPlayers").Return(true)
-		mockLocalFile.On("AlertPlayers").Return(expectedAlertPlayers, nil)
-		mockLocalFile.On("DeleteAlertPlayers").Return(nil)
+		mockConfigV0 := &mocks.ConfigV0Interface{}
+		mockConfigV0.On("IsExistUser").Return(true)
+		mockConfigV0.On("User").Return(expectedUserConfig, nil)
+		mockConfigV0.On("DeleteUser").Return(nil)
+		mockConfigV0.On("IsExistAlertPlayers").Return(true)
+		mockConfigV0.On("AlertPlayers").Return(expectedAlertPlayers, nil)
+		mockConfigV0.On("DeleteAlertPlayers").Return(nil)
 		mockStorage := &mocks.StorageInterface{}
 		mockStorage.On("ReadDataVersion").Return(uint(0), nil)
 		mockStorage.On("IsExistUserConfig").Return(false)
@@ -43,12 +43,12 @@ func TestConfigMigrator_Migrate(t *testing.T) {
 		mockStorage.On("WriteDataVersion", uint(1)).Return(nil)
 
 		// テスト
-		cm := NewConfigMigrator(mockLocalFile, mockStorage, nil)
+		cm := NewConfigMigrator(mockConfigV0, mockStorage, nil)
 		err := cm.Execute()
 
 		// アサーション
 		require.NoError(t, err)
-		mockLocalFile.AssertExpectations(t)
+		mockConfigV0.AssertExpectations(t)
 		mockStorage.AssertExpectations(t)
 	})
 }
@@ -77,9 +77,9 @@ func TestConfigMigrator_toV1(t *testing.T) {
 		t.Parallel()
 
 		// 準備
-		mockLocalFile := &mocks.LocalFileInterface{}
-		mockLocalFile.On("IsExistUser").Return(true)
-		mockLocalFile.On("IsExistAlertPlayers").Return(true)
+		mockConfigV0 := &mocks.ConfigV0Interface{}
+		mockConfigV0.On("IsExistUser").Return(true)
+		mockConfigV0.On("IsExistAlertPlayers").Return(true)
 		mockStorage := &mocks.StorageInterface{}
 		mockStorage.On("ReadDataVersion").Return(uint(0), nil)
 		mockStorage.On("IsExistUserConfig").Return(true)
@@ -87,12 +87,12 @@ func TestConfigMigrator_toV1(t *testing.T) {
 		mockStorage.On("WriteDataVersion", uint(1)).Return(nil)
 
 		// テスト
-		cm := NewConfigMigrator(mockLocalFile, mockStorage, nil)
+		cm := NewConfigMigrator(mockConfigV0, mockStorage, nil)
 		err := cm.toV1()
 
 		// アサーション
 		require.NoError(t, err)
-		mockLocalFile.AssertExpectations(t)
+		mockConfigV0.AssertExpectations(t)
 		mockStorage.AssertExpectations(t)
 		mockStorage.AssertNotCalled(t, "WriteUserConfig")
 		mockStorage.AssertNotCalled(t, "WriteAlertPlayers")

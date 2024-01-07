@@ -2,7 +2,6 @@
 package infra
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 	"testing"
@@ -16,103 +15,6 @@ import (
 
 const testInstallPath = "testdata"
 
-func TestLocalFile_User(t *testing.T) {
-	t.Run("正常系", func(t *testing.T) {
-		defer os.RemoveAll(ConfigDir)
-
-		expected := domain.UserConfig{
-			FontSize: "large",
-			Displays: domain.Displays{
-				Ship: domain.Ship{
-					PR: true,
-				},
-				Overall: domain.Overall{
-					PR: false,
-				},
-			},
-		}
-
-		localFile := NewLocalFile()
-		err := writeJSON(localFile.userConfigPath, expected)
-		require.NoError(t, err)
-
-		// 取得
-		actual, err := localFile.User()
-		require.NoError(t, err)
-		assert.Equal(t, expected, actual)
-
-		// 削除
-		err = os.Remove(localFile.userConfigPath)
-		require.NoError(t, err)
-
-		// 取得 存在しない場合 デフォルト値を返却する
-		actual, err = localFile.User()
-		require.NoError(t, err)
-		assert.Equal(t, domain.DefaultUserConfig, actual)
-	})
-
-	t.Run("正常系_ファイルに新規パラメータが存在しない", func(t *testing.T) {
-		// テストで生成したディレクトリを削除
-		defer os.RemoveAll(ConfigDir)
-
-		// 必須項目のみconfig.jsonに書き込む
-		installPath := "dir/"
-		appid := "abc"
-		saved := fmt.Sprintf(`{"install_path": "%s","appid": "%s"}`, installPath, appid)
-		err := os.Mkdir(ConfigDir, os.ModePerm)
-		require.NoError(t, err)
-		err = os.WriteFile(filepath.Join(ConfigDir, UserConfigFile), []byte(saved), os.ModePerm)
-		require.NoError(t, err)
-
-		localFile := NewLocalFile()
-		actual, err := localFile.User()
-		require.NoError(t, err)
-
-		// 存在するパラメータはその値、存在しないパラメータはデフォルト値が格納されていること
-		expected := domain.DefaultUserConfig
-		expected.InstallPath = installPath
-		expected.Appid = appid
-		require.Equal(t, expected, actual)
-	})
-}
-
-func TestLocalFile_AlertPlayers(t *testing.T) {
-	// テストで生成したディレクトリを削除
-	defer os.RemoveAll(ConfigDir)
-
-	expected := []domain.AlertPlayer{
-		{
-			AccountID: 100,
-			Name:      "test",
-			Pattern:   "bi-check-circle-fill",
-			Message:   "hello",
-		},
-		{
-			AccountID: 200,
-			Name:      "hoge",
-			Pattern:   "bi-check-circle-fill",
-			Message:   "memo",
-		},
-	}
-
-	localFile := NewLocalFile()
-	err := writeJSON(localFile.alertPlayerPath, expected)
-	require.NoError(t, err)
-
-	// 取得：正常系
-	actual, err := localFile.AlertPlayers()
-	require.NoError(t, err)
-	assert.Equal(t, expected, actual)
-
-	// 取得：存在しない場合 デフォルト値を返却する
-	err = os.Remove(filepath.Join(ConfigDir, AlertPlayerFile))
-	require.NoError(t, err)
-
-	actual, err = localFile.AlertPlayers()
-	require.NoError(t, err)
-	assert.Equal(t, []domain.AlertPlayer{}, actual)
-}
-
 func TestLocalFile_SaveScreenshot(t *testing.T) {
 	t.Run("正常系", func(t *testing.T) {
 		// テストデータの作成
@@ -124,8 +26,8 @@ func TestLocalFile_SaveScreenshot(t *testing.T) {
 		defer os.RemoveAll(filepath.Dir(path))
 
 		// テスト
-		localFile := LocalFile{}
-		err := localFile.SaveScreenshot(path, base64Data)
+		instance := LocalFile{}
+		err := instance.SaveScreenshot(path, base64Data)
 
 		// アサーション
 		require.NoError(t, err)
@@ -204,8 +106,8 @@ func TestLocalFile_GetTempArenaInfo(t *testing.T) {
 		err = writeJSON(filepath.Join(testInstallPath, replaysDir, "12.4.0", tempArenaInfoFile), expected)
 		require.NoError(t, err)
 
-		localFile := NewLocalFile()
-		actual, err := localFile.TempArenaInfo(testInstallPath)
+		instance := NewLocalFile()
+		actual, err := instance.TempArenaInfo(testInstallPath)
 		require.NoError(t, err)
 		assert.Equal(t, expected, actual)
 	})
@@ -223,8 +125,8 @@ func TestLocalFile_GetTempArenaInfo(t *testing.T) {
 				err := writeJSON(path, domain.TempArenaInfo{})
 				require.NoError(t, err)
 
-				localFile := NewLocalFile()
-				_, err = localFile.TempArenaInfo(testInstallPath)
+				instance := NewLocalFile()
+				_, err = instance.TempArenaInfo(testInstallPath)
 				require.Error(t, err)
 			}(path)
 		}
@@ -234,8 +136,8 @@ func TestLocalFile_GetTempArenaInfo(t *testing.T) {
 		require.NoError(t, err)
 		defer os.RemoveAll(testInstallPath)
 
-		localFile := NewLocalFile()
-		_, err = localFile.TempArenaInfo(testInstallPath)
+		instance := NewLocalFile()
+		_, err = instance.TempArenaInfo(testInstallPath)
 
 		code, ok := failure.CodeOf(err)
 		assert.True(t, ok)

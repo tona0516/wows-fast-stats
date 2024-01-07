@@ -8,20 +8,20 @@ import (
 )
 
 type ConfigMigrator struct {
-	localFile adapter.LocalFileInterface
-	storage   adapter.StorageInterface
-	logger    adapter.LoggerInterface
+	configV0 adapter.ConfigV0Interface
+	storage  adapter.StorageInterface
+	logger   adapter.LoggerInterface
 }
 
 func NewConfigMigrator(
-	localFile adapter.LocalFileInterface,
+	configV0 adapter.ConfigV0Interface,
 	storage adapter.StorageInterface,
 	logger adapter.LoggerInterface,
 ) *ConfigMigrator {
 	return &ConfigMigrator{
-		localFile: localFile,
-		storage:   storage,
-		logger:    logger,
+		configV0: configV0,
+		storage:  storage,
+		logger:   logger,
 	}
 }
 
@@ -44,8 +44,8 @@ func (m *ConfigMigrator) toV1() error {
 		return nil
 	}
 
-	if m.localFile.IsExistUser() && !m.storage.IsExistUserConfig() {
-		userConfig, err := m.localFile.User()
+	if m.configV0.IsExistUser() && !m.storage.IsExistUserConfig() {
+		userConfig, err := m.configV0.User()
 		if err != nil {
 			return err
 		}
@@ -54,11 +54,11 @@ func (m *ConfigMigrator) toV1() error {
 			return err
 		}
 
-		_ = m.localFile.DeleteUser()
+		_ = m.configV0.DeleteUser()
 	}
 
-	if m.localFile.IsExistAlertPlayers() && !m.storage.IsExistAlertPlayers() {
-		alertPlayers, err := m.localFile.AlertPlayers()
+	if m.configV0.IsExistAlertPlayers() && !m.storage.IsExistAlertPlayers() {
+		alertPlayers, err := m.configV0.AlertPlayers()
 		if err != nil {
 			return err
 		}
@@ -67,7 +67,7 @@ func (m *ConfigMigrator) toV1() error {
 			return err
 		}
 
-		_ = m.localFile.DeleteAlertPlayers()
+		_ = m.configV0.DeleteAlertPlayers()
 	}
 
 	if err := m.storage.WriteDataVersion(1); err != nil {

@@ -82,6 +82,7 @@ func initApp(env vo.Env) *App {
 		Timeout: timeout,
 	})
 	localFile := infra.NewLocalFile()
+	configV0 := infra.NewConfigV0()
 	unregistered := infra.NewUnregistered()
 	github := infra.NewGithub(infra.RequestConfig{
 		URL:     "https://api.github.com",
@@ -111,7 +112,7 @@ func initApp(env vo.Env) *App {
 	battle := usecase.NewBattle(parallels, wargaming, localFile, numbers, unregistered, storage, logger)
 	watcher := usecase.NewWatcher(watchInterval, localFile, storage, logger, runtime.EventsEmit)
 	updater := usecase.NewUpdater(env, github, logger)
-	configMigrator := usecase.NewConfigMigrator(localFile, storage, logger)
+	configMigrator := usecase.NewConfigMigrator(configV0, storage, logger)
 
 	return NewApp(
 		env,
