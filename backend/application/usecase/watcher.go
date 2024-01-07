@@ -45,7 +45,7 @@ func NewWatcher(
 }
 
 func (w *Watcher) Prepare() error {
-	userConfig, err := w.storage.ReadUserConfig()
+	userConfig, err := w.storage.UserConfig()
 	if err != nil {
 		return err
 	}

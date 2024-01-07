@@ -29,7 +29,7 @@ func TestWatcher_Start(t *testing.T) {
 		mockStorage := &mocks.StorageInterface{}
 		mockLocalFile := &mocks.LocalFileInterface{}
 
-		mockStorage.On("ReadUserConfig").Return(config, nil)
+		mockStorage.On("UserConfig").Return(config, nil)
 		mockLocalFile.On("TempArenaInfo", config.InstallPath).Return(domain.TempArenaInfo{}, nil)
 
 		var events []string
@@ -73,7 +73,7 @@ func TestWatcher_Start(t *testing.T) {
 			mockStorage := &mocks.StorageInterface{}
 			mockLocalFile := &mocks.LocalFileInterface{}
 
-			mockStorage.On("ReadUserConfig").Return(config, nil)
+			mockStorage.On("UserConfig").Return(config, nil)
 			mockLocalFile.On("TempArenaInfo", config.InstallPath).Return(domain.TempArenaInfo{}, failure.New(ie))
 
 			var events []string
@@ -107,7 +107,7 @@ func TestWatcher_Start(t *testing.T) {
 			FontSize:    "medium",
 		}
 		mockStorage := &mocks.StorageInterface{}
-		mockStorage.On("ReadUserConfig").Return(config, nil)
+		mockStorage.On("UserConfig").Return(config, nil)
 
 		var events []string
 		emitFunc := func(ctx context.Context, eventName string, optionalData ...interface{}) {
@@ -142,7 +142,7 @@ func TestWatcher_Start(t *testing.T) {
 		mockLocalFile := &mocks.LocalFileInterface{}
 		mockLogger := &mocks.LoggerInterface{}
 
-		mockStorage.On("ReadUserConfig").Return(config, nil)
+		mockStorage.On("UserConfig").Return(config, nil)
 		mockLocalFile.On("TempArenaInfo", config.InstallPath).Return(
 			domain.TempArenaInfo{},
 			failure.New(apperr.UnexpectedError),

@@ -33,14 +33,14 @@ func NewReport(
 
 func (r *Report) Send(message string, content error) {
 	// get UserConfig
-	userConfig, err := r.storage.ReadUserConfig()
+	userConfig, err := r.storage.UserConfig()
 	if err != nil || !userConfig.SendReport {
 		return
 	}
 	jsonUserConfig := prettryJSON(userConfig)
 
 	// get IGN
-	ign, _ := r.storage.ReadOwnIGN()
+	ign, _ := r.storage.OwnIGN()
 
 	// get TempArenaInfo
 	tempArenaInfo, err := r.localFile.TempArenaInfo(userConfig.InstallPath)

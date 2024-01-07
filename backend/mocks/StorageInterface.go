@@ -13,6 +13,94 @@ type StorageInterface struct {
 	mock.Mock
 }
 
+// AlertPlayers provides a mock function with given fields:
+func (_m *StorageInterface) AlertPlayers() ([]domain.AlertPlayer, error) {
+	ret := _m.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for AlertPlayers")
+	}
+
+	var r0 []domain.AlertPlayer
+	var r1 error
+	if rf, ok := ret.Get(0).(func() ([]domain.AlertPlayer, error)); ok {
+		return rf()
+	}
+	if rf, ok := ret.Get(0).(func() []domain.AlertPlayer); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]domain.AlertPlayer)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func() error); ok {
+		r1 = rf()
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// DataVersion provides a mock function with given fields:
+func (_m *StorageInterface) DataVersion() (uint, error) {
+	ret := _m.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for DataVersion")
+	}
+
+	var r0 uint
+	var r1 error
+	if rf, ok := ret.Get(0).(func() (uint, error)); ok {
+		return rf()
+	}
+	if rf, ok := ret.Get(0).(func() uint); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(uint)
+	}
+
+	if rf, ok := ret.Get(1).(func() error); ok {
+		r1 = rf()
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// ExpectedStats provides a mock function with given fields:
+func (_m *StorageInterface) ExpectedStats() (domain.ExpectedStats, error) {
+	ret := _m.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for ExpectedStats")
+	}
+
+	var r0 domain.ExpectedStats
+	var r1 error
+	if rf, ok := ret.Get(0).(func() (domain.ExpectedStats, error)); ok {
+		return rf()
+	}
+	if rf, ok := ret.Get(0).(func() domain.ExpectedStats); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(domain.ExpectedStats)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func() error); ok {
+		r1 = rf()
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // IsExistAlertPlayers provides a mock function with given fields:
 func (_m *StorageInterface) IsExistAlertPlayers() bool {
 	ret := _m.Called()
@@ -49,100 +137,12 @@ func (_m *StorageInterface) IsExistUserConfig() bool {
 	return r0
 }
 
-// ReadAlertPlayers provides a mock function with given fields:
-func (_m *StorageInterface) ReadAlertPlayers() ([]domain.AlertPlayer, error) {
+// OwnIGN provides a mock function with given fields:
+func (_m *StorageInterface) OwnIGN() (string, error) {
 	ret := _m.Called()
 
 	if len(ret) == 0 {
-		panic("no return value specified for ReadAlertPlayers")
-	}
-
-	var r0 []domain.AlertPlayer
-	var r1 error
-	if rf, ok := ret.Get(0).(func() ([]domain.AlertPlayer, error)); ok {
-		return rf()
-	}
-	if rf, ok := ret.Get(0).(func() []domain.AlertPlayer); ok {
-		r0 = rf()
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]domain.AlertPlayer)
-		}
-	}
-
-	if rf, ok := ret.Get(1).(func() error); ok {
-		r1 = rf()
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// ReadDataVersion provides a mock function with given fields:
-func (_m *StorageInterface) ReadDataVersion() (uint, error) {
-	ret := _m.Called()
-
-	if len(ret) == 0 {
-		panic("no return value specified for ReadDataVersion")
-	}
-
-	var r0 uint
-	var r1 error
-	if rf, ok := ret.Get(0).(func() (uint, error)); ok {
-		return rf()
-	}
-	if rf, ok := ret.Get(0).(func() uint); ok {
-		r0 = rf()
-	} else {
-		r0 = ret.Get(0).(uint)
-	}
-
-	if rf, ok := ret.Get(1).(func() error); ok {
-		r1 = rf()
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// ReadExpectedStats provides a mock function with given fields:
-func (_m *StorageInterface) ReadExpectedStats() (domain.ExpectedStats, error) {
-	ret := _m.Called()
-
-	if len(ret) == 0 {
-		panic("no return value specified for ReadExpectedStats")
-	}
-
-	var r0 domain.ExpectedStats
-	var r1 error
-	if rf, ok := ret.Get(0).(func() (domain.ExpectedStats, error)); ok {
-		return rf()
-	}
-	if rf, ok := ret.Get(0).(func() domain.ExpectedStats); ok {
-		r0 = rf()
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(domain.ExpectedStats)
-		}
-	}
-
-	if rf, ok := ret.Get(1).(func() error); ok {
-		r1 = rf()
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// ReadOwnIGN provides a mock function with given fields:
-func (_m *StorageInterface) ReadOwnIGN() (string, error) {
-	ret := _m.Called()
-
-	if len(ret) == 0 {
-		panic("no return value specified for ReadOwnIGN")
+		panic("no return value specified for OwnIGN")
 	}
 
 	var r0 string
@@ -165,12 +165,12 @@ func (_m *StorageInterface) ReadOwnIGN() (string, error) {
 	return r0, r1
 }
 
-// ReadUserConfig provides a mock function with given fields:
-func (_m *StorageInterface) ReadUserConfig() (domain.UserConfig, error) {
+// UserConfig provides a mock function with given fields:
+func (_m *StorageInterface) UserConfig() (domain.UserConfig, error) {
 	ret := _m.Called()
 
 	if len(ret) == 0 {
-		panic("no return value specified for ReadUserConfig")
+		panic("no return value specified for UserConfig")
 	}
 
 	var r0 domain.UserConfig

@@ -31,7 +31,7 @@ func TestStorage_DataVersion(t *testing.T) {
 	t.Parallel()
 
 	// 取得：保存されていない場合0を返却する
-	actual, err := storage.ReadDataVersion()
+	actual, err := storage.DataVersion()
 	require.NoError(t, err)
 	assert.Equal(t, uint(0), actual)
 
@@ -41,7 +41,7 @@ func TestStorage_DataVersion(t *testing.T) {
 	require.NoError(t, err)
 
 	// 取得：正常系
-	actual, err = storage.ReadDataVersion()
+	actual, err = storage.DataVersion()
 	require.NoError(t, err)
 	assert.Equal(t, expected, actual)
 }
@@ -50,7 +50,7 @@ func TestStorage_UserConfig(t *testing.T) {
 	t.Parallel()
 
 	// 取得：保存されていない場合はデフォルト値を返却する
-	actual, err := storage.ReadUserConfig()
+	actual, err := storage.UserConfig()
 	require.NoError(t, err)
 	assert.Equal(t, domain.DefaultUserConfig, actual)
 	assert.False(t, storage.IsExistUserConfig())
@@ -68,7 +68,7 @@ func TestStorage_UserConfig(t *testing.T) {
 	assert.True(t, storage.IsExistUserConfig())
 
 	// 取得：正常系
-	actual, err = storage.ReadUserConfig()
+	actual, err = storage.UserConfig()
 	require.NoError(t, err)
 	assert.Equal(t, expected, actual)
 }
@@ -77,7 +77,7 @@ func TestStorage_AlertPlayers(t *testing.T) {
 	t.Parallel()
 
 	// 取得：保存されていない場合空のスライスを返却する
-	actual, err := storage.ReadAlertPlayers()
+	actual, err := storage.AlertPlayers()
 	require.NoError(t, err)
 	assert.Equal(t, []domain.AlertPlayer{}, actual)
 	assert.False(t, storage.IsExistAlertPlayers())
@@ -102,7 +102,7 @@ func TestStorage_AlertPlayers(t *testing.T) {
 	assert.True(t, storage.IsExistAlertPlayers())
 
 	// 取得：正常系
-	actual, err = storage.ReadAlertPlayers()
+	actual, err = storage.AlertPlayers()
 	require.NoError(t, err)
 	assert.Equal(t, expected, actual)
 }
@@ -128,7 +128,7 @@ func TestStorage_ExpectedStats(t *testing.T) {
 	require.NoError(t, err)
 
 	// 取得：正常系
-	actual, err := storage.ReadExpectedStats()
+	actual, err := storage.ExpectedStats()
 	require.NoError(t, err)
 	assert.Equal(t, expected, actual)
 }
@@ -142,7 +142,7 @@ func TestStorage_OwnIGN(t *testing.T) {
 	require.NoError(t, err)
 
 	// 取得：正常系
-	actual, err := storage.ReadOwnIGN()
+	actual, err := storage.OwnIGN()
 	require.NoError(t, err)
 	assert.Equal(t, expected, actual)
 }

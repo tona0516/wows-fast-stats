@@ -42,7 +42,7 @@ func NewConfig(
 }
 
 func (c *Config) User() (domain.UserConfig, error) {
-	return c.storage.ReadUserConfig()
+	return c.storage.UserConfig()
 }
 
 func (c *Config) ValidateRequired(
@@ -82,7 +82,7 @@ func (c *Config) UpdateRequired(
 	}
 
 	// Note: overwrite only required setting
-	config, err := c.storage.ReadUserConfig()
+	config, err := c.storage.UserConfig()
 	if err != nil {
 		return validatedResult, err
 	}
@@ -97,7 +97,7 @@ func (c *Config) UpdateRequired(
 
 func (c *Config) UpdateOptional(config domain.UserConfig) error {
 	// Note: exclulde required setting
-	saved, err := c.storage.ReadUserConfig()
+	saved, err := c.storage.UserConfig()
 	if err != nil {
 		return err
 	}
@@ -110,12 +110,12 @@ func (c *Config) UpdateOptional(config domain.UserConfig) error {
 }
 
 func (c *Config) AlertPlayers() ([]domain.AlertPlayer, error) {
-	players, err := c.storage.ReadAlertPlayers()
+	players, err := c.storage.AlertPlayers()
 	return players, err
 }
 
 func (c *Config) UpdateAlertPlayer(player domain.AlertPlayer) error {
-	players, err := c.storage.ReadAlertPlayers()
+	players, err := c.storage.AlertPlayers()
 	if err != nil {
 		return err
 	}
@@ -137,7 +137,7 @@ func (c *Config) UpdateAlertPlayer(player domain.AlertPlayer) error {
 }
 
 func (c *Config) RemoveAlertPlayer(accountID int) error {
-	players, err := c.storage.ReadAlertPlayers()
+	players, err := c.storage.AlertPlayers()
 	if err != nil {
 		return err
 	}

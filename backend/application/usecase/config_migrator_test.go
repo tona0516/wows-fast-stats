@@ -35,7 +35,7 @@ func TestConfigMigrator_Migrate(t *testing.T) {
 		mockConfigV0.On("AlertPlayers").Return(expectedAlertPlayers, nil)
 		mockConfigV0.On("DeleteAlertPlayers").Return(nil)
 		mockStorage := &mocks.StorageInterface{}
-		mockStorage.On("ReadDataVersion").Return(uint(0), nil)
+		mockStorage.On("DataVersion").Return(uint(0), nil)
 		mockStorage.On("IsExistUserConfig").Return(false)
 		mockStorage.On("WriteUserConfig", expectedUserConfig).Return(nil)
 		mockStorage.On("IsExistAlertPlayers").Return(false)
@@ -60,7 +60,7 @@ func TestConfigMigrator_toV1(t *testing.T) {
 
 		// 準備
 		mockStorage := &mocks.StorageInterface{}
-		mockStorage.On("ReadDataVersion").Return(uint(1), nil)
+		mockStorage.On("DataVersion").Return(uint(1), nil)
 
 		// テスト
 		cm := NewConfigMigrator(nil, mockStorage, nil)
@@ -81,7 +81,7 @@ func TestConfigMigrator_toV1(t *testing.T) {
 		mockConfigV0.On("IsExistUser").Return(true)
 		mockConfigV0.On("IsExistAlertPlayers").Return(true)
 		mockStorage := &mocks.StorageInterface{}
-		mockStorage.On("ReadDataVersion").Return(uint(0), nil)
+		mockStorage.On("DataVersion").Return(uint(0), nil)
 		mockStorage.On("IsExistUserConfig").Return(true)
 		mockStorage.On("IsExistAlertPlayers").Return(true)
 		mockStorage.On("WriteDataVersion", uint(1)).Return(nil)

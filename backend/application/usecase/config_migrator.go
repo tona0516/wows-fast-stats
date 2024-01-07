@@ -35,7 +35,7 @@ func (m *ConfigMigrator) Execute() error {
 
 //nolint:cyclop
 func (m *ConfigMigrator) toV1() error {
-	version, err := m.storage.ReadDataVersion()
+	version, err := m.storage.DataVersion()
 	if err != nil {
 		return err
 	}

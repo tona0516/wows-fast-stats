@@ -36,7 +36,7 @@ func TestConfig_UpdateRequired(t *testing.T) {
 		mockWargaming := &mocks.WargamingInterface{}
 		mockStorage := &mocks.StorageInterface{}
 		mockWargaming.On("Test", config.Appid).Return(true, nil)
-		mockStorage.On("ReadUserConfig").Return(domain.DefaultUserConfig, nil)
+		mockStorage.On("UserConfig").Return(domain.DefaultUserConfig, nil)
 		mockStorage.On("WriteUserConfig", config).Return(nil)
 
 		// テスト
@@ -100,7 +100,7 @@ func TestConfig_UpdateOptional(t *testing.T) {
 		actualWritten.FontSize = "small"
 
 		mockStorage := &mocks.StorageInterface{}
-		mockStorage.On("ReadUserConfig").Return(domain.DefaultUserConfig, nil)
+		mockStorage.On("UserConfig").Return(domain.DefaultUserConfig, nil)
 		mockStorage.On("WriteUserConfig", actualWritten).Return(nil)
 
 		// テスト実行
@@ -125,7 +125,7 @@ func TestConfig_AlertPlayers(t *testing.T) {
 			{AccountID: 2, Name: "Player2"},
 		}
 		mockStorage := &mocks.StorageInterface{}
-		mockStorage.On("ReadAlertPlayers").Return(expected, nil)
+		mockStorage.On("AlertPlayers").Return(expected, nil)
 
 		// テスト
 		config := NewConfig(nil, nil, mockStorage, nil)
@@ -153,7 +153,7 @@ func TestConfig_UpdateAlertPlayer(t *testing.T) {
 		newPlayer := domain.AlertPlayer{AccountID: 3, Name: "Player3"}
 
 		mockStorage := &mocks.StorageInterface{}
-		mockStorage.On("ReadAlertPlayers").Return(existingPlayers, nil)
+		mockStorage.On("AlertPlayers").Return(existingPlayers, nil)
 		mockStorage.On("WriteAlertPlayers", append(existingPlayers, newPlayer)).Return(nil)
 
 		// テスト
@@ -172,7 +172,7 @@ func TestConfig_UpdateAlertPlayer(t *testing.T) {
 		playerToUpdate := domain.AlertPlayer{AccountID: 1, Name: "UpdatedPlayer"}
 
 		mockStorage := &mocks.StorageInterface{}
-		mockStorage.On("ReadAlertPlayers").Return(existingPlayers, nil)
+		mockStorage.On("AlertPlayers").Return(existingPlayers, nil)
 		mockStorage.On("WriteAlertPlayers", []domain.AlertPlayer{
 			{AccountID: 1, Name: "UpdatedPlayer"},
 			{AccountID: 2, Name: "Player2"},
@@ -202,7 +202,7 @@ func TestConfig_RemoveAlertPlayer(t *testing.T) {
 		}
 
 		mockStorage := &mocks.StorageInterface{}
-		mockStorage.On("ReadAlertPlayers").Return(existingPlayers, nil)
+		mockStorage.On("AlertPlayers").Return(existingPlayers, nil)
 		mockStorage.On("WriteAlertPlayers", mock.Anything).Return(nil)
 
 		// テスト

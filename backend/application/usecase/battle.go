@@ -228,7 +228,7 @@ func (b *Battle) fetchExpectedStats(channel chan vo.Result[domain.ExpectedStats]
 
 	b.logger.Warn(failure.New(apperr.FailSafeProccess))
 
-	expectedStats, errCache := b.storage.ReadExpectedStats()
+	expectedStats, errCache := b.storage.ExpectedStats()
 	if errCache == nil {
 		result.Value = expectedStats
 		channel <- result

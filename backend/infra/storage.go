@@ -28,7 +28,7 @@ func NewStorage(db *badger.DB) *Storage {
 	}
 }
 
-func (s *Storage) ReadDataVersion() (uint, error) {
+func (s *Storage) DataVersion() (uint, error) {
 	version, err := read[uint](s.db, dataVersionKey)
 	if isErrKeyNotFound(err) {
 		return 0, nil
@@ -46,7 +46,7 @@ func (s *Storage) IsExistUserConfig() bool {
 	return !isErrKeyNotFound(err)
 }
 
-func (s *Storage) ReadUserConfig() (domain.UserConfig, error) {
+func (s *Storage) UserConfig() (domain.UserConfig, error) {
 	config, err := read[domain.UserConfig](s.db, userConfigKey)
 	if isErrKeyNotFound(err) {
 		return domain.DefaultUserConfig, nil
@@ -64,7 +64,7 @@ func (s *Storage) IsExistAlertPlayers() bool {
 	return !isErrKeyNotFound(err)
 }
 
-func (s *Storage) ReadAlertPlayers() ([]domain.AlertPlayer, error) {
+func (s *Storage) AlertPlayers() ([]domain.AlertPlayer, error) {
 	players, err := read[[]domain.AlertPlayer](s.db, alertPlayersKey)
 	if isErrKeyNotFound(err) {
 		return make([]domain.AlertPlayer, 0), nil
@@ -77,7 +77,7 @@ func (s *Storage) WriteAlertPlayers(players []domain.AlertPlayer) error {
 	return write(s.db, alertPlayersKey, players)
 }
 
-func (s *Storage) ReadExpectedStats() (domain.ExpectedStats, error) {
+func (s *Storage) ExpectedStats() (domain.ExpectedStats, error) {
 	return read[domain.ExpectedStats](s.db, expectedStatsKey)
 }
 
@@ -85,7 +85,7 @@ func (s *Storage) WriteExpectedStats(expectedStats domain.ExpectedStats) error {
 	return write(s.db, expectedStatsKey, expectedStats)
 }
 
-func (s *Storage) ReadOwnIGN() (string, error) {
+func (s *Storage) OwnIGN() (string, error) {
 	return read[string](s.db, ownIGNKey)
 }
 
