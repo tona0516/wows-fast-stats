@@ -48,6 +48,7 @@ function setup() {
     "github.com/wailsapp/wails/v2/cmd/wails@latest",
     "github.com/golangci/golangci-lint/cmd/golangci-lint@latest",
     "github.com/vektra/mockery/v2@v2.38.0",
+    "github.com/fdaines/arch-go@latest",
   ];
   goPkgs.forEach((pkg) => {
     exec(`go install ${pkg}`);

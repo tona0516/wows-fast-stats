@@ -1,0 +1,25 @@
+version: 1
+threshold:
+  compliance: 100
+dependenciesRules:
+  - package: '**.adapter'
+    shouldOnlyDependsOn:
+      internal:
+        - '**.domain'
+  - package: '**.infra'
+    shouldNotDependsOn:
+      internal:
+        - '**.application'
+  - package: '**.application'
+    shouldNotDependsOn:
+      internal:
+        - '**.infra'
+  - package: '**.domain'
+    shouldNotDependsOn:
+      internal:
+        - '**.adapter'
+        - '**.infra'
+        - '**.application'
+contentsRules:
+  - package: '**.adapter'
+    shouldOnlyContainInterfaces: true
