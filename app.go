@@ -68,13 +68,13 @@ func (a *App) onStartup(ctx context.Context) {
 	a.logger.Init(ctx)
 
 	runtime.EventsOn(ctx, EventOnload, func(optionalData ...interface{}) {
-		a.logger.Info("application started")
+		a.logger.Info("application started", nil)
 	})
 }
 
 func (a *App) Migrate() error {
 	if err := a.configMigrator.Execute(); err != nil {
-		a.logger.Error(err)
+		a.logger.Error(err, nil)
 		return apperr.Unwrap(err)
 	}
 
@@ -83,7 +83,7 @@ func (a *App) Migrate() error {
 
 func (a *App) StartWatching() error {
 	if err := a.watcher.Prepare(); err != nil {
-		a.logger.Error(err)
+		a.logger.Error(err, nil)
 		return apperr.Unwrap(err)
 	}
 
@@ -103,13 +103,13 @@ func (a *App) Battle() (domain.Battle, error) {
 
 	userConfig, err := a.config.User()
 	if err != nil {
-		a.logger.Error(err)
+		a.logger.Error(err, nil)
 		return result, apperr.Unwrap(err)
 	}
 
 	result, err = a.battle.Get(userConfig)
 	if err != nil {
-		a.logger.Error(err)
+		a.logger.Error(err, nil)
 		return result, apperr.Unwrap(err)
 	}
 
@@ -119,7 +119,7 @@ func (a *App) Battle() (domain.Battle, error) {
 func (a *App) SelectDirectory() (string, error) {
 	path, err := a.config.SelectDirectory(a.ctx)
 	if err != nil {
-		a.logger.Error(err)
+		a.logger.Error(err, nil)
 	}
 
 	return path, apperr.Unwrap(err)
@@ -128,7 +128,7 @@ func (a *App) SelectDirectory() (string, error) {
 func (a *App) OpenDirectory(path string) error {
 	err := a.config.OpenDirectory(path)
 	if err != nil {
-		a.logger.Warn(err)
+		a.logger.Warn(err, nil)
 	}
 
 	return apperr.Unwrap(err)
@@ -141,7 +141,7 @@ func (a *App) DefaultUserConfig() domain.UserConfig {
 func (a *App) UserConfig() (domain.UserConfig, error) {
 	config, err := a.config.User()
 	if err != nil {
-		a.logger.Error(err)
+		a.logger.Error(err, nil)
 	}
 
 	return config, apperr.Unwrap(err)
@@ -150,7 +150,7 @@ func (a *App) UserConfig() (domain.UserConfig, error) {
 func (a *App) ApplyUserConfig(config domain.UserConfig) error {
 	err := a.config.UpdateOptional(config)
 	if err != nil {
-		a.logger.Error(err)
+		a.logger.Error(err, nil)
 	}
 
 	return apperr.Unwrap(err)
@@ -169,7 +169,7 @@ func (a *App) ApplyRequiredUserConfig(
 ) (vo.RequiredConfigError, error) {
 	validatedResult, err := a.config.UpdateRequired(installPath, appid)
 	if err != nil {
-		a.logger.Error(err)
+		a.logger.Error(err, nil)
 	}
 
 	return validatedResult, apperr.Unwrap(err)
@@ -178,7 +178,7 @@ func (a *App) ApplyRequiredUserConfig(
 func (a *App) ManualScreenshot(filename string, base64Data string) (bool, error) {
 	saved, err := a.screenshot.SaveWithDialog(a.ctx, filename, base64Data)
 	if err != nil {
-		a.logger.Error(err)
+		a.logger.Error(err, nil)
 	}
 	return saved, apperr.Unwrap(err)
 }
@@ -186,7 +186,7 @@ func (a *App) ManualScreenshot(filename string, base64Data string) (bool, error)
 func (a *App) AutoScreenshot(filename string, base64Data string) error {
 	err := a.screenshot.SaveForAuto(filename, base64Data)
 	if err != nil {
-		a.logger.Error(err)
+		a.logger.Error(err, nil)
 	}
 	return apperr.Unwrap(err)
 }
@@ -210,7 +210,7 @@ func (a *App) RemoveExcludePlayerID(playerID int) {
 func (a *App) AlertPlayers() ([]domain.AlertPlayer, error) {
 	players, err := a.config.AlertPlayers()
 	if err != nil {
-		a.logger.Error(err)
+		a.logger.Error(err, nil)
 	}
 
 	return players, apperr.Unwrap(err)
@@ -219,7 +219,7 @@ func (a *App) AlertPlayers() ([]domain.AlertPlayer, error) {
 func (a *App) UpdateAlertPlayer(player domain.AlertPlayer) error {
 	err := a.config.UpdateAlertPlayer(player)
 	if err != nil {
-		a.logger.Error(err)
+		a.logger.Error(err, nil)
 	}
 
 	return apperr.Unwrap(err)
@@ -228,7 +228,7 @@ func (a *App) UpdateAlertPlayer(player domain.AlertPlayer) error {
 func (a *App) RemoveAlertPlayer(accountID int) error {
 	err := a.config.RemoveAlertPlayer(accountID)
 	if err != nil {
-		a.logger.Error(err)
+		a.logger.Error(err, nil)
 	}
 
 	return apperr.Unwrap(err)
@@ -237,7 +237,7 @@ func (a *App) RemoveAlertPlayer(accountID int) error {
 func (a *App) SearchPlayer(prefix string) (domain.WGAccountList, error) {
 	accountList, err := a.config.SearchPlayer(prefix)
 	if err != nil {
-		a.logger.Error(err)
+		a.logger.Error(err, nil)
 	}
 
 	return accountList, apperr.Unwrap(err)
@@ -249,7 +249,7 @@ func (a *App) AlertPatterns() []string {
 
 func (a *App) LogError(errString string) {
 	err := failure.New(apperr.FrontendError, failure.Messagef("%s", errString))
-	a.logger.Error(err)
+	a.logger.Error(err, nil)
 }
 
 func (a *App) LatestRelease() (domain.GHLatestRelease, error) {

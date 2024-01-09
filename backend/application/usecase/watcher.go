@@ -75,7 +75,7 @@ func (w *Watcher) Start(appCtx context.Context, cancelCtx context.Context) {
 					continue
 				}
 
-				w.logger.Error(err)
+				w.logger.Error(err, nil)
 				w.eventsEmitFunc(appCtx, EventErr, apperr.Unwrap(err))
 				return
 			}

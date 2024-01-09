@@ -24,6 +24,7 @@ func (n *Numbers) ExpectedStats() (domain.ExpectedStats, error) {
 		res, err := webapi.GetRequest[domain.NSExpectedStats](
 			n.config.URL+"/personal/rating/expected/json/",
 			n.config.Timeout,
+			nil,
 		)
 		if err != nil {
 			return res, err

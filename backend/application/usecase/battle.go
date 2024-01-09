@@ -226,7 +226,7 @@ func (b *Battle) fetchExpectedStats(channel chan vo.Result[domain.ExpectedStats]
 		return
 	}
 
-	b.logger.Warn(failure.New(apperr.FailSafeProccess))
+	b.logger.Warn(failure.New(apperr.FailSafeProccess), nil)
 
 	expectedStats, errCache := b.storage.ExpectedStats()
 	if errCache == nil {

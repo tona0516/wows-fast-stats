@@ -147,7 +147,7 @@ func TestWatcher_Start(t *testing.T) {
 			domain.TempArenaInfo{},
 			failure.New(apperr.UnexpectedError),
 		)
-		mockLogger.On("Error", mock.Anything).Return()
+		mockLogger.On("Error", mock.Anything, mock.Anything).Return()
 
 		var events []string
 		emitFunc := func(ctx context.Context, eventName string, optionalData ...interface{}) {

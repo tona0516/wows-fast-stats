@@ -24,6 +24,7 @@ func (g *Github) LatestRelease() (domain.GHLatestRelease, error) {
 		res, err := webapi.GetRequest[domain.GHLatestRelease](
 			g.config.URL+"/repos/tona0516/wows-fast-stats/releases/latest",
 			g.config.Timeout,
+			nil,
 		)
 		if err != nil {
 			return res, err

@@ -7,7 +7,6 @@ import (
 	"os"
 	"testing"
 	"time"
-	"wfs/backend/application/vo"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -34,7 +33,7 @@ func TestGetRequest(t *testing.T) {
 		defer server.Close()
 		expected.FullURL = server.URL
 
-		actual, err := GetRequest[TestData](server.URL, 1*time.Second)
+		actual, err := GetRequest[TestData](server.URL, 1*time.Second, nil)
 
 		assert.Equal(t, expected, actual)
 		require.NoError(t, err)
@@ -53,7 +52,7 @@ func TestGetRequest(t *testing.T) {
 		defer server.Close()
 		expected.FullURL = server.URL + "?hoge=fuga"
 
-		actual, err := GetRequest[TestData](server.URL, 1*time.Second, vo.NewPair("hoge", "fuga"))
+		actual, err := GetRequest[TestData](server.URL, 1*time.Second, map[string]string{"hoge": "fuga"})
 
 		assert.Equal(t, expected, actual)
 		require.NoError(t, err)
@@ -71,7 +70,7 @@ func TestGetRequest(t *testing.T) {
 		}))
 		defer server.Close()
 
-		_, err := GetRequest[TestData](server.URL, 100*time.Millisecond)
+		_, err := GetRequest[TestData](server.URL, 100*time.Millisecond, nil)
 
 		require.Error(t, err)
 	})
@@ -100,7 +99,7 @@ func TestGetRequest(t *testing.T) {
 				}))
 				defer server.Close()
 
-				_, err := GetRequest[TestData](server.URL, 1*time.Second)
+				_, err := GetRequest[TestData](server.URL, 1*time.Second, nil)
 
 				require.Error(t, err)
 			})

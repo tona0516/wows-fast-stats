@@ -4,7 +4,6 @@ package mocks
 
 import (
 	context "context"
-	vo "wfs/backend/application/vo"
 
 	mock "github.com/stretchr/testify/mock"
 )
@@ -15,39 +14,18 @@ type LoggerInterface struct {
 }
 
 // Debug provides a mock function with given fields: message, contexts
-func (_m *LoggerInterface) Debug(message string, contexts ...vo.Pair) {
-	_va := make([]interface{}, len(contexts))
-	for _i := range contexts {
-		_va[_i] = contexts[_i]
-	}
-	var _ca []interface{}
-	_ca = append(_ca, message)
-	_ca = append(_ca, _va...)
-	_m.Called(_ca...)
+func (_m *LoggerInterface) Debug(message string, contexts map[string]string) {
+	_m.Called(message, contexts)
 }
 
 // Error provides a mock function with given fields: err, contexts
-func (_m *LoggerInterface) Error(err error, contexts ...vo.Pair) {
-	_va := make([]interface{}, len(contexts))
-	for _i := range contexts {
-		_va[_i] = contexts[_i]
-	}
-	var _ca []interface{}
-	_ca = append(_ca, err)
-	_ca = append(_ca, _va...)
-	_m.Called(_ca...)
+func (_m *LoggerInterface) Error(err error, contexts map[string]string) {
+	_m.Called(err, contexts)
 }
 
 // Info provides a mock function with given fields: message, contexts
-func (_m *LoggerInterface) Info(message string, contexts ...vo.Pair) {
-	_va := make([]interface{}, len(contexts))
-	for _i := range contexts {
-		_va[_i] = contexts[_i]
-	}
-	var _ca []interface{}
-	_ca = append(_ca, message)
-	_ca = append(_ca, _va...)
-	_m.Called(_ca...)
+func (_m *LoggerInterface) Info(message string, contexts map[string]string) {
+	_m.Called(message, contexts)
 }
 
 // Init provides a mock function with given fields: appCtx
@@ -56,15 +34,8 @@ func (_m *LoggerInterface) Init(appCtx context.Context) {
 }
 
 // Warn provides a mock function with given fields: err, contexts
-func (_m *LoggerInterface) Warn(err error, contexts ...vo.Pair) {
-	_va := make([]interface{}, len(contexts))
-	for _i := range contexts {
-		_va[_i] = contexts[_i]
-	}
-	var _ca []interface{}
-	_ca = append(_ca, err)
-	_ca = append(_ca, _va...)
-	_m.Called(_ca...)
+func (_m *LoggerInterface) Warn(err error, contexts map[string]string) {
+	_m.Called(err, contexts)
 }
 
 // NewLoggerInterface creates a new instance of LoggerInterface. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.

@@ -5,7 +5,6 @@ import (
 	"strings"
 	"time"
 	"wfs/backend/apperr"
-	"wfs/backend/application/vo"
 	"wfs/backend/domain"
 	"wfs/backend/infra/response"
 	"wfs/backend/infra/webapi"
@@ -38,10 +37,12 @@ func (w *Wargaming) AccountInfo(accountIDs []int) (domain.WGAccountInfo, error) 
 		w.config.URL+"/wows/account/info/",
 		w.config.Retry,
 		w.config.Timeout,
-		vo.NewPair("application_id", w.appid),
-		vo.NewPair("account_id", strings.Join(strAccountIDs, ",")),
-		vo.NewPair("fields", response.WGAccountInfo{}.Field()),
-		vo.NewPair("extra", "statistics.pvp_solo,statistics.pvp_div2,statistics.pvp_div3"),
+		map[string]string{
+			"application_id": w.appid,
+			"account_id":     strings.Join(strAccountIDs, ","),
+			"fields":         response.WGAccountInfo{}.Field(),
+			"extra":          "statistics.pvp_solo,statistics.pvp_div2,statistics.pvp_div3",
+		},
 	)
 
 	return res.Data, err
@@ -52,10 +53,12 @@ func (w *Wargaming) AccountList(accountNames []string) (domain.WGAccountList, er
 		w.config.URL+"/wows/account/list/",
 		w.config.Retry,
 		w.config.Timeout,
-		vo.NewPair("application_id", w.appid),
-		vo.NewPair("search", strings.Join(accountNames, ",")),
-		vo.NewPair("fields", response.WGAccountList{}.Field()),
-		vo.NewPair("type", "exact"),
+		map[string]string{
+			"application_id": w.appid,
+			"search":         strings.Join(accountNames, ","),
+			"fields":         response.WGAccountList{}.Field(),
+			"type":           "exact",
+		},
 	)
 
 	return res.Data, err
@@ -66,10 +69,12 @@ func (w *Wargaming) AccountListForSearch(prefix string) (domain.WGAccountList, e
 		w.config.URL+"/wows/account/list/",
 		w.config.Retry,
 		w.config.Timeout,
-		vo.NewPair("application_id", w.appid),
-		vo.NewPair("search", prefix),
-		vo.NewPair("fields", response.WGAccountList{}.Field()),
-		vo.NewPair("limit", "10"),
+		map[string]string{
+			"application_id": w.appid,
+			"search":         prefix,
+			"fields":         response.WGAccountList{}.Field(),
+			"limit":          "10",
+		},
 	)
 
 	return res.Data, err
@@ -85,9 +90,11 @@ func (w *Wargaming) ClansAccountInfo(accountIDs []int) (domain.WGClansAccountInf
 		w.config.URL+"/wows/clans/accountinfo/",
 		w.config.Retry,
 		w.config.Timeout,
-		vo.NewPair("application_id", w.appid),
-		vo.NewPair("account_id", strings.Join(strAccountIDs, ",")),
-		vo.NewPair("fields", response.WGClansAccountInfo{}.Field()),
+		map[string]string{
+			"application_id": w.appid,
+			"account_id":     strings.Join(strAccountIDs, ","),
+			"fields":         response.WGClansAccountInfo{}.Field(),
+		},
 	)
 
 	return res.Data, err
@@ -107,9 +114,11 @@ func (w *Wargaming) ClansInfo(clanIDs []int) (domain.WGClansInfo, error) {
 		w.config.URL+"/wows/clans/info/",
 		w.config.Retry,
 		w.config.Timeout,
-		vo.NewPair("application_id", w.appid),
-		vo.NewPair("clan_id", strings.Join(strClanIDs, ",")),
-		vo.NewPair("fields", response.WGClansInfo{}.Field()),
+		map[string]string{
+			"application_id": w.appid,
+			"clan_id":        strings.Join(strClanIDs, ","),
+			"fields":         response.WGClansInfo{}.Field(),
+		},
 	)
 
 	return res.Data, err
@@ -120,10 +129,12 @@ func (w *Wargaming) ShipsStats(accountID int) (domain.WGShipsStats, error) {
 		w.config.URL+"/wows/ships/stats/",
 		w.config.Retry,
 		w.config.Timeout,
-		vo.NewPair("application_id", w.appid),
-		vo.NewPair("account_id", strconv.Itoa(accountID)),
-		vo.NewPair("fields", response.WGShipsStats{}.Field()),
-		vo.NewPair("extra", "pvp_solo,pvp_div2,pvp_div3"),
+		map[string]string{
+			"application_id": w.appid,
+			"account_id":     strconv.Itoa(accountID),
+			"fields":         response.WGShipsStats{}.Field(),
+			"extra":          "pvp_solo,pvp_div2,pvp_div3",
+		},
 	)
 
 	return res.Data, err
@@ -134,10 +145,12 @@ func (w *Wargaming) EncycShips(pageNo int) (domain.WGEncycShips, int, error) {
 		w.config.URL+"/wows/encyclopedia/ships/",
 		w.config.Retry,
 		w.config.Timeout,
-		vo.NewPair("application_id", w.appid),
-		vo.NewPair("fields", response.WGEncycShips{}.Field()),
-		vo.NewPair("language", "ja"),
-		vo.NewPair("page_no", strconv.Itoa(pageNo)),
+		map[string]string{
+			"application_id": w.appid,
+			"fields":         response.WGEncycShips{}.Field(),
+			"language":       "ja",
+			"page_no":        strconv.Itoa(pageNo),
+		},
 	)
 
 	return res.Data, res.Meta.PageTotal, err
@@ -148,8 +161,10 @@ func (w *Wargaming) EncycInfo() (domain.WGEncycInfoData, error) {
 		w.config.URL+"/wows/encyclopedia/info/",
 		w.config.Retry,
 		w.config.Timeout,
-		vo.NewPair("application_id", w.appid),
-		vo.NewPair("fields", response.WGEncycInfo{}.Field()),
+		map[string]string{
+			"application_id": w.appid,
+			"fields":         response.WGEncycInfo{}.Field(),
+		},
 	)
 
 	return res.Data, err
@@ -160,9 +175,11 @@ func (w *Wargaming) BattleArenas() (domain.WGBattleArenas, error) {
 		w.config.URL+"/wows/encyclopedia/battlearenas/",
 		w.config.Retry,
 		w.config.Timeout,
-		vo.NewPair("application_id", w.appid),
-		vo.NewPair("fields", response.WGBattleArenas{}.Field()),
-		vo.NewPair("language", "ja"),
+		map[string]string{
+			"application_id": w.appid,
+			"fields":         response.WGBattleArenas{}.Field(),
+			"language":       "ja",
+		},
 	)
 
 	return res.Data, err
@@ -173,9 +190,11 @@ func (w *Wargaming) BattleTypes() (domain.WGBattleTypes, error) {
 		w.config.URL+"/wows/encyclopedia/battletypes/",
 		w.config.Retry,
 		w.config.Timeout,
-		vo.NewPair("application_id", w.appid),
-		vo.NewPair("fields", response.WGBattleTypes{}.Field()),
-		vo.NewPair("language", "ja"),
+		map[string]string{
+			"application_id": w.appid,
+			"fields":         response.WGBattleTypes{}.Field(),
+			"language":       "ja",
+		},
 	)
 
 	return res.Data, err
@@ -186,8 +205,10 @@ func (w *Wargaming) Test(appid string) (bool, error) {
 		w.config.URL+"/wows/encyclopedia/info/",
 		w.config.Retry,
 		w.config.Timeout,
-		vo.NewPair("application_id", appid),
-		vo.NewPair("fields", response.WGEncycInfo{}.Field()),
+		map[string]string{
+			"application_id": appid,
+			"fields":         response.WGEncycInfo{}.Field(),
+		},
 	)
 
 	return err == nil, err
@@ -197,11 +218,11 @@ func request[T response.WGResponse](
 	rawURL string,
 	retry uint64,
 	timeout time.Duration,
-	query ...vo.Pair,
+	queries map[string]string,
 ) (T, error) {
 	b := backoff.WithMaxRetries(backoff.NewExponentialBackOff(), retry)
 	operation := func() (webapi.Response[T], error) {
-		res, err := webapi.GetRequest[T](rawURL, timeout, query...)
+		res, err := webapi.GetRequest[T](rawURL, timeout, queries)
 		if err != nil {
 			return res, err
 		}

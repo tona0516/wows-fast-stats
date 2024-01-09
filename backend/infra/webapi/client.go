@@ -10,7 +10,6 @@ import (
 	"os"
 	"strconv"
 	"time"
-	"wfs/backend/application/vo"
 
 	"github.com/morikuni/failure"
 )
@@ -18,7 +17,7 @@ import (
 func GetRequest[T any](
 	rawURL string,
 	timeout time.Duration,
-	queries ...vo.Pair,
+	queries map[string]string,
 ) (Response[T], error) {
 	var response Response[T]
 	errCtx := failure.Context{}
@@ -29,8 +28,8 @@ func GetRequest[T any](
 		return response, failure.Wrap(err, errCtx)
 	}
 	q := u.Query()
-	for _, query := range queries {
-		q.Add(query.Key, query.Value)
+	for key, value := range queries {
+		q.Add(key, value)
 	}
 	u.RawQuery = q.Encode()
 	response.FullURL = u.String()

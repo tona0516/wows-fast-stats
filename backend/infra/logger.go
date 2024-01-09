@@ -63,21 +63,21 @@ func (l *Logger) Init(appCtx context.Context) {
 		Logger()
 }
 
-func (l *Logger) Debug(message string, contexts ...vo.Pair) {
+func (l *Logger) Debug(message string, contexts map[string]string) {
 	e := l.zlog.Debug()
-	addContext(e, contexts...)
+	addContext(e, contexts)
 	e.Msg(message)
 }
 
-func (l *Logger) Info(message string, contexts ...vo.Pair) {
+func (l *Logger) Info(message string, contexts map[string]string) {
 	e := l.zlog.Info()
-	addContext(e, contexts...)
+	addContext(e, contexts)
 	e.Msg(message)
 }
 
-func (l *Logger) Warn(err error, contexts ...vo.Pair) {
+func (l *Logger) Warn(err error, contexts map[string]string) {
 	e := l.zlog.Warn().Err(err)
-	addContext(e, contexts...)
+	addContext(e, contexts)
 	e.Send()
 
 	if l.report != nil {
@@ -85,9 +85,9 @@ func (l *Logger) Warn(err error, contexts ...vo.Pair) {
 	}
 }
 
-func (l *Logger) Error(err error, contexts ...vo.Pair) {
+func (l *Logger) Error(err error, contexts map[string]string) {
 	e := l.zlog.Error().Err(err)
-	addContext(e, contexts...)
+	addContext(e, contexts)
 	e.Send()
 
 	if l.report != nil {
@@ -95,11 +95,13 @@ func (l *Logger) Error(err error, contexts ...vo.Pair) {
 	}
 }
 
-func addContext(e *zerolog.Event, contexts ...vo.Pair) {
-	if len(contexts) != 0 {
-		for _, c := range contexts {
-			e = e.Str(c.Key, c.Value)
-		}
+func addContext(e *zerolog.Event, contexts map[string]string) {
+	if contexts == nil {
+		return
+	}
+
+	for key, value := range contexts {
+		e = e.Str(key, value)
 	}
 }
 
