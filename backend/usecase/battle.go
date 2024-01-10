@@ -3,22 +3,21 @@ package usecase
 import (
 	"sort"
 	"sync"
-	"wfs/backend/adapter"
 	"wfs/backend/apperr"
-	"wfs/backend/application/vo"
 	"wfs/backend/domain"
+	"wfs/backend/repository"
 
 	"github.com/morikuni/failure"
 )
 
 type Battle struct {
 	parallels     uint
-	wargaming     adapter.WargamingInterface
-	numbers       adapter.NumbersInterface
-	unregistered  adapter.UnregisteredInterface
-	localFile     adapter.LocalFileInterface
-	storage       adapter.StorageInterface
-	logger        adapter.LoggerInterface
+	wargaming     repository.WargamingInterface
+	numbers       repository.NumbersInterface
+	unregistered  repository.UnregisteredInterface
+	localFile     repository.LocalFileInterface
+	storage       repository.StorageInterface
+	logger        repository.LoggerInterface
 	isFirstBattle bool
 
 	warship          domain.Warships
@@ -29,12 +28,12 @@ type Battle struct {
 
 func NewBattle(
 	parallels uint,
-	wargaming adapter.WargamingInterface,
-	localFile adapter.LocalFileInterface,
-	numbers adapter.NumbersInterface,
-	unregistered adapter.UnregisteredInterface,
-	storage adapter.StorageInterface,
-	logger adapter.LoggerInterface,
+	wargaming repository.WargamingInterface,
+	localFile repository.LocalFileInterface,
+	numbers repository.NumbersInterface,
+	unregistered repository.UnregisteredInterface,
+	storage repository.StorageInterface,
+	logger repository.LoggerInterface,
 ) *Battle {
 	return &Battle{
 		parallels:     parallels,
@@ -53,10 +52,10 @@ func (b *Battle) Get(userConfig domain.UserConfig) (domain.Battle, error) {
 	var result domain.Battle
 
 	// Fetch on-memory stored data
-	warshipResult := make(chan vo.Result[domain.Warships])
-	allExpectedStatsResult := make(chan vo.Result[domain.ExpectedStats])
-	battleArenasResult := make(chan vo.Result[domain.WGBattleArenas])
-	battleTypesResult := make(chan vo.Result[domain.WGBattleTypes])
+	warshipResult := make(chan domain.Result[domain.Warships])
+	allExpectedStatsResult := make(chan domain.Result[domain.ExpectedStats])
+	battleArenasResult := make(chan domain.Result[domain.WGBattleArenas])
+	battleTypesResult := make(chan domain.Result[domain.WGBattleTypes])
 	if b.isFirstBattle {
 		go b.fetchWarships(warshipResult)
 		go b.fetchExpectedStats(allExpectedStatsResult)
@@ -81,9 +80,9 @@ func (b *Battle) Get(userConfig domain.UserConfig) (domain.Battle, error) {
 	accountIDs := accountList.AccountIDs()
 
 	// Fetch each stats
-	accountInfoResult := make(chan vo.Result[domain.WGAccountInfo])
-	shipStatsResult := make(chan vo.Result[domain.AllPlayerShipsStats])
-	clanResult := make(chan vo.Result[domain.Clans])
+	accountInfoResult := make(chan domain.Result[domain.WGAccountInfo])
+	shipStatsResult := make(chan domain.Result[domain.AllPlayerShipsStats])
+	clanResult := make(chan domain.Result[domain.Clans])
 	go b.fetchAccountInfo(accountIDs, accountInfoResult)
 	go b.fetchAllPlayerShipsStats(accountIDs, shipStatsResult)
 	go b.fetchClanTag(accountIDs, clanResult)
@@ -155,9 +154,9 @@ func (b *Battle) getTempArenaInfo(userConfig domain.UserConfig) (domain.TempAren
 	return tempArenaInfo, nil
 }
 
-func (b *Battle) fetchWarships(channel chan vo.Result[domain.Warships]) {
+func (b *Battle) fetchWarships(channel chan domain.Result[domain.Warships]) {
 	warships := make(domain.Warships)
-	var result vo.Result[domain.Warships]
+	var result domain.Result[domain.Warships]
 
 	var mu sync.Mutex
 	addToResult := func(data domain.WGEncycShips) {
@@ -215,8 +214,8 @@ func (b *Battle) fetchWarships(channel chan vo.Result[domain.Warships]) {
 	channel <- result
 }
 
-func (b *Battle) fetchExpectedStats(channel chan vo.Result[domain.ExpectedStats]) {
-	var result vo.Result[domain.ExpectedStats]
+func (b *Battle) fetchExpectedStats(channel chan domain.Result[domain.ExpectedStats]) {
+	var result domain.Result[domain.ExpectedStats]
 
 	expectedStats, errFetch := b.numbers.ExpectedStats()
 	if errFetch == nil {
@@ -239,22 +238,22 @@ func (b *Battle) fetchExpectedStats(channel chan vo.Result[domain.ExpectedStats]
 	channel <- result
 }
 
-func (b *Battle) fetchBattleArenas(channel chan vo.Result[domain.WGBattleArenas]) {
+func (b *Battle) fetchBattleArenas(channel chan domain.Result[domain.WGBattleArenas]) {
 	battleArenas, err := b.wargaming.BattleArenas()
-	channel <- vo.Result[domain.WGBattleArenas]{Value: battleArenas, Error: err}
+	channel <- domain.Result[domain.WGBattleArenas]{Value: battleArenas, Error: err}
 }
 
-func (b *Battle) fetchBattleTypes(channel chan vo.Result[domain.WGBattleTypes]) {
+func (b *Battle) fetchBattleTypes(channel chan domain.Result[domain.WGBattleTypes]) {
 	battleTypes, err := b.wargaming.BattleTypes()
-	channel <- vo.Result[domain.WGBattleTypes]{Value: battleTypes, Error: err}
+	channel <- domain.Result[domain.WGBattleTypes]{Value: battleTypes, Error: err}
 }
 
-func (b *Battle) fetchAccountInfo(accountIDs []int, channel chan vo.Result[domain.WGAccountInfo]) {
+func (b *Battle) fetchAccountInfo(accountIDs []int, channel chan domain.Result[domain.WGAccountInfo]) {
 	accountInfo, err := b.wargaming.AccountInfo(accountIDs)
-	channel <- vo.Result[domain.WGAccountInfo]{Value: accountInfo, Error: err}
+	channel <- domain.Result[domain.WGAccountInfo]{Value: accountInfo, Error: err}
 }
 
-func (b *Battle) fetchAllPlayerShipsStats(accountIDs []int, channel chan vo.Result[domain.AllPlayerShipsStats]) {
+func (b *Battle) fetchAllPlayerShipsStats(accountIDs []int, channel chan domain.Result[domain.AllPlayerShipsStats]) {
 	shipStatsMap := make(domain.AllPlayerShipsStats)
 	var mu sync.Mutex
 	err := doParallel(b.parallels, accountIDs, func(accountID int) error {
@@ -270,12 +269,12 @@ func (b *Battle) fetchAllPlayerShipsStats(accountIDs []int, channel chan vo.Resu
 		return nil
 	})
 
-	channel <- vo.Result[domain.AllPlayerShipsStats]{Value: shipStatsMap, Error: err}
+	channel <- domain.Result[domain.AllPlayerShipsStats]{Value: shipStatsMap, Error: err}
 }
 
-func (b *Battle) fetchClanTag(accountIDs []int, channel chan vo.Result[domain.Clans]) {
+func (b *Battle) fetchClanTag(accountIDs []int, channel chan domain.Result[domain.Clans]) {
 	clans := make(domain.Clans)
-	var result vo.Result[domain.Clans]
+	var result domain.Result[domain.Clans]
 
 	clansAccountInfo, err := b.wargaming.ClansAccountInfo(accountIDs)
 	if err != nil {

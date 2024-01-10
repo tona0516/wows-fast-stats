@@ -2,11 +2,10 @@ package main
 
 import (
 	"context"
-	"wfs/backend/adapter"
 	"wfs/backend/apperr"
-	"wfs/backend/application/usecase"
-	"wfs/backend/application/vo"
 	"wfs/backend/domain"
+	"wfs/backend/repository"
+	"wfs/backend/usecase"
 
 	"github.com/morikuni/failure"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
@@ -29,8 +28,8 @@ func newVolatileData() volatileData {
 //nolint:containedctx
 type App struct {
 	ctx            context.Context
-	env            vo.Env
-	logger         adapter.LoggerInterface
+	env            domain.Env
+	logger         repository.LoggerInterface
 	config         usecase.Config
 	screenshot     usecase.Screenshot
 	watcher        usecase.Watcher
@@ -41,8 +40,8 @@ type App struct {
 }
 
 func NewApp(
-	env vo.Env,
-	logger adapter.LoggerInterface,
+	env domain.Env,
+	logger repository.LoggerInterface,
 	config usecase.Config,
 	screenshot usecase.Screenshot,
 	watcher usecase.Watcher,
@@ -159,14 +158,14 @@ func (a *App) ApplyUserConfig(config domain.UserConfig) error {
 func (a *App) ValidateRequiredConfig(
 	installPath string,
 	appid string,
-) vo.RequiredConfigError {
+) domain.RequiredConfigError {
 	return a.config.ValidateRequired(installPath, appid)
 }
 
 func (a *App) ApplyRequiredUserConfig(
 	installPath string,
 	appid string,
-) (vo.RequiredConfigError, error) {
+) (domain.RequiredConfigError, error) {
 	validatedResult, err := a.config.UpdateRequired(installPath, appid)
 	if err != nil {
 		a.logger.Error(err, nil)

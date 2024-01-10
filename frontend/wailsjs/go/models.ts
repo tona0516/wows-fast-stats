@@ -766,6 +766,22 @@ export namespace domain {
 	
 	
 	
+	export class RequiredConfigError {
+	    valid: boolean;
+	    install_path: string;
+	    appid: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new RequiredConfigError(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.valid = source["valid"];
+	        this.install_path = source["install_path"];
+	        this.appid = source["appid"];
+	    }
+	}
 	
 	
 	
@@ -856,27 +872,6 @@ export namespace domain {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.nickname = source["nickname"];
 	        this.account_id = source["account_id"];
-	    }
-	}
-
-}
-
-export namespace vo {
-	
-	export class RequiredConfigError {
-	    valid: boolean;
-	    install_path: string;
-	    appid: string;
-	
-	    static createFrom(source: any = {}) {
-	        return new RequiredConfigError(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.valid = source["valid"];
-	        this.install_path = source["install_path"];
-	        this.appid = source["appid"];
 	    }
 	}
 

@@ -1,7 +1,7 @@
 import { Summary } from "src/lib/Summary";
 import { type OptionalBattle } from "src/lib/types";
 import { derived, writable, type Writable } from "svelte/store";
-import { domain, vo } from "wailsjs/go/models";
+import { domain } from "wailsjs/go/models";
 
 export const storedBattle = writable(undefined) as Writable<OptionalBattle>;
 export const storedExcludedPlayers = writable([]) as Writable<number[]>;
@@ -18,4 +18,4 @@ export const storedAlertPlayers = writable([]) as Writable<
 export const storedLogs = writable([]) as Writable<string[]>;
 export const storedRequiredConfigError = writable(
   {},
-) as Writable<vo.RequiredConfigError>;
+) as Writable<domain.RequiredConfigError>;

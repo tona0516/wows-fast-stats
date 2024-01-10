@@ -5,20 +5,20 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
-	"wfs/backend/application/vo"
+	"wfs/backend/domain"
 )
 
 const emptyJSON = "{}"
 
 type Report struct {
-	env       vo.Env
+	env       domain.Env
 	localFile LocalFile
 	discord   Discord
 	storage   Storage
 }
 
 func NewReport(
-	env vo.Env,
+	env domain.Env,
 	localFile LocalFile,
 	discord Discord,
 	storage Storage,

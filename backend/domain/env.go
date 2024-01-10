@@ -1,4 +1,4 @@
-package vo
+package domain
 
 // Note: set by ldflags.
 type Env struct {

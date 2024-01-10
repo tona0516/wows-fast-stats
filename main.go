@@ -6,9 +6,9 @@ import (
 	"os"
 	"strconv"
 	"time"
-	"wfs/backend/application/usecase"
-	"wfs/backend/application/vo"
+	"wfs/backend/domain"
 	"wfs/backend/infra"
+	"wfs/backend/usecase"
 
 	"github.com/dgraph-io/badger/v4"
 	"github.com/mitchellh/go-ps"
@@ -36,7 +36,7 @@ func main() {
 	}
 
 	isDev, _ := strconv.ParseBool(IsDev)
-	env := vo.Env{
+	env := domain.Env{
 		AppName: AppName,
 		Semver:  Semver,
 		IsDev:   isDev,
@@ -67,7 +67,7 @@ func main() {
 	}
 }
 
-func initApp(env vo.Env) *App {
+func initApp(env domain.Env) *App {
 	// infra
 	var maxRetry uint64 = 2
 	timeout := 10 * time.Second

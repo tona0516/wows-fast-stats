@@ -3,23 +3,22 @@ package usecase
 import (
 	"context"
 	"path/filepath"
-	"wfs/backend/adapter"
 	"wfs/backend/apperr"
-	"wfs/backend/application/vo"
+	"wfs/backend/repository"
 
 	"github.com/morikuni/failure"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 type Screenshot struct {
-	localFile      adapter.LocalFileInterface
-	logger         adapter.LoggerInterface
-	SaveFileDialog vo.SaveFileDialog
+	localFile      repository.LocalFileInterface
+	logger         repository.LoggerInterface
+	SaveFileDialog saveFileDialogFunc
 }
 
 func NewScreenshot(
-	localFile adapter.LocalFileInterface,
-	logger adapter.LoggerInterface,
+	localFile repository.LocalFileInterface,
+	logger repository.LoggerInterface,
 ) *Screenshot {
 	return &Screenshot{
 		localFile:      localFile,

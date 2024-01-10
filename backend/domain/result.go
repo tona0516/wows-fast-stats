@@ -1,4 +1,4 @@
-package vo
+package domain
 
 type Result[T any] struct {
 	Value T

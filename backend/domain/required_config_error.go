@@ -1,4 +1,4 @@
-package vo
+package domain
 
 type RequiredConfigError struct {
 	Valid       bool   `json:"valid"`

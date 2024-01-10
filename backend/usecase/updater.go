@@ -2,24 +2,23 @@ package usecase
 
 import (
 	"fmt"
-	"wfs/backend/adapter"
-	"wfs/backend/application/vo"
 	"wfs/backend/domain"
+	"wfs/backend/repository"
 
 	"github.com/Masterminds/semver/v3"
 	"github.com/morikuni/failure"
 )
 
 type Updater struct {
-	env    vo.Env
-	github adapter.GithubInterface
-	logger adapter.LoggerInterface
+	env    domain.Env
+	github repository.GithubInterface
+	logger repository.LoggerInterface
 }
 
 func NewUpdater(
-	env vo.Env,
-	github adapter.GithubInterface,
-	logger adapter.LoggerInterface,
+	env domain.Env,
+	github repository.GithubInterface,
+	logger repository.LoggerInterface,
 ) *Updater {
 	return &Updater{
 		env:    env,

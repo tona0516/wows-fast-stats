@@ -4,8 +4,8 @@ import (
 	"context"
 	"os"
 	"time"
-	"wfs/backend/adapter"
-	"wfs/backend/application/vo"
+	"wfs/backend/domain"
+	"wfs/backend/repository"
 
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/pkgerrors"
@@ -14,13 +14,13 @@ import (
 
 type Logger struct {
 	zlog   zerolog.Logger
-	env    vo.Env
-	report adapter.ReportInterface
+	env    domain.Env
+	report repository.ReportInterface
 }
 
 func NewLogger(
-	env vo.Env,
-	report adapter.ReportInterface,
+	env domain.Env,
+	report repository.ReportInterface,
 ) *Logger {
 	return &Logger{
 		env:    env,

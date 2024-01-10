@@ -4,10 +4,9 @@ import (
 	"context"
 	"os"
 	"path/filepath"
-	"wfs/backend/adapter"
 	"wfs/backend/apperr"
-	"wfs/backend/application/vo"
 	"wfs/backend/domain"
+	"wfs/backend/repository"
 
 	"github.com/morikuni/failure"
 	"github.com/skratchdot/open-golang/open"
@@ -17,19 +16,19 @@ import (
 const GameExeName = "WorldOfWarships.exe"
 
 type Config struct {
-	localFile           adapter.LocalFileInterface
-	wargaming           adapter.WargamingInterface
-	storage             adapter.StorageInterface
-	logger              adapter.LoggerInterface
-	OpenDirectoryDialog vo.OpenDirectoryDialog
-	OpenWithDefaultApp  vo.OpenWithDefaultApp
+	localFile           repository.LocalFileInterface
+	wargaming           repository.WargamingInterface
+	storage             repository.StorageInterface
+	logger              repository.LoggerInterface
+	OpenDirectoryDialog openDirectoryDialogFunc
+	OpenWithDefaultApp  openWithDefaultAppFunc
 }
 
 func NewConfig(
-	localFile adapter.LocalFileInterface,
-	wargaming adapter.WargamingInterface,
-	storage adapter.StorageInterface,
-	logger adapter.LoggerInterface,
+	localFile repository.LocalFileInterface,
+	wargaming repository.WargamingInterface,
+	storage repository.StorageInterface,
+	logger repository.LoggerInterface,
 ) *Config {
 	return &Config{
 		localFile:           localFile,
@@ -48,8 +47,8 @@ func (c *Config) User() (domain.UserConfig, error) {
 func (c *Config) ValidateRequired(
 	installPath string,
 	appid string,
-) vo.RequiredConfigError {
-	result := vo.RequiredConfigError{}
+) domain.RequiredConfigError {
+	result := domain.RequiredConfigError{}
 
 	if installPath == "" {
 		result.InstallPath = apperr.EmptyInstallPath.ErrorCode()
@@ -74,7 +73,7 @@ func (c *Config) ValidateRequired(
 func (c *Config) UpdateRequired(
 	installPath string,
 	appid string,
-) (vo.RequiredConfigError, error) {
+) (domain.RequiredConfigError, error) {
 	// validate
 	validatedResult := c.ValidateRequired(installPath, appid)
 	if !validatedResult.Valid {

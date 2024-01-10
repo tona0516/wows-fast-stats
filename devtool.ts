@@ -58,7 +58,7 @@ function setup() {
 
 function genmock() {
   exec(
-    "mockery --all --dir ./backend/adapter --output ./backend/mocks"
+    "mockery --all --dir ./backend/repository --output ./backend/mocks"
   );
 }
 

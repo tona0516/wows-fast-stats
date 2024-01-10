@@ -6,7 +6,6 @@ import (
 	"path/filepath"
 	"testing"
 	"wfs/backend/apperr"
-	"wfs/backend/application/vo"
 	"wfs/backend/domain"
 	"wfs/backend/mocks"
 
@@ -44,7 +43,7 @@ func TestConfig_UpdateRequired(t *testing.T) {
 		actual, err := c.UpdateRequired(config.InstallPath, config.Appid)
 
 		// アサーション
-		assert.Equal(t, vo.RequiredConfigError{Valid: true}, actual)
+		assert.Equal(t, domain.RequiredConfigError{Valid: true}, actual)
 		require.NoError(t, err)
 		mockWargaming.AssertExpectations(t)
 		mockStorage.AssertExpectations(t)
@@ -63,7 +62,7 @@ func TestConfig_UpdateRequired(t *testing.T) {
 		actual, err := c.UpdateRequired(config.InstallPath, config.Appid)
 
 		// アサーション
-		assert.Equal(t, vo.RequiredConfigError{InstallPath: apperr.InvalidInstallPath.ErrorCode()}, actual)
+		assert.Equal(t, domain.RequiredConfigError{InstallPath: apperr.InvalidInstallPath.ErrorCode()}, actual)
 		require.NoError(t, err)
 		mockWargaming.AssertExpectations(t)
 	})
@@ -79,7 +78,7 @@ func TestConfig_UpdateRequired(t *testing.T) {
 		actual, err := c.UpdateRequired(config.InstallPath, config.Appid)
 
 		// アサーション
-		assert.Equal(t, vo.RequiredConfigError{AppID: apperr.InvalidAppID.ErrorCode()}, actual)
+		assert.Equal(t, domain.RequiredConfigError{AppID: apperr.InvalidAppID.ErrorCode()}, actual)
 		require.NoError(t, err)
 		mockWargaming.AssertExpectations(t)
 	})

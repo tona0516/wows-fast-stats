@@ -3,7 +3,6 @@ package usecase
 import (
 	"testing"
 	"wfs/backend/apperr"
-	"wfs/backend/application/vo"
 	"wfs/backend/domain"
 	"wfs/backend/mocks"
 
@@ -22,7 +21,7 @@ func TestUpdater_IsUpdatable(t *testing.T) {
 		response := domain.GHLatestRelease{TagName: "2.0.0", HTMLURL: "https://hoge.com"}
 		mockGithub.On("LatestRelease").Return(response, nil)
 
-		env := vo.Env{Semver: "1.0.0"}
+		env := domain.Env{Semver: "1.0.0"}
 		updater := NewUpdater(env, mockGithub, nil)
 
 		// テスト
@@ -44,7 +43,7 @@ func TestUpdater_IsUpdatable(t *testing.T) {
 		response := domain.GHLatestRelease{TagName: "1.0.0", HTMLURL: "https://hoge.com"}
 		mockGithub.On("LatestRelease").Return(response, nil)
 
-		env := vo.Env{Semver: "1.0.0"}
+		env := domain.Env{Semver: "1.0.0"}
 		updater := NewUpdater(env, mockGithub, nil)
 
 		// テスト
@@ -66,7 +65,7 @@ func TestUpdater_IsUpdatable(t *testing.T) {
 		expected := failure.New(apperr.HTTPRequestError)
 		mockGithub.On("LatestRelease").Return(domain.GHLatestRelease{}, expected)
 
-		env := vo.Env{Semver: "1.0.0"}
+		env := domain.Env{Semver: "1.0.0"}
 		updater := NewUpdater(env, mockGithub, nil)
 
 		// テスト

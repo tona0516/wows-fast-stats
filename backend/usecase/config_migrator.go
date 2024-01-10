@@ -1,22 +1,22 @@
 package usecase
 
 import (
-	"wfs/backend/adapter"
 	"wfs/backend/apperr"
+	"wfs/backend/repository"
 
 	"github.com/morikuni/failure"
 )
 
 type ConfigMigrator struct {
-	configV0 adapter.ConfigV0Interface
-	storage  adapter.StorageInterface
-	logger   adapter.LoggerInterface
+	configV0 repository.ConfigV0Interface
+	storage  repository.StorageInterface
+	logger   repository.LoggerInterface
 }
 
 func NewConfigMigrator(
-	configV0 adapter.ConfigV0Interface,
-	storage adapter.StorageInterface,
-	logger adapter.LoggerInterface,
+	configV0 repository.ConfigV0Interface,
+	storage repository.StorageInterface,
+	logger repository.LoggerInterface,
 ) *ConfigMigrator {
 	return &ConfigMigrator{
 		configV0: configV0,
