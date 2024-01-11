@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	domain "wfs/backend/domain"
+	model "wfs/backend/domain/model"
 
 	mock "github.com/stretchr/testify/mock"
 )
@@ -14,23 +14,23 @@ type UnregisteredInterface struct {
 }
 
 // Warship provides a mock function with given fields:
-func (_m *UnregisteredInterface) Warship() (domain.Warships, error) {
+func (_m *UnregisteredInterface) Warship() (model.Warships, error) {
 	ret := _m.Called()
 
 	if len(ret) == 0 {
 		panic("no return value specified for Warship")
 	}
 
-	var r0 domain.Warships
+	var r0 model.Warships
 	var r1 error
-	if rf, ok := ret.Get(0).(func() (domain.Warships, error)); ok {
+	if rf, ok := ret.Get(0).(func() (model.Warships, error)); ok {
 		return rf()
 	}
-	if rf, ok := ret.Get(0).(func() domain.Warships); ok {
+	if rf, ok := ret.Get(0).(func() model.Warships); ok {
 		r0 = rf()
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(domain.Warships)
+			r0 = ret.Get(0).(model.Warships)
 		}
 	}
 

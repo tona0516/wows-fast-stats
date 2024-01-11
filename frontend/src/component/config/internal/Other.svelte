@@ -3,9 +3,9 @@
   import { Notifier } from "src/lib/Notifier";
   import { createEventDispatcher } from "svelte";
   import { OpenDirectory } from "wailsjs/go/main/App";
-  import { domain } from "wailsjs/go/models";
+  import { model } from "wailsjs/go/models";
 
-  export let inputConfig: domain.UserConfig;
+  export let inputConfig: model.UserConfig;
 
   const dispatch = createEventDispatcher();
 

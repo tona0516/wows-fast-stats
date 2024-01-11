@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { domain } from "wailsjs/go/models";
+  import type { model } from "wailsjs/go/models";
   import ExternalLink from "src/component/common/ExternalLink.svelte";
   import UkTable from "src/component/common/uikit/UkTable.svelte";
   import { DispName } from "src/lib/DispName";
@@ -8,7 +8,7 @@
     RatingColorFactory,
   } from "src/lib/rating/RatingColorFactory";
 
-  export let config: domain.UserConfig;
+  export let config: model.UserConfig;
 
   const COLUMNS = [
     { text: "スキル", colspan: 1 },

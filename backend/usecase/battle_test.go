@@ -3,7 +3,7 @@ package usecase
 import (
 	"testing"
 	"wfs/backend/apperr"
-	"wfs/backend/domain"
+	"wfs/backend/domain/model"
 	"wfs/backend/mocks"
 
 	"github.com/morikuni/failure"
@@ -23,12 +23,12 @@ func TestBattle_Get_正常系_初回(t *testing.T) {
 	mockStorage := &mocks.StorageInterface{}
 
 	mockWargaming.On("SetAppID", mock.Anything).Return()
-	mockWargaming.On("AccountList", mock.Anything).Return(domain.WGAccountList{
+	mockWargaming.On("AccountList", mock.Anything).Return(model.WGAccountList{
 		{NickName: "player_1", AccountID: 1},
 		{NickName: "player_2", AccountID: 2},
 	}, nil)
-	mockWargaming.On("EncycShips", mock.Anything).Return(domain.WGEncycShips{
-		1: domain.WGEncycShipsData{
+	mockWargaming.On("EncycShips", mock.Anything).Return(model.WGEncycShips{
+		1: model.WGEncycShipsData{
 			Tier:      1,
 			Type:      "Battleship",
 			Name:      "ship_1",
@@ -36,19 +36,19 @@ func TestBattle_Get_正常系_初回(t *testing.T) {
 			IsPremium: false,
 		},
 	}, 2, nil)
-	mockWargaming.On("BattleArenas").Return(domain.WGBattleArenas{}, nil)
-	mockWargaming.On("BattleTypes").Return(domain.WGBattleTypes{}, nil)
-	mockWargaming.On("AccountInfo", mock.Anything).Return(domain.WGAccountInfo{}, nil)
-	mockWargaming.On("ShipsStats", mock.Anything).Return(domain.WGShipsStats{}, nil)
-	mockWargaming.On("ClansAccountInfo", mock.Anything).Return(domain.WGClansAccountInfo{}, nil)
-	mockWargaming.On("ClansInfo", mock.Anything).Return(domain.WGClansInfo{}, nil)
+	mockWargaming.On("BattleArenas").Return(model.WGBattleArenas{}, nil)
+	mockWargaming.On("BattleTypes").Return(model.WGBattleTypes{}, nil)
+	mockWargaming.On("AccountInfo", mock.Anything).Return(model.WGAccountInfo{}, nil)
+	mockWargaming.On("ShipsStats", mock.Anything).Return(model.WGShipsStats{}, nil)
+	mockWargaming.On("ClansAccountInfo", mock.Anything).Return(model.WGClansAccountInfo{}, nil)
+	mockWargaming.On("ClansInfo", mock.Anything).Return(model.WGClansInfo{}, nil)
 
-	mockNumbers.On("ExpectedStats").Return(domain.ExpectedStats{}, nil)
+	mockNumbers.On("ExpectedStats").Return(model.ExpectedStats{}, nil)
 
-	mockUnregistered.On("Warship").Return(domain.Warships{}, nil)
+	mockUnregistered.On("Warship").Return(model.Warships{}, nil)
 
-	mockLocalFile.On("TempArenaInfo", mock.Anything).Return(domain.TempArenaInfo{
-		Vehicles: []domain.Vehicle{
+	mockLocalFile.On("TempArenaInfo", mock.Anything).Return(model.TempArenaInfo{
+		Vehicles: []model.Vehicle{
 			{ShipID: 1, Name: "player_1", Relation: 0},
 			{ShipID: 2, Name: "player_2", Relation: 2},
 		},
@@ -59,7 +59,7 @@ func TestBattle_Get_正常系_初回(t *testing.T) {
 
 	// テスト
 	b := NewBattle(5, mockWargaming, mockLocalFile, mockNumbers, mockUnregistered, mockStorage, nil)
-	_, err := b.Get(domain.UserConfig{})
+	_, err := b.Get(model.UserConfig{})
 
 	// アサーション
 	require.NoError(t, err)
@@ -81,17 +81,17 @@ func TestBattle_Get_正常系_2回目以降(t *testing.T) {
 	mockStorage := &mocks.StorageInterface{}
 
 	mockWargaming.On("SetAppID", mock.Anything).Return()
-	mockWargaming.On("AccountList", mock.Anything).Return(domain.WGAccountList{
+	mockWargaming.On("AccountList", mock.Anything).Return(model.WGAccountList{
 		{NickName: "player_1", AccountID: 1},
 		{NickName: "player_2", AccountID: 2},
 	}, nil)
-	mockWargaming.On("AccountInfo", mock.Anything).Return(domain.WGAccountInfo{}, nil)
-	mockWargaming.On("ShipsStats", mock.Anything).Return(domain.WGShipsStats{}, nil)
-	mockWargaming.On("ClansAccountInfo", mock.Anything).Return(domain.WGClansAccountInfo{}, nil)
-	mockWargaming.On("ClansInfo", mock.Anything).Return(domain.WGClansInfo{}, nil)
+	mockWargaming.On("AccountInfo", mock.Anything).Return(model.WGAccountInfo{}, nil)
+	mockWargaming.On("ShipsStats", mock.Anything).Return(model.WGShipsStats{}, nil)
+	mockWargaming.On("ClansAccountInfo", mock.Anything).Return(model.WGClansAccountInfo{}, nil)
+	mockWargaming.On("ClansInfo", mock.Anything).Return(model.WGClansInfo{}, nil)
 
-	mockLocalFile.On("TempArenaInfo", mock.Anything).Return(domain.TempArenaInfo{
-		Vehicles: []domain.Vehicle{
+	mockLocalFile.On("TempArenaInfo", mock.Anything).Return(model.TempArenaInfo{
+		Vehicles: []model.Vehicle{
 			{ShipID: 1, Name: "player_1", Relation: 0},
 			{ShipID: 2, Name: "player_2", Relation: 2},
 		},
@@ -102,7 +102,7 @@ func TestBattle_Get_正常系_2回目以降(t *testing.T) {
 	// テスト
 	b := NewBattle(5, mockWargaming, mockLocalFile, mockNumbers, mockUnregistered, mockStorage, nil)
 	b.isFirstBattle = false
-	_, err := b.Get(domain.UserConfig{})
+	_, err := b.Get(model.UserConfig{})
 
 	// アサーション
 	require.NoError(t, err)
@@ -126,12 +126,12 @@ func TestBattle_Get_異常系(t *testing.T) {
 	mockWargaming.On("SetAppID", mock.Anything).Return()
 
 	expectedError := failure.New(apperr.FileNotExist)
-	mockLocalFile.On("TempArenaInfo", mock.Anything).Return(domain.TempArenaInfo{}, expectedError)
+	mockLocalFile.On("TempArenaInfo", mock.Anything).Return(model.TempArenaInfo{}, expectedError)
 
 	// テスト
 	b := NewBattle(5, mockWargaming, mockLocalFile, mockNumbers, mockUnregistered, mockStorage, nil)
 	b.isFirstBattle = false
-	_, err := b.Get(domain.UserConfig{})
+	_, err := b.Get(model.UserConfig{})
 
 	// アサーション
 	code, ok := failure.CodeOf(err)

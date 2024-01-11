@@ -3,10 +3,10 @@ import { AbstractColumn } from "src/lib/column/intetface/AbstractColumn";
 import { RatingColorFactory } from "src/lib/rating/RatingColorFactory";
 import { type BasicKey, type StatsCategory } from "src/lib/types";
 import { toPlayerStats } from "src/lib/util";
-import type { domain } from "wailsjs/go/models";
+import type { model } from "wailsjs/go/models";
 
 export class PlayerName extends AbstractColumn<BasicKey> {
-  constructor(private config: domain.UserConfig) {
+  constructor(private config: model.UserConfig) {
     super("player_name", "プレイヤー", "プレイヤー", 2);
   }
 
@@ -18,7 +18,7 @@ export class PlayerName extends AbstractColumn<BasicKey> {
     return true;
   }
 
-  displayValue(player: domain.Player): string {
+  displayValue(player: model.Player): string {
     const clanID = player.player_info.clan.id;
     const clanTag = player.player_info.clan.tag;
     const playerName = player.player_info.name;
@@ -26,11 +26,11 @@ export class PlayerName extends AbstractColumn<BasicKey> {
     return clanID !== 0 ? `[${clanTag}] ${playerName}` : playerName;
   }
 
-  isShowCheckBox(player: domain.Player): boolean {
+  isShowCheckBox(player: model.Player): boolean {
     return player.player_info.id !== 0;
   }
 
-  bgColorCode(player: domain.Player): string {
+  bgColorCode(player: model.Player): string {
     let statsCategory: StatsCategory | undefined;
 
     if (this.config.custom_color.player_name === "ship") {

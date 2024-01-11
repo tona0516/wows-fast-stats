@@ -1,7 +1,7 @@
 import clone from "clone";
 import { RatingAdapter } from "src/lib/rating/RatingColor";
 import type { Rating, ShipType } from "src/lib/types";
-import { domain } from "wailsjs/go/models";
+import { model } from "wailsjs/go/models";
 
 class RatingFactor {
   constructor(
@@ -63,7 +63,7 @@ export const RATING_FACTORS: RatingFactor[] = [
   ),
 ];
 
-const getSampleTeam = (): domain.Team => {
+const getSampleTeam = (): model.Team => {
   const SAMPLE_AVG_DAMAGE = 10000;
   const SHIP_INFO_SAMPLES: { type: ShipType; tier: number }[] = [
     { type: "cv", tier: 11 },
@@ -77,7 +77,7 @@ const getSampleTeam = (): domain.Team => {
   ];
 
   const players = RATING_FACTORS.map((value, i, _) => {
-    const ss = new domain.ShipStats();
+    const ss = new model.ShipStats();
     ss.battles = 10;
     ss.damage = value.damage.min * SAMPLE_AVG_DAMAGE;
     ss.max_damage = {
@@ -98,7 +98,7 @@ const getSampleTeam = (): domain.Team => {
     ss.planes_killed = 5;
     ss.platoon_rate = 3.00;
 
-    const os = new domain.OverallStats();
+    const os = new model.OverallStats();
     os.battles = 10;
     os.damage = value.damage.min * SAMPLE_AVG_DAMAGE;
     os.max_damage = {
@@ -129,13 +129,13 @@ const getSampleTeam = (): domain.Team => {
     };
     os.platoon_rate = 3.00;
 
-    const pi = new domain.PlayerInfo();
+    const pi = new model.PlayerInfo();
     pi.id = 1;
     pi.name = "player_name" + i + 1;
     pi.clan = { tag: "TEST", id: 1 };
     pi.is_hidden = false;
 
-    const si = new domain.ShipInfo();
+    const si = new model.ShipInfo();
     si.id = 1;
     si.name = "Test Ship";
     si.nation = "japan";
@@ -144,15 +144,15 @@ const getSampleTeam = (): domain.Team => {
     si.avg_damage = SAMPLE_AVG_DAMAGE;
     si.is_premium = false;
 
-    const pvpSolo = new domain.PlayerStats();
+    const pvpSolo = new model.PlayerStats();
     pvpSolo.ship = clone(ss);
     pvpSolo.overall = clone(os);
 
-    const pvpAll = new domain.PlayerStats();
+    const pvpAll = new model.PlayerStats();
     pvpAll.ship = clone(ss);
     pvpAll.overall = clone(os);
 
-    const player = new domain.Player();
+    const player = new model.Player();
     player.player_info = pi;
     player.ship_info = si;
     player.pvp_solo = pvpSolo;
@@ -161,7 +161,7 @@ const getSampleTeam = (): domain.Team => {
     return player;
   });
 
-  const team = new domain.Team();
+  const team = new model.Team();
   team.players = players;
 
   return team;
@@ -172,7 +172,7 @@ export const SAMPLE_TEAM = getSampleTeam();
 export namespace RatingColorFactory {
   export const fromPR = (
     value: number,
-    config: domain.UserConfig,
+    config: model.UserConfig,
   ): RatingAdapter => {
     const rf = RATING_FACTORS.findLast(
       (it) => value >= 0 && value >= it.pr.min,
@@ -183,7 +183,7 @@ export namespace RatingColorFactory {
   export const fromDamage = (
     value: number,
     expected: number,
-    config: domain.UserConfig,
+    config: model.UserConfig,
   ): RatingAdapter => {
     if (expected === 0) {
       return new RatingAdapter(undefined, config);
@@ -196,7 +196,7 @@ export namespace RatingColorFactory {
 
   export const fromWinRate = (
     value: number,
-    config: domain.UserConfig,
+    config: model.UserConfig,
   ): RatingAdapter => {
     const rf = RATING_FACTORS.findLast((it) => value >= it.winRate.min);
     return new RatingAdapter(rf?.level, config);

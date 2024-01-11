@@ -5,12 +5,12 @@
   import { Notifier } from "src/lib/Notifier";
   import { storedConfig } from "src/stores";
   import { ApplyUserConfig } from "wailsjs/go/main/App";
-  import { domain } from "wailsjs/go/models";
+  import { model } from "wailsjs/go/models";
 
-  export let inputConfig: domain.UserConfig;
+  export let inputConfig: model.UserConfig;
 
   let isLoading = false;
-  let teamAverage: domain.TeamAverage = inputConfig.team_average;
+  let teamAverage: model.TeamAverage = inputConfig.team_average;
 
   $: isValidMinShipBattles =
     teamAverage.min_ship_battles > 0 &&

@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"time"
 	"wfs/backend/apperr"
-	"wfs/backend/domain"
-	"wfs/backend/repository"
+	"wfs/backend/domain/model"
+	"wfs/backend/domain/repository"
 
 	"github.com/morikuni/failure"
 )
@@ -24,7 +24,7 @@ type Watcher struct {
 	storage        repository.StorageInterface
 	logger         repository.LoggerInterface
 	eventsEmitFunc eventEmitFunc
-	userConfig     domain.UserConfig
+	userConfig     model.UserConfig
 }
 
 func NewWatcher(

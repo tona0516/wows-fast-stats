@@ -2,7 +2,7 @@ package usecase
 
 import (
 	"wfs/backend/apperr"
-	"wfs/backend/repository"
+	"wfs/backend/domain/repository"
 
 	"github.com/morikuni/failure"
 )

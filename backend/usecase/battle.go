@@ -4,8 +4,8 @@ import (
 	"sort"
 	"sync"
 	"wfs/backend/apperr"
-	"wfs/backend/domain"
-	"wfs/backend/repository"
+	"wfs/backend/domain/model"
+	"wfs/backend/domain/repository"
 
 	"github.com/morikuni/failure"
 )
@@ -20,10 +20,10 @@ type Battle struct {
 	logger        repository.LoggerInterface
 	isFirstBattle bool
 
-	warship          domain.Warships
-	allExpectedStats domain.ExpectedStats
-	battleArenas     domain.WGBattleArenas
-	battleTypes      domain.WGBattleTypes
+	warship          model.Warships
+	allExpectedStats model.ExpectedStats
+	battleArenas     model.WGBattleArenas
+	battleTypes      model.WGBattleTypes
 }
 
 func NewBattle(
@@ -47,15 +47,15 @@ func NewBattle(
 	}
 }
 
-func (b *Battle) Get(userConfig domain.UserConfig) (domain.Battle, error) {
+func (b *Battle) Get(userConfig model.UserConfig) (model.Battle, error) {
 	b.wargaming.SetAppID(userConfig.Appid)
-	var result domain.Battle
+	var result model.Battle
 
 	// Fetch on-memory stored data
-	warshipResult := make(chan domain.Result[domain.Warships])
-	allExpectedStatsResult := make(chan domain.Result[domain.ExpectedStats])
-	battleArenasResult := make(chan domain.Result[domain.WGBattleArenas])
-	battleTypesResult := make(chan domain.Result[domain.WGBattleTypes])
+	warshipResult := make(chan model.Result[model.Warships])
+	allExpectedStatsResult := make(chan model.Result[model.ExpectedStats])
+	battleArenasResult := make(chan model.Result[model.WGBattleArenas])
+	battleTypesResult := make(chan model.Result[model.WGBattleTypes])
 	if b.isFirstBattle {
 		go b.fetchWarships(warshipResult)
 		go b.fetchExpectedStats(allExpectedStatsResult)
@@ -80,9 +80,9 @@ func (b *Battle) Get(userConfig domain.UserConfig) (domain.Battle, error) {
 	accountIDs := accountList.AccountIDs()
 
 	// Fetch each stats
-	accountInfoResult := make(chan domain.Result[domain.WGAccountInfo])
-	shipStatsResult := make(chan domain.Result[domain.AllPlayerShipsStats])
-	clanResult := make(chan domain.Result[domain.Clans])
+	accountInfoResult := make(chan model.Result[model.WGAccountInfo])
+	shipStatsResult := make(chan model.Result[model.AllPlayerShipsStats])
+	clanResult := make(chan model.Result[model.Clans])
 	go b.fetchAccountInfo(accountIDs, accountInfoResult)
 	go b.fetchAllPlayerShipsStats(accountIDs, shipStatsResult)
 	go b.fetchClanTag(accountIDs, clanResult)
@@ -139,7 +139,7 @@ func (b *Battle) Get(userConfig domain.UserConfig) (domain.Battle, error) {
 	return result, nil
 }
 
-func (b *Battle) getTempArenaInfo(userConfig domain.UserConfig) (domain.TempArenaInfo, error) {
+func (b *Battle) getTempArenaInfo(userConfig model.UserConfig) (model.TempArenaInfo, error) {
 	tempArenaInfo, err := b.localFile.TempArenaInfo(userConfig.InstallPath)
 	if err != nil {
 		return tempArenaInfo, err
@@ -154,19 +154,19 @@ func (b *Battle) getTempArenaInfo(userConfig domain.UserConfig) (domain.TempAren
 	return tempArenaInfo, nil
 }
 
-func (b *Battle) fetchWarships(channel chan domain.Result[domain.Warships]) {
-	warships := make(domain.Warships)
-	var result domain.Result[domain.Warships]
+func (b *Battle) fetchWarships(channel chan model.Result[model.Warships]) {
+	warships := make(model.Warships)
+	var result model.Result[model.Warships]
 
 	var mu sync.Mutex
-	addToResult := func(data domain.WGEncycShips) {
+	addToResult := func(data model.WGEncycShips) {
 		for shipID, warship := range data {
 			mu.Lock()
-			warships[shipID] = domain.Warship{
+			warships[shipID] = model.Warship{
 				Name:      warship.Name,
 				Tier:      warship.Tier,
-				Type:      domain.NewShipType(warship.Type),
-				Nation:    domain.Nation(warship.Nation),
+				Type:      model.NewShipType(warship.Type),
+				Nation:    model.Nation(warship.Nation),
 				IsPremium: warship.IsPremium,
 			}
 			mu.Unlock()
@@ -214,8 +214,8 @@ func (b *Battle) fetchWarships(channel chan domain.Result[domain.Warships]) {
 	channel <- result
 }
 
-func (b *Battle) fetchExpectedStats(channel chan domain.Result[domain.ExpectedStats]) {
-	var result domain.Result[domain.ExpectedStats]
+func (b *Battle) fetchExpectedStats(channel chan model.Result[model.ExpectedStats]) {
+	var result model.Result[model.ExpectedStats]
 
 	expectedStats, errFetch := b.numbers.ExpectedStats()
 	if errFetch == nil {
@@ -238,23 +238,23 @@ func (b *Battle) fetchExpectedStats(channel chan domain.Result[domain.ExpectedSt
 	channel <- result
 }
 
-func (b *Battle) fetchBattleArenas(channel chan domain.Result[domain.WGBattleArenas]) {
+func (b *Battle) fetchBattleArenas(channel chan model.Result[model.WGBattleArenas]) {
 	battleArenas, err := b.wargaming.BattleArenas()
-	channel <- domain.Result[domain.WGBattleArenas]{Value: battleArenas, Error: err}
+	channel <- model.Result[model.WGBattleArenas]{Value: battleArenas, Error: err}
 }
 
-func (b *Battle) fetchBattleTypes(channel chan domain.Result[domain.WGBattleTypes]) {
+func (b *Battle) fetchBattleTypes(channel chan model.Result[model.WGBattleTypes]) {
 	battleTypes, err := b.wargaming.BattleTypes()
-	channel <- domain.Result[domain.WGBattleTypes]{Value: battleTypes, Error: err}
+	channel <- model.Result[model.WGBattleTypes]{Value: battleTypes, Error: err}
 }
 
-func (b *Battle) fetchAccountInfo(accountIDs []int, channel chan domain.Result[domain.WGAccountInfo]) {
+func (b *Battle) fetchAccountInfo(accountIDs []int, channel chan model.Result[model.WGAccountInfo]) {
 	accountInfo, err := b.wargaming.AccountInfo(accountIDs)
-	channel <- domain.Result[domain.WGAccountInfo]{Value: accountInfo, Error: err}
+	channel <- model.Result[model.WGAccountInfo]{Value: accountInfo, Error: err}
 }
 
-func (b *Battle) fetchAllPlayerShipsStats(accountIDs []int, channel chan domain.Result[domain.AllPlayerShipsStats]) {
-	shipStatsMap := make(domain.AllPlayerShipsStats)
+func (b *Battle) fetchAllPlayerShipsStats(accountIDs []int, channel chan model.Result[model.AllPlayerShipsStats]) {
+	shipStatsMap := make(model.AllPlayerShipsStats)
 	var mu sync.Mutex
 	err := doParallel(b.parallels, accountIDs, func(accountID int) error {
 		shipStats, err := b.wargaming.ShipsStats(accountID)
@@ -269,12 +269,12 @@ func (b *Battle) fetchAllPlayerShipsStats(accountIDs []int, channel chan domain.
 		return nil
 	})
 
-	channel <- domain.Result[domain.AllPlayerShipsStats]{Value: shipStatsMap, Error: err}
+	channel <- model.Result[model.AllPlayerShipsStats]{Value: shipStatsMap, Error: err}
 }
 
-func (b *Battle) fetchClanTag(accountIDs []int, channel chan domain.Result[domain.Clans]) {
-	clans := make(domain.Clans)
-	var result domain.Result[domain.Clans]
+func (b *Battle) fetchClanTag(accountIDs []int, channel chan model.Result[model.Clans]) {
+	clans := make(model.Clans)
+	var result model.Result[model.Clans]
 
 	clansAccountInfo, err := b.wargaming.ClansAccountInfo(accountIDs)
 	if err != nil {
@@ -294,7 +294,7 @@ func (b *Battle) fetchClanTag(accountIDs []int, channel chan domain.Result[domai
 	for _, accountID := range accountIDs {
 		clanID := clansAccountInfo[accountID].ClanID
 		clanTag := clansInfo[clanID].Tag
-		clans[accountID] = domain.Clan{Tag: clanTag, ID: clanID}
+		clans[accountID] = model.Clan{Tag: clanTag, ID: clanID}
 	}
 
 	result.Value = clans
@@ -302,18 +302,18 @@ func (b *Battle) fetchClanTag(accountIDs []int, channel chan domain.Result[domai
 }
 
 func (b *Battle) compose(
-	tempArenaInfo domain.TempArenaInfo,
-	accountInfo domain.WGAccountInfo,
-	accountList domain.WGAccountList,
-	clans domain.Clans,
-	allPlayerShipsStats domain.AllPlayerShipsStats,
-	warships domain.Warships,
-	allExpectedStats domain.ExpectedStats,
-	battleArenas domain.WGBattleArenas,
-	battleTypes domain.WGBattleTypes,
-) domain.Battle {
-	friends := make(domain.Players, 0)
-	enemies := make(domain.Players, 0)
+	tempArenaInfo model.TempArenaInfo,
+	accountInfo model.WGAccountInfo,
+	accountList model.WGAccountList,
+	clans model.Clans,
+	allPlayerShipsStats model.AllPlayerShipsStats,
+	warships model.Warships,
+	allExpectedStats model.ExpectedStats,
+	battleArenas model.WGBattleArenas,
+	battleTypes model.WGBattleTypes,
+) model.Battle {
+	friends := make(model.Players, 0)
+	enemies := make(model.Players, 0)
 
 	var ownShip string
 
@@ -324,10 +324,10 @@ func (b *Battle) compose(
 
 		warship, ok := warships[vehicle.ShipID]
 		if !ok {
-			warship = domain.Warship{
+			warship = model.Warship{
 				Name:   "Unknown",
 				Tier:   0,
-				Type:   domain.ShipTypeNONE,
+				Type:   model.ShipTypeNONE,
 				Nation: "",
 			}
 		}
@@ -335,7 +335,7 @@ func (b *Battle) compose(
 			ownShip = warship.Name
 		}
 
-		stats := domain.NewStats(
+		stats := model.NewStats(
 			vehicle.ShipID,
 			accountInfo[accountID],
 			allPlayerShipsStats.Player(accountID),
@@ -343,14 +343,14 @@ func (b *Battle) compose(
 			warships,
 		)
 
-		player := domain.Player{
-			PlayerInfo: domain.PlayerInfo{
+		player := model.Player{
+			PlayerInfo: model.PlayerInfo{
 				ID:       accountID,
 				Name:     nickname,
 				Clan:     clan,
 				IsHidden: accountInfo[accountID].HiddenProfile,
 			},
-			ShipInfo: domain.ShipInfo{
+			ShipInfo: model.ShipInfo{
 				ID:        vehicle.ShipID,
 				Name:      warship.Name,
 				Nation:    warship.Nation,
@@ -359,8 +359,8 @@ func (b *Battle) compose(
 				IsPremium: warship.IsPremium,
 				AvgDamage: allExpectedStats[vehicle.ShipID].AverageDamageDealt,
 			},
-			PvPSolo: playerStats(domain.StatsPatternPvPSolo, stats),
-			PvPAll:  playerStats(domain.StatsPatternPvPAll, stats),
+			PvPSolo: playerStats(model.StatsPatternPvPSolo, stats),
+			PvPAll:  playerStats(model.StatsPatternPvPAll, stats),
 		}
 
 		if vehicle.IsFriend() {
@@ -373,13 +373,13 @@ func (b *Battle) compose(
 	sort.Sort(friends)
 	sort.Sort(enemies)
 
-	teams := []domain.Team{
+	teams := []model.Team{
 		{Players: friends},
 		{Players: enemies},
 	}
 
-	battle := domain.Battle{
-		Meta: domain.Meta{
+	battle := model.Battle{
+		Meta: model.Meta{
 			Unixtime: tempArenaInfo.Unixtime(),
 			Arena:    tempArenaInfo.BattleArena(battleArenas),
 			Type:     tempArenaInfo.BattleType(battleTypes),
@@ -392,41 +392,41 @@ func (b *Battle) compose(
 }
 
 func playerStats(
-	statsPattern domain.StatsPattern,
-	stats *domain.Stats,
-) domain.PlayerStats {
-	return domain.PlayerStats{
-		ShipStats: domain.ShipStats{
-			Battles:            stats.Battles(domain.StatsCategoryShip, statsPattern),
-			Damage:             stats.AvgDamage(domain.StatsCategoryShip, statsPattern),
-			MaxDamage:          stats.MaxDamage(domain.StatsCategoryShip, statsPattern),
-			WinRate:            stats.WinRate(domain.StatsCategoryShip, statsPattern),
-			WinSurvivedRate:    stats.WinSurvivedRate(domain.StatsCategoryShip, statsPattern),
-			LoseSurvivedRate:   stats.LoseSurvivedRate(domain.StatsCategoryShip, statsPattern),
-			KdRate:             stats.KdRate(domain.StatsCategoryShip, statsPattern),
-			Kill:               stats.AvgKill(domain.StatsCategoryShip, statsPattern),
-			Exp:                stats.AvgExp(domain.StatsCategoryShip, statsPattern),
-			PR:                 stats.PR(domain.StatsCategoryShip, statsPattern),
+	statsPattern model.StatsPattern,
+	stats *model.Stats,
+) model.PlayerStats {
+	return model.PlayerStats{
+		ShipStats: model.ShipStats{
+			Battles:            stats.Battles(model.StatsCategoryShip, statsPattern),
+			Damage:             stats.AvgDamage(model.StatsCategoryShip, statsPattern),
+			MaxDamage:          stats.MaxDamage(model.StatsCategoryShip, statsPattern),
+			WinRate:            stats.WinRate(model.StatsCategoryShip, statsPattern),
+			WinSurvivedRate:    stats.WinSurvivedRate(model.StatsCategoryShip, statsPattern),
+			LoseSurvivedRate:   stats.LoseSurvivedRate(model.StatsCategoryShip, statsPattern),
+			KdRate:             stats.KdRate(model.StatsCategoryShip, statsPattern),
+			Kill:               stats.AvgKill(model.StatsCategoryShip, statsPattern),
+			Exp:                stats.AvgExp(model.StatsCategoryShip, statsPattern),
+			PR:                 stats.PR(model.StatsCategoryShip, statsPattern),
 			MainBatteryHitRate: stats.MainBatteryHitRate(statsPattern),
 			TorpedoesHitRate:   stats.TorpedoesHitRate(statsPattern),
 			PlanesKilled:       stats.PlanesKilled(statsPattern),
-			PlatoonRate:        stats.PlatoonRate(domain.StatsCategoryShip),
+			PlatoonRate:        stats.PlatoonRate(model.StatsCategoryShip),
 		},
-		OverallStats: domain.OverallStats{
-			Battles:           stats.Battles(domain.StatsCategoryOverall, statsPattern),
-			Damage:            stats.AvgDamage(domain.StatsCategoryOverall, statsPattern),
-			MaxDamage:         stats.MaxDamage(domain.StatsCategoryOverall, statsPattern),
-			WinRate:           stats.WinRate(domain.StatsCategoryOverall, statsPattern),
-			WinSurvivedRate:   stats.WinSurvivedRate(domain.StatsCategoryOverall, statsPattern),
-			LoseSurvivedRate:  stats.LoseSurvivedRate(domain.StatsCategoryOverall, statsPattern),
-			KdRate:            stats.KdRate(domain.StatsCategoryOverall, statsPattern),
-			Kill:              stats.AvgKill(domain.StatsCategoryOverall, statsPattern),
-			Exp:               stats.AvgExp(domain.StatsCategoryOverall, statsPattern),
-			PR:                stats.PR(domain.StatsCategoryOverall, statsPattern),
+		OverallStats: model.OverallStats{
+			Battles:           stats.Battles(model.StatsCategoryOverall, statsPattern),
+			Damage:            stats.AvgDamage(model.StatsCategoryOverall, statsPattern),
+			MaxDamage:         stats.MaxDamage(model.StatsCategoryOverall, statsPattern),
+			WinRate:           stats.WinRate(model.StatsCategoryOverall, statsPattern),
+			WinSurvivedRate:   stats.WinSurvivedRate(model.StatsCategoryOverall, statsPattern),
+			LoseSurvivedRate:  stats.LoseSurvivedRate(model.StatsCategoryOverall, statsPattern),
+			KdRate:            stats.KdRate(model.StatsCategoryOverall, statsPattern),
+			Kill:              stats.AvgKill(model.StatsCategoryOverall, statsPattern),
+			Exp:               stats.AvgExp(model.StatsCategoryOverall, statsPattern),
+			PR:                stats.PR(model.StatsCategoryOverall, statsPattern),
 			AvgTier:           stats.AvgTier(statsPattern),
 			UsingShipTypeRate: stats.UsingShipTypeRate(statsPattern),
 			UsingTierRate:     stats.UsingTierRate(statsPattern),
-			PlatoonRate:       stats.PlatoonRate(domain.StatsCategoryOverall),
+			PlatoonRate:       stats.PlatoonRate(model.StatsCategoryOverall),
 		},
 	}
 }

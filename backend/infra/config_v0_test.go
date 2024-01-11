@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
-	"wfs/backend/domain"
+	"wfs/backend/domain/model"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -16,13 +16,13 @@ func TestLocalFile_User(t *testing.T) {
 	t.Run("正常系", func(t *testing.T) {
 		defer os.RemoveAll(ConfigDir)
 
-		expected := domain.UserConfig{
+		expected := model.UserConfig{
 			FontSize: "large",
-			Displays: domain.Displays{
-				Ship: domain.Ship{
+			Displays: model.Displays{
+				Ship: model.Ship{
 					PR: true,
 				},
-				Overall: domain.Overall{
+				Overall: model.Overall{
 					PR: false,
 				},
 			},
@@ -44,7 +44,7 @@ func TestLocalFile_User(t *testing.T) {
 		// 取得 存在しない場合 デフォルト値を返却する
 		actual, err = instance.User()
 		require.NoError(t, err)
-		assert.Equal(t, domain.DefaultUserConfig, actual)
+		assert.Equal(t, model.DefaultUserConfig, actual)
 	})
 
 	t.Run("正常系_ファイルに新規パラメータが存在しない", func(t *testing.T) {
@@ -65,7 +65,7 @@ func TestLocalFile_User(t *testing.T) {
 		require.NoError(t, err)
 
 		// 存在するパラメータはその値、存在しないパラメータはデフォルト値が格納されていること
-		expected := domain.DefaultUserConfig
+		expected := model.DefaultUserConfig
 		expected.InstallPath = installPath
 		expected.Appid = appid
 		require.Equal(t, expected, actual)
@@ -76,7 +76,7 @@ func TestLocalFile_AlertPlayers(t *testing.T) {
 	// テストで生成したディレクトリを削除
 	defer os.RemoveAll(ConfigDir)
 
-	expected := []domain.AlertPlayer{
+	expected := []model.AlertPlayer{
 		{
 			AccountID: 100,
 			Name:      "test",
@@ -106,5 +106,5 @@ func TestLocalFile_AlertPlayers(t *testing.T) {
 
 	actual, err = instance.AlertPlayers()
 	require.NoError(t, err)
-	assert.Equal(t, []domain.AlertPlayer{}, actual)
+	assert.Equal(t, []model.AlertPlayer{}, actual)
 }

@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"testing"
 	"wfs/backend/apperr"
-	"wfs/backend/domain"
+	"wfs/backend/domain/model"
 	"wfs/backend/mocks"
 
 	"github.com/morikuni/failure"
@@ -35,7 +35,7 @@ func TestConfig_UpdateRequired(t *testing.T) {
 		mockWargaming := &mocks.WargamingInterface{}
 		mockStorage := &mocks.StorageInterface{}
 		mockWargaming.On("Test", config.Appid).Return(true, nil)
-		mockStorage.On("UserConfig").Return(domain.DefaultUserConfig, nil)
+		mockStorage.On("UserConfig").Return(model.DefaultUserConfig, nil)
 		mockStorage.On("WriteUserConfig", config).Return(nil)
 
 		// テスト
@@ -43,14 +43,14 @@ func TestConfig_UpdateRequired(t *testing.T) {
 		actual, err := c.UpdateRequired(config.InstallPath, config.Appid)
 
 		// アサーション
-		assert.Equal(t, domain.RequiredConfigError{Valid: true}, actual)
+		assert.Equal(t, model.RequiredConfigError{Valid: true}, actual)
 		require.NoError(t, err)
 		mockWargaming.AssertExpectations(t)
 		mockStorage.AssertExpectations(t)
 	})
 
 	t.Run("異常系_不正なインストールパス", func(t *testing.T) {
-		config := domain.DefaultUserConfig
+		config := model.DefaultUserConfig
 		config.InstallPath = "invalid/path" // Note: 不正なパス
 		config.Appid = "abc123"
 
@@ -62,7 +62,7 @@ func TestConfig_UpdateRequired(t *testing.T) {
 		actual, err := c.UpdateRequired(config.InstallPath, config.Appid)
 
 		// アサーション
-		assert.Equal(t, domain.RequiredConfigError{InstallPath: apperr.InvalidInstallPath.ErrorCode()}, actual)
+		assert.Equal(t, model.RequiredConfigError{InstallPath: apperr.InvalidInstallPath.ErrorCode()}, actual)
 		require.NoError(t, err)
 		mockWargaming.AssertExpectations(t)
 	})
@@ -78,7 +78,7 @@ func TestConfig_UpdateRequired(t *testing.T) {
 		actual, err := c.UpdateRequired(config.InstallPath, config.Appid)
 
 		// アサーション
-		assert.Equal(t, domain.RequiredConfigError{AppID: apperr.InvalidAppID.ErrorCode()}, actual)
+		assert.Equal(t, model.RequiredConfigError{AppID: apperr.InvalidAppID.ErrorCode()}, actual)
 		require.NoError(t, err)
 		mockWargaming.AssertExpectations(t)
 	})
@@ -95,11 +95,11 @@ func TestConfig_UpdateOptional(t *testing.T) {
 		config := createInputConfig()
 		config.FontSize = "small"
 		// Note: requiredな値を与えてもこれらの値はWriteUserConfigでは含まれない
-		actualWritten := domain.DefaultUserConfig
+		actualWritten := model.DefaultUserConfig
 		actualWritten.FontSize = "small"
 
 		mockStorage := &mocks.StorageInterface{}
-		mockStorage.On("UserConfig").Return(domain.DefaultUserConfig, nil)
+		mockStorage.On("UserConfig").Return(model.DefaultUserConfig, nil)
 		mockStorage.On("WriteUserConfig", actualWritten).Return(nil)
 
 		// テスト実行
@@ -119,7 +119,7 @@ func TestConfig_AlertPlayers(t *testing.T) {
 		t.Parallel()
 
 		// 準備
-		expected := []domain.AlertPlayer{
+		expected := []model.AlertPlayer{
 			{AccountID: 1, Name: "Player1"},
 			{AccountID: 2, Name: "Player2"},
 		}
@@ -140,7 +140,7 @@ func TestConfig_AlertPlayers(t *testing.T) {
 func TestConfig_UpdateAlertPlayer(t *testing.T) {
 	t.Parallel()
 
-	existingPlayers := []domain.AlertPlayer{
+	existingPlayers := []model.AlertPlayer{
 		{AccountID: 1, Name: "Player1"},
 		{AccountID: 2, Name: "Player2"},
 	}
@@ -149,7 +149,7 @@ func TestConfig_UpdateAlertPlayer(t *testing.T) {
 		t.Parallel()
 
 		// 準備
-		newPlayer := domain.AlertPlayer{AccountID: 3, Name: "Player3"}
+		newPlayer := model.AlertPlayer{AccountID: 3, Name: "Player3"}
 
 		mockStorage := &mocks.StorageInterface{}
 		mockStorage.On("AlertPlayers").Return(existingPlayers, nil)
@@ -168,11 +168,11 @@ func TestConfig_UpdateAlertPlayer(t *testing.T) {
 		t.Parallel()
 
 		// 準備
-		playerToUpdate := domain.AlertPlayer{AccountID: 1, Name: "UpdatedPlayer"}
+		playerToUpdate := model.AlertPlayer{AccountID: 1, Name: "UpdatedPlayer"}
 
 		mockStorage := &mocks.StorageInterface{}
 		mockStorage.On("AlertPlayers").Return(existingPlayers, nil)
-		mockStorage.On("WriteAlertPlayers", []domain.AlertPlayer{
+		mockStorage.On("WriteAlertPlayers", []model.AlertPlayer{
 			{AccountID: 1, Name: "UpdatedPlayer"},
 			{AccountID: 2, Name: "Player2"},
 		}).Return(nil)
@@ -195,7 +195,7 @@ func TestConfig_RemoveAlertPlayer(t *testing.T) {
 
 		// 準備
 		accountIDToRemove := 1
-		existingPlayers := []domain.AlertPlayer{
+		existingPlayers := []model.AlertPlayer{
 			{AccountID: 1, Name: "Player1"},
 			{AccountID: 2, Name: "Player2"},
 		}
@@ -214,8 +214,8 @@ func TestConfig_RemoveAlertPlayer(t *testing.T) {
 	})
 }
 
-func createInputConfig() domain.UserConfig {
-	config := domain.DefaultUserConfig
+func createInputConfig() model.UserConfig {
+	config := model.DefaultUserConfig
 	config.InstallPath = validInstallPath
 	config.Appid = validAppID
 

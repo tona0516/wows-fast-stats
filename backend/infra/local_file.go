@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"wfs/backend/apperr"
-	"wfs/backend/domain"
+	"wfs/backend/domain/model"
 
 	"github.com/morikuni/failure"
 )
@@ -52,8 +52,8 @@ func (l *LocalFile) SaveScreenshot(path string, base64Data string) error {
 	return failure.Wrap(err)
 }
 
-func (l *LocalFile) TempArenaInfo(installPath string) (domain.TempArenaInfo, error) {
-	var tempArenaInfo domain.TempArenaInfo
+func (l *LocalFile) TempArenaInfo(installPath string) (model.TempArenaInfo, error) {
+	var tempArenaInfo model.TempArenaInfo
 
 	tempArenaInfoPaths := []string{}
 	root := filepath.Join(installPath, replaysDir)
@@ -84,13 +84,13 @@ func (l *LocalFile) TempArenaInfo(installPath string) (domain.TempArenaInfo, err
 	return decideTempArenaInfo(tempArenaInfoPaths)
 }
 
-func (l *LocalFile) SaveTempArenaInfo(tempArenaInfo domain.TempArenaInfo) error {
+func (l *LocalFile) SaveTempArenaInfo(tempArenaInfo model.TempArenaInfo) error {
 	path := filepath.Join(tempArenaInfoDir, "tempArenaInfo_"+strconv.FormatInt(tempArenaInfo.Unixtime(), 10)+".json")
 	return writeJSON(path, tempArenaInfo)
 }
 
-func decideTempArenaInfo(paths []string) (domain.TempArenaInfo, error) {
-	var result domain.TempArenaInfo
+func decideTempArenaInfo(paths []string) (model.TempArenaInfo, error) {
+	var result model.TempArenaInfo
 	size := len(paths)
 
 	if size == 0 {
@@ -98,12 +98,12 @@ func decideTempArenaInfo(paths []string) (domain.TempArenaInfo, error) {
 	}
 
 	if size == 1 {
-		return readJSON(paths[0], domain.TempArenaInfo{})
+		return readJSON(paths[0], model.TempArenaInfo{})
 	}
 
-	var latest domain.TempArenaInfo
+	var latest model.TempArenaInfo
 	for _, path := range paths {
-		tempArenaInfo, err := readJSON(path, domain.TempArenaInfo{})
+		tempArenaInfo, err := readJSON(path, model.TempArenaInfo{})
 		if err != nil {
 			continue
 		}

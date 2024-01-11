@@ -9,7 +9,7 @@
   import { EventsOn, EventsEmit } from "wailsjs/runtime/runtime";
   import { storedConfig, storedRequiredConfigError } from "src/stores";
   import AlertModals from "src/component/modal/AlertModals.svelte";
-  import { domain } from "wailsjs/go/models";
+  import { model } from "wailsjs/go/models";
   import UkIcon from "src/component/common/uikit/UkIcon.svelte";
   import ExternalLink from "src/component/common/ExternalLink.svelte";
   import UkSpinner from "src/component/common/uikit/UkSpinner.svelte";
@@ -21,7 +21,7 @@
   let modals: AlertModals;
   let mainPage: MainPage | undefined;
   let initialized = false;
-  let updatableRelease: domain.GHLatestRelease;
+  let updatableRelease: model.GHLatestRelease;
 
   $: {
     // @ts-ignore
@@ -31,7 +31,7 @@
   EventsOn("BATTLE_START", () => mainPage?.fetchBattle());
   EventsOn("BATTLE_ERR", (error: string) => Notifier.failure(error));
 
-  const initialize = async (): Promise<domain.UserConfig | undefined> => {
+  const initialize = async (): Promise<model.UserConfig | undefined> => {
     try {
       await Migrate();
 
@@ -55,7 +55,7 @@
     }
   };
 
-  const checkUpdate = async (config: domain.UserConfig) => {
+  const checkUpdate = async (config: model.UserConfig) => {
     try {
       if (config.notify_updatable) {
         const latestRelease = await LatestRelease();

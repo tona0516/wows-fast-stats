@@ -2,7 +2,7 @@ package usecase
 
 import (
 	"testing"
-	"wfs/backend/domain"
+	"wfs/backend/domain/model"
 	"wfs/backend/mocks"
 
 	"github.com/stretchr/testify/require"
@@ -14,12 +14,12 @@ func TestConfigMigrator_Migrate(t *testing.T) {
 		t.Parallel()
 
 		// 準備
-		expectedUserConfig := domain.UserConfig{
+		expectedUserConfig := model.UserConfig{
 			InstallPath: "a",
 			Appid:       "a",
 			FontSize:    "large",
 		}
-		expectedAlertPlayers := []domain.AlertPlayer{
+		expectedAlertPlayers := []model.AlertPlayer{
 			{
 				AccountID: 1,
 				Name:      "a",

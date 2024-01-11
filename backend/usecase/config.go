@@ -5,8 +5,8 @@ import (
 	"os"
 	"path/filepath"
 	"wfs/backend/apperr"
-	"wfs/backend/domain"
-	"wfs/backend/repository"
+	"wfs/backend/domain/model"
+	"wfs/backend/domain/repository"
 
 	"github.com/morikuni/failure"
 	"github.com/skratchdot/open-golang/open"
@@ -40,15 +40,15 @@ func NewConfig(
 	}
 }
 
-func (c *Config) User() (domain.UserConfig, error) {
+func (c *Config) User() (model.UserConfig, error) {
 	return c.storage.UserConfig()
 }
 
 func (c *Config) ValidateRequired(
 	installPath string,
 	appid string,
-) domain.RequiredConfigError {
-	result := domain.RequiredConfigError{}
+) model.RequiredConfigError {
+	result := model.RequiredConfigError{}
 
 	if installPath == "" {
 		result.InstallPath = apperr.EmptyInstallPath.ErrorCode()
@@ -73,7 +73,7 @@ func (c *Config) ValidateRequired(
 func (c *Config) UpdateRequired(
 	installPath string,
 	appid string,
-) (domain.RequiredConfigError, error) {
+) (model.RequiredConfigError, error) {
 	// validate
 	validatedResult := c.ValidateRequired(installPath, appid)
 	if !validatedResult.Valid {
@@ -94,7 +94,7 @@ func (c *Config) UpdateRequired(
 	return validatedResult, err
 }
 
-func (c *Config) UpdateOptional(config domain.UserConfig) error {
+func (c *Config) UpdateOptional(config model.UserConfig) error {
 	// Note: exclulde required setting
 	saved, err := c.storage.UserConfig()
 	if err != nil {
@@ -108,12 +108,12 @@ func (c *Config) UpdateOptional(config domain.UserConfig) error {
 	return err
 }
 
-func (c *Config) AlertPlayers() ([]domain.AlertPlayer, error) {
+func (c *Config) AlertPlayers() ([]model.AlertPlayer, error) {
 	players, err := c.storage.AlertPlayers()
 	return players, err
 }
 
-func (c *Config) UpdateAlertPlayer(player domain.AlertPlayer) error {
+func (c *Config) UpdateAlertPlayer(player model.AlertPlayer) error {
 	players, err := c.storage.AlertPlayers()
 	if err != nil {
 		return err
@@ -157,7 +157,7 @@ func (c *Config) RemoveAlertPlayer(accountID int) error {
 	return c.storage.WriteAlertPlayers(players)
 }
 
-func (c *Config) SearchPlayer(prefix string) (domain.WGAccountList, error) {
+func (c *Config) SearchPlayer(prefix string) (model.WGAccountList, error) {
 	return c.wargaming.AccountListForSearch(prefix)
 }
 

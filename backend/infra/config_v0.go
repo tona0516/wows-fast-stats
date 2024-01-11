@@ -4,7 +4,7 @@ import (
 	"os"
 	"path/filepath"
 	"wfs/backend/apperr"
-	"wfs/backend/domain"
+	"wfs/backend/domain/model"
 
 	"github.com/morikuni/failure"
 )
@@ -30,10 +30,10 @@ func NewConfigV0() *ConfigV0 {
 	}
 }
 
-func (c *ConfigV0) User() (domain.UserConfig, error) {
-	config, err := readJSON(c.userConfigPath, domain.DefaultUserConfig)
+func (c *ConfigV0) User() (model.UserConfig, error) {
+	config, err := readJSON(c.userConfigPath, model.DefaultUserConfig)
 	if err != nil && failure.Is(err, apperr.FileNotExist) {
-		return domain.DefaultUserConfig, nil
+		return model.DefaultUserConfig, nil
 	}
 
 	return config, err
@@ -48,10 +48,10 @@ func (c *ConfigV0) DeleteUser() error {
 	return os.RemoveAll(c.userConfigPath)
 }
 
-func (c *ConfigV0) AlertPlayers() ([]domain.AlertPlayer, error) {
-	players, err := readJSON(c.alertPlayerPath, []domain.AlertPlayer{})
+func (c *ConfigV0) AlertPlayers() ([]model.AlertPlayer, error) {
+	players, err := readJSON(c.alertPlayerPath, []model.AlertPlayer{})
 	if err != nil && failure.Is(err, apperr.FileNotExist) {
-		return []domain.AlertPlayer{}, nil
+		return []model.AlertPlayer{}, nil
 	}
 
 	return players, err

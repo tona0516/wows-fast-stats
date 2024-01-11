@@ -14,17 +14,17 @@ import {
   UserConfig,
   ValidateRequiredConfig,
 } from "wailsjs/go/main/App";
-import { domain } from "wailsjs/go/models";
+import { model } from "wailsjs/go/models";
 import { EventsOn } from "wailsjs/runtime/runtime";
 
 export namespace FetchProxy {
-  export const getBattle = async (): Promise<domain.Battle> => {
+  export const getBattle = async (): Promise<model.Battle> => {
     const ret = await Battle();
     storedBattle.set(ret);
     return ret;
   };
 
-  export const getConfig = async (): Promise<domain.UserConfig> => {
+  export const getConfig = async (): Promise<model.UserConfig> => {
     const ret = await UserConfig();
     storedConfig.set(ret);
     return ret;
@@ -33,7 +33,7 @@ export namespace FetchProxy {
   export const validateRequiredConfig = async (
     installPath: string,
     appid: string,
-  ): Promise<domain.RequiredConfigError> => {
+  ): Promise<model.RequiredConfigError> => {
     const ret = await ValidateRequiredConfig(installPath, appid);
     storedRequiredConfigError.set(ret);
     return ret;
@@ -42,13 +42,13 @@ export namespace FetchProxy {
   export const applyRequiredConfig = async (
     installPath: string,
     appid: string,
-  ): Promise<domain.RequiredConfigError> => {
+  ): Promise<model.RequiredConfigError> => {
     const ret = await ApplyRequiredUserConfig(installPath, appid);
     storedRequiredConfigError.set(ret);
     return ret;
   };
 
-  export const getAlertPlayers = async (): Promise<domain.AlertPlayer[]> => {
+  export const getAlertPlayers = async (): Promise<model.AlertPlayer[]> => {
     const ret = await AlertPlayers();
     storedAlertPlayers.set(ret);
     return ret;

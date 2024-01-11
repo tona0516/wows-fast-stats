@@ -6,7 +6,7 @@ import (
 	"os"
 	"strconv"
 	"time"
-	"wfs/backend/domain"
+	"wfs/backend/domain/model"
 	"wfs/backend/infra"
 	"wfs/backend/usecase"
 
@@ -36,7 +36,7 @@ func main() {
 	}
 
 	isDev, _ := strconv.ParseBool(IsDev)
-	env := domain.Env{
+	env := model.Env{
 		AppName: AppName,
 		Semver:  Semver,
 		IsDev:   isDev,
@@ -67,7 +67,7 @@ func main() {
 	}
 }
 
-func initApp(env domain.Env) *App {
+func initApp(env model.Env) *App {
 	// infra
 	var maxRetry uint64 = 2
 	timeout := 10 * time.Second

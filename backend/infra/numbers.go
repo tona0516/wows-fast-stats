@@ -3,7 +3,7 @@ package infra
 import (
 	"net/http"
 	"wfs/backend/apperr"
-	"wfs/backend/domain"
+	"wfs/backend/domain/model"
 	"wfs/backend/infra/webapi"
 
 	"github.com/cenkalti/backoff/v4"
@@ -18,10 +18,10 @@ func NewNumbers(config RequestConfig) *Numbers {
 	return &Numbers{config: config}
 }
 
-func (n *Numbers) ExpectedStats() (domain.ExpectedStats, error) {
+func (n *Numbers) ExpectedStats() (model.ExpectedStats, error) {
 	b := backoff.WithMaxRetries(backoff.NewExponentialBackOff(), n.config.Retry)
-	operation := func() (webapi.Response[domain.NSExpectedStats], error) {
-		res, err := webapi.GetRequest[domain.NSExpectedStats](
+	operation := func() (webapi.Response[model.NSExpectedStats], error) {
+		res, err := webapi.GetRequest[model.NSExpectedStats](
 			n.config.URL+"/personal/rating/expected/json/",
 			n.config.Timeout,
 			nil,

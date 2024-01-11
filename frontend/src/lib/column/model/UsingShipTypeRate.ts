@@ -5,13 +5,13 @@ import { AbstractColumn } from "src/lib/column/intetface/AbstractColumn";
 import type { IGraphColumn } from "src/lib/column/intetface/IGraphColumn";
 import type { OverallKey } from "src/lib/types";
 import { toPlayerStats } from "src/lib/util";
-import type { domain } from "wailsjs/go/models";
+import type { model } from "wailsjs/go/models";
 
 export class UsingShipTypeRate
   extends AbstractColumn<OverallKey>
   implements IGraphColumn
 {
-  constructor(private config: domain.UserConfig) {
+  constructor(private config: model.UserConfig) {
     super("using_ship_type_rate", "艦割合", "艦種別プレイ割合", 1);
   }
 
@@ -23,7 +23,7 @@ export class UsingShipTypeRate
     return this.config.displays.overall.using_ship_type_rate;
   }
 
-  getGraphParam(player: domain.Player): StackedBarGraphParam {
+  getGraphParam(player: model.Player): StackedBarGraphParam {
     const digit = this.config.custom_digit.using_ship_type_rate;
     const shipTypeGroup = toPlayerStats(player, this.config.stats_pattern)
       .overall.using_ship_type_rate;

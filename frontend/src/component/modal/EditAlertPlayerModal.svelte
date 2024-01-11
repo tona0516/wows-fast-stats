@@ -1,20 +1,20 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
   import { AlertPatterns, UpdateAlertPlayer } from "wailsjs/go/main/App";
-  import type { domain } from "wailsjs/go/models";
+  import type { model } from "wailsjs/go/models";
   import UkModal from "src/component/common/uikit/UkModal.svelte";
   import UIkit from "uikit";
   import { ModalElementID } from "./ModalElementID";
   import clone from "clone";
 
-  export let defaultAlertPlayer: domain.AlertPlayer;
+  export let defaultAlertPlayer: model.AlertPlayer;
   export let maxMemoLength: number;
   const dispatch = createEventDispatcher();
-  let target: domain.AlertPlayer = clone(defaultAlertPlayer);
+  let target: model.AlertPlayer = clone(defaultAlertPlayer);
   $: disableUpdateButton =
     target.account_id === 0 || target.name === "" || target.pattern === "";
 
-  export const show = (_target: domain.AlertPlayer) => {
+  export const show = (_target: model.AlertPlayer) => {
     target = _target;
     const elem = document.getElementById(ModalElementID.EDIT_ALERT_PLAYER);
     UIkit.modal(elem!).show();

@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 	"wfs/backend/apperr"
-	"wfs/backend/domain"
+	"wfs/backend/domain/model"
 	"wfs/backend/mocks"
 
 	"github.com/morikuni/failure"
@@ -21,7 +21,7 @@ func TestWatcher_Start(t *testing.T) {
 		t.Parallel()
 
 		// 準備
-		config := domain.UserConfig{
+		config := model.UserConfig{
 			InstallPath: "install_path_test",
 			Appid:       "abc123",
 			FontSize:    "medium",
@@ -30,7 +30,7 @@ func TestWatcher_Start(t *testing.T) {
 		mockLocalFile := &mocks.LocalFileInterface{}
 
 		mockStorage.On("UserConfig").Return(config, nil)
-		mockLocalFile.On("TempArenaInfo", config.InstallPath).Return(domain.TempArenaInfo{}, nil)
+		mockLocalFile.On("TempArenaInfo", config.InstallPath).Return(model.TempArenaInfo{}, nil)
 
 		var events []string
 		emitFunc := func(ctx context.Context, eventName string, optionalData ...interface{}) {
@@ -65,7 +65,7 @@ func TestWatcher_Start(t *testing.T) {
 
 		for _, ie := range ignoreErrs {
 			// 準備
-			config := domain.UserConfig{
+			config := model.UserConfig{
 				InstallPath: "install_path_test",
 				Appid:       "abc123",
 				FontSize:    "medium",
@@ -74,7 +74,7 @@ func TestWatcher_Start(t *testing.T) {
 			mockLocalFile := &mocks.LocalFileInterface{}
 
 			mockStorage.On("UserConfig").Return(config, nil)
-			mockLocalFile.On("TempArenaInfo", config.InstallPath).Return(domain.TempArenaInfo{}, failure.New(ie))
+			mockLocalFile.On("TempArenaInfo", config.InstallPath).Return(model.TempArenaInfo{}, failure.New(ie))
 
 			var events []string
 			emitFunc := func(ctx context.Context, eventName string, optionalData ...interface{}) {
@@ -101,7 +101,7 @@ func TestWatcher_Start(t *testing.T) {
 		t.Parallel()
 
 		// 準備
-		config := domain.UserConfig{
+		config := model.UserConfig{
 			InstallPath: "install_path_test",
 			Appid:       "abc123",
 			FontSize:    "medium",
@@ -133,7 +133,7 @@ func TestWatcher_Start(t *testing.T) {
 		t.Parallel()
 
 		// 準備
-		config := domain.UserConfig{
+		config := model.UserConfig{
 			InstallPath: "install_path_test",
 			Appid:       "abc123",
 			FontSize:    "medium",
@@ -144,7 +144,7 @@ func TestWatcher_Start(t *testing.T) {
 
 		mockStorage.On("UserConfig").Return(config, nil)
 		mockLocalFile.On("TempArenaInfo", config.InstallPath).Return(
-			domain.TempArenaInfo{},
+			model.TempArenaInfo{},
 			failure.New(apperr.UnexpectedError),
 		)
 		mockLogger.On("Error", mock.Anything, mock.Anything).Return()

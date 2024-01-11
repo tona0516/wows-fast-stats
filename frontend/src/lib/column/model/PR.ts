@@ -6,14 +6,14 @@ import type { ISummaryColumn } from "src/lib/column/intetface/ISummaryColumn";
 import { RatingColorFactory } from "src/lib/rating/RatingColorFactory";
 import { type CommonKey, type StatsCategory } from "src/lib/types";
 import { toPlayerStats } from "src/lib/util";
-import type { domain } from "wailsjs/go/models";
+import type { model } from "wailsjs/go/models";
 
 export class PR
   extends AbstractColumn<CommonKey>
   implements ISingleColumn, ISummaryColumn
 {
   constructor(
-    private config: domain.UserConfig,
+    private config: model.UserConfig,
     private category: StatsCategory,
   ) {
     super("pr", "PR", "Personal Rating", 1);
@@ -27,11 +27,11 @@ export class PR
     return this.config.displays[this.category].pr;
   }
 
-  getTdClass(player: domain.Player): string {
+  getTdClass(player: model.Player): string {
     return this.getValue(player) === -1 ? CssClass.TD_MULTI : CssClass.TD_NUM;
   }
 
-  getDisplayValue(player: domain.Player): string {
+  getDisplayValue(player: model.Player): string {
     const value = this.getValue(player);
     if (value === -1) {
       return "N/A";
@@ -40,14 +40,14 @@ export class PR
     return value.toFixed(this.getDigit());
   }
 
-  getTextColorCode(player: domain.Player): string {
+  getTextColorCode(player: model.Player): string {
     return RatingColorFactory.fromPR(
       this.getValue(player),
       this.config,
     ).getTextColorCode();
   }
 
-  getValue(player: domain.Player): number {
+  getValue(player: model.Player): number {
     return toPlayerStats(player, this.config.stats_pattern)[this.category].pr;
   }
 

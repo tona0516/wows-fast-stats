@@ -3,11 +3,11 @@ import { AbstractColumn } from "src/lib/column/intetface/AbstractColumn";
 import { NumbersURL } from "src/lib/NumbersURL";
 import { type CommonKey, type StatsCategory } from "src/lib/types";
 import { tierString, toPlayerStats } from "src/lib/util";
-import type { domain } from "wailsjs/go/models";
+import type { model } from "wailsjs/go/models";
 
 export class MaxDamage extends AbstractColumn<CommonKey> {
   constructor(
-    private config: domain.UserConfig,
+    private config: model.UserConfig,
     private category: StatsCategory,
   ) {
     let innerColumnNumber: number;
@@ -31,7 +31,7 @@ export class MaxDamage extends AbstractColumn<CommonKey> {
     return this.config.displays[this.category].max_damage;
   }
 
-  damage(player: domain.Player): string {
+  damage(player: model.Player): string {
     const value = toPlayerStats(player, this.config.stats_pattern)[
       this.category
     ].max_damage.damage;
@@ -39,7 +39,7 @@ export class MaxDamage extends AbstractColumn<CommonKey> {
     return value.toFixed(digit);
   }
 
-  shipInfo(player: domain.Player): [url: string, text: string] {
+  shipInfo(player: model.Player): [url: string, text: string] {
     const maxDamage = toPlayerStats(player, this.config.stats_pattern).overall
       .max_damage;
     const url = NumbersURL.ship(maxDamage.ship_id);

@@ -3,8 +3,8 @@ package main
 import (
 	"context"
 	"wfs/backend/apperr"
-	"wfs/backend/domain"
-	"wfs/backend/repository"
+	"wfs/backend/domain/model"
+	"wfs/backend/domain/repository"
 	"wfs/backend/usecase"
 
 	"github.com/morikuni/failure"
@@ -15,20 +15,20 @@ const EventOnload = "ONLOAD"
 
 type volatileData struct {
 	cancelWatcher  context.CancelFunc
-	excludePlayers domain.ExcludedPlayers
+	excludePlayers model.ExcludedPlayers
 }
 
 func newVolatileData() volatileData {
 	return volatileData{
 		cancelWatcher:  nil,
-		excludePlayers: make(domain.ExcludedPlayers),
+		excludePlayers: make(model.ExcludedPlayers),
 	}
 }
 
 //nolint:containedctx
 type App struct {
 	ctx            context.Context
-	env            domain.Env
+	env            model.Env
 	logger         repository.LoggerInterface
 	config         usecase.Config
 	screenshot     usecase.Screenshot
@@ -40,7 +40,7 @@ type App struct {
 }
 
 func NewApp(
-	env domain.Env,
+	env model.Env,
 	logger repository.LoggerInterface,
 	config usecase.Config,
 	screenshot usecase.Screenshot,
@@ -97,8 +97,8 @@ func (a *App) StartWatching() error {
 	return nil
 }
 
-func (a *App) Battle() (domain.Battle, error) {
-	result := domain.Battle{}
+func (a *App) Battle() (model.Battle, error) {
+	result := model.Battle{}
 
 	userConfig, err := a.config.User()
 	if err != nil {
@@ -133,11 +133,11 @@ func (a *App) OpenDirectory(path string) error {
 	return apperr.Unwrap(err)
 }
 
-func (a *App) DefaultUserConfig() domain.UserConfig {
-	return domain.DefaultUserConfig
+func (a *App) DefaultUserConfig() model.UserConfig {
+	return model.DefaultUserConfig
 }
 
-func (a *App) UserConfig() (domain.UserConfig, error) {
+func (a *App) UserConfig() (model.UserConfig, error) {
 	config, err := a.config.User()
 	if err != nil {
 		a.logger.Error(err, nil)
@@ -146,7 +146,7 @@ func (a *App) UserConfig() (domain.UserConfig, error) {
 	return config, apperr.Unwrap(err)
 }
 
-func (a *App) ApplyUserConfig(config domain.UserConfig) error {
+func (a *App) ApplyUserConfig(config model.UserConfig) error {
 	err := a.config.UpdateOptional(config)
 	if err != nil {
 		a.logger.Error(err, nil)
@@ -158,14 +158,14 @@ func (a *App) ApplyUserConfig(config domain.UserConfig) error {
 func (a *App) ValidateRequiredConfig(
 	installPath string,
 	appid string,
-) domain.RequiredConfigError {
+) model.RequiredConfigError {
 	return a.config.ValidateRequired(installPath, appid)
 }
 
 func (a *App) ApplyRequiredUserConfig(
 	installPath string,
 	appid string,
-) (domain.RequiredConfigError, error) {
+) (model.RequiredConfigError, error) {
 	validatedResult, err := a.config.UpdateRequired(installPath, appid)
 	if err != nil {
 		a.logger.Error(err, nil)
@@ -206,7 +206,7 @@ func (a *App) RemoveExcludePlayerID(playerID int) {
 	a.volatileData.excludePlayers.Remove(playerID)
 }
 
-func (a *App) AlertPlayers() ([]domain.AlertPlayer, error) {
+func (a *App) AlertPlayers() ([]model.AlertPlayer, error) {
 	players, err := a.config.AlertPlayers()
 	if err != nil {
 		a.logger.Error(err, nil)
@@ -215,7 +215,7 @@ func (a *App) AlertPlayers() ([]domain.AlertPlayer, error) {
 	return players, apperr.Unwrap(err)
 }
 
-func (a *App) UpdateAlertPlayer(player domain.AlertPlayer) error {
+func (a *App) UpdateAlertPlayer(player model.AlertPlayer) error {
 	err := a.config.UpdateAlertPlayer(player)
 	if err != nil {
 		a.logger.Error(err, nil)
@@ -233,7 +233,7 @@ func (a *App) RemoveAlertPlayer(accountID int) error {
 	return apperr.Unwrap(err)
 }
 
-func (a *App) SearchPlayer(prefix string) (domain.WGAccountList, error) {
+func (a *App) SearchPlayer(prefix string) (model.WGAccountList, error) {
 	accountList, err := a.config.SearchPlayer(prefix)
 	if err != nil {
 		a.logger.Error(err, nil)
@@ -243,7 +243,7 @@ func (a *App) SearchPlayer(prefix string) (domain.WGAccountList, error) {
 }
 
 func (a *App) AlertPatterns() []string {
-	return domain.AlertPatterns
+	return model.AlertPatterns
 }
 
 func (a *App) LogError(errString string) {
@@ -251,7 +251,7 @@ func (a *App) LogError(errString string) {
 	a.logger.Error(err, nil)
 }
 
-func (a *App) LatestRelease() (domain.GHLatestRelease, error) {
+func (a *App) LatestRelease() (model.GHLatestRelease, error) {
 	latestRelease, err := a.updater.IsUpdatable()
 	return latestRelease, apperr.Unwrap(err)
 }

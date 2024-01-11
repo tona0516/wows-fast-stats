@@ -1,4 +1,4 @@
-export namespace domain {
+export namespace model {
 	
 	export class AlertPlayer {
 	    account_id: number;

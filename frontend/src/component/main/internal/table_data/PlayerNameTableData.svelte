@@ -11,13 +11,13 @@
     AddExcludePlayerID,
     RemoveExcludePlayerID,
   } from "wailsjs/go/main/App";
-  import type { domain } from "wailsjs/go/models";
+  import type { model } from "wailsjs/go/models";
   import type { PlayerName } from "src/lib/column/model/PlayerName";
   import { ClipboardSetText } from "wailsjs/runtime/runtime";
   import { Notifier } from "src/lib/Notifier";
 
   export let column: PlayerName;
-  export let player: domain.Player;
+  export let player: model.Player;
 
   $: accountID = player.player_info.id;
   $: isNPC = accountID === 0;

@@ -1,7 +1,7 @@
-import type { domain } from "wailsjs/go/models";
+import type { model } from "wailsjs/go/models";
 
 export interface ISingleColumn {
-  getTdClass(player: domain.Player): string;
-  getDisplayValue(player: domain.Player): string;
-  getTextColorCode(player: domain.Player): string;
+  getTdClass(player: model.Player): string;
+  getDisplayValue(player: model.Player): string;
+  getTextColorCode(player: model.Player): string;
 }

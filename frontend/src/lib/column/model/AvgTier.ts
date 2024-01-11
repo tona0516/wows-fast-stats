@@ -4,13 +4,13 @@ import { AbstractColumn } from "src/lib/column/intetface/AbstractColumn";
 import type { ISingleColumn } from "src/lib/column/intetface/ISingleColumn";
 import { type OverallKey } from "src/lib/types";
 import { toPlayerStats } from "src/lib/util";
-import type { domain } from "wailsjs/go/models";
+import type { model } from "wailsjs/go/models";
 
 export class AvgTier
   extends AbstractColumn<OverallKey>
   implements ISingleColumn
 {
-  constructor(private config: domain.UserConfig) {
+  constructor(private config: model.UserConfig) {
     super("avg_tier", "平均T", "平均Tier", 1);
   }
 
@@ -22,18 +22,18 @@ export class AvgTier
     return this.config.displays.overall.avg_tier;
   }
 
-  getTdClass(_: domain.Player): string {
+  getTdClass(_: model.Player): string {
     return CssClass.TD_NUM;
   }
 
-  getDisplayValue(player: domain.Player): string {
+  getDisplayValue(player: model.Player): string {
     const digit = this.config.custom_digit.avg_tier;
     const value = toPlayerStats(player, this.config.stats_pattern).overall
       .avg_tier;
     return value.toFixed(digit);
   }
 
-  getTextColorCode(_: domain.Player): string {
+  getTextColorCode(_: model.Player): string {
     return "";
   }
 }

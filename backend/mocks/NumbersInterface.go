@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	domain "wfs/backend/domain"
+	model "wfs/backend/domain/model"
 
 	mock "github.com/stretchr/testify/mock"
 )
@@ -14,23 +14,23 @@ type NumbersInterface struct {
 }
 
 // ExpectedStats provides a mock function with given fields:
-func (_m *NumbersInterface) ExpectedStats() (domain.ExpectedStats, error) {
+func (_m *NumbersInterface) ExpectedStats() (model.ExpectedStats, error) {
 	ret := _m.Called()
 
 	if len(ret) == 0 {
 		panic("no return value specified for ExpectedStats")
 	}
 
-	var r0 domain.ExpectedStats
+	var r0 model.ExpectedStats
 	var r1 error
-	if rf, ok := ret.Get(0).(func() (domain.ExpectedStats, error)); ok {
+	if rf, ok := ret.Get(0).(func() (model.ExpectedStats, error)); ok {
 		return rf()
 	}
-	if rf, ok := ret.Get(0).(func() domain.ExpectedStats); ok {
+	if rf, ok := ret.Get(0).(func() model.ExpectedStats); ok {
 		r0 = rf()
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(domain.ExpectedStats)
+			r0 = ret.Get(0).(model.ExpectedStats)
 		}
 	}
 

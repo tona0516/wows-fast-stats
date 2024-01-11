@@ -2,7 +2,7 @@ package infra
 
 import (
 	"testing"
-	"wfs/backend/domain"
+	"wfs/backend/domain/model"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -27,46 +27,46 @@ func TestUnregistered_Warship(t *testing.T) {
 	actual, err := unregistered.Warship()
 
 	// アサーション
-	expected := domain.Warships{
+	expected := model.Warships{
 		1: {
 			Name:      "Ship 1",
 			Tier:      11,
-			Type:      domain.ShipTypeCV,
+			Type:      model.ShipTypeCV,
 			Nation:    "uk",
 			IsPremium: false,
 		},
 		2: {
 			Name:      "Ship 2",
 			Tier:      10,
-			Type:      domain.ShipTypeBB,
+			Type:      model.ShipTypeBB,
 			Nation:    "usa",
 			IsPremium: false,
 		},
 		3: {
 			Name:      "Ship 3",
 			Tier:      9,
-			Type:      domain.ShipTypeCL,
+			Type:      model.ShipTypeCL,
 			Nation:    "japan",
 			IsPremium: false,
 		},
 		4: {
 			Name:      "Ship 4",
 			Tier:      8,
-			Type:      domain.ShipTypeDD,
+			Type:      model.ShipTypeDD,
 			Nation:    "pan_asia",
 			IsPremium: false,
 		},
 		5: {
 			Name:      "Ship 5",
 			Tier:      7,
-			Type:      domain.ShipTypeSS,
+			Type:      model.ShipTypeSS,
 			Nation:    "commonwealth",
 			IsPremium: false,
 		},
 		6: {
 			Name:      "Ship 6",
 			Tier:      6,
-			Type:      domain.ShipTypeAUX,
+			Type:      model.ShipTypeAUX,
 			Nation:    "events",
 			IsPremium: false,
 		},

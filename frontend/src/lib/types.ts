@@ -1,5 +1,5 @@
 import type { Summary } from "src/lib/Summary";
-import { domain } from "wailsjs/go/models";
+import { model } from "wailsjs/go/models";
 
 export const BasicKey = {
   player_info: "player_info",
@@ -9,21 +9,21 @@ export type BasicKey = (typeof BasicKey)[keyof typeof BasicKey];
 
 type CommonMethod = "convertValues";
 
-export type StatsCategory = Exclude<keyof domain.PlayerStats, CommonMethod>;
+export type StatsCategory = Exclude<keyof model.PlayerStats, CommonMethod>;
 export type ColumnCategory = Readonly<"basic" | StatsCategory>;
 
-export type ShipType = Readonly<keyof domain.ShipTypeGroup>;
-export type TierGroup = Readonly<keyof domain.TierGroup>;
+export type ShipType = Readonly<keyof model.ShipTypeGroup>;
+export type TierGroup = Readonly<keyof model.TierGroup>;
 export type StatsExtra = Exclude<
-  keyof domain.Player,
+  keyof model.Player,
   keyof typeof BasicKey | CommonMethod
 >;
-export type Rating = Readonly<keyof domain.SkillColorCode>;
+export type Rating = Readonly<keyof model.SkillColorCode>;
 
-export type ShipKey = Readonly<keyof domain.Ship>;
-export type OverallKey = Readonly<keyof domain.Overall>;
+export type ShipKey = Readonly<keyof model.Ship>;
+export type OverallKey = Readonly<keyof model.Overall>;
 export type CommonKey = ShipKey & OverallKey;
-export type DigitKey = Readonly<keyof domain.CustomDigit>;
+export type DigitKey = Readonly<keyof model.CustomDigit>;
 
-export type OptionalBattle = domain.Battle | undefined;
+export type OptionalBattle = model.Battle | undefined;
 export type OptionalSummary = Summary | undefined;

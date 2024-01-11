@@ -3,7 +3,7 @@ package usecase
 import (
 	"testing"
 	"wfs/backend/apperr"
-	"wfs/backend/domain"
+	"wfs/backend/domain/model"
 	"wfs/backend/mocks"
 
 	"github.com/morikuni/failure"
@@ -18,10 +18,10 @@ func TestUpdater_IsUpdatable(t *testing.T) {
 
 		// 準備
 		mockGithub := &mocks.GithubInterface{}
-		response := domain.GHLatestRelease{TagName: "2.0.0", HTMLURL: "https://hoge.com"}
+		response := model.GHLatestRelease{TagName: "2.0.0", HTMLURL: "https://hoge.com"}
 		mockGithub.On("LatestRelease").Return(response, nil)
 
-		env := domain.Env{Semver: "1.0.0"}
+		env := model.Env{Semver: "1.0.0"}
 		updater := NewUpdater(env, mockGithub, nil)
 
 		// テスト
@@ -40,10 +40,10 @@ func TestUpdater_IsUpdatable(t *testing.T) {
 
 		// 準備
 		mockGithub := &mocks.GithubInterface{}
-		response := domain.GHLatestRelease{TagName: "1.0.0", HTMLURL: "https://hoge.com"}
+		response := model.GHLatestRelease{TagName: "1.0.0", HTMLURL: "https://hoge.com"}
 		mockGithub.On("LatestRelease").Return(response, nil)
 
-		env := domain.Env{Semver: "1.0.0"}
+		env := model.Env{Semver: "1.0.0"}
 		updater := NewUpdater(env, mockGithub, nil)
 
 		// テスト
@@ -63,9 +63,9 @@ func TestUpdater_IsUpdatable(t *testing.T) {
 		// 準備
 		mockGithub := &mocks.GithubInterface{}
 		expected := failure.New(apperr.HTTPRequestError)
-		mockGithub.On("LatestRelease").Return(domain.GHLatestRelease{}, expected)
+		mockGithub.On("LatestRelease").Return(model.GHLatestRelease{}, expected)
 
-		env := domain.Env{Semver: "1.0.0"}
+		env := model.Env{Semver: "1.0.0"}
 		updater := NewUpdater(env, mockGithub, nil)
 
 		// テスト

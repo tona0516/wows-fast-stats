@@ -2,21 +2,21 @@ package usecase
 
 import (
 	"fmt"
-	"wfs/backend/domain"
-	"wfs/backend/repository"
+	"wfs/backend/domain/model"
+	"wfs/backend/domain/repository"
 
 	"github.com/Masterminds/semver/v3"
 	"github.com/morikuni/failure"
 )
 
 type Updater struct {
-	env    domain.Env
+	env    model.Env
 	github repository.GithubInterface
 	logger repository.LoggerInterface
 }
 
 func NewUpdater(
-	env domain.Env,
+	env model.Env,
 	github repository.GithubInterface,
 	logger repository.LoggerInterface,
 ) *Updater {
@@ -27,8 +27,8 @@ func NewUpdater(
 	}
 }
 
-func (u *Updater) IsUpdatable() (domain.GHLatestRelease, error) {
-	var latestRelease domain.GHLatestRelease
+func (u *Updater) IsUpdatable() (model.GHLatestRelease, error) {
+	var latestRelease model.GHLatestRelease
 
 	c, err := semver.NewConstraint(fmt.Sprintf("> %s", u.env.Semver))
 	if err != nil {

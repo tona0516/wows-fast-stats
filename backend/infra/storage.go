@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/gob"
 	"errors"
-	"wfs/backend/domain"
+	"wfs/backend/domain/model"
 
 	"github.com/dgraph-io/badger/v4"
 	"github.com/morikuni/failure"
@@ -42,46 +42,46 @@ func (s *Storage) WriteDataVersion(version uint) error {
 }
 
 func (s *Storage) IsExistUserConfig() bool {
-	_, err := read[domain.UserConfig](s.db, userConfigKey)
+	_, err := read[model.UserConfig](s.db, userConfigKey)
 	return !isErrKeyNotFound(err)
 }
 
-func (s *Storage) UserConfig() (domain.UserConfig, error) {
-	config, err := read[domain.UserConfig](s.db, userConfigKey)
+func (s *Storage) UserConfig() (model.UserConfig, error) {
+	config, err := read[model.UserConfig](s.db, userConfigKey)
 	if isErrKeyNotFound(err) {
-		return domain.DefaultUserConfig, nil
+		return model.DefaultUserConfig, nil
 	}
 
 	return config, err
 }
 
-func (s *Storage) WriteUserConfig(config domain.UserConfig) error {
+func (s *Storage) WriteUserConfig(config model.UserConfig) error {
 	return write(s.db, userConfigKey, config)
 }
 
 func (s *Storage) IsExistAlertPlayers() bool {
-	_, err := read[[]domain.AlertPlayer](s.db, alertPlayersKey)
+	_, err := read[[]model.AlertPlayer](s.db, alertPlayersKey)
 	return !isErrKeyNotFound(err)
 }
 
-func (s *Storage) AlertPlayers() ([]domain.AlertPlayer, error) {
-	players, err := read[[]domain.AlertPlayer](s.db, alertPlayersKey)
+func (s *Storage) AlertPlayers() ([]model.AlertPlayer, error) {
+	players, err := read[[]model.AlertPlayer](s.db, alertPlayersKey)
 	if isErrKeyNotFound(err) {
-		return make([]domain.AlertPlayer, 0), nil
+		return make([]model.AlertPlayer, 0), nil
 	}
 
 	return players, err
 }
 
-func (s *Storage) WriteAlertPlayers(players []domain.AlertPlayer) error {
+func (s *Storage) WriteAlertPlayers(players []model.AlertPlayer) error {
 	return write(s.db, alertPlayersKey, players)
 }
 
-func (s *Storage) ExpectedStats() (domain.ExpectedStats, error) {
-	return read[domain.ExpectedStats](s.db, expectedStatsKey)
+func (s *Storage) ExpectedStats() (model.ExpectedStats, error) {
+	return read[model.ExpectedStats](s.db, expectedStatsKey)
 }
 
-func (s *Storage) WriteExpectedStats(expectedStats domain.ExpectedStats) error {
+func (s *Storage) WriteExpectedStats(expectedStats model.ExpectedStats) error {
 	return write(s.db, expectedStatsKey, expectedStats)
 }
 

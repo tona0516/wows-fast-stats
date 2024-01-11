@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 	"wfs/backend/apperr"
-	"wfs/backend/domain"
+	"wfs/backend/domain/model"
 	"wfs/backend/infra/response"
 	"wfs/backend/infra/webapi"
 
@@ -27,7 +27,7 @@ func (w *Wargaming) SetAppID(appid string) {
 	w.appid = appid
 }
 
-func (w *Wargaming) AccountInfo(accountIDs []int) (domain.WGAccountInfo, error) {
+func (w *Wargaming) AccountInfo(accountIDs []int) (model.WGAccountInfo, error) {
 	strAccountIDs := make([]string, len(accountIDs))
 	for i, v := range accountIDs {
 		strAccountIDs[i] = strconv.Itoa(v)
@@ -48,7 +48,7 @@ func (w *Wargaming) AccountInfo(accountIDs []int) (domain.WGAccountInfo, error) 
 	return res.Data, err
 }
 
-func (w *Wargaming) AccountList(accountNames []string) (domain.WGAccountList, error) {
+func (w *Wargaming) AccountList(accountNames []string) (model.WGAccountList, error) {
 	res, err := request[response.WGAccountList](
 		w.config.URL+"/wows/account/list/",
 		w.config.Retry,
@@ -64,7 +64,7 @@ func (w *Wargaming) AccountList(accountNames []string) (domain.WGAccountList, er
 	return res.Data, err
 }
 
-func (w *Wargaming) AccountListForSearch(prefix string) (domain.WGAccountList, error) {
+func (w *Wargaming) AccountListForSearch(prefix string) (model.WGAccountList, error) {
 	res, err := request[response.WGAccountList](
 		w.config.URL+"/wows/account/list/",
 		w.config.Retry,
@@ -80,7 +80,7 @@ func (w *Wargaming) AccountListForSearch(prefix string) (domain.WGAccountList, e
 	return res.Data, err
 }
 
-func (w *Wargaming) ClansAccountInfo(accountIDs []int) (domain.WGClansAccountInfo, error) {
+func (w *Wargaming) ClansAccountInfo(accountIDs []int) (model.WGClansAccountInfo, error) {
 	strAccountIDs := make([]string, len(accountIDs))
 	for i, v := range accountIDs {
 		strAccountIDs[i] = strconv.Itoa(v)
@@ -100,14 +100,14 @@ func (w *Wargaming) ClansAccountInfo(accountIDs []int) (domain.WGClansAccountInf
 	return res.Data, err
 }
 
-func (w *Wargaming) ClansInfo(clanIDs []int) (domain.WGClansInfo, error) {
+func (w *Wargaming) ClansInfo(clanIDs []int) (model.WGClansInfo, error) {
 	strClanIDs := make([]string, len(clanIDs))
 	for i, v := range clanIDs {
 		strClanIDs[i] = strconv.Itoa(v)
 	}
 
 	if len(strClanIDs) == 0 {
-		return domain.WGClansInfo{}, nil
+		return model.WGClansInfo{}, nil
 	}
 
 	res, err := request[response.WGClansInfo](
@@ -124,7 +124,7 @@ func (w *Wargaming) ClansInfo(clanIDs []int) (domain.WGClansInfo, error) {
 	return res.Data, err
 }
 
-func (w *Wargaming) ShipsStats(accountID int) (domain.WGShipsStats, error) {
+func (w *Wargaming) ShipsStats(accountID int) (model.WGShipsStats, error) {
 	res, err := request[response.WGShipsStats](
 		w.config.URL+"/wows/ships/stats/",
 		w.config.Retry,
@@ -140,7 +140,7 @@ func (w *Wargaming) ShipsStats(accountID int) (domain.WGShipsStats, error) {
 	return res.Data, err
 }
 
-func (w *Wargaming) EncycShips(pageNo int) (domain.WGEncycShips, int, error) {
+func (w *Wargaming) EncycShips(pageNo int) (model.WGEncycShips, int, error) {
 	res, err := request[response.WGEncycShips](
 		w.config.URL+"/wows/encyclopedia/ships/",
 		w.config.Retry,
@@ -156,7 +156,7 @@ func (w *Wargaming) EncycShips(pageNo int) (domain.WGEncycShips, int, error) {
 	return res.Data, res.Meta.PageTotal, err
 }
 
-func (w *Wargaming) EncycInfo() (domain.WGEncycInfoData, error) {
+func (w *Wargaming) EncycInfo() (model.WGEncycInfoData, error) {
 	res, err := request[response.WGEncycInfo](
 		w.config.URL+"/wows/encyclopedia/info/",
 		w.config.Retry,
@@ -170,7 +170,7 @@ func (w *Wargaming) EncycInfo() (domain.WGEncycInfoData, error) {
 	return res.Data, err
 }
 
-func (w *Wargaming) BattleArenas() (domain.WGBattleArenas, error) {
+func (w *Wargaming) BattleArenas() (model.WGBattleArenas, error) {
 	res, err := request[response.WGBattleArenas](
 		w.config.URL+"/wows/encyclopedia/battlearenas/",
 		w.config.Retry,
@@ -185,7 +185,7 @@ func (w *Wargaming) BattleArenas() (domain.WGBattleArenas, error) {
 	return res.Data, err
 }
 
-func (w *Wargaming) BattleTypes() (domain.WGBattleTypes, error) {
+func (w *Wargaming) BattleTypes() (model.WGBattleTypes, error) {
 	res, err := request[response.WGBattleTypes](
 		w.config.URL+"/wows/encyclopedia/battletypes/",
 		w.config.Retry,

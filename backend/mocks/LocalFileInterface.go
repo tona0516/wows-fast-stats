@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	domain "wfs/backend/domain"
+	model "wfs/backend/domain/model"
 
 	mock "github.com/stretchr/testify/mock"
 )
@@ -32,7 +32,7 @@ func (_m *LocalFileInterface) SaveScreenshot(path string, base64Data string) err
 }
 
 // SaveTempArenaInfo provides a mock function with given fields: tempArenaInfo
-func (_m *LocalFileInterface) SaveTempArenaInfo(tempArenaInfo domain.TempArenaInfo) error {
+func (_m *LocalFileInterface) SaveTempArenaInfo(tempArenaInfo model.TempArenaInfo) error {
 	ret := _m.Called(tempArenaInfo)
 
 	if len(ret) == 0 {
@@ -40,7 +40,7 @@ func (_m *LocalFileInterface) SaveTempArenaInfo(tempArenaInfo domain.TempArenaIn
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(domain.TempArenaInfo) error); ok {
+	if rf, ok := ret.Get(0).(func(model.TempArenaInfo) error); ok {
 		r0 = rf(tempArenaInfo)
 	} else {
 		r0 = ret.Error(0)
@@ -50,22 +50,22 @@ func (_m *LocalFileInterface) SaveTempArenaInfo(tempArenaInfo domain.TempArenaIn
 }
 
 // TempArenaInfo provides a mock function with given fields: installPath
-func (_m *LocalFileInterface) TempArenaInfo(installPath string) (domain.TempArenaInfo, error) {
+func (_m *LocalFileInterface) TempArenaInfo(installPath string) (model.TempArenaInfo, error) {
 	ret := _m.Called(installPath)
 
 	if len(ret) == 0 {
 		panic("no return value specified for TempArenaInfo")
 	}
 
-	var r0 domain.TempArenaInfo
+	var r0 model.TempArenaInfo
 	var r1 error
-	if rf, ok := ret.Get(0).(func(string) (domain.TempArenaInfo, error)); ok {
+	if rf, ok := ret.Get(0).(func(string) (model.TempArenaInfo, error)); ok {
 		return rf(installPath)
 	}
-	if rf, ok := ret.Get(0).(func(string) domain.TempArenaInfo); ok {
+	if rf, ok := ret.Get(0).(func(string) model.TempArenaInfo); ok {
 		r0 = rf(installPath)
 	} else {
-		r0 = ret.Get(0).(domain.TempArenaInfo)
+		r0 = ret.Get(0).(model.TempArenaInfo)
 	}
 
 	if rf, ok := ret.Get(1).(func(string) error); ok {

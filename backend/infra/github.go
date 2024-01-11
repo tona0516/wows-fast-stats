@@ -3,7 +3,7 @@ package infra
 import (
 	"net/http"
 	"wfs/backend/apperr"
-	"wfs/backend/domain"
+	"wfs/backend/domain/model"
 	"wfs/backend/infra/webapi"
 
 	"github.com/cenkalti/backoff/v4"
@@ -18,10 +18,10 @@ func NewGithub(config RequestConfig) *Github {
 	return &Github{config: config}
 }
 
-func (g *Github) LatestRelease() (domain.GHLatestRelease, error) {
+func (g *Github) LatestRelease() (model.GHLatestRelease, error) {
 	b := backoff.WithMaxRetries(backoff.NewExponentialBackOff(), g.config.Retry)
-	operation := func() (webapi.Response[domain.GHLatestRelease], error) {
-		res, err := webapi.GetRequest[domain.GHLatestRelease](
+	operation := func() (webapi.Response[model.GHLatestRelease], error) {
+		res, err := webapi.GetRequest[model.GHLatestRelease](
 			g.config.URL+"/repos/tona0516/wows-fast-stats/releases/latest",
 			g.config.Timeout,
 			nil,

@@ -7,12 +7,12 @@
   import { Notifier } from "src/lib/Notifier";
   import { storedConfig } from "src/stores";
   import { SelectDirectory, StartWatching } from "wailsjs/go/main/App";
-  import { domain } from "wailsjs/go/models";
+  import { model } from "wailsjs/go/models";
 
-  export let inputConfig: domain.UserConfig;
+  export let inputConfig: model.UserConfig;
 
   let isLoading = false;
-  let requiredConfigError: domain.RequiredConfigError;
+  let requiredConfigError: model.RequiredConfigError;
 
   const clickSelectDirectory = async () => {
     try {

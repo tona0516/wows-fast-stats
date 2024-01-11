@@ -4,10 +4,10 @@ import { AbstractColumn } from "src/lib/column/intetface/AbstractColumn";
 import type { ISingleColumn } from "src/lib/column/intetface/ISingleColumn";
 import type { ShipKey } from "src/lib/types";
 import { toPlayerStats } from "src/lib/util";
-import type { domain } from "wailsjs/go/models";
+import type { model } from "wailsjs/go/models";
 
 export class HitRate extends AbstractColumn<ShipKey> implements ISingleColumn {
-  constructor(private config: domain.UserConfig) {
+  constructor(private config: model.UserConfig) {
     super("hit_rate", "Hit率(主|魚)", "命中率 (主砲|魚雷)", 1);
   }
 
@@ -19,11 +19,11 @@ export class HitRate extends AbstractColumn<ShipKey> implements ISingleColumn {
     return this.config.displays.ship.hit_rate;
   }
 
-  getTdClass(_: domain.Player): string {
+  getTdClass(_: model.Player): string {
     return CssClass.TD_MULTI;
   }
 
-  getDisplayValue(player: domain.Player): string {
+  getDisplayValue(player: model.Player): string {
     const digit = this.config.custom_digit.hit_rate;
     const stats = toPlayerStats(player, this.config.stats_pattern).ship;
     return `${stats.main_battery_hit_rate.toFixed(
@@ -31,7 +31,7 @@ export class HitRate extends AbstractColumn<ShipKey> implements ISingleColumn {
     )}% | ${stats.torpedoes_hit_rate.toFixed(digit)}%`;
   }
 
-  getTextColorCode(_: domain.Player): string {
+  getTextColorCode(_: model.Player): string {
     return "";
   }
 }

@@ -1,9 +1,9 @@
 <script lang="ts">
   import type { IGraphColumn } from "src/lib/column/intetface/IGraphColumn";
-  import type { domain } from "wailsjs/go/models";
+  import type { model } from "wailsjs/go/models";
 
   export let column: IGraphColumn;
-  export let player: domain.Player;
+  export let player: model.Player;
 
   $: param = column.getGraphParam(player);
 </script>

@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	domain "wfs/backend/domain"
+	model "wfs/backend/domain/model"
 
 	mock "github.com/stretchr/testify/mock"
 )
@@ -14,23 +14,23 @@ type ConfigV0Interface struct {
 }
 
 // AlertPlayers provides a mock function with given fields:
-func (_m *ConfigV0Interface) AlertPlayers() ([]domain.AlertPlayer, error) {
+func (_m *ConfigV0Interface) AlertPlayers() ([]model.AlertPlayer, error) {
 	ret := _m.Called()
 
 	if len(ret) == 0 {
 		panic("no return value specified for AlertPlayers")
 	}
 
-	var r0 []domain.AlertPlayer
+	var r0 []model.AlertPlayer
 	var r1 error
-	if rf, ok := ret.Get(0).(func() ([]domain.AlertPlayer, error)); ok {
+	if rf, ok := ret.Get(0).(func() ([]model.AlertPlayer, error)); ok {
 		return rf()
 	}
-	if rf, ok := ret.Get(0).(func() []domain.AlertPlayer); ok {
+	if rf, ok := ret.Get(0).(func() []model.AlertPlayer); ok {
 		r0 = rf()
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]domain.AlertPlayer)
+			r0 = ret.Get(0).([]model.AlertPlayer)
 		}
 	}
 
@@ -116,22 +116,22 @@ func (_m *ConfigV0Interface) IsExistUser() bool {
 }
 
 // User provides a mock function with given fields:
-func (_m *ConfigV0Interface) User() (domain.UserConfig, error) {
+func (_m *ConfigV0Interface) User() (model.UserConfig, error) {
 	ret := _m.Called()
 
 	if len(ret) == 0 {
 		panic("no return value specified for User")
 	}
 
-	var r0 domain.UserConfig
+	var r0 model.UserConfig
 	var r1 error
-	if rf, ok := ret.Get(0).(func() (domain.UserConfig, error)); ok {
+	if rf, ok := ret.Get(0).(func() (model.UserConfig, error)); ok {
 		return rf()
 	}
-	if rf, ok := ret.Get(0).(func() domain.UserConfig); ok {
+	if rf, ok := ret.Get(0).(func() model.UserConfig); ok {
 		r0 = rf()
 	} else {
-		r0 = ret.Get(0).(domain.UserConfig)
+		r0 = ret.Get(0).(model.UserConfig)
 	}
 
 	if rf, ok := ret.Get(1).(func() error); ok {

@@ -24,7 +24,7 @@ import {
   type ShipKey,
 } from "src/lib/types";
 import { isDigitKey, isOverallKey, isShipKey } from "src/lib/util";
-import { domain } from "wailsjs/go/models";
+import { model } from "wailsjs/go/models";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 class ColumnArray extends Array<AbstractColumn<any>> {
@@ -49,7 +49,7 @@ class ColumnArray extends Array<AbstractColumn<any>> {
 
 export namespace ColumnProvider {
   export const getAllColumns = (
-    config: domain.UserConfig,
+    config: model.UserConfig,
   ): [basic: ColumnArray, ship: ColumnArray, overall: ColumnArray] => {
     return [
       new ColumnArray("basic", [new PlayerName(config), new ShipInfo(config)]),
@@ -93,7 +93,7 @@ export namespace ColumnProvider {
   }
 
   export const getDisplayableColumns = (): DisplayableColumn[] => {
-    const config = new domain.UserConfig();
+    const config = new model.UserConfig();
     const [_, shipColumns, overallColumns] = getAllColumns(config);
     const columns: AbstractColumn<string>[] = [
       ...shipColumns,

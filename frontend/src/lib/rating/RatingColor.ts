@@ -1,12 +1,12 @@
 import type { Rating } from "src/lib/types";
-import type { domain } from "wailsjs/go/models";
+import type { model } from "wailsjs/go/models";
 
 const NONE_COLOR = "#000000";
 
 export class RatingAdapter {
   constructor(
     public rating: Rating | undefined,
-    private config: domain.UserConfig,
+    private config: model.UserConfig,
   ) {}
 
   getTextColorCode(): string {

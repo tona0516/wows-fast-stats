@@ -1,9 +1,9 @@
 <script lang="ts">
   import type { ISingleColumn } from "src/lib/column/intetface/ISingleColumn";
-  import type { domain } from "wailsjs/go/models";
+  import type { model } from "wailsjs/go/models";
 
   export let column: ISingleColumn;
-  export let player: domain.Player;
+  export let player: model.Player;
 </script>
 
 <td

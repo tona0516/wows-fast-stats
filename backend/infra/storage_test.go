@@ -3,7 +3,7 @@ package infra
 import (
 	"os"
 	"testing"
-	"wfs/backend/domain"
+	"wfs/backend/domain/model"
 
 	"github.com/dgraph-io/badger/v4"
 	"github.com/stretchr/testify/assert"
@@ -52,15 +52,15 @@ func TestStorage_UserConfig(t *testing.T) {
 	// 取得：保存されていない場合はデフォルト値を返却する
 	actual, err := storage.UserConfig()
 	require.NoError(t, err)
-	assert.Equal(t, domain.DefaultUserConfig, actual)
+	assert.Equal(t, model.DefaultUserConfig, actual)
 	assert.False(t, storage.IsExistUserConfig())
 
 	// 書き込み：正常系
-	expected := domain.UserConfig{
+	expected := model.UserConfig{
 		FontSize: "large",
-		Displays: domain.Displays{
-			Ship:    domain.Ship{PR: true},
-			Overall: domain.Overall{PR: false},
+		Displays: model.Displays{
+			Ship:    model.Ship{PR: true},
+			Overall: model.Overall{PR: false},
 		},
 	}
 	err = storage.WriteUserConfig(expected)
@@ -79,11 +79,11 @@ func TestStorage_AlertPlayers(t *testing.T) {
 	// 取得：保存されていない場合空のスライスを返却する
 	actual, err := storage.AlertPlayers()
 	require.NoError(t, err)
-	assert.Equal(t, []domain.AlertPlayer{}, actual)
+	assert.Equal(t, []model.AlertPlayer{}, actual)
 	assert.False(t, storage.IsExistAlertPlayers())
 
 	// 書き込み：正常系
-	expected := []domain.AlertPlayer{
+	expected := []model.AlertPlayer{
 		{
 			AccountID: 100,
 			Name:      "test",
@@ -110,13 +110,13 @@ func TestStorage_AlertPlayers(t *testing.T) {
 func TestStorage_ExpectedStats(t *testing.T) {
 	t.Parallel()
 
-	expected := domain.ExpectedStats{
-		1: domain.ExpectedValues{
+	expected := model.ExpectedStats{
+		1: model.ExpectedValues{
 			AverageDamageDealt: 123,
 			AverageFrags:       456,
 			WinRate:            789,
 		},
-		10: domain.ExpectedValues{
+		10: model.ExpectedValues{
 			AverageDamageDealt: 1,
 			AverageFrags:       2,
 			WinRate:            3,

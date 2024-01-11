@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	domain "wfs/backend/domain"
+	model "wfs/backend/domain/model"
 
 	mock "github.com/stretchr/testify/mock"
 )
@@ -14,22 +14,22 @@ type GithubInterface struct {
 }
 
 // LatestRelease provides a mock function with given fields:
-func (_m *GithubInterface) LatestRelease() (domain.GHLatestRelease, error) {
+func (_m *GithubInterface) LatestRelease() (model.GHLatestRelease, error) {
 	ret := _m.Called()
 
 	if len(ret) == 0 {
 		panic("no return value specified for LatestRelease")
 	}
 
-	var r0 domain.GHLatestRelease
+	var r0 model.GHLatestRelease
 	var r1 error
-	if rf, ok := ret.Get(0).(func() (domain.GHLatestRelease, error)); ok {
+	if rf, ok := ret.Get(0).(func() (model.GHLatestRelease, error)); ok {
 		return rf()
 	}
-	if rf, ok := ret.Get(0).(func() domain.GHLatestRelease); ok {
+	if rf, ok := ret.Get(0).(func() model.GHLatestRelease); ok {
 		r0 = rf()
 	} else {
-		r0 = ret.Get(0).(domain.GHLatestRelease)
+		r0 = ret.Get(0).(model.GHLatestRelease)
 	}
 
 	if rf, ok := ret.Get(1).(func() error); ok {

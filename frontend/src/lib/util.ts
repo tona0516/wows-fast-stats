@@ -1,5 +1,5 @@
 import type { DigitKey, OverallKey, ShipKey, ShipType } from "src/lib/types";
-import { domain } from "wailsjs/go/models";
+import { model } from "wailsjs/go/models";
 
 const ROMAN_NUMERALS: { decimal: number; numeral: string }[] = [
   { decimal: 10, numeral: "X" },
@@ -10,9 +10,9 @@ const ROMAN_NUMERALS: { decimal: number; numeral: string }[] = [
 ];
 
 export const toPlayerStats = (
-  player: domain.Player,
+  player: model.Player,
   statsPattern: string,
-): domain.PlayerStats => {
+): model.PlayerStats => {
   switch (statsPattern) {
     case "pvp_solo":
       return player.pvp_solo;
@@ -38,17 +38,17 @@ export const tierString = (value: number): string => {
 };
 
 export const isShipType = (type: string): type is ShipType => {
-  return Object.keys(new domain.ShipTypeGroup()).includes(type);
+  return Object.keys(new model.ShipTypeGroup()).includes(type);
 };
 
 export const isDigitKey = (key: string): key is DigitKey => {
-  return Object.keys(new domain.CustomDigit()).includes(key);
+  return Object.keys(new model.CustomDigit()).includes(key);
 };
 
 export const isShipKey = (key: string): key is ShipKey => {
-  return Object.keys(new domain.Ship()).includes(key);
+  return Object.keys(new model.Ship()).includes(key);
 };
 
 export const isOverallKey = (key: string): key is OverallKey => {
-  return Object.keys(new domain.Overall()).includes(key);
+  return Object.keys(new model.Overall()).includes(key);
 };

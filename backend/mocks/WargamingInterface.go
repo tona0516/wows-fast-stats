@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	domain "wfs/backend/domain"
+	model "wfs/backend/domain/model"
 
 	mock "github.com/stretchr/testify/mock"
 )
@@ -14,23 +14,23 @@ type WargamingInterface struct {
 }
 
 // AccountInfo provides a mock function with given fields: accountIDs
-func (_m *WargamingInterface) AccountInfo(accountIDs []int) (domain.WGAccountInfo, error) {
+func (_m *WargamingInterface) AccountInfo(accountIDs []int) (model.WGAccountInfo, error) {
 	ret := _m.Called(accountIDs)
 
 	if len(ret) == 0 {
 		panic("no return value specified for AccountInfo")
 	}
 
-	var r0 domain.WGAccountInfo
+	var r0 model.WGAccountInfo
 	var r1 error
-	if rf, ok := ret.Get(0).(func([]int) (domain.WGAccountInfo, error)); ok {
+	if rf, ok := ret.Get(0).(func([]int) (model.WGAccountInfo, error)); ok {
 		return rf(accountIDs)
 	}
-	if rf, ok := ret.Get(0).(func([]int) domain.WGAccountInfo); ok {
+	if rf, ok := ret.Get(0).(func([]int) model.WGAccountInfo); ok {
 		r0 = rf(accountIDs)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(domain.WGAccountInfo)
+			r0 = ret.Get(0).(model.WGAccountInfo)
 		}
 	}
 
@@ -44,23 +44,23 @@ func (_m *WargamingInterface) AccountInfo(accountIDs []int) (domain.WGAccountInf
 }
 
 // AccountList provides a mock function with given fields: accountNames
-func (_m *WargamingInterface) AccountList(accountNames []string) (domain.WGAccountList, error) {
+func (_m *WargamingInterface) AccountList(accountNames []string) (model.WGAccountList, error) {
 	ret := _m.Called(accountNames)
 
 	if len(ret) == 0 {
 		panic("no return value specified for AccountList")
 	}
 
-	var r0 domain.WGAccountList
+	var r0 model.WGAccountList
 	var r1 error
-	if rf, ok := ret.Get(0).(func([]string) (domain.WGAccountList, error)); ok {
+	if rf, ok := ret.Get(0).(func([]string) (model.WGAccountList, error)); ok {
 		return rf(accountNames)
 	}
-	if rf, ok := ret.Get(0).(func([]string) domain.WGAccountList); ok {
+	if rf, ok := ret.Get(0).(func([]string) model.WGAccountList); ok {
 		r0 = rf(accountNames)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(domain.WGAccountList)
+			r0 = ret.Get(0).(model.WGAccountList)
 		}
 	}
 
@@ -74,23 +74,23 @@ func (_m *WargamingInterface) AccountList(accountNames []string) (domain.WGAccou
 }
 
 // AccountListForSearch provides a mock function with given fields: prefix
-func (_m *WargamingInterface) AccountListForSearch(prefix string) (domain.WGAccountList, error) {
+func (_m *WargamingInterface) AccountListForSearch(prefix string) (model.WGAccountList, error) {
 	ret := _m.Called(prefix)
 
 	if len(ret) == 0 {
 		panic("no return value specified for AccountListForSearch")
 	}
 
-	var r0 domain.WGAccountList
+	var r0 model.WGAccountList
 	var r1 error
-	if rf, ok := ret.Get(0).(func(string) (domain.WGAccountList, error)); ok {
+	if rf, ok := ret.Get(0).(func(string) (model.WGAccountList, error)); ok {
 		return rf(prefix)
 	}
-	if rf, ok := ret.Get(0).(func(string) domain.WGAccountList); ok {
+	if rf, ok := ret.Get(0).(func(string) model.WGAccountList); ok {
 		r0 = rf(prefix)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(domain.WGAccountList)
+			r0 = ret.Get(0).(model.WGAccountList)
 		}
 	}
 
@@ -104,23 +104,23 @@ func (_m *WargamingInterface) AccountListForSearch(prefix string) (domain.WGAcco
 }
 
 // BattleArenas provides a mock function with given fields:
-func (_m *WargamingInterface) BattleArenas() (domain.WGBattleArenas, error) {
+func (_m *WargamingInterface) BattleArenas() (model.WGBattleArenas, error) {
 	ret := _m.Called()
 
 	if len(ret) == 0 {
 		panic("no return value specified for BattleArenas")
 	}
 
-	var r0 domain.WGBattleArenas
+	var r0 model.WGBattleArenas
 	var r1 error
-	if rf, ok := ret.Get(0).(func() (domain.WGBattleArenas, error)); ok {
+	if rf, ok := ret.Get(0).(func() (model.WGBattleArenas, error)); ok {
 		return rf()
 	}
-	if rf, ok := ret.Get(0).(func() domain.WGBattleArenas); ok {
+	if rf, ok := ret.Get(0).(func() model.WGBattleArenas); ok {
 		r0 = rf()
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(domain.WGBattleArenas)
+			r0 = ret.Get(0).(model.WGBattleArenas)
 		}
 	}
 
@@ -134,23 +134,23 @@ func (_m *WargamingInterface) BattleArenas() (domain.WGBattleArenas, error) {
 }
 
 // BattleTypes provides a mock function with given fields:
-func (_m *WargamingInterface) BattleTypes() (domain.WGBattleTypes, error) {
+func (_m *WargamingInterface) BattleTypes() (model.WGBattleTypes, error) {
 	ret := _m.Called()
 
 	if len(ret) == 0 {
 		panic("no return value specified for BattleTypes")
 	}
 
-	var r0 domain.WGBattleTypes
+	var r0 model.WGBattleTypes
 	var r1 error
-	if rf, ok := ret.Get(0).(func() (domain.WGBattleTypes, error)); ok {
+	if rf, ok := ret.Get(0).(func() (model.WGBattleTypes, error)); ok {
 		return rf()
 	}
-	if rf, ok := ret.Get(0).(func() domain.WGBattleTypes); ok {
+	if rf, ok := ret.Get(0).(func() model.WGBattleTypes); ok {
 		r0 = rf()
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(domain.WGBattleTypes)
+			r0 = ret.Get(0).(model.WGBattleTypes)
 		}
 	}
 
@@ -164,23 +164,23 @@ func (_m *WargamingInterface) BattleTypes() (domain.WGBattleTypes, error) {
 }
 
 // ClansAccountInfo provides a mock function with given fields: accountIDs
-func (_m *WargamingInterface) ClansAccountInfo(accountIDs []int) (domain.WGClansAccountInfo, error) {
+func (_m *WargamingInterface) ClansAccountInfo(accountIDs []int) (model.WGClansAccountInfo, error) {
 	ret := _m.Called(accountIDs)
 
 	if len(ret) == 0 {
 		panic("no return value specified for ClansAccountInfo")
 	}
 
-	var r0 domain.WGClansAccountInfo
+	var r0 model.WGClansAccountInfo
 	var r1 error
-	if rf, ok := ret.Get(0).(func([]int) (domain.WGClansAccountInfo, error)); ok {
+	if rf, ok := ret.Get(0).(func([]int) (model.WGClansAccountInfo, error)); ok {
 		return rf(accountIDs)
 	}
-	if rf, ok := ret.Get(0).(func([]int) domain.WGClansAccountInfo); ok {
+	if rf, ok := ret.Get(0).(func([]int) model.WGClansAccountInfo); ok {
 		r0 = rf(accountIDs)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(domain.WGClansAccountInfo)
+			r0 = ret.Get(0).(model.WGClansAccountInfo)
 		}
 	}
 
@@ -194,23 +194,23 @@ func (_m *WargamingInterface) ClansAccountInfo(accountIDs []int) (domain.WGClans
 }
 
 // ClansInfo provides a mock function with given fields: clanIDs
-func (_m *WargamingInterface) ClansInfo(clanIDs []int) (domain.WGClansInfo, error) {
+func (_m *WargamingInterface) ClansInfo(clanIDs []int) (model.WGClansInfo, error) {
 	ret := _m.Called(clanIDs)
 
 	if len(ret) == 0 {
 		panic("no return value specified for ClansInfo")
 	}
 
-	var r0 domain.WGClansInfo
+	var r0 model.WGClansInfo
 	var r1 error
-	if rf, ok := ret.Get(0).(func([]int) (domain.WGClansInfo, error)); ok {
+	if rf, ok := ret.Get(0).(func([]int) (model.WGClansInfo, error)); ok {
 		return rf(clanIDs)
 	}
-	if rf, ok := ret.Get(0).(func([]int) domain.WGClansInfo); ok {
+	if rf, ok := ret.Get(0).(func([]int) model.WGClansInfo); ok {
 		r0 = rf(clanIDs)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(domain.WGClansInfo)
+			r0 = ret.Get(0).(model.WGClansInfo)
 		}
 	}
 
@@ -224,24 +224,24 @@ func (_m *WargamingInterface) ClansInfo(clanIDs []int) (domain.WGClansInfo, erro
 }
 
 // EncycShips provides a mock function with given fields: pageNo
-func (_m *WargamingInterface) EncycShips(pageNo int) (domain.WGEncycShips, int, error) {
+func (_m *WargamingInterface) EncycShips(pageNo int) (model.WGEncycShips, int, error) {
 	ret := _m.Called(pageNo)
 
 	if len(ret) == 0 {
 		panic("no return value specified for EncycShips")
 	}
 
-	var r0 domain.WGEncycShips
+	var r0 model.WGEncycShips
 	var r1 int
 	var r2 error
-	if rf, ok := ret.Get(0).(func(int) (domain.WGEncycShips, int, error)); ok {
+	if rf, ok := ret.Get(0).(func(int) (model.WGEncycShips, int, error)); ok {
 		return rf(pageNo)
 	}
-	if rf, ok := ret.Get(0).(func(int) domain.WGEncycShips); ok {
+	if rf, ok := ret.Get(0).(func(int) model.WGEncycShips); ok {
 		r0 = rf(pageNo)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(domain.WGEncycShips)
+			r0 = ret.Get(0).(model.WGEncycShips)
 		}
 	}
 
@@ -266,23 +266,23 @@ func (_m *WargamingInterface) SetAppID(appid string) {
 }
 
 // ShipsStats provides a mock function with given fields: accountID
-func (_m *WargamingInterface) ShipsStats(accountID int) (domain.WGShipsStats, error) {
+func (_m *WargamingInterface) ShipsStats(accountID int) (model.WGShipsStats, error) {
 	ret := _m.Called(accountID)
 
 	if len(ret) == 0 {
 		panic("no return value specified for ShipsStats")
 	}
 
-	var r0 domain.WGShipsStats
+	var r0 model.WGShipsStats
 	var r1 error
-	if rf, ok := ret.Get(0).(func(int) (domain.WGShipsStats, error)); ok {
+	if rf, ok := ret.Get(0).(func(int) (model.WGShipsStats, error)); ok {
 		return rf(accountID)
 	}
-	if rf, ok := ret.Get(0).(func(int) domain.WGShipsStats); ok {
+	if rf, ok := ret.Get(0).(func(int) model.WGShipsStats); ok {
 		r0 = rf(accountID)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(domain.WGShipsStats)
+			r0 = ret.Get(0).(model.WGShipsStats)
 		}
 	}
 

@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	domain "wfs/backend/domain"
+	model "wfs/backend/domain/model"
 
 	mock "github.com/stretchr/testify/mock"
 )
@@ -14,23 +14,23 @@ type StorageInterface struct {
 }
 
 // AlertPlayers provides a mock function with given fields:
-func (_m *StorageInterface) AlertPlayers() ([]domain.AlertPlayer, error) {
+func (_m *StorageInterface) AlertPlayers() ([]model.AlertPlayer, error) {
 	ret := _m.Called()
 
 	if len(ret) == 0 {
 		panic("no return value specified for AlertPlayers")
 	}
 
-	var r0 []domain.AlertPlayer
+	var r0 []model.AlertPlayer
 	var r1 error
-	if rf, ok := ret.Get(0).(func() ([]domain.AlertPlayer, error)); ok {
+	if rf, ok := ret.Get(0).(func() ([]model.AlertPlayer, error)); ok {
 		return rf()
 	}
-	if rf, ok := ret.Get(0).(func() []domain.AlertPlayer); ok {
+	if rf, ok := ret.Get(0).(func() []model.AlertPlayer); ok {
 		r0 = rf()
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]domain.AlertPlayer)
+			r0 = ret.Get(0).([]model.AlertPlayer)
 		}
 	}
 
@@ -72,23 +72,23 @@ func (_m *StorageInterface) DataVersion() (uint, error) {
 }
 
 // ExpectedStats provides a mock function with given fields:
-func (_m *StorageInterface) ExpectedStats() (domain.ExpectedStats, error) {
+func (_m *StorageInterface) ExpectedStats() (model.ExpectedStats, error) {
 	ret := _m.Called()
 
 	if len(ret) == 0 {
 		panic("no return value specified for ExpectedStats")
 	}
 
-	var r0 domain.ExpectedStats
+	var r0 model.ExpectedStats
 	var r1 error
-	if rf, ok := ret.Get(0).(func() (domain.ExpectedStats, error)); ok {
+	if rf, ok := ret.Get(0).(func() (model.ExpectedStats, error)); ok {
 		return rf()
 	}
-	if rf, ok := ret.Get(0).(func() domain.ExpectedStats); ok {
+	if rf, ok := ret.Get(0).(func() model.ExpectedStats); ok {
 		r0 = rf()
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(domain.ExpectedStats)
+			r0 = ret.Get(0).(model.ExpectedStats)
 		}
 	}
 
@@ -166,22 +166,22 @@ func (_m *StorageInterface) OwnIGN() (string, error) {
 }
 
 // UserConfig provides a mock function with given fields:
-func (_m *StorageInterface) UserConfig() (domain.UserConfig, error) {
+func (_m *StorageInterface) UserConfig() (model.UserConfig, error) {
 	ret := _m.Called()
 
 	if len(ret) == 0 {
 		panic("no return value specified for UserConfig")
 	}
 
-	var r0 domain.UserConfig
+	var r0 model.UserConfig
 	var r1 error
-	if rf, ok := ret.Get(0).(func() (domain.UserConfig, error)); ok {
+	if rf, ok := ret.Get(0).(func() (model.UserConfig, error)); ok {
 		return rf()
 	}
-	if rf, ok := ret.Get(0).(func() domain.UserConfig); ok {
+	if rf, ok := ret.Get(0).(func() model.UserConfig); ok {
 		r0 = rf()
 	} else {
-		r0 = ret.Get(0).(domain.UserConfig)
+		r0 = ret.Get(0).(model.UserConfig)
 	}
 
 	if rf, ok := ret.Get(1).(func() error); ok {
@@ -194,7 +194,7 @@ func (_m *StorageInterface) UserConfig() (domain.UserConfig, error) {
 }
 
 // WriteAlertPlayers provides a mock function with given fields: players
-func (_m *StorageInterface) WriteAlertPlayers(players []domain.AlertPlayer) error {
+func (_m *StorageInterface) WriteAlertPlayers(players []model.AlertPlayer) error {
 	ret := _m.Called(players)
 
 	if len(ret) == 0 {
@@ -202,7 +202,7 @@ func (_m *StorageInterface) WriteAlertPlayers(players []domain.AlertPlayer) erro
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func([]domain.AlertPlayer) error); ok {
+	if rf, ok := ret.Get(0).(func([]model.AlertPlayer) error); ok {
 		r0 = rf(players)
 	} else {
 		r0 = ret.Error(0)
@@ -230,7 +230,7 @@ func (_m *StorageInterface) WriteDataVersion(version uint) error {
 }
 
 // WriteExpectedStats provides a mock function with given fields: expectedStats
-func (_m *StorageInterface) WriteExpectedStats(expectedStats domain.ExpectedStats) error {
+func (_m *StorageInterface) WriteExpectedStats(expectedStats model.ExpectedStats) error {
 	ret := _m.Called(expectedStats)
 
 	if len(ret) == 0 {
@@ -238,7 +238,7 @@ func (_m *StorageInterface) WriteExpectedStats(expectedStats domain.ExpectedStat
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(domain.ExpectedStats) error); ok {
+	if rf, ok := ret.Get(0).(func(model.ExpectedStats) error); ok {
 		r0 = rf(expectedStats)
 	} else {
 		r0 = ret.Error(0)
@@ -266,7 +266,7 @@ func (_m *StorageInterface) WriteOwnIGN(ign string) error {
 }
 
 // WriteUserConfig provides a mock function with given fields: config
-func (_m *StorageInterface) WriteUserConfig(config domain.UserConfig) error {
+func (_m *StorageInterface) WriteUserConfig(config model.UserConfig) error {
 	ret := _m.Called(config)
 
 	if len(ret) == 0 {
@@ -274,7 +274,7 @@ func (_m *StorageInterface) WriteUserConfig(config domain.UserConfig) error {
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(domain.UserConfig) error); ok {
+	if rf, ok := ret.Get(0).(func(model.UserConfig) error); ok {
 		r0 = rf(config)
 	} else {
 		r0 = ret.Error(0)

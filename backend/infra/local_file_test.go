@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"testing"
 	"wfs/backend/apperr"
-	"wfs/backend/domain"
+	"wfs/backend/domain/model"
 
 	"github.com/morikuni/failure"
 	"github.com/stretchr/testify/assert"
@@ -40,8 +40,8 @@ func TestLocalFile_SaveScreenshot(t *testing.T) {
 
 func TestLocalFile_GetTempArenaInfo(t *testing.T) {
 	t.Run("正常系", func(t *testing.T) {
-		expected := domain.TempArenaInfo{
-			Vehicles: []domain.Vehicle{
+		expected := model.TempArenaInfo{
+			Vehicles: []model.Vehicle{
 				{ShipID: 1, Relation: 0, ID: 100, Name: "player_1"},
 				{ShipID: 2, Relation: 1, ID: 200, Name: "player_2"},
 				{ShipID: 3, Relation: 2, ID: 300, Name: "player_3"},
@@ -75,8 +75,8 @@ func TestLocalFile_GetTempArenaInfo(t *testing.T) {
 	})
 
 	t.Run("正常系_該当ファイルが複数存在する場合_最新を返す", func(t *testing.T) {
-		older := domain.TempArenaInfo{
-			Vehicles: []domain.Vehicle{
+		older := model.TempArenaInfo{
+			Vehicles: []model.Vehicle{
 				{ShipID: 1, Relation: 0, ID: 100, Name: "player_1"},
 				{ShipID: 2, Relation: 1, ID: 200, Name: "player_2"},
 				{ShipID: 3, Relation: 2, ID: 300, Name: "player_3"},
@@ -87,8 +87,8 @@ func TestLocalFile_GetTempArenaInfo(t *testing.T) {
 			PlayerName: "player_1",
 		}
 
-		expected := domain.TempArenaInfo{
-			Vehicles: []domain.Vehicle{
+		expected := model.TempArenaInfo{
+			Vehicles: []model.Vehicle{
 				{ShipID: 1, Relation: 0, ID: 100, Name: "player_1"},
 				{ShipID: 2, Relation: 1, ID: 200, Name: "player_2"},
 				{ShipID: 3, Relation: 2, ID: 300, Name: "player_3"},
@@ -122,7 +122,7 @@ func TestLocalFile_GetTempArenaInfo(t *testing.T) {
 			func(path string) {
 				defer os.RemoveAll(testInstallPath)
 
-				err := writeJSON(path, domain.TempArenaInfo{})
+				err := writeJSON(path, model.TempArenaInfo{})
 				require.NoError(t, err)
 
 				instance := NewLocalFile()

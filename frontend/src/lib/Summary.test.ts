@@ -1,20 +1,20 @@
 import { DispName } from "src/lib/DispName";
 import { Summary } from "src/lib/Summary";
 import type { StatsExtra } from "src/lib/types";
-import { domain } from "wailsjs/go/models";
+import { model } from "wailsjs/go/models";
 
-const makePlayer = (): domain.Player => {
-  const pvpSolo = new domain.PlayerStats();
-  pvpSolo.ship = new domain.ShipStats();
-  pvpSolo.overall = new domain.OverallStats();
+const makePlayer = (): model.Player => {
+  const pvpSolo = new model.PlayerStats();
+  pvpSolo.ship = new model.ShipStats();
+  pvpSolo.overall = new model.OverallStats();
 
-  const pvpAll = new domain.PlayerStats();
-  pvpAll.ship = new domain.ShipStats();
-  pvpAll.overall = new domain.OverallStats();
+  const pvpAll = new model.PlayerStats();
+  pvpAll.ship = new model.ShipStats();
+  pvpAll.overall = new model.OverallStats();
 
-  const player = new domain.Player();
-  player.player_info = new domain.PlayerInfo();
-  player.ship_info = new domain.ShipInfo();
+  const player = new model.Player();
+  player.player_info = new model.PlayerInfo();
+  player.ship_info = new model.ShipInfo();
   player.pvp_solo = pvpSolo;
   player.pvp_all = pvpAll;
 
@@ -23,7 +23,7 @@ const makePlayer = (): domain.Player => {
 
 test("undefined", () => {
   expect(
-    Summary.calculate(undefined, [], new domain.UserConfig()),
+    Summary.calculate(undefined, [], new model.UserConfig()),
   ).toBeUndefined();
 });
 
@@ -54,23 +54,23 @@ test("calculate - all types, ship, pvp_all, excluded player", () => {
   enemy2.player_info.id = 12;
   enemy2[extra].ship.battles = 100;
 
-  const friendTeam = new domain.Team();
+  const friendTeam = new model.Team();
   friendTeam.players = [friend1, friend2];
-  const enemyTeam = new domain.Team();
+  const enemyTeam = new model.Team();
   enemyTeam.players = [enemy1, enemy2];
 
-  const battle = new domain.Battle();
+  const battle = new model.Battle();
   battle.teams = [friendTeam, enemyTeam];
 
-  const customDigit = new domain.CustomDigit();
+  const customDigit = new model.CustomDigit();
   customDigit.pr = 0;
   customDigit.damage = 1;
   customDigit.win_rate = 2;
 
-  const teamAvg = new domain.TeamAverage();
+  const teamAvg = new model.TeamAverage();
   teamAvg.min_ship_battles = 20;
 
-  const config = new domain.UserConfig();
+  const config = new model.UserConfig();
   config.custom_digit = customDigit;
   config.team_average = teamAvg;
   config.stats_pattern = extra;
@@ -150,23 +150,23 @@ test("calculate - each ship type, overall, pvp_solo", () => {
     return enemy;
   });
 
-  const friendTeam = new domain.Team();
+  const friendTeam = new model.Team();
   friendTeam.players = friends;
-  const enemyTeam = new domain.Team();
+  const enemyTeam = new model.Team();
   enemyTeam.players = enemies;
 
-  const battle = new domain.Battle();
+  const battle = new model.Battle();
   battle.teams = [friendTeam, enemyTeam];
 
-  const customDigit = new domain.CustomDigit();
+  const customDigit = new model.CustomDigit();
   customDigit.pr = 0;
   customDigit.damage = 1;
   customDigit.win_rate = 2;
 
-  const teamAvg = new domain.TeamAverage();
+  const teamAvg = new model.TeamAverage();
   teamAvg.min_overall_battles = 1;
 
-  const config = new domain.UserConfig();
+  const config = new model.UserConfig();
   config.custom_digit = customDigit;
   config.team_average = teamAvg;
   config.stats_pattern = extra;

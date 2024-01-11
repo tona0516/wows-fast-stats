@@ -6,14 +6,14 @@ import type { ISummaryColumn } from "src/lib/column/intetface/ISummaryColumn";
 import { RatingColorFactory } from "src/lib/rating/RatingColorFactory";
 import { type CommonKey, type StatsCategory } from "src/lib/types";
 import { toPlayerStats } from "src/lib/util";
-import type { domain } from "wailsjs/go/models";
+import type { model } from "wailsjs/go/models";
 
 export class Damage
   extends AbstractColumn<CommonKey>
   implements ISingleColumn, ISummaryColumn
 {
   constructor(
-    private config: domain.UserConfig,
+    private config: model.UserConfig,
     private category: StatsCategory,
   ) {
     super("damage", "Dmg", "平均ダメージ", 1);
@@ -27,15 +27,15 @@ export class Damage
     return this.config.displays[this.category].damage;
   }
 
-  getTdClass(_: domain.Player): string {
+  getTdClass(_: model.Player): string {
     return CssClass.TD_NUM;
   }
 
-  getDisplayValue(player: domain.Player): string {
+  getDisplayValue(player: model.Player): string {
     return this.getValue(player).toFixed(this.getDigit());
   }
 
-  getTextColorCode(player: domain.Player): string {
+  getTextColorCode(player: model.Player): string {
     if (this.category !== "ship") return "";
     const value = toPlayerStats(player, this.config.stats_pattern).ship.damage;
 
@@ -46,7 +46,7 @@ export class Damage
     ).getTextColorCode();
   }
 
-  getValue(player: domain.Player): number {
+  getValue(player: model.Player): number {
     return toPlayerStats(player, this.config.stats_pattern)[this.category]
       .damage;
   }

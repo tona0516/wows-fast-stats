@@ -1,12 +1,12 @@
 import { RatingAdapter } from "src/lib/rating/RatingColor";
 import { RatingColorFactory } from "src/lib/rating/RatingColorFactory";
-import { domain } from "wailsjs/go/models";
+import { model } from "wailsjs/go/models";
 
 test("none", () => {
   const expectedTextColor = "";
   const expectedBgColor = "#000000";
 
-  const config = new domain.UserConfig();
+  const config = new model.UserConfig();
 
   // pattern 1: rating is undefined
   const converter = new RatingAdapter(undefined, config);
@@ -24,7 +24,7 @@ test("factory", () => {
   const expectedTextColor = "#000001";
   const expectedBgColor = "#000002";
 
-  const config = new domain.UserConfig({
+  const config = new model.UserConfig({
     custom_color: {
       skill: {
         text: { super_unicum: expectedTextColor },
