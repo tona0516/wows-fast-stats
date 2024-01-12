@@ -243,6 +243,7 @@ export namespace model {
 	export class Clan {
 	    tag: string;
 	    id: number;
+	    hex_color: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new Clan(source);
@@ -252,6 +253,7 @@ export namespace model {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.tag = source["tag"];
 	        this.id = source["id"];
+	        this.hex_color = source["hex_color"];
 	    }
 	}
 	export class PlayerInfo {
@@ -535,7 +537,6 @@ export namespace model {
 	}
 	export class SkillColor {
 	    text: SkillColorCode;
-	    background: SkillColorCode;
 	
 	    static createFrom(source: any = {}) {
 	        return new SkillColor(source);
@@ -544,7 +545,6 @@ export namespace model {
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.text = this.convertValues(source["text"], SkillColorCode);
-	        this.background = this.convertValues(source["background"], SkillColorCode);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

@@ -14,6 +14,7 @@ const (
 	HTTPRequestError                  failure.StringCode = "HTTPリクエストエラー"
 	WGAPITemporaryUnavaillalble       failure.StringCode = "WG APIが一時的に利用できません。リロードしてください。"
 	WGAPIError                        failure.StringCode = "WG APIが利用できません。再起動するか、設定を見直してください。"
+	UWGAPIError                       failure.StringCode = "WG APIが利用できません。リロードしてください。"
 	NumbersAPIFetchExpectedStatsError failure.StringCode = "ユーザの予測成績の取得に失敗しました。"
 	DiscordAPISendLogError            failure.StringCode = "ログ送信にに失敗しました。"
 	GithubAPICheckUpdateError         failure.StringCode = "アプリ更新チェックに失敗しました。"

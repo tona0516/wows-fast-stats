@@ -59,19 +59,31 @@
   {/if}
 </td>
 
-<td style="background-color: {column.bgColorCode(player)}">
+<td>
   <div class="{CssClass.TD_STR} {CssClass.OMIT}">
     {#if isNPC}
-      {column.displayValue(player)}
+      {column.playerName(player)}
     {:else}
       <UkTooltip tooltip={alertPlayer?.message}>
         <!-- svelte-ignore a11y-invalid-attribute -->
         <a href="#">
-          {#if alertPlayer}
-            <i class="bi {alertPlayer.pattern}" />
-          {/if}
-          {column.displayValue(player)}
-          <UkIcon name="chevron-down" />
+          <div class="uk-flex">
+            {#if alertPlayer}
+              <i class="bi {alertPlayer.pattern}" />
+            {/if}
+            {#if isBelongToClan}
+              <div
+                class="clan-tag"
+                style="color: {column.clanColorCode(player)}"
+              >
+                {column.clanName(player)}
+              </div>
+            {/if}
+            <div style="color: {column.textColorCode(player)}">
+              {column.playerName(player)}
+            </div>
+            <UkIcon name="chevron-down" />
+          </div>
         </a>
       </UkTooltip>
     {/if}
@@ -139,3 +151,9 @@
     </UkDowndown>
   {/if}
 </td>
+
+<style>
+  :global(.clan-tag) {
+    margin-right: 2px;
+  }
+</style>

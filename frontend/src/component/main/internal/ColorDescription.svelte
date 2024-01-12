@@ -33,10 +33,10 @@
       ratingText: DispName.SKILL_LEVELS.get(rating.level),
       playerName: {
         text: "player_name",
-        bgColor: RatingColorFactory.fromPR(
+        textColor: RatingColorFactory.fromPR(
           rating.pr.min,
           config,
-        ).getBgColorCode(),
+        ).getTextColorCode(),
       },
       pr: {
         text: `${rating.pr.min} ~ ${rating.pr.max}`,
@@ -80,7 +80,7 @@
             <td class="uk-text-center">{desc.ratingText}</td>
             <td
               class="uk-text-center"
-              style="background-color: {desc.playerName.bgColor};"
+              style="color: {desc.playerName.textColor};"
               >{desc.playerName.text}</td
             >
             <td class="uk-text-center" style="color: {desc.pr.textColor};"

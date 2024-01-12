@@ -134,7 +134,7 @@
   >
     <thead>
       <tr>
-        {#each ["スキル", "文字色", "背景色"] as column}
+        {#each ["スキル", "文字色"] as column}
           <th class="uk-text-center">{column}</th>
         {/each}
       </tr>
@@ -148,15 +148,6 @@
               class="uk-input"
               type="color"
               bind:value={inputConfig.custom_color.skill.text[sl.key]}
-              on:input={() => dispatch("Change")}
-            />
-          </td>
-
-          <td>
-            <input
-              class="uk-input"
-              type="color"
-              bind:value={inputConfig.custom_color.skill.background[sl.key]}
               on:input={() => dispatch("Change")}
             />
           </td>

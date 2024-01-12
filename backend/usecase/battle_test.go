@@ -17,6 +17,7 @@ func TestBattle_Get_正常系_初回(t *testing.T) {
 
 	// 準備
 	mockWargaming := &mocks.WargamingInterface{}
+	mockUnofficialWargaming := &mocks.UnofficialWargamingInterface{}
 	mockNumbers := &mocks.NumbersInterface{}
 	mockUnregistered := &mocks.UnregisteredInterface{}
 	mockLocalFile := &mocks.LocalFileInterface{}
@@ -43,6 +44,10 @@ func TestBattle_Get_正常系_初回(t *testing.T) {
 	mockWargaming.On("ClansAccountInfo", mock.Anything).Return(model.WGClansAccountInfo{}, nil)
 	mockWargaming.On("ClansInfo", mock.Anything).Return(model.WGClansInfo{}, nil)
 
+	mockWargaming.On("ClansInfo", mock.Anything).Return(model.WGClansInfo{
+		1: model.WGClansInfoData{Tag: "TEST"},
+	}, nil)
+
 	mockNumbers.On("ExpectedStats").Return(model.ExpectedStats{}, nil)
 
 	mockUnregistered.On("Warship").Return(model.Warships{}, nil)
@@ -58,12 +63,22 @@ func TestBattle_Get_正常系_初回(t *testing.T) {
 	mockStorage.On("WriteExpectedStats", mock.Anything).Return(nil)
 
 	// テスト
-	b := NewBattle(5, mockWargaming, mockLocalFile, mockNumbers, mockUnregistered, mockStorage, nil)
+	b := NewBattle(
+		5,
+		mockWargaming,
+		mockUnofficialWargaming,
+		mockLocalFile,
+		mockNumbers,
+		mockUnregistered,
+		mockStorage,
+		nil,
+	)
 	_, err := b.Get(model.UserConfig{})
 
 	// アサーション
 	require.NoError(t, err)
 	mockWargaming.AssertExpectations(t)
+	mockUnofficialWargaming.AssertExpectations(t)
 	mockNumbers.AssertExpectations(t)
 	mockUnregistered.AssertExpectations(t)
 	mockLocalFile.AssertExpectations(t)
@@ -75,6 +90,7 @@ func TestBattle_Get_正常系_2回目以降(t *testing.T) {
 
 	// 準備
 	mockWargaming := &mocks.WargamingInterface{}
+	mockUnofficialWargaming := &mocks.UnofficialWargamingInterface{}
 	mockNumbers := &mocks.NumbersInterface{}
 	mockUnregistered := &mocks.UnregisteredInterface{}
 	mockLocalFile := &mocks.LocalFileInterface{}
@@ -88,7 +104,11 @@ func TestBattle_Get_正常系_2回目以降(t *testing.T) {
 	mockWargaming.On("AccountInfo", mock.Anything).Return(model.WGAccountInfo{}, nil)
 	mockWargaming.On("ShipsStats", mock.Anything).Return(model.WGShipsStats{}, nil)
 	mockWargaming.On("ClansAccountInfo", mock.Anything).Return(model.WGClansAccountInfo{}, nil)
-	mockWargaming.On("ClansInfo", mock.Anything).Return(model.WGClansInfo{}, nil)
+	mockWargaming.On("ClansInfo", mock.Anything).Return(model.WGClansInfo{
+		1: model.WGClansInfoData{Tag: "TEST"},
+	}, nil)
+
+	mockUnofficialWargaming.On("ClansAutoComplete", mock.Anything).Return(model.UWGClansAutocomplete{}, nil)
 
 	mockLocalFile.On("TempArenaInfo", mock.Anything).Return(model.TempArenaInfo{
 		Vehicles: []model.Vehicle{
@@ -100,13 +120,23 @@ func TestBattle_Get_正常系_2回目以降(t *testing.T) {
 	mockStorage.On("WriteOwnIGN", mock.Anything).Return(nil)
 
 	// テスト
-	b := NewBattle(5, mockWargaming, mockLocalFile, mockNumbers, mockUnregistered, mockStorage, nil)
+	b := NewBattle(
+		5,
+		mockWargaming,
+		mockUnofficialWargaming,
+		mockLocalFile,
+		mockNumbers,
+		mockUnregistered,
+		mockStorage,
+		nil,
+	)
 	b.isFirstBattle = false
 	_, err := b.Get(model.UserConfig{})
 
 	// アサーション
 	require.NoError(t, err)
 	mockWargaming.AssertExpectations(t)
+	mockUnofficialWargaming.AssertExpectations(t)
 	mockNumbers.AssertExpectations(t)
 	mockUnregistered.AssertExpectations(t)
 	mockLocalFile.AssertExpectations(t)
@@ -118,6 +148,7 @@ func TestBattle_Get_異常系(t *testing.T) {
 
 	// 準備
 	mockWargaming := &mocks.WargamingInterface{}
+	mockUnofficialWargaming := &mocks.UnofficialWargamingInterface{}
 	mockNumbers := &mocks.NumbersInterface{}
 	mockUnregistered := &mocks.UnregisteredInterface{}
 	mockLocalFile := &mocks.LocalFileInterface{}
@@ -129,7 +160,16 @@ func TestBattle_Get_異常系(t *testing.T) {
 	mockLocalFile.On("TempArenaInfo", mock.Anything).Return(model.TempArenaInfo{}, expectedError)
 
 	// テスト
-	b := NewBattle(5, mockWargaming, mockLocalFile, mockNumbers, mockUnregistered, mockStorage, nil)
+	b := NewBattle(
+		5,
+		mockWargaming,
+		mockUnofficialWargaming,
+		mockLocalFile,
+		mockNumbers,
+		mockUnregistered,
+		mockStorage,
+		nil,
+	)
 	b.isFirstBattle = false
 	_, err := b.Get(model.UserConfig{})
 
@@ -139,6 +179,7 @@ func TestBattle_Get_異常系(t *testing.T) {
 	assert.Equal(t, apperr.FileNotExist, code)
 
 	mockWargaming.AssertExpectations(t)
+	mockUnofficialWargaming.AssertExpectations(t)
 	mockNumbers.AssertExpectations(t)
 	mockUnregistered.AssertExpectations(t)
 	mockLocalFile.AssertExpectations(t)

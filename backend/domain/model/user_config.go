@@ -31,16 +31,6 @@ var DefaultUserConfig = UserConfig{
 				Unicum:      "#da6ff5",
 				SuperUnicum: "#bf15ee",
 			},
-			Background: SkillColorCode{
-				Bad:         "#a41200",
-				BelowAvg:    "#a34a02",
-				Avg:         "#a38204",
-				Good:        "#518517",
-				VeryGood:    "#2f6f41",
-				Great:       "#04436d",
-				Unicum:      "#232166",
-				SuperUnicum: "#531460",
-			},
 		},
 		Tier: TierColor{
 			Own: TierColorCode{
@@ -162,8 +152,7 @@ type TierColor struct {
 }
 
 type SkillColor struct {
-	Text       SkillColorCode `json:"text"`
-	Background SkillColorCode `json:"background"`
+	Text SkillColorCode `json:"text"`
 }
 
 type ShipTypeColor struct {

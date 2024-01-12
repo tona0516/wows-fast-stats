@@ -132,7 +132,7 @@ const getSampleTeam = (): model.Team => {
     const pi = new model.PlayerInfo();
     pi.id = 1;
     pi.name = "player_name" + i + 1;
-    pi.clan = { tag: "TEST", id: 1 };
+    pi.clan = { tag: "TEST", id: 1, hex_color: "" };
     pi.is_hidden = false;
 
     const si = new model.ShipInfo();
