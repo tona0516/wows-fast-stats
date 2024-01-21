@@ -276,7 +276,6 @@ func (b *Battle) fetchAllPlayerShipsStats(accountIDs []int, channel chan model.R
 }
 
 func (b *Battle) fetchClan(accountIDs []int, channel chan model.Result[model.Clans]) {
-	clans := make(model.Clans)
 	var result model.Result[model.Clans]
 
 	clansAccountInfo, err := b.wargaming.ClansAccountInfo(accountIDs)
@@ -293,28 +292,11 @@ func (b *Battle) fetchClan(accountIDs []int, channel chan model.Result[model.Cla
 		channel <- result
 		return
 	}
-
-	clanHexColorResult := make(chan model.Result[map[string]string])
 	clanTags := clansInfo.Tags()
-	go b.fetchClanHexColor(clanTags, clanHexColorResult)
-	hexColorMap := <-clanHexColorResult
 
-	for _, accountID := range accountIDs {
-		clanID := clansAccountInfo[accountID].ClanID
-		clanTag := clansInfo[clanID].Tag
-		hexColor := hexColorMap.Value[clanTag]
-		clans[accountID] = model.Clan{Tag: clanTag, ID: clanID, HexColor: hexColor}
-	}
-
-	result.Value = clans
-	channel <- result
-}
-
-func (b *Battle) fetchClanHexColor(clanTags []string, channel chan model.Result[map[string]string]) {
 	hexColorMap := make(map[string]string)
 	var mu sync.Mutex
-
-	err := doParallel(uint(len(clanTags)), clanTags, func(tag string) error {
+	err = doParallel(uint(len(clanTags)), clanTags, func(tag string) error {
 		autocomplete, err := b.uwargaming.ClansAutoComplete(tag)
 		if err != nil {
 			return err
@@ -333,7 +315,16 @@ func (b *Battle) fetchClanHexColor(clanTags []string, channel chan model.Result[
 		b.logger.Warn(err, nil)
 	}
 
-	channel <- model.Result[map[string]string]{Value: hexColorMap, Error: nil}
+	clans := make(model.Clans)
+	for _, accountID := range accountIDs {
+		clanID := clansAccountInfo[accountID].ClanID
+		clanTag := clansInfo[clanID].Tag
+		hexColor := hexColorMap[clanTag]
+		clans[accountID] = model.Clan{Tag: clanTag, ID: clanID, HexColor: hexColor}
+	}
+
+	result.Value = clans
+	channel <- result
 }
 
 func (b *Battle) compose(
