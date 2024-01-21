@@ -40,7 +40,9 @@ function getFormattedLDFlags(isDev: boolean): string {
 }
 
 function exec(command: string) {
+  console.log(`$ ${command}`)
   shelljs.exec(command, { env: { ...process.env, FORCE_COLOR: "true" } });
+  console.log("")
 }
 
 function setup() {
@@ -75,6 +77,7 @@ function fmt() {
 }
 
 function test() {
+  exec("arch-go");
   exec("go test -cover ./...");
   exec(`${FRONTEND_NPM_COMMAND} run test`);
 }

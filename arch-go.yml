@@ -3,10 +3,6 @@ threshold:
   compliance: 100
   coverage: 0
 dependenciesRules:
-  - package: '**.adapter'
-    shouldOnlyDependsOn:
-      internal:
-        - '**.domain'
   - package: '**.infra'
     shouldNotDependsOn:
       internal:
@@ -18,11 +14,10 @@ dependenciesRules:
   - package: '**.domain'
     shouldNotDependsOn:
       internal:
-        - '**.adapter'
         - '**.infra'
         - '**.usecase'
       external:
         - "github.com/wailsapp/wails/v2/pkg/runtime"
 contentsRules:
-  - package: '**.adapter'
+  - package: '**.domain.repository'
     shouldOnlyContainInterfaces: true
