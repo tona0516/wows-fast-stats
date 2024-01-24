@@ -35,9 +35,3 @@ body {
 .td-multiple {
   text-align: center;
 }
-
-.omit {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}

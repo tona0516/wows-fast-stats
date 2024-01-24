@@ -14,7 +14,8 @@
 
 {#if column.innerColumnNumber > 1}
   {@const [url, text] = column.shipInfo(player)}
-  <td class="{CssClass.TD_STR} {CssClass.OMIT}">
-    <ExternalLink {url}>{text}</ExternalLink>
+  <td class={CssClass.TD_STR}>
+    <ExternalLink {url}><div class="uk-text-truncate">{text}</div></ExternalLink
+    >
   </td>
 {/if}

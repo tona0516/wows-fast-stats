@@ -16,10 +16,11 @@ const PLAYER = new model.Player({
     },
   },
 });
-const ALL_COLUMN_NUMBER: number = 1;
+const ALL_COLUMN_COUNT: number = 1;
+const SHIP_COLUMN_COUNT: number = 1;
 
 test("no column", () => {
-  expect(RowPattern.derive(PLAYER, STATS_PATTERN, 0)).toBe(
+  expect(RowPattern.derive(PLAYER, STATS_PATTERN, 0, 0)).toBe(
     RowPattern.NO_COLUMN,
   );
 });
@@ -31,9 +32,14 @@ test("private", () => {
     },
   });
 
-  expect(RowPattern.derive(player, STATS_PATTERN, ALL_COLUMN_NUMBER)).toBe(
-    RowPattern.PRIVATE,
-  );
+  expect(
+    RowPattern.derive(
+      player,
+      STATS_PATTERN,
+      ALL_COLUMN_COUNT,
+      SHIP_COLUMN_COUNT,
+    ),
+  ).toBe(RowPattern.PRIVATE);
 });
 
 test("no data - 無効なアカウントID", () => {
@@ -44,9 +50,14 @@ test("no data - 無効なアカウントID", () => {
     },
   });
 
-  expect(RowPattern.derive(player, STATS_PATTERN, ALL_COLUMN_NUMBER)).toBe(
-    RowPattern.NO_DATA,
-  );
+  expect(
+    RowPattern.derive(
+      player,
+      STATS_PATTERN,
+      ALL_COLUMN_COUNT,
+      SHIP_COLUMN_COUNT,
+    ),
+  ).toBe(RowPattern.NO_STATS);
 });
 
 test("no data - 総合戦闘数=0", () => {
@@ -62,9 +73,14 @@ test("no data - 総合戦闘数=0", () => {
     },
   });
 
-  expect(RowPattern.derive(player, STATS_PATTERN, ALL_COLUMN_NUMBER)).toBe(
-    RowPattern.NO_DATA,
-  );
+  expect(
+    RowPattern.derive(
+      player,
+      STATS_PATTERN,
+      ALL_COLUMN_COUNT,
+      SHIP_COLUMN_COUNT,
+    ),
+  ).toBe(RowPattern.NO_STATS);
 });
 
 test("no ship stats", () => {
@@ -83,13 +99,26 @@ test("no ship stats", () => {
     },
   });
 
-  expect(RowPattern.derive(player, STATS_PATTERN, ALL_COLUMN_NUMBER)).toBe(
-    RowPattern.NO_SHIP_STATS,
-  );
+  expect(
+    RowPattern.derive(
+      player,
+      STATS_PATTERN,
+      ALL_COLUMN_COUNT,
+      SHIP_COLUMN_COUNT,
+    ),
+  ).toBe(RowPattern.NO_SHIP_STATS);
 });
 
 test("full", () => {
-  expect(RowPattern.derive(PLAYER, STATS_PATTERN, ALL_COLUMN_NUMBER)).toBe(
+  expect(
+    RowPattern.derive(
+      PLAYER,
+      STATS_PATTERN,
+      ALL_COLUMN_COUNT,
+      SHIP_COLUMN_COUNT,
+    ),
+  ).toBe(RowPattern.FULL);
+  expect(RowPattern.derive(PLAYER, STATS_PATTERN, ALL_COLUMN_COUNT, 0)).toBe(
     RowPattern.FULL,
   );
 });

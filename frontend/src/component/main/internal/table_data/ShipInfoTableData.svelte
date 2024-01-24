@@ -25,9 +25,11 @@
   />
 </td>
 
-<td class="{CssClass.TD_STR} {CssClass.OMIT}">
+<td class={CssClass.TD_STR}>
   <ExternalLink url={NumbersURL.ship(player.ship_info.id)}
-    >{column.displayValue(player)}</ExternalLink
+    ><div class="uk-text-truncate">
+      {column.displayValue(player)}
+    </div></ExternalLink
   >
 </td>
 

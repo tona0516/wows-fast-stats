@@ -4,7 +4,7 @@ import type { model } from "wailsjs/go/models";
 export enum RowPattern {
   NO_COLUMN,
   PRIVATE,
-  NO_DATA,
+  NO_STATS,
   NO_SHIP_STATS,
   FULL,
 }
@@ -13,9 +13,10 @@ export namespace RowPattern {
   export const derive = (
     player: model.Player,
     statsPattern: string,
-    allColumnNumber: number,
+    allColumnCount: number,
+    shipColumnCount: number,
   ): RowPattern => {
-    if (allColumnNumber === 0) {
+    if (allColumnCount === 0) {
       return RowPattern.NO_COLUMN;
     }
 
@@ -25,10 +26,10 @@ export namespace RowPattern {
 
     const stats = toPlayerStats(player, statsPattern);
     if (player.player_info.id === 0 || stats.overall.battles === 0) {
-      return RowPattern.NO_DATA;
+      return RowPattern.NO_STATS;
     }
 
-    if (stats.ship.battles === 0) {
+    if (stats.ship.battles === 0 && shipColumnCount > 0) {
       return RowPattern.NO_SHIP_STATS;
     }
 

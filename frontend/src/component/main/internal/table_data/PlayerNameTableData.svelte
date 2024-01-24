@@ -1,7 +1,6 @@
 <script lang="ts">
   import ExternalLink from "src/component/common/ExternalLink.svelte";
   import UkDowndown from "src/component/common/uikit/UkDowndown.svelte";
-  import UkIcon from "src/component/common/uikit/UkIcon.svelte";
   import UkTooltip from "src/component/common/uikit/UkTooltip.svelte";
   import { NumbersURL } from "src/lib/NumbersURL";
   import { CssClass } from "src/lib/CssClass";
@@ -59,35 +58,32 @@
   {/if}
 </td>
 
-<td>
-  <div class="{CssClass.TD_STR} {CssClass.OMIT}">
-    {#if isNPC}
-      {column.playerName(player)}
-    {:else}
-      <UkTooltip tooltip={alertPlayer?.message}>
-        <!-- svelte-ignore a11y-invalid-attribute -->
-        <a href="#">
-          <div class="uk-flex">
-            {#if alertPlayer}
-              <i class="bi {alertPlayer.pattern}" />
-            {/if}
-            {#if isBelongToClan}
-              <div
-                class="clan-tag"
-                style="color: {column.clanColorCode(player)}"
-              >
-                {column.clanName(player)}
-              </div>
-            {/if}
-            <div style="color: {column.textColorCode(player)}">
-              {column.playerName(player)}
+<td class={CssClass.TD_STR}>
+  {#if isNPC}
+    <div class="uk-text-truncate">{column.playerName(player)}</div>
+  {:else}
+    <UkTooltip tooltip={alertPlayer?.message}>
+      <!-- svelte-ignore a11y-invalid-attribute -->
+      <a href="#">
+        <div class="uk-flex">
+          {#if alertPlayer}
+            <i class="bi {alertPlayer.pattern}" />
+          {/if}
+          {#if isBelongToClan}
+            <div class="clan-tag" style="color: {column.clanColorCode(player)}">
+              {column.clanName(player)}
             </div>
-            <UkIcon name="chevron-down" />
+          {/if}
+          <div
+            class="uk-text-truncate"
+            style="color: {column.textColorCode(player)}"
+          >
+            {column.playerName(player)}
           </div>
-        </a>
-      </UkTooltip>
-    {/if}
-  </div>
+        </div>
+      </a>
+    </UkTooltip>
+  {/if}
 
   {#if !isNPC}
     <UkDowndown>
