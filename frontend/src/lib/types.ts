@@ -18,12 +18,12 @@ export type StatsExtra = Exclude<
   keyof model.Player,
   keyof typeof BasicKey | CommonMethod
 >;
-export type Rating = Readonly<keyof model.SkillColorCode>;
+export type Rating = Readonly<keyof model.UCSkillColorCode>;
 
-export type ShipKey = Readonly<keyof model.Ship>;
-export type OverallKey = Readonly<keyof model.Overall>;
+export type ShipKey = Readonly<keyof model.UCDisplayShip>;
+export type OverallKey = Readonly<keyof model.UCDisplayOverall>;
 export type CommonKey = ShipKey & OverallKey;
-export type DigitKey = Readonly<keyof model.CustomDigit>;
+export type DigitKey = Readonly<keyof model.UCDigit>;
 
 export type OptionalBattle = model.Battle | undefined;
 export type OptionalSummary = Summary | undefined;

@@ -22,7 +22,7 @@ export class PlatoonRate
   }
 
   shouldShowColumn(): boolean {
-    return this.config.displays[this.category].platoon_rate;
+    return this.config.display[this.category].platoon_rate;
   }
 
   getTdClass(_: model.Player): string {
@@ -30,7 +30,7 @@ export class PlatoonRate
   }
 
   getDisplayValue(player: model.Player): string {
-    const digit = this.config.custom_digit.platoon_rate;
+    const digit = this.config.digit.platoon_rate;
     const value = toPlayerStats(player, this.config.stats_pattern)[
       this.category
     ].platoon_rate;

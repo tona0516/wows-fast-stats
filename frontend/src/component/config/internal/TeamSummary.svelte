@@ -10,14 +10,14 @@
   export let inputConfig: model.UserConfig;
 
   let isLoading = false;
-  let teamAverage: model.TeamAverage = inputConfig.team_average;
+  let teamSummary: model.UCTeamSummary = inputConfig.team_summary;
 
   $: isValidMinShipBattles =
-    teamAverage.min_ship_battles > 0 &&
-    Number.isSafeInteger(teamAverage.min_ship_battles);
+    teamSummary.min_ship_battles > 0 &&
+    Number.isSafeInteger(teamSummary.min_ship_battles);
   $: isValidMinOverallBattles =
-    teamAverage.min_overall_battles > 0 &&
-    Number.isSafeInteger(teamAverage.min_overall_battles);
+    teamSummary.min_overall_battles > 0 &&
+    Number.isSafeInteger(teamSummary.min_overall_battles);
   $: isValidAll = isValidMinShipBattles && isValidMinOverallBattles;
 
   const clickApply = async () => {
@@ -27,7 +27,7 @@
 
     try {
       isLoading = true;
-      inputConfig.team_average = teamAverage;
+      inputConfig.team_summary = teamSummary;
       await ApplyUserConfig(inputConfig);
       await FetchProxy.getConfig();
       Notifier.success("設定を更新しました");
@@ -47,7 +47,7 @@
     <input
       class="uk-input uk-form-width-small"
       type="number"
-      bind:value={teamAverage.min_ship_battles}
+      bind:value={teamSummary.min_ship_battles}
     />
     {#if !isValidMinShipBattles}
       <div class="uk-text-danger">1以上の整数を入力してください。</div>
@@ -59,7 +59,7 @@
     <input
       class="uk-input uk-form-width-small"
       type="number"
-      bind:value={teamAverage.min_overall_battles}
+      bind:value={teamSummary.min_overall_battles}
     />
     {#if !isValidMinOverallBattles}
       <div class="uk-text-danger">1以上の整数を入力してください。</div>

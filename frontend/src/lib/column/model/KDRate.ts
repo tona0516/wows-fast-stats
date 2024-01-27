@@ -19,7 +19,7 @@ export class KDRate extends AbstractColumn<CommonKey> implements ISingleColumn {
   }
 
   shouldShowColumn(): boolean {
-    return this.config.displays[this.category].kd_rate;
+    return this.config.display[this.category].kd_rate;
   }
 
   getTdClass(_: model.Player): string {
@@ -30,7 +30,7 @@ export class KDRate extends AbstractColumn<CommonKey> implements ISingleColumn {
     const value = toPlayerStats(player, this.config.stats_pattern)[
       this.category
     ].kd_rate;
-    const digit = this.config.custom_digit.kd_rate;
+    const digit = this.config.digit.kd_rate;
 
     return value.toFixed(digit);
   }

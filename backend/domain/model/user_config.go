@@ -6,22 +6,22 @@ var DefaultUserConfig = UserConfig{
 	SendReport:      true,
 	NotifyUpdatable: true,
 	StatsPattern:    StatsPatternPvPAll,
-	Displays: Displays{
-		Ship: Ship{
+	Display: UCDisplay{
+		Ship: UCDisplayShip{
 			PR:      true,
 			Damage:  true,
 			WinRate: true,
 			Battles: true,
 		},
-		Overall: Overall{
+		Overall: UCDisplayOverall{
 			Damage:  true,
 			WinRate: true,
 			Battles: true,
 		},
 	},
-	CustomColor: CustomColor{
-		Skill: SkillColor{
-			Text: SkillColorCode{
+	Color: UCColor{
+		Skill: UCSkillColor{
+			Text: UCSkillColorCode{
 				Bad:         "#ff382d",
 				BelowAvg:    "#fd9234",
 				Avg:         "#ffd351",
@@ -32,27 +32,27 @@ var DefaultUserConfig = UserConfig{
 				SuperUnicum: "#bf15ee",
 			},
 		},
-		Tier: TierColor{
-			Own: TierColorCode{
+		Tier: UCTierColor{
+			Own: UCTierColorCode{
 				Low:    "#8CA113",
 				Middle: "#205B85",
 				High:   "#990F4F",
 			},
-			Other: TierColorCode{
+			Other: UCTierColorCode{
 				Low:    "#E6F5B0",
 				Middle: "#B3D7DD",
 				High:   "#E3ADD5",
 			},
 		},
-		ShipType: ShipTypeColor{
-			Own: ShipTypeColorCode{
+		ShipType: UCShipTypeColor{
+			Own: UCShipTypeColorCode{
 				CV: "#5E2883",
 				BB: "#CA1028",
 				CL: "#27853F",
 				DD: "#D9760F",
 				SS: "#233B8B",
 			},
-			Other: ShipTypeColorCode{
+			Other: UCShipTypeColorCode{
 				CV: "#CAB2D6",
 				BB: "#FBB4C4",
 				CL: "#CCEBC5",
@@ -62,7 +62,7 @@ var DefaultUserConfig = UserConfig{
 		},
 		PlayerName: PlayerNameColorShip,
 	},
-	CustomDigit: CustomDigit{
+	Digit: UCDigit{
 		PR:                0,
 		Damage:            0,
 		WinRate:           1,
@@ -78,7 +78,7 @@ var DefaultUserConfig = UserConfig{
 		UsingTierRate:     1,
 		PlatoonRate:       1,
 	},
-	TeamAverage: TeamAverage{
+	TeamSummary: UCTeamSummary{
 		MinShipBattles:    1,
 		MinOverallBattles: 10,
 	},
@@ -89,12 +89,12 @@ type UserConfig struct {
 	InstallPath string `json:"install_path"`
 	Appid       string `json:"appid"`
 	// display
-	FontSize    string      `json:"font_size"`
-	Displays    Displays    `json:"displays"`
-	CustomColor CustomColor `json:"custom_color"`
-	CustomDigit CustomDigit `json:"custom_digit"`
+	FontSize string    `json:"font_size"`
+	Display  UCDisplay `json:"display"`
+	Color    UCColor   `json:"color"`
+	Digit    UCDigit   `json:"digit"`
 	// team summary
-	TeamAverage TeamAverage `json:"team_average"`
+	TeamSummary UCTeamSummary `json:"team_summary"`
 	// other
 	SaveScreenshot    bool         `json:"save_screenshot"`
 	SaveTempArenaInfo bool         `json:"save_temp_arena_info"`
@@ -103,12 +103,12 @@ type UserConfig struct {
 	StatsPattern      StatsPattern `json:"stats_pattern"`
 }
 
-type Displays struct {
-	Ship    Ship    `json:"ship"`
-	Overall Overall `json:"overall"`
+type UCDisplay struct {
+	Ship    UCDisplayShip    `json:"ship"`
+	Overall UCDisplayOverall `json:"overall"`
 }
 
-type Ship struct {
+type UCDisplayShip struct {
 	PR           bool `json:"pr"`
 	Damage       bool `json:"damage"`
 	MaxDamage    bool `json:"max_damage"`
@@ -123,7 +123,7 @@ type Ship struct {
 	PlatoonRate  bool `json:"platoon_rate"`
 }
 
-type Overall struct {
+type UCDisplayOverall struct {
 	PR                bool `json:"pr"`
 	Damage            bool `json:"damage"`
 	MaxDamage         bool `json:"max_damage"`
@@ -139,28 +139,28 @@ type Overall struct {
 	PlatoonRate       bool `json:"platoon_rate"`
 }
 
-type CustomColor struct {
-	Skill      SkillColor      `json:"skill"`
-	Tier       TierColor       `json:"tier"`
-	ShipType   ShipTypeColor   `json:"ship_type"`
+type UCColor struct {
+	Skill      UCSkillColor    `json:"skill"`
+	Tier       UCTierColor     `json:"tier"`
+	ShipType   UCShipTypeColor `json:"ship_type"`
 	PlayerName PlayerNameColor `json:"player_name"`
 }
 
-type TierColor struct {
-	Own   TierColorCode `json:"own"`
-	Other TierColorCode `json:"other"`
+type UCTierColor struct {
+	Own   UCTierColorCode `json:"own"`
+	Other UCTierColorCode `json:"other"`
 }
 
-type SkillColor struct {
-	Text SkillColorCode `json:"text"`
+type UCSkillColor struct {
+	Text UCSkillColorCode `json:"text"`
 }
 
-type ShipTypeColor struct {
-	Own   ShipTypeColorCode `json:"own"`
-	Other ShipTypeColorCode `json:"other"`
+type UCShipTypeColor struct {
+	Own   UCShipTypeColorCode `json:"own"`
+	Other UCShipTypeColorCode `json:"other"`
 }
 
-type SkillColorCode struct {
+type UCSkillColorCode struct {
 	Bad         string `json:"bad"`
 	BelowAvg    string `json:"below_avg"`
 	Avg         string `json:"avg"`
@@ -171,13 +171,13 @@ type SkillColorCode struct {
 	SuperUnicum string `json:"super_unicum"`
 }
 
-type TierColorCode struct {
+type UCTierColorCode struct {
 	Low    string `json:"low"`    // tier 1~4
 	Middle string `json:"middle"` // tier 5~7
 	High   string `json:"high"`   // tier 8~★
 }
 
-type ShipTypeColorCode struct {
+type UCShipTypeColorCode struct {
 	SS string `json:"ss"`
 	DD string `json:"dd"`
 	CL string `json:"cl"`
@@ -185,7 +185,7 @@ type ShipTypeColorCode struct {
 	CV string `json:"cv"`
 }
 
-type CustomDigit struct {
+type UCDigit struct {
 	PR                uint `json:"pr"`
 	Damage            uint `json:"damage"`
 	MaxDamage         uint `json:"max_damage"`
@@ -203,7 +203,7 @@ type CustomDigit struct {
 	PlatoonRate       uint `json:"platoon_rate"`
 }
 
-type TeamAverage struct {
+type UCTeamSummary struct {
 	MinShipBattles    uint `json:"min_ship_battles"`
 	MinOverallBattles uint `json:"min_overall_battles"`
 }

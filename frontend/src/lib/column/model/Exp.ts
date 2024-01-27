@@ -19,7 +19,7 @@ export class Exp extends AbstractColumn<CommonKey> implements ISingleColumn {
   }
 
   shouldShowColumn(): boolean {
-    return this.config.displays[this.category].exp;
+    return this.config.display[this.category].exp;
   }
 
   getTdClass(_: model.Player): string {
@@ -27,7 +27,7 @@ export class Exp extends AbstractColumn<CommonKey> implements ISingleColumn {
   }
 
   getDisplayValue(player: model.Player): string {
-    const digit = this.config.custom_digit.exp;
+    const digit = this.config.digit.exp;
     const value = toPlayerStats(player, this.config.stats_pattern)[
       this.category
     ].exp;

@@ -19,7 +19,7 @@ export class Kill extends AbstractColumn<CommonKey> implements ISingleColumn {
   }
 
   shouldShowColumn(): boolean {
-    return this.config.displays[this.category].kill;
+    return this.config.display[this.category].kill;
   }
 
   getTdClass(_: model.Player): string {
@@ -27,7 +27,7 @@ export class Kill extends AbstractColumn<CommonKey> implements ISingleColumn {
   }
 
   getDisplayValue(player: model.Player): string {
-    const digit = this.config.custom_digit.kill;
+    const digit = this.config.digit.kill;
     const value = toPlayerStats(player, this.config.stats_pattern)[
       this.category
     ].kill;

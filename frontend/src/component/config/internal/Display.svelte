@@ -23,9 +23,9 @@
       const defaultConfig = await DefaultUserConfig();
 
       inputConfig.font_size = defaultConfig.font_size;
-      inputConfig.displays = defaultConfig.displays;
-      inputConfig.custom_color = defaultConfig.custom_color;
-      inputConfig.custom_digit = defaultConfig.custom_digit;
+      inputConfig.display = defaultConfig.display;
+      inputConfig.color = defaultConfig.color;
+      inputConfig.digit = defaultConfig.digit;
 
       await ApplyUserConfig(inputConfig);
       await FetchProxy.getConfig();
@@ -81,7 +81,7 @@
               <input
                 class="uk-checkbox"
                 type="checkbox"
-                bind:checked={inputConfig.displays.ship[display.shipKey]}
+                bind:checked={inputConfig.display.ship[display.shipKey]}
                 on:change={() => dispatch("Change")}
               />
             </td>
@@ -94,7 +94,7 @@
               <input
                 class="uk-checkbox"
                 type="checkbox"
-                bind:checked={inputConfig.displays.overall[display.overallKey]}
+                bind:checked={inputConfig.display.overall[display.overallKey]}
                 on:change={() => dispatch("Change")}
               />
             </td>
@@ -106,13 +106,12 @@
             <td class="uk-text-center">
               <select
                 class="uk-select uk-form-small uk-form-width-xsmall"
-                bind:value={inputConfig.custom_digit[display.digitKey]}
+                bind:value={inputConfig.digit[display.digitKey]}
                 on:change={() => dispatch("Change")}
               >
                 {#each [0, 1, 2] as digit}
                   <option
-                    selected={digit ===
-                      inputConfig.custom_digit[display.digitKey]}
+                    selected={digit === inputConfig.digit[display.digitKey]}
                     value={digit}>{digit}</option
                   >
                 {/each}
@@ -147,7 +146,7 @@
             <input
               class="uk-input"
               type="color"
-              bind:value={inputConfig.custom_color.skill.text[sl.key]}
+              bind:value={inputConfig.color.skill.text[sl.key]}
               on:input={() => dispatch("Change")}
             />
           </td>
@@ -174,7 +173,7 @@
             <input
               class="uk-input"
               type="color"
-              bind:value={inputConfig.custom_color.tier.own[tg.key]}
+              bind:value={inputConfig.color.tier.own[tg.key]}
               on:input={() => dispatch("Change")}
             />
           </td>
@@ -183,7 +182,7 @@
             <input
               class="uk-input"
               type="color"
-              bind:value={inputConfig.custom_color.tier.other[tg.key]}
+              bind:value={inputConfig.color.tier.other[tg.key]}
               on:input={() => dispatch("Change")}
             />
           </td>
@@ -210,7 +209,7 @@
             <input
               class="uk-input"
               type="color"
-              bind:value={inputConfig.custom_color.ship_type.own[st.key]}
+              bind:value={inputConfig.color.ship_type.own[st.key]}
               on:input={() => dispatch("Change")}
             />
           </td>
@@ -219,7 +218,7 @@
             <input
               class="uk-input"
               type="color"
-              bind:value={inputConfig.custom_color.ship_type.other[st.key]}
+              bind:value={inputConfig.color.ship_type.other[st.key]}
               on:input={() => dispatch("Change")}
             />
           </td>
@@ -233,12 +232,12 @@
   <div>プレイヤー名の背景色</div>
   <select
     class="uk-select uk-form-width-medium"
-    bind:value={inputConfig.custom_color.player_name}
+    bind:value={inputConfig.color.player_name}
     on:change={() => dispatch("Change")}
   >
     {#each DispName.PLAYER_NAME_COLORS.toArray() as pnc}
       <option
-        selected={pnc.key === $storedConfig.custom_color.player_name}
+        selected={pnc.key === $storedConfig.color.player_name}
         value={pnc.key}>{pnc.value}</option
       >
     {/each}

@@ -62,17 +62,17 @@ test("calculate - all types, ship, pvp_all, excluded player", () => {
   const battle = new model.Battle();
   battle.teams = [friendTeam, enemyTeam];
 
-  const customDigit = new model.CustomDigit();
+  const customDigit = new model.UCDigit();
   customDigit.pr = 0;
   customDigit.damage = 1;
   customDigit.win_rate = 2;
 
-  const teamAvg = new model.TeamAverage();
-  teamAvg.min_ship_battles = 20;
+  const teamSummary = new model.UCTeamSummary();
+  teamSummary.min_ship_battles = 20;
 
   const config = new model.UserConfig();
-  config.custom_digit = customDigit;
-  config.team_average = teamAvg;
+  config.digit = customDigit;
+  config.team_summary = teamSummary;
   config.stats_pattern = extra;
 
   const summary = Summary.calculate(battle, [enemy2.player_info.id], config);
@@ -158,17 +158,17 @@ test("calculate - each ship type, overall, pvp_solo", () => {
   const battle = new model.Battle();
   battle.teams = [friendTeam, enemyTeam];
 
-  const customDigit = new model.CustomDigit();
+  const customDigit = new model.UCDigit();
   customDigit.pr = 0;
   customDigit.damage = 1;
   customDigit.win_rate = 2;
 
-  const teamAvg = new model.TeamAverage();
-  teamAvg.min_overall_battles = 1;
+  const teamSummary = new model.UCTeamSummary();
+  teamSummary.min_overall_battles = 1;
 
   const config = new model.UserConfig();
-  config.custom_digit = customDigit;
-  config.team_average = teamAvg;
+  config.digit = customDigit;
+  config.team_summary = teamSummary;
   config.stats_pattern = extra;
 
   const summary = Summary.calculate(battle, [], config);

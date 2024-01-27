@@ -65,7 +65,7 @@
   });
 </script>
 
-{#if config.custom_color}
+{#if config.color}
   <div class="uk-flex uk-flex-center">
     <UkTable>
       <thead>

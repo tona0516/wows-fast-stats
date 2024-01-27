@@ -161,15 +161,15 @@ const isMinBattlesOrMore = (
   category: StatsCategory,
 ): boolean => {
   const battles = toPlayerStats(player, config.stats_pattern)[category].battles;
-  const teamAverage = config.team_average;
+  const teamSummary = config.team_summary;
 
   let minBattles: number;
   switch (category) {
     case "ship":
-      minBattles = teamAverage.min_ship_battles;
+      minBattles = teamSummary.min_ship_battles;
       break;
     case "overall":
-      minBattles = teamAverage.min_overall_battles;
+      minBattles = teamSummary.min_overall_battles;
       break;
   }
 

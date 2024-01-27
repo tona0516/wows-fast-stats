@@ -40,10 +40,10 @@ export class PlayerName extends AbstractColumn<BasicKey> {
   textColorCode(player: model.Player): string {
     let statsCategory: StatsCategory | undefined;
 
-    if (this.config.custom_color.player_name === "ship") {
+    if (this.config.color.player_name === "ship") {
       statsCategory = "ship";
     }
-    if (this.config.custom_color.player_name === "overall") {
+    if (this.config.color.player_name === "overall") {
       statsCategory = "overall";
     }
 

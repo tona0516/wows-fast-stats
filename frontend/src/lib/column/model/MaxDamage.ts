@@ -28,14 +28,14 @@ export class MaxDamage extends AbstractColumn<CommonKey> {
   }
 
   shouldShowColumn(): boolean {
-    return this.config.displays[this.category].max_damage;
+    return this.config.display[this.category].max_damage;
   }
 
   damage(player: model.Player): string {
     const value = toPlayerStats(player, this.config.stats_pattern)[
       this.category
     ].max_damage.damage;
-    const digit = this.config.custom_digit.max_damage;
+    const digit = this.config.digit.max_damage;
     return value.toFixed(digit);
   }
 

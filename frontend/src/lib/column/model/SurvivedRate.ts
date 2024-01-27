@@ -22,7 +22,7 @@ export class SurvivedRate
   }
 
   shouldShowColumn(): boolean {
-    return this.config.displays[this.category].survived_rate;
+    return this.config.display[this.category].survived_rate;
   }
 
   getTdClass(_: model.Player): string {
@@ -30,7 +30,7 @@ export class SurvivedRate
   }
 
   getDisplayValue(player: model.Player): string {
-    const digit = this.config.custom_digit.survived_rate;
+    const digit = this.config.digit.survived_rate;
     const stats = toPlayerStats(player, this.config.stats_pattern)[
       this.category
     ];

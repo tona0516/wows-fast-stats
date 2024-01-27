@@ -24,7 +24,7 @@ export class PR
   }
 
   shouldShowColumn(): boolean {
-    return this.config.displays[this.category].pr;
+    return this.config.display[this.category].pr;
   }
 
   getTdClass(player: model.Player): string {
@@ -52,7 +52,7 @@ export class PR
   }
 
   getDigit(): number {
-    return this.config.custom_digit.pr;
+    return this.config.digit.pr;
   }
 
   getCategory(): StatsCategory {

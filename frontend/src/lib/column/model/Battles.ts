@@ -22,7 +22,7 @@ export class Battles
   }
 
   shouldShowColumn(): boolean {
-    return this.config.displays[this.category].battles;
+    return this.config.display[this.category].battles;
   }
 
   getTdClass(_: model.Player): string {
@@ -30,7 +30,7 @@ export class Battles
   }
 
   getDisplayValue(player: model.Player): string {
-    const digit = this.config.custom_digit.battles;
+    const digit = this.config.digit.battles;
     const value = toPlayerStats(player, this.config.stats_pattern)[
       this.category
     ].battles;

@@ -22,7 +22,7 @@ test("factory", () => {
   const expectedBgColor = "#000002";
 
   const config = new model.UserConfig({
-    custom_color: {
+    color: {
       skill: {
         text: { super_unicum: expectedTextColor },
         background: { super_unicum: expectedBgColor },

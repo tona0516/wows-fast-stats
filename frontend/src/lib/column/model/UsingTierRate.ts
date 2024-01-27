@@ -20,15 +20,15 @@ export class UsingTierRate
   }
 
   shouldShowColumn(): boolean {
-    return this.config.displays.overall.using_tier_rate;
+    return this.config.display.overall.using_tier_rate;
   }
 
   getGraphParam(player: model.Player): StackedBarGraphParam {
-    const digit = this.config.custom_digit.using_tier_rate;
+    const digit = this.config.digit.using_tier_rate;
     const tierRateGroup = toPlayerStats(player, this.config.stats_pattern)
       .overall.using_tier_rate;
     const ownTierGroup = this.toTierGroup(player.ship_info.tier);
-    const colors = this.config.custom_color.tier;
+    const colors = this.config.color.tier;
 
     const items = DispName.TIER_GROUPS.toArray().map((tier) => {
       const colorCode =

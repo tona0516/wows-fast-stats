@@ -24,7 +24,7 @@ export class WinRate
   }
 
   shouldShowColumn(): boolean {
-    return this.config.displays[this.category].win_rate;
+    return this.config.display[this.category].win_rate;
   }
 
   getTdClass(_: model.Player): string {
@@ -48,7 +48,7 @@ export class WinRate
   }
 
   getDigit(): number {
-    return this.config.custom_digit.win_rate;
+    return this.config.digit.win_rate;
   }
 
   getCategory(): StatsCategory {

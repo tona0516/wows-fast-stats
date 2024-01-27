@@ -19,7 +19,7 @@ export class AvgTier
   }
 
   shouldShowColumn(): boolean {
-    return this.config.displays.overall.avg_tier;
+    return this.config.display.overall.avg_tier;
   }
 
   getTdClass(_: model.Player): string {
@@ -27,7 +27,7 @@ export class AvgTier
   }
 
   getDisplayValue(player: model.Player): string {
-    const digit = this.config.custom_digit.avg_tier;
+    const digit = this.config.digit.avg_tier;
     const value = toPlayerStats(player, this.config.stats_pattern).overall
       .avg_tier;
     return value.toFixed(digit);

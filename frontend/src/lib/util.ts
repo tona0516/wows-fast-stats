@@ -42,13 +42,13 @@ export const isShipType = (type: string): type is ShipType => {
 };
 
 export const isDigitKey = (key: string): key is DigitKey => {
-  return Object.keys(new model.CustomDigit()).includes(key);
+  return Object.keys(new model.UCDigit()).includes(key);
 };
 
 export const isShipKey = (key: string): key is ShipKey => {
-  return Object.keys(new model.Ship()).includes(key);
+  return Object.keys(new model.UCDisplayShip()).includes(key);
 };
 
 export const isOverallKey = (key: string): key is OverallKey => {
-  return Object.keys(new model.Overall()).includes(key);
+  return Object.keys(new model.UCDisplayOverall()).includes(key);
 };

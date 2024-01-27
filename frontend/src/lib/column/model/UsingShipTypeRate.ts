@@ -20,15 +20,15 @@ export class UsingShipTypeRate
   }
 
   shouldShowColumn(): boolean {
-    return this.config.displays.overall.using_ship_type_rate;
+    return this.config.display.overall.using_ship_type_rate;
   }
 
   getGraphParam(player: model.Player): StackedBarGraphParam {
-    const digit = this.config.custom_digit.using_ship_type_rate;
+    const digit = this.config.digit.using_ship_type_rate;
     const shipTypeGroup = toPlayerStats(player, this.config.stats_pattern)
       .overall.using_ship_type_rate;
     const ownShipType = player.ship_info.type;
-    const colors = this.config.custom_color.ship_type;
+    const colors = this.config.color.ship_type;
 
     const items = DispName.SHIP_TYPES.toArray().map((type) => {
       const colorCode =

@@ -58,9 +58,9 @@ func TestStorage_UserConfig(t *testing.T) {
 	// 書き込み：正常系
 	expected := model.UserConfig{
 		FontSize: "large",
-		Displays: model.Displays{
-			Ship:    model.Ship{PR: true},
-			Overall: model.Overall{PR: false},
+		Display: model.UCDisplay{
+			Ship:    model.UCDisplayShip{PR: true},
+			Overall: model.UCDisplayOverall{PR: false},
 		},
 	}
 	err = storage.WriteUserConfig(expected)

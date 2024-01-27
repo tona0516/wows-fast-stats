@@ -16,7 +16,7 @@ export class HitRate extends AbstractColumn<ShipKey> implements ISingleColumn {
   }
 
   shouldShowColumn(): boolean {
-    return this.config.displays.ship.hit_rate;
+    return this.config.display.ship.hit_rate;
   }
 
   getTdClass(_: model.Player): string {
@@ -24,7 +24,7 @@ export class HitRate extends AbstractColumn<ShipKey> implements ISingleColumn {
   }
 
   getDisplayValue(player: model.Player): string {
-    const digit = this.config.custom_digit.hit_rate;
+    const digit = this.config.digit.hit_rate;
     const stats = toPlayerStats(player, this.config.stats_pattern).ship;
     return `${stats.main_battery_hit_rate.toFixed(
       digit,

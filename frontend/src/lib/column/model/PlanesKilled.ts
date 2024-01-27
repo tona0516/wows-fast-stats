@@ -19,7 +19,7 @@ export class PlanesKilled
   }
 
   shouldShowColumn(): boolean {
-    return this.config.displays.ship.planes_killed;
+    return this.config.display.ship.planes_killed;
   }
 
   getTdClass(_: model.Player): string {
@@ -27,7 +27,7 @@ export class PlanesKilled
   }
 
   getDisplayValue(player: model.Player): string {
-    const digit = this.config.custom_digit.planes_killed;
+    const digit = this.config.digit.planes_killed;
     const value = toPlayerStats(player, this.config.stats_pattern).ship
       .planes_killed;
     return value.toFixed(digit);

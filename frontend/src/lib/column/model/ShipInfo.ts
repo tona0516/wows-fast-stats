@@ -80,7 +80,7 @@ export class ShipInfo extends AbstractColumn<BasicKey> {
   }
 
   bgColorCode(player: model.Player): string {
-    const ownColor = this.config.custom_color.ship_type.own;
+    const ownColor = this.config.color.ship_type.own;
     const type = player.ship_info.type;
 
     if (!isShipType(type)) {

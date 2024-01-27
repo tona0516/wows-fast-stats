@@ -11,6 +11,6 @@ export class RatingAdapter {
     if (!this.rating) {
       return "";
     }
-    return this.config.custom_color.skill.text[this.rating];
+    return this.config.color.skill.text[this.rating];
   }
 }

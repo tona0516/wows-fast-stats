@@ -24,7 +24,7 @@ export class Damage
   }
 
   shouldShowColumn(): boolean {
-    return this.config.displays[this.category].damage;
+    return this.config.display[this.category].damage;
   }
 
   getTdClass(_: model.Player): string {
@@ -52,7 +52,7 @@ export class Damage
   }
 
   getDigit(): number {
-    return this.config.custom_digit.damage;
+    return this.config.digit.damage;
   }
 
   getCategory(): StatsCategory {
