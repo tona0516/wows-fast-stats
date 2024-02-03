@@ -1,61 +1,41 @@
 import SingleTableData from "src/component/main/internal/table_data/SingleTableData.svelte";
 import { CssClass } from "src/lib/CssClass";
-import { AbstractColumn } from "src/lib/column/intetface/AbstractColumn";
-import type { ISingleColumn } from "src/lib/column/intetface/ISingleColumn";
+import { Rating } from "src/lib/Rating";
+import { AbstractStatsColumn } from "src/lib/column/intetface/AbstractStatsColumn";
 import type { ISummaryColumn } from "src/lib/column/intetface/ISummaryColumn";
-import { RatingColorFactory } from "src/lib/rating/RatingColorFactory";
-import { type CommonKey, type StatsCategory } from "src/lib/types";
-import { toPlayerStats } from "src/lib/util";
+import { type StatsCategory } from "src/lib/types";
 import type { model } from "wailsjs/go/models";
 
-export class PR
-  extends AbstractColumn<CommonKey>
-  implements ISingleColumn, ISummaryColumn
-{
-  constructor(
-    private config: model.UserConfig,
-    private category: StatsCategory,
-  ) {
-    super("pr", "PR", "Personal Rating", 1);
+export class PR extends AbstractStatsColumn<string> implements ISummaryColumn {
+  constructor(config: model.UserConfig, category: StatsCategory) {
+    super("pr", 1, config, category);
   }
 
-  getSvelteComponent() {
-    return SingleTableData;
-  }
-
-  shouldShowColumn(): boolean {
-    return this.config.display[this.category].pr;
-  }
-
-  getTdClass(player: model.Player): string {
-    return this.getValue(player) === -1 ? CssClass.TD_MULTI : CssClass.TD_NUM;
-  }
-
-  getDisplayValue(player: model.Player): string {
-    const value = this.getValue(player);
+  displayValue(player: model.Player): string {
+    const value = this.value(player);
     if (value === -1) {
       return "N/A";
     }
 
-    return value.toFixed(this.getDigit());
+    return value.toFixed(this.digit());
   }
 
-  getTextColorCode(player: model.Player): string {
-    return RatingColorFactory.fromPR(
-      this.getValue(player),
-      this.config,
-    ).getTextColorCode();
+  svelteComponent() {
+    return SingleTableData;
   }
 
-  getValue(player: model.Player): number {
-    return toPlayerStats(player, this.config.stats_pattern)[this.category].pr;
+  tdClass(player: model.Player): string {
+    return this.value(player) === -1 ? CssClass.TD_MULTI : CssClass.TD_NUM;
   }
 
-  getDigit(): number {
-    return this.config.digit.pr;
+  textColorCode(player: model.Player): string {
+    return Rating.fromPR(
+      this.value(player),
+      this.config.color.skill.text,
+    ).colorCode();
   }
 
-  getCategory(): StatsCategory {
-    return this.category;
+  value(player: model.Player): number {
+    return this.playerStats(player)[this.category].pr;
   }
 }

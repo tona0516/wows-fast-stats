@@ -29,9 +29,9 @@
       <tr>
         {#each categories as category}
           {#each category as column}
-            {#if column.shouldShowColumn()}
-              <th class="uk-text-center" colspan={column.innerColumnNumber}
-                >{column.minDisplayName}</th
+            {#if column.shouldShow()}
+              <th class="uk-text-center" colspan={column.innerColumnCount}
+                >{column.header}</th
               >
             {/if}
           {/each}
@@ -51,7 +51,7 @@
         <tr>
           {#each basicColumns as column}
             <svelte:component
-              this={column.getSvelteComponent()}
+              this={column.svelteComponent()}
               {column}
               {player}
               on:EditAlertPlayer
@@ -69,9 +69,9 @@
           {:else if rowPattern === RowPattern.NO_SHIP_STATS}
             <td class="no_data" colspan={shipColumnCount}>N/A</td>
             {#each overallColumns as column}
-              {#if column.shouldShowColumn()}
+              {#if column.shouldShow()}
                 <svelte:component
-                  this={column.getSvelteComponent()}
+                  this={column.svelteComponent()}
                   {column}
                   {player}
                 />
@@ -79,9 +79,9 @@
             {/each}
           {:else}
             {#each shipColumns as column}
-              {#if column.shouldShowColumn()}
+              {#if column.shouldShow()}
                 <svelte:component
-                  this={column.getSvelteComponent()}
+                  this={column.svelteComponent()}
                   {column}
                   {player}
                 />
@@ -89,9 +89,9 @@
             {/each}
 
             {#each overallColumns as column}
-              {#if column.shouldShowColumn()}
+              {#if column.shouldShow()}
                 <svelte:component
-                  this={column.getSvelteComponent()}
+                  this={column.svelteComponent()}
                   {column}
                   {player}
                 />

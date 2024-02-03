@@ -44,7 +44,7 @@ func TestConfigMigrator_Migrate(t *testing.T) {
 
 		// テスト
 		cm := NewConfigMigrator(mockConfigV0, mockStorage, nil)
-		err := cm.Execute()
+		err := cm.ExecuteIfNeeded()
 
 		// アサーション
 		require.NoError(t, err)

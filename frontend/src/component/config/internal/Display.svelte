@@ -8,11 +8,11 @@
   import { ApplyUserConfig, DefaultUserConfig } from "wailsjs/go/main/App";
   import { model } from "wailsjs/go/models";
   import clone from "clone";
-  import { SAMPLE_TEAM } from "src/lib/rating/RatingColorFactory";
   import { ModalElementID } from "src/component/modal/ModalElementID";
-  import { ColumnProvider } from "src/lib/column/ColumnProvider";
   import { FetchProxy } from "src/lib/FetchProxy";
   import { Notifier } from "src/lib/Notifier";
+  import { deriveColumnSettings } from "src/lib/util";
+  import { SAMPLE_TEAM } from "src/lib/RatingDef";
 
   export let inputConfig: model.UserConfig;
 
@@ -37,7 +37,7 @@
     }
   };
 
-  $: displays = ColumnProvider.getDisplayableColumns();
+  $: columnSettings = deriveColumnSettings(inputConfig);
 </script>
 
 <ConfirmModal message="表示設定をリセットしますか？" on:Confirmed={reset} />
@@ -70,18 +70,18 @@
       </tr>
     </thead>
     <tbody>
-      {#each displays as display}
+      {#each columnSettings as column}
         <tr>
           <td>
-            {display.name}
+            {DispName.FULL_COLUMN_NAMES.get(column.key) ?? column.key}
           </td>
 
-          {#if display.shipKey}
+          {#if column.ship.key}
             <td class="uk-text-center">
               <input
                 class="uk-checkbox"
                 type="checkbox"
-                bind:checked={inputConfig.display.ship[display.shipKey]}
+                bind:checked={inputConfig.display.ship[column.ship.key]}
                 on:change={() => dispatch("Change")}
               />
             </td>
@@ -89,12 +89,12 @@
             <td></td>
           {/if}
 
-          {#if display.overallKey}
+          {#if column.overall.key}
             <td class="uk-text-center">
               <input
                 class="uk-checkbox"
                 type="checkbox"
-                bind:checked={inputConfig.display.overall[display.overallKey]}
+                bind:checked={inputConfig.display.overall[column.overall.key]}
                 on:change={() => dispatch("Change")}
               />
             </td>
@@ -102,16 +102,16 @@
             <td></td>
           {/if}
 
-          {#if display.digitKey}
+          {#if column.digit.key}
             <td class="uk-text-center">
               <select
                 class="uk-select uk-form-small uk-form-width-xsmall"
-                bind:value={inputConfig.digit[display.digitKey]}
+                bind:value={inputConfig.digit[column.digit.key]}
                 on:change={() => dispatch("Change")}
               >
                 {#each [0, 1, 2] as digit}
                   <option
-                    selected={digit === inputConfig.digit[display.digitKey]}
+                    selected={digit === inputConfig.digit[column.digit.key]}
                     value={digit}>{digit}</option
                   >
                 {/each}

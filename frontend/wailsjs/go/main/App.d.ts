@@ -22,11 +22,13 @@ export function ExcludePlayerIDs():Promise<Array<number>>;
 
 export function LatestRelease():Promise<model.GHLatestRelease>;
 
-export function LogError(arg1:string):Promise<void>;
+export function LogError(arg1:string,arg2:{[key: string]: string}):Promise<void>;
+
+export function LogInfo(arg1:string,arg2:{[key: string]: string}):Promise<void>;
 
 export function ManualScreenshot(arg1:string,arg2:string):Promise<boolean>;
 
-export function Migrate():Promise<void>;
+export function MigrateIfNeeded():Promise<void>;
 
 export function OpenDirectory(arg1:string):Promise<void>;
 

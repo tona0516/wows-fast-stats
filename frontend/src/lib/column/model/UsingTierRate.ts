@@ -1,46 +1,35 @@
 import StackedBarGraphTableData from "src/component/main/internal/table_data/StackedBarGraphTableData.svelte";
 import { DispName } from "src/lib/DispName";
 import type { StackedBarGraphParam } from "src/lib/column/StackedBarGraphParam";
-import { AbstractColumn } from "src/lib/column/intetface/AbstractColumn";
-import type { IGraphColumn } from "src/lib/column/intetface/IGraphColumn";
-import type { OverallKey, TierGroup } from "src/lib/types";
-import { toPlayerStats } from "src/lib/util";
+import { AbstractStatsColumn } from "src/lib/column/intetface/AbstractStatsColumn";
+import type { TierGroup } from "src/lib/types";
 import type { model } from "wailsjs/go/models";
 
-export class UsingTierRate
-  extends AbstractColumn<OverallKey>
-  implements IGraphColumn
-{
-  constructor(private config: model.UserConfig) {
-    super("using_tier_rate", "T割合", "ティア別プレイ割合", 1);
+export class UsingTierRate extends AbstractStatsColumn<StackedBarGraphParam> {
+  constructor(config: model.UserConfig) {
+    super("using_tier_rate", 1, config, "overall");
   }
 
-  getSvelteComponent() {
-    return StackedBarGraphTableData;
-  }
-
-  shouldShowColumn(): boolean {
-    return this.config.display.overall.using_tier_rate;
-  }
-
-  getGraphParam(player: model.Player): StackedBarGraphParam {
-    const digit = this.config.digit.using_tier_rate;
-    const tierRateGroup = toPlayerStats(player, this.config.stats_pattern)
-      .overall.using_tier_rate;
+  displayValue(player: model.Player): StackedBarGraphParam {
+    const tierRateGroup = this.playerStats(player).overall.using_tier_rate;
     const ownTierGroup = this.toTierGroup(player.ship_info.tier);
     const colors = this.config.color.tier;
 
-    const items = DispName.TIER_GROUPS.toArray().map((tier) => {
+    const items = DispName.TIER_GROUPS.toArray().map((it) => {
       const colorCode =
-        tier.key === ownTierGroup
-          ? colors.own[tier.key]
-          : colors.other[tier.key];
-      const rate = tierRateGroup[tier.key];
+        it.key === ownTierGroup
+          ? colors.own[it.key]
+          : colors.other[it.key];
+      const rate = tierRateGroup[it.key];
 
-      return { label: tier.value, colorCode: colorCode, value: rate };
+      return { label: it.value, colorCode: colorCode, value: rate };
     });
 
-    return { digit: digit, items: items };
+    return { digit: this.digit(), items: items };
+  }
+
+  svelteComponent() {
+    return StackedBarGraphTableData;
   }
 
   private toTierGroup(tier: number): TierGroup | undefined {

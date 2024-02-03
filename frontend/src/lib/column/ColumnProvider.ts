@@ -17,21 +17,15 @@ import { SurvivedRate } from "src/lib/column/model/SurvivedRate";
 import { UsingShipTypeRate } from "src/lib/column/model/UsingShipTypeRate";
 import { UsingTierRate } from "src/lib/column/model/UsingTierRate";
 import { WinRate } from "src/lib/column/model/WinRate";
-import {
-  type ColumnCategory,
-  type DigitKey,
-  type OverallKey,
-  type ShipKey,
-} from "src/lib/types";
-import { isDigitKey, isOverallKey, isShipKey } from "src/lib/util";
+import { type ColumnCategory } from "src/lib/types";
 import { model } from "wailsjs/go/models";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-class ColumnArray extends Array<AbstractColumn<any>> {
+class ColumnArray extends Array<AbstractColumn> {
   constructor(
     private category: ColumnCategory,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    private columns: AbstractColumn<any>[],
+    private columns: AbstractColumn[],
   ) {
     super(...columns);
   }
@@ -42,8 +36,8 @@ class ColumnArray extends Array<AbstractColumn<any>> {
 
   columnCount(): number {
     return this.columns
-      .filter((it) => it.shouldShowColumn())
-      .reduce((a, it) => a + it.innerColumnNumber, 0);
+      .filter((it) => it.shouldShow())
+      .reduce((a, it) => a + it.innerColumnCount, 0);
   }
 }
 
@@ -51,6 +45,7 @@ export namespace ColumnProvider {
   export const getAllColumns = (
     config: model.UserConfig,
   ): [basic: ColumnArray, ship: ColumnArray, overall: ColumnArray] => {
+
     return [
       new ColumnArray("basic", [new PlayerName(config), new ShipInfo(config)]),
       new ColumnArray("ship", [
@@ -83,39 +78,5 @@ export namespace ColumnProvider {
         new UsingTierRate(config),
       ]),
     ];
-  };
-
-  interface DisplayableColumn {
-    name: string;
-    digitKey?: DigitKey;
-    shipKey?: ShipKey;
-    overallKey?: OverallKey;
-  }
-
-  export const getDisplayableColumns = (): DisplayableColumn[] => {
-    const config = new model.UserConfig();
-    const [_, shipColumns, overallColumns] = getAllColumns(config);
-    const columns: AbstractColumn<string>[] = [
-      ...shipColumns,
-      ...overallColumns,
-    ];
-
-    const result: DisplayableColumn[] = [];
-    columns.forEach((column) => {
-      const key = column.displayKey;
-      if (result.find((it) => it.digitKey === key)) {
-        return;
-      }
-
-      const dc: DisplayableColumn = { name: column.fullDisplayName };
-
-      if (isDigitKey(key)) dc.digitKey = key;
-      if (isShipKey(key)) dc.shipKey = key;
-      if (isOverallKey(key)) dc.overallKey = key;
-
-      result.push(dc);
-    });
-
-    return result;
   };
 }

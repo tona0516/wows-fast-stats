@@ -1,6 +1,6 @@
 import { ArrayMap } from "src/lib/ArrayMap";
 import { DispName } from "src/lib/DispName";
-import type { AbstractColumn } from "src/lib/column/intetface/AbstractColumn";
+import type { AbstractStatsColumn } from "src/lib/column/intetface/AbstractStatsColumn";
 import { type ISummaryColumn } from "src/lib/column/intetface/ISummaryColumn";
 import { Damage } from "src/lib/column/model/Damage";
 import { PR } from "src/lib/column/model/PR";
@@ -15,7 +15,7 @@ import { toPlayerStats } from "src/lib/util";
 import { model } from "wailsjs/go/models";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-type SummaryColumn = AbstractColumn<any> & ISummaryColumn;
+type SummaryColumn = AbstractStatsColumn<any> & ISummaryColumn;
 export type SummaryShipType = ShipType | "all";
 
 export interface Summary {
@@ -68,13 +68,13 @@ export namespace Summary {
     };
 
     columns.forEach((column) => {
-      result.meta.columnNames.push(column.minDisplayName);
+      result.meta.columnNames.push(column.header);
 
       const filtered = battle.teams.map((team) => {
         return team.players.filter(
           (player) =>
             !isExcluded(player, excludedIDs) &&
-            isMinBattlesOrMore(player, config, column.getCategory()),
+            isMinBattlesOrMore(player, config, column.category),
         );
       });
 
@@ -92,7 +92,7 @@ export namespace Summary {
           mean(players, column),
         );
 
-        const digit = column.getDigit();
+        const digit = column.digit();
         result.values.get(shipType)!.friends.push(friendMean.toFixed(digit));
         result.values.get(shipType)!.enemies.push(enemyMean.toFixed(digit));
         result.values
@@ -177,7 +177,7 @@ const isMinBattlesOrMore = (
 };
 
 const mean = (players: model.Player[], column: SummaryColumn): number => {
-  const values = players.map((player) => column.getValue(player));
+  const values = players.map((player) => column.value(player));
   return values.length !== 0
     ? values.reduce((a, b) => a + b, 0) / values.length
     : 0;

@@ -19,12 +19,12 @@
   export let player: model.Player;
 
   $: accountID = player.player_info.id;
-  $: isNPC = accountID === 0;
-  $: isBelongToClan = player.player_info.clan.id !== 0;
   $: isChecked = !$storedExcludedPlayers.includes(accountID);
   $: alertPlayer = $storedAlertPlayers.find(
     (it) => it.account_id === accountID,
   );
+  $: clanTag = column.clanTag(player);
+  $: isNPC = column.isNPC(player);
 
   const dispatch = createEventDispatcher();
 
@@ -48,7 +48,7 @@
 </script>
 
 <td>
-  {#if column.isShowCheckBox(player)}
+  {#if !isNPC}
     <input
       class="uk-checkbox"
       type="checkbox"
@@ -59,9 +59,7 @@
 </td>
 
 <td class={CssClass.TD_STR}>
-  {#if isNPC}
-    <div class="uk-text-truncate">{column.playerName(player)}</div>
-  {:else}
+  {#if !isNPC}
     <UkTooltip tooltip={alertPlayer?.message}>
       <!-- svelte-ignore a11y-invalid-attribute -->
       <a href="#">
@@ -69,9 +67,9 @@
           {#if alertPlayer}
             <i class="bi {alertPlayer.pattern}" />
           {/if}
-          {#if isBelongToClan}
+          {#if clanTag}
             <div class="clan-tag" style="color: {column.clanColorCode(player)}">
-              {column.clanName(player)}
+              {clanTag}
             </div>
           {/if}
           <div
@@ -83,12 +81,10 @@
         </div>
       </a>
     </UkTooltip>
-  {/if}
 
-  {#if !isNPC}
     <UkDowndown>
       <ul class="uk-nav uk-dropdown-nav">
-        {#if isBelongToClan}
+        {#if clanTag}
           <li>
             <ExternalLink url={NumbersURL.clan(player.player_info.clan.id)}
               >クラン詳細(WoWS Stats & Numbers)</ExternalLink
@@ -145,6 +141,8 @@
         </li>
       </ul>
     </UkDowndown>
+  {:else}
+    <div class="uk-text-truncate">{column.playerName(player)}</div>
   {/if}
 </td>
 

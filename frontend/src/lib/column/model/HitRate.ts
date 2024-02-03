@@ -1,37 +1,25 @@
 import SingleTableData from "src/component/main/internal/table_data/SingleTableData.svelte";
 import { CssClass } from "src/lib/CssClass";
-import { AbstractColumn } from "src/lib/column/intetface/AbstractColumn";
-import type { ISingleColumn } from "src/lib/column/intetface/ISingleColumn";
-import type { ShipKey } from "src/lib/types";
-import { toPlayerStats } from "src/lib/util";
+import { AbstractStatsColumn } from "src/lib/column/intetface/AbstractStatsColumn";
 import type { model } from "wailsjs/go/models";
 
-export class HitRate extends AbstractColumn<ShipKey> implements ISingleColumn {
-  constructor(private config: model.UserConfig) {
-    super("hit_rate", "Hit率(主|魚)", "命中率 (主砲|魚雷)", 1);
+export class HitRate extends AbstractStatsColumn<string> {
+  constructor(config: model.UserConfig) {
+    super("hit_rate", 1, config, "ship");
   }
 
-  getSvelteComponent() {
+  displayValue(player: model.Player): string {
+    const stats = this.playerStats(player).ship;
+    return `${stats.main_battery_hit_rate.toFixed(
+      this.digit(),
+    )}% | ${stats.torpedoes_hit_rate.toFixed(this.digit())}%`;
+  }
+
+  svelteComponent() {
     return SingleTableData;
-  }
-
-  shouldShowColumn(): boolean {
-    return this.config.display.ship.hit_rate;
   }
 
   getTdClass(_: model.Player): string {
     return CssClass.TD_MULTI;
-  }
-
-  getDisplayValue(player: model.Player): string {
-    const digit = this.config.digit.hit_rate;
-    const stats = toPlayerStats(player, this.config.stats_pattern).ship;
-    return `${stats.main_battery_hit_rate.toFixed(
-      digit,
-    )}% | ${stats.torpedoes_hit_rate.toFixed(digit)}%`;
-  }
-
-  getTextColorCode(_: model.Player): string {
-    return "";
   }
 }

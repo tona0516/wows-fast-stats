@@ -25,7 +25,7 @@ func NewConfigMigrator(
 	}
 }
 
-func (m *ConfigMigrator) Execute() error {
+func (m *ConfigMigrator) ExecuteIfNeeded() error {
 	if err := m.toV1(); err != nil {
 		return failure.New(apperr.MigrationError, failure.Messagef("%s", err.Error()))
 	}

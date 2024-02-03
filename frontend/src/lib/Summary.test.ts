@@ -70,10 +70,15 @@ test("calculate - all types, ship, pvp_all, excluded player", () => {
   const teamSummary = new model.UCTeamSummary();
   teamSummary.min_ship_battles = 20;
 
+  const display = new model.UCDisplay();
+  display.ship = new model.UCDisplayShip();
+  display.overall = new model.UCDisplayOverall();
+
   const config = new model.UserConfig();
   config.digit = customDigit;
   config.team_summary = teamSummary;
   config.stats_pattern = extra;
+  config.display = display;
 
   const summary = Summary.calculate(battle, [enemy2.player_info.id], config);
 
@@ -166,10 +171,15 @@ test("calculate - each ship type, overall, pvp_solo", () => {
   const teamSummary = new model.UCTeamSummary();
   teamSummary.min_overall_battles = 1;
 
+  const display = new model.UCDisplay();
+  display.ship = new model.UCDisplayShip();
+  display.overall = new model.UCDisplayOverall();
+
   const config = new model.UserConfig();
   config.digit = customDigit;
   config.team_summary = teamSummary;
   config.stats_pattern = extra;
+  config.display = display;
 
   const summary = Summary.calculate(battle, [], config);
 

@@ -15,6 +15,7 @@
   import UkSpinner from "../common/uikit/UkSpinner.svelte";
   import { FetchProxy } from "src/lib/FetchProxy";
   import { Notifier } from "src/lib/Notifier";
+  import { LogInfo } from "wailsjs/go/main/App";
 
   const MAIN_PAGE_ID = "mainpage";
   const screenshot = new Screenshot(MAIN_PAGE_ID);
@@ -36,6 +37,8 @@
       if ($storedConfig.save_screenshot) {
         screenshot.auto(battle.meta);
       }
+
+      await LogInfo("", { "fetch_duration(s)": elapsed.toFixed(1) });
     } catch (error) {
       Notifier.failure(error);
     } finally {

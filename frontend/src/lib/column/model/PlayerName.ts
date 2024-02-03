@@ -1,40 +1,40 @@
 import PlayerNameTableData from "src/component/main/internal/table_data/PlayerNameTableData.svelte";
+import { Rating } from "src/lib/Rating";
 import { AbstractColumn } from "src/lib/column/intetface/AbstractColumn";
-import { RatingColorFactory } from "src/lib/rating/RatingColorFactory";
-import { type BasicKey, type StatsCategory } from "src/lib/types";
+import { type StatsCategory } from "src/lib/types";
 import { toPlayerStats } from "src/lib/util";
 import type { model } from "wailsjs/go/models";
 
-export class PlayerName extends AbstractColumn<BasicKey> {
+export class PlayerName extends AbstractColumn {
   constructor(private config: model.UserConfig) {
-    super("player_name", "プレイヤー", "プレイヤー", 2);
+    super("player_name", "プレイヤー", 2);
   }
 
-  getSvelteComponent() {
+  svelteComponent() {
     return PlayerNameTableData;
   }
 
-  shouldShowColumn(): boolean {
+  shouldShow(): boolean {
     return true;
   }
 
-  clanName(player: model.Player): string {
+  clanTag(player: model.Player): string | undefined {
     const clanID = player.player_info.clan.id;
     const clanTag = player.player_info.clan.tag;
 
-    return clanID !== 0 ? `[${clanTag}] ` : "";
+    return clanID !== 0 ? `[${clanTag}] ` : undefined;
   }
 
   playerName(player: model.Player): string {
     return player.player_info.name;
   }
 
-  isShowCheckBox(player: model.Player): boolean {
-    return player.player_info.id !== 0;
+  isNPC(player: model.Player): boolean {
+    return player.player_info.id === 0;
   }
 
   clanColorCode(player: model.Player): string {
-    return player.player_info.clan.hex_color
+    return player.player_info.clan.hex_color;
   }
 
   textColorCode(player: model.Player): string {
@@ -54,6 +54,6 @@ export class PlayerName extends AbstractColumn<BasicKey> {
     const pr = toPlayerStats(player, this.config.stats_pattern)[statsCategory]
       .pr;
 
-    return RatingColorFactory.fromPR(pr, this.config).getTextColorCode();
+    return Rating.fromPR(pr, this.config.color.skill.text).colorCode();
   }
 }

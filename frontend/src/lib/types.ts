@@ -18,7 +18,7 @@ export type StatsExtra = Exclude<
   keyof model.Player,
   keyof typeof BasicKey | CommonMethod
 >;
-export type Rating = Readonly<keyof model.UCSkillColorCode>;
+export type RatingLevel = Readonly<keyof model.UCSkillColorCode>;
 
 export type ShipKey = Readonly<keyof model.UCDisplayShip>;
 export type OverallKey = Readonly<keyof model.UCDisplayOverall>;

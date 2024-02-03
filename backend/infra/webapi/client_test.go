@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"testing"
 	"time"
 
@@ -13,8 +12,22 @@ import (
 )
 
 // テスト用のデータ型.
-type TestData struct {
+type TestRequestBody struct {
+	ID string `json:"ID"`
+}
+
+type TestResponseBody struct {
 	Name string `json:"name"`
+}
+
+func mockServer[T, U any](response Response[T, U], responseTime time.Duration) *httptest.Server {
+	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		time.Sleep(responseTime)
+
+		w.Header().Set("content-type", "application/json")
+		w.WriteHeader(response.StatusCode)
+		_, _ = w.Write(response.BodyByte)
+	}))
 }
 
 func TestGetRequest(t *testing.T) {
@@ -23,17 +36,22 @@ func TestGetRequest(t *testing.T) {
 	t.Run("正常系_クエリなし", func(t *testing.T) {
 		t.Parallel()
 
-		expected := normalResponse()
+		responseBody := TestResponseBody{Name: "test_name"}
+		responseBodyByte, _ := json.Marshal(responseBody)
+		expected := Response[any, TestResponseBody]{
+			Request: Request[any]{
+				Method: http.MethodGet,
+			},
+			StatusCode: http.StatusOK,
+			Body:       responseBody,
+			BodyByte:   responseBodyByte,
+		}
 
-		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Header().Set("Content-Type", "application/json")
-			w.WriteHeader(expected.StatusCode)
-			_, _ = w.Write(expected.ByteBody)
-		}))
+		server := mockServer(expected, 0)
 		defer server.Close()
-		expected.FullURL = server.URL
+		expected.Request.URL = server.URL
 
-		actual, err := GetRequest[TestData](server.URL, 1*time.Second, nil)
+		actual, err := GetRequest[TestResponseBody](server.URL, 1*time.Second, nil)
 
 		assert.Equal(t, expected, actual)
 		require.NoError(t, err)
@@ -42,17 +60,22 @@ func TestGetRequest(t *testing.T) {
 	t.Run("正常系_クエリあり", func(t *testing.T) {
 		t.Parallel()
 
-		expected := normalResponse()
+		responseBody := TestResponseBody{Name: "test_name"}
+		responseBodyByte, _ := json.Marshal(responseBody)
+		expected := Response[any, TestResponseBody]{
+			Request: Request[any]{
+				Method: http.MethodGet,
+			},
+			StatusCode: http.StatusOK,
+			Body:       responseBody,
+			BodyByte:   responseBodyByte,
+		}
 
-		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Header().Set("Content-Type", "application/json")
-			w.WriteHeader(expected.StatusCode)
-			_, _ = w.Write(expected.ByteBody)
-		}))
+		server := mockServer(expected, 0)
 		defer server.Close()
-		expected.FullURL = server.URL + "?hoge=fuga"
+		expected.Request.URL = server.URL + "?hoge=fuga"
 
-		actual, err := GetRequest[TestData](server.URL, 1*time.Second, map[string]string{"hoge": "fuga"})
+		actual, err := GetRequest[TestResponseBody](server.URL, 1*time.Second, map[string]string{"hoge": "fuga"})
 
 		assert.Equal(t, expected, actual)
 		require.NoError(t, err)
@@ -61,16 +84,22 @@ func TestGetRequest(t *testing.T) {
 	t.Run("異常系_タイムアウト", func(t *testing.T) {
 		t.Parallel()
 
-		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			time.Sleep(1 * time.Second)
+		responseBody := TestResponseBody{Name: "test_name"}
+		responseBodyByte, _ := json.Marshal(responseBody)
+		expected := Response[any, TestResponseBody]{
+			Request: Request[any]{
+				Method: http.MethodGet,
+			},
+			StatusCode: http.StatusOK,
+			Body:       responseBody,
+			BodyByte:   responseBodyByte,
+		}
 
-			w.Header().Set("Content-Type", "application/json")
-			w.WriteHeader(http.StatusOK)
-			_, _ = w.Write(normalResponse().ByteBody)
-		}))
+		server := mockServer(expected, 1*time.Second)
 		defer server.Close()
+		expected.Request.URL = server.URL
 
-		_, err := GetRequest[TestData](server.URL, 100*time.Millisecond, nil)
+		_, err := GetRequest[TestResponseBody](server.URL, 100*time.Millisecond, nil)
 
 		require.Error(t, err)
 	})
@@ -93,13 +122,12 @@ func TestGetRequest(t *testing.T) {
 				t.Parallel()
 
 				server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-					w.Header().Set("Content-Type", "application/json")
 					w.WriteHeader(http.StatusOK)
 					_, _ = w.Write([]byte(res.body))
 				}))
 				defer server.Close()
 
-				_, err := GetRequest[TestData](server.URL, 1*time.Second, nil)
+				_, err := GetRequest[TestResponseBody](server.URL, 1*time.Second, nil)
 
 				require.Error(t, err)
 			})
@@ -107,48 +135,112 @@ func TestGetRequest(t *testing.T) {
 	})
 }
 
-func TestPostMultipartFormData(t *testing.T) {
+func TestPostRequestJSON(t *testing.T) {
 	t.Parallel()
-	t.Run("正常系", func(t *testing.T) {
+
+	t.Run("正常系_ボディなし", func(t *testing.T) {
 		t.Parallel()
 
-		expected := normalResponse()
+		responseBody := TestResponseBody{Name: "test_name"}
+		responseBodyByte, _ := json.Marshal(responseBody)
+		expected := Response[any, TestResponseBody]{
+			Request: Request[any]{
+				Method: http.MethodPost,
+			},
+			StatusCode: http.StatusOK,
+			Body:       responseBody,
+			BodyByte:   responseBodyByte,
+		}
 
-		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Header().Set("Content-Type", "application/json")
-			w.WriteHeader(expected.StatusCode)
-			_, _ = w.Write(expected.ByteBody)
-		}))
+		server := mockServer(expected, 0)
 		defer server.Close()
-		expected.FullURL = server.URL
+		expected.Request.URL = server.URL
 
-		filename := "testfile.txt"
-		_, err := os.Create(filename)
-		defer os.Remove(filename)
+		actual, err := PostRequestJSON[any, TestResponseBody](server.URL, 1*time.Second, nil)
+
+		assert.Equal(t, expected, actual)
 		require.NoError(t, err)
+	})
 
-		actual, err := PostMultipartFormData[TestData](
+	t.Run("正常系_ボディあり", func(t *testing.T) {
+		t.Parallel()
+
+		responseBody := TestResponseBody{Name: "test_name"}
+		responseBodyByte, _ := json.Marshal(responseBody)
+		expected := Response[TestRequestBody, TestResponseBody]{
+			Request: Request[TestRequestBody]{
+				Method: http.MethodPost,
+				Body:   TestRequestBody{ID: "test_id"},
+			},
+			StatusCode: http.StatusOK,
+			Body:       responseBody,
+			BodyByte:   responseBodyByte,
+		}
+
+		server := mockServer(expected, 0)
+		defer server.Close()
+		expected.Request.URL = server.URL
+
+		actual, err := PostRequestJSON[TestRequestBody, TestResponseBody](
 			server.URL,
 			1*time.Second,
-			[]Form{
-				NewForm("content_name", "content_value", false),
-				NewForm("file", filename, true),
-			},
+			TestRequestBody{ID: "test_id"},
 		)
 
 		assert.Equal(t, expected, actual)
 		require.NoError(t, err)
 	})
-}
 
-func normalResponse() Response[TestData] {
-	testData := TestData{Name: "test"}
-	//nolint:errchkjson
-	byteBody, _ := json.Marshal(testData)
+	t.Run("異常系_タイムアウト", func(t *testing.T) {
+		t.Parallel()
 
-	return Response[TestData]{
-		StatusCode: http.StatusOK,
-		Body:       testData,
-		ByteBody:   byteBody,
-	}
+		responseBody := TestResponseBody{Name: "test_name"}
+		responseBodyByte, _ := json.Marshal(responseBody)
+		expected := Response[TestRequestBody, TestResponseBody]{
+			Request: Request[TestRequestBody]{
+				Method: http.MethodPost,
+			},
+			StatusCode: http.StatusOK,
+			Body:       responseBody,
+			BodyByte:   responseBodyByte,
+		}
+
+		server := mockServer(expected, 1*time.Second)
+		defer server.Close()
+		expected.Request.URL = server.URL
+
+		_, err := PostRequestJSON[TestRequestBody, TestResponseBody](server.URL, 100*time.Millisecond, TestRequestBody{})
+
+		require.Error(t, err)
+	})
+
+	t.Run("異常系_不正なレスポンス", func(t *testing.T) {
+		t.Parallel()
+
+		responses := []struct {
+			name string
+			body string
+		}{
+			{name: "HTML", body: "<html></html>"},
+			{name: "不正なJSON", body: `{"name":}`},
+		}
+
+		for _, res := range responses {
+			res := res
+
+			t.Run(res.name, func(t *testing.T) {
+				t.Parallel()
+
+				server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					w.WriteHeader(http.StatusOK)
+					_, _ = w.Write([]byte(res.body))
+				}))
+				defer server.Close()
+
+				_, err := PostRequestJSON[TestRequestBody, TestResponseBody](server.URL, 1*time.Second, TestRequestBody{})
+
+				require.Error(t, err)
+			})
+		}
+	})
 }

@@ -35,7 +35,7 @@ export class Screenshot {
       }
       return (await htmlToImage.toPng(element!)).split(",")[1];
     } catch (error) {
-      LogError(`${this.getBase64Image.name}: ${JSON.stringify(error)}`);
+      LogError(`${this.getBase64Image.name}: ${JSON.stringify(error)}`, {});
       throw error;
     }
   }

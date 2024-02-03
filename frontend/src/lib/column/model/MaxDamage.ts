@@ -1,51 +1,52 @@
 import MaxDamageTableData from "src/component/main/internal/table_data/MaxDamageTableData.svelte";
-import { AbstractColumn } from "src/lib/column/intetface/AbstractColumn";
+import { AbstractStatsColumn } from "src/lib/column/intetface/AbstractStatsColumn";
 import { NumbersURL } from "src/lib/NumbersURL";
-import { type CommonKey, type StatsCategory } from "src/lib/types";
-import { tierString, toPlayerStats } from "src/lib/util";
+import { type StatsCategory } from "src/lib/types";
+import { tierString } from "src/lib/util";
 import type { model } from "wailsjs/go/models";
 
-export class MaxDamage extends AbstractColumn<CommonKey> {
-  constructor(
-    private config: model.UserConfig,
-    private category: StatsCategory,
-  ) {
-    let innerColumnNumber: number;
+export interface MaxDamageParam {
+  damage: string;
+  shipInfo?: {
+    url: string;
+    name: string;
+  };
+}
+
+export class MaxDamage extends AbstractStatsColumn<MaxDamageParam> {
+  constructor(config: model.UserConfig, category: StatsCategory) {
+    let innerColumnCount: number;
     switch (category) {
       case "ship":
-        innerColumnNumber = 1;
+        innerColumnCount = 1;
         break;
       case "overall":
-        innerColumnNumber = 2;
+        innerColumnCount = 2;
         break;
     }
 
-    super("max_damage", "最大Dmg", "最大ダメージ", innerColumnNumber);
+    super("max_damage", innerColumnCount, config, category);
   }
 
-  getSvelteComponent() {
+  displayValue(player: model.Player): MaxDamageParam {
+    const maxDamage = this.playerStats(player)[this.category].max_damage;
+    const value = maxDamage.value.toFixed(this.digit());
+
+    switch (this.category) {
+      case "ship":
+        return { damage: value };
+      case "overall": {
+        const url = NumbersURL.ship(maxDamage.ship_id);
+        const name = `${tierString(maxDamage.ship_tier)} ${maxDamage.ship_name}`;
+        return {
+          damage: value,
+          shipInfo: { url, name },
+        };
+      }
+    }
+  }
+
+  svelteComponent() {
     return MaxDamageTableData;
-  }
-
-  shouldShowColumn(): boolean {
-    return this.config.display[this.category].max_damage;
-  }
-
-  damage(player: model.Player): string {
-    const value = toPlayerStats(player, this.config.stats_pattern)[
-      this.category
-    ].max_damage.damage;
-    const digit = this.config.digit.max_damage;
-    return value.toFixed(digit);
-  }
-
-  shipInfo(player: model.Player): [url: string, text: string] {
-    const maxDamage = toPlayerStats(player, this.config.stats_pattern).overall
-      .max_damage;
-    const url = NumbersURL.ship(maxDamage.ship_id);
-
-    const text = `${tierString(maxDamage.ship_tier)} ${maxDamage.ship_name}`;
-
-    return [url, text];
   }
 }

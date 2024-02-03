@@ -1,3 +1,4 @@
+import type { ColumnSetting } from "src/lib/ColumnSetting";
 import type { DigitKey, OverallKey, ShipKey, ShipType } from "src/lib/types";
 import { model } from "wailsjs/go/models";
 
@@ -51,4 +52,39 @@ export const isShipKey = (key: string): key is ShipKey => {
 
 export const isOverallKey = (key: string): key is OverallKey => {
   return Object.keys(new model.UCDisplayOverall()).includes(key);
+};
+
+export const deriveColumnSetting = (
+  config: model.UserConfig,
+  key: string,
+): ColumnSetting => {
+  const shipKey = isShipKey(key) ? key : undefined;
+  const overallKey = isOverallKey(key) ? key : undefined;
+  const digitKey = isDigitKey(key) ? key : undefined;
+
+  return {
+    key: key,
+    ship: {
+      key: shipKey,
+      value: shipKey ? config.display.ship[shipKey] : false,
+    },
+    overall: {
+      key: overallKey,
+      value: overallKey ? config.display.overall[overallKey] : false,
+    },
+    digit: {
+      key: digitKey,
+      value: digitKey ? config.digit[digitKey] : 0,
+    },
+  };
+};
+
+export const deriveColumnSettings = (
+  config: model.UserConfig,
+): ColumnSetting[] => {
+  const shipKeys = Object.keys(config.display.ship);
+  const overallKeys = Object.keys(config.display.overall);
+  const allKeys = [...new Set([...shipKeys, ...overallKeys])];
+
+  return allKeys.map((key) => deriveColumnSetting(config, key));
 };

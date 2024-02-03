@@ -1,5 +1,4 @@
 import { AbstractColumn } from "src/lib/column/intetface/AbstractColumn";
-import { type BasicKey } from "src/lib/types";
 import type { model } from "wailsjs/go/models";
 
 import FlagCommonWealth from "src/assets/images/flag_Commonwealth.png";
@@ -62,16 +61,16 @@ const PREMIUM_SHIP_ICONS: { [key: string]: string } = {
   ss: ShipPremiumSS,
 };
 
-export class ShipInfo extends AbstractColumn<BasicKey> {
+export class ShipInfo extends AbstractColumn {
   constructor(private config: model.UserConfig) {
-    super("ship_info", "艦", "艦情報", 3);
+    super("ship_info", "艦", 3);
   }
 
-  getSvelteComponent() {
+  svelteComponent() {
     return ShipInfoTableData;
   }
 
-  shouldShowColumn(): boolean {
+  shouldShow(): boolean {
     return true;
   }
 
@@ -80,23 +79,16 @@ export class ShipInfo extends AbstractColumn<BasicKey> {
   }
 
   bgColorCode(player: model.Player): string {
-    const ownColor = this.config.color.ship_type.own;
     const type = player.ship_info.type;
+    if (!isShipType(type)) return "";
 
-    if (!isShipType(type)) {
-      return "#00000000";
-    }
-
-    return ownColor[type];
+    return this.config.color.ship_type.own[type];
   }
 
   shipTypeIconPath(player: model.Player): string {
     const shipInfo = player.ship_info;
     const type = shipInfo.type;
-
-    if (!isShipType(type)) {
-      return "";
-    }
+    if (!isShipType(type)) return "";
 
     return shipInfo.is_premium ? PREMIUM_SHIP_ICONS[type] : SHIP_ICONS[type];
   }

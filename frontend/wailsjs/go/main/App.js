@@ -42,16 +42,20 @@ export function LatestRelease() {
   return window['go']['main']['App']['LatestRelease']();
 }
 
-export function LogError(arg1) {
-  return window['go']['main']['App']['LogError'](arg1);
+export function LogError(arg1, arg2) {
+  return window['go']['main']['App']['LogError'](arg1, arg2);
+}
+
+export function LogInfo(arg1, arg2) {
+  return window['go']['main']['App']['LogInfo'](arg1, arg2);
 }
 
 export function ManualScreenshot(arg1, arg2) {
   return window['go']['main']['App']['ManualScreenshot'](arg1, arg2);
 }
 
-export function Migrate() {
-  return window['go']['main']['App']['Migrate']();
+export function MigrateIfNeeded() {
+  return window['go']['main']['App']['MigrateIfNeeded']();
 }
 
 export function OpenDirectory(arg1) {

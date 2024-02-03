@@ -1,12 +1,11 @@
-export abstract class AbstractColumn<T> {
+export abstract class AbstractColumn {
   constructor(
-    readonly displayKey: T,
-    readonly minDisplayName: string,
-    readonly fullDisplayName: string,
-    readonly innerColumnNumber: number,
+    readonly key: string,
+    readonly header: string,
+    readonly innerColumnCount: number,
   ) {}
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  abstract getSvelteComponent(): any;
-  abstract shouldShowColumn(): boolean;
+  abstract svelteComponent(): any;
+  abstract shouldShow(): boolean;
 }

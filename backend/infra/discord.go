@@ -1,9 +1,8 @@
 package infra
 
 import (
-	"encoding/json"
 	"net/http"
-	"os"
+	"strconv"
 	"wfs/backend/apperr"
 	"wfs/backend/infra/webapi"
 
@@ -22,39 +21,23 @@ func NewDiscord(config RequestConfig) *Discord {
 	return &Discord{config: config}
 }
 
-func (d *Discord) Upload(filename string, text string, message string) error {
-	// create file
-	file, err := os.Create(filename)
-	if err != nil {
-		return failure.Wrap(err)
+func (d *Discord) Comment(message string) error {
+	res, err := webapi.PostRequestJSON[DiscordRequestBody, any](
+		d.config.URL,
+		d.config.Timeout,
+		DiscordRequestBody{Content: message},
+	)
+	errCtx := failure.Context{
+		"url":         res.Request.URL,
+		"status_code": strconv.Itoa(res.StatusCode),
+		"body":        string(res.BodyByte),
 	}
-
-	defer func() {
-		_ = file.Close()
-		_ = os.Remove(filename)
-	}()
-
-	// write text to file
-	_, err = file.WriteString(text)
 	if err != nil {
-		return failure.Wrap(err)
-	}
-
-	// upload file
-	//nolint:errchkjson
-	payload, _ := json.Marshal(DiscordRequestBody{Content: message})
-	forms := []webapi.Form{
-		webapi.NewForm("payload_json", string(payload), false),
-		webapi.NewForm("file", filename, true),
-	}
-
-	res, err := webapi.PostMultipartFormData[any](d.config.URL, d.config.Timeout, forms)
-	if err != nil {
-		return err
+		return failure.Wrap(err, errCtx)
 	}
 
 	if res.StatusCode != http.StatusOK {
-		return failure.New(apperr.DiscordAPISendLogError, apperr.ToRequestErrorContext(res))
+		return failure.New(apperr.DiscordAPISendLogError, errCtx)
 	}
 
 	return nil

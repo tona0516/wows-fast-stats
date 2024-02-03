@@ -2,6 +2,7 @@ package infra
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"time"
 	"wfs/backend/domain/model"
@@ -13,18 +14,18 @@ import (
 )
 
 type Logger struct {
-	zlog   zerolog.Logger
-	env    model.Env
-	report repository.ReportInterface
+	zlog    zerolog.Logger
+	env     model.Env
+	discord repository.DiscordInterface
 }
 
 func NewLogger(
 	env model.Env,
-	report repository.ReportInterface,
+	discord repository.DiscordInterface,
 ) *Logger {
 	return &Logger{
-		env:    env,
-		report: report,
+		env:     env,
+		discord: discord,
 	}
 }
 
@@ -47,13 +48,18 @@ func (l *Logger) Init(appCtx context.Context) {
 		Out:        &frontendWriter{appCtx: appCtx},
 		NoColor:    true,
 	}
+	reportWriter := zerolog.ConsoleWriter{
+		TimeFormat: time.DateTime,
+		Out:        &reportWriter{discord: l.discord},
+		NoColor:    true,
+	}
 	logFile, _ := os.OpenFile(
 		l.env.AppName+".log",
 		os.O_APPEND|os.O_CREATE|os.O_WRONLY,
 		0o664,
 	)
 
-	multi := zerolog.MultiLevelWriter(consoleWriter, frontendWriter, logFile)
+	multi := zerolog.MultiLevelWriter(consoleWriter, frontendWriter, reportWriter, logFile)
 
 	l.zlog = zerolog.New(multi).
 		With().
@@ -64,39 +70,31 @@ func (l *Logger) Init(appCtx context.Context) {
 }
 
 func (l *Logger) Debug(message string, contexts map[string]string) {
-	e := l.zlog.Debug()
+	e := l.zlog.Debug().Str("message", message)
 	addContext(e, contexts)
-	e.Msg(message)
+	e.Send()
 }
 
 func (l *Logger) Info(message string, contexts map[string]string) {
-	e := l.zlog.Info()
+	e := l.zlog.Info().Str("message", message)
 	addContext(e, contexts)
-	e.Msg(message)
+	e.Send()
 }
 
 func (l *Logger) Warn(err error, contexts map[string]string) {
-	e := l.zlog.Warn().Err(err)
+	e := l.zlog.Warn().Str("error", fmt.Sprintf("%+v", err))
 	addContext(e, contexts)
 	e.Send()
-
-	if l.report != nil {
-		l.report.Send("warn has occurred!", err)
-	}
 }
 
 func (l *Logger) Error(err error, contexts map[string]string) {
-	e := l.zlog.Error().Err(err)
+	e := l.zlog.Error().Str("error", fmt.Sprintf("%+v", err))
 	addContext(e, contexts)
 	e.Send()
-
-	if l.report != nil {
-		l.report.Send("error has occurred!", err)
-	}
 }
 
 func addContext(e *zerolog.Event, contexts map[string]string) {
-	if contexts == nil {
+	if len(contexts) == 0 {
 		return
 	}
 
@@ -112,5 +110,14 @@ type frontendWriter struct {
 
 func (w *frontendWriter) Write(p []byte) (int, error) {
 	runtime.EventsEmit(w.appCtx, "LOG", string(p))
+	return len(p), nil
+}
+
+type reportWriter struct {
+	discord repository.DiscordInterface
+}
+
+func (w *reportWriter) Write(p []byte) (int, error) {
+	_ = w.discord.Comment(string(p))
 	return len(p), nil
 }

@@ -6,16 +6,18 @@
 
   export let column: MaxDamage;
   export let player: model.Player;
+
+  $: param = column.displayValue(player);
 </script>
 
 <td class={CssClass.TD_NUM}>
-  {column.damage(player)}
+  {param.damage}
 </td>
 
-{#if column.innerColumnNumber > 1}
-  {@const [url, text] = column.shipInfo(player)}
+{#if param.shipInfo}
   <td class={CssClass.TD_STR}>
-    <ExternalLink {url}><div class="uk-text-truncate">{text}</div></ExternalLink
+    <ExternalLink url={param.shipInfo.url}
+      ><div class="uk-text-truncate">{param.shipInfo.name}</div></ExternalLink
     >
   </td>
 {/if}

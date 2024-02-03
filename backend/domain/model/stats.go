@@ -120,7 +120,7 @@ func (s *Stats) MaxDamage(category StatsCategory, pattern StatsPattern) MaxDamag
 	switch category {
 	case StatsCategoryShip:
 		return MaxDamage{
-			Damage: ship.MaxDamageDealt,
+			Value: ship.MaxDamageDealt,
 		}
 	case StatsCategoryOverall:
 		shipID := player.MaxDamageDealtShipID
@@ -129,7 +129,7 @@ func (s *Stats) MaxDamage(category StatsCategory, pattern StatsPattern) MaxDamag
 			ShipID:   shipID,
 			ShipName: warship.Name,
 			ShipTier: warship.Tier,
-			Damage:   player.MaxDamageDealt,
+			Value:    player.MaxDamageDealt,
 		}
 	}
 

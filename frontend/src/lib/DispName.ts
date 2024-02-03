@@ -3,7 +3,7 @@ import { FontSize } from "src/lib/FontSize";
 import type { SummaryShipType } from "src/lib/Summary";
 import {
   type ColumnCategory,
-  type Rating,
+  type RatingLevel,
   type ShipType,
   type StatsExtra,
   type TierGroup,
@@ -27,7 +27,7 @@ export namespace DispName {
     ["overall", "総合成績"],
   ]);
 
-  export const SKILL_LEVELS = new ArrayMap<Rating, string>([
+  export const SKILL_LEVELS = new ArrayMap<RatingLevel, string>([
     ["bad", "Bad"],
     ["below_avg", "Below Average"],
     ["avg", "Average"],
@@ -71,5 +71,41 @@ export namespace DispName {
     ["low", "1~4"],
     ["middle", "5~7"],
     ["high", "8~★"],
+  ]);
+
+  export const MIN_COLUMN_NAMES = new ArrayMap<string, string>([
+    ["pr", "PR"],
+    ["damage", "Dmg"],
+    ["max_damage", "最大Dmg"],
+    ["win_rate", "勝率"],
+    ["kd_rate", "K/D"],
+    ["kill", "撃沈"],
+    ["planes_killed", "撃墜"],
+    ["exp", "Exp"],
+    ["battles", "戦闘数"],
+    ["survived_rate", "生存率(勝|敗)"],
+    ["hit_rate", "命中率(主|魚)"],
+    ["platoon_rate", "プラ比"],
+    ["avg_tier", "平均T"],
+    ["using_ship_type_rate", "艦種割合"],
+    ["using_tier_rate", "T割合"],
+  ]);
+
+  export const FULL_COLUMN_NAMES = new ArrayMap<string, string>([
+    ["pr", "Personal Rating"],
+    ["damage", "与ダメージ"],
+    ["max_damage", "最大与ダメージ"],
+    ["win_rate", "勝率"],
+    ["kd_rate", "キルデス比"],
+    ["kill", "撃沈"],
+    ["planes_killed", "撃墜"],
+    ["exp", "経験値(プレミアム補正含む)"],
+    ["battles", "戦闘数"],
+    ["survived_rate", "生存率(勝利|敗北)"],
+    ["hit_rate", "命中率(主砲|魚雷)"],
+    ["platoon_rate", "分艦隊比率"],
+    ["avg_tier", "平均Tier"],
+    ["using_ship_type_rate", "使用艦種割合"],
+    ["using_tier_rate", "プレイTier割合"],
   ]);
 }

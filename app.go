@@ -8,10 +8,7 @@ import (
 	"wfs/backend/usecase"
 
 	"github.com/morikuni/failure"
-	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
-
-const EventOnload = "ONLOAD"
 
 type volatileData struct {
 	cancelWatcher  context.CancelFunc
@@ -65,14 +62,10 @@ func NewApp(
 func (a *App) onStartup(ctx context.Context) {
 	a.ctx = ctx
 	a.logger.Init(ctx)
-
-	runtime.EventsOn(ctx, EventOnload, func(optionalData ...interface{}) {
-		a.logger.Info("application started", nil)
-	})
 }
 
-func (a *App) Migrate() error {
-	if err := a.configMigrator.Execute(); err != nil {
+func (a *App) MigrateIfNeeded() error {
+	if err := a.configMigrator.ExecuteIfNeeded(); err != nil {
 		a.logger.Error(err, nil)
 		return apperr.Unwrap(err)
 	}
@@ -246,9 +239,13 @@ func (a *App) AlertPatterns() []string {
 	return model.AlertPatterns
 }
 
-func (a *App) LogError(errString string) {
+func (a *App) LogError(errString string, contexts map[string]string) {
 	err := failure.New(apperr.FrontendError, failure.Messagef("%s", errString))
-	a.logger.Error(err, nil)
+	a.logger.Error(err, contexts)
+}
+
+func (a *App) LogInfo(message string, contexts map[string]string) {
+	a.logger.Info(message, contexts)
 }
 
 func (a *App) LatestRelease() (model.GHLatestRelease, error) {

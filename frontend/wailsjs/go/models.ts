@@ -114,7 +114,7 @@ export namespace model {
 	    ship_id: number;
 	    ship_name: string;
 	    ship_tier: number;
-	    damage: number;
+	    value: number;
 	
 	    static createFrom(source: any = {}) {
 	        return new MaxDamage(source);
@@ -125,7 +125,7 @@ export namespace model {
 	        this.ship_id = source["ship_id"];
 	        this.ship_name = source["ship_name"];
 	        this.ship_tier = source["ship_tier"];
-	        this.damage = source["damage"];
+	        this.value = source["value"];
 	    }
 	}
 	export class ShipStats {

@@ -3,10 +3,8 @@
   import ExternalLink from "src/component/common/ExternalLink.svelte";
   import UkTable from "src/component/common/uikit/UkTable.svelte";
   import { DispName } from "src/lib/DispName";
-  import {
-    RATING_FACTORS,
-    RatingColorFactory,
-  } from "src/lib/rating/RatingColorFactory";
+  import { Rating } from "src/lib/Rating";
+  import { RATING_DEFS } from "src/lib/RatingDef";
 
   export let config: model.UserConfig;
 
@@ -28,38 +26,37 @@
     },
   ];
 
-  const descriptions = RATING_FACTORS.map((rating) => {
+  const skillColorCode = config.color.skill.text;
+
+  const descriptions = RATING_DEFS.map((rating) => {
     return {
       ratingText: DispName.SKILL_LEVELS.get(rating.level),
       playerName: {
         text: "player_name",
-        textColor: RatingColorFactory.fromPR(
-          rating.pr.min,
-          config,
-        ).getTextColorCode(),
+        textColor: Rating.fromPR(rating.pr.min, skillColorCode).colorCode(),
       },
       pr: {
         text: `${rating.pr.min} ~ ${rating.pr.max}`,
-        textColor: RatingColorFactory.fromDamage(
+        textColor: Rating.fromDamage(
           rating.damage.min,
           1.0,
-          config,
-        ).getTextColorCode(),
+          skillColorCode,
+        ).colorCode(),
       },
       damage: {
         text: `${rating.damage.min}倍 ~ ${rating.damage.max}倍`,
-        textColor: RatingColorFactory.fromDamage(
+        textColor: Rating.fromDamage(
           rating.damage.min,
           1.0,
-          config,
-        ).getTextColorCode(),
+          skillColorCode,
+        ).colorCode(),
       },
       win: {
         text: `${rating.winRate.min}% ~ ${rating.winRate.max}%`,
-        textColor: RatingColorFactory.fromWinRate(
+        textColor: Rating.fromWinRate(
           rating.winRate.min,
-          config,
-        ).getTextColorCode(),
+          skillColorCode,
+        ).colorCode(),
       },
     };
   });

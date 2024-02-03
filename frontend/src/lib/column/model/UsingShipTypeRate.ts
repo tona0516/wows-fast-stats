@@ -1,45 +1,31 @@
 import StackedBarGraphTableData from "src/component/main/internal/table_data/StackedBarGraphTableData.svelte";
 import { DispName } from "src/lib/DispName";
 import type { StackedBarGraphParam } from "src/lib/column/StackedBarGraphParam";
-import { AbstractColumn } from "src/lib/column/intetface/AbstractColumn";
-import type { IGraphColumn } from "src/lib/column/intetface/IGraphColumn";
-import type { OverallKey } from "src/lib/types";
-import { toPlayerStats } from "src/lib/util";
+import { AbstractStatsColumn } from "src/lib/column/intetface/AbstractStatsColumn";
 import type { model } from "wailsjs/go/models";
 
-export class UsingShipTypeRate
-  extends AbstractColumn<OverallKey>
-  implements IGraphColumn
-{
-  constructor(private config: model.UserConfig) {
-    super("using_ship_type_rate", "艦割合", "艦種別プレイ割合", 1);
+export class UsingShipTypeRate extends AbstractStatsColumn<StackedBarGraphParam> {
+  constructor(config: model.UserConfig) {
+    super("using_ship_type_rate", 1, config, "overall");
   }
 
-  getSvelteComponent() {
-    return StackedBarGraphTableData;
-  }
-
-  shouldShowColumn(): boolean {
-    return this.config.display.overall.using_ship_type_rate;
-  }
-
-  getGraphParam(player: model.Player): StackedBarGraphParam {
-    const digit = this.config.digit.using_ship_type_rate;
-    const shipTypeGroup = toPlayerStats(player, this.config.stats_pattern)
-      .overall.using_ship_type_rate;
+  displayValue(player: model.Player): StackedBarGraphParam {
+    const shipTypeGroup = this.playerStats(player).overall.using_ship_type_rate;
     const ownShipType = player.ship_info.type;
     const colors = this.config.color.ship_type;
 
-    const items = DispName.SHIP_TYPES.toArray().map((type) => {
+    const items = DispName.SHIP_TYPES.toArray().map((it) => {
       const colorCode =
-        type.key === ownShipType
-          ? colors.own[type.key]
-          : colors.other[type.key];
-      const rate = shipTypeGroup[type.key];
+        it.key === ownShipType ? colors.own[it.key] : colors.other[it.key];
+      const rate = shipTypeGroup[it.key];
 
-      return { label: type.value, colorCode: colorCode, value: rate };
+      return { label: it.value, colorCode: colorCode, value: rate };
     });
 
-    return { digit: digit, items: items };
+    return { digit: this.digit(), items: items };
+  }
+
+  svelteComponent() {
+    return StackedBarGraphTableData;
   }
 }

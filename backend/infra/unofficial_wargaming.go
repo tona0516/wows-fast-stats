@@ -2,6 +2,7 @@ package infra
 
 import (
 	"net/http"
+	"strconv"
 	"wfs/backend/apperr"
 	"wfs/backend/domain/model"
 	"wfs/backend/infra/webapi"
@@ -20,7 +21,7 @@ func NewUnofficialWargaming(config RequestConfig) *UnofficialWargaming {
 
 func (w *UnofficialWargaming) ClansAutoComplete(search string) (model.UWGClansAutocomplete, error) {
 	b := backoff.WithMaxRetries(backoff.NewExponentialBackOff(), w.config.Retry)
-	operation := func() (webapi.Response[model.UWGClansAutocomplete], error) {
+	operation := func() (webapi.Response[any, model.UWGClansAutocomplete], error) {
 		res, err := webapi.GetRequest[model.UWGClansAutocomplete](
 			w.config.URL+"/api/search/autocomplete/",
 			w.config.Timeout,
@@ -29,12 +30,17 @@ func (w *UnofficialWargaming) ClansAutoComplete(search string) (model.UWGClansAu
 				"type":   "clans",
 			},
 		)
+		errCtx := failure.Context{
+			"url":         res.Request.URL,
+			"status_code": strconv.Itoa(res.StatusCode),
+			"body":        string(res.BodyByte),
+		}
 		if err != nil {
-			return res, err
+			return res, failure.Wrap(err, errCtx)
 		}
 
 		if res.StatusCode != http.StatusOK {
-			return res, failure.New(apperr.UWGAPIError)
+			return res, failure.New(apperr.UWGAPIError, errCtx)
 		}
 
 		return res, nil
@@ -42,5 +48,5 @@ func (w *UnofficialWargaming) ClansAutoComplete(search string) (model.UWGClansAu
 
 	res, err := backoff.RetryWithData(operation, b)
 
-	return res.Body, failure.Wrap(err, apperr.ToRequestErrorContext(res))
+	return res.Body, failure.Wrap(err)
 }

@@ -99,13 +99,12 @@ func initApp(env model.Env) *App {
 		Retry:   maxRetry,
 		Timeout: timeout,
 	})
+	logger := infra.NewLogger(env, discord)
+
 	db, err := badger.Open(badger.DefaultOptions("./persistent_data"))
 	storage := infra.NewStorage(db)
-	report := infra.NewReport(env, *localFile, *discord, *storage)
-	logger := infra.NewLogger(env, report)
-
 	if err != nil {
-		report.Send("fatal has occurred!", err)
+		logger.Error(err, nil)
 		panic(err)
 	}
 

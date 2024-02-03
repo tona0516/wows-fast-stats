@@ -232,7 +232,7 @@ func TestStats_MaxDamage_Ship(t *testing.T) {
 	t.Parallel()
 
 	expected := MaxDamage{
-		Damage: 200000,
+		Value: 200000,
 	}
 
 	useShipID := 100
@@ -242,7 +242,7 @@ func TestStats_MaxDamage_Ship(t *testing.T) {
 		[]WGShipsStatsData{
 			{
 				Pvp: WGShipStatsValues{
-					MaxDamageDealt: expected.Damage,
+					MaxDamageDealt: expected.Value,
 				},
 				ShipID: useShipID,
 			},
@@ -261,7 +261,7 @@ func TestStats_MaxDamage_Overall(t *testing.T) {
 		ShipID:   100,
 		ShipName: "yamato",
 		ShipTier: 10,
-		Damage:   200000,
+		Value:    200000,
 	}
 
 	stats := NewStats(
@@ -274,7 +274,7 @@ func TestStats_MaxDamage_Overall(t *testing.T) {
 				PvpDiv3 WGPlayerStatsValues `json:"pvp_div3"`
 			}{
 				Pvp: WGPlayerStatsValues{
-					MaxDamageDealt:       expected.Damage,
+					MaxDamageDealt:       expected.Value,
 					MaxDamageDealtShipID: expected.ShipID,
 				},
 			},

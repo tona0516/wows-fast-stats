@@ -1,14 +1,14 @@
 <script lang="ts">
-  import type { ISingleColumn } from "src/lib/column/intetface/ISingleColumn";
+  import type { AbstractStatsColumn } from "src/lib/column/intetface/AbstractStatsColumn";
   import type { model } from "wailsjs/go/models";
 
-  export let column: ISingleColumn;
+  export let column: AbstractStatsColumn<string>;
   export let player: model.Player;
 </script>
 
 <td
-  class={column.getTdClass(player)}
-  style="color: {column.getTextColorCode(player)}"
+  class={column.tdClass(player)}
+  style="color: {column.textColorCode(player)}"
 >
-  {column.getDisplayValue(player)}
+  {column.displayValue(player)}
 </td>

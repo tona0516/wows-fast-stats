@@ -70,7 +70,7 @@
     >
     <div>
       <ul class="uk-list uk-list-disc uk-list-collapse">
-        <li>アプリバージョン</li>
+        <li>アプリ統計情報</li>
         <li>プレイヤー名</li>
         <li>エラーログ</li>
         <li>設定値(config/user.json)</li>

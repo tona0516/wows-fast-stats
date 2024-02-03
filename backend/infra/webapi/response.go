@@ -1,8 +1,8 @@
 package webapi
 
-type Response[T any] struct {
-	FullURL    string
+type Response[T any, U any] struct {
 	StatusCode int
-	Body       T
-	ByteBody   []byte
+	Request    Request[T]
+	Body       U
+	BodyByte   []byte
 }

@@ -221,10 +221,16 @@ func request[T response.WGResponse](
 	queries map[string]string,
 ) (T, error) {
 	b := backoff.WithMaxRetries(backoff.NewExponentialBackOff(), retry)
-	operation := func() (webapi.Response[T], error) {
+	operation := func() (webapi.Response[any, T], error) {
 		res, err := webapi.GetRequest[T](rawURL, timeout, queries)
+		errCtx := failure.Context{
+			"url":         res.Request.URL,
+			"status_code": strconv.Itoa(res.StatusCode),
+			"body":        string(res.BodyByte),
+		}
+
 		if err != nil {
-			return res, err
+			return res, failure.Wrap(err, errCtx)
 		}
 
 		if res.Body.GetStatus() == "error" {
@@ -232,15 +238,15 @@ func request[T response.WGResponse](
 			// https://developers.wargaming.net/documentation/guide/getting-started/#common-errors
 			message := res.Body.GetError().Message
 			if slices.Contains([]string{"REQUEST_LIMIT_EXCEEDED", "SOURCE_NOT_AVAILABLE"}, message) {
-				return res, failure.New(apperr.WGAPITemporaryUnavaillalble)
+				return res, failure.New(apperr.WGAPITemporaryUnavaillalble, errCtx)
 			}
 
-			return res, backoff.Permanent(failure.New(apperr.WGAPIError))
+			return res, backoff.Permanent(failure.New(apperr.WGAPIError, errCtx))
 		}
 
 		return res, nil
 	}
 	res, err := backoff.RetryWithData(operation, b)
 
-	return res.Body, failure.Wrap(err, apperr.ToRequestErrorContext(res))
+	return res.Body, failure.Wrap(err)
 }

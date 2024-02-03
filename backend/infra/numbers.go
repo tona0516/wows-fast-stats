@@ -2,6 +2,7 @@ package infra
 
 import (
 	"net/http"
+	"strconv"
 	"wfs/backend/apperr"
 	"wfs/backend/domain/model"
 	"wfs/backend/infra/webapi"
@@ -20,18 +21,23 @@ func NewNumbers(config RequestConfig) *Numbers {
 
 func (n *Numbers) ExpectedStats() (model.ExpectedStats, error) {
 	b := backoff.WithMaxRetries(backoff.NewExponentialBackOff(), n.config.Retry)
-	operation := func() (webapi.Response[model.NSExpectedStats], error) {
+	operation := func() (webapi.Response[any, model.NSExpectedStats], error) {
 		res, err := webapi.GetRequest[model.NSExpectedStats](
 			n.config.URL+"/personal/rating/expected/json/",
 			n.config.Timeout,
 			nil,
 		)
+		errCtx := failure.Context{
+			"url":         res.Request.URL,
+			"status_code": strconv.Itoa(res.StatusCode),
+			"body":        string(res.BodyByte),
+		}
 		if err != nil {
-			return res, err
+			return res, failure.Wrap(err, errCtx)
 		}
 
 		if res.StatusCode != http.StatusOK {
-			return res, failure.New(apperr.NumbersAPIFetchExpectedStatsError)
+			return res, failure.New(apperr.NumbersAPIFetchExpectedStatsError, errCtx)
 		}
 
 		return res, nil
@@ -39,5 +45,5 @@ func (n *Numbers) ExpectedStats() (model.ExpectedStats, error) {
 
 	res, err := backoff.RetryWithData(operation, b)
 
-	return res.Body.Data, failure.Wrap(err, apperr.ToRequestErrorContext(res))
+	return res.Body.Data, failure.Wrap(err)
 }

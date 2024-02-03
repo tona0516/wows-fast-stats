@@ -5,8 +5,12 @@
   import "bootstrap-icons/font/bootstrap-icons.css";
   import "charts.css";
 
-  import { LatestRelease, Migrate, StartWatching } from "wailsjs/go/main/App";
-  import { EventsOn, EventsEmit } from "wailsjs/runtime/runtime";
+  import {
+    LatestRelease,
+    MigrateIfNeeded,
+    StartWatching,
+  } from "wailsjs/go/main/App";
+  import { EventsOn } from "wailsjs/runtime/runtime";
   import { storedConfig, storedRequiredConfigError } from "src/stores";
   import AlertModals from "src/component/modal/AlertModals.svelte";
   import { model } from "wailsjs/go/models";
@@ -33,7 +37,7 @@
 
   const initialize = async (): Promise<model.UserConfig | undefined> => {
     try {
-      await Migrate();
+      await MigrateIfNeeded();
 
       const config = await FetchProxy.getConfig();
       const requiredConfigError = await FetchProxy.validateRequiredConfig(
@@ -55,13 +59,13 @@
     }
   };
 
-  const checkUpdate = async (config: model.UserConfig) => {
+  const notifyUpdate = async (config: model.UserConfig) => {
+    if (!config.notify_updatable) return;
+
     try {
-      if (config.notify_updatable) {
-        const latestRelease = await LatestRelease();
-        if (latestRelease.updatable) {
-          updatableRelease = latestRelease;
-        }
+      const latestRelease = await LatestRelease();
+      if (latestRelease.updatable) {
+        updatableRelease = latestRelease;
       }
     } catch (error) {
       Notifier.failure(error);
@@ -75,11 +79,7 @@
       return;
     }
 
-    await checkUpdate(config);
-  };
-
-  window.onload = function () {
-    EventsEmit("ONLOAD");
+    await notifyUpdate(config);
   };
 
   main();
