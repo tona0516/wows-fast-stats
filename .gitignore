@@ -15,7 +15,7 @@ node_modules
 /wows-fast-stats.log
 
 # credential
-/discord_webhook_url_*
+/discord_webhook.json
 
 # test
 /test_install_dir/replays/tempArenaInfo.json

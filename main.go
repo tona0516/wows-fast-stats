@@ -23,10 +23,11 @@ var assets embed.FS
 
 //nolint:gochecknoglobals
 var (
-	AppName           string
-	Semver            string
-	IsDev             string
-	DiscordWebhookURL string
+	AppName                string
+	Semver                 string
+	IsDev                  string
+	AlertDiscordWebhookURL string
+	InfoDiscordWebhookURL  string
 )
 
 func main() {
@@ -94,12 +95,17 @@ func initApp(env model.Env) *App {
 		Retry:   maxRetry,
 		Timeout: timeout,
 	})
-	discord := infra.NewDiscord(infra.RequestConfig{
-		URL:     DiscordWebhookURL,
+	alertDiscord := infra.NewDiscord(infra.RequestConfig{
+		URL:     AlertDiscordWebhookURL,
 		Retry:   maxRetry,
 		Timeout: timeout,
 	})
-	logger := infra.NewLogger(env, discord)
+	infoDiscord := infra.NewDiscord(infra.RequestConfig{
+		URL:     InfoDiscordWebhookURL,
+		Retry:   maxRetry,
+		Timeout: timeout,
+	})
+	logger := infra.NewLogger(env, alertDiscord, infoDiscord)
 
 	db, err := badger.Open(badger.DefaultOptions("./persistent_data"))
 	storage := infra.NewStorage(db)

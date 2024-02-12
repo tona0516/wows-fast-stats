@@ -1,7 +1,9 @@
 package infra
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"os"
 	"time"
@@ -9,29 +11,30 @@ import (
 	"wfs/backend/domain/repository"
 
 	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/pkgerrors"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 type Logger struct {
-	zlog    zerolog.Logger
-	env     model.Env
-	discord repository.DiscordInterface
+	zlog         zerolog.Logger
+	env          model.Env
+	alertDiscord repository.DiscordInterface
+	infoDiscord  repository.DiscordInterface
 }
 
 func NewLogger(
 	env model.Env,
-	discord repository.DiscordInterface,
+	alertDiscord repository.DiscordInterface,
+	infoDiscord repository.DiscordInterface,
 ) *Logger {
 	return &Logger{
-		env:     env,
-		discord: discord,
+		env:          env,
+		alertDiscord: alertDiscord,
+		infoDiscord:  infoDiscord,
 	}
 }
 
 func (l *Logger) Init(appCtx context.Context) {
-	//nolint:reassign
-	zerolog.ErrorStackMarshaler = pkgerrors.MarshalStack
+	zerolog.TimeFieldFormat = time.DateTime
 
 	if l.env.IsDev {
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)
@@ -40,18 +43,15 @@ func (l *Logger) Init(appCtx context.Context) {
 	}
 
 	consoleWriter := zerolog.ConsoleWriter{
-		TimeFormat: time.DateTime,
-		Out:        os.Stdout,
+		Out: os.Stdout,
 	}
 	frontendWriter := zerolog.ConsoleWriter{
-		TimeFormat: time.DateTime,
-		Out:        &frontendWriter{appCtx: appCtx},
-		NoColor:    true,
+		Out:     &frontendWriter{appCtx: appCtx},
+		NoColor: true,
 	}
-	reportWriter := zerolog.ConsoleWriter{
-		TimeFormat: time.DateTime,
-		Out:        &reportWriter{discord: l.discord},
-		NoColor:    true,
+	reportWriter := reportWriter{
+		alertDiscord: l.alertDiscord,
+		infoDiscord:  l.infoDiscord,
 	}
 	logFile, _ := os.OpenFile(
 		l.env.AppName+".log",
@@ -59,12 +59,11 @@ func (l *Logger) Init(appCtx context.Context) {
 		0o664,
 	)
 
-	multi := zerolog.MultiLevelWriter(consoleWriter, frontendWriter, reportWriter, logFile)
+	multi := zerolog.MultiLevelWriter(consoleWriter, frontendWriter, &reportWriter, logFile)
 
 	l.zlog = zerolog.New(multi).
 		With().
 		Timestamp().
-		Stack().
 		Str("semver", l.env.Semver).
 		Logger()
 }
@@ -114,10 +113,29 @@ func (w *frontendWriter) Write(p []byte) (int, error) {
 }
 
 type reportWriter struct {
-	discord repository.DiscordInterface
+	zerolog.FilteredLevelWriter
+	alertDiscord repository.DiscordInterface
+	infoDiscord  repository.DiscordInterface
 }
 
-func (w *reportWriter) Write(p []byte) (int, error) {
-	_ = w.discord.Comment(string(p))
+func (w *reportWriter) WriteLevel(level zerolog.Level, p []byte) (int, error) {
+	formatted := fmt.Sprintf("```%s```", pretty(string(p)))
+
+	var discord repository.DiscordInterface
+	if level >= zerolog.WarnLevel {
+		discord = w.alertDiscord
+	} else {
+		discord = w.infoDiscord
+	}
+	_ = discord.Comment(formatted)
+
 	return len(p), nil
+}
+
+func pretty(str string) string {
+	var prettyJSON bytes.Buffer
+	if err := json.Indent(&prettyJSON, []byte(str), "", "    "); err != nil {
+		return str
+	}
+	return prettyJSON.String()
 }

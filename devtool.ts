@@ -8,41 +8,56 @@ import readlineSync from "readline-sync";
 const APP_NAME = "wows-fast-stats";
 const SEMVER = "0.12.0";
 const BINARY_NAME = `${APP_NAME}-${SEMVER}.exe`;
+const DISCORD_WEBHOOK_JSON = "discord_webhook.json";
 const FRONTEND_NPM_COMMAND = "npm --prefix ./frontend";
-
-namespace LDFlags {
-  const COMMON = {
-    "main.AppName": APP_NAME,
-    "main.Semver": SEMVER,
-  } as const;
-
-  export const DEV = {
-    ...COMMON,
-    "main.DiscordWebhookURL": fs
-      .readFileSync("discord_webhook_url_dev", "utf-8")
-      .trim(),
-    "main.IsDev": true,
-  };
-
-  export const PROD = {
-    ...COMMON,
-    "main.DiscordWebhookURL": fs
-      .readFileSync("discord_webhook_url_prod", "utf-8")
-      .trim(),
-  };
-}
+const COMMON_LDFLAGS = {
+  "main.AppName": APP_NAME,
+  "main.Semver": SEMVER,
+} as const;
 
 function getFormattedLDFlags(isDev: boolean): string {
-  const flags = isDev ? LDFlags.DEV : LDFlags.PROD;
+  let discordWebhook: {
+    dev: { alert: string; info: string };
+    prod: { alert: string; info: string };
+  } = { dev: { alert: "", info: "" }, prod: { alert: "", info: "" } };
+
+  try {
+    discordWebhook = JSON.parse(fs.readFileSync(DISCORD_WEBHOOK_JSON, "utf8"));
+  } catch (error) {
+    console.log(`[WARN] Failed to parse ${DISCORD_WEBHOOK_JSON}: ${error}`);
+  }
+
+  let flags: { [key: string]: string | boolean };
+  if (isDev) {
+    flags = {
+      ...COMMON_LDFLAGS,
+      "main.IsDev": true,
+      "main.AlertDiscordWebhookURL": discordWebhook.dev.alert,
+      "main.InfoDiscordWebhookURL": discordWebhook.dev.info,
+    };
+  } else {
+    const alertURL = discordWebhook.prod.alert;
+    const infoURL = discordWebhook.prod.info;
+    if (!alertURL || !infoURL) {
+      throw Error("Discord webhook URL not defined");
+    }
+
+    flags = {
+      ...COMMON_LDFLAGS,
+      "main.AlertDiscordWebhookURL": alertURL,
+      "main.InfoDiscordWebhookURL": infoURL,
+    };
+  }
+
   return Object.entries(flags)
     .map((it) => `-X ${it[0]}=${it[1]}`)
     .join(" ");
 }
 
 function exec(command: string) {
-  console.log(`$ ${command}`)
+  console.log(`$ ${command}`);
   shelljs.exec(command, { env: { ...process.env, FORCE_COLOR: "true" } });
-  console.log("")
+  console.log("");
 }
 
 function setup() {

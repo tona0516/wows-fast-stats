@@ -62,6 +62,7 @@ func NewApp(
 func (a *App) onStartup(ctx context.Context) {
 	a.ctx = ctx
 	a.logger.Init(ctx)
+	a.logger.Info("onStartup()", nil)
 }
 
 func (a *App) MigrateIfNeeded() error {
