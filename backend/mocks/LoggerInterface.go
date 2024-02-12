@@ -23,6 +23,11 @@ func (_m *LoggerInterface) Error(err error, contexts map[string]string) {
 	_m.Called(err, contexts)
 }
 
+// Fatal provides a mock function with given fields: err, contexts
+func (_m *LoggerInterface) Fatal(err error, contexts map[string]string) {
+	_m.Called(err, contexts)
+}
+
 // Info provides a mock function with given fields: message, contexts
 func (_m *LoggerInterface) Info(message string, contexts map[string]string) {
 	_m.Called(message, contexts)

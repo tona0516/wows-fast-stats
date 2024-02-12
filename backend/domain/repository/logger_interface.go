@@ -10,4 +10,5 @@ type LoggerInterface interface {
 	Info(message string, contexts map[string]string)
 	Warn(err error, contexts map[string]string)
 	Error(err error, contexts map[string]string)
+	Fatal(err error, contexts map[string]string)
 }

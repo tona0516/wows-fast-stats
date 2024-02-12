@@ -72,6 +72,28 @@ func initApp(env model.Env) *App {
 	// infra
 	var maxRetry uint64 = 2
 	timeout := 10 * time.Second
+
+	alertDiscord := infra.NewDiscord(infra.RequestConfig{
+		URL:     AlertDiscordWebhookURL,
+		Retry:   maxRetry,
+		Timeout: timeout,
+	})
+	infoDiscord := infra.NewDiscord(infra.RequestConfig{
+		URL:     InfoDiscordWebhookURL,
+		Retry:   maxRetry,
+		Timeout: timeout,
+	})
+	db, err := badger.Open(badger.DefaultOptions("./persistent_data"))
+	if err != nil {
+		logger := infra.NewLogger(env, "", alertDiscord, infoDiscord)
+		logger.Fatal(err, nil)
+		return nil
+	}
+
+	storage := infra.NewStorage(db)
+	ownIGN, _ := storage.OwnIGN()
+	logger := infra.NewLogger(env, ownIGN, alertDiscord, infoDiscord)
+
 	wargaming := infra.NewWargaming(infra.RequestConfig{
 		URL:     "https://api.worldofwarships.asia",
 		Retry:   maxRetry,
@@ -95,24 +117,6 @@ func initApp(env model.Env) *App {
 		Retry:   maxRetry,
 		Timeout: timeout,
 	})
-	alertDiscord := infra.NewDiscord(infra.RequestConfig{
-		URL:     AlertDiscordWebhookURL,
-		Retry:   maxRetry,
-		Timeout: timeout,
-	})
-	infoDiscord := infra.NewDiscord(infra.RequestConfig{
-		URL:     InfoDiscordWebhookURL,
-		Retry:   maxRetry,
-		Timeout: timeout,
-	})
-	logger := infra.NewLogger(env, alertDiscord, infoDiscord)
-
-	db, err := badger.Open(badger.DefaultOptions("./persistent_data"))
-	storage := infra.NewStorage(db)
-	if err != nil {
-		logger.Error(err, nil)
-		panic(err)
-	}
 
 	// usecase
 	var parallels uint = 5

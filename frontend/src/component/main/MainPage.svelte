@@ -38,7 +38,7 @@
         screenshot.auto(battle.meta);
       }
 
-      await LogInfo("", { "fetch_duration(s)": elapsed.toFixed(1) });
+      LogInfo("fetch success", { "duration(s)": elapsed.toFixed(1) });
     } catch (error) {
       Notifier.failure(error);
     } finally {

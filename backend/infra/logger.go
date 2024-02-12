@@ -17,17 +17,20 @@ import (
 type Logger struct {
 	zlog         zerolog.Logger
 	env          model.Env
+	ownIGN       string
 	alertDiscord repository.DiscordInterface
 	infoDiscord  repository.DiscordInterface
 }
 
 func NewLogger(
 	env model.Env,
+	ownIGN string,
 	alertDiscord repository.DiscordInterface,
 	infoDiscord repository.DiscordInterface,
 ) *Logger {
 	return &Logger{
 		env:          env,
+		ownIGN:       ownIGN,
 		alertDiscord: alertDiscord,
 		infoDiscord:  infoDiscord,
 	}
@@ -65,6 +68,7 @@ func (l *Logger) Init(appCtx context.Context) {
 		With().
 		Timestamp().
 		Str("semver", l.env.Semver).
+		Str("ign", l.ownIGN).
 		Logger()
 }
 
@@ -88,6 +92,12 @@ func (l *Logger) Warn(err error, contexts map[string]string) {
 
 func (l *Logger) Error(err error, contexts map[string]string) {
 	e := l.zlog.Error().Str("error", fmt.Sprintf("%+v", err))
+	addContext(e, contexts)
+	e.Send()
+}
+
+func (l *Logger) Fatal(err error, contexts map[string]string) {
+	e := l.zlog.Fatal().Str("error", fmt.Sprintf("%+v", err))
 	addContext(e, contexts)
 	e.Send()
 }
