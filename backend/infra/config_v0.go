@@ -30,10 +30,10 @@ func NewConfigV0() *ConfigV0 {
 	}
 }
 
-func (c *ConfigV0) User() (model.UserConfig, error) {
-	config, err := readJSON(c.userConfigPath, model.DefaultUserConfig)
+func (c *ConfigV0) UserV1() (model.UserConfigV1, error) {
+	config, err := readJSON(c.userConfigPath, model.DefaultUserConfigV1)
 	if err != nil && failure.Is(err, apperr.FileNotExist) {
-		return model.DefaultUserConfig, nil
+		return model.DefaultUserConfigV1, nil
 	}
 
 	return config, err

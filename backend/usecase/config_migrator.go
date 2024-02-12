@@ -1,9 +1,12 @@
 package usecase
 
 import (
+	"errors"
 	"wfs/backend/apperr"
+	"wfs/backend/domain/model"
 	"wfs/backend/domain/repository"
 
+	"github.com/dgraph-io/badger/v4"
 	"github.com/morikuni/failure"
 )
 
@@ -30,6 +33,10 @@ func (m *ConfigMigrator) ExecuteIfNeeded() error {
 		return failure.New(apperr.MigrationError, failure.Messagef("%s", err.Error()))
 	}
 
+	if err := m.toV2(); err != nil {
+		return failure.New(apperr.MigrationError, failure.Messagef("%s", err.Error()))
+	}
+
 	return nil
 }
 
@@ -45,12 +52,12 @@ func (m *ConfigMigrator) toV1() error {
 	}
 
 	if m.configV0.IsExistUser() && !m.storage.IsExistUserConfig() {
-		userConfig, err := m.configV0.User()
+		userConfig, err := m.configV0.UserV1()
 		if err != nil {
 			return err
 		}
 
-		if err := m.storage.WriteUserConfig(userConfig); err != nil {
+		if err := m.storage.WriteUserConfigV1(userConfig); err != nil {
 			return err
 		}
 
@@ -71,6 +78,36 @@ func (m *ConfigMigrator) toV1() error {
 	}
 
 	if err := m.storage.WriteDataVersion(1); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *ConfigMigrator) toV2() error {
+	version, err := m.storage.DataVersion()
+	if err != nil {
+		return err
+	}
+
+	if version > 1 {
+		return nil
+	}
+
+	v1, err := m.storage.UserConfigV1()
+	if err != nil && !errors.Is(err, badger.ErrKeyNotFound) {
+		return err
+	}
+
+	if err == nil {
+		v2 := model.FromUserConfigV1(v1)
+
+		if err := m.storage.WriteUserConfig(v2); err != nil {
+			return err
+		}
+	}
+
+	if err := m.storage.WriteDataVersion(2); err != nil {
 		return err
 	}
 

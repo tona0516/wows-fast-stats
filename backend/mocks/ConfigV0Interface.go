@@ -115,23 +115,23 @@ func (_m *ConfigV0Interface) IsExistUser() bool {
 	return r0
 }
 
-// User provides a mock function with given fields:
-func (_m *ConfigV0Interface) User() (model.UserConfig, error) {
+// UserV1 provides a mock function with given fields:
+func (_m *ConfigV0Interface) UserV1() (model.UserConfigV1, error) {
 	ret := _m.Called()
 
 	if len(ret) == 0 {
-		panic("no return value specified for User")
+		panic("no return value specified for UserV1")
 	}
 
-	var r0 model.UserConfig
+	var r0 model.UserConfigV1
 	var r1 error
-	if rf, ok := ret.Get(0).(func() (model.UserConfig, error)); ok {
+	if rf, ok := ret.Get(0).(func() (model.UserConfigV1, error)); ok {
 		return rf()
 	}
-	if rf, ok := ret.Get(0).(func() model.UserConfig); ok {
+	if rf, ok := ret.Get(0).(func() model.UserConfigV1); ok {
 		r0 = rf()
 	} else {
-		r0 = ret.Get(0).(model.UserConfig)
+		r0 = ret.Get(0).(model.UserConfigV1)
 	}
 
 	if rf, ok := ret.Get(1).(func() error); ok {

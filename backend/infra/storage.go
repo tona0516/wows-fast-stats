@@ -41,6 +41,14 @@ func (s *Storage) WriteDataVersion(version uint) error {
 	return write(s.db, dataVersionKey, version)
 }
 
+func (s *Storage) UserConfigV1() (model.UserConfigV1, error) {
+	return read[model.UserConfigV1](s.db, userConfigKey)
+}
+
+func (s *Storage) WriteUserConfigV1(config model.UserConfigV1) error {
+	return write(s.db, userConfigKey, config)
+}
+
 func (s *Storage) IsExistUserConfig() bool {
 	_, err := read[model.UserConfig](s.db, userConfigKey)
 	return !isErrKeyNotFound(err)

@@ -16,15 +16,11 @@ func TestLocalFile_User(t *testing.T) {
 	t.Run("正常系", func(t *testing.T) {
 		defer os.RemoveAll(ConfigDir)
 
-		expected := model.UserConfig{
+		expected := model.UserConfigV1{
 			FontSize: "large",
-			Display: model.UCDisplay{
-				Ship: model.UCDisplayShip{
-					PR: true,
-				},
-				Overall: model.UCDisplayOverall{
-					PR: false,
-				},
+			Displays: model.Displays{
+				Ship:    model.Ship{PR: true},
+				Overall: model.Overall{PR: true},
 			},
 		}
 
@@ -33,7 +29,7 @@ func TestLocalFile_User(t *testing.T) {
 		require.NoError(t, err)
 
 		// 取得
-		actual, err := instance.User()
+		actual, err := instance.UserV1()
 		require.NoError(t, err)
 		assert.Equal(t, expected, actual)
 
@@ -42,9 +38,9 @@ func TestLocalFile_User(t *testing.T) {
 		require.NoError(t, err)
 
 		// 取得 存在しない場合 デフォルト値を返却する
-		actual, err = instance.User()
+		actual, err = instance.UserV1()
 		require.NoError(t, err)
-		assert.Equal(t, model.DefaultUserConfig, actual)
+		assert.Equal(t, model.DefaultUserConfigV1, actual)
 	})
 
 	t.Run("正常系_ファイルに新規パラメータが存在しない", func(t *testing.T) {
@@ -61,11 +57,11 @@ func TestLocalFile_User(t *testing.T) {
 		require.NoError(t, err)
 
 		instance := NewConfigV0()
-		actual, err := instance.User()
+		actual, err := instance.UserV1()
 		require.NoError(t, err)
 
 		// 存在するパラメータはその値、存在しないパラメータはデフォルト値が格納されていること
-		expected := model.DefaultUserConfig
+		expected := model.DefaultUserConfigV1
 		expected.InstallPath = installPath
 		expected.Appid = appid
 		require.Equal(t, expected, actual)

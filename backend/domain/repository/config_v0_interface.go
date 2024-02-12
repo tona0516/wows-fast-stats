@@ -3,7 +3,7 @@ package repository
 import "wfs/backend/domain/model"
 
 type ConfigV0Interface interface {
-	User() (model.UserConfig, error)
+	UserV1() (model.UserConfigV1, error)
 	IsExistUser() bool
 	DeleteUser() error
 	AlertPlayers() ([]model.AlertPlayer, error)
