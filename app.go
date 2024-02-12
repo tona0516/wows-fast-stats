@@ -99,7 +99,7 @@ func (a *App) Battle() (model.Battle, error) {
 		return result, apperr.Unwrap(err)
 	}
 
-	result, err = a.battle.Get(userConfig)
+	result, err = a.battle.Get(a.ctx, userConfig)
 	if err != nil {
 		a.logger.Error(err, nil)
 		return result, apperr.Unwrap(err)

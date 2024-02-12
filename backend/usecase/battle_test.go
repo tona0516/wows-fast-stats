@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"context"
 	"testing"
 	"wfs/backend/apperr"
 	"wfs/backend/domain/model"
@@ -72,8 +73,9 @@ func TestBattle_Get_正常系_初回(t *testing.T) {
 		mockUnregistered,
 		mockStorage,
 		nil,
+		nil,
 	)
-	_, err := b.Get(model.UserConfig{})
+	_, err := b.Get(context.TODO(), model.UserConfig{})
 
 	// アサーション
 	require.NoError(t, err)
@@ -129,9 +131,10 @@ func TestBattle_Get_正常系_2回目以降(t *testing.T) {
 		mockUnregistered,
 		mockStorage,
 		nil,
+		nil,
 	)
 	b.isFirstBattle = false
-	_, err := b.Get(model.UserConfig{})
+	_, err := b.Get(context.TODO(), model.UserConfig{})
 
 	// アサーション
 	require.NoError(t, err)
@@ -169,9 +172,10 @@ func TestBattle_Get_異常系(t *testing.T) {
 		mockUnregistered,
 		mockStorage,
 		nil,
+		nil,
 	)
 	b.isFirstBattle = false
-	_, err := b.Get(model.UserConfig{})
+	_, err := b.Get(context.TODO(), model.UserConfig{})
 
 	// アサーション
 	code, ok := failure.CodeOf(err)

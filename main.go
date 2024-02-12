@@ -123,7 +123,17 @@ func initApp(env model.Env) *App {
 	watchInterval := 1 * time.Second
 	config := usecase.NewConfig(localFile, wargaming, storage, logger)
 	screenshot := usecase.NewScreenshot(localFile, logger)
-	battle := usecase.NewBattle(parallels, wargaming, uwargaming, localFile, numbers, unregistered, storage, logger)
+	battle := usecase.NewBattle(
+		parallels,
+		wargaming,
+		uwargaming,
+		localFile,
+		numbers,
+		unregistered,
+		storage,
+		logger,
+		runtime.EventsEmit,
+	)
 	watcher := usecase.NewWatcher(watchInterval, localFile, storage, logger, runtime.EventsEmit)
 	updater := usecase.NewUpdater(env, github, logger)
 	configMigrator := usecase.NewConfigMigrator(configV0, storage, logger)

@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"context"
 	"sort"
 	"sync"
 	"wfs/backend/apperr"
@@ -11,20 +12,22 @@ import (
 )
 
 type Battle struct {
-	parallels     uint
-	wargaming     repository.WargamingInterface
-	uwargaming    repository.UnofficialWargamingInterface
-	numbers       repository.NumbersInterface
-	unregistered  repository.UnregisteredInterface
-	localFile     repository.LocalFileInterface
-	storage       repository.StorageInterface
-	logger        repository.LoggerInterface
-	isFirstBattle bool
+	parallels      uint
+	wargaming      repository.WargamingInterface
+	uwargaming     repository.UnofficialWargamingInterface
+	numbers        repository.NumbersInterface
+	unregistered   repository.UnregisteredInterface
+	localFile      repository.LocalFileInterface
+	storage        repository.StorageInterface
+	logger         repository.LoggerInterface
+	eventsEmitFunc eventEmitFunc
 
-	warship          model.Warships
-	allExpectedStats model.ExpectedStats
-	battleArenas     model.WGBattleArenas
-	battleTypes      model.WGBattleTypes
+	isFirstBattle                      bool
+	isNotifyExpectedStatsUnavaillalble bool
+	warship                            model.Warships
+	allExpectedStats                   model.ExpectedStats
+	battleArenas                       model.WGBattleArenas
+	battleTypes                        model.WGBattleTypes
 }
 
 func NewBattle(
@@ -36,21 +39,24 @@ func NewBattle(
 	unregistered repository.UnregisteredInterface,
 	storage repository.StorageInterface,
 	logger repository.LoggerInterface,
+	eventsEmitFunc eventEmitFunc,
 ) *Battle {
 	return &Battle{
-		parallels:     parallels,
-		wargaming:     wargaming,
-		uwargaming:    uwargaming,
-		localFile:     localFile,
-		numbers:       numbers,
-		unregistered:  unregistered,
-		storage:       storage,
-		logger:        logger,
-		isFirstBattle: true,
+		parallels:                          parallels,
+		wargaming:                          wargaming,
+		uwargaming:                         uwargaming,
+		localFile:                          localFile,
+		numbers:                            numbers,
+		unregistered:                       unregistered,
+		storage:                            storage,
+		logger:                             logger,
+		eventsEmitFunc:                     eventsEmitFunc,
+		isFirstBattle:                      true,
+		isNotifyExpectedStatsUnavaillalble: false,
 	}
 }
 
-func (b *Battle) Get(userConfig model.UserConfig) (model.Battle, error) {
+func (b *Battle) Get(appCtx context.Context, userConfig model.UserConfig) (model.Battle, error) {
 	b.wargaming.SetAppID(userConfig.Appid)
 	var result model.Battle
 
@@ -121,6 +127,11 @@ func (b *Battle) Get(userConfig model.UserConfig) (model.Battle, error) {
 
 	for _, err := range errs {
 		if err != nil {
+			if failure.Is(err, apperr.ExpectedStatsUnavaillalble) && !b.isNotifyExpectedStatsUnavaillalble {
+				b.eventsEmitFunc(appCtx, EventErr, apperr.ExpectedStatsUnavaillalble.ErrorCode())
+				b.isNotifyExpectedStatsUnavaillalble = true
+				continue
+			}
 			return result, err
 		}
 	}
@@ -220,6 +231,7 @@ func (b *Battle) fetchWarships(channel chan model.Result[model.Warships]) {
 func (b *Battle) fetchExpectedStats(channel chan model.Result[model.ExpectedStats]) {
 	var result model.Result[model.ExpectedStats]
 
+	// 最新の予測成績を取得
 	expectedStats, errFetch := b.numbers.ExpectedStats()
 	if errFetch == nil {
 		_ = b.storage.WriteExpectedStats(expectedStats)
@@ -228,8 +240,7 @@ func (b *Battle) fetchExpectedStats(channel chan model.Result[model.ExpectedStat
 		return
 	}
 
-	b.logger.Warn(failure.New(apperr.FailSafeProccess), nil)
-
+	// 取得できない場合、キャッシュを利用する
 	expectedStats, errCache := b.storage.ExpectedStats()
 	if errCache == nil {
 		result.Value = expectedStats
@@ -237,7 +248,11 @@ func (b *Battle) fetchExpectedStats(channel chan model.Result[model.ExpectedStat
 		return
 	}
 
-	result.Error = errFetch
+	// フェッチもキャッシュもできない場合、殻の構造体を返却して続行する
+	result.Error = failure.New(apperr.ExpectedStatsUnavaillalble, failure.Context{
+		"err_fetch": errFetch.Error(),
+		"err_cache": errCache.Error(),
+	})
 	channel <- result
 }
 

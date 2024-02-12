@@ -37,7 +37,7 @@ func (n *Numbers) ExpectedStats() (model.ExpectedStats, error) {
 		}
 
 		if res.StatusCode != http.StatusOK {
-			return res, failure.New(apperr.NumbersAPIFetchExpectedStatsError, errCtx)
+			return res, failure.New(apperr.NumbersAPIError, errCtx)
 		}
 
 		return res, nil

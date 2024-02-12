@@ -60,6 +60,6 @@ func TestNumbers_ExpectedStats(t *testing.T) {
 		_, err := numbers.ExpectedStats()
 
 		// アサーション
-		require.EqualError(t, apperr.Unwrap(err), apperr.NumbersAPIFetchExpectedStatsError.ErrorCode())
+		require.EqualError(t, apperr.Unwrap(err), apperr.NumbersAPIError.ErrorCode())
 	})
 }
