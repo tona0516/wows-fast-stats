@@ -40,8 +40,8 @@ func NewConfig(
 	}
 }
 
-func (c *Config) User() (model.UserConfig, error) {
-	return c.storage.UserConfig()
+func (c *Config) User() (model.UserConfigV2, error) {
+	return c.storage.UserConfigV2()
 }
 
 func (c *Config) ValidateRequired(
@@ -81,7 +81,7 @@ func (c *Config) UpdateRequired(
 	}
 
 	// Note: overwrite only required setting
-	config, err := c.storage.UserConfig()
+	config, err := c.storage.UserConfigV2()
 	if err != nil {
 		return validatedResult, err
 	}
@@ -89,14 +89,14 @@ func (c *Config) UpdateRequired(
 	config.Appid = appid
 
 	// write
-	err = c.storage.WriteUserConfig(config)
+	err = c.storage.WriteUserConfigV2(config)
 
 	return validatedResult, err
 }
 
-func (c *Config) UpdateOptional(config model.UserConfig) error {
+func (c *Config) UpdateOptional(config model.UserConfigV2) error {
 	// Note: exclulde required setting
-	saved, err := c.storage.UserConfig()
+	saved, err := c.storage.UserConfigV2()
 	if err != nil {
 		return err
 	}
@@ -104,7 +104,7 @@ func (c *Config) UpdateOptional(config model.UserConfig) error {
 	config.Appid = saved.Appid
 
 	// write
-	err = c.storage.WriteUserConfig(config)
+	err = c.storage.WriteUserConfigV2(config)
 	return err
 }
 

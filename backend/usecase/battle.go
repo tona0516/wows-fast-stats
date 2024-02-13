@@ -56,7 +56,7 @@ func NewBattle(
 	}
 }
 
-func (b *Battle) Get(appCtx context.Context, userConfig model.UserConfig) (model.Battle, error) {
+func (b *Battle) Get(appCtx context.Context, userConfig model.UserConfigV2) (model.Battle, error) {
 	b.wargaming.SetAppID(userConfig.Appid)
 	var result model.Battle
 
@@ -153,7 +153,7 @@ func (b *Battle) Get(appCtx context.Context, userConfig model.UserConfig) (model
 	return result, nil
 }
 
-func (b *Battle) getTempArenaInfo(userConfig model.UserConfig) (model.TempArenaInfo, error) {
+func (b *Battle) getTempArenaInfo(userConfig model.UserConfigV2) (model.TempArenaInfo, error) {
 	tempArenaInfo, err := b.localFile.TempArenaInfo(userConfig.InstallPath)
 	if err != nil {
 		return tempArenaInfo, err

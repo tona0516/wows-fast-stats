@@ -193,6 +193,34 @@ func (_m *StorageInterface) UserConfig() (model.UserConfig, error) {
 	return r0, r1
 }
 
+// UserConfigV2 provides a mock function with given fields:
+func (_m *StorageInterface) UserConfigV2() (model.UserConfigV2, error) {
+	ret := _m.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for UserConfigV2")
+	}
+
+	var r0 model.UserConfigV2
+	var r1 error
+	if rf, ok := ret.Get(0).(func() (model.UserConfigV2, error)); ok {
+		return rf()
+	}
+	if rf, ok := ret.Get(0).(func() model.UserConfigV2); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(model.UserConfigV2)
+	}
+
+	if rf, ok := ret.Get(1).(func() error); ok {
+		r1 = rf()
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // WriteAlertPlayers provides a mock function with given fields: players
 func (_m *StorageInterface) WriteAlertPlayers(players []model.AlertPlayer) error {
 	ret := _m.Called(players)
@@ -275,6 +303,24 @@ func (_m *StorageInterface) WriteUserConfig(config model.UserConfig) error {
 
 	var r0 error
 	if rf, ok := ret.Get(0).(func(model.UserConfig) error); ok {
+		r0 = rf(config)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// WriteUserConfigV2 provides a mock function with given fields: config
+func (_m *StorageInterface) WriteUserConfigV2(config model.UserConfigV2) error {
+	ret := _m.Called(config)
+
+	if len(ret) == 0 {
+		panic("no return value specified for WriteUserConfigV2")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(model.UserConfigV2) error); ok {
 		r0 = rf(config)
 	} else {
 		r0 = ret.Error(0)

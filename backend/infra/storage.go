@@ -41,11 +41,6 @@ func (s *Storage) WriteDataVersion(version uint) error {
 	return write(s.db, dataVersionKey, version)
 }
 
-func (s *Storage) IsExistUserConfig() bool {
-	_, err := read[model.UserConfig](s.db, userConfigKey)
-	return !isErrKeyNotFound(err)
-}
-
 func (s *Storage) UserConfig() (model.UserConfig, error) {
 	config, err := read[model.UserConfig](s.db, userConfigKey)
 	if isErrKeyNotFound(err) {
@@ -56,6 +51,24 @@ func (s *Storage) UserConfig() (model.UserConfig, error) {
 }
 
 func (s *Storage) WriteUserConfig(config model.UserConfig) error {
+	return write(s.db, userConfigKey, config)
+}
+
+func (s *Storage) IsExistUserConfig() bool {
+	_, err := read[model.UserConfig](s.db, userConfigKey)
+	return !isErrKeyNotFound(err)
+}
+
+func (s *Storage) UserConfigV2() (model.UserConfigV2, error) {
+	config, err := read[model.UserConfigV2](s.db, userConfigKey)
+	if isErrKeyNotFound(err) {
+		return model.DefaultUserConfigV2, nil
+	}
+
+	return config, err
+}
+
+func (s *Storage) WriteUserConfigV2(config model.UserConfigV2) error {
 	return write(s.db, userConfigKey, config)
 }
 

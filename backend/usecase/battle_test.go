@@ -75,7 +75,7 @@ func TestBattle_Get_正常系_初回(t *testing.T) {
 		nil,
 		nil,
 	)
-	_, err := b.Get(context.TODO(), model.UserConfig{})
+	_, err := b.Get(context.TODO(), model.UserConfigV2{})
 
 	// アサーション
 	require.NoError(t, err)
@@ -134,7 +134,7 @@ func TestBattle_Get_正常系_2回目以降(t *testing.T) {
 		nil,
 	)
 	b.isFirstBattle = false
-	_, err := b.Get(context.TODO(), model.UserConfig{})
+	_, err := b.Get(context.TODO(), model.UserConfigV2{})
 
 	// アサーション
 	require.NoError(t, err)
@@ -175,7 +175,7 @@ func TestBattle_Get_異常系(t *testing.T) {
 		nil,
 	)
 	b.isFirstBattle = false
-	_, err := b.Get(context.TODO(), model.UserConfig{})
+	_, err := b.Get(context.TODO(), model.UserConfigV2{})
 
 	// アサーション
 	code, ok := failure.CodeOf(err)

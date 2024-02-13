@@ -35,8 +35,8 @@ func TestConfig_UpdateRequired(t *testing.T) {
 		mockWargaming := &mocks.WargamingInterface{}
 		mockStorage := &mocks.StorageInterface{}
 		mockWargaming.On("Test", config.Appid).Return(true, nil)
-		mockStorage.On("UserConfig").Return(model.DefaultUserConfig, nil)
-		mockStorage.On("WriteUserConfig", config).Return(nil)
+		mockStorage.On("UserConfigV2").Return(model.DefaultUserConfigV2, nil)
+		mockStorage.On("WriteUserConfigV2", config).Return(nil)
 
 		// テスト
 		c := NewConfig(nil, mockWargaming, mockStorage, nil)
@@ -50,7 +50,7 @@ func TestConfig_UpdateRequired(t *testing.T) {
 	})
 
 	t.Run("異常系_不正なインストールパス", func(t *testing.T) {
-		config := model.DefaultUserConfig
+		config := model.DefaultUserConfigV2
 		config.InstallPath = "invalid/path" // Note: 不正なパス
 		config.Appid = "abc123"
 
@@ -95,12 +95,12 @@ func TestConfig_UpdateOptional(t *testing.T) {
 		config := createInputConfig()
 		config.FontSize = "small"
 		// Note: requiredな値を与えてもこれらの値はWriteUserConfigでは含まれない
-		actualWritten := model.DefaultUserConfig
+		actualWritten := model.DefaultUserConfigV2
 		actualWritten.FontSize = "small"
 
 		mockStorage := &mocks.StorageInterface{}
-		mockStorage.On("UserConfig").Return(model.DefaultUserConfig, nil)
-		mockStorage.On("WriteUserConfig", actualWritten).Return(nil)
+		mockStorage.On("UserConfigV2").Return(model.DefaultUserConfigV2, nil)
+		mockStorage.On("WriteUserConfigV2", actualWritten).Return(nil)
 
 		// テスト実行
 		c := NewConfig(nil, nil, mockStorage, nil)
@@ -214,8 +214,8 @@ func TestConfig_RemoveAlertPlayer(t *testing.T) {
 	})
 }
 
-func createInputConfig() model.UserConfig {
-	config := model.DefaultUserConfig
+func createInputConfig() model.UserConfigV2 {
+	config := model.DefaultUserConfigV2
 	config.InstallPath = validInstallPath
 	config.Appid = validAppID
 

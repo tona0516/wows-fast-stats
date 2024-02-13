@@ -58,9 +58,9 @@ func TestStorage_UserConfig(t *testing.T) {
 	// 書き込み：正常系
 	expected := model.UserConfig{
 		FontSize: "large",
-		Display: model.UCDisplay{
-			Ship:    model.UCDisplayShip{PR: true},
-			Overall: model.UCDisplayOverall{PR: false},
+		Displays: model.Displays{
+			Ship:    model.Ship{PR: true},
+			Overall: model.Overall{PR: false},
 		},
 	}
 	err = storage.WriteUserConfig(expected)
@@ -69,6 +69,31 @@ func TestStorage_UserConfig(t *testing.T) {
 
 	// 取得：正常系
 	actual, err = storage.UserConfig()
+	require.NoError(t, err)
+	assert.Equal(t, expected, actual)
+}
+
+func TestStorage_UserConfigV2(t *testing.T) {
+	t.Parallel()
+
+	// 取得：保存されていない場合はデフォルト値を返却する
+	actual, err := storage.UserConfigV2()
+	require.NoError(t, err)
+	assert.Equal(t, model.DefaultUserConfigV2, actual)
+
+	// 書き込み：正常系
+	expected := model.UserConfigV2{
+		FontSize: "large",
+		Display: model.UCDisplay{
+			Ship:    model.UCDisplayShip{PR: true},
+			Overall: model.UCDisplayOverall{PR: false},
+		},
+	}
+	err = storage.WriteUserConfigV2(expected)
+	require.NoError(t, err)
+
+	// 取得：正常系
+	actual, err = storage.UserConfigV2()
 	require.NoError(t, err)
 	assert.Equal(t, expected, actual)
 }

@@ -808,7 +808,8 @@ export namespace model {
 	}
 	
 	
-	export class UserConfig {
+	export class UserConfigV2 {
+	    version: number;
 	    install_path: string;
 	    appid: string;
 	    font_size: string;
@@ -823,11 +824,12 @@ export namespace model {
 	    stats_pattern: string;
 	
 	    static createFrom(source: any = {}) {
-	        return new UserConfig(source);
+	        return new UserConfigV2(source);
 	    }
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.version = source["version"];
 	        this.install_path = source["install_path"];
 	        this.appid = source["appid"];
 	        this.font_size = source["font_size"];

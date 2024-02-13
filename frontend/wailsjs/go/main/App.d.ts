@@ -10,13 +10,13 @@ export function AlertPlayers():Promise<Array<model.AlertPlayer>>;
 
 export function ApplyRequiredUserConfig(arg1:string,arg2:string):Promise<model.RequiredConfigError>;
 
-export function ApplyUserConfig(arg1:model.UserConfig):Promise<void>;
+export function ApplyUserConfig(arg1:model.UserConfigV2):Promise<void>;
 
 export function AutoScreenshot(arg1:string,arg2:string):Promise<void>;
 
 export function Battle():Promise<model.Battle>;
 
-export function DefaultUserConfig():Promise<model.UserConfig>;
+export function DefaultUserConfig():Promise<model.UserConfigV2>;
 
 export function ExcludePlayerIDs():Promise<Array<number>>;
 
@@ -46,6 +46,6 @@ export function StartWatching():Promise<void>;
 
 export function UpdateAlertPlayer(arg1:model.AlertPlayer):Promise<void>;
 
-export function UserConfig():Promise<model.UserConfig>;
+export function UserConfig():Promise<model.UserConfigV2>;
 
 export function ValidateRequiredConfig(arg1:string,arg2:string):Promise<model.RequiredConfigError>;

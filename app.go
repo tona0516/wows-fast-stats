@@ -126,11 +126,11 @@ func (a *App) OpenDirectory(path string) error {
 	return apperr.Unwrap(err)
 }
 
-func (a *App) DefaultUserConfig() model.UserConfig {
-	return model.DefaultUserConfig
+func (a *App) DefaultUserConfig() model.UserConfigV2 {
+	return model.DefaultUserConfigV2
 }
 
-func (a *App) UserConfig() (model.UserConfig, error) {
+func (a *App) UserConfig() (model.UserConfigV2, error) {
 	config, err := a.config.User()
 	if err != nil {
 		a.logger.Error(err, nil)
@@ -139,7 +139,7 @@ func (a *App) UserConfig() (model.UserConfig, error) {
 	return config, apperr.Unwrap(err)
 }
 
-func (a *App) ApplyUserConfig(config model.UserConfig) error {
+func (a *App) ApplyUserConfig(config model.UserConfigV2) error {
 	err := a.config.UpdateOptional(config)
 	if err != nil {
 		a.logger.Error(err, nil)

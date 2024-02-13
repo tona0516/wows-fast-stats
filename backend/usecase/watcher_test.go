@@ -21,7 +21,7 @@ func TestWatcher_Start(t *testing.T) {
 		t.Parallel()
 
 		// 準備
-		config := model.UserConfig{
+		config := model.UserConfigV2{
 			InstallPath: "install_path_test",
 			Appid:       "abc123",
 			FontSize:    "medium",
@@ -29,7 +29,7 @@ func TestWatcher_Start(t *testing.T) {
 		mockStorage := &mocks.StorageInterface{}
 		mockLocalFile := &mocks.LocalFileInterface{}
 
-		mockStorage.On("UserConfig").Return(config, nil)
+		mockStorage.On("UserConfigV2").Return(config, nil)
 		mockLocalFile.On("TempArenaInfo", config.InstallPath).Return(model.TempArenaInfo{}, nil)
 
 		var events []string
@@ -65,7 +65,7 @@ func TestWatcher_Start(t *testing.T) {
 
 		for _, ie := range ignoreErrs {
 			// 準備
-			config := model.UserConfig{
+			config := model.UserConfigV2{
 				InstallPath: "install_path_test",
 				Appid:       "abc123",
 				FontSize:    "medium",
@@ -73,7 +73,7 @@ func TestWatcher_Start(t *testing.T) {
 			mockStorage := &mocks.StorageInterface{}
 			mockLocalFile := &mocks.LocalFileInterface{}
 
-			mockStorage.On("UserConfig").Return(config, nil)
+			mockStorage.On("UserConfigV2").Return(config, nil)
 			mockLocalFile.On("TempArenaInfo", config.InstallPath).Return(model.TempArenaInfo{}, failure.New(ie))
 
 			var events []string
@@ -101,13 +101,13 @@ func TestWatcher_Start(t *testing.T) {
 		t.Parallel()
 
 		// 準備
-		config := model.UserConfig{
+		config := model.UserConfigV2{
 			InstallPath: "install_path_test",
 			Appid:       "abc123",
 			FontSize:    "medium",
 		}
 		mockStorage := &mocks.StorageInterface{}
-		mockStorage.On("UserConfig").Return(config, nil)
+		mockStorage.On("UserConfigV2").Return(config, nil)
 
 		var events []string
 		emitFunc := func(ctx context.Context, eventName string, optionalData ...interface{}) {
@@ -133,7 +133,7 @@ func TestWatcher_Start(t *testing.T) {
 		t.Parallel()
 
 		// 準備
-		config := model.UserConfig{
+		config := model.UserConfigV2{
 			InstallPath: "install_path_test",
 			Appid:       "abc123",
 			FontSize:    "medium",
@@ -142,7 +142,7 @@ func TestWatcher_Start(t *testing.T) {
 		mockLocalFile := &mocks.LocalFileInterface{}
 		mockLogger := &mocks.LoggerInterface{}
 
-		mockStorage.On("UserConfig").Return(config, nil)
+		mockStorage.On("UserConfigV2").Return(config, nil)
 		mockLocalFile.On("TempArenaInfo", config.InstallPath).Return(
 			model.TempArenaInfo{},
 			failure.New(apperr.UnexpectedError),

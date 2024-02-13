@@ -24,7 +24,7 @@ type Watcher struct {
 	storage        repository.StorageInterface
 	logger         repository.LoggerInterface
 	eventsEmitFunc eventEmitFunc
-	userConfig     model.UserConfig
+	userConfig     model.UserConfigV2
 }
 
 func NewWatcher(
@@ -44,7 +44,7 @@ func NewWatcher(
 }
 
 func (w *Watcher) Prepare() error {
-	userConfig, err := w.storage.UserConfig()
+	userConfig, err := w.storage.UserConfigV2()
 	if err != nil {
 		return err
 	}

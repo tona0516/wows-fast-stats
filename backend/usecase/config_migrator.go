@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"wfs/backend/apperr"
+	"wfs/backend/domain/model"
 	"wfs/backend/domain/repository"
 
 	"github.com/morikuni/failure"
@@ -27,6 +28,10 @@ func NewConfigMigrator(
 
 func (m *ConfigMigrator) ExecuteIfNeeded() error {
 	if err := m.toV1(); err != nil {
+		return failure.New(apperr.MigrationError, failure.Messagef("%s", err.Error()))
+	}
+
+	if err := m.toV2(); err != nil {
 		return failure.New(apperr.MigrationError, failure.Messagef("%s", err.Error()))
 	}
 
@@ -75,4 +80,47 @@ func (m *ConfigMigrator) toV1() error {
 	}
 
 	return nil
+}
+
+func (m *ConfigMigrator) toV2() error {
+	version, err := m.storage.DataVersion()
+	if err != nil {
+		return err
+	}
+
+	if version > 1 {
+		return nil
+	}
+
+	update := func(config model.UserConfigV2) error {
+		if err := m.storage.WriteUserConfigV2(config); err != nil {
+			return err
+		}
+
+		if err := m.storage.WriteDataVersion(2); err != nil {
+			return err
+		}
+
+		return nil
+	}
+
+	v2, err := m.storage.UserConfigV2()
+	if err != nil {
+		return err
+	}
+
+	// バージョンが存在しないかつバグが発生していない場合
+	if v2.Version == 0 && v2.Display != (model.UCDisplay{}) {
+		v2.Version = 2
+		return update(v2)
+	}
+
+	// マイグレーションが必要な場合
+	v1, err := m.storage.UserConfig()
+	if err != nil {
+		return err
+	}
+	v2 = model.FromUserConfigV1(v1)
+
+	return update(v2)
 }

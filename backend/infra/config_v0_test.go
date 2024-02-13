@@ -18,13 +18,9 @@ func TestLocalFile_User(t *testing.T) {
 
 		expected := model.UserConfig{
 			FontSize: "large",
-			Display: model.UCDisplay{
-				Ship: model.UCDisplayShip{
-					PR: true,
-				},
-				Overall: model.UCDisplayOverall{
-					PR: false,
-				},
+			Displays: model.Displays{
+				Ship:    model.Ship{PR: true},
+				Overall: model.Overall{PR: true},
 			},
 		}
 
