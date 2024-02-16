@@ -46,66 +46,84 @@ func TestStorage_DataVersion(t *testing.T) {
 	assert.Equal(t, expected, actual)
 }
 
+//nolint:tparallel
 func TestStorage_UserConfig(t *testing.T) {
 	t.Parallel()
 
-	// 取得：保存されていない場合はデフォルト値を返却する
-	actual, err := storage.UserConfig()
-	require.NoError(t, err)
-	assert.Equal(t, model.DefaultUserConfig, actual)
-	assert.False(t, storage.IsExistUserConfig())
+	//nolint:paralleltest
+	t.Run("v1", func(t *testing.T) {
+		err := delete(storage.db, userConfigKey)
+		require.NoError(t, err)
 
-	// 書き込み：正常系
-	expected := model.UserConfig{
-		FontSize: "large",
-		Displays: model.Displays{
-			Ship:    model.Ship{PR: true},
-			Overall: model.Overall{PR: false},
-		},
-	}
-	err = storage.WriteUserConfig(expected)
-	require.NoError(t, err)
-	assert.True(t, storage.IsExistUserConfig())
+		// 取得：保存されていない場合はデフォルト値を返却する
+		actual, err := storage.UserConfig()
+		require.NoError(t, err)
+		assert.Equal(t, model.DefaultUserConfig, actual)
+		assert.False(t, storage.IsExistUserConfig())
 
-	// 取得：正常系
-	actual, err = storage.UserConfig()
-	require.NoError(t, err)
-	assert.Equal(t, expected, actual)
-}
+		// 書き込み：正常系
+		expected := model.UserConfig{
+			FontSize: "large",
+			Displays: model.Displays{
+				Ship:    model.Ship{PR: true},
+				Overall: model.Overall{PR: false},
+			},
+		}
+		err = storage.WriteUserConfig(expected)
+		require.NoError(t, err)
+		assert.True(t, storage.IsExistUserConfig())
 
-func TestStorage_UserConfigV2(t *testing.T) {
-	t.Parallel()
+		// 取得：正常系
+		actual, err = storage.UserConfig()
+		require.NoError(t, err)
+		assert.Equal(t, expected, actual)
+	})
 
-	// 取得：保存されていない場合はデフォルト値を返却する
-	actual, err := storage.UserConfigV2()
-	require.NoError(t, err)
-	assert.Equal(t, model.DefaultUserConfigV2, actual)
+	//nolint:paralleltest
+	t.Run("v2", func(t *testing.T) {
+		err := delete(storage.db, userConfigKey)
+		require.NoError(t, err)
 
-	// 書き込み：正常系
-	expected := model.UserConfigV2{
-		FontSize: "large",
-		Display: model.UCDisplay{
-			Ship:    model.UCDisplayShip{PR: true},
-			Overall: model.UCDisplayOverall{PR: false},
-		},
-	}
-	err = storage.WriteUserConfigV2(expected)
-	require.NoError(t, err)
+		// 取得：保存されていない場合はデフォルト値を返却する
+		actual, err := storage.UserConfigV2()
+		require.NoError(t, err)
+		assert.Equal(t, model.DefaultUserConfigV2, actual)
 
-	// 取得：正常系
-	actual, err = storage.UserConfigV2()
-	require.NoError(t, err)
-	assert.Equal(t, expected, actual)
+		// 書き込み：正常系
+		expected := model.UserConfigV2{
+			FontSize: "large",
+			Display: model.UCDisplay{
+				Ship:    model.UCDisplayShip{PR: true},
+				Overall: model.UCDisplayOverall{PR: false},
+			},
+		}
+		err = storage.WriteUserConfigV2(expected)
+		require.NoError(t, err)
+
+		// 取得：正常系
+		actual, err = storage.UserConfigV2()
+		require.NoError(t, err)
+		assert.Equal(t, expected, actual)
+	})
 }
 
 func TestStorage_AlertPlayers(t *testing.T) {
 	t.Parallel()
 
+	assertEmpty := func() {
+		actual, err := storage.AlertPlayers()
+		require.NoError(t, err)
+		assert.Equal(t, []model.AlertPlayer{}, actual)
+		assert.False(t, storage.IsExistAlertPlayers())
+	}
+
 	// 取得：保存されていない場合空のスライスを返却する
-	actual, err := storage.AlertPlayers()
+	assertEmpty()
+
+	// 書き込み：空配列を書き込もうとした場合はキーごと削除される
+	err := storage.WriteAlertPlayers([]model.AlertPlayer{})
 	require.NoError(t, err)
-	assert.Equal(t, []model.AlertPlayer{}, actual)
-	assert.False(t, storage.IsExistAlertPlayers())
+	assertEmpty()
 
 	// 書き込み：正常系
 	expected := []model.AlertPlayer{
@@ -127,7 +145,7 @@ func TestStorage_AlertPlayers(t *testing.T) {
 	assert.True(t, storage.IsExistAlertPlayers())
 
 	// 取得：正常系
-	actual, err = storage.AlertPlayers()
+	actual, err := storage.AlertPlayers()
 	require.NoError(t, err)
 	assert.Equal(t, expected, actual)
 }

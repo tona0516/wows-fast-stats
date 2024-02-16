@@ -93,7 +93,7 @@ function fmt() {
 
 function test() {
   exec("arch-go");
-  exec("go test -cover ./...");
+  exec("go test -cover ./... -count=1");
   exec(`${FRONTEND_NPM_COMMAND} run test`);
 }
 

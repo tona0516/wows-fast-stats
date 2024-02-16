@@ -80,13 +80,16 @@ func (s *Storage) IsExistAlertPlayers() bool {
 func (s *Storage) AlertPlayers() ([]model.AlertPlayer, error) {
 	players, err := read[[]model.AlertPlayer](s.db, alertPlayersKey)
 	if isErrKeyNotFound(err) {
-		return make([]model.AlertPlayer, 0), nil
+		return []model.AlertPlayer{}, nil
 	}
 
 	return players, err
 }
 
 func (s *Storage) WriteAlertPlayers(players []model.AlertPlayer) error {
+	if len(players) == 0 {
+		return delete(s.db, alertPlayersKey)
+	}
 	return write(s.db, alertPlayersKey, players)
 }
 
@@ -138,6 +141,13 @@ func write[T any](db *badger.DB, key string, target T) error {
 	})
 
 	return err
+}
+
+func delete(db *badger.DB, key string) error {
+	return db.Update(func(txn *badger.Txn) error {
+		err := txn.Delete([]byte(key))
+		return failure.Wrap(err)
+	})
 }
 
 func isErrKeyNotFound(err error) bool {

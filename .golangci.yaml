@@ -30,3 +30,5 @@ linters:
     - interfacebloat
     - depguard
     - gosmopolitan
+    - revive
+    - predeclared
