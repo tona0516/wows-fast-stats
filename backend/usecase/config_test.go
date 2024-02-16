@@ -11,7 +11,6 @@ import (
 
 	"github.com/morikuni/failure"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 )
 
@@ -168,8 +167,6 @@ func TestConfig_UpdateAlertPlayer(t *testing.T) {
 		t.Parallel()
 
 		// 準備
-		playerToUpdate := model.AlertPlayer{AccountID: 1, Name: "UpdatedPlayer"}
-
 		mockStorage := &mocks.StorageInterface{}
 		mockStorage.On("AlertPlayers").Return(existingPlayers, nil)
 		mockStorage.On("WriteAlertPlayers", []model.AlertPlayer{
@@ -179,7 +176,7 @@ func TestConfig_UpdateAlertPlayer(t *testing.T) {
 
 		// テスト
 		config := NewConfig(nil, nil, mockStorage, nil)
-		err := config.UpdateAlertPlayer(playerToUpdate)
+		err := config.UpdateAlertPlayer(model.AlertPlayer{AccountID: 1, Name: "UpdatedPlayer"})
 
 		// アサーション
 		require.NoError(t, err)
@@ -190,27 +187,46 @@ func TestConfig_UpdateAlertPlayer(t *testing.T) {
 func TestConfig_RemoveAlertPlayer(t *testing.T) {
 	t.Parallel()
 
-	t.Run("正常系", func(t *testing.T) {
+	t.Run("正常系_対象IDあり", func(t *testing.T) {
 		t.Parallel()
 
 		// 準備
-		accountIDToRemove := 1
-		existingPlayers := []model.AlertPlayer{
+		mockStorage := &mocks.StorageInterface{}
+		mockStorage.On("AlertPlayers").Return([]model.AlertPlayer{
 			{AccountID: 1, Name: "Player1"},
 			{AccountID: 2, Name: "Player2"},
-		}
-
-		mockStorage := &mocks.StorageInterface{}
-		mockStorage.On("AlertPlayers").Return(existingPlayers, nil)
-		mockStorage.On("WriteAlertPlayers", mock.Anything).Return(nil)
+		}, nil)
+		mockStorage.On("WriteAlertPlayers", []model.AlertPlayer{
+			{AccountID: 2, Name: "Player2"},
+		}).Return(nil)
 
 		// テスト
 		config := NewConfig(nil, nil, mockStorage, nil)
-		err := config.RemoveAlertPlayer(accountIDToRemove)
+		err := config.RemoveAlertPlayer(1)
 
 		// アサーション
 		require.NoError(t, err)
 		mockStorage.AssertExpectations(t)
+	})
+
+	t.Run("正常系_対象IDなし", func(t *testing.T) {
+		t.Parallel()
+
+		// 準備
+		mockStorage := &mocks.StorageInterface{}
+		mockStorage.On("AlertPlayers").Return([]model.AlertPlayer{
+			{AccountID: 1, Name: "Player1"},
+			{AccountID: 2, Name: "Player2"},
+		}, nil)
+
+		// テスト
+		config := NewConfig(nil, nil, mockStorage, nil)
+		err := config.RemoveAlertPlayer(3)
+
+		// アサーション
+		require.NoError(t, err)
+		mockStorage.AssertExpectations(t)
+		mockStorage.AssertNotCalled(t, "WriteAlertPlayers")
 	})
 }
 
