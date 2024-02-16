@@ -5,7 +5,7 @@
   import { OpenDirectory } from "wailsjs/go/main/App";
   import { model } from "wailsjs/go/models";
 
-  export let inputConfig: model.UserConfig;
+  export let inputConfig: model.UserConfigV2;
 
   const dispatch = createEventDispatcher();
 

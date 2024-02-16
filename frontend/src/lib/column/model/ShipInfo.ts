@@ -62,7 +62,7 @@ const PREMIUM_SHIP_ICONS: { [key: string]: string } = {
 };
 
 export class ShipInfo extends AbstractColumn {
-  constructor(private config: model.UserConfig) {
+  constructor(private config: model.UserConfigV2) {
     super("ship_info", "艦", 3);
   }
 

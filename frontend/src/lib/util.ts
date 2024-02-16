@@ -55,7 +55,7 @@ export const isOverallKey = (key: string): key is OverallKey => {
 };
 
 export const deriveColumnSetting = (
-  config: model.UserConfig,
+  config: model.UserConfigV2,
   key: string,
 ): ColumnSetting => {
   const shipKey = isShipKey(key) ? key : undefined;
@@ -80,7 +80,7 @@ export const deriveColumnSetting = (
 };
 
 export const deriveColumnSettings = (
-  config: model.UserConfig,
+  config: model.UserConfigV2,
 ): ColumnSetting[] => {
   const shipKeys = Object.keys(config.display.ship);
   const overallKeys = Object.keys(config.display.overall);

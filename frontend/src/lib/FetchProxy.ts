@@ -24,7 +24,7 @@ export namespace FetchProxy {
     return ret;
   };
 
-  export const getConfig = async (): Promise<model.UserConfig> => {
+  export const getConfig = async (): Promise<model.UserConfigV2> => {
     const ret = await UserConfig();
     storedConfig.set(ret);
     return ret;

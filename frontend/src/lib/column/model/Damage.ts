@@ -9,7 +9,7 @@ export class Damage
   extends AbstractStatsColumn<string>
   implements ISummaryColumn
 {
-  constructor(config: model.UserConfig, category: StatsCategory) {
+  constructor(config: model.UserConfigV2, category: StatsCategory) {
     super("damage", 1, config, category);
   }
 

@@ -7,7 +7,7 @@
   import { ApplyUserConfig } from "wailsjs/go/main/App";
   import { model } from "wailsjs/go/models";
 
-  export let inputConfig: model.UserConfig;
+  export let inputConfig: model.UserConfigV2;
 
   let isLoading = false;
   let teamSummary: model.UCTeamSummary = inputConfig.team_summary;

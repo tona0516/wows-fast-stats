@@ -14,7 +14,7 @@
   import { deriveColumnSettings } from "src/lib/util";
   import { SAMPLE_TEAM } from "src/lib/RatingDef";
 
-  export let inputConfig: model.UserConfig;
+  export let inputConfig: model.UserConfigV2;
 
   const dispatch = createEventDispatcher();
 

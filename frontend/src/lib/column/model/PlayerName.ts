@@ -6,7 +6,7 @@ import { toPlayerStats } from "src/lib/util";
 import type { model } from "wailsjs/go/models";
 
 export class PlayerName extends AbstractColumn {
-  constructor(private config: model.UserConfig) {
+  constructor(private config: model.UserConfigV2) {
     super("player_name", "プレイヤー", 2);
   }
 

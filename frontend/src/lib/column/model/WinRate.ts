@@ -9,7 +9,7 @@ export class WinRate
   extends AbstractStatsColumn<string>
   implements ISummaryColumn
 {
-  constructor(config: model.UserConfig, category: StatsCategory) {
+  constructor(config: model.UserConfigV2, category: StatsCategory) {
     super("win_rate", 1, config, category);
   }
 

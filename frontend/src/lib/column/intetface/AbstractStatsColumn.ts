@@ -12,7 +12,7 @@ export abstract class AbstractStatsColumn<T> extends AbstractColumn {
   constructor(
     readonly key: string,
     readonly innerColumnCount: number,
-    readonly config: model.UserConfig,
+    readonly config: model.UserConfigV2,
     readonly category: StatsCategory,
   ) {
     super(key, DispName.MIN_COLUMN_NAMES.get(key) ?? key, innerColumnCount);

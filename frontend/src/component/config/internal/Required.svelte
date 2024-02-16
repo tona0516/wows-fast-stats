@@ -9,7 +9,7 @@
   import { SelectDirectory, StartWatching } from "wailsjs/go/main/App";
   import { model } from "wailsjs/go/models";
 
-  export let inputConfig: model.UserConfig;
+  export let inputConfig: model.UserConfigV2;
 
   let isLoading = false;
   let requiredConfigError: model.RequiredConfigError;

@@ -5,7 +5,7 @@ import { AbstractStatsColumn } from "src/lib/column/intetface/AbstractStatsColum
 import type { model } from "wailsjs/go/models";
 
 export class UsingShipTypeRate extends AbstractStatsColumn<StackedBarGraphParam> {
-  constructor(config: model.UserConfig) {
+  constructor(config: model.UserConfigV2) {
     super("using_ship_type_rate", 1, config, "overall");
   }
 

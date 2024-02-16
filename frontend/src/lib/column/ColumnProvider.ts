@@ -43,7 +43,7 @@ class ColumnArray extends Array<AbstractColumn> {
 
 export namespace ColumnProvider {
   export const getAllColumns = (
-    config: model.UserConfig,
+    config: model.UserConfigV2,
   ): [basic: ColumnArray, ship: ColumnArray, overall: ColumnArray] => {
 
     return [

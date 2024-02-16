@@ -8,7 +8,7 @@ test("正常系", () => {
     { fontSize: "large", zoomRate: 1.15 },
   ].forEach((it) => {
     expect(
-      FontSize.getZoomRate(new model.UserConfig({ font_size: it.fontSize })),
+      FontSize.getZoomRate(new model.UserConfigV2({ font_size: it.fontSize })),
     ).toBe(it.zoomRate);
   });
 });
@@ -19,7 +19,7 @@ test("異常系", () => {
     { fontSize: "invalid", zoomRate: 1.0 },
   ].forEach((it) => {
     expect(
-      FontSize.getZoomRate(new model.UserConfig({ font_size: it.fontSize })),
+      FontSize.getZoomRate(new model.UserConfigV2({ font_size: it.fontSize })),
     ).toBe(it.zoomRate);
   });
 });

@@ -4,7 +4,7 @@ import { type StatsCategory } from "src/lib/types";
 import type { model } from "wailsjs/go/models";
 
 export class Battles extends AbstractStatsColumn<string> {
-  constructor(config: model.UserConfig, category: StatsCategory) {
+  constructor(config: model.UserConfigV2, category: StatsCategory) {
     super("battles", 1, config, category);
   }
 

@@ -6,7 +6,7 @@
   import { Rating } from "src/lib/Rating";
   import { RATING_DEFS } from "src/lib/RatingDef";
 
-  export let config: model.UserConfig;
+  export let config: model.UserConfigV2;
 
   const COLUMNS = [
     { text: "スキル", colspan: 1 },

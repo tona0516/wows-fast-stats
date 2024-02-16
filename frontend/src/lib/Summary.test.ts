@@ -23,7 +23,7 @@ const makePlayer = (): model.Player => {
 
 test("undefined", () => {
   expect(
-    Summary.calculate(undefined, [], new model.UserConfig()),
+    Summary.calculate(undefined, [], new model.UserConfigV2()),
   ).toBeUndefined();
 });
 
@@ -74,7 +74,7 @@ test("calculate - all types, ship, pvp_all, excluded player", () => {
   display.ship = new model.UCDisplayShip();
   display.overall = new model.UCDisplayOverall();
 
-  const config = new model.UserConfig();
+  const config = new model.UserConfigV2();
   config.digit = customDigit;
   config.team_summary = teamSummary;
   config.stats_pattern = extra;
@@ -175,7 +175,7 @@ test("calculate - each ship type, overall, pvp_solo", () => {
   display.ship = new model.UCDisplayShip();
   display.overall = new model.UCDisplayOverall();
 
-  const config = new model.UserConfig();
+  const config = new model.UserConfigV2();
   config.digit = customDigit;
   config.team_summary = teamSummary;
   config.stats_pattern = extra;

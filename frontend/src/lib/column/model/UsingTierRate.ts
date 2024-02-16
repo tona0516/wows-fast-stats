@@ -6,7 +6,7 @@ import type { TierGroup } from "src/lib/types";
 import type { model } from "wailsjs/go/models";
 
 export class UsingTierRate extends AbstractStatsColumn<StackedBarGraphParam> {
-  constructor(config: model.UserConfig) {
+  constructor(config: model.UserConfigV2) {
     super("using_tier_rate", 1, config, "overall");
   }
 

@@ -48,7 +48,7 @@ export namespace Summary {
   export const calculate = (
     battle: OptionalBattle,
     excludedIDs: number[],
-    config: model.UserConfig,
+    config: model.UserConfigV2,
   ): OptionalSummary => {
     if (!validate(battle)) {
       return undefined;
@@ -118,7 +118,7 @@ const validate = (battle: OptionalBattle): battle is model.Battle => {
 };
 
 const deriveColumns = (
-  config: model.UserConfig,
+  config: model.UserConfigV2,
 ): {
   columns: SummaryColumn[];
   headers: SummaryHeader[];
@@ -157,7 +157,7 @@ const isExcluded = (player: model.Player, excludedIDs: number[]): boolean => {
 
 const isMinBattlesOrMore = (
   player: model.Player,
-  config: model.UserConfig,
+  config: model.UserConfigV2,
   category: StatsCategory,
 ): boolean => {
   const battles = toPlayerStats(player, config.stats_pattern)[category].battles;

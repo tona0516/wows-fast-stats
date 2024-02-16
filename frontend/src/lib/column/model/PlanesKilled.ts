@@ -3,7 +3,7 @@ import { AbstractStatsColumn } from "src/lib/column/intetface/AbstractStatsColum
 import type { model } from "wailsjs/go/models";
 
 export class PlanesKilled extends AbstractStatsColumn<string> {
-  constructor(config: model.UserConfig) {
+  constructor(config: model.UserConfigV2) {
     super("planes_killed", 1, config, "ship");
   }
 

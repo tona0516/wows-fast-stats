@@ -6,7 +6,7 @@
   import { FetchProxy } from "src/lib/FetchProxy";
 
   export let teams: model.Team[];
-  export let config: model.UserConfig;
+  export let config: model.UserConfigV2;
 
   $: categories = ColumnProvider.getAllColumns(config);
   $: [basicColumns, shipColumns, overallColumns] = categories;

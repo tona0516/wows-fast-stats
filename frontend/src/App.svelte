@@ -35,7 +35,7 @@
   EventsOn("BATTLE_START", () => mainPage?.fetchBattle());
   EventsOn("BATTLE_ERR", (error: string) => Notifier.failure(error));
 
-  const initialize = async (): Promise<model.UserConfig | undefined> => {
+  const initialize = async (): Promise<model.UserConfigV2 | undefined> => {
     try {
       await MigrateIfNeeded();
 
@@ -59,7 +59,7 @@
     }
   };
 
-  const notifyUpdate = async (config: model.UserConfig) => {
+  const notifyUpdate = async (config: model.UserConfigV2) => {
     if (!config.notify_updatable) return;
 
     try {

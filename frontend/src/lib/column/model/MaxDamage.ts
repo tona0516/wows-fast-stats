@@ -14,7 +14,7 @@ export interface MaxDamageParam {
 }
 
 export class MaxDamage extends AbstractStatsColumn<MaxDamageParam> {
-  constructor(config: model.UserConfig, category: StatsCategory) {
+  constructor(config: model.UserConfigV2, category: StatsCategory) {
     let innerColumnCount: number;
     switch (category) {
       case "ship":

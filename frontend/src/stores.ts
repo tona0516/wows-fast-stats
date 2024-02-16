@@ -5,7 +5,7 @@ import { model } from "wailsjs/go/models";
 
 export const storedBattle = writable(undefined) as Writable<OptionalBattle>;
 export const storedExcludedPlayers = writable([]) as Writable<number[]>;
-export const storedConfig = writable({}) as Writable<model.UserConfig>;
+export const storedConfig = writable({}) as Writable<model.UserConfigV2>;
 
 export const storedSummary = derived(
   [storedBattle, storedExcludedPlayers, storedConfig],

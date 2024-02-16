@@ -21,7 +21,7 @@ const ZOOM_RATIO = new Map<FontSize, number>([
 ]);
 
 export namespace FontSize {
-  export const getZoomRate = (config: model.UserConfig): number => {
+  export const getZoomRate = (config: model.UserConfigV2): number => {
     const fontSize = config.font_size as FontSize;
     const zoomRatio = ZOOM_RATIO.get(fontSize);
 
