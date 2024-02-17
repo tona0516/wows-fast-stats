@@ -85,14 +85,16 @@ func initApp(env model.Env) *App {
 	})
 	db, err := badger.Open(badger.DefaultOptions("./persistent_data"))
 	if err != nil {
-		logger := infra.NewLogger(env, "", alertDiscord, infoDiscord)
+		logger := infra.NewLogger(env, alertDiscord, infoDiscord)
 		logger.Fatal(err, nil)
 		return nil
 	}
 
 	storage := infra.NewStorage(db)
 	ownIGN, _ := storage.OwnIGN()
-	logger := infra.NewLogger(env, ownIGN, alertDiscord, infoDiscord)
+
+	logger := infra.NewLogger(env, alertDiscord, infoDiscord)
+	logger.SetOwnIGN(ownIGN)
 
 	wargaming := infra.NewWargaming(infra.RequestConfig{
 		URL:     "https://api.worldofwarships.asia",

@@ -30,6 +30,7 @@ func TestBattle_Get_正常系_初回(t *testing.T) {
 	mockUnregistered := &mocks.UnregisteredInterface{}
 	mockLocalFile := &mocks.LocalFileInterface{}
 	mockStorage := &mocks.StorageInterface{}
+	mockLogger := &mocks.LoggerInterface{}
 
 	mockWargaming.On("AccountList", mock.Anything, mock.Anything).Return(model.WGAccountList{
 		{NickName: "player_1", AccountID: 1},
@@ -68,6 +69,8 @@ func TestBattle_Get_正常系_初回(t *testing.T) {
 	mockStorage.On("WriteOwnIGN", mock.Anything).Return(nil)
 	mockStorage.On("WriteExpectedStats", mock.Anything).Return(nil)
 
+	mockLogger.On("SetOwnIGN", mock.Anything).Return()
+
 	// テスト
 	b := NewBattle(
 		5,
@@ -77,7 +80,7 @@ func TestBattle_Get_正常系_初回(t *testing.T) {
 		mockNumbers,
 		mockUnregistered,
 		mockStorage,
-		nil,
+		mockLogger,
 		nil,
 	)
 	_, err := b.Get(context.TODO(), testUserConfig)
@@ -102,6 +105,7 @@ func TestBattle_Get_正常系_2回目以降(t *testing.T) {
 	mockUnregistered := &mocks.UnregisteredInterface{}
 	mockLocalFile := &mocks.LocalFileInterface{}
 	mockStorage := &mocks.StorageInterface{}
+	mockLogger := &mocks.LoggerInterface{}
 
 	mockWargaming.On("AccountList", mock.Anything, mock.Anything).Return(model.WGAccountList{
 		{NickName: "player_1", AccountID: 1},
@@ -125,6 +129,8 @@ func TestBattle_Get_正常系_2回目以降(t *testing.T) {
 
 	mockStorage.On("WriteOwnIGN", mock.Anything).Return(nil)
 
+	mockLogger.On("SetOwnIGN", mock.Anything).Return()
+
 	// テスト
 	b := NewBattle(
 		5,
@@ -134,7 +140,7 @@ func TestBattle_Get_正常系_2回目以降(t *testing.T) {
 		mockNumbers,
 		mockUnregistered,
 		mockStorage,
-		nil,
+		mockLogger,
 		nil,
 	)
 	b.isFirstBattle = false
@@ -160,6 +166,7 @@ func TestBattle_Get_異常系(t *testing.T) {
 	mockUnregistered := &mocks.UnregisteredInterface{}
 	mockLocalFile := &mocks.LocalFileInterface{}
 	mockStorage := &mocks.StorageInterface{}
+	mockLogger := &mocks.LoggerInterface{}
 
 	expectedError := failure.New(apperr.FileNotExist)
 	mockLocalFile.On("TempArenaInfo", mock.Anything).Return(model.TempArenaInfo{}, expectedError)
@@ -173,7 +180,7 @@ func TestBattle_Get_異常系(t *testing.T) {
 		mockNumbers,
 		mockUnregistered,
 		mockStorage,
-		nil,
+		mockLogger,
 		nil,
 	)
 	b.isFirstBattle = false

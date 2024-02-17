@@ -38,6 +38,11 @@ func (_m *LoggerInterface) Init(appCtx context.Context) {
 	_m.Called(appCtx)
 }
 
+// SetOwnIGN provides a mock function with given fields: ownIGN
+func (_m *LoggerInterface) SetOwnIGN(ownIGN string) {
+	_m.Called(ownIGN)
+}
+
 // Warn provides a mock function with given fields: err, contexts
 func (_m *LoggerInterface) Warn(err error, contexts map[string]string) {
 	_m.Called(err, contexts)

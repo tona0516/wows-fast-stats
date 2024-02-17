@@ -84,6 +84,7 @@ func (b *Battle) Get(appCtx context.Context, userConfig model.UserConfigV2) (mod
 
 	// persist own ign for reporting
 	_ = b.storage.WriteOwnIGN(tempArenaInfo.PlayerName)
+	b.logger.SetOwnIGN(tempArenaInfo.PlayerName)
 
 	// Get Account ID list
 	accountList, err := b.wargaming.AccountList(appID, tempArenaInfo.AccountNames())

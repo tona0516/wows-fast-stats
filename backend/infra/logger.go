@@ -17,23 +17,26 @@ import (
 type Logger struct {
 	zlog         zerolog.Logger
 	env          model.Env
-	ownIGN       string
 	alertDiscord repository.DiscordInterface
 	infoDiscord  repository.DiscordInterface
+
+	ownIGN string
 }
 
 func NewLogger(
 	env model.Env,
-	ownIGN string,
 	alertDiscord repository.DiscordInterface,
 	infoDiscord repository.DiscordInterface,
 ) *Logger {
 	return &Logger{
 		env:          env,
-		ownIGN:       ownIGN,
 		alertDiscord: alertDiscord,
 		infoDiscord:  infoDiscord,
 	}
+}
+
+func (l *Logger) SetOwnIGN(ownIGN string) {
+	l.ownIGN = ownIGN
 }
 
 func (l *Logger) Init(appCtx context.Context) {
@@ -68,36 +71,50 @@ func (l *Logger) Init(appCtx context.Context) {
 		With().
 		Timestamp().
 		Str("semver", l.env.Semver).
-		Str("ign", l.ownIGN).
 		Logger()
 }
 
 func (l *Logger) Debug(message string, contexts map[string]string) {
-	e := l.zlog.Debug().Str("message", message)
+	e := l.zlog.Debug().
+		Str("ign", l.ownIGN).
+		Str("message", message)
+
 	addContext(e, contexts)
 	e.Send()
 }
 
 func (l *Logger) Info(message string, contexts map[string]string) {
-	e := l.zlog.Info().Str("message", message)
+	e := l.zlog.Info().
+		Str("ign", l.ownIGN).
+		Str("message", message)
+
 	addContext(e, contexts)
 	e.Send()
 }
 
 func (l *Logger) Warn(err error, contexts map[string]string) {
-	e := l.zlog.Warn().Str("error", fmt.Sprintf("%+v", err))
+	e := l.zlog.Warn().
+		Str("ign", l.ownIGN).
+		Str("error", fmt.Sprintf("%+v", err))
+
 	addContext(e, contexts)
 	e.Send()
 }
 
 func (l *Logger) Error(err error, contexts map[string]string) {
-	e := l.zlog.Error().Str("error", fmt.Sprintf("%+v", err))
+	e := l.zlog.Error().
+		Str("ign", l.ownIGN).
+		Str("error", fmt.Sprintf("%+v", err))
+
 	addContext(e, contexts)
 	e.Send()
 }
 
 func (l *Logger) Fatal(err error, contexts map[string]string) {
-	e := l.zlog.Fatal().Str("error", fmt.Sprintf("%+v", err))
+	e := l.zlog.Fatal().
+		Str("ign", l.ownIGN).
+		Str("error", fmt.Sprintf("%+v", err))
+
 	addContext(e, contexts)
 	e.Send()
 }
