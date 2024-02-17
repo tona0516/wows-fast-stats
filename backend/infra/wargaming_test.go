@@ -15,6 +15,8 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+const testAppID = "test_appid"
+
 func TestWargaming_AccountInfo(t *testing.T) {
 	t.Parallel()
 
@@ -33,7 +35,7 @@ func TestWargaming_AccountInfo(t *testing.T) {
 			URL: server.URL,
 		})
 
-		result, err := wargaming.AccountInfo([]int{123, 456})
+		result, err := wargaming.AccountInfo(testAppID, []int{123, 456})
 		require.NoError(t, err)
 		assert.Equal(t, model.WGAccountInfo{}, result)
 	})
@@ -63,7 +65,7 @@ func TestWargaming_AccountInfo(t *testing.T) {
 			URL: server.URL,
 		})
 
-		_, err := wargaming.AccountInfo([]int{123, 456})
+		_, err := wargaming.AccountInfo(testAppID, []int{123, 456})
 		code, ok := failure.CodeOf(err)
 		assert.True(t, ok)
 		assert.Equal(t, apperr.WGAPIError, code)
@@ -108,7 +110,7 @@ func TestWargaming_AccountInfo(t *testing.T) {
 
 			wargaming := NewWargaming(RequestConfig{URL: server.URL, Retry: retry})
 
-			_, err := wargaming.AccountInfo([]int{123, 456})
+			_, err := wargaming.AccountInfo(testAppID, []int{123, 456})
 
 			require.NoError(t, err)
 			assert.Equal(t, int(retry+1), calls)
@@ -145,7 +147,7 @@ func TestWargaming_AccountInfo(t *testing.T) {
 
 			wargaming := NewWargaming(RequestConfig{URL: server.URL, Retry: retry})
 
-			_, err := wargaming.AccountInfo([]int{123, 456})
+			_, err := wargaming.AccountInfo(testAppID, []int{123, 456})
 
 			code, ok := failure.CodeOf(err)
 			assert.True(t, ok)
@@ -171,7 +173,7 @@ func TestWargaming_AccountListForSearch(t *testing.T) {
 		URL: server.URL,
 	})
 
-	result, err := wargaming.AccountListForSearch("player")
+	result, err := wargaming.AccountListForSearch(testAppID, "player")
 
 	require.NoError(t, err)
 	assert.Equal(t, model.WGAccountList{}, result)
@@ -193,7 +195,7 @@ func TestWargaming_ClansAccountInfo(t *testing.T) {
 		URL: server.URL,
 	})
 
-	result, err := wargaming.ClansAccountInfo([]int{123, 456})
+	result, err := wargaming.ClansAccountInfo(testAppID, []int{123, 456})
 
 	require.NoError(t, err)
 	assert.Equal(t, model.WGClansAccountInfo{}, result)
@@ -215,7 +217,7 @@ func TestWargaming_ClansInfo(t *testing.T) {
 		URL: server.URL,
 	})
 
-	result, err := wargaming.ClansInfo([]int{123, 456})
+	result, err := wargaming.ClansInfo(testAppID, []int{123, 456})
 
 	require.NoError(t, err)
 	assert.Equal(t, model.WGClansInfo{}, result)
@@ -237,7 +239,7 @@ func TestWargaming_ShipsStats(t *testing.T) {
 		URL: server.URL,
 	})
 
-	result, err := wargaming.ShipsStats(123)
+	result, err := wargaming.ShipsStats(testAppID, 123)
 
 	require.NoError(t, err)
 	assert.Equal(t, model.WGShipsStats{}, result)
@@ -264,7 +266,7 @@ func TestWargaming_EncycShips(t *testing.T) {
 		URL: server.URL,
 	})
 
-	result, pageTotal, err := wargaming.EncycShips(1)
+	result, pageTotal, err := wargaming.EncycShips(testAppID, 1)
 
 	require.NoError(t, err)
 	assert.Equal(t, model.WGEncycShips{}, result)
@@ -281,7 +283,7 @@ func TestWargaming_EncycInfo(t *testing.T) {
 		URL: server.URL,
 	})
 
-	result, err := wargaming.EncycInfo()
+	result, err := wargaming.EncycInfo(testAppID)
 
 	require.NoError(t, err)
 	assert.Equal(t, model.WGEncycInfoData{}, result)
@@ -303,7 +305,7 @@ func TestWargaming_BattleArena(t *testing.T) {
 		URL: server.URL,
 	})
 
-	result, err := wargaming.BattleArenas()
+	result, err := wargaming.BattleArenas(testAppID)
 
 	require.NoError(t, err)
 	assert.Equal(t, model.WGBattleArenas{}, result)
@@ -324,7 +326,7 @@ func TestWargaming_BattleTypes(t *testing.T) {
 	wargaming := NewWargaming(RequestConfig{
 		URL: server.URL,
 	})
-	result, err := wargaming.BattleTypes()
+	result, err := wargaming.BattleTypes(testAppID)
 
 	require.NoError(t, err)
 	assert.Equal(t, model.WGBattleTypes{}, result)

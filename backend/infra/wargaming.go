@@ -15,7 +15,6 @@ import (
 )
 
 type Wargaming struct {
-	appid  string
 	config RequestConfig
 }
 
@@ -23,11 +22,7 @@ func NewWargaming(config RequestConfig) *Wargaming {
 	return &Wargaming{config: config}
 }
 
-func (w *Wargaming) SetAppID(appid string) {
-	w.appid = appid
-}
-
-func (w *Wargaming) AccountInfo(accountIDs []int) (model.WGAccountInfo, error) {
+func (w *Wargaming) AccountInfo(appID string, accountIDs []int) (model.WGAccountInfo, error) {
 	strAccountIDs := make([]string, len(accountIDs))
 	for i, v := range accountIDs {
 		strAccountIDs[i] = strconv.Itoa(v)
@@ -38,7 +33,7 @@ func (w *Wargaming) AccountInfo(accountIDs []int) (model.WGAccountInfo, error) {
 		w.config.Retry,
 		w.config.Timeout,
 		map[string]string{
-			"application_id": w.appid,
+			"application_id": appID,
 			"account_id":     strings.Join(strAccountIDs, ","),
 			"fields":         response.WGAccountInfo{}.Field(),
 			"extra":          "statistics.pvp_solo,statistics.pvp_div2,statistics.pvp_div3",
@@ -48,13 +43,13 @@ func (w *Wargaming) AccountInfo(accountIDs []int) (model.WGAccountInfo, error) {
 	return res.Data, err
 }
 
-func (w *Wargaming) AccountList(accountNames []string) (model.WGAccountList, error) {
+func (w *Wargaming) AccountList(appID string, accountNames []string) (model.WGAccountList, error) {
 	res, err := request[response.WGAccountList](
 		w.config.URL+"/wows/account/list/",
 		w.config.Retry,
 		w.config.Timeout,
 		map[string]string{
-			"application_id": w.appid,
+			"application_id": appID,
 			"search":         strings.Join(accountNames, ","),
 			"fields":         response.WGAccountList{}.Field(),
 			"type":           "exact",
@@ -64,13 +59,13 @@ func (w *Wargaming) AccountList(accountNames []string) (model.WGAccountList, err
 	return res.Data, err
 }
 
-func (w *Wargaming) AccountListForSearch(prefix string) (model.WGAccountList, error) {
+func (w *Wargaming) AccountListForSearch(appID string, prefix string) (model.WGAccountList, error) {
 	res, err := request[response.WGAccountList](
 		w.config.URL+"/wows/account/list/",
 		w.config.Retry,
 		w.config.Timeout,
 		map[string]string{
-			"application_id": w.appid,
+			"application_id": appID,
 			"search":         prefix,
 			"fields":         response.WGAccountList{}.Field(),
 			"limit":          "10",
@@ -80,7 +75,7 @@ func (w *Wargaming) AccountListForSearch(prefix string) (model.WGAccountList, er
 	return res.Data, err
 }
 
-func (w *Wargaming) ClansAccountInfo(accountIDs []int) (model.WGClansAccountInfo, error) {
+func (w *Wargaming) ClansAccountInfo(appID string, accountIDs []int) (model.WGClansAccountInfo, error) {
 	strAccountIDs := make([]string, len(accountIDs))
 	for i, v := range accountIDs {
 		strAccountIDs[i] = strconv.Itoa(v)
@@ -91,7 +86,7 @@ func (w *Wargaming) ClansAccountInfo(accountIDs []int) (model.WGClansAccountInfo
 		w.config.Retry,
 		w.config.Timeout,
 		map[string]string{
-			"application_id": w.appid,
+			"application_id": appID,
 			"account_id":     strings.Join(strAccountIDs, ","),
 			"fields":         response.WGClansAccountInfo{}.Field(),
 		},
@@ -100,7 +95,7 @@ func (w *Wargaming) ClansAccountInfo(accountIDs []int) (model.WGClansAccountInfo
 	return res.Data, err
 }
 
-func (w *Wargaming) ClansInfo(clanIDs []int) (model.WGClansInfo, error) {
+func (w *Wargaming) ClansInfo(appID string, clanIDs []int) (model.WGClansInfo, error) {
 	strClanIDs := make([]string, len(clanIDs))
 	for i, v := range clanIDs {
 		strClanIDs[i] = strconv.Itoa(v)
@@ -115,7 +110,7 @@ func (w *Wargaming) ClansInfo(clanIDs []int) (model.WGClansInfo, error) {
 		w.config.Retry,
 		w.config.Timeout,
 		map[string]string{
-			"application_id": w.appid,
+			"application_id": appID,
 			"clan_id":        strings.Join(strClanIDs, ","),
 			"fields":         response.WGClansInfo{}.Field(),
 		},
@@ -124,13 +119,13 @@ func (w *Wargaming) ClansInfo(clanIDs []int) (model.WGClansInfo, error) {
 	return res.Data, err
 }
 
-func (w *Wargaming) ShipsStats(accountID int) (model.WGShipsStats, error) {
+func (w *Wargaming) ShipsStats(appID string, accountID int) (model.WGShipsStats, error) {
 	res, err := request[response.WGShipsStats](
 		w.config.URL+"/wows/ships/stats/",
 		w.config.Retry,
 		w.config.Timeout,
 		map[string]string{
-			"application_id": w.appid,
+			"application_id": appID,
 			"account_id":     strconv.Itoa(accountID),
 			"fields":         response.WGShipsStats{}.Field(),
 			"extra":          "pvp_solo,pvp_div2,pvp_div3",
@@ -140,13 +135,13 @@ func (w *Wargaming) ShipsStats(accountID int) (model.WGShipsStats, error) {
 	return res.Data, err
 }
 
-func (w *Wargaming) EncycShips(pageNo int) (model.WGEncycShips, int, error) {
+func (w *Wargaming) EncycShips(appID string, pageNo int) (model.WGEncycShips, int, error) {
 	res, err := request[response.WGEncycShips](
 		w.config.URL+"/wows/encyclopedia/ships/",
 		w.config.Retry,
 		w.config.Timeout,
 		map[string]string{
-			"application_id": w.appid,
+			"application_id": appID,
 			"fields":         response.WGEncycShips{}.Field(),
 			"language":       "ja",
 			"page_no":        strconv.Itoa(pageNo),
@@ -156,13 +151,13 @@ func (w *Wargaming) EncycShips(pageNo int) (model.WGEncycShips, int, error) {
 	return res.Data, res.Meta.PageTotal, err
 }
 
-func (w *Wargaming) EncycInfo() (model.WGEncycInfoData, error) {
+func (w *Wargaming) EncycInfo(appID string) (model.WGEncycInfoData, error) {
 	res, err := request[response.WGEncycInfo](
 		w.config.URL+"/wows/encyclopedia/info/",
 		w.config.Retry,
 		w.config.Timeout,
 		map[string]string{
-			"application_id": w.appid,
+			"application_id": appID,
 			"fields":         response.WGEncycInfo{}.Field(),
 		},
 	)
@@ -170,13 +165,13 @@ func (w *Wargaming) EncycInfo() (model.WGEncycInfoData, error) {
 	return res.Data, err
 }
 
-func (w *Wargaming) BattleArenas() (model.WGBattleArenas, error) {
+func (w *Wargaming) BattleArenas(appID string) (model.WGBattleArenas, error) {
 	res, err := request[response.WGBattleArenas](
 		w.config.URL+"/wows/encyclopedia/battlearenas/",
 		w.config.Retry,
 		w.config.Timeout,
 		map[string]string{
-			"application_id": w.appid,
+			"application_id": appID,
 			"fields":         response.WGBattleArenas{}.Field(),
 			"language":       "ja",
 		},
@@ -185,13 +180,13 @@ func (w *Wargaming) BattleArenas() (model.WGBattleArenas, error) {
 	return res.Data, err
 }
 
-func (w *Wargaming) BattleTypes() (model.WGBattleTypes, error) {
+func (w *Wargaming) BattleTypes(appID string) (model.WGBattleTypes, error) {
 	res, err := request[response.WGBattleTypes](
 		w.config.URL+"/wows/encyclopedia/battletypes/",
 		w.config.Retry,
 		w.config.Timeout,
 		map[string]string{
-			"application_id": w.appid,
+			"application_id": appID,
 			"fields":         response.WGBattleTypes{}.Field(),
 			"language":       "ja",
 		},
@@ -200,13 +195,13 @@ func (w *Wargaming) BattleTypes() (model.WGBattleTypes, error) {
 	return res.Data, err
 }
 
-func (w *Wargaming) Test(appid string) (bool, error) {
+func (w *Wargaming) Test(appID string) (bool, error) {
 	_, err := request[response.WGEncycInfo](
 		w.config.URL+"/wows/encyclopedia/info/",
 		w.config.Retry,
 		w.config.Timeout,
 		map[string]string{
-			"application_id": appid,
+			"application_id": appID,
 			"fields":         response.WGEncycInfo{}.Field(),
 		},
 	)

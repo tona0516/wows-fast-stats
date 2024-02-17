@@ -2,6 +2,7 @@ package infra
 
 import (
 	"os"
+	"path"
 	"testing"
 	"wfs/backend/domain/model"
 
@@ -10,25 +11,34 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-//nolint:gochecknoglobals
-var storage *Storage
+const dbPrefix = "storage_test"
 
-func TestMain(m *testing.M) {
-	// before all
-	storagePath := "./unit_test_storage"
-	db, _ := badger.Open(badger.DefaultOptions(storagePath))
-	storage = NewStorage(db)
+func openDB(t *testing.T) *badger.DB {
+	t.Helper()
 
-	code := m.Run()
+	storagePath := path.Join(dbPrefix, t.Name())
+	db, err := badger.Open(badger.DefaultOptions(storagePath))
+	require.NoError(t, err)
 
-	// after all
-	os.RemoveAll(storagePath)
+	err = db.DropAll()
+	require.NoError(t, err)
 
-	os.Exit(code)
+	return db
+}
+
+func cleanDB(t *testing.T, db *badger.DB) {
+	t.Helper()
+
+	_ = db.DropAll()
+	_ = db.Close()
+	_ = os.RemoveAll(path.Join(dbPrefix, t.Name()))
 }
 
 func TestStorage_DataVersion(t *testing.T) {
 	t.Parallel()
+
+	db := openDB(t)
+	storage := NewStorage(db)
 
 	// 取得：保存されていない場合0を返却する
 	actual, err := storage.DataVersion()
@@ -44,71 +54,83 @@ func TestStorage_DataVersion(t *testing.T) {
 	actual, err = storage.DataVersion()
 	require.NoError(t, err)
 	assert.Equal(t, expected, actual)
+
+	cleanDB(t, db)
 }
 
-//nolint:tparallel
 func TestStorage_UserConfig(t *testing.T) {
 	t.Parallel()
 
-	//nolint:paralleltest
-	t.Run("v1", func(t *testing.T) {
-		err := delete(storage.db, userConfigKey)
-		require.NoError(t, err)
+	db := openDB(t)
+	storage := NewStorage(db)
 
-		// 取得：保存されていない場合はデフォルト値を返却する
-		actual, err := storage.UserConfig()
-		require.NoError(t, err)
-		assert.Equal(t, model.DefaultUserConfig, actual)
-		assert.False(t, storage.IsExistUserConfig())
+	err := delete(storage.db, userConfigKey)
+	require.NoError(t, err)
 
-		// 書き込み：正常系
-		expected := model.UserConfig{
-			FontSize: "large",
-			Displays: model.Displays{
-				Ship:    model.Ship{PR: true},
-				Overall: model.Overall{PR: false},
-			},
-		}
-		err = storage.WriteUserConfig(expected)
-		require.NoError(t, err)
-		assert.True(t, storage.IsExistUserConfig())
+	// 取得：保存されていない場合はデフォルト値を返却する
+	actual, err := storage.UserConfig()
+	require.NoError(t, err)
+	assert.Equal(t, model.DefaultUserConfig, actual)
+	assert.False(t, storage.IsExistUserConfig())
 
-		// 取得：正常系
-		actual, err = storage.UserConfig()
-		require.NoError(t, err)
-		assert.Equal(t, expected, actual)
-	})
+	// 書き込み：正常系
+	expected := model.UserConfig{
+		FontSize: "large",
+		Displays: model.Displays{
+			Ship:    model.Ship{PR: true},
+			Overall: model.Overall{PR: false},
+		},
+	}
+	err = storage.WriteUserConfig(expected)
+	require.NoError(t, err)
+	assert.True(t, storage.IsExistUserConfig())
 
-	//nolint:paralleltest
-	t.Run("v2", func(t *testing.T) {
-		err := delete(storage.db, userConfigKey)
-		require.NoError(t, err)
+	// 取得：正常系
+	actual, err = storage.UserConfig()
+	require.NoError(t, err)
+	assert.Equal(t, expected, actual)
 
-		// 取得：保存されていない場合はデフォルト値を返却する
-		actual, err := storage.UserConfigV2()
-		require.NoError(t, err)
-		assert.Equal(t, model.DefaultUserConfigV2, actual)
+	cleanDB(t, db)
+}
 
-		// 書き込み：正常系
-		expected := model.UserConfigV2{
-			FontSize: "large",
-			Display: model.UCDisplay{
-				Ship:    model.UCDisplayShip{PR: true},
-				Overall: model.UCDisplayOverall{PR: false},
-			},
-		}
-		err = storage.WriteUserConfigV2(expected)
-		require.NoError(t, err)
+func TestStorage_UserConfigV2(t *testing.T) {
+	t.Parallel()
 
-		// 取得：正常系
-		actual, err = storage.UserConfigV2()
-		require.NoError(t, err)
-		assert.Equal(t, expected, actual)
-	})
+	db := openDB(t)
+	storage := NewStorage(db)
+
+	err := delete(storage.db, userConfigKey)
+	require.NoError(t, err)
+
+	// 取得：保存されていない場合はデフォルト値を返却する
+	actual, err := storage.UserConfigV2()
+	require.NoError(t, err)
+	assert.Equal(t, model.DefaultUserConfigV2, actual)
+
+	// 書き込み：正常系
+	expected := model.UserConfigV2{
+		FontSize: "large",
+		Display: model.UCDisplay{
+			Ship:    model.UCDisplayShip{PR: true},
+			Overall: model.UCDisplayOverall{PR: false},
+		},
+	}
+	err = storage.WriteUserConfigV2(expected)
+	require.NoError(t, err)
+
+	// 取得：正常系
+	actual, err = storage.UserConfigV2()
+	require.NoError(t, err)
+	assert.Equal(t, expected, actual)
+
+	cleanDB(t, db)
 }
 
 func TestStorage_AlertPlayers(t *testing.T) {
 	t.Parallel()
+
+	db := openDB(t)
+	storage := NewStorage(db)
 
 	assertEmpty := func() {
 		actual, err := storage.AlertPlayers()
@@ -148,10 +170,15 @@ func TestStorage_AlertPlayers(t *testing.T) {
 	actual, err := storage.AlertPlayers()
 	require.NoError(t, err)
 	assert.Equal(t, expected, actual)
+
+	cleanDB(t, db)
 }
 
 func TestStorage_ExpectedStats(t *testing.T) {
 	t.Parallel()
+
+	db := openDB(t)
+	storage := NewStorage(db)
 
 	expected := model.ExpectedStats{
 		1: model.ExpectedValues{
@@ -174,10 +201,15 @@ func TestStorage_ExpectedStats(t *testing.T) {
 	actual, err := storage.ExpectedStats()
 	require.NoError(t, err)
 	assert.Equal(t, expected, actual)
+
+	cleanDB(t, db)
 }
 
 func TestStorage_OwnIGN(t *testing.T) {
 	t.Parallel()
+
+	db := openDB(t)
+	storage := NewStorage(db)
 
 	expected := "tonango"
 	// 書き込み：正常系
@@ -188,4 +220,6 @@ func TestStorage_OwnIGN(t *testing.T) {
 	actual, err := storage.OwnIGN()
 	require.NoError(t, err)
 	assert.Equal(t, expected, actual)
+
+	cleanDB(t, db)
 }

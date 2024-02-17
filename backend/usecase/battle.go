@@ -57,8 +57,12 @@ func NewBattle(
 }
 
 func (b *Battle) Get(appCtx context.Context, userConfig model.UserConfigV2) (model.Battle, error) {
-	b.wargaming.SetAppID(userConfig.Appid)
 	var result model.Battle
+
+	appID := userConfig.Appid
+	if len(appID) == 0 {
+		return result, failure.New(apperr.WGAPIError)
+	}
 
 	// Fetch on-memory stored data
 	warshipResult := make(chan model.Result[model.Warships])
@@ -66,10 +70,10 @@ func (b *Battle) Get(appCtx context.Context, userConfig model.UserConfigV2) (mod
 	battleArenasResult := make(chan model.Result[model.WGBattleArenas])
 	battleTypesResult := make(chan model.Result[model.WGBattleTypes])
 	if b.isFirstBattle {
-		go b.fetchWarships(warshipResult)
+		go b.fetchWarships(appID, warshipResult)
 		go b.fetchExpectedStats(allExpectedStatsResult)
-		go b.fetchBattleArenas(battleArenasResult)
-		go b.fetchBattleTypes(battleTypesResult)
+		go b.fetchBattleArenas(appID, battleArenasResult)
+		go b.fetchBattleTypes(appID, battleTypesResult)
 	}
 
 	// Get tempArenaInfo.json
@@ -82,7 +86,7 @@ func (b *Battle) Get(appCtx context.Context, userConfig model.UserConfigV2) (mod
 	_ = b.storage.WriteOwnIGN(tempArenaInfo.PlayerName)
 
 	// Get Account ID list
-	accountList, err := b.wargaming.AccountList(tempArenaInfo.AccountNames())
+	accountList, err := b.wargaming.AccountList(appID, tempArenaInfo.AccountNames())
 	if err != nil {
 		return result, err
 	}
@@ -92,9 +96,9 @@ func (b *Battle) Get(appCtx context.Context, userConfig model.UserConfigV2) (mod
 	accountInfoResult := make(chan model.Result[model.WGAccountInfo])
 	shipStatsResult := make(chan model.Result[model.AllPlayerShipsStats])
 	clanResult := make(chan model.Result[model.Clans])
-	go b.fetchAccountInfo(accountIDs, accountInfoResult)
-	go b.fetchAllPlayerShipsStats(accountIDs, shipStatsResult)
-	go b.fetchClan(accountIDs, clanResult)
+	go b.fetchAccountInfo(appID, accountIDs, accountInfoResult)
+	go b.fetchAllPlayerShipsStats(appID, accountIDs, shipStatsResult)
+	go b.fetchClan(appID, accountIDs, clanResult)
 
 	errs := make([]error, 0)
 
@@ -168,7 +172,7 @@ func (b *Battle) getTempArenaInfo(userConfig model.UserConfigV2) (model.TempAren
 	return tempArenaInfo, nil
 }
 
-func (b *Battle) fetchWarships(channel chan model.Result[model.Warships]) {
+func (b *Battle) fetchWarships(appID string, channel chan model.Result[model.Warships]) {
 	warships := make(model.Warships)
 	var result model.Result[model.Warships]
 
@@ -188,7 +192,7 @@ func (b *Battle) fetchWarships(channel chan model.Result[model.Warships]) {
 	}
 
 	first := 1
-	encycShips, pageTotal, err := b.wargaming.EncycShips(first)
+	encycShips, pageTotal, err := b.wargaming.EncycShips(appID, first)
 	if err != nil {
 		result.Error = err
 		channel <- result
@@ -198,7 +202,7 @@ func (b *Battle) fetchWarships(channel chan model.Result[model.Warships]) {
 
 	pages := makeRange(first+1, pageTotal+1)
 	err = doParallel(b.parallels, pages, func(page int) error {
-		res, _, err := b.wargaming.EncycShips(page)
+		res, _, err := b.wargaming.EncycShips(appID, page)
 		if err != nil {
 			return err
 		}
@@ -256,26 +260,30 @@ func (b *Battle) fetchExpectedStats(channel chan model.Result[model.ExpectedStat
 	channel <- result
 }
 
-func (b *Battle) fetchBattleArenas(channel chan model.Result[model.WGBattleArenas]) {
-	battleArenas, err := b.wargaming.BattleArenas()
+func (b *Battle) fetchBattleArenas(appID string, channel chan model.Result[model.WGBattleArenas]) {
+	battleArenas, err := b.wargaming.BattleArenas(appID)
 	channel <- model.Result[model.WGBattleArenas]{Value: battleArenas, Error: err}
 }
 
-func (b *Battle) fetchBattleTypes(channel chan model.Result[model.WGBattleTypes]) {
-	battleTypes, err := b.wargaming.BattleTypes()
+func (b *Battle) fetchBattleTypes(appID string, channel chan model.Result[model.WGBattleTypes]) {
+	battleTypes, err := b.wargaming.BattleTypes(appID)
 	channel <- model.Result[model.WGBattleTypes]{Value: battleTypes, Error: err}
 }
 
-func (b *Battle) fetchAccountInfo(accountIDs []int, channel chan model.Result[model.WGAccountInfo]) {
-	accountInfo, err := b.wargaming.AccountInfo(accountIDs)
+func (b *Battle) fetchAccountInfo(appID string, accountIDs []int, channel chan model.Result[model.WGAccountInfo]) {
+	accountInfo, err := b.wargaming.AccountInfo(appID, accountIDs)
 	channel <- model.Result[model.WGAccountInfo]{Value: accountInfo, Error: err}
 }
 
-func (b *Battle) fetchAllPlayerShipsStats(accountIDs []int, channel chan model.Result[model.AllPlayerShipsStats]) {
+func (b *Battle) fetchAllPlayerShipsStats(
+	appID string,
+	accountIDs []int,
+	channel chan model.Result[model.AllPlayerShipsStats],
+) {
 	shipStatsMap := make(model.AllPlayerShipsStats)
 	var mu sync.Mutex
 	err := doParallel(b.parallels, accountIDs, func(accountID int) error {
-		shipStats, err := b.wargaming.ShipsStats(accountID)
+		shipStats, err := b.wargaming.ShipsStats(appID, accountID)
 		if err != nil {
 			return err
 		}
@@ -290,10 +298,10 @@ func (b *Battle) fetchAllPlayerShipsStats(accountIDs []int, channel chan model.R
 	channel <- model.Result[model.AllPlayerShipsStats]{Value: shipStatsMap, Error: err}
 }
 
-func (b *Battle) fetchClan(accountIDs []int, channel chan model.Result[model.Clans]) {
+func (b *Battle) fetchClan(appID string, accountIDs []int, channel chan model.Result[model.Clans]) {
 	var result model.Result[model.Clans]
 
-	clansAccountInfo, err := b.wargaming.ClansAccountInfo(accountIDs)
+	clansAccountInfo, err := b.wargaming.ClansAccountInfo(appID, accountIDs)
 	if err != nil {
 		result.Error = err
 		channel <- result
@@ -301,7 +309,7 @@ func (b *Battle) fetchClan(accountIDs []int, channel chan model.Result[model.Cla
 	}
 
 	clanIDs := clansAccountInfo.ClanIDs()
-	clansInfo, err := b.wargaming.ClansInfo(clanIDs)
+	clansInfo, err := b.wargaming.ClansInfo(appID, clanIDs)
 	if err != nil {
 		result.Error = err
 		channel <- result

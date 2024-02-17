@@ -157,8 +157,23 @@ func (c *Config) RemoveAlertPlayer(accountID int) error {
 	return c.storage.WriteAlertPlayers(players)
 }
 
-func (c *Config) SearchPlayer(prefix string) (model.WGAccountList, error) {
-	return c.wargaming.AccountListForSearch(prefix)
+func (c *Config) SearchPlayer(prefix string) model.WGAccountList {
+	config, err := c.storage.UserConfigV2()
+	if err != nil {
+		return model.WGAccountList{}
+	}
+
+	appID := config.Appid
+	if appID == "" {
+		return model.WGAccountList{}
+	}
+
+	result, err := c.wargaming.AccountListForSearch(appID, prefix)
+	if err != nil {
+		return model.WGAccountList{}
+	}
+
+	return result
 }
 
 func (c *Config) SelectDirectory(appCtx context.Context) (string, error) {
