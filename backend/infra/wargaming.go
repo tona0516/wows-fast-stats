@@ -1,6 +1,7 @@
 package infra
 
 import (
+	"net/http"
 	"strconv"
 	"strings"
 	"time"
@@ -38,6 +39,7 @@ func (w *Wargaming) AccountInfo(appID string, accountIDs []int) (model.WGAccount
 			"fields":         response.WGAccountInfo{}.Field(),
 			"extra":          "statistics.pvp_solo,statistics.pvp_div2,statistics.pvp_div3",
 		},
+		w.config.Transport,
 	)
 
 	return res.Data, err
@@ -54,6 +56,7 @@ func (w *Wargaming) AccountList(appID string, accountNames []string) (model.WGAc
 			"fields":         response.WGAccountList{}.Field(),
 			"type":           "exact",
 		},
+		w.config.Transport,
 	)
 
 	return res.Data, err
@@ -70,6 +73,7 @@ func (w *Wargaming) AccountListForSearch(appID string, prefix string) (model.WGA
 			"fields":         response.WGAccountList{}.Field(),
 			"limit":          "10",
 		},
+		w.config.Transport,
 	)
 
 	return res.Data, err
@@ -90,6 +94,7 @@ func (w *Wargaming) ClansAccountInfo(appID string, accountIDs []int) (model.WGCl
 			"account_id":     strings.Join(strAccountIDs, ","),
 			"fields":         response.WGClansAccountInfo{}.Field(),
 		},
+		w.config.Transport,
 	)
 
 	return res.Data, err
@@ -114,6 +119,7 @@ func (w *Wargaming) ClansInfo(appID string, clanIDs []int) (model.WGClansInfo, e
 			"clan_id":        strings.Join(strClanIDs, ","),
 			"fields":         response.WGClansInfo{}.Field(),
 		},
+		w.config.Transport,
 	)
 
 	return res.Data, err
@@ -130,6 +136,7 @@ func (w *Wargaming) ShipsStats(appID string, accountID int) (model.WGShipsStats,
 			"fields":         response.WGShipsStats{}.Field(),
 			"extra":          "pvp_solo,pvp_div2,pvp_div3",
 		},
+		w.config.Transport,
 	)
 
 	return res.Data, err
@@ -146,6 +153,7 @@ func (w *Wargaming) EncycShips(appID string, pageNo int) (model.WGEncycShips, in
 			"language":       "ja",
 			"page_no":        strconv.Itoa(pageNo),
 		},
+		w.config.Transport,
 	)
 
 	return res.Data, res.Meta.PageTotal, err
@@ -160,6 +168,7 @@ func (w *Wargaming) EncycInfo(appID string) (model.WGEncycInfoData, error) {
 			"application_id": appID,
 			"fields":         response.WGEncycInfo{}.Field(),
 		},
+		w.config.Transport,
 	)
 
 	return res.Data, err
@@ -175,6 +184,7 @@ func (w *Wargaming) BattleArenas(appID string) (model.WGBattleArenas, error) {
 			"fields":         response.WGBattleArenas{}.Field(),
 			"language":       "ja",
 		},
+		w.config.Transport,
 	)
 
 	return res.Data, err
@@ -190,6 +200,7 @@ func (w *Wargaming) BattleTypes(appID string) (model.WGBattleTypes, error) {
 			"fields":         response.WGBattleTypes{}.Field(),
 			"language":       "ja",
 		},
+		w.config.Transport,
 	)
 
 	return res.Data, err
@@ -204,6 +215,7 @@ func (w *Wargaming) Test(appID string) (bool, error) {
 			"application_id": appID,
 			"fields":         response.WGEncycInfo{}.Field(),
 		},
+		w.config.Transport,
 	)
 
 	return err == nil, err
@@ -214,10 +226,11 @@ func request[T response.WGResponse](
 	retry uint64,
 	timeout time.Duration,
 	queries map[string]string,
+	transport *http.Transport,
 ) (T, error) {
 	b := backoff.WithMaxRetries(backoff.NewExponentialBackOff(), retry)
 	operation := func() (webapi.Response[any, T], error) {
-		res, err := webapi.GetRequest[T](rawURL, timeout, queries)
+		res, err := webapi.GetRequest[T](rawURL, timeout, queries, transport)
 		errCtx := failure.Context{
 			"url":         res.Request.URL,
 			"status_code": strconv.Itoa(res.StatusCode),

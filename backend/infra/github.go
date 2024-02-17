@@ -26,6 +26,7 @@ func (g *Github) LatestRelease() (model.GHLatestRelease, error) {
 			g.config.URL+"/repos/tona0516/wows-fast-stats/releases/latest",
 			g.config.Timeout,
 			nil,
+			g.config.Transport,
 		)
 		errCtx := failure.Context{
 			"url":         res.Request.URL,

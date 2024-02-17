@@ -51,7 +51,7 @@ func TestGetRequest(t *testing.T) {
 		defer server.Close()
 		expected.Request.URL = server.URL
 
-		actual, err := GetRequest[TestResponseBody](server.URL, 1*time.Second, nil)
+		actual, err := GetRequest[TestResponseBody](server.URL, 1*time.Second, nil, nil)
 
 		assert.Equal(t, expected, actual)
 		require.NoError(t, err)
@@ -75,7 +75,7 @@ func TestGetRequest(t *testing.T) {
 		defer server.Close()
 		expected.Request.URL = server.URL + "?hoge=fuga"
 
-		actual, err := GetRequest[TestResponseBody](server.URL, 1*time.Second, map[string]string{"hoge": "fuga"})
+		actual, err := GetRequest[TestResponseBody](server.URL, 1*time.Second, map[string]string{"hoge": "fuga"}, nil)
 
 		assert.Equal(t, expected, actual)
 		require.NoError(t, err)
@@ -99,7 +99,7 @@ func TestGetRequest(t *testing.T) {
 		defer server.Close()
 		expected.Request.URL = server.URL
 
-		_, err := GetRequest[TestResponseBody](server.URL, 100*time.Millisecond, nil)
+		_, err := GetRequest[TestResponseBody](server.URL, 100*time.Millisecond, nil, nil)
 
 		require.Error(t, err)
 	})
@@ -127,7 +127,7 @@ func TestGetRequest(t *testing.T) {
 				}))
 				defer server.Close()
 
-				_, err := GetRequest[TestResponseBody](server.URL, 1*time.Second, nil)
+				_, err := GetRequest[TestResponseBody](server.URL, 1*time.Second, nil, nil)
 
 				require.Error(t, err)
 			})
@@ -156,7 +156,7 @@ func TestPostRequestJSON(t *testing.T) {
 		defer server.Close()
 		expected.Request.URL = server.URL
 
-		actual, err := PostRequestJSON[any, TestResponseBody](server.URL, 1*time.Second, nil)
+		actual, err := PostRequestJSON[any, TestResponseBody](server.URL, 1*time.Second, nil, nil)
 
 		assert.Equal(t, expected, actual)
 		require.NoError(t, err)
@@ -185,6 +185,7 @@ func TestPostRequestJSON(t *testing.T) {
 			server.URL,
 			1*time.Second,
 			TestRequestBody{ID: "test_id"},
+			nil,
 		)
 
 		assert.Equal(t, expected, actual)
@@ -209,7 +210,7 @@ func TestPostRequestJSON(t *testing.T) {
 		defer server.Close()
 		expected.Request.URL = server.URL
 
-		_, err := PostRequestJSON[TestRequestBody, TestResponseBody](server.URL, 100*time.Millisecond, TestRequestBody{})
+		_, err := PostRequestJSON[TestRequestBody, TestResponseBody](server.URL, 100*time.Millisecond, TestRequestBody{}, nil)
 
 		require.Error(t, err)
 	})
@@ -237,7 +238,7 @@ func TestPostRequestJSON(t *testing.T) {
 				}))
 				defer server.Close()
 
-				_, err := PostRequestJSON[TestRequestBody, TestResponseBody](server.URL, 1*time.Second, TestRequestBody{})
+				_, err := PostRequestJSON[TestRequestBody, TestResponseBody](server.URL, 1*time.Second, TestRequestBody{}, nil)
 
 				require.Error(t, err)
 			})

@@ -15,6 +15,7 @@ func GetRequest[T any](
 	rawURL string,
 	timeout time.Duration,
 	queries map[string]string,
+	transport *http.Transport,
 ) (Response[any, T], error) {
 	var response Response[any, T]
 	response.Request.Method = http.MethodGet
@@ -38,7 +39,7 @@ func GetRequest[T any](
 	}
 
 	// request
-	err = request[any, T](req, &response, timeout)
+	err = request[any, T](req, &response, timeout, transport)
 	return response, failure.Wrap(err)
 }
 
@@ -46,6 +47,7 @@ func PostRequestJSON[T, U any](
 	rawURL string,
 	timeout time.Duration,
 	requestBody T,
+	transport *http.Transport,
 ) (Response[T, U], error) {
 	var response Response[T, U]
 	response.Request.Method = http.MethodPost
@@ -66,7 +68,7 @@ func PostRequestJSON[T, U any](
 	req.Header.Set("content-type", "application/json")
 
 	// request
-	err = request[T, U](req, &response, timeout)
+	err = request[T, U](req, &response, timeout, transport)
 	return response, failure.Wrap(err)
 }
 
@@ -74,9 +76,14 @@ func request[T, U any](
 	request *http.Request,
 	response *Response[T, U],
 	timeout time.Duration,
+	transport *http.Transport,
 ) error {
 	client := http.Client{}
 	client.Timeout = timeout
+
+	if transport != nil {
+		client = http.Client{Transport: transport}
+	}
 
 	// request
 	res, err := client.Do(request)

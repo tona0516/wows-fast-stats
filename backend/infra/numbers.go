@@ -26,6 +26,7 @@ func (n *Numbers) ExpectedStats() (model.ExpectedStats, error) {
 			n.config.URL+"/personal/rating/expected/json/",
 			n.config.Timeout,
 			nil,
+			n.config.Transport,
 		)
 		errCtx := failure.Context{
 			"url":         res.Request.URL,

@@ -29,6 +29,7 @@ func (w *UnofficialWargaming) ClansAutoComplete(search string) (model.UWGClansAu
 				"search": search,
 				"type":   "clans",
 			},
+			w.config.Transport,
 		)
 		errCtx := failure.Context{
 			"url":         res.Request.URL,

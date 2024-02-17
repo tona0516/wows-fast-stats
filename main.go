@@ -1,8 +1,10 @@
 package main
 
 import (
+	"crypto/tls"
 	"embed"
 	"fmt"
+	"net/http"
 	"os"
 	"strconv"
 	"time"
@@ -110,6 +112,11 @@ func initApp(env model.Env) *App {
 		URL:     "https://api.wows-numbers.com",
 		Retry:   maxRetry,
 		Timeout: timeout,
+		// workaround for expired SSL certificate
+		Transport: &http.Transport{
+			//nolint:gosec
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		},
 	})
 	localFile := infra.NewLocalFile()
 	configV0 := infra.NewConfigV0()

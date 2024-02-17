@@ -26,6 +26,7 @@ func (d *Discord) Comment(message string) error {
 		d.config.URL,
 		d.config.Timeout,
 		DiscordRequestBody{Content: message},
+		d.config.Transport,
 	)
 	errCtx := failure.Context{
 		"url":         res.Request.URL,
