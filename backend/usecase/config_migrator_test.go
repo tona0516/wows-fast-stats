@@ -173,7 +173,6 @@ func TestConfigMigrator_toV2(t *testing.T) {
 		mockStorage.AssertNotCalled(t, "WriteUserConfigV2")
 		mockStorage.AssertNotCalled(t, "WriteDataVersion")
 	})
-
 	t.Run("正常系_UserConfigV2のVersionのみ更新", func(t *testing.T) {
 		t.Parallel()
 
@@ -188,7 +187,7 @@ func TestConfigMigrator_toV2(t *testing.T) {
 			},
 		}
 
-		expeect := model.UserConfigV2{
+		expect := model.UserConfigV2{
 			Version:     2,
 			Appid:       "test_appid",
 			InstallPath: "test_install_path",
@@ -202,7 +201,7 @@ func TestConfigMigrator_toV2(t *testing.T) {
 		mockStorage := &mocks.StorageInterface{}
 		mockStorage.On("DataVersion").Return(uint(1), nil)
 		mockStorage.On("UserConfigV2").Return(v2, nil)
-		mockStorage.On("WriteUserConfigV2", expeect).Return(nil)
+		mockStorage.On("WriteUserConfigV2", expect).Return(nil)
 		mockStorage.On("WriteDataVersion", uint(2)).Return(nil)
 
 		// テスト
@@ -213,7 +212,6 @@ func TestConfigMigrator_toV2(t *testing.T) {
 		require.NoError(t, err)
 		mockStorage.AssertExpectations(t)
 	})
-
 	t.Run("正常系_成功", func(t *testing.T) {
 		t.Parallel()
 
