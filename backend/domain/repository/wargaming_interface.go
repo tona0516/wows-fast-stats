@@ -2,6 +2,7 @@ package repository
 
 import "wfs/backend/domain/model"
 
+//go:generate mockgen -source=$GOFILE -destination ../mock_$GOPACKAGE/$GOFILE -package mock_$GOPACKAGE
 type WargamingInterface interface {
 	AccountInfo(appID string, accountIDs []int) (model.WGAccountInfo, error)
 	AccountList(appID string, accountNames []string) (model.WGAccountList, error)

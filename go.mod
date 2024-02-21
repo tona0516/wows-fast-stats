@@ -39,6 +39,7 @@ require (
 	github.com/rogpeppe/go-internal v1.11.0 // indirect
 	github.com/wailsapp/go-webview2 v1.0.10 // indirect
 	go.opencensus.io v0.24.0 // indirect
+	go.uber.org/mock v0.4.0 // indirect
 	google.golang.org/protobuf v1.32.0 // indirect
 )
 

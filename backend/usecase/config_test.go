@@ -6,12 +6,13 @@ import (
 	"path/filepath"
 	"testing"
 	"wfs/backend/apperr"
+	"wfs/backend/domain/mock_repository"
 	"wfs/backend/domain/model"
-	"wfs/backend/mocks"
 
 	"github.com/morikuni/failure"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/mock/gomock"
 )
 
 const (
@@ -23,6 +24,8 @@ var errWargaming = failure.New(apperr.WGAPIError)
 
 //nolint:paralleltest
 func TestConfig_UpdateRequired(t *testing.T) {
+	ctrl := gomock.NewController(t)
+
 	// 準備
 	err := createGameClientPath()
 	require.NoError(t, err)
@@ -31,11 +34,12 @@ func TestConfig_UpdateRequired(t *testing.T) {
 	t.Run("正常系", func(t *testing.T) {
 		config := createInputConfig()
 
-		mockWargaming := &mocks.WargamingInterface{}
-		mockStorage := &mocks.StorageInterface{}
-		mockWargaming.On("Test", config.Appid).Return(true, nil)
-		mockStorage.On("UserConfigV2").Return(model.DefaultUserConfigV2, nil)
-		mockStorage.On("WriteUserConfigV2", config).Return(nil)
+		mockWargaming := mock_repository.NewMockWargamingInterface(ctrl)
+		mockWargaming.EXPECT().Test(config.Appid).Return(true, nil)
+
+		mockStorage := mock_repository.NewMockStorageInterface(ctrl)
+		mockStorage.EXPECT().UserConfigV2().Return(model.DefaultUserConfigV2, nil)
+		mockStorage.EXPECT().WriteUserConfigV2(config).Return(nil)
 
 		// テスト
 		c := NewConfig(nil, mockWargaming, mockStorage, nil)
@@ -44,8 +48,6 @@ func TestConfig_UpdateRequired(t *testing.T) {
 		// アサーション
 		assert.Equal(t, model.RequiredConfigError{Valid: true}, actual)
 		require.NoError(t, err)
-		mockWargaming.AssertExpectations(t)
-		mockStorage.AssertExpectations(t)
 	})
 
 	t.Run("異常系_不正なインストールパス", func(t *testing.T) {
@@ -53,8 +55,8 @@ func TestConfig_UpdateRequired(t *testing.T) {
 		config.InstallPath = "invalid/path" // Note: 不正なパス
 		config.Appid = "abc123"
 
-		mockWargaming := &mocks.WargamingInterface{}
-		mockWargaming.On("Test", config.Appid).Return(true, nil)
+		mockWargaming := mock_repository.NewMockWargamingInterface(ctrl)
+		mockWargaming.EXPECT().Test(config.Appid).Return(true, nil)
 
 		// テスト
 		c := NewConfig(nil, mockWargaming, nil, nil)
@@ -63,14 +65,13 @@ func TestConfig_UpdateRequired(t *testing.T) {
 		// アサーション
 		assert.Equal(t, model.RequiredConfigError{InstallPath: apperr.InvalidInstallPath.ErrorCode()}, actual)
 		require.NoError(t, err)
-		mockWargaming.AssertExpectations(t)
 	})
 
 	t.Run("異常系_不正なAppID", func(t *testing.T) {
 		config := createInputConfig()
 
-		mockWargaming := &mocks.WargamingInterface{}
-		mockWargaming.On("Test", config.Appid).Return(false, errWargaming) // Note: WG APIでエラー
+		mockWargaming := mock_repository.NewMockWargamingInterface(ctrl)
+		mockWargaming.EXPECT().Test(config.Appid).Return(false, errWargaming) // Note: WG APIでエラー
 
 		// テスト
 		c := NewConfig(nil, mockWargaming, nil, nil)
@@ -79,12 +80,13 @@ func TestConfig_UpdateRequired(t *testing.T) {
 		// アサーション
 		assert.Equal(t, model.RequiredConfigError{AppID: apperr.InvalidAppID.ErrorCode()}, actual)
 		require.NoError(t, err)
-		mockWargaming.AssertExpectations(t)
 	})
 }
 
 //nolint:paralleltest
 func TestConfig_UpdateOptional(t *testing.T) {
+	ctrl := gomock.NewController(t)
+
 	// 準備
 	err := createGameClientPath()
 	require.NoError(t, err)
@@ -97,9 +99,9 @@ func TestConfig_UpdateOptional(t *testing.T) {
 		actualWritten := model.DefaultUserConfigV2
 		actualWritten.FontSize = "small"
 
-		mockStorage := &mocks.StorageInterface{}
-		mockStorage.On("UserConfigV2").Return(model.DefaultUserConfigV2, nil)
-		mockStorage.On("WriteUserConfigV2", actualWritten).Return(nil)
+		mockStorage := mock_repository.NewMockStorageInterface(ctrl)
+		mockStorage.EXPECT().UserConfigV2().Return(model.DefaultUserConfigV2, nil)
+		mockStorage.EXPECT().WriteUserConfigV2(actualWritten).Return(nil)
 
 		// テスト実行
 		c := NewConfig(nil, nil, mockStorage, nil)
@@ -107,12 +109,13 @@ func TestConfig_UpdateOptional(t *testing.T) {
 
 		// アサーション
 		require.NoError(t, err)
-		mockStorage.AssertExpectations(t)
 	})
 }
 
 func TestConfig_AlertPlayers(t *testing.T) {
 	t.Parallel()
+
+	ctrl := gomock.NewController(t)
 
 	t.Run("正常系", func(t *testing.T) {
 		t.Parallel()
@@ -122,8 +125,9 @@ func TestConfig_AlertPlayers(t *testing.T) {
 			{AccountID: 1, Name: "Player1"},
 			{AccountID: 2, Name: "Player2"},
 		}
-		mockStorage := &mocks.StorageInterface{}
-		mockStorage.On("AlertPlayers").Return(expected, nil)
+
+		mockStorage := mock_repository.NewMockStorageInterface(ctrl)
+		mockStorage.EXPECT().AlertPlayers().Return(expected, nil)
 
 		// テスト
 		config := NewConfig(nil, nil, mockStorage, nil)
@@ -132,12 +136,13 @@ func TestConfig_AlertPlayers(t *testing.T) {
 		// アサーション
 		require.NoError(t, err)
 		assert.Equal(t, expected, actual)
-		mockStorage.AssertExpectations(t)
 	})
 }
 
 func TestConfig_UpdateAlertPlayer(t *testing.T) {
 	t.Parallel()
+
+	ctrl := gomock.NewController(t)
 
 	existingPlayers := []model.AlertPlayer{
 		{AccountID: 1, Name: "Player1"},
@@ -150,9 +155,9 @@ func TestConfig_UpdateAlertPlayer(t *testing.T) {
 		// 準備
 		newPlayer := model.AlertPlayer{AccountID: 3, Name: "Player3"}
 
-		mockStorage := &mocks.StorageInterface{}
-		mockStorage.On("AlertPlayers").Return(existingPlayers, nil)
-		mockStorage.On("WriteAlertPlayers", append(existingPlayers, newPlayer)).Return(nil)
+		mockStorage := mock_repository.NewMockStorageInterface(ctrl)
+		mockStorage.EXPECT().AlertPlayers().Return(existingPlayers, nil)
+		mockStorage.EXPECT().WriteAlertPlayers(append(existingPlayers, newPlayer)).Return(nil)
 
 		// テスト
 		config := NewConfig(nil, nil, mockStorage, nil)
@@ -160,16 +165,15 @@ func TestConfig_UpdateAlertPlayer(t *testing.T) {
 
 		// アサーション
 		require.NoError(t, err)
-		mockStorage.AssertExpectations(t)
 	})
 
 	t.Run("正常系_更新", func(t *testing.T) {
 		t.Parallel()
 
 		// 準備
-		mockStorage := &mocks.StorageInterface{}
-		mockStorage.On("AlertPlayers").Return(existingPlayers, nil)
-		mockStorage.On("WriteAlertPlayers", []model.AlertPlayer{
+		mockStorage := mock_repository.NewMockStorageInterface(ctrl)
+		mockStorage.EXPECT().AlertPlayers().Return(existingPlayers, nil)
+		mockStorage.EXPECT().WriteAlertPlayers([]model.AlertPlayer{
 			{AccountID: 1, Name: "UpdatedPlayer"},
 			{AccountID: 2, Name: "Player2"},
 		}).Return(nil)
@@ -180,23 +184,24 @@ func TestConfig_UpdateAlertPlayer(t *testing.T) {
 
 		// アサーション
 		require.NoError(t, err)
-		mockStorage.AssertExpectations(t)
 	})
 }
 
 func TestConfig_RemoveAlertPlayer(t *testing.T) {
 	t.Parallel()
 
+	ctrl := gomock.NewController(t)
+
 	t.Run("正常系_対象IDあり", func(t *testing.T) {
 		t.Parallel()
 
 		// 準備
-		mockStorage := &mocks.StorageInterface{}
-		mockStorage.On("AlertPlayers").Return([]model.AlertPlayer{
+		mockStorage := mock_repository.NewMockStorageInterface(ctrl)
+		mockStorage.EXPECT().AlertPlayers().Return([]model.AlertPlayer{
 			{AccountID: 1, Name: "Player1"},
 			{AccountID: 2, Name: "Player2"},
 		}, nil)
-		mockStorage.On("WriteAlertPlayers", []model.AlertPlayer{
+		mockStorage.EXPECT().WriteAlertPlayers([]model.AlertPlayer{
 			{AccountID: 2, Name: "Player2"},
 		}).Return(nil)
 
@@ -206,15 +211,14 @@ func TestConfig_RemoveAlertPlayer(t *testing.T) {
 
 		// アサーション
 		require.NoError(t, err)
-		mockStorage.AssertExpectations(t)
 	})
 
 	t.Run("正常系_対象IDなし", func(t *testing.T) {
 		t.Parallel()
 
 		// 準備
-		mockStorage := &mocks.StorageInterface{}
-		mockStorage.On("AlertPlayers").Return([]model.AlertPlayer{
+		mockStorage := mock_repository.NewMockStorageInterface(ctrl)
+		mockStorage.EXPECT().AlertPlayers().Return([]model.AlertPlayer{
 			{AccountID: 1, Name: "Player1"},
 			{AccountID: 2, Name: "Player2"},
 		}, nil)
@@ -225,8 +229,6 @@ func TestConfig_RemoveAlertPlayer(t *testing.T) {
 
 		// アサーション
 		require.NoError(t, err)
-		mockStorage.AssertExpectations(t)
-		mockStorage.AssertNotCalled(t, "WriteAlertPlayers")
 	})
 }
 

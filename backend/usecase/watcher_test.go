@@ -5,17 +5,19 @@ import (
 	"testing"
 	"time"
 	"wfs/backend/apperr"
+	"wfs/backend/domain/mock_repository"
 	"wfs/backend/domain/model"
-	"wfs/backend/mocks"
 
 	"github.com/morikuni/failure"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/mock/gomock"
 )
 
 func TestWatcher_Start(t *testing.T) {
 	t.Parallel()
+
+	ctrl := gomock.NewController(t)
 
 	t.Run("正常系_戦闘開始", func(t *testing.T) {
 		t.Parallel()
@@ -26,11 +28,11 @@ func TestWatcher_Start(t *testing.T) {
 			Appid:       "abc123",
 			FontSize:    "medium",
 		}
-		mockStorage := &mocks.StorageInterface{}
-		mockLocalFile := &mocks.LocalFileInterface{}
+		mockStorage := mock_repository.NewMockStorageInterface(ctrl)
+		mockStorage.EXPECT().UserConfigV2().Return(config, nil)
 
-		mockStorage.On("UserConfigV2").Return(config, nil)
-		mockLocalFile.On("TempArenaInfo", config.InstallPath).Return(model.TempArenaInfo{}, nil)
+		mockLocalFile := mock_repository.NewMockLocalFileInterface(ctrl)
+		mockLocalFile.EXPECT().TempArenaInfo(config.InstallPath).Return(model.TempArenaInfo{}, nil).AnyTimes()
 
 		var events []string
 		emitFunc := func(ctx context.Context, eventName string, optionalData ...interface{}) {
@@ -51,10 +53,8 @@ func TestWatcher_Start(t *testing.T) {
 
 		assert.Len(t, events, 1)
 		assert.Contains(t, events, EventStart)
-
-		mockStorage.AssertExpectations(t)
-		mockLocalFile.AssertExpectations(t)
 	})
+
 	t.Run("正常系_戦闘終了", func(t *testing.T) {
 		t.Parallel()
 
@@ -70,11 +70,12 @@ func TestWatcher_Start(t *testing.T) {
 				Appid:       "abc123",
 				FontSize:    "medium",
 			}
-			mockStorage := &mocks.StorageInterface{}
-			mockLocalFile := &mocks.LocalFileInterface{}
 
-			mockStorage.On("UserConfigV2").Return(config, nil)
-			mockLocalFile.On("TempArenaInfo", config.InstallPath).Return(model.TempArenaInfo{}, failure.New(ie))
+			mockStorage := mock_repository.NewMockStorageInterface(ctrl)
+			mockStorage.EXPECT().UserConfigV2().Return(config, nil)
+
+			mockLocalFile := mock_repository.NewMockLocalFileInterface(ctrl)
+			mockLocalFile.EXPECT().TempArenaInfo(config.InstallPath).Return(model.TempArenaInfo{}, failure.New(ie)).AnyTimes()
 
 			var events []string
 			emitFunc := func(ctx context.Context, eventName string, optionalData ...interface{}) {
@@ -97,6 +98,7 @@ func TestWatcher_Start(t *testing.T) {
 			assert.Contains(t, events, EventEnd)
 		}
 	})
+
 	t.Run("正常系_キャンセル", func(t *testing.T) {
 		t.Parallel()
 
@@ -106,8 +108,9 @@ func TestWatcher_Start(t *testing.T) {
 			Appid:       "abc123",
 			FontSize:    "medium",
 		}
-		mockStorage := &mocks.StorageInterface{}
-		mockStorage.On("UserConfigV2").Return(config, nil)
+
+		mockStorage := mock_repository.NewMockStorageInterface(ctrl)
+		mockStorage.EXPECT().UserConfigV2().Return(config, nil)
 
 		var events []string
 		emitFunc := func(ctx context.Context, eventName string, optionalData ...interface{}) {
@@ -126,9 +129,8 @@ func TestWatcher_Start(t *testing.T) {
 		time.Sleep(100 * time.Millisecond)
 
 		assert.Empty(t, events)
-
-		mockStorage.AssertExpectations(t)
 	})
+
 	t.Run("異常系_エラー発生", func(t *testing.T) {
 		t.Parallel()
 
@@ -138,16 +140,18 @@ func TestWatcher_Start(t *testing.T) {
 			Appid:       "abc123",
 			FontSize:    "medium",
 		}
-		mockStorage := &mocks.StorageInterface{}
-		mockLocalFile := &mocks.LocalFileInterface{}
-		mockLogger := &mocks.LoggerInterface{}
 
-		mockStorage.On("UserConfigV2").Return(config, nil)
-		mockLocalFile.On("TempArenaInfo", config.InstallPath).Return(
+		mockStorage := mock_repository.NewMockStorageInterface(ctrl)
+		mockStorage.EXPECT().UserConfigV2().Return(config, nil)
+
+		mockLocalFile := mock_repository.NewMockLocalFileInterface(ctrl)
+		mockLocalFile.EXPECT().TempArenaInfo(config.InstallPath).Return(
 			model.TempArenaInfo{},
 			failure.New(apperr.UnexpectedError),
-		)
-		mockLogger.On("Error", mock.Anything, mock.Anything).Return()
+		).AnyTimes()
+
+		mockLogger := mock_repository.NewMockLoggerInterface(ctrl)
+		mockLogger.EXPECT().Error(gomock.Any(), gomock.Any())
 
 		var events []string
 		emitFunc := func(ctx context.Context, eventName string, optionalData ...interface{}) {
@@ -168,9 +172,5 @@ func TestWatcher_Start(t *testing.T) {
 
 		assert.Len(t, events, 1)
 		assert.Contains(t, events, EventErr)
-
-		mockStorage.AssertExpectations(t)
-		mockLocalFile.AssertExpectations(t)
-		mockLogger.AssertExpectations(t)
 	})
 }

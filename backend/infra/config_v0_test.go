@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestLocalFile_User(t *testing.T) {
+func TestConfigV0_User(t *testing.T) {
 	t.Run("正常系", func(t *testing.T) {
 		defer os.RemoveAll(ConfigDir)
 
@@ -68,7 +68,7 @@ func TestLocalFile_User(t *testing.T) {
 	})
 }
 
-func TestLocalFile_AlertPlayers(t *testing.T) {
+func TestConfigV0_AlertPlayers(t *testing.T) {
 	// テストで生成したディレクトリを削除
 	defer os.RemoveAll(ConfigDir)
 

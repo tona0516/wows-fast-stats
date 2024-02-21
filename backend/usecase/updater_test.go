@@ -3,23 +3,27 @@ package usecase
 import (
 	"testing"
 	"wfs/backend/apperr"
+	"wfs/backend/domain/mock_repository"
 	"wfs/backend/domain/model"
-	"wfs/backend/mocks"
 
 	"github.com/morikuni/failure"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/mock/gomock"
 )
 
 func TestUpdater_IsUpdatable(t *testing.T) {
 	t.Parallel()
+
+	ctrl := gomock.NewController(t)
+
 	t.Run("正常系_アップデートあり", func(t *testing.T) {
 		t.Parallel()
 
 		// 準備
-		mockGithub := &mocks.GithubInterface{}
+		mockGithub := mock_repository.NewMockGithubInterface(ctrl)
 		response := model.GHLatestRelease{TagName: "2.0.0", HTMLURL: "https://hoge.com"}
-		mockGithub.On("LatestRelease").Return(response, nil)
+		mockGithub.EXPECT().LatestRelease().Return(response, nil)
 
 		env := model.Env{Semver: "1.0.0"}
 		updater := NewUpdater(env, mockGithub, nil)
@@ -32,16 +36,15 @@ func TestUpdater_IsUpdatable(t *testing.T) {
 		// アサーション
 		assert.Equal(t, expected, actual)
 		require.NoError(t, err)
-		mockGithub.AssertExpectations(t)
 	})
 
 	t.Run("正常系_アップデートなし", func(t *testing.T) {
 		t.Parallel()
 
 		// 準備
-		mockGithub := &mocks.GithubInterface{}
+		mockGithub := mock_repository.NewMockGithubInterface(ctrl)
 		response := model.GHLatestRelease{TagName: "1.0.0", HTMLURL: "https://hoge.com"}
-		mockGithub.On("LatestRelease").Return(response, nil)
+		mockGithub.EXPECT().LatestRelease().Return(response, nil)
 
 		env := model.Env{Semver: "1.0.0"}
 		updater := NewUpdater(env, mockGithub, nil)
@@ -54,16 +57,15 @@ func TestUpdater_IsUpdatable(t *testing.T) {
 		// アサーション
 		assert.Equal(t, expected, actual)
 		require.NoError(t, err)
-		mockGithub.AssertExpectations(t)
 	})
 
 	t.Run("異常系", func(t *testing.T) {
 		t.Parallel()
 
 		// 準備
-		mockGithub := &mocks.GithubInterface{}
+		mockGithub := mock_repository.NewMockGithubInterface(ctrl)
 		expected := failure.New(apperr.HTTPRequestError)
-		mockGithub.On("LatestRelease").Return(model.GHLatestRelease{}, expected)
+		mockGithub.EXPECT().LatestRelease().Return(model.GHLatestRelease{}, expected)
 
 		env := model.Env{Semver: "1.0.0"}
 		updater := NewUpdater(env, mockGithub, nil)
@@ -75,6 +77,5 @@ func TestUpdater_IsUpdatable(t *testing.T) {
 		code, ok := failure.CodeOf(err)
 		assert.True(t, ok)
 		assert.Equal(t, apperr.HTTPRequestError, code)
-		mockGithub.AssertExpectations(t)
 	})
 }

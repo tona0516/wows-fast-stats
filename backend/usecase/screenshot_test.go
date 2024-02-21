@@ -5,12 +5,13 @@ import (
 	"path/filepath"
 	"testing"
 	"wfs/backend/apperr"
-	"wfs/backend/mocks"
+	"wfs/backend/domain/mock_repository"
 
 	"github.com/morikuni/failure"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
+	"go.uber.org/mock/gomock"
 )
 
 const (
@@ -21,13 +22,15 @@ const (
 func TestScreenshot_SaveForAuto(t *testing.T) {
 	t.Parallel()
 
+	ctrl := gomock.NewController(t)
+
 	t.Run("正常系", func(t *testing.T) {
 		t.Parallel()
 
 		// 準備
 		screenshotPath := filepath.Join("screenshot", filename)
-		mockLocalFile := &mocks.LocalFileInterface{}
-		mockLocalFile.On("SaveScreenshot", screenshotPath, base64Data).Return(nil)
+		mockLocalFile := mock_repository.NewMockLocalFileInterface(ctrl)
+		mockLocalFile.EXPECT().SaveScreenshot(screenshotPath, base64Data).Return(nil).AnyTimes()
 
 		s := NewScreenshot(mockLocalFile, nil)
 		s.SaveFileDialog = func(ctx context.Context, dialogOptions runtime.SaveDialogOptions) (string, error) {
@@ -39,19 +42,21 @@ func TestScreenshot_SaveForAuto(t *testing.T) {
 
 		// アサーション
 		require.NoError(t, err)
-		mockLocalFile.AssertExpectations(t)
 	})
 }
 
 func TestScreenshot_SaveWithDialog(t *testing.T) {
 	t.Parallel()
 
+	ctrl := gomock.NewController(t)
+
 	t.Run("正常系", func(t *testing.T) {
 		t.Parallel()
+
 		// 準備
 		screenshotPath := filepath.Join("directory", filename)
-		mockLocalFile := &mocks.LocalFileInterface{}
-		mockLocalFile.On("SaveScreenshot", screenshotPath, base64Data).Return(nil)
+		mockLocalFile := mock_repository.NewMockLocalFileInterface(ctrl)
+		mockLocalFile.EXPECT().SaveScreenshot(screenshotPath, base64Data).Return(nil).AnyTimes()
 
 		s := NewScreenshot(mockLocalFile, nil)
 		s.SaveFileDialog = func(ctx context.Context, dialogOptions runtime.SaveDialogOptions) (string, error) {
@@ -64,7 +69,6 @@ func TestScreenshot_SaveWithDialog(t *testing.T) {
 		// アサーション
 		require.True(t, saved)
 		require.NoError(t, err)
-		mockLocalFile.AssertExpectations(t)
 	})
 
 	t.Run("異常系", func(t *testing.T) {

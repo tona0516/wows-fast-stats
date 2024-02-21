@@ -1,7 +1,6 @@
 package usecase
 
 import (
-	"fmt"
 	"wfs/backend/domain/model"
 	"wfs/backend/domain/repository"
 
@@ -30,7 +29,7 @@ func NewUpdater(
 func (u *Updater) IsUpdatable() (model.GHLatestRelease, error) {
 	var latestRelease model.GHLatestRelease
 
-	c, err := semver.NewConstraint(fmt.Sprintf("> %s", u.env.Semver))
+	c, err := semver.NewConstraint("> " + u.env.Semver)
 	if err != nil {
 		return latestRelease, failure.Wrap(err)
 	}

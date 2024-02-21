@@ -4,13 +4,13 @@ import (
 	"context"
 	"testing"
 	"wfs/backend/apperr"
+	"wfs/backend/domain/mock_repository"
 	"wfs/backend/domain/model"
-	"wfs/backend/mocks"
 
 	"github.com/morikuni/failure"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/mock/gomock"
 )
 
 //nolint:gochecknoglobals
@@ -23,20 +23,15 @@ var testUserConfig = model.UserConfigV2{
 func TestBattle_Get_正常系_初回(t *testing.T) {
 	t.Parallel()
 
-	// 準備
-	mockWargaming := &mocks.WargamingInterface{}
-	mockUnofficialWargaming := &mocks.UnofficialWargamingInterface{}
-	mockNumbers := &mocks.NumbersInterface{}
-	mockUnregistered := &mocks.UnregisteredInterface{}
-	mockLocalFile := &mocks.LocalFileInterface{}
-	mockStorage := &mocks.StorageInterface{}
-	mockLogger := &mocks.LoggerInterface{}
+	ctrl := gomock.NewController(t)
 
-	mockWargaming.On("AccountList", mock.Anything, mock.Anything).Return(model.WGAccountList{
+	// 準備
+	mockWargaming := mock_repository.NewMockWargamingInterface(ctrl)
+	mockWargaming.EXPECT().AccountList(gomock.Any(), gomock.Any()).Return(model.WGAccountList{
 		{NickName: "player_1", AccountID: 1},
 		{NickName: "player_2", AccountID: 2},
 	}, nil)
-	mockWargaming.On("EncycShips", mock.Anything, mock.Anything).Return(model.WGEncycShips{
+	mockWargaming.EXPECT().EncycShips(gomock.Any(), gomock.Any()).Return(model.WGEncycShips{
 		1: model.WGEncycShipsData{
 			Tier:      1,
 			Type:      "Battleship",
@@ -44,32 +39,49 @@ func TestBattle_Get_正常系_初回(t *testing.T) {
 			Nation:    "japan",
 			IsPremium: false,
 		},
-	}, 2, nil)
-	mockWargaming.On("BattleArenas", mock.Anything).Return(model.WGBattleArenas{}, nil)
-	mockWargaming.On("BattleTypes", mock.Anything).Return(model.WGBattleTypes{}, nil)
-	mockWargaming.On("AccountInfo", mock.Anything, mock.Anything).Return(model.WGAccountInfo{}, nil)
-	mockWargaming.On("ShipsStats", mock.Anything, mock.Anything).Return(model.WGShipsStats{}, nil)
-	mockWargaming.On("ClansAccountInfo", mock.Anything, mock.Anything).Return(model.WGClansAccountInfo{}, nil)
-	mockWargaming.On("ClansInfo", mock.Anything, mock.Anything).Return(model.WGClansInfo{
-		1: model.WGClansInfoData{Tag: "TEST"},
-	}, nil)
-	mockUnofficialWargaming.On("ClansAutoComplete", mock.Anything).Return(model.UWGClansAutocomplete{}, nil)
+	}, 2, nil).Times(2)
+	mockWargaming.EXPECT().BattleArenas(gomock.Any()).Return(model.WGBattleArenas{}, nil)
+	mockWargaming.EXPECT().BattleTypes(gomock.Any()).Return(model.WGBattleTypes{}, nil)
+	mockWargaming.EXPECT().AccountInfo(gomock.Any(), gomock.Any()).Return(model.WGAccountInfo{}, nil)
+	mockWargaming.EXPECT().ShipsStats(gomock.Any(), gomock.Any()).Return(model.WGShipsStats{}, nil).AnyTimes()
+	mockWargaming.EXPECT().ClansAccountInfo(gomock.Any(), gomock.Any()).Return(model.WGClansAccountInfo{}, nil)
+	mockWargaming.EXPECT().ClansInfo(gomock.Any(), gomock.Any()).Return(model.WGClansInfo{}, nil)
 
-	mockNumbers.On("ExpectedStats").Return(model.ExpectedStats{}, nil)
+	mockUnofficialWargaming := mock_repository.NewMockUnofficialWargamingInterface(ctrl)
+	mockUnofficialWargaming.EXPECT().ClansAutoComplete(gomock.Any()).Return(model.UWGClansAutocomplete{
+		SearchAutocompleteResult: []struct {
+			HexColor string `json:"hex_color"`
+			Tag      string `json:"tag"`
+			ID       int    `json:"id"`
+		}{
+			{
+				HexColor: "#114514",
+				Tag:      "TEST",
+				ID:       1919810,
+			},
+		},
+	}, nil).AnyTimes()
 
-	mockUnregistered.On("Warship").Return(model.Warships{}, nil)
+	mockNumbers := mock_repository.NewMockNumbersInterface(ctrl)
+	mockNumbers.EXPECT().ExpectedStats().Return(model.ExpectedStats{}, nil)
 
-	mockLocalFile.On("TempArenaInfo", mock.Anything).Return(model.TempArenaInfo{
+	mockUnregistered := mock_repository.NewMockUnregisteredInterface(ctrl)
+	mockUnregistered.EXPECT().Warship().Return(model.Warships{}, nil)
+
+	mockLocalFile := mock_repository.NewMockLocalFileInterface(ctrl)
+	mockLocalFile.EXPECT().TempArenaInfo(gomock.Any()).Return(model.TempArenaInfo{
 		Vehicles: []model.Vehicle{
 			{ShipID: 1, Name: "player_1", Relation: 0},
 			{ShipID: 2, Name: "player_2", Relation: 2},
 		},
 	}, nil)
 
-	mockStorage.On("WriteOwnIGN", mock.Anything).Return(nil)
-	mockStorage.On("WriteExpectedStats", mock.Anything).Return(nil)
+	mockStorage := mock_repository.NewMockStorageInterface(ctrl)
+	mockStorage.EXPECT().WriteOwnIGN(gomock.Any()).Return(nil)
+	mockStorage.EXPECT().WriteExpectedStats(gomock.Any()).Return(nil)
 
-	mockLogger.On("SetOwnIGN", mock.Anything).Return()
+	mockLogger := mock_repository.NewMockLoggerInterface(ctrl)
+	mockLogger.EXPECT().SetOwnIGN(gomock.Any()).Return()
 
 	// テスト
 	b := NewBattle(
@@ -87,49 +99,56 @@ func TestBattle_Get_正常系_初回(t *testing.T) {
 
 	// アサーション
 	require.NoError(t, err)
-	mockWargaming.AssertExpectations(t)
-	mockUnofficialWargaming.AssertExpectations(t)
-	mockNumbers.AssertExpectations(t)
-	mockUnregistered.AssertExpectations(t)
-	mockLocalFile.AssertExpectations(t)
-	mockStorage.AssertExpectations(t)
 }
 
 func TestBattle_Get_正常系_2回目以降(t *testing.T) {
 	t.Parallel()
+	ctrl := gomock.NewController(t)
 
 	// 準備
-	mockWargaming := &mocks.WargamingInterface{}
-	mockUnofficialWargaming := &mocks.UnofficialWargamingInterface{}
-	mockNumbers := &mocks.NumbersInterface{}
-	mockUnregistered := &mocks.UnregisteredInterface{}
-	mockLocalFile := &mocks.LocalFileInterface{}
-	mockStorage := &mocks.StorageInterface{}
-	mockLogger := &mocks.LoggerInterface{}
-
-	mockWargaming.On("AccountList", mock.Anything, mock.Anything).Return(model.WGAccountList{
+	mockWargaming := mock_repository.NewMockWargamingInterface(ctrl)
+	mockWargaming.EXPECT().AccountList(gomock.Any(), gomock.Any()).Return(model.WGAccountList{
 		{NickName: "player_1", AccountID: 1},
 		{NickName: "player_2", AccountID: 2},
 	}, nil)
-	mockWargaming.On("AccountInfo", mock.Anything, mock.Anything).Return(model.WGAccountInfo{}, nil)
-	mockWargaming.On("ShipsStats", mock.Anything, mock.Anything).Return(model.WGShipsStats{}, nil)
-	mockWargaming.On("ClansAccountInfo", mock.Anything, mock.Anything).Return(model.WGClansAccountInfo{}, nil)
-	mockWargaming.On("ClansInfo", mock.Anything, mock.Anything).Return(model.WGClansInfo{
-		1: model.WGClansInfoData{Tag: "TEST"},
-	}, nil)
+	mockWargaming.EXPECT().AccountInfo(gomock.Any(), gomock.Any()).Return(model.WGAccountInfo{}, nil)
+	mockWargaming.EXPECT().ShipsStats(gomock.Any(), gomock.Any()).Return(model.WGShipsStats{}, nil).AnyTimes()
+	mockWargaming.EXPECT().ClansAccountInfo(gomock.Any(), gomock.Any()).Return(model.WGClansAccountInfo{}, nil)
+	mockWargaming.EXPECT().ClansInfo(gomock.Any(), gomock.Any()).Return(model.WGClansInfo{}, nil)
 
-	mockUnofficialWargaming.On("ClansAutoComplete", mock.Anything).Return(model.UWGClansAutocomplete{}, nil)
+	mockUnofficialWargaming := mock_repository.NewMockUnofficialWargamingInterface(ctrl)
+	mockUnofficialWargaming.EXPECT().ClansAutoComplete(gomock.Any()).Return(model.UWGClansAutocomplete{
+		SearchAutocompleteResult: []struct {
+			HexColor string `json:"hex_color"`
+			Tag      string `json:"tag"`
+			ID       int    `json:"id"`
+		}{
+			{
+				HexColor: "#114514",
+				Tag:      "TEST",
+				ID:       1919810,
+			},
+		},
+	}, nil).AnyTimes()
 
-	mockLocalFile.On("TempArenaInfo", mock.Anything).Return(model.TempArenaInfo{
+	mockNumbers := mock_repository.NewMockNumbersInterface(ctrl)
+
+	mockUnregistered := mock_repository.NewMockUnregisteredInterface(ctrl)
+
+	mockLocalFile := mock_repository.NewMockLocalFileInterface(ctrl)
+	mockLocalFile.EXPECT().TempArenaInfo(gomock.Any()).Return(model.TempArenaInfo{
 		Vehicles: []model.Vehicle{
 			{ShipID: 1, Name: "player_1", Relation: 0},
 			{ShipID: 2, Name: "player_2", Relation: 2},
 		},
+		PlayerName: "player_1",
 	}, nil)
 
-	mockStorage.On("WriteOwnIGN", mock.Anything).Return(nil)
+	mockStorage := mock_repository.NewMockStorageInterface(ctrl)
+	mockStorage.EXPECT().WriteOwnIGN(gomock.Any()).Return(nil)
 
-	mockLogger.On("SetOwnIGN", mock.Anything).Return()
+	mockLogger := mock_repository.NewMockLoggerInterface(ctrl)
+	mockLogger.EXPECT().SetOwnIGN(gomock.Any()).Return()
 
 	// テスト
 	b := NewBattle(
@@ -148,39 +167,29 @@ func TestBattle_Get_正常系_2回目以降(t *testing.T) {
 
 	// アサーション
 	require.NoError(t, err)
-	mockWargaming.AssertExpectations(t)
-	mockUnofficialWargaming.AssertExpectations(t)
-	mockNumbers.AssertExpectations(t)
-	mockUnregistered.AssertExpectations(t)
-	mockLocalFile.AssertExpectations(t)
-	mockStorage.AssertExpectations(t)
 }
 
 func TestBattle_Get_異常系(t *testing.T) {
 	t.Parallel()
 
 	// 準備
-	mockWargaming := &mocks.WargamingInterface{}
-	mockUnofficialWargaming := &mocks.UnofficialWargamingInterface{}
-	mockNumbers := &mocks.NumbersInterface{}
-	mockUnregistered := &mocks.UnregisteredInterface{}
-	mockLocalFile := &mocks.LocalFileInterface{}
-	mockStorage := &mocks.StorageInterface{}
-	mockLogger := &mocks.LoggerInterface{}
+	ctrl := gomock.NewController(t)
 
+	// 準備
+	mockLocalFile := mock_repository.NewMockLocalFileInterface(ctrl)
 	expectedError := failure.New(apperr.FileNotExist)
-	mockLocalFile.On("TempArenaInfo", mock.Anything).Return(model.TempArenaInfo{}, expectedError)
+	mockLocalFile.EXPECT().TempArenaInfo(gomock.Any()).Return(model.TempArenaInfo{}, expectedError)
 
 	// テスト
 	b := NewBattle(
 		5,
-		mockWargaming,
-		mockUnofficialWargaming,
+		nil,
+		nil,
 		mockLocalFile,
-		mockNumbers,
-		mockUnregistered,
-		mockStorage,
-		mockLogger,
+		nil,
+		nil,
+		nil,
+		nil,
 		nil,
 	)
 	b.isFirstBattle = false
@@ -190,11 +199,4 @@ func TestBattle_Get_異常系(t *testing.T) {
 	code, ok := failure.CodeOf(err)
 	assert.True(t, ok)
 	assert.Equal(t, apperr.FileNotExist, code)
-
-	mockWargaming.AssertExpectations(t)
-	mockUnofficialWargaming.AssertExpectations(t)
-	mockNumbers.AssertExpectations(t)
-	mockUnregistered.AssertExpectations(t)
-	mockLocalFile.AssertExpectations(t)
-	mockStorage.AssertExpectations(t)
 }

@@ -2,14 +2,17 @@ package usecase
 
 import (
 	"testing"
+	"wfs/backend/domain/mock_repository"
 	"wfs/backend/domain/model"
-	"wfs/backend/mocks"
 
 	"github.com/stretchr/testify/require"
+	"go.uber.org/mock/gomock"
 )
 
 func TestConfigMigrator_Migrate(t *testing.T) {
 	t.Parallel()
+	ctrl := gomock.NewController(t)
+
 	t.Run("正常系", func(t *testing.T) {
 		t.Parallel()
 
@@ -31,26 +34,28 @@ func TestConfigMigrator_Migrate(t *testing.T) {
 			},
 		}
 		// toV1()
-		mockConfigV0 := &mocks.ConfigV0Interface{}
-		mockConfigV0.On("IsExistUser").Return(true)
-		mockConfigV0.On("User").Return(savedUserConfig, nil)
-		mockConfigV0.On("DeleteUser").Return(nil)
-		mockConfigV0.On("IsExistAlertPlayers").Return(true).Once()
-		mockConfigV0.On("AlertPlayers").Return(savedAlertPlayers, nil)
-		mockConfigV0.On("DeleteAlertPlayers").Return(nil)
-		mockStorage := &mocks.StorageInterface{}
-		mockStorage.On("DataVersion").Return(uint(0), nil).Once()
-		mockStorage.On("IsExistUserConfig").Return(false)
-		mockStorage.On("WriteUserConfig", savedUserConfig).Return(nil)
-		mockStorage.On("IsExistAlertPlayers").Return(false).Once()
-		mockStorage.On("WriteAlertPlayers", savedAlertPlayers).Return(nil)
-		mockStorage.On("WriteDataVersion", uint(1)).Return(nil).Once()
+		mockConfigV0 := mock_repository.NewMockConfigV0Interface(ctrl)
+		mockConfigV0.EXPECT().IsExistUser().Return(true)
+		mockConfigV0.EXPECT().User().Return(savedUserConfig, nil)
+		mockConfigV0.EXPECT().DeleteUser().Return(nil)
+		mockConfigV0.EXPECT().IsExistAlertPlayers().Return(true).MaxTimes(1)
+		mockConfigV0.EXPECT().AlertPlayers().Return(savedAlertPlayers, nil)
+		mockConfigV0.EXPECT().DeleteAlertPlayers().Return(nil)
+
+		mockStorage := mock_repository.NewMockStorageInterface(ctrl)
+		mockStorage.EXPECT().DataVersion().Return(uint(0), nil).MaxTimes(1)
+		mockStorage.EXPECT().IsExistUserConfig().Return(false)
+		mockStorage.EXPECT().WriteUserConfig(savedUserConfig).Return(nil)
+		mockStorage.EXPECT().IsExistAlertPlayers().Return(false).MaxTimes(1)
+		mockStorage.EXPECT().WriteAlertPlayers(savedAlertPlayers).Return(nil)
+		mockStorage.EXPECT().WriteDataVersion(uint(1)).Return(nil).MaxTimes(1)
+
 		// toV2()
-		mockStorage.On("DataVersion").Return(uint(1), nil).Once()
-		mockStorage.On("UserConfigV2").Return(model.UserConfigV2{}, nil)
-		mockStorage.On("UserConfig").Return(savedUserConfig, nil)
-		mockStorage.On("WriteUserConfigV2", model.FromUserConfigV1(savedUserConfig)).Return(nil)
-		mockStorage.On("WriteDataVersion", uint(2)).Return(nil).Once()
+		mockStorage.EXPECT().DataVersion().Return(uint(1), nil).MaxTimes(1)
+		mockStorage.EXPECT().UserConfigV2().Return(model.UserConfigV2{}, nil)
+		mockStorage.EXPECT().UserConfig().Return(savedUserConfig, nil)
+		mockStorage.EXPECT().WriteUserConfigV2(model.FromUserConfigV1(savedUserConfig)).Return(nil)
+		mockStorage.EXPECT().WriteDataVersion(uint(2)).Return(nil).MaxTimes(1)
 
 		// テスト
 		cm := NewConfigMigrator(mockConfigV0, mockStorage, nil)
@@ -58,19 +63,20 @@ func TestConfigMigrator_Migrate(t *testing.T) {
 
 		// アサーション
 		require.NoError(t, err)
-		mockConfigV0.AssertExpectations(t)
-		mockStorage.AssertExpectations(t)
 	})
 }
 
 func TestConfigMigrator_toV1(t *testing.T) {
 	t.Parallel()
+
+	ctrl := gomock.NewController(t)
+
 	t.Run("正常系_マイグレ不要_バージョン1以上", func(t *testing.T) {
 		t.Parallel()
 
 		// 準備
-		mockStorage := &mocks.StorageInterface{}
-		mockStorage.On("DataVersion").Return(uint(1), nil)
+		mockStorage := mock_repository.NewMockStorageInterface(ctrl)
+		mockStorage.EXPECT().DataVersion().Return(uint(1), nil)
 
 		// テスト
 		cm := NewConfigMigrator(nil, mockStorage, nil)
@@ -78,23 +84,21 @@ func TestConfigMigrator_toV1(t *testing.T) {
 
 		// アサーション
 		require.NoError(t, err)
-		mockStorage.AssertExpectations(t)
-		mockStorage.AssertNotCalled(t, "WriteUserConfig")
-		mockStorage.AssertNotCalled(t, "WriteAlertPlayers")
-		mockStorage.AssertNotCalled(t, "WriteDataVersion")
 	})
+
 	t.Run("正常系_マイグレ不要_すでにストレージに存在", func(t *testing.T) {
 		t.Parallel()
 
 		// 準備
-		mockConfigV0 := &mocks.ConfigV0Interface{}
-		mockConfigV0.On("IsExistUser").Return(true)
-		mockConfigV0.On("IsExistAlertPlayers").Return(true)
-		mockStorage := &mocks.StorageInterface{}
-		mockStorage.On("DataVersion").Return(uint(0), nil)
-		mockStorage.On("IsExistUserConfig").Return(true)
-		mockStorage.On("IsExistAlertPlayers").Return(true)
-		mockStorage.On("WriteDataVersion", uint(1)).Return(nil)
+		mockConfigV0 := mock_repository.NewMockConfigV0Interface(ctrl)
+		mockConfigV0.EXPECT().IsExistUser().Return(true)
+		mockConfigV0.EXPECT().IsExistAlertPlayers().Return(true)
+
+		mockStorage := mock_repository.NewMockStorageInterface(ctrl)
+		mockStorage.EXPECT().DataVersion().Return(uint(0), nil)
+		mockStorage.EXPECT().IsExistUserConfig().Return(true)
+		mockStorage.EXPECT().IsExistAlertPlayers().Return(true)
+		mockStorage.EXPECT().WriteDataVersion(uint(1)).Return(nil)
 
 		// テスト
 		cm := NewConfigMigrator(mockConfigV0, mockStorage, nil)
@@ -102,11 +106,8 @@ func TestConfigMigrator_toV1(t *testing.T) {
 
 		// アサーション
 		require.NoError(t, err)
-		mockConfigV0.AssertExpectations(t)
-		mockStorage.AssertExpectations(t)
-		mockStorage.AssertNotCalled(t, "WriteUserConfig")
-		mockStorage.AssertNotCalled(t, "WriteAlertPlayers")
 	})
+
 	t.Run("正常系_成功", func(t *testing.T) {
 		t.Parallel()
 
@@ -128,20 +129,21 @@ func TestConfigMigrator_toV1(t *testing.T) {
 			},
 		}
 		// toV1()
-		mockConfigV0 := &mocks.ConfigV0Interface{}
-		mockConfigV0.On("IsExistUser").Return(true)
-		mockConfigV0.On("User").Return(savedUserConfig, nil)
-		mockConfigV0.On("DeleteUser").Return(nil)
-		mockConfigV0.On("IsExistAlertPlayers").Return(true)
-		mockConfigV0.On("AlertPlayers").Return(savedAlertPlayers, nil)
-		mockConfigV0.On("DeleteAlertPlayers").Return(nil)
-		mockStorage := &mocks.StorageInterface{}
-		mockStorage.On("DataVersion").Return(uint(0), nil)
-		mockStorage.On("IsExistUserConfig").Return(false)
-		mockStorage.On("WriteUserConfig", savedUserConfig).Return(nil)
-		mockStorage.On("IsExistAlertPlayers").Return(false)
-		mockStorage.On("WriteAlertPlayers", savedAlertPlayers).Return(nil)
-		mockStorage.On("WriteDataVersion", uint(1)).Return(nil)
+		mockConfigV0 := mock_repository.NewMockConfigV0Interface(ctrl)
+		mockConfigV0.EXPECT().IsExistUser().Return(true)
+		mockConfigV0.EXPECT().User().Return(savedUserConfig, nil)
+		mockConfigV0.EXPECT().DeleteUser().Return(nil)
+		mockConfigV0.EXPECT().IsExistAlertPlayers().Return(true)
+		mockConfigV0.EXPECT().AlertPlayers().Return(savedAlertPlayers, nil)
+		mockConfigV0.EXPECT().DeleteAlertPlayers().Return(nil)
+
+		mockStorage := mock_repository.NewMockStorageInterface(ctrl)
+		mockStorage.EXPECT().DataVersion().Return(uint(0), nil)
+		mockStorage.EXPECT().IsExistUserConfig().Return(false)
+		mockStorage.EXPECT().WriteUserConfig(savedUserConfig).Return(nil)
+		mockStorage.EXPECT().IsExistAlertPlayers().Return(false)
+		mockStorage.EXPECT().WriteAlertPlayers(savedAlertPlayers).Return(nil)
+		mockStorage.EXPECT().WriteDataVersion(uint(1)).Return(nil)
 
 		// テスト
 		cm := NewConfigMigrator(mockConfigV0, mockStorage, nil)
@@ -149,19 +151,20 @@ func TestConfigMigrator_toV1(t *testing.T) {
 
 		// アサーション
 		require.NoError(t, err)
-		mockConfigV0.AssertExpectations(t)
-		mockStorage.AssertExpectations(t)
 	})
 }
 
 func TestConfigMigrator_toV2(t *testing.T) {
 	t.Parallel()
+
+	ctrl := gomock.NewController(t)
+
 	t.Run("正常系_マイグレ不要_バージョン2以上", func(t *testing.T) {
 		t.Parallel()
 
 		// 準備
-		mockStorage := &mocks.StorageInterface{}
-		mockStorage.On("DataVersion").Return(uint(2), nil)
+		mockStorage := mock_repository.NewMockStorageInterface(ctrl)
+		mockStorage.EXPECT().DataVersion().Return(uint(2), nil)
 
 		// テスト
 		cm := NewConfigMigrator(nil, mockStorage, nil)
@@ -169,9 +172,6 @@ func TestConfigMigrator_toV2(t *testing.T) {
 
 		// アサーション
 		require.NoError(t, err)
-		mockStorage.AssertExpectations(t)
-		mockStorage.AssertNotCalled(t, "WriteUserConfigV2")
-		mockStorage.AssertNotCalled(t, "WriteDataVersion")
 	})
 	t.Run("正常系_UserConfigV2のVersionのみ更新", func(t *testing.T) {
 		t.Parallel()
@@ -198,11 +198,11 @@ func TestConfigMigrator_toV2(t *testing.T) {
 			},
 		}
 
-		mockStorage := &mocks.StorageInterface{}
-		mockStorage.On("DataVersion").Return(uint(1), nil)
-		mockStorage.On("UserConfigV2").Return(v2, nil)
-		mockStorage.On("WriteUserConfigV2", expect).Return(nil)
-		mockStorage.On("WriteDataVersion", uint(2)).Return(nil)
+		mockStorage := mock_repository.NewMockStorageInterface(ctrl)
+		mockStorage.EXPECT().DataVersion().Return(uint(1), nil)
+		mockStorage.EXPECT().UserConfigV2().Return(v2, nil)
+		mockStorage.EXPECT().WriteUserConfigV2(expect).Return(nil)
+		mockStorage.EXPECT().WriteDataVersion(uint(2)).Return(nil)
 
 		// テスト
 		cm := NewConfigMigrator(nil, mockStorage, nil)
@@ -210,7 +210,6 @@ func TestConfigMigrator_toV2(t *testing.T) {
 
 		// アサーション
 		require.NoError(t, err)
-		mockStorage.AssertExpectations(t)
 	})
 	t.Run("正常系_成功", func(t *testing.T) {
 		t.Parallel()
@@ -271,12 +270,12 @@ func TestConfigMigrator_toV2(t *testing.T) {
 
 		expected := model.FromUserConfigV1(v1)
 
-		mockStorage := &mocks.StorageInterface{}
-		mockStorage.On("DataVersion").Return(uint(1), nil)
-		mockStorage.On("UserConfigV2").Return(model.UserConfigV2{}, nil)
-		mockStorage.On("UserConfig").Return(v1, nil)
-		mockStorage.On("WriteUserConfigV2", expected).Return(nil)
-		mockStorage.On("WriteDataVersion", uint(2)).Return(nil)
+		mockStorage := mock_repository.NewMockStorageInterface(ctrl)
+		mockStorage.EXPECT().DataVersion().Return(uint(1), nil)
+		mockStorage.EXPECT().UserConfigV2().Return(model.UserConfigV2{}, nil)
+		mockStorage.EXPECT().UserConfig().Return(v1, nil)
+		mockStorage.EXPECT().WriteUserConfigV2(expected).Return(nil)
+		mockStorage.EXPECT().WriteDataVersion(uint(2)).Return(nil)
 
 		// テスト
 		cm := NewConfigMigrator(nil, mockStorage, nil)
@@ -284,6 +283,5 @@ func TestConfigMigrator_toV2(t *testing.T) {
 
 		// アサーション
 		require.NoError(t, err)
-		mockStorage.AssertExpectations(t)
 	})
 }
