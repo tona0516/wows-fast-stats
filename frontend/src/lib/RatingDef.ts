@@ -142,6 +142,7 @@ const sampleTeam = (): model.Team => {
     si.is_premium = false;
 
     const pvpSolo = new model.PlayerStats();
+    pvpSolo.ship = clone(ss);
     pvpSolo.overall = clone(os);
 
     const pvpAll = new model.PlayerStats();
