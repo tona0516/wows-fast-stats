@@ -48,7 +48,7 @@ export class PlayerName extends AbstractColumn {
     }
 
     if (!statsCategory) {
-      return "#000000";
+      return "";
     }
 
     const pr = toPlayerStats(player, this.config.stats_pattern)[statsCategory]
