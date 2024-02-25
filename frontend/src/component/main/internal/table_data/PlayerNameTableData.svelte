@@ -63,9 +63,9 @@
     <UkTooltip tooltip={alertPlayer?.message}>
       <!-- svelte-ignore a11y-invalid-attribute -->
       <a href="#">
-        <div class="uk-flex">
+        <div class="uk-flex uk-flex-middle">
           {#if alertPlayer}
-            <i class="bi {alertPlayer.pattern}" />
+            <i class="bi {alertPlayer.pattern} alert-icon" />
           {/if}
           {#if clanTag}
             <div class="clan-tag" style="color: {column.clanColorCode(player)}">
@@ -147,6 +147,10 @@
 </td>
 
 <style>
+  :global(.alert-icon) {
+    margin-right: 2px;
+  }
+
   :global(.clan-tag) {
     margin-right: 2px;
   }
