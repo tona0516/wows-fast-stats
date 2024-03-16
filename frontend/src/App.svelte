@@ -7,6 +7,7 @@
 
   import {
     LatestRelease,
+    LogError,
     MigrateIfNeeded,
     StartWatching,
   } from "wailsjs/go/main/App";
@@ -34,6 +35,27 @@
 
   EventsOn("BATTLE_START", () => mainPage?.fetchBattle());
   EventsOn("BATTLE_ERR", (error: string) => Notifier.failure(error));
+
+  window.onunhandledrejection = (event) => {
+    const message = "window.onunhandledrejection";
+    const error = event.reason;
+    if (error instanceof Error) {
+      sendFronendError(message, error);
+    } else {
+      LogError(message, { error: JSON.stringify(error) });
+    }
+  };
+  window.onerror = (_event, _source, _lineno, _colno, error) => {
+    sendFronendError("window.onerror", error);
+  };
+
+  const sendFronendError = (message: string, error: Error | undefined) => {
+    LogError(message, {
+      "error.name": error?.name ?? "",
+      "error.message": error?.message ?? "",
+      "error.stack": error?.stack ?? "",
+    });
+  };
 
   const initialize = async (): Promise<model.UserConfigV2 | undefined> => {
     try {
