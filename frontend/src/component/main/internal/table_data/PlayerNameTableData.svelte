@@ -93,8 +93,11 @@
         {/if}
 
         <li>
-          <ExternalLink url={NumbersURL.player(player.player_info.id)}
-            >プレイヤー詳細(WoWS Stats & Numbers)</ExternalLink
+          <ExternalLink
+            url={NumbersURL.player(
+              player.player_info.id,
+              player.player_info.name,
+            )}>プレイヤー詳細(WoWS Stats & Numbers)</ExternalLink
           >
         </li>
 
