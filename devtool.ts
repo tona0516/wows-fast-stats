@@ -74,9 +74,7 @@ function setup() {
 }
 
 function genmock() {
-  exec(
-    "go generate ./..."
-  );
+  exec("go generate ./...");
 }
 
 function lint() {
@@ -156,7 +154,13 @@ async function pkg() {
 }
 
 function clean() {
-  ["config/", "cache/", "temp_arena_info/", "screenshot/"].forEach((target) => {
+  [
+    "config/",
+    "cache/",
+    "temp_arena_info/",
+    "screenshot/",
+    "persistent_data/",
+  ].forEach((target) => {
     fs.rmSync(target, { recursive: true, force: true });
   });
 }
