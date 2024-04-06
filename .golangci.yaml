@@ -12,6 +12,8 @@ linters:
     - deadcode # Deprecated
     - exhaustivestruct # Deprecated
     - structcheck # Deprecated
+    - copyloopvar # Deprecated
+    - intrange # Deprecated
     - wrapcheck
     - forbidigo
     - funlen

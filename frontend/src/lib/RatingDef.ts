@@ -125,6 +125,7 @@ const sampleTeam = (): model.Team => {
       high: 33.4,
     };
     os.platoon_rate = 3.0;
+    os.threat_level = 10000; // TODO
 
     const pi = new model.PlayerInfo();
     pi.id = 1;

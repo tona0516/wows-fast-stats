@@ -50,6 +50,7 @@ type OverallStats struct {
 	Kill              float64       `json:"kill"`
 	Exp               float64       `json:"exp"`
 	PR                float64       `json:"pr"`
+	ThreatLevel       float64       `json:"threat_level"`
 	AvgTier           float64       `json:"avg_tier"`
 	UsingShipTypeRate ShipTypeGroup `json:"using_ship_type_rate"`
 	UsingTierRate     TierGroup     `json:"using_tier_rate"`

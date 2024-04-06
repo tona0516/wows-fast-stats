@@ -37,6 +37,10 @@ export abstract class AbstractStatsColumn<T> extends AbstractColumn {
     return "";
   }
 
+  bgColorCode(_: model.Player): string {
+    return "";
+  }
+
   playerStats(player: model.Player): model.PlayerStats {
     return toPlayerStats(player, this.config.stats_pattern);
   }

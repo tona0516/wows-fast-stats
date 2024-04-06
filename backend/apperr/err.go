@@ -26,6 +26,7 @@ const (
 	MigrationError              failure.StringCode = "データマイグレーションに失敗しました。configフォルダを削除して再起動してください。"
 	ReplayDirNotFoundError      failure.StringCode = "replayフォルダが存在しません。"
 	ExpectedStatsUnavaillalble  failure.StringCode = "PRを算出できませんでした。予測成績の取得に失敗しました。"
+	InvalidTempArenaInfo        failure.StringCode = "不正なtempArenaInfo.jsonのです。"
 	UnexpectedError             failure.StringCode = "予期しないエラーが発生しました。"
 )
 

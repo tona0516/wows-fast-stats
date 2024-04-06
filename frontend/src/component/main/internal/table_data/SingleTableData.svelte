@@ -8,7 +8,9 @@
 
 <td
   class={column.tdClass(player)}
-  style="color: {column.textColorCode(player)}"
+  style="color: {column.textColorCode(
+    player,
+  )}; background-color: {column.bgColorCode(player)}"
 >
   {column.displayValue(player)}
 </td>

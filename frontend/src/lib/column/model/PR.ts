@@ -13,10 +13,6 @@ export class PR extends AbstractStatsColumn<string> implements ISummaryColumn {
 
   displayValue(player: model.Player): string {
     const value = this.value(player);
-    if (value === -1) {
-      return "N/A";
-    }
-
     return value.toFixed(this.digit());
   }
 

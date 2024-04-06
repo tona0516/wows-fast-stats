@@ -78,6 +78,7 @@ var DefaultUserConfigV2 = UserConfigV2{
 		UsingShipTypeRate: 1,
 		UsingTierRate:     1,
 		PlatoonRate:       1,
+		ThreatLevel:       0,
 	},
 	TeamSummary: UCTeamSummary{
 		MinShipBattles:    1,
@@ -112,8 +113,23 @@ func FromUserConfigV1(v1 UserConfig) UserConfigV2 {
 		Appid:       v1.Appid,
 		FontSize:    v1.FontSize,
 		Display: UCDisplay{
-			Ship:    UCDisplayShip(v1.Displays.Ship),
-			Overall: UCDisplayOverall(v1.Displays.Overall),
+			Ship: UCDisplayShip(v1.Displays.Ship),
+			Overall: UCDisplayOverall{
+				ThreatLevel:       false,
+				PR:                v1.Displays.Overall.PR,
+				Damage:            v1.Displays.Overall.Damage,
+				MaxDamage:         v1.Displays.Overall.MaxDamage,
+				WinRate:           v1.Displays.Overall.WinRate,
+				KdRate:            v1.Displays.Overall.KdRate,
+				Kill:              v1.Displays.Overall.Kill,
+				Exp:               v1.Displays.Overall.Exp,
+				Battles:           v1.Displays.Overall.Battles,
+				SurvivedRate:      v1.Displays.Overall.SurvivedRate,
+				AvgTier:           v1.Displays.Overall.AvgTier,
+				UsingShipTypeRate: v1.Displays.Overall.UsingShipTypeRate,
+				UsingTierRate:     v1.Displays.Overall.UsingTierRate,
+				PlatoonRate:       v1.Displays.Overall.PlatoonRate,
+			},
 		},
 		Color: UCColor{
 			Skill: UCSkillColor{
@@ -129,7 +145,24 @@ func FromUserConfigV1(v1 UserConfig) UserConfigV2 {
 			},
 			PlayerName: v1.CustomColor.PlayerName,
 		},
-		Digit:             UCDigit(v1.CustomDigit),
+		Digit: UCDigit{
+			PR:                v1.CustomDigit.PR,
+			Damage:            v1.CustomDigit.Damage,
+			MaxDamage:         v1.CustomDigit.MaxDamage,
+			WinRate:           v1.CustomDigit.WinRate,
+			KdRate:            v1.CustomDigit.KdRate,
+			Kill:              v1.CustomDigit.Kill,
+			PlanesKilled:      v1.CustomDigit.PlanesKilled,
+			Exp:               v1.CustomDigit.Exp,
+			Battles:           v1.CustomDigit.Battles,
+			SurvivedRate:      v1.CustomDigit.SurvivedRate,
+			HitRate:           v1.CustomDigit.HitRate,
+			AvgTier:           v1.CustomDigit.AvgTier,
+			UsingShipTypeRate: v1.CustomDigit.UsingShipTypeRate,
+			UsingTierRate:     v1.CustomDigit.UsingTierRate,
+			PlatoonRate:       v1.CustomDigit.PlatoonRate,
+			ThreatLevel:       0,
+		},
 		TeamSummary:       UCTeamSummary(v1.TeamAverage),
 		SaveScreenshot:    v1.SaveScreenshot,
 		SaveTempArenaInfo: v1.SaveTempArenaInfo,
@@ -173,6 +206,7 @@ type UCDisplayOverall struct {
 	UsingShipTypeRate bool `json:"using_ship_type_rate"`
 	UsingTierRate     bool `json:"using_tier_rate"`
 	PlatoonRate       bool `json:"platoon_rate"`
+	ThreatLevel       bool `json:"threat_level"`
 }
 
 type UCColor struct {
@@ -237,6 +271,7 @@ type UCDigit struct {
 	UsingShipTypeRate uint `json:"using_ship_type_rate"`
 	UsingTierRate     uint `json:"using_tier_rate"`
 	PlatoonRate       uint `json:"platoon_rate"`
+	ThreatLevel       uint `json:"threat_level"`
 }
 
 type UCTeamSummary struct {

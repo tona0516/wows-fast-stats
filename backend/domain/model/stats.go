@@ -199,6 +199,18 @@ func (s *Stats) WinRate(category StatsCategory, pattern StatsPattern) float64 {
 	return 0
 }
 
+func (s *Stats) SurvivedRate(category StatsCategory, pattern StatsPattern) float64 {
+	ship, player := s.statsValues(pattern)
+	switch category {
+	case StatsCategoryShip:
+		return percentage(ship.SurvivedBattles, ship.Battles)
+	case StatsCategoryOverall:
+		return percentage(player.SurvivedBattles, player.Battles)
+	}
+
+	return 0
+}
+
 func (s *Stats) WinSurvivedRate(category StatsCategory, pattern StatsPattern) float64 {
 	ship, player := s.statsValues(pattern)
 	switch category {

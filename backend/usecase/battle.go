@@ -393,6 +393,24 @@ func (b *Battle) compose(
 			warships,
 		)
 
+		threatLevel := model.NewThreatLevel(
+			vehicle.ShipID,
+			warships,
+			tempArenaInfo,
+			model.ThreatLevelStatistics{
+				PlayerAvgDamage:  stats.AvgDamage(model.StatsCategoryOverall, model.StatsPatternPvPAll),
+				PlayerAvgKill:    stats.AvgKill(model.StatsCategoryOverall, model.StatsPatternPvPAll),
+				PlayerKdRate:     stats.KdRate(model.StatsCategoryOverall, model.StatsPatternPvPAll),
+				PlayerWinRate:    stats.WinRate(model.StatsCategoryOverall, model.StatsPatternPvPAll),
+				PlayerBattles:    stats.Battles(model.StatsCategoryOverall, model.StatsPatternPvPAll),
+				ShipAvgDamage:    stats.AvgDamage(model.StatsCategoryShip, model.StatsPatternPvPAll),
+				ShipWinRate:      stats.WinRate(model.StatsCategoryShip, model.StatsPatternPvPAll),
+				ShipSurvivedRate: stats.SurvivedRate(model.StatsCategoryShip, model.StatsPatternPvPAll),
+				ShipPlanesKilled: stats.PlanesKilled(model.StatsPatternPvPAll),
+				ShipBattles:      stats.Battles(model.StatsCategoryShip, model.StatsPatternPvPAll),
+			},
+		)
+
 		player := model.Player{
 			PlayerInfo: model.PlayerInfo{
 				ID:       accountID,
@@ -409,8 +427,8 @@ func (b *Battle) compose(
 				IsPremium: warship.IsPremium,
 				AvgDamage: allExpectedStats[vehicle.ShipID].AverageDamageDealt,
 			},
-			PvPSolo: playerStats(model.StatsPatternPvPSolo, stats),
-			PvPAll:  playerStats(model.StatsPatternPvPAll, stats),
+			PvPSolo: playerStats(model.StatsPatternPvPSolo, stats, threatLevel),
+			PvPAll:  playerStats(model.StatsPatternPvPAll, stats, threatLevel),
 		}
 
 		if vehicle.IsFriend() {
@@ -444,6 +462,7 @@ func (b *Battle) compose(
 func playerStats(
 	statsPattern model.StatsPattern,
 	stats *model.Stats,
+	threatLevel *model.ThreatLevel,
 ) model.PlayerStats {
 	return model.PlayerStats{
 		ShipStats: model.ShipStats{
@@ -473,6 +492,7 @@ func playerStats(
 			Kill:              stats.AvgKill(model.StatsCategoryOverall, statsPattern),
 			Exp:               stats.AvgExp(model.StatsCategoryOverall, statsPattern),
 			PR:                stats.PR(model.StatsCategoryOverall, statsPattern),
+			ThreatLevel:       threatLevel.Calculate(),
 			AvgTier:           stats.AvgTier(statsPattern),
 			UsingShipTypeRate: stats.UsingShipTypeRate(statsPattern),
 			UsingTierRate:     stats.UsingTierRate(statsPattern),

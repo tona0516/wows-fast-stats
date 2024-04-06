@@ -14,6 +14,7 @@ import { PlatoonRate } from "src/lib/column/model/PlatoonRate";
 import { PlayerName } from "src/lib/column/model/PlayerName";
 import { ShipInfo } from "src/lib/column/model/ShipInfo";
 import { SurvivedRate } from "src/lib/column/model/SurvivedRate";
+import { ThreatLevel } from "src/lib/column/model/ThreatLevel";
 import { UsingShipTypeRate } from "src/lib/column/model/UsingShipTypeRate";
 import { UsingTierRate } from "src/lib/column/model/UsingTierRate";
 import { WinRate } from "src/lib/column/model/WinRate";
@@ -45,9 +46,11 @@ export namespace ColumnProvider {
   export const getAllColumns = (
     config: model.UserConfigV2,
   ): [basic: ColumnArray, ship: ColumnArray, overall: ColumnArray] => {
-
     return [
-      new ColumnArray("basic", [new PlayerName(config), new ShipInfo(config)]),
+      new ColumnArray("basic", [
+        new PlayerName(config),
+        new ShipInfo(config),
+    ]),
       new ColumnArray("ship", [
         new PR(config, "ship"),
         new Damage(config, "ship"),
@@ -63,6 +66,7 @@ export namespace ColumnProvider {
         new HitRate(config),
       ]),
       new ColumnArray("overall", [
+        new ThreatLevel(config),
         new PR(config, "overall"),
         new Damage(config, "overall"),
         new MaxDamage(config, "overall"),
