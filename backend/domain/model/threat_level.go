@@ -1,6 +1,7 @@
 package model
 
 import (
+	"math"
 	"wfs/backend/apperr"
 
 	"github.com/morikuni/failure"
@@ -103,6 +104,7 @@ type ThreatLevel struct {
 	warships      Warships
 	tempArenaInfo TempArenaInfo
 	statistics    ThreatLevelStatistics
+	playerName    string
 }
 
 type ThreatLevelStatistics struct {
@@ -129,12 +131,14 @@ func NewThreatLevel(
 	warships Warships,
 	tempArenaInfo TempArenaInfo,
 	statistics ThreatLevelStatistics,
+	playerName string,
 ) *ThreatLevel {
 	return &ThreatLevel{
 		useShipID:     useShipID,
 		warships:      warships,
 		tempArenaInfo: tempArenaInfo,
 		statistics:    statistics,
+		playerName:    playerName,
 	}
 }
 
@@ -161,7 +165,7 @@ func (t *ThreatLevel) Calculate() float64 {
 	shipAAIndex := t.antiAirCoefficient()
 
 	// 脅威レベルの算出
-	threatLevel := (playerTotalSkillScore + 1) * shipClassScore * 10000
+	threatLevel := math.Round((playerTotalSkillScore + 1) * shipClassScore * 10000)
 
 	// マッチのおける脅威レベルの補正
 	threatLevelInMatch := t.correctBasedOnMatch(threatLevel, shipAAIndex, battleDetail)
@@ -197,34 +201,36 @@ func (t *ThreatLevel) battleDetail() (threatLevelBattleDetail, error) {
 }
 
 func (t *ThreatLevel) baseDamageScore() float64 {
-	return (limitedValue(t.statistics.PlayerAvgDamage/40000, 1.5, 0.5) - 1) / 2
+	avgDamage := toInteger(t.statistics.PlayerAvgDamage)
+	return round((limitedValue(avgDamage/40000, 1.5, 0.5) - 1) / 2)
 }
 
 //nolint:nonamedreturns
 func (t *ThreatLevel) killScore() (killScore float64, kdRateScore float64) {
 	if t.statistics.PlayerBattles == 0 {
-		return -0.3 / 5, -0.5 / 5
+		return round(-0.3 / 5), round(-0.5 / 5)
 	}
 
 	killScore = limitedValue(t.statistics.PlayerAvgKill, 1.5, 0.5) - 0.8
-	kdRateScore = limitedValue(t.statistics.PlayerKdRate, 3, 0.7) - 1.2
+	kdRateScore = limitedValue(toInteger(t.statistics.PlayerKdRate), 3, 0.7) - 1.2
 
 	// KDRは高いのにKPRは低い（≒芋）は逆補正に
 	if killScore < 0 && kdRateScore > 0 {
 		kdRateScore *= -1
 	}
 
-	return killScore / 5, kdRateScore / 5
+	return round(killScore / 5), round(kdRateScore / 5)
 }
 
 func (t *ThreatLevel) winRateScore() float64 {
-	return (limitedValue(t.statistics.PlayerWinRate, 60, 30) - 50) / 100 * 3
+	return round((limitedValue(t.statistics.PlayerWinRate, 60, 30) - 50) / 100 * 3)
 }
 
 func (t *ThreatLevel) playerOverallScore() float64 {
 	// プレイヤー総合補正指数を一旦算出
 	killScore, kdRateScore := t.killScore()
-	playerGeneralScore := t.baseDamageScore() + killScore + kdRateScore + t.winRateScore()
+
+	playerGeneralScore := round(t.baseDamageScore() + killScore + kdRateScore + t.winRateScore())
 
 	// プレイ回数関連補正処理
 	battlesCountScore := limitedValue(float64(t.statistics.PlayerBattles)/1000, 3, 0.5)
@@ -254,7 +260,7 @@ func (t *ThreatLevel) playerOverallScore() float64 {
 		}
 	}
 
-	playerGeneralScore = (battlesCountScore-1.5)*0.05 + playerGeneralScore
+	playerGeneralScore = round((battlesCountScore-1.5)*0.05) + playerGeneralScore
 
 	return playerGeneralScore
 }
@@ -315,40 +321,42 @@ func (t *ThreatLevel) playerShipScore() float64 {
 		}
 	}
 
-	if std.damage < 25000 && shipType != ShipTypeSS {
+	if std.damage < 25000 {
 		std.damage = 25000
 	}
 
 	// ダメージ補正指数
-	shipDamageScore := limitedValue(t.statistics.ShipAvgDamage/std.damage, 1.5, 0.1) - 1
+	shipDamageScore := round(limitedValue(toInteger(t.statistics.ShipAvgDamage)/std.damage, 1.5, 0.1) - 1)
 
 	// 生存率補正指数
 	// 艦種ごとの影響度を考慮して補正
-	shipServiveScore := limitedValue(t.statistics.ShipSurvivedRate, std.survivedRate+0.1, std.survivedRate-0.1) *
-		std.influence / 1.5
+    surviveRate := t.statistics.ShipSurvivedRate / 100 // %で与えられるため0~100に変換する
+	limitedSurviveRate := limitedValue(surviveRate, std.survivedRate+0.1, std.survivedRate-0.1)
+	shipServiveScore := round(limitedSurviveRate * std.influence / 1.5)
 
 	// 空母の場合、制空の補正を考慮
 	var shipAAScore float64
 	if shipType == ShipTypeCV {
 		shipAAScore = t.statistics.ShipPlanesKilled / std.aaScore
 		if shipAAScore > 1 {
-			shipAAScore = (shipAAScore - 1) / 2
+			shipAAScore = round((shipAAScore - 1) / 2)
 		} else {
 			//nolint:gocritic
-			shipAAScore = shipAAScore - 1
+			shipAAScore = round(shipAAScore - 1)
 		}
 		shipAAScore = limitedValue(shipAAScore, 0.2, -0.3)
 	}
 
 	// 艦勝率補正指数
-	shipWinRateScore := limitedValue(t.statistics.ShipWinRate, 0.6, 0.4) - 0.5
+    winRate := t.statistics.ShipWinRate / 100 // %で与えられるため0~100に変換する
+	shipWinRateScore := limitedValue(winRate, 0.6, 0.4) - 0.5
 	// 空母の場合、勝率の影響を3割増加
 	if shipType == ShipTypeCV {
-		shipWinRateScore = shipAAScore * 1.3
+		shipWinRateScore = shipWinRateScore * 1.3
 	}
-	shipWinRateScore = shipWinRateScore * std.influence * 1.5
+	shipWinRateScore = round(shipWinRateScore * std.influence * 1.5)
 
-	return shipDamageScore + shipServiveScore + shipAAScore + shipWinRateScore
+	return round(shipDamageScore + shipServiveScore + shipAAScore + shipWinRateScore)
 }
 
 func (t *ThreatLevel) antiAirCoefficient() float64 {
@@ -357,9 +365,9 @@ func (t *ThreatLevel) antiAirCoefficient() float64 {
 		return 1.0
 	}
 
-	planesKilledRatio := t.statistics.ShipPlanesKilled / (specialAAShip.average * 1.5)
+	planesKilledRatio := t.statistics.ShipPlanesKilled / specialAAShip.average * 1.5
 	if planesKilledRatio > 1 {
-		planesKilledRatio = (planesKilledRatio-1)/4 + 1
+		planesKilledRatio = round((planesKilledRatio-1)/4) + 1
 	}
 	limitedPlanesKilledRatio := limitedValue(planesKilledRatio, 1.2, 1)
 
@@ -397,7 +405,7 @@ func (t *ThreatLevel) correctBasedOnMatch(
 ) float64 {
 	result := threatLevel
 	if battleDetail.IsCVMatch {
-		result = threatLevel * shipAAIndex
+		result = math.Round(threatLevel * shipAAIndex)
 	}
 
 	warship, ok := t.warships[t.useShipID]
@@ -407,10 +415,10 @@ func (t *ThreatLevel) correctBasedOnMatch(
 	shipTier := warship.Tier
 
 	if shipTier == battleDetail.TopTier {
-		result *= 1.1
+		result = math.Round(result * 1.1)
 	}
 	if shipTier == battleDetail.BottomTier {
-		result *= 0.9
+		result = math.Round(result * 0.9)
 	}
 
 	return result
@@ -424,4 +432,13 @@ func limitedValue(value float64, max float64, min float64) float64 {
 		return min
 	}
 	return value
+}
+
+func round(value float64) float64 {
+	pow := math.Pow(10, 4)
+	return toInteger(value*pow) / pow
+}
+
+func toInteger(value float64) float64 {
+	return float64(int(value))
 }

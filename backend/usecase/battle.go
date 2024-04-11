@@ -409,6 +409,7 @@ func (b *Battle) compose(
 				ShipPlanesKilled: stats.PlanesKilled(model.StatsPatternPvPAll),
 				ShipBattles:      stats.Battles(model.StatsCategoryShip, model.StatsPatternPvPAll),
 			},
+            nickname,
 		)
 
 		player := model.Player{
