@@ -89,7 +89,7 @@ export namespace DispName {
     ["avg_tier", "平均T"],
     ["using_ship_type_rate", "艦種割合"],
     ["using_tier_rate", "T割合"],
-    ["threat_level", "脅威度"],
+    ["threat_level", "戦力評価"],
   ]);
 
   export const FULL_COLUMN_NAMES = new ArrayMap<string, string>([
@@ -108,6 +108,6 @@ export namespace DispName {
     ["avg_tier", "平均Tier"],
     ["using_ship_type_rate", "使用艦種割合"],
     ["using_tier_rate", "プレイTier割合"],
-    ["threat_level", "脅威度(闇深XVM算出ロジック)"],
+    ["threat_level", "戦力評価(闇深XVM算出ロジック)"],
   ]);
 }

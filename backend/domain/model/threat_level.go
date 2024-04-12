@@ -1,11 +1,11 @@
 package model
 
 import (
+	"fmt"
 	"math"
-	"wfs/backend/apperr"
-
-	"github.com/morikuni/failure"
-	"golang.org/x/exp/slices"
+	// "wfs/backend/apperr"
+	// "github.com/morikuni/failure"
+	// "golang.org/x/exp/slices"
 )
 
 //nolint:gochecknoglobals
@@ -170,12 +170,27 @@ func (t *ThreatLevel) Calculate() float64 {
 	// マッチのおける脅威レベルの補正
 	threatLevelInMatch := t.correctBasedOnMatch(threatLevel, shipAAIndex, battleDetail)
 
+	if t.playerName == "inconno1993" {
+		// fmt.Printf("%s: %f\n", "playerOverallScore", playerOverallScore)
+		// fmt.Printf("%s: %f\n", "playerOverallScore", playerOverallScore)
+		// fmt.Printf("%s: %f\n", "playerOverallScore", playerOverallScore)
+		// fmt.Printf("%s: %f\n", "playerOverallScore", playerOverallScore)
+		fmt.Printf("%s: %f\n", "playerOverallScore", playerOverallScore)
+		fmt.Printf("%s: %f\n", "playerShipScore", playerShipScore)
+		fmt.Printf("%s: %f\n", "shipClassScore", shipClassScore)
+		fmt.Printf("%s: %f\n", "shipAAIndex", shipAAIndex)
+		fmt.Printf("%s: %f\n", "threatLevel", threatLevel)
+		fmt.Printf("%s: %f\n", "threatLevelInMatch", threatLevelInMatch)
+	}
+
 	return threatLevelInMatch
 }
 
 func (t *ThreatLevel) battleDetail() (threatLevelBattleDetail, error) {
 	isCVMatch := false
-	matchTiers := make([]uint, 0)
+	var topTier uint = 1
+	var bottomTier uint = 1
+	// matchTiers := make([]uint, 0)
 	for _, vehicle := range t.tempArenaInfo.Vehicles {
 		warship, ok := t.warships[vehicle.ShipID]
 		if !ok {
@@ -186,17 +201,39 @@ func (t *ThreatLevel) battleDetail() (threatLevelBattleDetail, error) {
 			isCVMatch = true
 		}
 
-		matchTiers = append(matchTiers, warship.Tier)
+		tier := warship.Tier
+
+		// Note: 超艦艇や1個差のみのマッチが考慮されてないが、闇深の実装に合わせる
+		if topTier < tier {
+			topTier = tier
+			if topTier > 2 {
+				bottomTier = topTier - 2
+			} else {
+				bottomTier = 1
+			}
+		}
+		if bottomTier > tier {
+			bottomTier = tier
+			if bottomTier > 8 {
+				topTier = 10
+			} else {
+				topTier = bottomTier + 2
+			}
+		}
+
+		// matchTiers = append(matchTiers, warship.Tier)
 	}
 
-	if len(matchTiers) == 0 {
-		return threatLevelBattleDetail{}, failure.New(apperr.InvalidTempArenaInfo)
-	}
+	// if len(matchTiers) == 0 {
+	// 	return threatLevelBattleDetail{}, failure.New(apperr.InvalidTempArenaInfo)
+	// }
 
 	return threatLevelBattleDetail{
 		IsCVMatch:  isCVMatch,
-		BottomTier: slices.Min(matchTiers),
-		TopTier:    slices.Max(matchTiers),
+		BottomTier: bottomTier,
+		TopTier:    topTier,
+		// BottomTier: slices.Min(matchTiers),
+		// TopTier:    slices.Max(matchTiers),
 	}, nil
 }
 
@@ -212,7 +249,7 @@ func (t *ThreatLevel) killScore() (killScore float64, kdRateScore float64) {
 	}
 
 	killScore = limitedValue(t.statistics.PlayerAvgKill, 1.5, 0.5) - 0.8
-	kdRateScore = limitedValue(toInteger(t.statistics.PlayerKdRate), 3, 0.7) - 1.2
+	kdRateScore = limitedValue(t.statistics.PlayerKdRate, 3, 0.7) - 1.2
 
 	// KDRは高いのにKPRは低い（≒芋）は逆補正に
 	if killScore < 0 && kdRateScore > 0 {
@@ -261,6 +298,14 @@ func (t *ThreatLevel) playerOverallScore() float64 {
 	}
 
 	playerGeneralScore = round((battlesCountScore-1.5)*0.05) + playerGeneralScore
+
+	if t.playerName == "inconno1993" {
+		fmt.Printf("%s: %f\n", "t.baseDamageScore()", t.baseDamageScore())
+		fmt.Printf("%s: %f\n", "killScore", killScore)
+		fmt.Printf("%s: %f\n", "t.statistics.PlayerKdRate", toInteger(t.statistics.PlayerKdRate))
+		fmt.Printf("%s: %f\n", "kdRateScore", kdRateScore)
+		fmt.Printf("%s: %f\n", "t.winRateScore()", t.winRateScore())
+	}
 
 	return playerGeneralScore
 }
@@ -330,7 +375,7 @@ func (t *ThreatLevel) playerShipScore() float64 {
 
 	// 生存率補正指数
 	// 艦種ごとの影響度を考慮して補正
-    surviveRate := t.statistics.ShipSurvivedRate / 100 // %で与えられるため0~100に変換する
+	surviveRate := t.statistics.ShipSurvivedRate / 100 // %で与えられるため0~100に変換する
 	limitedSurviveRate := limitedValue(surviveRate, std.survivedRate+0.1, std.survivedRate-0.1)
 	shipServiveScore := round(limitedSurviveRate * std.influence / 1.5)
 
@@ -348,7 +393,7 @@ func (t *ThreatLevel) playerShipScore() float64 {
 	}
 
 	// 艦勝率補正指数
-    winRate := t.statistics.ShipWinRate / 100 // %で与えられるため0~100に変換する
+	winRate := t.statistics.ShipWinRate / 100 // %で与えられるため0~100に変換する
 	shipWinRateScore := limitedValue(winRate, 0.6, 0.4) - 0.5
 	// 空母の場合、勝率の影響を3割増加
 	if shipType == ShipTypeCV {
