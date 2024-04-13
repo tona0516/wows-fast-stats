@@ -3,7 +3,7 @@ package infra
 import (
 	"testing"
 	"wfs/backend/apperr"
-	"wfs/backend/domain/model"
+	"wfs/backend/data"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -31,7 +31,7 @@ func TestNumbers_ExpectedStats(t *testing.T) {
 		require.NoError(t, err)
 
 		// アサーション
-		expected := model.ExpectedStats{
+		expected := data.ExpectedStats{
 			1234: {
 				AverageDamageDealt: 50000,
 				AverageFrags:       1.2,

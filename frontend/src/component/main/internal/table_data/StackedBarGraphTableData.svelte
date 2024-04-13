@@ -1,10 +1,10 @@
 <script lang="ts">
   import type { StackedBarGraphParam } from "src/lib/column/StackedBarGraphParam";
   import type { AbstractStatsColumn } from "src/lib/column/intetface/AbstractStatsColumn";
-  import type { model } from "wailsjs/go/models";
+  import type { data } from "wailsjs/go/models";
 
   export let column: AbstractStatsColumn<StackedBarGraphParam>;
-  export let player: model.Player;
+  export let player: data.Player;
 
   $: param = column.displayValue(player);
 </script>

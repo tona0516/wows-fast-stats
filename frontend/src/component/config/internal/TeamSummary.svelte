@@ -5,12 +5,12 @@
   import { Notifier } from "src/lib/Notifier";
   import { storedConfig } from "src/stores";
   import { ApplyUserConfig } from "wailsjs/go/main/App";
-  import { model } from "wailsjs/go/models";
+  import { data } from "wailsjs/go/models";
 
-  export let inputConfig: model.UserConfigV2;
+  export let inputConfig: data.UserConfigV2;
 
   let isLoading = false;
-  let teamSummary: model.UCTeamSummary = inputConfig.team_summary;
+  let teamSummary: data.UCTeamSummary = inputConfig.team_summary;
 
   $: isValidMinShipBattles =
     teamSummary.min_ship_battles > 0 &&

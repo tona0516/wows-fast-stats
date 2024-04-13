@@ -1,4 +1,4 @@
-export namespace model {
+export namespace data {
 	
 	export class AlertPlayer {
 	    account_id: number;

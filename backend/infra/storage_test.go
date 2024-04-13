@@ -4,7 +4,7 @@ import (
 	"os"
 	"path"
 	"testing"
-	"wfs/backend/domain/model"
+	"wfs/backend/data"
 
 	"github.com/dgraph-io/badger/v4"
 	"github.com/stretchr/testify/assert"
@@ -70,15 +70,15 @@ func TestStorage_UserConfig(t *testing.T) {
 	// 取得：保存されていない場合はデフォルト値を返却する
 	actual, err := storage.UserConfig()
 	require.NoError(t, err)
-	assert.Equal(t, model.DefaultUserConfig, actual)
+	assert.Equal(t, data.DefaultUserConfig, actual)
 	assert.False(t, storage.IsExistUserConfig())
 
 	// 書き込み：正常系
-	expected := model.UserConfig{
+	expected := data.UserConfig{
 		FontSize: "large",
-		Displays: model.Displays{
-			Ship:    model.Ship{PR: true},
-			Overall: model.Overall{PR: false},
+		Displays: data.Displays{
+			Ship:    data.Ship{PR: true},
+			Overall: data.Overall{PR: false},
 		},
 	}
 	err = storage.WriteUserConfig(expected)
@@ -105,14 +105,14 @@ func TestStorage_UserConfigV2(t *testing.T) {
 	// 取得：保存されていない場合はデフォルト値を返却する
 	actual, err := storage.UserConfigV2()
 	require.NoError(t, err)
-	assert.Equal(t, model.DefaultUserConfigV2, actual)
+	assert.Equal(t, data.DefaultUserConfigV2, actual)
 
 	// 書き込み：正常系
-	expected := model.UserConfigV2{
+	expected := data.UserConfigV2{
 		FontSize: "large",
-		Display: model.UCDisplay{
-			Ship:    model.UCDisplayShip{PR: true},
-			Overall: model.UCDisplayOverall{PR: false},
+		Display: data.UCDisplay{
+			Ship:    data.UCDisplayShip{PR: true},
+			Overall: data.UCDisplayOverall{PR: false},
 		},
 	}
 	err = storage.WriteUserConfigV2(expected)
@@ -135,7 +135,7 @@ func TestStorage_AlertPlayers(t *testing.T) {
 	assertEmpty := func() {
 		actual, err := storage.AlertPlayers()
 		require.NoError(t, err)
-		assert.Equal(t, []model.AlertPlayer{}, actual)
+		assert.Equal(t, []data.AlertPlayer{}, actual)
 		assert.False(t, storage.IsExistAlertPlayers())
 	}
 
@@ -143,12 +143,12 @@ func TestStorage_AlertPlayers(t *testing.T) {
 	assertEmpty()
 
 	// 書き込み：空配列を書き込もうとした場合はキーごと削除される
-	err := storage.WriteAlertPlayers([]model.AlertPlayer{})
+	err := storage.WriteAlertPlayers([]data.AlertPlayer{})
 	require.NoError(t, err)
 	assertEmpty()
 
 	// 書き込み：正常系
-	expected := []model.AlertPlayer{
+	expected := []data.AlertPlayer{
 		{
 			AccountID: 100,
 			Name:      "test",
@@ -180,13 +180,13 @@ func TestStorage_ExpectedStats(t *testing.T) {
 	db := openDB(t)
 	storage := NewStorage(db)
 
-	expected := model.ExpectedStats{
-		1: model.ExpectedValues{
+	expected := data.ExpectedStats{
+		1: data.ExpectedValues{
 			AverageDamageDealt: 123,
 			AverageFrags:       456,
 			WinRate:            789,
 		},
-		10: model.ExpectedValues{
+		10: data.ExpectedValues{
 			AverageDamageDealt: 1,
 			AverageFrags:       2,
 			WinRate:            3,

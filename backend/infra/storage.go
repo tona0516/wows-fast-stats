@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/gob"
 	"errors"
-	"wfs/backend/domain/model"
+	"wfs/backend/data"
 
 	"github.com/dgraph-io/badger/v4"
 	"github.com/morikuni/failure"
@@ -41,63 +41,63 @@ func (s *Storage) WriteDataVersion(version uint) error {
 	return write(s.db, dataVersionKey, version)
 }
 
-func (s *Storage) UserConfig() (model.UserConfig, error) {
-	config, err := read[model.UserConfig](s.db, userConfigKey)
+func (s *Storage) UserConfig() (data.UserConfig, error) {
+	config, err := read[data.UserConfig](s.db, userConfigKey)
 	if isErrKeyNotFound(err) {
-		return model.DefaultUserConfig, nil
+		return data.DefaultUserConfig, nil
 	}
 
 	return config, err
 }
 
-func (s *Storage) WriteUserConfig(config model.UserConfig) error {
+func (s *Storage) WriteUserConfig(config data.UserConfig) error {
 	return write(s.db, userConfigKey, config)
 }
 
 func (s *Storage) IsExistUserConfig() bool {
-	_, err := read[model.UserConfig](s.db, userConfigKey)
+	_, err := read[data.UserConfig](s.db, userConfigKey)
 	return !isErrKeyNotFound(err)
 }
 
-func (s *Storage) UserConfigV2() (model.UserConfigV2, error) {
-	config, err := read[model.UserConfigV2](s.db, userConfigKey)
+func (s *Storage) UserConfigV2() (data.UserConfigV2, error) {
+	config, err := read[data.UserConfigV2](s.db, userConfigKey)
 	if isErrKeyNotFound(err) {
-		return model.DefaultUserConfigV2, nil
+		return data.DefaultUserConfigV2, nil
 	}
 
 	return config, err
 }
 
-func (s *Storage) WriteUserConfigV2(config model.UserConfigV2) error {
+func (s *Storage) WriteUserConfigV2(config data.UserConfigV2) error {
 	return write(s.db, userConfigKey, config)
 }
 
 func (s *Storage) IsExistAlertPlayers() bool {
-	_, err := read[[]model.AlertPlayer](s.db, alertPlayersKey)
+	_, err := read[[]data.AlertPlayer](s.db, alertPlayersKey)
 	return !isErrKeyNotFound(err)
 }
 
-func (s *Storage) AlertPlayers() ([]model.AlertPlayer, error) {
-	players, err := read[[]model.AlertPlayer](s.db, alertPlayersKey)
+func (s *Storage) AlertPlayers() ([]data.AlertPlayer, error) {
+	players, err := read[[]data.AlertPlayer](s.db, alertPlayersKey)
 	if isErrKeyNotFound(err) {
-		return []model.AlertPlayer{}, nil
+		return []data.AlertPlayer{}, nil
 	}
 
 	return players, err
 }
 
-func (s *Storage) WriteAlertPlayers(players []model.AlertPlayer) error {
+func (s *Storage) WriteAlertPlayers(players []data.AlertPlayer) error {
 	if len(players) == 0 {
 		return delete(s.db, alertPlayersKey)
 	}
 	return write(s.db, alertPlayersKey, players)
 }
 
-func (s *Storage) ExpectedStats() (model.ExpectedStats, error) {
-	return read[model.ExpectedStats](s.db, expectedStatsKey)
+func (s *Storage) ExpectedStats() (data.ExpectedStats, error) {
+	return read[data.ExpectedStats](s.db, expectedStatsKey)
 }
 
-func (s *Storage) WriteExpectedStats(expectedStats model.ExpectedStats) error {
+func (s *Storage) WriteExpectedStats(expectedStats data.ExpectedStats) error {
 	return write(s.db, expectedStatsKey, expectedStats)
 }
 

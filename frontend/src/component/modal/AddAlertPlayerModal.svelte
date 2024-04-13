@@ -5,14 +5,14 @@
     AlertPatterns,
     UpdateAlertPlayer,
   } from "wailsjs/go/main/App";
-  import type { model } from "wailsjs/go/models";
+  import type { data } from "wailsjs/go/models";
   import clone from "clone";
   import UIkit from "uikit";
   import UkModal from "src/component/common/uikit/UkModal.svelte";
   import UkIcon from "src/component/common/uikit/UkIcon.svelte";
   import { ModalElementID } from "./ModalElementID";
 
-  export let defaultAlertPlayer: model.AlertPlayer;
+  export let defaultAlertPlayer: data.AlertPlayer;
   export let maxMemoLength: number;
   const dispatch = createEventDispatcher();
 
@@ -30,7 +30,7 @@
     searchResult = undefined;
   };
 
-  const add = async (player: model.AlertPlayer) => {
+  const add = async (player: data.AlertPlayer) => {
     try {
       player.account_id = searchResult!.account_id;
       player.name = searchResult!.nickname;
@@ -68,11 +68,11 @@
     }
   };
 
-  let target: model.AlertPlayer = clone(defaultAlertPlayer);
+  let target: data.AlertPlayer = clone(defaultAlertPlayer);
   let isSearching: boolean = false;
   let searchInput: string = "";
-  let searchPlayers: model.WGAccountListData[] = [];
-  let searchResult: model.WGAccountListData | undefined = undefined;
+  let searchPlayers: data.WGAccountListData[] = [];
+  let searchResult: data.WGAccountListData | undefined = undefined;
 
   $: disableAddButton =
     searchResult === undefined ||

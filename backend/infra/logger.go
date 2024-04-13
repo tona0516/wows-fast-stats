@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"os"
 	"time"
-	"wfs/backend/domain/model"
-	"wfs/backend/domain/repository"
+	"wfs/backend/data"
+	"wfs/backend/repository"
 
 	"github.com/rs/zerolog"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
@@ -16,7 +16,7 @@ import (
 
 type Logger struct {
 	zlog         zerolog.Logger
-	env          model.Env
+	env          data.Env
 	alertDiscord repository.DiscordInterface
 	infoDiscord  repository.DiscordInterface
 
@@ -24,7 +24,7 @@ type Logger struct {
 }
 
 func NewLogger(
-	env model.Env,
+	env data.Env,
 	alertDiscord repository.DiscordInterface,
 	infoDiscord repository.DiscordInterface,
 ) *Logger {

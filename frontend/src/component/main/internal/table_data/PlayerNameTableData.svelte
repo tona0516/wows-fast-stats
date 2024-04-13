@@ -10,13 +10,13 @@
     AddExcludePlayerID,
     RemoveExcludePlayerID,
   } from "wailsjs/go/main/App";
-  import type { model } from "wailsjs/go/models";
+  import type { data } from "wailsjs/go/models";
   import type { PlayerName } from "src/lib/column/model/PlayerName";
   import { ClipboardSetText } from "wailsjs/runtime/runtime";
   import { Notifier } from "src/lib/Notifier";
 
   export let column: PlayerName;
-  export let player: model.Player;
+  export let player: data.Player;
 
   $: accountID = player.player_info.id;
   $: isChecked = !$storedExcludedPlayers.includes(accountID);

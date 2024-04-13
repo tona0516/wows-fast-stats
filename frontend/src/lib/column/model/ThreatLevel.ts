@@ -1,14 +1,14 @@
 import SingleTableData from "src/component/main/internal/table_data/SingleTableData.svelte";
 import { ThreatLevelInfo } from "src/lib/ThreatLevel";
 import { AbstractStatsColumn } from "src/lib/column/intetface/AbstractStatsColumn";
-import type { model } from "wailsjs/go/models";
+import type { data } from "wailsjs/go/models";
 
 export class ThreatLevel extends AbstractStatsColumn<string> {
-  constructor(config: model.UserConfigV2) {
+  constructor(config: data.UserConfigV2) {
     super("threat_level", 1, config, "overall");
   }
 
-  displayValue(player: model.Player): string {
+  displayValue(player: data.Player): string {
     const value = this.playerStats(player).overall.threat_level_in_match;
     if (value === -1) {
       return "N/A";
@@ -17,12 +17,12 @@ export class ThreatLevel extends AbstractStatsColumn<string> {
     return value.toFixed(this.digit());
   }
 
-  textColorCode(player: model.Player): string {
+  textColorCode(player: data.Player): string {
     return ThreatLevelInfo.fromScore(player.pvp_all.overall.threat_level)
       .textColorCode;
   }
 
-  bgColorCode(player: model.Player): string {
+  bgColorCode(player: data.Player): string {
     return ThreatLevelInfo.fromScore(player.pvp_all.overall.threat_level)
       .bgColorCode;
   }

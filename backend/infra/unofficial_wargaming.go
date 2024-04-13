@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strconv"
 	"wfs/backend/apperr"
-	"wfs/backend/domain/model"
+	"wfs/backend/data"
 	"wfs/backend/infra/webapi"
 
 	"github.com/cenkalti/backoff/v4"
@@ -19,10 +19,10 @@ func NewUnofficialWargaming(config RequestConfig) *UnofficialWargaming {
 	return &UnofficialWargaming{config: config}
 }
 
-func (w *UnofficialWargaming) ClansAutoComplete(search string) (model.UWGClansAutocomplete, error) {
+func (w *UnofficialWargaming) ClansAutoComplete(search string) (data.UWGClansAutocomplete, error) {
 	b := backoff.WithMaxRetries(backoff.NewExponentialBackOff(), w.config.Retry)
-	operation := func() (webapi.Response[any, model.UWGClansAutocomplete], error) {
-		res, err := webapi.GetRequest[model.UWGClansAutocomplete](
+	operation := func() (webapi.Response[any, data.UWGClansAutocomplete], error) {
+		res, err := webapi.GetRequest[data.UWGClansAutocomplete](
 			w.config.URL+"/api/search/autocomplete/",
 			w.config.Timeout,
 			map[string]string{

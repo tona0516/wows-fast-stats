@@ -5,20 +5,20 @@ import {
   LogError,
   ManualScreenshot,
 } from "wailsjs/go/main/App";
-import type { model } from "wailsjs/go/models";
+import type { data } from "wailsjs/go/models";
 
 export class Screenshot {
   private isFirst: boolean = true;
 
   constructor(private targetElementID: string) {}
 
-  async manual(meta: model.Meta): Promise<boolean> {
+  async manual(meta: data.Meta): Promise<boolean> {
     const filename = deriveFileName(meta);
     const image = await this.getBase64Image();
     return await ManualScreenshot(filename, image);
   }
 
-  async auto(meta: model.Meta) {
+  async auto(meta: data.Meta) {
     const filename = deriveFileName(meta);
     const image = await this.getBase64Image();
     await AutoScreenshot(filename, image);
@@ -41,7 +41,7 @@ export class Screenshot {
   }
 }
 
-const deriveFileName = (meta: model.Meta): string => {
+const deriveFileName = (meta: data.Meta): string => {
   const items = [
     format(fromUnixTime(meta.unixtime), "yyyy-MM-dd-HH-mm-ss"),
     meta.own_ship.replaceAll(" ", "-"),

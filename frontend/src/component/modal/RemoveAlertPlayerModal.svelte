@@ -1,16 +1,16 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
   import { RemoveAlertPlayer } from "wailsjs/go/main/App";
-  import type { model } from "wailsjs/go/models";
+  import type { data } from "wailsjs/go/models";
   import UkModal from "src/component/common/uikit/UkModal.svelte";
   import UIkit from "uikit";
   import { ModalElementID } from "./ModalElementID";
   import clone from "clone";
 
-  export let defaultAlertPlayer: model.AlertPlayer;
+  export let defaultAlertPlayer: data.AlertPlayer;
   const dispatch = createEventDispatcher();
 
-  export const show = (_target: model.AlertPlayer) => {
+  export const show = (_target: data.AlertPlayer) => {
     target = _target;
 
     const elem = document.getElementById(ModalElementID.REMOVE_ALERT_PLAYER);
@@ -26,7 +26,7 @@
     }
   };
 
-  let target: model.AlertPlayer = clone(defaultAlertPlayer);
+  let target: data.AlertPlayer = clone(defaultAlertPlayer);
 </script>
 
 <UkModal id={ModalElementID.REMOVE_ALERT_PLAYER}>

@@ -1,20 +1,20 @@
 import { DispName } from "src/lib/DispName";
 import { Summary } from "src/lib/Summary";
 import type { StatsExtra } from "src/lib/types";
-import { model } from "wailsjs/go/models";
+import { data } from "wailsjs/go/models";
 
-const makePlayer = (): model.Player => {
-  const pvpSolo = new model.PlayerStats();
-  pvpSolo.ship = new model.ShipStats();
-  pvpSolo.overall = new model.OverallStats();
+const makePlayer = (): data.Player => {
+  const pvpSolo = new data.PlayerStats();
+  pvpSolo.ship = new data.ShipStats();
+  pvpSolo.overall = new data.OverallStats();
 
-  const pvpAll = new model.PlayerStats();
-  pvpAll.ship = new model.ShipStats();
-  pvpAll.overall = new model.OverallStats();
+  const pvpAll = new data.PlayerStats();
+  pvpAll.ship = new data.ShipStats();
+  pvpAll.overall = new data.OverallStats();
 
-  const player = new model.Player();
-  player.player_info = new model.PlayerInfo();
-  player.ship_info = new model.ShipInfo();
+  const player = new data.Player();
+  player.player_info = new data.PlayerInfo();
+  player.ship_info = new data.ShipInfo();
   player.pvp_solo = pvpSolo;
   player.pvp_all = pvpAll;
 
@@ -23,7 +23,7 @@ const makePlayer = (): model.Player => {
 
 test("undefined", () => {
   expect(
-    Summary.calculate(undefined, [], new model.UserConfigV2()),
+    Summary.calculate(undefined, [], new data.UserConfigV2()),
   ).toBeUndefined();
 });
 
@@ -54,27 +54,27 @@ test("calculate - all types, ship, pvp_all, excluded player", () => {
   enemy2.player_info.id = 12;
   enemy2[extra].ship.battles = 100;
 
-  const friendTeam = new model.Team();
+  const friendTeam = new data.Team();
   friendTeam.players = [friend1, friend2];
-  const enemyTeam = new model.Team();
+  const enemyTeam = new data.Team();
   enemyTeam.players = [enemy1, enemy2];
 
-  const battle = new model.Battle();
+  const battle = new data.Battle();
   battle.teams = [friendTeam, enemyTeam];
 
-  const customDigit = new model.UCDigit();
+  const customDigit = new data.UCDigit();
   customDigit.pr = 0;
   customDigit.damage = 1;
   customDigit.win_rate = 2;
 
-  const teamSummary = new model.UCTeamSummary();
+  const teamSummary = new data.UCTeamSummary();
   teamSummary.min_ship_battles = 20;
 
-  const display = new model.UCDisplay();
-  display.ship = new model.UCDisplayShip();
-  display.overall = new model.UCDisplayOverall();
+  const display = new data.UCDisplay();
+  display.ship = new data.UCDisplayShip();
+  display.overall = new data.UCDisplayOverall();
 
-  const config = new model.UserConfigV2();
+  const config = new data.UserConfigV2();
   config.digit = customDigit;
   config.team_summary = teamSummary;
   config.stats_pattern = extra;
@@ -155,27 +155,27 @@ test("calculate - each ship type, overall, pvp_solo", () => {
     return enemy;
   });
 
-  const friendTeam = new model.Team();
+  const friendTeam = new data.Team();
   friendTeam.players = friends;
-  const enemyTeam = new model.Team();
+  const enemyTeam = new data.Team();
   enemyTeam.players = enemies;
 
-  const battle = new model.Battle();
+  const battle = new data.Battle();
   battle.teams = [friendTeam, enemyTeam];
 
-  const customDigit = new model.UCDigit();
+  const customDigit = new data.UCDigit();
   customDigit.pr = 0;
   customDigit.damage = 1;
   customDigit.win_rate = 2;
 
-  const teamSummary = new model.UCTeamSummary();
+  const teamSummary = new data.UCTeamSummary();
   teamSummary.min_overall_battles = 1;
 
-  const display = new model.UCDisplay();
-  display.ship = new model.UCDisplayShip();
-  display.overall = new model.UCDisplayOverall();
+  const display = new data.UCDisplay();
+  display.ship = new data.UCDisplayShip();
+  display.overall = new data.UCDisplayOverall();
 
-  const config = new model.UserConfigV2();
+  const config = new data.UserConfigV2();
   config.digit = customDigit;
   config.team_summary = teamSummary;
   config.stats_pattern = extra;
