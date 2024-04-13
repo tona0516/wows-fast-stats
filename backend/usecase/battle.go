@@ -409,7 +409,7 @@ func (b *Battle) compose(
 				ShipPlanesKilled: stats.PlanesKilled(model.StatsPatternPvPAll),
 				ShipBattles:      stats.Battles(model.StatsCategoryShip, model.StatsPatternPvPAll),
 			},
-            nickname,
+			nickname,
 		)
 
 		player := model.Player{
@@ -465,6 +465,8 @@ func playerStats(
 	stats *model.Stats,
 	threatLevel *model.ThreatLevel,
 ) model.PlayerStats {
+	threatLevelValue, threatLevelValueInMatch := threatLevel.Calculate()
+
 	return model.PlayerStats{
 		ShipStats: model.ShipStats{
 			Battles:            stats.Battles(model.StatsCategoryShip, statsPattern),
@@ -483,21 +485,22 @@ func playerStats(
 			PlatoonRate:        stats.PlatoonRate(model.StatsCategoryShip),
 		},
 		OverallStats: model.OverallStats{
-			Battles:           stats.Battles(model.StatsCategoryOverall, statsPattern),
-			Damage:            stats.AvgDamage(model.StatsCategoryOverall, statsPattern),
-			MaxDamage:         stats.MaxDamage(model.StatsCategoryOverall, statsPattern),
-			WinRate:           stats.WinRate(model.StatsCategoryOverall, statsPattern),
-			WinSurvivedRate:   stats.WinSurvivedRate(model.StatsCategoryOverall, statsPattern),
-			LoseSurvivedRate:  stats.LoseSurvivedRate(model.StatsCategoryOverall, statsPattern),
-			KdRate:            stats.KdRate(model.StatsCategoryOverall, statsPattern),
-			Kill:              stats.AvgKill(model.StatsCategoryOverall, statsPattern),
-			Exp:               stats.AvgExp(model.StatsCategoryOverall, statsPattern),
-			PR:                stats.PR(model.StatsCategoryOverall, statsPattern),
-			ThreatLevel:       threatLevel.Calculate(),
-			AvgTier:           stats.AvgTier(statsPattern),
-			UsingShipTypeRate: stats.UsingShipTypeRate(statsPattern),
-			UsingTierRate:     stats.UsingTierRate(statsPattern),
-			PlatoonRate:       stats.PlatoonRate(model.StatsCategoryOverall),
+			Battles:            stats.Battles(model.StatsCategoryOverall, statsPattern),
+			Damage:             stats.AvgDamage(model.StatsCategoryOverall, statsPattern),
+			MaxDamage:          stats.MaxDamage(model.StatsCategoryOverall, statsPattern),
+			WinRate:            stats.WinRate(model.StatsCategoryOverall, statsPattern),
+			WinSurvivedRate:    stats.WinSurvivedRate(model.StatsCategoryOverall, statsPattern),
+			LoseSurvivedRate:   stats.LoseSurvivedRate(model.StatsCategoryOverall, statsPattern),
+			KdRate:             stats.KdRate(model.StatsCategoryOverall, statsPattern),
+			Kill:               stats.AvgKill(model.StatsCategoryOverall, statsPattern),
+			Exp:                stats.AvgExp(model.StatsCategoryOverall, statsPattern),
+			PR:                 stats.PR(model.StatsCategoryOverall, statsPattern),
+			ThreatLevel:        threatLevelValue,
+			ThreatLevelInMatch: threatLevelValueInMatch,
+			AvgTier:            stats.AvgTier(statsPattern),
+			UsingShipTypeRate:  stats.UsingShipTypeRate(statsPattern),
+			UsingTierRate:      stats.UsingTierRate(statsPattern),
+			PlatoonRate:        stats.PlatoonRate(model.StatsCategoryOverall),
 		},
 	}
 }

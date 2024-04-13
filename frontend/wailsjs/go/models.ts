@@ -66,6 +66,7 @@ export namespace model {
 	    exp: number;
 	    pr: number;
 	    threat_level: number;
+	    threat_level_in_match: number;
 	    avg_tier: number;
 	    using_ship_type_rate: ShipTypeGroup;
 	    using_tier_rate: TierGroup;
@@ -88,6 +89,7 @@ export namespace model {
 	        this.exp = source["exp"];
 	        this.pr = source["pr"];
 	        this.threat_level = source["threat_level"];
+	        this.threat_level_in_match = source["threat_level_in_match"];
 	        this.avg_tier = source["avg_tier"];
 	        this.using_ship_type_rate = this.convertValues(source["using_ship_type_rate"], ShipTypeGroup);
 	        this.using_tier_rate = this.convertValues(source["using_tier_rate"], TierGroup);

@@ -1,11 +1,10 @@
 package model
 
 import (
-	"fmt"
 	"math"
 	// "wfs/backend/apperr"
 	// "github.com/morikuni/failure"
-	// "golang.org/x/exp/slices"
+	// "golang.org/x/exp/slices".
 )
 
 //nolint:gochecknoglobals
@@ -142,12 +141,9 @@ func NewThreatLevel(
 	}
 }
 
-func (t *ThreatLevel) Calculate() float64 {
+func (t *ThreatLevel) Calculate() (float64, float64) {
 	// 戦闘情報の取得
-	battleDetail, err := t.battleDetail()
-	if err != nil {
-		return -1
-	}
+	battleDetail := t.battleDetail()
 
 	// プレイヤー総合補正指数
 	playerOverallScore := t.playerOverallScore()
@@ -170,27 +166,16 @@ func (t *ThreatLevel) Calculate() float64 {
 	// マッチのおける脅威レベルの補正
 	threatLevelInMatch := t.correctBasedOnMatch(threatLevel, shipAAIndex, battleDetail)
 
-	if t.playerName == "inconno1993" {
-		// fmt.Printf("%s: %f\n", "playerOverallScore", playerOverallScore)
-		// fmt.Printf("%s: %f\n", "playerOverallScore", playerOverallScore)
-		// fmt.Printf("%s: %f\n", "playerOverallScore", playerOverallScore)
-		// fmt.Printf("%s: %f\n", "playerOverallScore", playerOverallScore)
-		fmt.Printf("%s: %f\n", "playerOverallScore", playerOverallScore)
-		fmt.Printf("%s: %f\n", "playerShipScore", playerShipScore)
-		fmt.Printf("%s: %f\n", "shipClassScore", shipClassScore)
-		fmt.Printf("%s: %f\n", "shipAAIndex", shipAAIndex)
-		fmt.Printf("%s: %f\n", "threatLevel", threatLevel)
-		fmt.Printf("%s: %f\n", "threatLevelInMatch", threatLevelInMatch)
-	}
-
-	return threatLevelInMatch
+	return threatLevel, threatLevelInMatch
 }
 
-func (t *ThreatLevel) battleDetail() (threatLevelBattleDetail, error) {
-	isCVMatch := false
-	var topTier uint = 1
-	var bottomTier uint = 1
-	// matchTiers := make([]uint, 0)
+func (t *ThreatLevel) battleDetail() threatLevelBattleDetail {
+	var (
+		isCVMatch  bool
+		topTier    uint = 1
+		bottomTier uint = 1
+	)
+
 	for _, vehicle := range t.tempArenaInfo.Vehicles {
 		warship, ok := t.warships[vehicle.ShipID]
 		if !ok {
@@ -220,21 +205,13 @@ func (t *ThreatLevel) battleDetail() (threatLevelBattleDetail, error) {
 				topTier = bottomTier + 2
 			}
 		}
-
-		// matchTiers = append(matchTiers, warship.Tier)
 	}
-
-	// if len(matchTiers) == 0 {
-	// 	return threatLevelBattleDetail{}, failure.New(apperr.InvalidTempArenaInfo)
-	// }
 
 	return threatLevelBattleDetail{
 		IsCVMatch:  isCVMatch,
 		BottomTier: bottomTier,
 		TopTier:    topTier,
-		// BottomTier: slices.Min(matchTiers),
-		// TopTier:    slices.Max(matchTiers),
-	}, nil
+	}
 }
 
 func (t *ThreatLevel) baseDamageScore() float64 {
@@ -298,14 +275,6 @@ func (t *ThreatLevel) playerOverallScore() float64 {
 	}
 
 	playerGeneralScore = round((battlesCountScore-1.5)*0.05) + playerGeneralScore
-
-	if t.playerName == "inconno1993" {
-		fmt.Printf("%s: %f\n", "t.baseDamageScore()", t.baseDamageScore())
-		fmt.Printf("%s: %f\n", "killScore", killScore)
-		fmt.Printf("%s: %f\n", "t.statistics.PlayerKdRate", toInteger(t.statistics.PlayerKdRate))
-		fmt.Printf("%s: %f\n", "kdRateScore", kdRateScore)
-		fmt.Printf("%s: %f\n", "t.winRateScore()", t.winRateScore())
-	}
 
 	return playerGeneralScore
 }
@@ -386,7 +355,6 @@ func (t *ThreatLevel) playerShipScore() float64 {
 		if shipAAScore > 1 {
 			shipAAScore = round((shipAAScore - 1) / 2)
 		} else {
-			//nolint:gocritic
 			shipAAScore = round(shipAAScore - 1)
 		}
 		shipAAScore = limitedValue(shipAAScore, 0.2, -0.3)
@@ -397,7 +365,7 @@ func (t *ThreatLevel) playerShipScore() float64 {
 	shipWinRateScore := limitedValue(winRate, 0.6, 0.4) - 0.5
 	// 空母の場合、勝率の影響を3割増加
 	if shipType == ShipTypeCV {
-		shipWinRateScore = shipWinRateScore * 1.3
+		shipWinRateScore *= 1.3
 	}
 	shipWinRateScore = round(shipWinRateScore * std.influence * 1.5)
 

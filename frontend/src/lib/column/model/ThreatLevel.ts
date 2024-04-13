@@ -9,7 +9,7 @@ export class ThreatLevel extends AbstractStatsColumn<string> {
   }
 
   displayValue(player: model.Player): string {
-    const value = this.playerStats(player).overall.threat_level;
+    const value = this.playerStats(player).overall.threat_level_in_match;
     if (value === -1) {
       return "N/A";
     }

@@ -126,6 +126,7 @@ const sampleTeam = (): model.Team => {
     };
     os.platoon_rate = 3.0;
     os.threat_level = 10000; // TODO
+    os.threat_level_in_match = 10000; // TODO
 
     const pi = new model.PlayerInfo();
     pi.id = 1;

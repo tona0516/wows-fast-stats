@@ -10,7 +10,7 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/skratchdot/open-golang v0.0.0-20200116055534-eef842397966
 	github.com/stretchr/testify v1.8.4
-	github.com/wailsapp/wails/v2 v2.7.0
+	github.com/wailsapp/wails/v2 v2.8.0
 	golang.org/x/exp v0.0.0-20240112132812-db7319d0e0e3
 	golang.org/x/sync v0.6.0
 )
@@ -37,7 +37,6 @@ require (
 	github.com/klauspost/compress v1.17.4 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/leaanthony/u v1.1.1 // indirect
-	github.com/rogpeppe/go-internal v1.12.0 // indirect
 	github.com/wailsapp/go-webview2 v1.0.10 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	google.golang.org/protobuf v1.32.0 // indirect
