@@ -16,6 +16,7 @@ var (
 	emptyShipsStats    = []WGShipsStatsData{}
 	emptyExpectedStats = ExpectedStats{}
 	emptyWarships      = Warships{}
+	emptyTempArenaInfo = TempArenaInfo{}
 )
 
 // ref: https://asia.wows-numbers.com/personal/rating
@@ -54,6 +55,7 @@ func TestStats_PR_Ship(t *testing.T) {
 				},
 			},
 			emptyWarships,
+			emptyTempArenaInfo,
 		)
 
 		assert.InDelta(t, p.expected, stats.PR(StatsCategoryShip, StatsPatternPvPAll), allowableDelta)
@@ -129,6 +131,7 @@ func TestStats_PR_Overall(t *testing.T) {
 			},
 		},
 		emptyWarships,
+		emptyTempArenaInfo,
 	)
 
 	assert.InDelta(t, 2215.0243612353, stats.PR(StatsCategoryOverall, StatsPatternPvPAll), allowableDelta)
@@ -155,6 +158,7 @@ func TestStats_AvgDamage_Overall(t *testing.T) {
 		emptyShipsStats,
 		emptyExpectedStats,
 		emptyWarships,
+		emptyTempArenaInfo,
 	)
 
 	assert.InDelta(t, 10000, stats.AvgDamage(StatsCategoryOverall, StatsPatternPvPAll), allowableDelta)
@@ -181,6 +185,7 @@ func TestStats_AvgDamage_Overall_Solo(t *testing.T) {
 		emptyShipsStats,
 		emptyExpectedStats,
 		emptyWarships,
+		emptyTempArenaInfo,
 	)
 
 	assert.InDelta(t, 10000, stats.AvgDamage(StatsCategoryOverall, StatsPatternPvPSolo), allowableDelta)
@@ -202,6 +207,7 @@ func TestStats_AvgDamage_Ship(t *testing.T) {
 		},
 		emptyExpectedStats,
 		emptyWarships,
+		emptyTempArenaInfo,
 	)
 
 	assert.InDelta(t, 10000, stats.AvgDamage(StatsCategoryShip, StatsPatternPvPAll), allowableDelta)
@@ -223,6 +229,7 @@ func TestStats_AvgDamage_Ship_Solo(t *testing.T) {
 		},
 		emptyExpectedStats,
 		emptyWarships,
+		emptyTempArenaInfo,
 	)
 
 	assert.InDelta(t, 10000, stats.AvgDamage(StatsCategoryShip, StatsPatternPvPSolo), allowableDelta)
@@ -249,6 +256,7 @@ func TestStats_MaxDamage_Ship(t *testing.T) {
 		},
 		emptyExpectedStats,
 		emptyWarships,
+		emptyTempArenaInfo,
 	)
 
 	assert.Equal(t, expected, stats.MaxDamage(StatsCategoryShip, StatsPatternPvPAll))
@@ -287,6 +295,7 @@ func TestStats_MaxDamage_Overall(t *testing.T) {
 				Tier: expected.ShipTier,
 			},
 		},
+		emptyTempArenaInfo,
 	)
 
 	assert.Equal(t, expected, stats.MaxDamage(StatsCategoryOverall, StatsPatternPvPAll))
@@ -312,6 +321,7 @@ func TestStats_Battles(t *testing.T) {
 		emptyShipsStats,
 		emptyExpectedStats,
 		emptyWarships,
+		emptyTempArenaInfo,
 	)
 
 	assert.InDelta(t, 100, stats.Battles(StatsCategoryOverall, StatsPatternPvPAll), allowableDelta)
@@ -339,6 +349,7 @@ func TestStats_KdRate(t *testing.T) {
 		emptyShipsStats,
 		emptyExpectedStats,
 		emptyWarships,
+		emptyTempArenaInfo,
 	)
 
 	assert.InDelta(t, 0.5, stats.KdRate(StatsCategoryOverall, StatsPatternPvPAll), allowableDelta)
@@ -365,6 +376,7 @@ func TestStats_AvgKill(t *testing.T) {
 		emptyShipsStats,
 		emptyExpectedStats,
 		emptyWarships,
+		emptyTempArenaInfo,
 	)
 
 	assert.InDelta(t, 0.3, stats.AvgKill(StatsCategoryOverall, StatsPatternPvPAll), allowableDelta)
@@ -391,6 +403,7 @@ func TestStats_AvgExp(t *testing.T) {
 		emptyShipsStats,
 		emptyExpectedStats,
 		emptyWarships,
+		emptyTempArenaInfo,
 	)
 
 	assert.InDelta(t, 1500, stats.AvgExp(StatsCategoryOverall, StatsPatternPvPAll), allowableDelta)
@@ -417,6 +430,7 @@ func TestStats_WinRate(t *testing.T) {
 		emptyShipsStats,
 		emptyExpectedStats,
 		emptyWarships,
+		emptyTempArenaInfo,
 	)
 
 	assert.InDelta(t, 60, stats.WinRate(StatsCategoryOverall, StatsPatternPvPAll), allowableDelta)
@@ -443,6 +457,7 @@ func TestStats_WinSurvivedRate(t *testing.T) {
 		emptyShipsStats,
 		emptyExpectedStats,
 		emptyWarships,
+		emptyTempArenaInfo,
 	)
 
 	assert.InDelta(t, 20, stats.WinSurvivedRate(StatsCategoryOverall, StatsPatternPvPAll), allowableDelta)
@@ -471,6 +486,7 @@ func TestStats_LoseSurvivedRate(t *testing.T) {
 		emptyShipsStats,
 		emptyExpectedStats,
 		emptyWarships,
+		emptyTempArenaInfo,
 	)
 
 	assert.InDelta(t, 50, stats.LoseSurvivedRate(StatsCategoryOverall, StatsPatternPvPAll), allowableDelta)
@@ -499,6 +515,7 @@ func TestStats_MainBatteryHitRate(t *testing.T) {
 		},
 		emptyExpectedStats,
 		emptyWarships,
+		emptyTempArenaInfo,
 	)
 
 	assert.InDelta(t, 50, stats.MainBatteryHitRate(StatsPatternPvPAll), allowableDelta)
@@ -527,6 +544,7 @@ func TestStats_TorpedoesHitRate(t *testing.T) {
 		},
 		emptyExpectedStats,
 		emptyWarships,
+		emptyTempArenaInfo,
 	)
 
 	assert.InDelta(t, 25, stats.TorpedoesHitRate(StatsPatternPvPAll), allowableDelta)
@@ -550,6 +568,7 @@ func TestStats_PlanesKilled(t *testing.T) {
 		},
 		emptyExpectedStats,
 		emptyWarships,
+		emptyTempArenaInfo,
 	)
 
 	assert.InDelta(t, 33.4, stats.PlanesKilled(StatsPatternPvPAll), allowableDelta)
@@ -576,6 +595,7 @@ func TestStats_AvgTier(t *testing.T) {
 			100: {Tier: 5},
 			200: {Tier: 8},
 		},
+		emptyTempArenaInfo,
 	)
 
 	assert.InDelta(t, 7.14, stats.AvgTier(StatsPatternPvPAll), allowableDelta)
@@ -607,6 +627,7 @@ func TestStats_UsingTierRate(t *testing.T) {
 			200: {Tier: 8},
 			300: {Tier: 4},
 		},
+		emptyTempArenaInfo,
 	)
 
 	tierGroup := stats.UsingTierRate(StatsPatternPvPAll)
@@ -646,6 +667,7 @@ func TestStats_UsingShipTypeRate(t *testing.T) {
 			300: {Type: ShipTypeBB},
 			400: {Type: ShipTypeCV},
 		},
+		emptyTempArenaInfo,
 	)
 
 	shipTypeGroup := stats.UsingShipTypeRate(StatsPatternPvPAll)
@@ -685,6 +707,7 @@ func TestStats_PlatoonRate(t *testing.T) {
 		emptyShipsStats,
 		emptyExpectedStats,
 		emptyWarships,
+		emptyTempArenaInfo,
 	)
 
 	assert.InDelta(t, 2.4, stats.PlatoonRate(StatsCategoryOverall), allowableDelta)

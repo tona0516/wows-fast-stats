@@ -391,25 +391,7 @@ func (b *Battle) compose(
 			allPlayerShipsStats.Player(accountID),
 			allExpectedStats,
 			warships,
-		)
-
-		threatLevel := data.NewThreatLevel(
-			vehicle.ShipID,
-			warships,
 			tempArenaInfo,
-			data.ThreatLevelStatistics{
-				PlayerAvgDamage:  stats.AvgDamage(data.StatsCategoryOverall, data.StatsPatternPvPAll),
-				PlayerAvgKill:    stats.AvgKill(data.StatsCategoryOverall, data.StatsPatternPvPAll),
-				PlayerKdRate:     stats.KdRate(data.StatsCategoryOverall, data.StatsPatternPvPAll),
-				PlayerWinRate:    stats.WinRate(data.StatsCategoryOverall, data.StatsPatternPvPAll),
-				PlayerBattles:    stats.Battles(data.StatsCategoryOverall, data.StatsPatternPvPAll),
-				ShipAvgDamage:    stats.AvgDamage(data.StatsCategoryShip, data.StatsPatternPvPAll),
-				ShipWinRate:      stats.WinRate(data.StatsCategoryShip, data.StatsPatternPvPAll),
-				ShipSurvivedRate: stats.SurvivedRate(data.StatsCategoryShip, data.StatsPatternPvPAll),
-				ShipPlanesKilled: stats.PlanesKilled(data.StatsPatternPvPAll),
-				ShipBattles:      stats.Battles(data.StatsCategoryShip, data.StatsPatternPvPAll),
-			},
-			nickname,
 		)
 
 		player := data.Player{
@@ -428,8 +410,8 @@ func (b *Battle) compose(
 				IsPremium: warship.IsPremium,
 				AvgDamage: allExpectedStats[vehicle.ShipID].AverageDamageDealt,
 			},
-			PvPSolo: playerStats(data.StatsPatternPvPSolo, stats, threatLevel),
-			PvPAll:  playerStats(data.StatsPatternPvPAll, stats, threatLevel),
+			PvPSolo: playerStats(data.StatsPatternPvPSolo, stats),
+			PvPAll:  playerStats(data.StatsPatternPvPAll, stats),
 		}
 
 		if vehicle.IsFriend() {
@@ -463,9 +445,8 @@ func (b *Battle) compose(
 func playerStats(
 	statsPattern data.StatsPattern,
 	stats *data.Stats,
-	threatLevel *data.ThreatLevel,
 ) data.PlayerStats {
-	threatLevelValue, threatLevelValueInMatch := threatLevel.Calculate()
+	threatLevel := stats.ThreatLevel()
 
 	return data.PlayerStats{
 		ShipStats: data.ShipStats{
@@ -495,8 +476,8 @@ func playerStats(
 			Kill:               stats.AvgKill(data.StatsCategoryOverall, statsPattern),
 			Exp:                stats.AvgExp(data.StatsCategoryOverall, statsPattern),
 			PR:                 stats.PR(data.StatsCategoryOverall, statsPattern),
-			ThreatLevel:        threatLevelValue,
-			ThreatLevelInMatch: threatLevelValueInMatch,
+			ThreatLevel:        threatLevel.Raw,
+			ThreatLevelInMatch: threatLevel.Modified,
 			AvgTier:            stats.AvgTier(statsPattern),
 			UsingShipTypeRate:  stats.UsingShipTypeRate(statsPattern),
 			UsingTierRate:      stats.UsingTierRate(statsPattern),
