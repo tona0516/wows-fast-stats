@@ -6,7 +6,7 @@ import shelljs from "shelljs";
 import readlineSync from "readline-sync";
 
 const APP_NAME = "wows-fast-stats";
-const SEMVER = "0.13.2";
+const SEMVER = "0.14.0";
 const BINARY_NAME = `${APP_NAME}-${SEMVER}.exe`;
 const DISCORD_WEBHOOK_JSON = "discord_webhook.json";
 const FRONTEND_NPM_COMMAND = "npm --prefix ./frontend";
