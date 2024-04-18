@@ -1,5 +1,5 @@
 import { AbstractColumn } from "src/lib/column/intetface/AbstractColumn";
-import type { model } from "wailsjs/go/models";
+import type { data } from "wailsjs/go/models";
 
 import FlagCommonWealth from "src/assets/images/flag_Commonwealth.png";
 import FlagEurope from "src/assets/images/flag_Europe.png";
@@ -62,7 +62,7 @@ const PREMIUM_SHIP_ICONS: { [key: string]: string } = {
 };
 
 export class ShipInfo extends AbstractColumn {
-  constructor(private config: model.UserConfigV2) {
+  constructor(private config: data.UserConfigV2) {
     super("ship_info", "艦", 3);
   }
 
@@ -74,18 +74,18 @@ export class ShipInfo extends AbstractColumn {
     return true;
   }
 
-  displayValue(player: model.Player): string {
+  displayValue(player: data.Player): string {
     return `${tierString(player.ship_info.tier)} ${player.ship_info.name}`;
   }
 
-  bgColorCode(player: model.Player): string {
+  bgColorCode(player: data.Player): string {
     const type = player.ship_info.type;
     if (!isShipType(type)) return "";
 
     return this.config.color.ship_type.own[type];
   }
 
-  shipTypeIconPath(player: model.Player): string {
+  shipTypeIconPath(player: data.Player): string {
     const shipInfo = player.ship_info;
     const type = shipInfo.type;
     if (!isShipType(type)) return "";
@@ -93,7 +93,7 @@ export class ShipInfo extends AbstractColumn {
     return shipInfo.is_premium ? PREMIUM_SHIP_ICONS[type] : SHIP_ICONS[type];
   }
 
-  nationIconPath(player: model.Player): string {
+  nationIconPath(player: data.Player): string {
     return FLAGS[player.ship_info.nation] ?? "";
   }
 }

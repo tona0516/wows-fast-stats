@@ -1,10 +1,10 @@
 import { Rating } from "src/lib/Rating";
-import { model } from "wailsjs/go/models";
+import { data } from "wailsjs/go/models";
 
 test("none", () => {
   const expectedTextColor = "";
 
-  const skillColorCode = new model.UCSkillColorCode();
+  const skillColorCode = new data.UCSkillColorCode();
 
   // pattern 1: rating is undefined
   const converter = new Rating(undefined, skillColorCode);
@@ -19,7 +19,7 @@ test("none", () => {
 test("factory", () => {
   const expectedTextColor = "#114514";
 
-  const skillColorCode = new model.UCSkillColorCode({
+  const skillColorCode = new data.UCSkillColorCode({
     super_unicum: expectedTextColor,
   });
 

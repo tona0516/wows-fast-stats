@@ -8,9 +8,9 @@ import (
 	"os"
 	"strconv"
 	"time"
-	"wfs/backend/domain/model"
+	"wfs/backend/data"
 	"wfs/backend/infra"
-	"wfs/backend/usecase"
+	"wfs/backend/service"
 
 	"github.com/dgraph-io/badger/v4"
 	"github.com/mitchellh/go-ps"
@@ -39,7 +39,7 @@ func main() {
 	}
 
 	isDev, _ := strconv.ParseBool(IsDev)
-	env := model.Env{
+	env := data.Env{
 		AppName: AppName,
 		Semver:  Semver,
 		IsDev:   isDev,
@@ -70,7 +70,7 @@ func main() {
 	}
 }
 
-func initApp(env model.Env) *App {
+func initApp(env data.Env) *App {
 	// infra
 	var maxRetry uint64 = 2
 	timeout := 10 * time.Second
@@ -130,9 +130,9 @@ func initApp(env model.Env) *App {
 	// usecase
 	var parallels uint = 5
 	watchInterval := 1 * time.Second
-	config := usecase.NewConfig(localFile, wargaming, storage, logger)
-	screenshot := usecase.NewScreenshot(localFile, logger)
-	battle := usecase.NewBattle(
+	config := service.NewConfig(localFile, wargaming, storage, logger)
+	screenshot := service.NewScreenshot(localFile, logger)
+	battle := service.NewBattle(
 		parallels,
 		wargaming,
 		uwargaming,
@@ -143,9 +143,9 @@ func initApp(env model.Env) *App {
 		logger,
 		runtime.EventsEmit,
 	)
-	watcher := usecase.NewWatcher(watchInterval, localFile, storage, logger, runtime.EventsEmit)
-	updater := usecase.NewUpdater(env, github, logger)
-	configMigrator := usecase.NewConfigMigrator(configV0, storage, logger)
+	watcher := service.NewWatcher(watchInterval, localFile, storage, logger, runtime.EventsEmit)
+	updater := service.NewUpdater(env, github, logger)
+	configMigrator := service.NewConfigMigrator(configV0, storage, logger)
 
 	return NewApp(
 		env,

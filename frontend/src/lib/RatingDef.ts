@@ -1,6 +1,6 @@
 import clone from "clone";
 import type { RatingLevel, ShipType } from "src/lib/types";
-import { model } from "wailsjs/go/models";
+import { data } from "wailsjs/go/models";
 
 interface RatingDef {
   level: RatingLevel;
@@ -60,7 +60,7 @@ export const RATING_DEFS: RatingDef[] = [
   },
 ];
 
-const sampleTeam = (): model.Team => {
+const sampleTeam = (): data.Team => {
   const SAMPLE_AVG_DAMAGE = 10000;
   const SHIP_INFO_SAMPLES: { type: ShipType; tier: number }[] = [
     { type: "cv", tier: 11 },
@@ -74,7 +74,7 @@ const sampleTeam = (): model.Team => {
   ];
 
   const players = RATING_DEFS.map((value, i, _) => {
-    const ss = new model.ShipStats();
+    const ss = new data.ShipStats();
     ss.battles = 10;
     ss.damage = value.damage.min * SAMPLE_AVG_DAMAGE;
     ss.max_damage = {
@@ -95,7 +95,7 @@ const sampleTeam = (): model.Team => {
     ss.planes_killed = 5;
     ss.platoon_rate = 3.0;
 
-    const os = new model.OverallStats();
+    const os = new data.OverallStats();
     os.battles = 10;
     os.damage = value.damage.min * SAMPLE_AVG_DAMAGE;
     os.max_damage = {
@@ -126,13 +126,18 @@ const sampleTeam = (): model.Team => {
     };
     os.platoon_rate = 3.0;
 
-    const pi = new model.PlayerInfo();
+    const tm = new data.ThreatLevel();
+    tm.raw = 19000; // TODO
+    tm.modified = 19000; // TODO
+    os.threat_level = tm;
+
+    const pi = new data.PlayerInfo();
     pi.id = 1;
     pi.name = "player_name" + i + 1;
     pi.clan = { tag: "TEST", id: 1, hex_color: "" };
     pi.is_hidden = false;
 
-    const si = new model.ShipInfo();
+    const si = new data.ShipInfo();
     si.id = 1;
     si.name = "Test Ship";
     si.nation = "japan";
@@ -141,15 +146,15 @@ const sampleTeam = (): model.Team => {
     si.avg_damage = SAMPLE_AVG_DAMAGE;
     si.is_premium = false;
 
-    const pvpSolo = new model.PlayerStats();
+    const pvpSolo = new data.PlayerStats();
     pvpSolo.ship = clone(ss);
     pvpSolo.overall = clone(os);
 
-    const pvpAll = new model.PlayerStats();
+    const pvpAll = new data.PlayerStats();
     pvpAll.ship = clone(ss);
     pvpAll.overall = clone(os);
 
-    const player = new model.Player();
+    const player = new data.Player();
     player.player_info = pi;
     player.ship_info = si;
     player.pvp_solo = pvpSolo;
@@ -158,7 +163,7 @@ const sampleTeam = (): model.Team => {
     return player;
   });
 
-  const team = new model.Team();
+  const team = new data.Team();
   team.players = players;
 
   return team;

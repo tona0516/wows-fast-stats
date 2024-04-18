@@ -1,12 +1,12 @@
 <script lang="ts">
-  import type { model } from "wailsjs/go/models";
+  import type { data } from "wailsjs/go/models";
   import ExternalLink from "src/component/common/ExternalLink.svelte";
   import UkTable from "src/component/common/uikit/UkTable.svelte";
   import { DispName } from "src/lib/DispName";
   import { Rating } from "src/lib/Rating";
   import { RATING_DEFS } from "src/lib/RatingDef";
 
-  export let config: model.UserConfigV2;
+  export let config: data.UserConfigV2;
 
   const COLUMNS = [
     { text: "スキル", colspan: 1 },

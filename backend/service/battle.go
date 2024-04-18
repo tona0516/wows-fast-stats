@@ -1,0 +1,487 @@
+package service
+
+import (
+	"context"
+	"sort"
+	"sync"
+	"wfs/backend/apperr"
+	"wfs/backend/data"
+	"wfs/backend/repository"
+
+	"github.com/morikuni/failure"
+)
+
+type Battle struct {
+	parallels      uint
+	wargaming      repository.WargamingInterface
+	uwargaming     repository.UnofficialWargamingInterface
+	numbers        repository.NumbersInterface
+	unregistered   repository.UnregisteredInterface
+	localFile      repository.LocalFileInterface
+	storage        repository.StorageInterface
+	logger         repository.LoggerInterface
+	eventsEmitFunc eventEmitFunc
+
+	isFirstBattle                      bool
+	isNotifyExpectedStatsUnavaillalble bool
+	warship                            data.Warships
+	allExpectedStats                   data.ExpectedStats
+	battleArenas                       data.WGBattleArenas
+	battleTypes                        data.WGBattleTypes
+}
+
+func NewBattle(
+	parallels uint,
+	wargaming repository.WargamingInterface,
+	uwargaming repository.UnofficialWargamingInterface,
+	localFile repository.LocalFileInterface,
+	numbers repository.NumbersInterface,
+	unregistered repository.UnregisteredInterface,
+	storage repository.StorageInterface,
+	logger repository.LoggerInterface,
+	eventsEmitFunc eventEmitFunc,
+) *Battle {
+	return &Battle{
+		parallels:                          parallels,
+		wargaming:                          wargaming,
+		uwargaming:                         uwargaming,
+		localFile:                          localFile,
+		numbers:                            numbers,
+		unregistered:                       unregistered,
+		storage:                            storage,
+		logger:                             logger,
+		eventsEmitFunc:                     eventsEmitFunc,
+		isFirstBattle:                      true,
+		isNotifyExpectedStatsUnavaillalble: false,
+	}
+}
+
+func (b *Battle) Get(appCtx context.Context, userConfig data.UserConfigV2) (data.Battle, error) {
+	var result data.Battle
+
+	appID := userConfig.Appid
+	if len(appID) == 0 {
+		return result, failure.New(apperr.WGAPIError)
+	}
+
+	// Fetch on-memory stored data
+	warshipResult := make(chan data.Result[data.Warships])
+	allExpectedStatsResult := make(chan data.Result[data.ExpectedStats])
+	battleArenasResult := make(chan data.Result[data.WGBattleArenas])
+	battleTypesResult := make(chan data.Result[data.WGBattleTypes])
+	if b.isFirstBattle {
+		go b.fetchWarships(appID, warshipResult)
+		go b.fetchExpectedStats(allExpectedStatsResult)
+		go b.fetchBattleArenas(appID, battleArenasResult)
+		go b.fetchBattleTypes(appID, battleTypesResult)
+	}
+
+	// Get tempArenaInfo.json
+	tempArenaInfo, err := b.getTempArenaInfo(userConfig)
+	if err != nil {
+		return result, err
+	}
+
+	// persist own ign for reporting
+	_ = b.storage.WriteOwnIGN(tempArenaInfo.PlayerName)
+	b.logger.SetOwnIGN(tempArenaInfo.PlayerName)
+
+	// Get Account ID list
+	accountList, err := b.wargaming.AccountList(appID, tempArenaInfo.AccountNames())
+	if err != nil {
+		return result, err
+	}
+	accountIDs := accountList.AccountIDs()
+
+	// Fetch each stats
+	accountInfoResult := make(chan data.Result[data.WGAccountInfo])
+	shipStatsResult := make(chan data.Result[data.AllPlayerShipsStats])
+	clanResult := make(chan data.Result[data.Clans])
+	go b.fetchAccountInfo(appID, accountIDs, accountInfoResult)
+	go b.fetchAllPlayerShipsStats(appID, accountIDs, shipStatsResult)
+	go b.fetchClan(appID, accountIDs, clanResult)
+
+	errs := make([]error, 0)
+
+	if b.isFirstBattle {
+		warship := <-warshipResult
+		b.warship = warship.Value
+		errs = append(errs, warship.Error)
+
+		expectedStats := <-allExpectedStatsResult
+		b.allExpectedStats = expectedStats.Value
+		errs = append(errs, expectedStats.Error)
+
+		battleArenas := <-battleArenasResult
+		b.battleArenas = battleArenas.Value
+		errs = append(errs, battleArenas.Error)
+
+		battleTypes := <-battleTypesResult
+		b.battleTypes = battleTypes.Value
+		errs = append(errs, battleTypes.Error)
+	}
+
+	accountInfo := <-accountInfoResult
+	errs = append(errs, accountInfo.Error)
+
+	shipStats := <-shipStatsResult
+	errs = append(errs, shipStats.Error)
+
+	clan := <-clanResult
+	errs = append(errs, clan.Error)
+
+	for _, err := range errs {
+		if err != nil {
+			if failure.Is(err, apperr.ExpectedStatsUnavaillalble) && !b.isNotifyExpectedStatsUnavaillalble {
+				b.eventsEmitFunc(appCtx, EventErr, apperr.ExpectedStatsUnavaillalble.ErrorCode())
+				b.isNotifyExpectedStatsUnavaillalble = true
+				continue
+			}
+			return result, err
+		}
+	}
+
+	result = b.compose(
+		tempArenaInfo,
+		accountInfo.Value,
+		accountList,
+		clan.Value,
+		shipStats.Value,
+		b.warship,
+		b.allExpectedStats,
+		b.battleArenas,
+		b.battleTypes,
+	)
+
+	b.isFirstBattle = false
+
+	return result, nil
+}
+
+func (b *Battle) getTempArenaInfo(userConfig data.UserConfigV2) (data.TempArenaInfo, error) {
+	tempArenaInfo, err := b.localFile.TempArenaInfo(userConfig.InstallPath)
+	if err != nil {
+		return tempArenaInfo, err
+	}
+
+	if userConfig.SaveTempArenaInfo {
+		if err := b.localFile.SaveTempArenaInfo(tempArenaInfo); err != nil {
+			return tempArenaInfo, err
+		}
+	}
+
+	return tempArenaInfo, nil
+}
+
+func (b *Battle) fetchWarships(appID string, channel chan data.Result[data.Warships]) {
+	warships := make(data.Warships)
+	var result data.Result[data.Warships]
+
+	var mu sync.Mutex
+	addToResult := func(encycShips data.WGEncycShips) {
+		for shipID, warship := range encycShips {
+			mu.Lock()
+			warships[shipID] = data.Warship{
+				Name:      warship.Name,
+				Tier:      warship.Tier,
+				Type:      data.NewShipType(warship.Type),
+				Nation:    data.Nation(warship.Nation),
+				IsPremium: warship.IsPremium,
+			}
+			mu.Unlock()
+		}
+	}
+
+	first := 1
+	encycShips, pageTotal, err := b.wargaming.EncycShips(appID, first)
+	if err != nil {
+		result.Error = err
+		channel <- result
+		return
+	}
+	addToResult(encycShips)
+
+	pages := makeRange(first+1, pageTotal+1)
+	err = doParallel(b.parallels, pages, func(page int) error {
+		res, _, err := b.wargaming.EncycShips(appID, page)
+		if err != nil {
+			return err
+		}
+
+		addToResult(res)
+		return nil
+	})
+	if err != nil {
+		result.Error = err
+		channel <- result
+		return
+	}
+
+	unregisteredShipInfo, err := b.unregistered.Warship()
+	if err != nil {
+		result.Error = err
+		channel <- result
+		return
+	}
+	for k, v := range unregisteredShipInfo {
+		if _, ok := warships[k]; !ok {
+			warships[k] = v
+		}
+	}
+
+	result.Value = warships
+	channel <- result
+}
+
+func (b *Battle) fetchExpectedStats(channel chan data.Result[data.ExpectedStats]) {
+	var result data.Result[data.ExpectedStats]
+
+	// 最新の予測成績を取得
+	expectedStats, errFetch := b.numbers.ExpectedStats()
+	if errFetch == nil {
+		_ = b.storage.WriteExpectedStats(expectedStats)
+		result.Value = expectedStats
+		channel <- result
+		return
+	}
+
+	// 取得できない場合、キャッシュを利用する
+	expectedStats, errCache := b.storage.ExpectedStats()
+	if errCache == nil {
+		result.Value = expectedStats
+		channel <- result
+		return
+	}
+
+	// フェッチもキャッシュもできない場合、殻の構造体を返却して続行する
+	result.Error = failure.New(apperr.ExpectedStatsUnavaillalble, failure.Context{
+		"err_fetch": errFetch.Error(),
+		"err_cache": errCache.Error(),
+	})
+	channel <- result
+}
+
+func (b *Battle) fetchBattleArenas(appID string, channel chan data.Result[data.WGBattleArenas]) {
+	battleArenas, err := b.wargaming.BattleArenas(appID)
+	channel <- data.Result[data.WGBattleArenas]{Value: battleArenas, Error: err}
+}
+
+func (b *Battle) fetchBattleTypes(appID string, channel chan data.Result[data.WGBattleTypes]) {
+	battleTypes, err := b.wargaming.BattleTypes(appID)
+	channel <- data.Result[data.WGBattleTypes]{Value: battleTypes, Error: err}
+}
+
+func (b *Battle) fetchAccountInfo(appID string, accountIDs []int, channel chan data.Result[data.WGAccountInfo]) {
+	accountInfo, err := b.wargaming.AccountInfo(appID, accountIDs)
+	channel <- data.Result[data.WGAccountInfo]{Value: accountInfo, Error: err}
+}
+
+func (b *Battle) fetchAllPlayerShipsStats(
+	appID string,
+	accountIDs []int,
+	channel chan data.Result[data.AllPlayerShipsStats],
+) {
+	shipStatsMap := make(data.AllPlayerShipsStats)
+	var mu sync.Mutex
+	err := doParallel(b.parallels, accountIDs, func(accountID int) error {
+		shipStats, err := b.wargaming.ShipsStats(appID, accountID)
+		if err != nil {
+			return err
+		}
+
+		mu.Lock()
+		shipStatsMap[accountID] = shipStats
+		mu.Unlock()
+
+		return nil
+	})
+
+	channel <- data.Result[data.AllPlayerShipsStats]{Value: shipStatsMap, Error: err}
+}
+
+func (b *Battle) fetchClan(appID string, accountIDs []int, channel chan data.Result[data.Clans]) {
+	var result data.Result[data.Clans]
+
+	clansAccountInfo, err := b.wargaming.ClansAccountInfo(appID, accountIDs)
+	if err != nil {
+		result.Error = err
+		channel <- result
+		return
+	}
+
+	clanIDs := clansAccountInfo.ClanIDs()
+	clansInfo, err := b.wargaming.ClansInfo(appID, clanIDs)
+	if err != nil {
+		result.Error = err
+		channel <- result
+		return
+	}
+	clanTags := clansInfo.Tags()
+
+	hexColorMap := make(map[string]string)
+	var mu sync.Mutex
+	err = doParallel(uint(len(clanTags)), clanTags, func(tag string) error {
+		autocomplete, err := b.uwargaming.ClansAutoComplete(tag)
+		if err != nil {
+			return err
+		}
+
+		hexColor := autocomplete.HexColor(tag)
+		if hexColor != "" {
+			mu.Lock()
+			hexColorMap[tag] = hexColor
+			mu.Unlock()
+		}
+
+		return nil
+	})
+	if err != nil {
+		b.logger.Warn(err, nil)
+	}
+
+	clans := make(data.Clans)
+	for _, accountID := range accountIDs {
+		clanID := clansAccountInfo[accountID].ClanID
+		clanTag := clansInfo[clanID].Tag
+		hexColor := hexColorMap[clanTag]
+		clans[accountID] = data.Clan{Tag: clanTag, ID: clanID, HexColor: hexColor}
+	}
+
+	result.Value = clans
+	channel <- result
+}
+
+func (b *Battle) compose(
+	tempArenaInfo data.TempArenaInfo,
+	accountInfo data.WGAccountInfo,
+	accountList data.WGAccountList,
+	clans data.Clans,
+	allPlayerShipsStats data.AllPlayerShipsStats,
+	warships data.Warships,
+	allExpectedStats data.ExpectedStats,
+	battleArenas data.WGBattleArenas,
+	battleTypes data.WGBattleTypes,
+) data.Battle {
+	friends := make(data.Players, 0)
+	enemies := make(data.Players, 0)
+
+	var ownShip string
+
+	for _, vehicle := range tempArenaInfo.Vehicles {
+		nickname := vehicle.Name
+		accountID := accountList.AccountID(nickname)
+		clan := clans[accountID]
+
+		warship, ok := warships[vehicle.ShipID]
+		if !ok {
+			warship = data.Warship{
+				Name:   "Unknown",
+				Tier:   0,
+				Type:   data.ShipTypeNONE,
+				Nation: "",
+			}
+		}
+		if nickname == tempArenaInfo.PlayerName {
+			ownShip = warship.Name
+		}
+
+		stats := data.NewStats(
+			vehicle.ShipID,
+			accountInfo[accountID],
+			allPlayerShipsStats.Player(accountID),
+			allExpectedStats,
+			warships,
+			tempArenaInfo,
+		)
+
+		threatLevel := stats.ThreatLevel()
+
+		player := data.Player{
+			PlayerInfo: data.PlayerInfo{
+				ID:       accountID,
+				Name:     nickname,
+				Clan:     clan,
+				IsHidden: accountInfo[accountID].HiddenProfile,
+			},
+			ShipInfo: data.ShipInfo{
+				ID:        vehicle.ShipID,
+				Name:      warship.Name,
+				Nation:    warship.Nation,
+				Tier:      warship.Tier,
+				Type:      warship.Type,
+				IsPremium: warship.IsPremium,
+				AvgDamage: allExpectedStats[vehicle.ShipID].AverageDamageDealt,
+			},
+			PvPSolo: playerStats(data.StatsPatternPvPSolo, stats, threatLevel),
+			PvPAll:  playerStats(data.StatsPatternPvPAll, stats, threatLevel),
+		}
+
+		if vehicle.IsFriend() {
+			friends = append(friends, player)
+		} else {
+			enemies = append(enemies, player)
+		}
+	}
+
+	sort.Sort(friends)
+	sort.Sort(enemies)
+
+	teams := []data.Team{
+		{Players: friends},
+		{Players: enemies},
+	}
+
+	battle := data.Battle{
+		Meta: data.Meta{
+			Unixtime: tempArenaInfo.Unixtime(),
+			Arena:    tempArenaInfo.BattleArena(battleArenas),
+			Type:     tempArenaInfo.BattleType(battleTypes),
+			OwnShip:  ownShip,
+		},
+		Teams: teams,
+	}
+
+	return battle
+}
+
+func playerStats(
+	statsPattern data.StatsPattern,
+	stats *data.Stats,
+	threatLevel data.ThreatLevel,
+) data.PlayerStats {
+	return data.PlayerStats{
+		ShipStats: data.ShipStats{
+			Battles:            stats.Battles(data.StatsCategoryShip, statsPattern),
+			Damage:             stats.AvgDamage(data.StatsCategoryShip, statsPattern),
+			MaxDamage:          stats.MaxDamage(data.StatsCategoryShip, statsPattern),
+			WinRate:            stats.WinRate(data.StatsCategoryShip, statsPattern),
+			WinSurvivedRate:    stats.WinSurvivedRate(data.StatsCategoryShip, statsPattern),
+			LoseSurvivedRate:   stats.LoseSurvivedRate(data.StatsCategoryShip, statsPattern),
+			KdRate:             stats.KdRate(data.StatsCategoryShip, statsPattern),
+			Kill:               stats.AvgKill(data.StatsCategoryShip, statsPattern),
+			Exp:                stats.AvgExp(data.StatsCategoryShip, statsPattern),
+			PR:                 stats.PR(data.StatsCategoryShip, statsPattern),
+			MainBatteryHitRate: stats.MainBatteryHitRate(statsPattern),
+			TorpedoesHitRate:   stats.TorpedoesHitRate(statsPattern),
+			PlanesKilled:       stats.PlanesKilled(statsPattern),
+			PlatoonRate:        stats.PlatoonRate(data.StatsCategoryShip),
+		},
+		OverallStats: data.OverallStats{
+			Battles:           stats.Battles(data.StatsCategoryOverall, statsPattern),
+			Damage:            stats.AvgDamage(data.StatsCategoryOverall, statsPattern),
+			MaxDamage:         stats.MaxDamage(data.StatsCategoryOverall, statsPattern),
+			WinRate:           stats.WinRate(data.StatsCategoryOverall, statsPattern),
+			WinSurvivedRate:   stats.WinSurvivedRate(data.StatsCategoryOverall, statsPattern),
+			LoseSurvivedRate:  stats.LoseSurvivedRate(data.StatsCategoryOverall, statsPattern),
+			KdRate:            stats.KdRate(data.StatsCategoryOverall, statsPattern),
+			Kill:              stats.AvgKill(data.StatsCategoryOverall, statsPattern),
+			Exp:               stats.AvgExp(data.StatsCategoryOverall, statsPattern),
+			PR:                stats.PR(data.StatsCategoryOverall, statsPattern),
+			AvgTier:           stats.AvgTier(statsPattern),
+			UsingShipTypeRate: stats.UsingShipTypeRate(statsPattern),
+			UsingTierRate:     stats.UsingTierRate(statsPattern),
+			PlatoonRate:       stats.PlatoonRate(data.StatsCategoryOverall),
+			ThreatLevel:       threatLevel,
+		},
+	}
+}

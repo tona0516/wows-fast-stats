@@ -3,48 +3,48 @@ package main
 import (
 	"context"
 	"wfs/backend/apperr"
-	"wfs/backend/domain/model"
-	"wfs/backend/domain/repository"
-	"wfs/backend/usecase"
+	"wfs/backend/data"
+	"wfs/backend/repository"
+	"wfs/backend/service"
 
 	"github.com/morikuni/failure"
 )
 
 type volatileData struct {
 	cancelWatcher  context.CancelFunc
-	excludePlayers model.ExcludedPlayers
+	excludePlayers data.ExcludedPlayers
 }
 
 func newVolatileData() volatileData {
 	return volatileData{
 		cancelWatcher:  nil,
-		excludePlayers: make(model.ExcludedPlayers),
+		excludePlayers: make(data.ExcludedPlayers),
 	}
 }
 
 //nolint:containedctx
 type App struct {
 	ctx            context.Context
-	env            model.Env
+	env            data.Env
 	logger         repository.LoggerInterface
-	config         usecase.Config
-	screenshot     usecase.Screenshot
-	watcher        usecase.Watcher
-	battle         usecase.Battle
-	updater        usecase.Updater
-	configMigrator usecase.ConfigMigrator
+	config         service.Config
+	screenshot     service.Screenshot
+	watcher        service.Watcher
+	battle         service.Battle
+	updater        service.Updater
+	configMigrator service.ConfigMigrator
 	volatileData   volatileData
 }
 
 func NewApp(
-	env model.Env,
+	env data.Env,
 	logger repository.LoggerInterface,
-	config usecase.Config,
-	screenshot usecase.Screenshot,
-	watcher usecase.Watcher,
-	battle usecase.Battle,
-	updater usecase.Updater,
-	configMigrator usecase.ConfigMigrator,
+	config service.Config,
+	screenshot service.Screenshot,
+	watcher service.Watcher,
+	battle service.Battle,
+	updater service.Updater,
+	configMigrator service.ConfigMigrator,
 ) *App {
 	return &App{
 		env:            env,
@@ -90,8 +90,8 @@ func (a *App) StartWatching() error {
 	return nil
 }
 
-func (a *App) Battle() (model.Battle, error) {
-	result := model.Battle{}
+func (a *App) Battle() (data.Battle, error) {
+	result := data.Battle{}
 
 	userConfig, err := a.config.User()
 	if err != nil {
@@ -126,11 +126,11 @@ func (a *App) OpenDirectory(path string) error {
 	return apperr.Unwrap(err)
 }
 
-func (a *App) DefaultUserConfig() model.UserConfigV2 {
-	return model.DefaultUserConfigV2
+func (a *App) DefaultUserConfig() data.UserConfigV2 {
+	return data.DefaultUserConfigV2
 }
 
-func (a *App) UserConfig() (model.UserConfigV2, error) {
+func (a *App) UserConfig() (data.UserConfigV2, error) {
 	config, err := a.config.User()
 	if err != nil {
 		a.logger.Error(err, nil)
@@ -139,7 +139,7 @@ func (a *App) UserConfig() (model.UserConfigV2, error) {
 	return config, apperr.Unwrap(err)
 }
 
-func (a *App) ApplyUserConfig(config model.UserConfigV2) error {
+func (a *App) ApplyUserConfig(config data.UserConfigV2) error {
 	err := a.config.UpdateOptional(config)
 	if err != nil {
 		a.logger.Error(err, nil)
@@ -151,14 +151,14 @@ func (a *App) ApplyUserConfig(config model.UserConfigV2) error {
 func (a *App) ValidateRequiredConfig(
 	installPath string,
 	appid string,
-) model.RequiredConfigError {
+) data.RequiredConfigError {
 	return a.config.ValidateRequired(installPath, appid)
 }
 
 func (a *App) ApplyRequiredUserConfig(
 	installPath string,
 	appid string,
-) (model.RequiredConfigError, error) {
+) (data.RequiredConfigError, error) {
 	validatedResult, err := a.config.UpdateRequired(installPath, appid)
 	if err != nil {
 		a.logger.Error(err, nil)
@@ -199,7 +199,7 @@ func (a *App) RemoveExcludePlayerID(playerID int) {
 	a.volatileData.excludePlayers.Remove(playerID)
 }
 
-func (a *App) AlertPlayers() ([]model.AlertPlayer, error) {
+func (a *App) AlertPlayers() ([]data.AlertPlayer, error) {
 	players, err := a.config.AlertPlayers()
 	if err != nil {
 		a.logger.Error(err, nil)
@@ -208,7 +208,7 @@ func (a *App) AlertPlayers() ([]model.AlertPlayer, error) {
 	return players, apperr.Unwrap(err)
 }
 
-func (a *App) UpdateAlertPlayer(player model.AlertPlayer) error {
+func (a *App) UpdateAlertPlayer(player data.AlertPlayer) error {
 	err := a.config.UpdateAlertPlayer(player)
 	if err != nil {
 		a.logger.Error(err, nil)
@@ -226,12 +226,12 @@ func (a *App) RemoveAlertPlayer(accountID int) error {
 	return apperr.Unwrap(err)
 }
 
-func (a *App) SearchPlayer(prefix string) model.WGAccountList {
+func (a *App) SearchPlayer(prefix string) data.WGAccountList {
 	return a.config.SearchPlayer(prefix)
 }
 
 func (a *App) AlertPatterns() []string {
-	return model.AlertPatterns
+	return data.AlertPatterns
 }
 
 func (a *App) LogError(errString string, contexts map[string]string) {
@@ -243,7 +243,7 @@ func (a *App) LogInfo(message string, contexts map[string]string) {
 	a.logger.Info(message, contexts)
 }
 
-func (a *App) LatestRelease() (model.GHLatestRelease, error) {
+func (a *App) LatestRelease() (data.GHLatestRelease, error) {
 	latestRelease, err := a.updater.IsUpdatable()
 	return latestRelease, apperr.Unwrap(err)
 }

@@ -5,7 +5,7 @@ import (
 	"net/http/httptest"
 	"testing"
 	"wfs/backend/apperr"
-	"wfs/backend/domain/model"
+	"wfs/backend/data"
 
 	"github.com/morikuni/failure"
 	"github.com/stretchr/testify/assert"
@@ -18,7 +18,7 @@ func TestUnofficialWargaming_AccountListForSearch(t *testing.T) {
 	t.Run("正常系", func(t *testing.T) {
 		t.Parallel()
 
-		expected := model.UWGClansAutocomplete{
+		expected := data.UWGClansAutocomplete{
 			SearchAutocompleteResult: []struct {
 				HexColor string `json:"hex_color"`
 				Tag      string `json:"tag"`

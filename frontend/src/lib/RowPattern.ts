@@ -1,5 +1,5 @@
 import { toPlayerStats } from "src/lib/util";
-import type { model } from "wailsjs/go/models";
+import type { data } from "wailsjs/go/models";
 
 export enum RowPattern {
   NO_COLUMN,
@@ -11,7 +11,7 @@ export enum RowPattern {
 
 export namespace RowPattern {
   export const derive = (
-    player: model.Player,
+    player: data.Player,
     statsPattern: string,
     allColumnCount: number,
     shipColumnCount: number,

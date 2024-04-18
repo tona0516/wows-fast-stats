@@ -12,7 +12,7 @@ import {
   type StatsCategory,
 } from "src/lib/types";
 import { toPlayerStats } from "src/lib/util";
-import { model } from "wailsjs/go/models";
+import { data } from "wailsjs/go/models";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type SummaryColumn = AbstractStatsColumn<any> & ISummaryColumn;
@@ -48,7 +48,7 @@ export namespace Summary {
   export const calculate = (
     battle: OptionalBattle,
     excludedIDs: number[],
-    config: model.UserConfigV2,
+    config: data.UserConfigV2,
   ): OptionalSummary => {
     if (!validate(battle)) {
       return undefined;
@@ -79,7 +79,7 @@ export namespace Summary {
       });
 
       [...result.values.keys()].forEach((shipType) => {
-        let origin: model.Player[][];
+        let origin: data.Player[][];
         if (shipType.toString() === "all") {
           origin = filtered;
         } else {
@@ -105,7 +105,7 @@ export namespace Summary {
   };
 }
 
-const validate = (battle: OptionalBattle): battle is model.Battle => {
+const validate = (battle: OptionalBattle): battle is data.Battle => {
   if (!battle) {
     return false;
   }
@@ -118,7 +118,7 @@ const validate = (battle: OptionalBattle): battle is model.Battle => {
 };
 
 const deriveColumns = (
-  config: model.UserConfigV2,
+  config: data.UserConfigV2,
 ): {
   columns: SummaryColumn[];
   headers: SummaryHeader[];
@@ -150,14 +150,14 @@ const deriveColumns = (
   return { columns, headers };
 };
 
-const isExcluded = (player: model.Player, excludedIDs: number[]): boolean => {
+const isExcluded = (player: data.Player, excludedIDs: number[]): boolean => {
   const accountID = player.player_info.id;
   return accountID === 0 || excludedIDs.includes(accountID);
 };
 
 const isMinBattlesOrMore = (
-  player: model.Player,
-  config: model.UserConfigV2,
+  player: data.Player,
+  config: data.UserConfigV2,
   category: StatsCategory,
 ): boolean => {
   const battles = toPlayerStats(player, config.stats_pattern)[category].battles;
@@ -176,7 +176,7 @@ const isMinBattlesOrMore = (
   return battles >= minBattles;
 };
 
-const mean = (players: model.Player[], column: SummaryColumn): number => {
+const mean = (players: data.Player[], column: SummaryColumn): number => {
   const values = players.map((player) => column.value(player));
   return values.length !== 0
     ? values.reduce((a, b) => a + b, 0) / values.length

@@ -2,13 +2,13 @@ package response
 
 import (
 	"reflect"
-	"wfs/backend/domain/model"
+	"wfs/backend/data"
 )
 
 type WGAccountList struct {
-	WGResponseCommon[model.WGAccountList]
+	WGResponseCommon[data.WGAccountList]
 }
 
 func (w WGAccountList) Field() string {
-	return fieldQuery(reflect.TypeOf(&model.WGAccountListData{}).Elem())
+	return fieldQuery(reflect.TypeOf(&data.WGAccountListData{}).Elem())
 }

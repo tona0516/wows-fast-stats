@@ -2,13 +2,13 @@ package response
 
 import (
 	"reflect"
-	"wfs/backend/domain/model"
+	"wfs/backend/data"
 )
 
 type WGEncycInfo struct {
-	WGResponseCommon[model.WGEncycInfoData]
+	WGResponseCommon[data.WGEncycInfoData]
 }
 
 func (w WGEncycInfo) Field() string {
-	return fieldQuery(reflect.TypeOf(&model.WGEncycInfoData{}).Elem())
+	return fieldQuery(reflect.TypeOf(&data.WGEncycInfoData{}).Elem())
 }

@@ -14,7 +14,7 @@
   import { EventsOn } from "wailsjs/runtime/runtime";
   import { storedConfig, storedRequiredConfigError } from "src/stores";
   import AlertModals from "src/component/modal/AlertModals.svelte";
-  import { model } from "wailsjs/go/models";
+  import { data } from "wailsjs/go/models";
   import UkIcon from "src/component/common/uikit/UkIcon.svelte";
   import ExternalLink from "src/component/common/ExternalLink.svelte";
   import UkSpinner from "src/component/common/uikit/UkSpinner.svelte";
@@ -26,7 +26,7 @@
   let modals: AlertModals;
   let mainPage: MainPage | undefined;
   let initialized = false;
-  let updatableRelease: model.GHLatestRelease;
+  let updatableRelease: data.GHLatestRelease;
 
   $: {
     // @ts-ignore
@@ -57,7 +57,7 @@
     });
   };
 
-  const initialize = async (): Promise<model.UserConfigV2 | undefined> => {
+  const initialize = async (): Promise<data.UserConfigV2 | undefined> => {
     try {
       await MigrateIfNeeded();
 
@@ -81,7 +81,7 @@
     }
   };
 
-  const notifyUpdate = async (config: model.UserConfigV2) => {
+  const notifyUpdate = async (config: data.UserConfigV2) => {
     if (!config.notify_updatable) return;
 
     try {

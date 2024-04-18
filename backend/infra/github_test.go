@@ -3,7 +3,7 @@ package infra
 import (
 	"testing"
 	"wfs/backend/apperr"
-	"wfs/backend/domain/model"
+	"wfs/backend/data"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -15,7 +15,7 @@ func TestGithub_LatestRelease(t *testing.T) {
 	t.Run("正常系", func(t *testing.T) {
 		t.Parallel()
 
-		expected := model.GHLatestRelease{
+		expected := data.GHLatestRelease{
 			HTMLURL: "https://github.com/tona0516/wows-fast-stats/releases/tag/1.0.0",
 			TagName: "1.0.0",
 		}

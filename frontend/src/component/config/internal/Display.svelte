@@ -6,7 +6,7 @@
   import { createEventDispatcher } from "svelte";
   import UIkit from "uikit";
   import { ApplyUserConfig, DefaultUserConfig } from "wailsjs/go/main/App";
-  import { model } from "wailsjs/go/models";
+  import { data } from "wailsjs/go/models";
   import clone from "clone";
   import { ModalElementID } from "src/component/modal/ModalElementID";
   import { FetchProxy } from "src/lib/FetchProxy";
@@ -14,7 +14,7 @@
   import { deriveColumnSettings } from "src/lib/util";
   import { SAMPLE_TEAM } from "src/lib/RatingDef";
 
-  export let inputConfig: model.UserConfigV2;
+  export let inputConfig: data.UserConfigV2;
 
   const dispatch = createEventDispatcher();
 

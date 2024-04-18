@@ -1,12 +1,12 @@
 <script lang="ts">
   import ExternalLink from "src/component/common/ExternalLink.svelte";
-  import type { model } from "wailsjs/go/models";
+  import type { data } from "wailsjs/go/models";
   import { CssClass } from "src/lib/CssClass";
   import { NumbersURL } from "src/lib/NumbersURL";
   import type { ShipInfo } from "src/lib/column/model/ShipInfo";
 
   export let column: ShipInfo;
-  export let player: model.Player;
+  export let player: data.Player;
 </script>
 
 <td>

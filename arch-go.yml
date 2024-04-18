@@ -3,21 +3,21 @@ threshold:
   compliance: 100
   coverage: 0
 dependenciesRules:
-  - package: '**.infra'
+  - package: 'backend.infra'
     shouldNotDependsOn:
       internal:
-        - '**.usecase'
-  - package: '**.usecase'
+        - backend.service'
+  - package: 'backend.service'
     shouldNotDependsOn:
       internal:
-        - '**.infra'
-  - package: '**.domain'
+        - 'backend.infra'
+  - package: 'backend.data'
     shouldNotDependsOn:
       internal:
-        - '**.infra'
-        - '**.usecase'
+        - 'backend.infra'
+        - 'backend.service'
       external:
         - "github.com/wailsapp/wails/v2/pkg/runtime"
 contentsRules:
-  - package: '**.domain.repository'
+  - package: 'backend.repository'
     shouldOnlyContainInterfaces: true

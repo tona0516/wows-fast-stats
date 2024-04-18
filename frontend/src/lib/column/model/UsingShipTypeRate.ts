@@ -2,14 +2,14 @@ import StackedBarGraphTableData from "src/component/main/internal/table_data/Sta
 import { DispName } from "src/lib/DispName";
 import type { StackedBarGraphParam } from "src/lib/column/StackedBarGraphParam";
 import { AbstractStatsColumn } from "src/lib/column/intetface/AbstractStatsColumn";
-import type { model } from "wailsjs/go/models";
+import type { data } from "wailsjs/go/models";
 
 export class UsingShipTypeRate extends AbstractStatsColumn<StackedBarGraphParam> {
-  constructor(config: model.UserConfigV2) {
+  constructor(config: data.UserConfigV2) {
     super("using_ship_type_rate", 1, config, "overall");
   }
 
-  displayValue(player: model.Player): StackedBarGraphParam {
+  displayValue(player: data.Player): StackedBarGraphParam {
     const shipTypeGroup = this.playerStats(player).overall.using_ship_type_rate;
     const ownShipType = player.ship_info.type;
     const colors = this.config.color.ship_type;

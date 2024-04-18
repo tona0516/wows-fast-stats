@@ -7,7 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 	"wfs/backend/apperr"
-	"wfs/backend/domain/model"
+	"wfs/backend/data"
 	"wfs/backend/infra/response"
 
 	"github.com/morikuni/failure"
@@ -23,10 +23,10 @@ func TestWargaming_AccountInfo(t *testing.T) {
 	t.Run("正常系", func(t *testing.T) {
 		t.Parallel()
 		server := simpleMockServer(200, response.WGAccountInfo{
-			WGResponseCommon: response.WGResponseCommon[model.WGAccountInfo]{
+			WGResponseCommon: response.WGResponseCommon[data.WGAccountInfo]{
 				Status: "",
 				Error:  response.WGError{},
-				Data:   map[int]model.WGAccountInfoData{},
+				Data:   map[int]data.WGAccountInfoData{},
 			},
 		})
 		defer server.Close()
@@ -37,7 +37,7 @@ func TestWargaming_AccountInfo(t *testing.T) {
 
 		result, err := wargaming.AccountInfo(testAppID, []int{123, 456})
 		require.NoError(t, err)
-		assert.Equal(t, model.WGAccountInfo{}, result)
+		assert.Equal(t, data.WGAccountInfo{}, result)
 	})
 
 	t.Run("異常系_リトライなし", func(t *testing.T) {
@@ -161,10 +161,10 @@ func TestWargaming_AccountListForSearch(t *testing.T) {
 	t.Parallel()
 
 	server := simpleMockServer(200, response.WGAccountList{
-		WGResponseCommon: response.WGResponseCommon[model.WGAccountList]{
+		WGResponseCommon: response.WGResponseCommon[data.WGAccountList]{
 			Status: "",
 			Error:  response.WGError{},
-			Data:   []model.WGAccountListData{},
+			Data:   []data.WGAccountListData{},
 		},
 	})
 	defer server.Close()
@@ -176,17 +176,17 @@ func TestWargaming_AccountListForSearch(t *testing.T) {
 	result, err := wargaming.AccountListForSearch(testAppID, "player")
 
 	require.NoError(t, err)
-	assert.Equal(t, model.WGAccountList{}, result)
+	assert.Equal(t, data.WGAccountList{}, result)
 }
 
 func TestWargaming_ClansAccountInfo(t *testing.T) {
 	t.Parallel()
 
 	server := simpleMockServer(200, response.WGClansAccountInfo{
-		WGResponseCommon: response.WGResponseCommon[model.WGClansAccountInfo]{
+		WGResponseCommon: response.WGResponseCommon[data.WGClansAccountInfo]{
 			Status: "",
 			Error:  response.WGError{},
-			Data:   map[int]model.WGClansAccountInfoData{},
+			Data:   map[int]data.WGClansAccountInfoData{},
 		},
 	})
 	defer server.Close()
@@ -198,17 +198,17 @@ func TestWargaming_ClansAccountInfo(t *testing.T) {
 	result, err := wargaming.ClansAccountInfo(testAppID, []int{123, 456})
 
 	require.NoError(t, err)
-	assert.Equal(t, model.WGClansAccountInfo{}, result)
+	assert.Equal(t, data.WGClansAccountInfo{}, result)
 }
 
 func TestWargaming_ClansInfo(t *testing.T) {
 	t.Parallel()
 
 	server := simpleMockServer(200, response.WGClansInfo{
-		WGResponseCommon: response.WGResponseCommon[model.WGClansInfo]{
+		WGResponseCommon: response.WGResponseCommon[data.WGClansInfo]{
 			Status: "",
 			Error:  response.WGError{},
-			Data:   map[int]model.WGClansInfoData{},
+			Data:   map[int]data.WGClansInfoData{},
 		},
 	})
 	defer server.Close()
@@ -220,17 +220,17 @@ func TestWargaming_ClansInfo(t *testing.T) {
 	result, err := wargaming.ClansInfo(testAppID, []int{123, 456})
 
 	require.NoError(t, err)
-	assert.Equal(t, model.WGClansInfo{}, result)
+	assert.Equal(t, data.WGClansInfo{}, result)
 }
 
 func TestWargaming_ShipsStats(t *testing.T) {
 	t.Parallel()
 
 	server := simpleMockServer(200, response.WGShipsStats{
-		WGResponseCommon: response.WGResponseCommon[model.WGShipsStats]{
+		WGResponseCommon: response.WGResponseCommon[data.WGShipsStats]{
 			Status: "",
 			Error:  response.WGError{},
-			Data:   map[int][]model.WGShipsStatsData{},
+			Data:   map[int][]data.WGShipsStatsData{},
 		},
 	})
 	defer server.Close()
@@ -242,7 +242,7 @@ func TestWargaming_ShipsStats(t *testing.T) {
 	result, err := wargaming.ShipsStats(testAppID, 123)
 
 	require.NoError(t, err)
-	assert.Equal(t, model.WGShipsStats{}, result)
+	assert.Equal(t, data.WGShipsStats{}, result)
 }
 
 func TestWargaming_EncycShips(t *testing.T) {
@@ -250,10 +250,10 @@ func TestWargaming_EncycShips(t *testing.T) {
 
 	expectedPageTotal := 5
 	server := simpleMockServer(200, response.WGEncycShips{
-		WGResponseCommon: response.WGResponseCommon[model.WGEncycShips]{
+		WGResponseCommon: response.WGResponseCommon[data.WGEncycShips]{
 			Status: "",
 			Error:  response.WGError{},
-			Data:   map[int]model.WGEncycShipsData{},
+			Data:   map[int]data.WGEncycShipsData{},
 		},
 		Meta: struct {
 			PageTotal int `json:"page_total"`
@@ -269,7 +269,7 @@ func TestWargaming_EncycShips(t *testing.T) {
 	result, pageTotal, err := wargaming.EncycShips(testAppID, 1)
 
 	require.NoError(t, err)
-	assert.Equal(t, model.WGEncycShips{}, result)
+	assert.Equal(t, data.WGEncycShips{}, result)
 	assert.Equal(t, expectedPageTotal, pageTotal)
 }
 
@@ -286,17 +286,17 @@ func TestWargaming_EncycInfo(t *testing.T) {
 	result, err := wargaming.EncycInfo(testAppID)
 
 	require.NoError(t, err)
-	assert.Equal(t, model.WGEncycInfoData{}, result)
+	assert.Equal(t, data.WGEncycInfoData{}, result)
 }
 
 func TestWargaming_BattleArena(t *testing.T) {
 	t.Parallel()
 
 	server := simpleMockServer(200, response.WGBattleArenas{
-		WGResponseCommon: response.WGResponseCommon[model.WGBattleArenas]{
+		WGResponseCommon: response.WGResponseCommon[data.WGBattleArenas]{
 			Status: "",
 			Error:  response.WGError{},
-			Data:   map[int]model.WGBattleArenasData{},
+			Data:   map[int]data.WGBattleArenasData{},
 		},
 	})
 	defer server.Close()
@@ -308,17 +308,17 @@ func TestWargaming_BattleArena(t *testing.T) {
 	result, err := wargaming.BattleArenas(testAppID)
 
 	require.NoError(t, err)
-	assert.Equal(t, model.WGBattleArenas{}, result)
+	assert.Equal(t, data.WGBattleArenas{}, result)
 }
 
 func TestWargaming_BattleTypes(t *testing.T) {
 	t.Parallel()
 
 	server := simpleMockServer(200, response.WGBattleTypes{
-		WGResponseCommon: response.WGResponseCommon[model.WGBattleTypes]{
+		WGResponseCommon: response.WGResponseCommon[data.WGBattleTypes]{
 			Status: "",
 			Error:  response.WGError{},
-			Data:   map[string]model.WGBattleTypesData{},
+			Data:   map[string]data.WGBattleTypesData{},
 		},
 	})
 	defer server.Close()
@@ -329,7 +329,7 @@ func TestWargaming_BattleTypes(t *testing.T) {
 	result, err := wargaming.BattleTypes(testAppID)
 
 	require.NoError(t, err)
-	assert.Equal(t, model.WGBattleTypes{}, result)
+	assert.Equal(t, data.WGBattleTypes{}, result)
 }
 
 func TestWargaming_Test(t *testing.T) {

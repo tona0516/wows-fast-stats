@@ -1,4 +1,4 @@
-export namespace model {
+export namespace data {
 	
 	export class AlertPlayer {
 	    account_id: number;
@@ -54,6 +54,20 @@ export namespace model {
 	        this.cv = source["cv"];
 	    }
 	}
+	export class ThreatLevel {
+	    raw: number;
+	    modified: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new ThreatLevel(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.raw = source["raw"];
+	        this.modified = source["modified"];
+	    }
+	}
 	export class OverallStats {
 	    battles: number;
 	    damage: number;
@@ -65,6 +79,7 @@ export namespace model {
 	    kill: number;
 	    exp: number;
 	    pr: number;
+	    threat_level: ThreatLevel;
 	    avg_tier: number;
 	    using_ship_type_rate: ShipTypeGroup;
 	    using_tier_rate: TierGroup;
@@ -86,6 +101,7 @@ export namespace model {
 	        this.kill = source["kill"];
 	        this.exp = source["exp"];
 	        this.pr = source["pr"];
+	        this.threat_level = this.convertValues(source["threat_level"], ThreatLevel);
 	        this.avg_tier = source["avg_tier"];
 	        this.using_ship_type_rate = this.convertValues(source["using_ship_type_rate"], ShipTypeGroup);
 	        this.using_tier_rate = this.convertValues(source["using_tier_rate"], TierGroup);
@@ -452,6 +468,7 @@ export namespace model {
 	
 	
 	
+	
 	export class UCShipTypeColorCode {
 	    ss: string;
 	    dd: string;
@@ -660,6 +677,7 @@ export namespace model {
 	    using_ship_type_rate: number;
 	    using_tier_rate: number;
 	    platoon_rate: number;
+	    threat_level: number;
 	
 	    static createFrom(source: any = {}) {
 	        return new UCDigit(source);
@@ -682,6 +700,7 @@ export namespace model {
 	        this.using_ship_type_rate = source["using_ship_type_rate"];
 	        this.using_tier_rate = source["using_tier_rate"];
 	        this.platoon_rate = source["platoon_rate"];
+	        this.threat_level = source["threat_level"];
 	    }
 	}
 	export class UCDisplayOverall {
@@ -698,6 +717,7 @@ export namespace model {
 	    using_ship_type_rate: boolean;
 	    using_tier_rate: boolean;
 	    platoon_rate: boolean;
+	    threat_level: boolean;
 	
 	    static createFrom(source: any = {}) {
 	        return new UCDisplayOverall(source);
@@ -718,6 +738,7 @@ export namespace model {
 	        this.using_ship_type_rate = source["using_ship_type_rate"];
 	        this.using_tier_rate = source["using_tier_rate"];
 	        this.platoon_rate = source["platoon_rate"];
+	        this.threat_level = source["threat_level"];
 	    }
 	}
 	export class UCDisplayShip {

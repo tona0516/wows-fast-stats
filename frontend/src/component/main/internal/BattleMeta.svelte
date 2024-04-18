@@ -1,9 +1,9 @@
 <script lang="ts">
   import { format, fromUnixTime } from "date-fns";
   import UkIcon from "src/component/common/uikit/UkIcon.svelte";
-  import type { model } from "wailsjs/go/models";
+  import type { data } from "wailsjs/go/models";
 
-  export let meta: model.Meta;
+  export let meta: data.Meta;
 
   $: battleMetas = [
     {
