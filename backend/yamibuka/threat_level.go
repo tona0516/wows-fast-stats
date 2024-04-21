@@ -3,6 +3,8 @@ package yamibuka
 import (
 	"math"
 	"wfs/backend/data"
+
+	"github.com/shopspring/decimal"
 )
 
 //nolint:gochecknoglobals
@@ -89,60 +91,44 @@ var specialShipScores = map[int]float64{
 	3763320528: 0.9,   // Kaga
 }
 
-type ThreatLevelParam struct {
-	TempArenaInfo    data.TempArenaInfo
-	Warships         data.Warships
-	ShipID           int
-	ShipBattles      uint
-	ShipDamage       float64
-	ShipWinRate      float64
-	ShipSurvivedRate float64
-	ShipPlanesKilled float64
-	OverallBattles   uint
-	OverallDamage    float64
-	OverallWinRate   float64
-	OverallKill      float64
-	OverallKdRate    float64
-}
-
-func CalculateThreatLevel(param ThreatLevelParam) data.ThreatLevel {
+func CalculateThreatLevel(f ThreatLevelFactor) data.ThreatLevel {
 	// 戦闘情報の取得
-	isCVMatch, topTier, bottomTier := matchInfo(param.TempArenaInfo, param.Warships)
+	isCVMatch, topTier, bottomTier := matchInfo(f.tempArenaInfo, f.warships)
 
 	// プレイヤー総合補正指数
 	playerOverallScore := playerOverallScore(
-		param.OverallBattles,
-		param.OverallDamage,
-		param.OverallKill,
-		param.OverallKdRate,
-		param.OverallWinRate,
+		f.overallBattles,
+		f.overallDamage,
+		f.overallKill,
+		f.overallKdRate,
+		f.overallWinRate,
 	)
 
 	// 艦成績補正
 	playerShipScore := playerShipScore(
-		param.Warships,
-		param.ShipID,
-		param.ShipBattles,
-		param.ShipDamage,
-		param.ShipSurvivedRate,
-		param.ShipPlanesKilled,
-		param.ShipWinRate,
+		f.warships,
+		f.shipID,
+		f.shipBattles,
+		f.shipDamage,
+		f.shipSurvivedRate,
+		f.shipPlanesKilled,
+		f.shipWinRate,
 	)
 
 	// 最後に数値の幅を作る係数を設定
 	playerTotalSkillScore := (playerOverallScore + playerShipScore) * 0.5
 
 	// 特に補正が必要だと思う艦級を含めた脅威度補正
-	shipClassScore := shipClassScore(param.Warships, param.ShipID)
+	shipClassScore := shipClassScore(f.warships, f.shipID)
 
 	// AA特化艦補正
-	shipAAIndex := antiAirCoefficient(param.ShipID, param.ShipPlanesKilled)
+	shipAAIndex := antiAirCoefficient(f.shipID, f.shipPlanesKilled)
 
 	// 脅威レベルの算出
 	raw := math.Round((playerTotalSkillScore + 1) * shipClassScore * 10000)
 
 	// マッチのおける脅威レベルの補正
-	modified := correctBasedOnMatch(raw, param.Warships, param.ShipID, shipAAIndex, isCVMatch, topTier, bottomTier)
+	modified := correctBasedOnMatch(raw, f.warships, f.shipID, shipAAIndex, isCVMatch, topTier, bottomTier)
 
 	return data.ThreatLevel{
 		Raw:      raw,
@@ -150,10 +136,12 @@ func CalculateThreatLevel(param ThreatLevelParam) data.ThreatLevel {
 	}
 }
 
+//nolint:nonamedreturns
 func matchInfo(
 	tempArenaInfo data.TempArenaInfo,
 	warships data.Warships,
 ) (isCVMatch bool, topTier uint, bottomTier uint) {
+	isCVMatch = false
 	topTier = 1
 	bottomTier = 1
 
@@ -193,7 +181,7 @@ func matchInfo(
 }
 
 func baseDamageScore(overallAvgDamage float64) float64 {
-	return round((limitedValue(toInteger(overallAvgDamage)/40000, 1.5, 0.5) - 1) / 2)
+	return floorU4((limitedValue(floor(overallAvgDamage)/40000, 1.5, 0.5) - 1) / 2)
 }
 
 func killScore(
@@ -202,22 +190,22 @@ func killScore(
 	overallKdRate float64,
 ) (float64, float64) {
 	if overallBattles == 0 {
-		return round(-0.3 / 5), round(-0.5 / 5)
+		return floorU4(-0.3 / 5), floorU4(-0.5 / 5)
 	}
 
 	killScore := limitedValue(overallAvgKill, 1.5, 0.5) - 0.8
-	kdRateScore := limitedValue(overallKdRate, 3, 0.7) - 1.2
+	kdRateScore := limitedValue(floor(round(overallKdRate, 2)), 3, 0.7) - 1.2
 
 	// KDRは高いのにKPRは低い（≒芋）は逆補正に
 	if killScore < 0 && kdRateScore > 0 {
 		kdRateScore *= -1
 	}
 
-	return round(killScore / 5), round(kdRateScore / 5)
+	return floorU4(killScore / 5), floorU4(kdRateScore / 5)
 }
 
 func winRateScore(overallWinRate float64) float64 {
-	return round((limitedValue(overallWinRate, 60, 30) - 50) / 100 * 3)
+	return floorU4((limitedValue(overallWinRate, 60, 30) - 50) / 100 * 3)
 }
 
 func playerOverallScore(
@@ -228,9 +216,12 @@ func playerOverallScore(
 	overallWinRate float64,
 ) float64 {
 	// プレイヤー総合補正指数を一旦算出
+	baseDamageScore := baseDamageScore(overallAvgDamage)
 	killScore, kdRateScore := killScore(overallBattles, overallAvgKill, overallKdRate)
+	winRateScore := winRateScore(overallWinRate)
 
-	playerGeneralScore := round(baseDamageScore(overallAvgDamage) + killScore + kdRateScore + winRateScore(overallWinRate))
+	playerGeneralScore := floorU4(
+		baseDamageScore + killScore + kdRateScore + winRateScore)
 
 	// プレイ回数関連補正処理
 	battlesCountScore := limitedValue(float64(overallBattles)/1000, 3, 0.5)
@@ -260,7 +251,7 @@ func playerOverallScore(
 		}
 	}
 
-	playerGeneralScore = round((battlesCountScore-1.5)*0.05) + playerGeneralScore
+	playerGeneralScore = floorU4((battlesCountScore-1.5)*0.05) + playerGeneralScore
 
 	return playerGeneralScore
 }
@@ -341,22 +332,22 @@ func playerShipScore(
 	}
 
 	// ダメージ補正指数
-	shipDamageScore := round(limitedValue(toInteger(shipAvgDamage)/std.damage, 1.5, 0.1) - 1)
+	shipDamageScore := floorU4(limitedValue(floor(shipAvgDamage)/std.damage, 1.5, 0.1) - 1)
 
 	// 生存率補正指数
 	// 艦種ごとの影響度を考慮して補正
 	surviveRate := shipSurvivedRate / 100 // %で与えられるため0~100に変換する
 	limitedSurviveRate := limitedValue(surviveRate, std.survivedRate+0.1, std.survivedRate-0.1)
-	shipServiveScore := round(limitedSurviveRate * std.influence / 1.5)
+	shipServiveScore := floorU4(limitedSurviveRate * std.influence / 1.5)
 
 	// 空母の場合、制空の補正を考慮
 	var shipAAScore float64
 	if shipType == data.ShipTypeCV {
 		shipAAScore = shipAvgPlanesKilled / std.aaScore
 		if shipAAScore > 1 {
-			shipAAScore = round((shipAAScore - 1) / 2)
+			shipAAScore = floorU4((shipAAScore - 1) / 2)
 		} else {
-			shipAAScore = round(shipAAScore - 1)
+			shipAAScore = floorU4(shipAAScore - 1)
 		}
 		shipAAScore = limitedValue(shipAAScore, 0.2, -0.3)
 	}
@@ -368,9 +359,9 @@ func playerShipScore(
 	if shipType == data.ShipTypeCV {
 		shipWinRateScore *= 1.3
 	}
-	shipWinRateScore = round(shipWinRateScore * std.influence * 1.5)
+	shipWinRateScore = floorU4(shipWinRateScore * std.influence * 1.5)
 
-	return round(shipDamageScore + shipServiveScore + shipAAScore + shipWinRateScore)
+	return floorU4(shipDamageScore + shipServiveScore + shipAAScore + shipWinRateScore)
 }
 
 func antiAirCoefficient(
@@ -384,7 +375,7 @@ func antiAirCoefficient(
 
 	planesKilledRatio := shipAvgPlanesKilled / specialAAShip.avg * 1.5
 	if planesKilledRatio > 1 {
-		planesKilledRatio = round((planesKilledRatio-1)/4) + 1
+		planesKilledRatio = floorU4((planesKilledRatio-1)/4) + 1
 	}
 	limitedPlanesKilledRatio := limitedValue(planesKilledRatio, 1.2, 1)
 
@@ -458,11 +449,17 @@ func limitedValue(value float64, max float64, min float64) float64 {
 	return value
 }
 
-func round(value float64) float64 {
+func floorU4(value float64) float64 {
 	pow := math.Pow(10, 4)
-	return toInteger(value*pow) / pow
+	return floor(value*pow) / pow
 }
 
-func toInteger(value float64) float64 {
-	return float64(int(value))
+func floor(value float64) float64 {
+	result, _ := decimal.NewFromFloat(value).Floor().Float64()
+	return result
+}
+
+func round(value float64, digits uint) float64 {
+	result, _ := decimal.NewFromFloat(value).Round(int32(digits)).Float64()
+	return result
 }
