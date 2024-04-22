@@ -100,22 +100,21 @@ function dev() {
 }
 
 function chbtl() {
-  const testReplayDir = "./テストフォルダ/replays";
+  const testReplayPath = "./test_install_dir/replays";
   const tempArenaInfoName = "tempArenaInfo.json";
 
   const files = fs
-    .readdirSync(testReplayDir)
-    .filter(
-      (file) => file.startsWith(tempArenaInfoName) && file !== tempArenaInfoName
-    );
+    .readdirSync(testReplayPath)
+    .filter((file) => file.endsWith(".json") && file !== tempArenaInfoName)
+    .map((file) => path.join(file));
   files.forEach((file, i) => {
     console.log(i, file);
   });
 
   const index = readlineSync.question("index? > ");
   fs.copyFileSync(
-    path.join(testReplayDir, files[Number(index)]),
-    path.join(testReplayDir, tempArenaInfoName)
+    path.join(testReplayPath, files[Number(index)]),
+    path.join(testReplayPath, tempArenaInfoName)
   );
 }
 

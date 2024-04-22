@@ -1,0 +1,152 @@
+{
+  "vehicles": [
+    {
+      "shipId": 4180587856,
+      "relation": 1,
+      "id": 537066496,
+      "name": "331451868"
+    },
+    {
+      "shipId": 3761157968,
+      "relation": 2,
+      "id": 671377669,
+      "name": "wangshiyedacheng"
+    },
+    {
+      "shipId": 4181637104,
+      "relation": 2,
+      "id": 671465355,
+      "name": "leebox1987"
+    },
+    {
+      "shipId": 4065212112,
+      "relation": 2,
+      "id": 537276172,
+      "name": "Arknights_BB"
+    },
+    {
+      "shipId": 4077795024,
+      "relation": 1,
+      "id": 537138832,
+      "name": "ToKinoco"
+    },
+    {
+      "shipId": 4182718288,
+      "relation": 2,
+      "id": 537189142,
+      "name": "Johnnyjc"
+    },
+    {
+      "shipId": 4284430032,
+      "relation": 1,
+      "id": 671212696,
+      "name": "BASCHI"
+    },
+    {
+      "shipId": 4265588720,
+      "relation": 0,
+      "id": 671250713,
+      "name": "tonango"
+    },
+    {
+      "shipId": 3750638896,
+      "relation": 2,
+      "id": 671467424,
+      "name": "Guo_2017"
+    },
+    {
+      "shipId": 3761125360,
+      "relation": 1,
+      "id": 536906033,
+      "name": "guhooo"
+    },
+    {
+      "shipId": 4076779472,
+      "relation": 1,
+      "id": 537171890,
+      "name": "supernova8"
+    },
+    {
+      "shipId": 3709777872,
+      "relation": 2,
+      "id": 671183286,
+      "name": "nagisa_saikou"
+    },
+    {
+      "shipId": 4182652752,
+      "relation": 2,
+      "id": 536980409,
+      "name": "Two_CH4"
+    },
+    {
+      "shipId": 3750705136,
+      "relation": 1,
+      "id": 671320122,
+      "name": "YQMNQ"
+    },
+    {
+      "shipId": 4075697872,
+      "relation": 1,
+      "id": 537050166,
+      "name": "DELTA_PAPA87"
+    },
+    {
+      "shipId": 4065212112,
+      "relation": 1,
+      "id": 671352136,
+      "name": "Ric_029"
+    },
+    {
+      "shipId": 4265588720,
+      "relation": 2,
+      "id": 671320286,
+      "name": "Yusano_Atri"
+    },
+    {
+      "shipId": 3720263664,
+      "relation": 1,
+      "id": 671395296,
+      "name": "MTDroine"
+    },
+    {
+      "shipId": 4286494416,
+      "relation": 1,
+      "id": 536980330,
+      "name": "SAKISAKIyoutube"
+    },
+    {
+      "shipId": 4286527472,
+      "relation": 2,
+      "id": 537052652,
+      "name": "fluxyash"
+    },
+    {
+      "shipId": 3352180720,
+      "relation": 2,
+      "id": 537231853,
+      "name": "BPLUSVABLE"
+    },
+    {
+      "shipId": 4077827792,
+      "relation": 2,
+      "id": 671479535,
+      "name": "hsax_2022"
+    },
+    {
+      "shipId": 4276041712,
+      "relation": 2,
+      "id": 537138806,
+      "name": "SECARLAROW"
+    },
+    {
+      "shipId": 4286527472,
+      "relation": 1,
+      "id": 671363324,
+      "name": "lala_accurate"
+    }
+  ],
+  "dateTime": "18.04.2024 23:03:27",
+  "mapId": 27,
+  "matchGroup": "pvp",
+  "playerName": "tonango"
+}
