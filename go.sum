@@ -145,8 +145,8 @@ github.com/wailsapp/go-webview2 v1.0.10 h1:PP5Hug6pnQEAhfRzLCoOh2jJaPdrqeRgJKZhy
 github.com/wailsapp/go-webview2 v1.0.10/go.mod h1:Uk2BePfCRzttBBjFrBmqKGJd41P6QIHeV9kTgIeOZNo=
 github.com/wailsapp/mimetype v1.4.1 h1:pQN9ycO7uo4vsUUuPeHEYoUkLVkaRntMnHJxVwYhwHs=
 github.com/wailsapp/mimetype v1.4.1/go.mod h1:9aV5k31bBOv5z6u+QP8TltzvNGJPmNJD4XlAL3U+j3o=
-github.com/wailsapp/wails/v2 v2.8.0 h1:b2NNn99uGPiN6P5bDsnPwOJZWtAOUhNLv7Vl+YxMTr4=
-github.com/wailsapp/wails/v2 v2.8.0/go.mod h1:EFUGWkUX3KofO4fmKR/GmsLy3HhPH7NbyOEaMt8lBF0=
+github.com/wailsapp/wails/v2 v2.8.1 h1:KAudNjlFaiXnDfFEfSNoLoibJ1ovoutSrJ8poerTPW0=
+github.com/wailsapp/wails/v2 v2.8.1/go.mod h1:EFUGWkUX3KofO4fmKR/GmsLy3HhPH7NbyOEaMt8lBF0=
 github.com/yuin/goldmark v1.1.27/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.2.1/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 go.opencensus.io v0.24.0 h1:y73uSU6J157QMP2kn2r30vwW1A2W2WFwSCGnAVxeaD0=
