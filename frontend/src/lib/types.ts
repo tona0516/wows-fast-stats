@@ -18,8 +18,6 @@ export type StatsExtra = Exclude<
   keyof data.Player,
   keyof typeof BasicKey | CommonMethod
 >;
-export type RatingLevel = Readonly<keyof data.UCSkillColorCode>;
-
 export type ShipKey = Readonly<keyof data.UCDisplayShip>;
 export type OverallKey = Readonly<keyof data.UCDisplayOverall>;
 export type CommonKey = ShipKey & OverallKey;

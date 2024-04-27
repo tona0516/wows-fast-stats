@@ -10,7 +10,6 @@
   } from "src/stores";
   import Function from "./internal/Function.svelte";
   import Summary from "./internal/Summary.svelte";
-  import ColorDescription from "./internal/ColorDescription.svelte";
   import Ofuse from "./internal/Ofuse.svelte";
   import UkSpinner from "../common/uikit/UkSpinner.svelte";
   import { FetchProxy } from "src/lib/FetchProxy";
@@ -81,8 +80,6 @@
           <Summary {summary} />
         </div>
       {/if}
-
-      <ColorDescription {config} />
     {:else}
       <p class="uk-text-center">
         {#if $storedRequiredConfigError.valid}

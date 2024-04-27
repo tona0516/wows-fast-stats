@@ -1,6 +1,7 @@
 <script lang="ts">
   import MainPage from "src/component/main/MainPage.svelte";
   import ConfigPage from "src/component/config/ConfigPage.svelte";
+  import InfoPage from "src/component/info/InfoPage.svelte";
 
   import "bootstrap-icons/font/bootstrap-icons.css";
   import "charts.css";
@@ -137,6 +138,10 @@
           {/if}
         </a>
       </li>
+      <li>
+        <!-- svelte-ignore a11y-invalid-attribute -->
+        <a href="#"><UkIcon name="info" /></a>
+      </li>
     </UkTab>
     <ul id={tabID} class="uk-switcher">
       <li>
@@ -152,6 +157,9 @@
           on:EditAlertPlayer={(e) => modals.showEdit(e.detail.target)}
           on:RemoveAlertPlayer={(e) => modals.showRemove(e.detail.target)}
         />
+      </li>
+      <li>
+        <InfoPage />
       </li>
     </ul>
   {:else}

@@ -6,8 +6,6 @@
   import TeamSummary from "./internal/TeamSummary.svelte";
   import Display from "./internal/Display.svelte";
   import AlertPlayer from "./internal/AlertPlayer.svelte";
-  import AppInfo from "./internal/AppInfo.svelte";
-  import Logging from "./internal/Logging.svelte";
   import UkIcon from "src/component/common/uikit/UkIcon.svelte";
   import UkTab from "src/component/common/uikit/UkTab.svelte";
   import clone from "clone";
@@ -46,7 +44,7 @@
           {/if}
         </a>
       </li>
-      {#each ["表示設定", "チームサマリー設定", "プレイヤーリスト設定", "その他設定", "ログ", "アプリ情報"] as menu}
+      {#each ["表示設定", "チームサマリー設定", "プレイヤーリスト設定", "その他設定"] as menu}
         <!-- svelte-ignore a11y-invalid-attribute -->
         <li><a href="#">{menu}</a></li>
       {/each}
@@ -72,12 +70,6 @@
       </li>
       <li>
         <Other {inputConfig} on:Change={silentApply} />
-      </li>
-      <li>
-        <Logging />
-      </li>
-      <li>
-        <AppInfo />
       </li>
     </ul>
   </div>

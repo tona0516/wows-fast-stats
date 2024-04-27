@@ -1,5 +1,5 @@
 import SingleTableData from "src/component/main/internal/table_data/SingleTableData.svelte";
-import { Rating } from "src/lib/Rating";
+import { RatingInfo } from "src/lib/RatingLevel";
 import { AbstractStatsColumn } from "src/lib/column/intetface/AbstractStatsColumn";
 import type { ISummaryColumn } from "src/lib/column/intetface/ISummaryColumn";
 import { type StatsCategory } from "src/lib/types";
@@ -25,11 +25,11 @@ export class Damage
     if (this.category !== "ship") return "";
     const value = this.playerStats(player).ship.damage;
 
-    return Rating.fromDamage(
+    return RatingInfo.fromDamage(
       value,
       player.ship_info.avg_damage,
       this.config.color.skill.text,
-    ).colorCode();
+    )?.textColorCode ?? "";
   }
 
   value(player: data.Player): number {

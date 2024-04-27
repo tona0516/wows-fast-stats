@@ -1,14 +1,13 @@
 export enum ThreatLevel {
-  ERR,
-  IR,
-  R,
-  O,
-  Y,
-  G,
-  B,
-  I,
-  V,
-  UV,
+  IR = "IR",
+  R = "R",
+  O = "O",
+  Y = "Y",
+  G = "G",
+  B = "B",
+  I = "I",
+  V = "V",
+  UV = "UV",
 }
 
 export class ThreatLevelInfo {
@@ -18,21 +17,17 @@ export class ThreatLevelInfo {
     readonly bgColorCode: string,
   ) {}
 
-  static fromScore(score: number): ThreatLevelInfo {
+  static fromScore(score: number): ThreatLevelInfo | undefined {
     const tl = THREAT_LEVEL_DEFS.findLast((it) => score >= it.score);
-    return tl ? tl.info : new ThreatLevelInfo(ThreatLevel.ERR, "", "");
+    return tl?.info;
   }
 }
 
 const THREAT_LEVEL_COEF = 0.5;
-const THREAT_LEVEL_DEFS: {
+export const THREAT_LEVEL_DEFS: {
   info: ThreatLevelInfo;
   score: number;
 }[] = [
-  {
-    info: new ThreatLevelInfo(ThreatLevel.ERR, "", ""),
-    score: -1,
-  },
   {
     info: new ThreatLevelInfo(ThreatLevel.IR, "#FFFFFF", "#000000"),
     score: 0,

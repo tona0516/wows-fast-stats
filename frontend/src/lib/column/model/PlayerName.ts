@@ -1,5 +1,5 @@
 import PlayerNameTableData from "src/component/main/internal/table_data/PlayerNameTableData.svelte";
-import { Rating } from "src/lib/Rating";
+import { RatingInfo } from "src/lib/RatingLevel";
 import { AbstractColumn } from "src/lib/column/intetface/AbstractColumn";
 import { type StatsCategory } from "src/lib/types";
 import { toPlayerStats } from "src/lib/util";
@@ -54,6 +54,8 @@ export class PlayerName extends AbstractColumn {
     const pr = toPlayerStats(player, this.config.stats_pattern)[statsCategory]
       .pr;
 
-    return Rating.fromPR(pr, this.config.color.skill.text).colorCode();
+    return (
+      RatingInfo.fromPR(pr, this.config.color.skill.text)?.textColorCode ?? ""
+    );
   }
 }

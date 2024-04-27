@@ -1,6 +1,6 @@
 import SingleTableData from "src/component/main/internal/table_data/SingleTableData.svelte";
 import { CssClass } from "src/lib/CssClass";
-import { Rating } from "src/lib/Rating";
+import { RatingInfo } from "src/lib/RatingLevel";
 import { AbstractStatsColumn } from "src/lib/column/intetface/AbstractStatsColumn";
 import type { ISummaryColumn } from "src/lib/column/intetface/ISummaryColumn";
 import { type StatsCategory } from "src/lib/types";
@@ -25,10 +25,10 @@ export class PR extends AbstractStatsColumn<string> implements ISummaryColumn {
   }
 
   textColorCode(player: data.Player): string {
-    return Rating.fromPR(
-      this.value(player),
-      this.config.color.skill.text,
-    ).colorCode();
+    return (
+      RatingInfo.fromPR(this.value(player), this.config.color.skill.text)
+        ?.textColorCode ?? ""
+    );
   }
 
   value(player: data.Player): number {

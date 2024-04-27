@@ -1,9 +1,9 @@
 import { ArrayMap } from "src/lib/ArrayMap";
 import { FontSize } from "src/lib/FontSize";
+import type { RatingLevel } from "src/lib/RatingLevel";
 import type { SummaryShipType } from "src/lib/Summary";
 import {
   type ColumnCategory,
-  type RatingLevel,
   type ShipType,
   type StatsExtra,
   type TierGroup,

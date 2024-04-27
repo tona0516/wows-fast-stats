@@ -1,6 +1,5 @@
 <script lang="ts">
   import { DispName } from "src/lib/DispName";
-  import StatisticsTable from "src/component/main/internal/StatsTable.svelte";
   import ConfirmModal from "src/component/modal/ConfirmModal.svelte";
   import { storedConfig } from "src/stores";
   import { createEventDispatcher } from "svelte";
@@ -12,7 +11,6 @@
   import { FetchProxy } from "src/lib/FetchProxy";
   import { Notifier } from "src/lib/Notifier";
   import { deriveColumnSettings } from "src/lib/util";
-  import { SAMPLE_TEAM } from "src/lib/RatingDef";
 
   export let inputConfig: data.UserConfigV2;
 
@@ -242,11 +240,6 @@
       >
     {/each}
   </select>
-</div>
-
-<div class="uk-padding-small">
-  <div>プレビュー</div>
-  <StatisticsTable teams={[SAMPLE_TEAM]} config={inputConfig} />
 </div>
 
 <div class="uk-padding-small">

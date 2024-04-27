@@ -1,5 +1,5 @@
 import SingleTableData from "src/component/main/internal/table_data/SingleTableData.svelte";
-import { Rating } from "src/lib/Rating";
+import { RatingInfo } from "src/lib/RatingLevel";
 import { AbstractStatsColumn } from "src/lib/column/intetface/AbstractStatsColumn";
 import type { ISummaryColumn } from "src/lib/column/intetface/ISummaryColumn";
 import { type StatsCategory } from "src/lib/types";
@@ -22,10 +22,10 @@ export class WinRate
   }
 
   textColorCode(player: data.Player): string {
-    return Rating.fromWinRate(
-      this.value(player),
-      this.config.color.skill.text,
-    ).colorCode();
+    return (
+      RatingInfo.fromWinRate(this.value(player), this.config.color.skill.text)
+        ?.textColorCode ?? ""
+    );
   }
 
   value(player: data.Player): number {
