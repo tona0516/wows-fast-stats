@@ -73,7 +73,7 @@ func main() {
 func initApp(env data.Env) *App {
 	// infra
 	var maxRetry uint64 = 2
-	timeout := 10 * time.Second
+	timeout := 5 * time.Second
 
 	alertDiscord := infra.NewDiscord(infra.RequestConfig{
 		URL:     AlertDiscordWebhookURL,
