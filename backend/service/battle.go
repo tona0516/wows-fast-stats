@@ -7,6 +7,7 @@ import (
 	"wfs/backend/apperr"
 	"wfs/backend/data"
 	"wfs/backend/repository"
+	"wfs/backend/yamibuka"
 
 	"github.com/morikuni/failure"
 )
@@ -394,7 +395,22 @@ func (b *Battle) compose(
 			tempArenaInfo,
 		)
 
-		threatLevel := stats.ThreatLevel()
+		threatLevel := yamibuka.CalculateThreatLevel(yamibuka.NewThreatLevelFactor(
+			accountID,
+			tempArenaInfo,
+			warships,
+			vehicle.ShipID,
+			stats.Battles(data.StatsCategoryShip, data.StatsPatternPvPAll),
+			stats.AvgDamage(data.StatsCategoryShip, data.StatsPatternPvPAll),
+			stats.WinRate(data.StatsCategoryShip, data.StatsPatternPvPAll),
+			stats.SurvivedRate(data.StatsCategoryShip, data.StatsPatternPvPAll),
+			stats.PlanesKilled(data.StatsCategoryShip),
+			stats.Battles(data.StatsCategoryOverall, data.StatsPatternPvPAll),
+			stats.AvgDamage(data.StatsCategoryOverall, data.StatsPatternPvPAll),
+			stats.WinRate(data.StatsCategoryOverall, data.StatsPatternPvPAll),
+			stats.AvgKill(data.StatsCategoryOverall, data.StatsPatternPvPAll),
+			stats.KdRate(data.StatsCategoryOverall, data.StatsPatternPvPAll),
+		))
 
 		player := data.Player{
 			PlayerInfo: data.PlayerInfo{
