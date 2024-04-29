@@ -125,7 +125,7 @@ func CalculateThreatLevel(f ThreatLevelFactor) data.ThreatLevel {
 	shipAAIndex := antiAirCoefficient(f.shipID, f.shipPlanesKilled)
 
 	// 脅威レベルの算出
-	raw := math.Round((playerTotalSkillScore + 1) * shipClassScore * 10000)
+	raw := (playerTotalSkillScore + 1) * shipClassScore * 10000
 
 	// マッチのおける脅威レベルの補正
 	modified := correctBasedOnMatch(raw, f.warships, f.shipID, shipAAIndex, isCVMatch, topTier, bottomTier)
@@ -420,7 +420,7 @@ func correctBasedOnMatch(
 ) float64 {
 	result := raw
 	if isCVMatch {
-		result = math.Round(raw * shipAAIndex)
+		result = raw * shipAAIndex
 	}
 
 	warship, ok := warships[shipID]
@@ -430,10 +430,10 @@ func correctBasedOnMatch(
 	shipTier := warship.Tier
 
 	if shipTier == topTier {
-		result = math.Round(result * 1.1)
+		result = result * 1.1
 	}
 	if shipTier == bottomTier {
-		result = math.Round(result * 0.9)
+		result = result * 0.9
 	}
 
 	return result
