@@ -6,7 +6,7 @@ type Battle struct {
 }
 
 type Team struct {
-	Players Players `json:"players"`
+	Players            Players            `json:"players"`
 }
 
 type Meta struct {

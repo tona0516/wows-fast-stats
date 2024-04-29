@@ -20,7 +20,7 @@ const (
 	shipIDYoshino  = 3749623504
 )
 
-func TestThreatLevel_Calculate_CV_CVあり_Tierミドル(t *testing.T) {
+func TestThreatLevel_CalculateThreatLevel_CV_CVあり_Tierミドル(t *testing.T) {
 	t.Parallel()
 
 	actual := CalculateThreatLevel(NewThreatLevelFactor(
@@ -70,7 +70,7 @@ func TestThreatLevel_Calculate_CV_CVあり_Tierミドル(t *testing.T) {
 	assert.InDelta(t, expected.Modified, actual.Modified, allowableDelta)
 }
 
-func TestThreatLevel_Calculate_BB_CVあり_Tierトップ(t *testing.T) {
+func TestThreatLevel_CalculateThreatLevel_BB_CVあり_Tierトップ(t *testing.T) {
 	t.Parallel()
 
 	actual := CalculateThreatLevel(NewThreatLevelFactor(
@@ -120,7 +120,7 @@ func TestThreatLevel_Calculate_BB_CVあり_Tierトップ(t *testing.T) {
 	assert.InDelta(t, expected.Modified, actual.Modified, allowableDelta)
 }
 
-func TestThreatLevel_Calculate_CL_CVなし_Tierミドル(t *testing.T) {
+func TestThreatLevel_CalculateThreatLevel_CL_CVなし_Tierミドル(t *testing.T) {
 	t.Parallel()
 
 	actual := CalculateThreatLevel(NewThreatLevelFactor(
@@ -158,7 +158,7 @@ func TestThreatLevel_Calculate_CL_CVなし_Tierミドル(t *testing.T) {
 	assert.InDelta(t, expected.Modified, actual.Modified, allowableDelta)
 }
 
-func TestThreatLevel_Calculate_DD_CVあり_Tierボトム_特殊補正艦(t *testing.T) {
+func TestThreatLevel_CalculateThreatLevel_DD_CVあり_Tierボトム_特殊補正艦(t *testing.T) {
 	t.Parallel()
 
 	shipIDSims := 4264441840
