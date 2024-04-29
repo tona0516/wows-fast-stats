@@ -3,10 +3,7 @@
   import ExternalLink from "src/component/common/ExternalLink.svelte";
   import { DispName } from "src/lib/DispName";
   import { RATING_DEFS, RatingInfo, type RatingDef } from "src/lib/RatingLevel";
-  import {
-    THREAT_LEVEL_DEFS,
-    type ThreatLevelDef,
-  } from "src/lib/ThreatLevel";
+  import { THREAT_LEVEL_DEFS, type ThreatLevelDef } from "src/lib/ThreatLevel";
   import type {
     DispColorTableInfo,
     Row,

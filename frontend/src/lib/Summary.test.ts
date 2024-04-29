@@ -66,7 +66,6 @@ test("calculate - all types, ship, pvp_all, excluded player", () => {
   customDigit.pr = 0;
   customDigit.damage = 1;
   customDigit.win_rate = 2;
-  customDigit.threat_level = 0;
 
   const teamSummary = new data.UCTeamSummary();
   teamSummary.min_ship_battles = 20;
@@ -90,7 +89,6 @@ test("calculate - all types, ship, pvp_all, excluded player", () => {
     (0).toFixed(customDigit.pr),
     (0).toFixed(customDigit.damage),
     (0).toFixed(customDigit.win_rate),
-    (0).toFixed(customDigit.threat_level),
   ]);
   expect(summary?.values.get("all")?.enemies).toEqual([
     enemy1[extra].ship.pr.toFixed(customDigit.pr),
@@ -99,7 +97,6 @@ test("calculate - all types, ship, pvp_all, excluded player", () => {
     (0).toFixed(customDigit.pr),
     (0).toFixed(customDigit.damage),
     (0).toFixed(customDigit.win_rate),
-    (0).toFixed(customDigit.threat_level),
   ]);
   expect(summary?.values.get("all")?.diffs).toEqual([
     {
@@ -123,7 +120,6 @@ test("calculate - all types, ship, pvp_all, excluded player", () => {
     { colorCode: "", diff: (0).toFixed(customDigit.pr) },
     { colorCode: "", diff: (0).toFixed(customDigit.damage) },
     { colorCode: "", diff: (0).toFixed(customDigit.win_rate) },
-    { colorCode: "", diff: (0).toFixed(customDigit.threat_level) },
   ]);
 });
 
@@ -133,9 +129,7 @@ test("calculate - each ship type, overall, pvp_solo", () => {
   const battles = 100,
     pr = 1000,
     damage = 10000,
-    winRate = 50,
-    threatLevel = new data.ThreatLevel();
-  threatLevel.modified = 11000;
+    winRate = 50;
 
   const friends = shipTypes.map((it) => {
     const friend = makePlayer();
@@ -145,7 +139,6 @@ test("calculate - each ship type, overall, pvp_solo", () => {
     friend[extra].overall.pr = pr;
     friend[extra].overall.damage = damage;
     friend[extra].overall.win_rate = winRate;
-    friend[extra].overall.threat_level = threatLevel;
 
     return friend;
   });
@@ -158,7 +151,6 @@ test("calculate - each ship type, overall, pvp_solo", () => {
     enemy[extra].overall.pr = 0;
     enemy[extra].overall.damage = 0;
     enemy[extra].overall.win_rate = 0;
-    enemy[extra].overall.threat_level = new data.ThreatLevel();
 
     return enemy;
   });
@@ -175,7 +167,6 @@ test("calculate - each ship type, overall, pvp_solo", () => {
   customDigit.pr = 0;
   customDigit.damage = 1;
   customDigit.win_rate = 2;
-  customDigit.threat_level = 0;
 
   const teamSummary = new data.UCTeamSummary();
   teamSummary.min_overall_battles = 1;
@@ -200,7 +191,6 @@ test("calculate - each ship type, overall, pvp_solo", () => {
       pr.toFixed(customDigit.pr),
       damage.toFixed(customDigit.damage),
       winRate.toFixed(customDigit.win_rate),
-      threatLevel.modified.toFixed(customDigit.threat_level),
     ]);
   });
 
@@ -220,10 +210,6 @@ test("calculate - each ship type, overall, pvp_solo", () => {
       {
         colorCode: "#99d02b",
         diff: `+${winRate.toFixed(customDigit.win_rate)}`,
-      },
-      {
-        colorCode: "#99d02b",
-        diff: `+${threatLevel.modified.toFixed(customDigit.threat_level)}`,
       },
     ]);
   });

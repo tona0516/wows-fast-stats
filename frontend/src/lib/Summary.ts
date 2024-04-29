@@ -4,7 +4,6 @@ import type { AbstractStatsColumn } from "src/lib/column/intetface/AbstractStats
 import { type ISummaryColumn } from "src/lib/column/intetface/ISummaryColumn";
 import { Damage } from "src/lib/column/model/Damage";
 import { PR } from "src/lib/column/model/PR";
-import { ThreatLevel } from "src/lib/column/model/ThreatLevel";
 import { WinRate } from "src/lib/column/model/WinRate";
 import {
   type OptionalBattle,
@@ -89,12 +88,9 @@ export namespace Summary {
           );
         }
 
-        const [friendMean, enemyMean] = origin.map((players) => {
-          if (column instanceof ThreatLevel) {
-            return meanForsThreatLevel(players, column);
-          }
-          return mean(players, column);
-        });
+        const [friendMean, enemyMean] = origin.map((players) =>
+          mean(players, column),
+        );
 
         const digit = column.digit();
         result.values.get(shipType)!.friends.push(friendMean.toFixed(digit));
@@ -137,7 +133,6 @@ const deriveColumns = (
     new PR(config, "overall"),
     new Damage(config, "overall"),
     new WinRate(config, "overall"),
-    new ThreatLevel(config),
   ];
 
   const columns = shipCols.concat(overallCols);
@@ -187,21 +182,6 @@ const mean = (players: data.Player[], column: SummaryColumn): number => {
     .map((player) => column.value(player));
   return values.length !== 0
     ? values.reduce((a, b) => a + b, 0) / values.length
-    : 0;
-};
-
-const meanForsThreatLevel = (
-  players: data.Player[],
-  column: ThreatLevel,
-): number => {
-  const values = players
-    .filter((player) => column.value(player) !== 1)
-    .map((player) => column.value(player));
-  return values.length !== 0
-    ? Math.pow(
-        values.reduce((a, b) => a * b, 1),
-        1 / values.length,
-      )
     : 0;
 };
 
