@@ -4,6 +4,7 @@
   import type { data } from "wailsjs/go/models";
   import { ColumnProvider } from "src/lib/column/ColumnProvider";
   import { FetchProxy } from "src/lib/FetchProxy";
+  import { storedTeamThreatLevels } from "src/stores";
 
   export let teams: data.Team[];
   export let config: data.UserConfigV2;
@@ -11,12 +12,30 @@
   $: categories = ColumnProvider.getAllColumns(config);
   $: [basicColumns, shipColumns, overallColumns] = categories;
   $: shipColumnCount = shipColumns.columnCount();
-  $: allColumnCount = shipColumnCount + overallColumns.columnCount();
+  $: statsColumnCount = shipColumnCount + overallColumns.columnCount();
+  $: allColumnCount = basicColumns.columnCount() + statsColumnCount;
 </script>
 
 <UkTable>
-  {#each teams as team}
+  {#each teams as team, i}
     <thead>
+      {#if config.display.overall.threat_level && $storedTeamThreatLevels && $storedTeamThreatLevels[i]}
+        {@const teamThreatLevel = $storedTeamThreatLevels[i]}
+        <tr>
+          <th class="uk-text-center" colspan={allColumnCount}>
+            戦力評価値平均 : <span class="uk-text-large uk-text-bold"
+              >{teamThreatLevel.average.toFixed(0)}</span
+            >
+            [確度 :
+            <span class="uk-text-default uk-text-bold"
+              >{teamThreatLevel.accuracy.toFixed(0)}</span
+            >%] [介護指数 :
+            <span class="uk-text-default uk-text-bold"
+              >{teamThreatLevel.dissociationDegree.toFixed(0)}</span
+            >%]
+          </th>
+        </tr>
+      {/if}
       <tr>
         {#each categories as category}
           {#if category.columnCount() > 0}
@@ -45,7 +64,7 @@
         {@const rowPattern = RowPattern.derive(
           player,
           statsPattern,
-          allColumnCount,
+          statsColumnCount,
           shipColumnCount,
         )}
         <tr>
@@ -61,11 +80,11 @@
           {/each}
 
           {#if rowPattern === RowPattern.NO_COLUMN}
-            <td class="no_data" colspan={allColumnCount}></td>
+            <td class="no_data" colspan={statsColumnCount}></td>
           {:else if rowPattern === RowPattern.PRIVATE}
-            <td class="no_data" colspan={allColumnCount}>PRIVATE</td>
+            <td class="no_data" colspan={statsColumnCount}>PRIVATE</td>
           {:else if rowPattern === RowPattern.NO_STATS}
-            <td class="no_data" colspan={allColumnCount}>N/A</td>
+            <td class="no_data" colspan={statsColumnCount}>N/A</td>
           {:else if rowPattern === RowPattern.NO_SHIP_STATS}
             <td class="no_data" colspan={shipColumnCount}>N/A</td>
             {#each overallColumns as column}

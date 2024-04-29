@@ -430,10 +430,10 @@ func correctBasedOnMatch(
 	shipTier := warship.Tier
 
 	if shipTier == topTier {
-		result = result * 1.1
+		result *= 1.1
 	}
 	if shipTier == bottomTier {
-		result = result * 0.9
+		result *= 0.9
 	}
 
 	return result
