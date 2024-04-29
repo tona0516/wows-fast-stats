@@ -3,7 +3,7 @@
   import AppInfo from "./internal/AppInfo.svelte";
   import Logging from "./internal/Logging.svelte";
   import UkTab from "src/component/common/uikit/UkTab.svelte";
-  import ColorDescription from "./internal/ColorDescription.svelte";
+  import ColorDescription from "./internal/DispColor.svelte";
 
   const INFO_MENU_ID = "info-menu-id";
 </script>

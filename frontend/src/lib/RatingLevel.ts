@@ -45,12 +45,13 @@ export class RatingInfo {
   }
 }
 
-export const RATING_DEFS: {
+export type RatingDef = {
   level: RatingLevel;
   pr: number;
   damage: number;
   winRate: number;
-}[] = [
+};
+export const RATING_DEFS: RatingDef[] = [
   {
     level: "bad",
     pr: 0,

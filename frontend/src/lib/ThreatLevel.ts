@@ -24,10 +24,11 @@ export class ThreatLevelInfo {
 }
 
 const THREAT_LEVEL_COEF = 0.5;
-export const THREAT_LEVEL_DEFS: {
+export type ThreatLevelDef = {
   info: ThreatLevelInfo;
   score: number;
-}[] = [
+};
+export const THREAT_LEVEL_DEFS: ThreatLevelDef[] = [
   {
     info: new ThreatLevelInfo(ThreatLevel.IR, "#FFFFFF", "#000000"),
     score: 0,
