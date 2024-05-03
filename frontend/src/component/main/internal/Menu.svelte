@@ -4,33 +4,17 @@
   import UkSpinner from "src/component/common/uikit/UkSpinner.svelte";
   import { DispName } from "src/lib/DispName";
   import { Notifier } from "src/lib/Notifier";
-  import type { Screenshot } from "src/lib/Screenshot";
   import { storedBattle, storedConfig } from "src/stores";
+  import { createEventDispatcher } from "svelte";
   import { ApplyUserConfig } from "wailsjs/go/main/App";
   import { WindowReloadApp } from "wailsjs/runtime/runtime";
 
-  export let screenshot: Screenshot;
+  export let isScreenshotting: boolean;
 
-  $: isScreenshotting = false;
   $: disableScreenshot = isScreenshotting || $storedBattle?.meta === undefined;
   let selectedStatsPattern: string = $storedConfig.stats_pattern;
 
-  const takeScreenshot = async () => {
-    if (!$storedBattle?.meta) {
-      return;
-    }
-
-    try {
-      isScreenshotting = true;
-      if (await screenshot.manual($storedBattle.meta)) {
-        Notifier.success("スクリーンショットを保存しました");
-      }
-    } catch (error) {
-      Notifier.failure(error);
-    } finally {
-      isScreenshotting = false;
-    }
-  };
+  const dispatch = createEventDispatcher();
 
   const onStatsPatternChanged = async () => {
     try {
@@ -60,7 +44,7 @@
 <button
   class="uk-button uk-button-primary uk-button-small"
   disabled={disableScreenshot}
-  on:click={() => takeScreenshot()}
+  on:click={() => dispatch("ManualScreenshot")}
 >
   {#if isScreenshotting}
     <UkSpinner />

@@ -19,6 +19,8 @@ import { EventsOn } from "wailsjs/runtime/runtime";
 
 export namespace FetchProxy {
   export const getBattle = async (): Promise<data.Battle> => {
+    // Note: 過去のデータが影響してか値が0になってしまうためクリーンする
+    storedBattle.set(undefined);
     const ret = await Battle();
     storedBattle.set(ret);
     return ret;

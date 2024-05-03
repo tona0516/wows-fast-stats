@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { Screenshot } from "src/lib/Screenshot";
   import BattleMeta from "src/component/main/internal/BattleMeta.svelte";
   import StatisticsTable from "src/component/main/internal/StatsTable.svelte";
   import {
@@ -8,33 +7,39 @@
     storedSummary,
     storedRequiredConfigError,
   } from "src/stores";
-  import Function from "./internal/Function.svelte";
+  import Menu from "./internal/Menu.svelte";
   import Summary from "./internal/Summary.svelte";
   import Ofuse from "./internal/Ofuse.svelte";
   import UkSpinner from "../common/uikit/UkSpinner.svelte";
   import { FetchProxy } from "src/lib/FetchProxy";
   import { Notifier } from "src/lib/Notifier";
   import { LogInfo } from "wailsjs/go/main/App";
+  import { data } from "wailsjs/go/models";
+  import { format, fromUnixTime } from "date-fns";
+  import { Screenshot } from "src/lib/Screenshot";
 
   const MAIN_PAGE_ID = "mainpage";
-  const screenshot = new Screenshot(MAIN_PAGE_ID);
 
+  let menu: Menu | undefined;
   let isLoading = false;
+  let isScreenshotting = false;
+
+  // Note: Promiseがガベージコレクションによって解放されてしまうため保持する
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  let autoScreenshotPromise: Promise<void>;
 
   export const fetchBattle = async () => {
     try {
       isLoading = true;
 
       const start = new Date().getTime();
-      // Note: 過去のデータが影響してか値が0になってしまうためクリーンする
-      storedBattle.set(undefined);
-      const battle = await FetchProxy.getBattle();
+      await FetchProxy.getBattle();
       const elapsed = (new Date().getTime() - start) / 1000;
 
       Notifier.success(`データ取得完了: ${elapsed.toFixed(1)}秒`);
 
       if ($storedConfig.save_screenshot) {
-        screenshot.auto(battle.meta);
+        autoScreenshotPromise = autoScreenshot();
       }
 
       LogInfo("fetch success", { "duration(s)": elapsed.toFixed(1) });
@@ -44,6 +49,46 @@
       isLoading = false;
     }
   };
+
+  const manualScreenshot = async () => {
+    try {
+      isScreenshotting = true;
+      const isSuccess = await Screenshot.manual(
+        MAIN_PAGE_ID,
+        deriveFileName($storedBattle!.meta),
+      );
+
+      if (isSuccess) {
+        Notifier.success("スクリーンショットを保存しました");
+      }
+    } catch (error) {
+      Notifier.failure("スクリーンショットに失敗しました", 10000);
+    } finally {
+      isScreenshotting = false;
+    }
+  };
+
+  const autoScreenshot = async () => {
+    try {
+      isScreenshotting = true;
+      await Screenshot.auto(MAIN_PAGE_ID, deriveFileName($storedBattle!.meta));
+    } catch (error) {
+      Notifier.failure("スクリーンショットに失敗しました", 10000);
+    } finally {
+      isScreenshotting = false;
+    }
+  };
+
+  const deriveFileName = (meta: data.Meta): string => {
+    const items = [
+      format(fromUnixTime(meta.unixtime), "yyyy-MM-dd-HH-mm-ss"),
+      meta.own_ship.replaceAll(" ", "-"),
+      meta.arena,
+      meta.type,
+    ];
+
+    return `${items.join("_")}`;
+  };
 </script>
 
 <!-- Note: Use the same color as that of body.  -->
@@ -52,7 +97,11 @@
   class="uk-padding-small uk-light uk-background-secondary"
 >
   <div class="uk-margin-small uk-flex uk-flex-center">
-    <Function {screenshot} />
+    <Menu
+      bind:this={menu}
+      {isScreenshotting}
+      on:ManualScreenshot={() => manualScreenshot()}
+    />
   </div>
 
   <div class="uk-margin-small">

@@ -1,53 +1,37 @@
-import { format, fromUnixTime } from "date-fns";
 import * as htmlToImage from "html-to-image";
 import {
   AutoScreenshot,
   LogError,
   ManualScreenshot,
 } from "wailsjs/go/main/App";
-import type { data } from "wailsjs/go/models";
 
-export class Screenshot {
-  private isFirst: boolean = true;
+export namespace Screenshot {
+  export const manual = async (
+    targetElementID: string,
+    filename: string,
+  ): Promise<boolean> => {
+    const image = await getBase64Image(targetElementID);
+    return await ManualScreenshot(filename + ".png", image);
+  };
 
-  constructor(private targetElementID: string) {}
-
-  async manual(meta: data.Meta): Promise<boolean> {
-    const filename = deriveFileName(meta);
-    const image = await this.getBase64Image();
-    return await ManualScreenshot(filename, image);
-  }
-
-  async auto(meta: data.Meta) {
-    const filename = deriveFileName(meta);
-    const image = await this.getBase64Image();
-    await AutoScreenshot(filename, image);
-  }
-
-  private async getBase64Image(): Promise<string> {
-    try {
-      const element = document.getElementById(this.targetElementID);
-
-      // Workaround: first screenshot can't draw values in table.
-      if (this.isFirst) {
-        await htmlToImage.toPng(element!);
-        this.isFirst = false;
-      }
-      return (await htmlToImage.toPng(element!)).split(",")[1];
-    } catch (error) {
-      LogError(`${this.getBase64Image.name}: ${JSON.stringify(error)}`, {});
-      throw error;
-    }
-  }
+  export const auto = async (
+    targetElementID: string,
+    filename: string,
+  ): Promise<void> => {
+    const image = await getBase64Image(targetElementID);
+    await AutoScreenshot(filename + ".png", image);
+  };
 }
 
-const deriveFileName = (meta: data.Meta): string => {
-  const items = [
-    format(fromUnixTime(meta.unixtime), "yyyy-MM-dd-HH-mm-ss"),
-    meta.own_ship.replaceAll(" ", "-"),
-    meta.arena,
-    meta.type,
-  ];
+const getBase64Image = async (targetElementID: string): Promise<string> => {
+  try {
+    const element = document.getElementById(targetElementID);
 
-  return `${items.join("_")}.png`;
+    // Workaround: first screenshot can't draw values in table.
+    await htmlToImage.toPng(element!);
+    return (await htmlToImage.toPng(element!)).split(",")[1];
+  } catch (error) {
+    LogError(`${getBase64Image.name}: ${JSON.stringify(error)}`, {});
+    throw error;
+  }
 };
