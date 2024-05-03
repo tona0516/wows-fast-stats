@@ -25,6 +25,7 @@ import ShipDD from "src/assets/images/ship_dd.png";
 import ShipPremiumDD from "src/assets/images/ship_dd_premium.png";
 import ShipSS from "src/assets/images/ship_ss.png";
 import ShipPremiumSS from "src/assets/images/ship_ss_premium.png";
+import ShipNone from "src/assets/images/ship_none.png"
 
 import { isShipType, tierString } from "src/lib/util";
 import ShipInfoTableData from "src/component/main/internal/table_data/ShipInfoTableData.svelte";
@@ -88,7 +89,7 @@ export class ShipInfo extends AbstractColumn {
   shipTypeIconPath(player: data.Player): string {
     const shipInfo = player.ship_info;
     const type = shipInfo.type;
-    if (!isShipType(type)) return "";
+    if (!isShipType(type)) return ShipNone;
 
     return shipInfo.is_premium ? PREMIUM_SHIP_ICONS[type] : SHIP_ICONS[type];
   }
