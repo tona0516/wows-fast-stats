@@ -164,6 +164,11 @@ function clean() {
   });
 }
 
+function uddep() {
+  exec("go get -u");
+  exec(`${FRONTEND_NPM_COMMAND} update`);
+}
+
 function main() {
   const program = new Command();
 
@@ -201,6 +206,7 @@ function main() {
     .command("clean")
     .description("Remove directories and files created by the application.")
     .action(clean);
+  program.command("uddep").description("Update dependencies.").action(uddep);
 
   program.parse();
 }

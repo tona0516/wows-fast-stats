@@ -12,7 +12,8 @@
     "chbtl": "ts-node devtool.ts chbtl",
     "build": "ts-node devtool.ts build",
     "pkg": "ts-node devtool.ts pkg",
-    "clean": "ts-node devtool.ts clean"
+    "clean": "ts-node devtool.ts clean",
+    "uddep": "ts-node devtool.ts uddep"
   },
   "dependencies": {
     "@types/archiver": "^6.0.1",
