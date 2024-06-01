@@ -2,14 +2,15 @@ package data
 
 type WGClansInfo map[int]WGClansInfoData
 
-func (w WGClansInfo) Tags() []string {
-	tags := make([]string, 0)
+func (w WGClansInfo) ToArray() []WGClansInfoData {
+	array := make([]WGClansInfoData, 0)
 	for _, v := range w {
-		tags = append(tags, v.Tag)
+		array = append(array, v)
 	}
-	return tags
+	return array
 }
 
 type WGClansInfoData struct {
-	Tag string `json:"tag"`
+	Tag         string `json:"tag"`
+	Description string `json:"description"`
 }

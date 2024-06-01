@@ -260,6 +260,7 @@ export namespace data {
 	    tag: string;
 	    id: number;
 	    hex_color: string;
+	    language: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new Clan(source);
@@ -270,6 +271,7 @@ export namespace data {
 	        this.tag = source["tag"];
 	        this.id = source["id"];
 	        this.hex_color = source["hex_color"];
+	        this.language = source["language"];
 	    }
 	}
 	export class PlayerInfo {
@@ -837,6 +839,7 @@ export namespace data {
 	    display: UCDisplay;
 	    color: UCColor;
 	    digit: UCDigit;
+	    show_language_frag: boolean;
 	    team_summary: UCTeamSummary;
 	    save_screenshot: boolean;
 	    save_temp_arena_info: boolean;
@@ -857,6 +860,7 @@ export namespace data {
 	        this.display = this.convertValues(source["display"], UCDisplay);
 	        this.color = this.convertValues(source["color"], UCColor);
 	        this.digit = this.convertValues(source["digit"], UCDigit);
+	        this.show_language_frag = source["show_language_frag"];
 	        this.team_summary = this.convertValues(source["team_summary"], UCTeamSummary);
 	        this.save_screenshot = source["save_screenshot"];
 	        this.save_temp_arena_info = source["save_temp_arena_info"];

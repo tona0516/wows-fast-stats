@@ -243,6 +243,16 @@
 </div>
 
 <div class="uk-padding-small">
+  <div>その他</div>
+  <input
+    class="uk-checkbox"
+    type="checkbox"
+    bind:checked={inputConfig.show_language_frag}
+    on:change={() => dispatch("Change")}
+  /> クラン国籍を表示する（クラン説明から言語検出）
+</div>
+
+<div class="uk-padding-small">
   <button
     class="uk-button uk-button-danger uk-text-nowrap"
     on:click={() => {

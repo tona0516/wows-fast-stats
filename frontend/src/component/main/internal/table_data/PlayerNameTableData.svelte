@@ -14,6 +14,7 @@
   import type { PlayerName } from "src/lib/column/model/PlayerName";
   import { ClipboardSetText } from "wailsjs/runtime/runtime";
   import { Notifier } from "src/lib/Notifier";
+  import "/node_modules/flag-icons/css/flag-icons.min.css";
 
   export let column: PlayerName;
   export let player: data.Player;
@@ -68,9 +69,19 @@
             <i class="bi {alertPlayer.pattern} alert-icon" />
           {/if}
           {#if clanTag}
-            <div class="clan-tag" style="color: {column.clanColorCode(player)}">
+            {#if column.clanFlagIconClass(player)}
+              <span
+                class="nation-icon uk-preserve-width {column.clanFlagIconClass(
+                  player,
+                )}"
+              ></span>
+            {/if}
+            <span
+              class="clan-tag"
+              style="color: {column.clanColorCode(player)}"
+            >
               {clanTag}
-            </div>
+            </span>
           {/if}
           <div
             class="uk-text-truncate"

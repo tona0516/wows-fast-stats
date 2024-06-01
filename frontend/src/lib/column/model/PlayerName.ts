@@ -25,6 +25,31 @@ export class PlayerName extends AbstractColumn {
     return clanID !== 0 ? `[${clanTag}] ` : undefined;
   }
 
+  clanFlagIconClass(player: data.Player): string | undefined {
+    if (!this.config.show_language_frag) {
+      return undefined;
+    }
+
+    let fragIcon = "";
+    switch (player.player_info.clan.language) {
+      case "ja":
+        fragIcon = "jp";
+        break;
+      case "zh":
+        fragIcon = "cn";
+        break;
+      case "ko":
+        fragIcon = "kr";
+        break;
+    }
+
+    if (!fragIcon) {
+      return undefined;
+    }
+
+    return `fi fi-${fragIcon}`;
+  }
+
   playerName(player: data.Player): string {
     return player.player_info.name;
   }

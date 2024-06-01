@@ -92,10 +92,11 @@ type UserConfigV2 struct {
 	InstallPath string `json:"install_path"`
 	Appid       string `json:"appid"`
 	// display
-	FontSize string    `json:"font_size"`
-	Display  UCDisplay `json:"display"`
-	Color    UCColor   `json:"color"`
-	Digit    UCDigit   `json:"digit"`
+	FontSize         string    `json:"font_size"`
+	Display          UCDisplay `json:"display"`
+	Color            UCColor   `json:"color"`
+	Digit            UCDigit   `json:"digit"`
+	ShowLanguageFrag bool      `json:"show_language_frag"`
 	// team summary
 	TeamSummary UCTeamSummary `json:"team_summary"`
 	// other

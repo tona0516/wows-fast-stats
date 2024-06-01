@@ -24,7 +24,7 @@ func mockServer[T, U any](response Response[T, U], responseTime time.Duration) *
 	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		time.Sleep(responseTime)
 
-		w.Header().Set("content-type", "application/json")
+		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(response.StatusCode)
 		_, _ = w.Write(response.BodyByte)
 	}))

@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"regexp"
 	"sort"
 	"sync"
 	"wfs/backend/apperr"
@@ -10,6 +11,7 @@ import (
 	"wfs/backend/yamibuka"
 
 	"github.com/morikuni/failure"
+	"github.com/rylans/getlang"
 )
 
 type Battle struct {
@@ -317,20 +319,39 @@ func (b *Battle) fetchClan(appID string, accountIDs []int, channel chan data.Res
 		channel <- result
 		return
 	}
-	clanTags := clansInfo.Tags()
 
-	hexColorMap := make(map[string]string)
+	clanInfoArray := clansInfo.ToArray()
+	colorMap := b.fetchClanColor(clanInfoArray)
+	languageMap := b.fetchClanLanguage(clanInfoArray)
+
+	clans := make(data.Clans)
+	for _, accountID := range accountIDs {
+		clanID := clansAccountInfo[accountID].ClanID
+		clanTag := clansInfo[clanID].Tag
+		hexColor := colorMap[clanTag]
+		language := languageMap[clanTag]
+
+		clans[accountID] = data.Clan{Tag: clanTag, ID: clanID, HexColor: hexColor, Language: language}
+	}
+
+	result.Value = clans
+	channel <- result
+}
+
+func (b *Battle) fetchClanColor(clanInfoArray []data.WGClansInfoData) map[string]string {
+	result := make(map[string]string)
+
 	var mu sync.Mutex
-	err = doParallel(uint(len(clanTags)), clanTags, func(tag string) error {
-		autocomplete, err := b.uwargaming.ClansAutoComplete(tag)
+	err := doParallel(uint(len(clanInfoArray)), clanInfoArray, func(clan data.WGClansInfoData) error {
+		autocomplete, err := b.uwargaming.ClansAutoComplete(clan.Tag)
 		if err != nil {
 			return err
 		}
 
-		hexColor := autocomplete.HexColor(tag)
+		hexColor := autocomplete.HexColor(clan.Tag)
 		if hexColor != "" {
 			mu.Lock()
-			hexColorMap[tag] = hexColor
+			result[clan.Tag] = hexColor
 			mu.Unlock()
 		}
 
@@ -340,16 +361,37 @@ func (b *Battle) fetchClan(appID string, accountIDs []int, channel chan data.Res
 		b.logger.Warn(err, nil)
 	}
 
-	clans := make(data.Clans)
-	for _, accountID := range accountIDs {
-		clanID := clansAccountInfo[accountID].ClanID
-		clanTag := clansInfo[clanID].Tag
-		hexColor := hexColorMap[clanTag]
-		clans[accountID] = data.Clan{Tag: clanTag, ID: clanID, HexColor: hexColor}
+	return result
+}
+
+func (b *Battle) fetchClanLanguage(clanInfoArray []data.WGClansInfoData) map[string]string {
+	result := make(map[string]string)
+
+	// URLを検出する正規表現パターン
+	urlPattern := `https?://[^\s]+`
+	re := regexp.MustCompile(urlPattern)
+
+	var mu sync.Mutex
+	err := doParallel(uint(len(clanInfoArray)), clanInfoArray, func(clan data.WGClansInfoData) error {
+		// URLを空文字に置き換える
+		description := re.ReplaceAllString(clan.Description, "")
+
+		if len(description) == 0 {
+			return nil
+		}
+
+		info := getlang.FromString(description)
+		mu.Lock()
+		result[clan.Tag] = info.LanguageCode()
+		mu.Unlock()
+
+		return nil
+	})
+	if err != nil {
+		b.logger.Warn(err, nil)
 	}
 
-	result.Value = clans
-	channel <- result
+	return result
 }
 
 func (b *Battle) compose(

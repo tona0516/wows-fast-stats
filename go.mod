@@ -20,6 +20,7 @@ require github.com/rs/zerolog v1.33.0
 require (
 	github.com/dgraph-io/badger/v4 v4.2.0
 	github.com/morikuni/failure v1.1.2
+	github.com/rylans/getlang v0.0.0-20201227074721-9e7f44ff8aa0
 	github.com/shopspring/decimal v1.4.0
 	go.uber.org/mock v0.4.0
 )

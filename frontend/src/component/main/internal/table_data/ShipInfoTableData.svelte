@@ -34,12 +34,6 @@
 </td>
 
 <style>
-  :global(.nation-icon) {
-    width: 1.5em;
-    display: flex;
-    align-items: center;
-  }
-
   :global(.ship-icon) {
     width: 1.25em;
     display: flex;

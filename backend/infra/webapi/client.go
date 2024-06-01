@@ -65,7 +65,7 @@ func PostRequestJSON[T, U any](
 	if err != nil {
 		return response, failure.Wrap(err)
 	}
-	req.Header.Set("content-type", "application/json")
+	req.Header.Set("Content-Type", "application/json")
 
 	// request
 	err = request[T, U](req, &response, timeout, transport)
