@@ -1,0 +1,44 @@
+{
+  "vehicles": [
+    {
+      "shipId": 3553507120,
+      "relation": 1,
+      "id": 671140358,
+      "name": "S8ash"
+    },
+    {
+      "shipId": 3532535600,
+      "relation": 1,
+      "id": 537176173,
+      "name": "WUMENG_2019"
+    },
+    {
+      "shipId": 3522049840,
+      "relation": 1,
+      "id": 536964829,
+      "name": "kombo0502"
+    },
+    {
+      "shipId": 3553507120,
+      "relation": 1,
+      "id": 536979321,
+      "name": "Just__Monika"
+    },
+    {
+      "shipId": 3762173744,
+      "relation": 0,
+      "id": 671144445,
+      "name": "tonango"
+    },
+    {
+      "shipId": 3553507120,
+      "relation": 1,
+      "id": 671379646,
+      "name": "beetic33_"
+    }
+  ],
+  "dateTime": "13.06.2024 20:09:58",
+  "mapId": 46,
+  "matchGroup": "event",
+  "playerName": "tonango"
+}

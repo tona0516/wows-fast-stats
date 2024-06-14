@@ -14,6 +14,7 @@ import FlagUssr from "src/assets/images/flag_Russia.png";
 import FlagSpain from "src/assets/images/flag_Spain.png";
 import FlagUsa from "src/assets/images/flag_USA.png";
 import FlagUk from "src/assets/images/flag_United_Kingdom.png";
+import FlagNone from "src/assets/images/flag_none.png"
 
 import ShipBB from "src/assets/images/ship_bb.png";
 import ShipPremiumBB from "src/assets/images/ship_bb_premium.png";
@@ -95,6 +96,6 @@ export class ShipInfo extends AbstractColumn {
   }
 
   nationIconPath(player: data.Player): string {
-    return FLAGS[player.ship_info.nation] ?? "";
+    return FLAGS[player.ship_info.nation] ?? FlagNone;
   }
 }

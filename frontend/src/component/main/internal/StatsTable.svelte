@@ -18,108 +18,110 @@
 
 <UkTable>
   {#each teams as team, i}
-    <thead>
-      {#if config.display.overall.threat_level && $storedTeamThreatLevels && $storedTeamThreatLevels[i]}
-        {@const teamThreatLevel = $storedTeamThreatLevels[i]}
+    {#if team.players.length !== 0}
+      <thead>
+        {#if config.display.overall.threat_level && $storedTeamThreatLevels && $storedTeamThreatLevels[i]}
+          {@const teamThreatLevel = $storedTeamThreatLevels[i]}
+          <tr>
+            <th class="uk-text-center" colspan={allColumnCount}>
+              戦力評価値平均 : <span class="uk-text-large uk-text-bold"
+                >{teamThreatLevel.average.toFixed(0)}</span
+              >
+              [確度 :
+              <span class="uk-text-default uk-text-bold"
+                >{teamThreatLevel.accuracy.toFixed(0)}</span
+              >%] [介護指数 :
+              <span class="uk-text-default uk-text-bold"
+                >{teamThreatLevel.dissociationDegree.toFixed(0)}</span
+              >%]
+            </th>
+          </tr>
+        {/if}
         <tr>
-          <th class="uk-text-center" colspan={allColumnCount}>
-            戦力評価値平均 : <span class="uk-text-large uk-text-bold"
-              >{teamThreatLevel.average.toFixed(0)}</span
-            >
-            [確度 :
-            <span class="uk-text-default uk-text-bold"
-              >{teamThreatLevel.accuracy.toFixed(0)}</span
-            >%] [介護指数 :
-            <span class="uk-text-default uk-text-bold"
-              >{teamThreatLevel.dissociationDegree.toFixed(0)}</span
-            >%]
-          </th>
-        </tr>
-      {/if}
-      <tr>
-        {#each categories as category}
-          {#if category.columnCount() > 0}
-            <th class="uk-text-center" colspan={category.columnCount()}
-              >{category.dispName()}</th
-            >
-          {/if}
-        {/each}
-      </tr>
-      <tr>
-        {#each categories as category}
-          {#each category as column}
-            {#if column.shouldShow()}
-              <th class="uk-text-center" colspan={column.innerColumnCount}
-                >{column.header}</th
+          {#each categories as category}
+            {#if category.columnCount() > 0}
+              <th class="uk-text-center" colspan={category.columnCount()}
+                >{category.dispName()}</th
               >
             {/if}
           {/each}
-        {/each}
-      </tr>
-    </thead>
-
-    <tbody>
-      {#each team.players as player}
-        {@const statsPattern = config.stats_pattern}
-        {@const rowPattern = RowPattern.derive(
-          player,
-          statsPattern,
-          statsColumnCount,
-          shipColumnCount,
-        )}
-        <tr>
-          {#each basicColumns as column}
-            <svelte:component
-              this={column.svelteComponent()}
-              {column}
-              {player}
-              on:EditAlertPlayer
-              on:RemoveAlertPlayer
-              on:CheckPlayer={() => FetchProxy.getExcludedPlayers()}
-            />
-          {/each}
-
-          {#if rowPattern === RowPattern.NO_COLUMN}
-            <td class="no_data" colspan={statsColumnCount}></td>
-          {:else if rowPattern === RowPattern.PRIVATE}
-            <td class="no_data" colspan={statsColumnCount}>PRIVATE</td>
-          {:else if rowPattern === RowPattern.NO_STATS}
-            <td class="no_data" colspan={statsColumnCount}>N/A</td>
-          {:else if rowPattern === RowPattern.NO_SHIP_STATS}
-            <td class="no_data" colspan={shipColumnCount}>N/A</td>
-            {#each overallColumns as column}
-              {#if column.shouldShow()}
-                <svelte:component
-                  this={column.svelteComponent()}
-                  {column}
-                  {player}
-                />
-              {/if}
-            {/each}
-          {:else}
-            {#each shipColumns as column}
-              {#if column.shouldShow()}
-                <svelte:component
-                  this={column.svelteComponent()}
-                  {column}
-                  {player}
-                />
-              {/if}
-            {/each}
-
-            {#each overallColumns as column}
-              {#if column.shouldShow()}
-                <svelte:component
-                  this={column.svelteComponent()}
-                  {column}
-                  {player}
-                />
-              {/if}
-            {/each}
-          {/if}
         </tr>
-      {/each}
-    </tbody>
+        <tr>
+          {#each categories as category}
+            {#each category as column}
+              {#if column.shouldShow()}
+                <th class="uk-text-center" colspan={column.innerColumnCount}
+                  >{column.header}</th
+                >
+              {/if}
+            {/each}
+          {/each}
+        </tr>
+      </thead>
+
+      <tbody>
+        {#each team.players as player}
+          {@const statsPattern = config.stats_pattern}
+          {@const rowPattern = RowPattern.derive(
+            player,
+            statsPattern,
+            statsColumnCount,
+            shipColumnCount,
+          )}
+          <tr>
+            {#each basicColumns as column}
+              <svelte:component
+                this={column.svelteComponent()}
+                {column}
+                {player}
+                on:EditAlertPlayer
+                on:RemoveAlertPlayer
+                on:CheckPlayer={() => FetchProxy.getExcludedPlayers()}
+              />
+            {/each}
+
+            {#if rowPattern === RowPattern.NO_COLUMN}
+              <td class="no_data" colspan={statsColumnCount}></td>
+            {:else if rowPattern === RowPattern.PRIVATE}
+              <td class="no_data" colspan={statsColumnCount}>PRIVATE</td>
+            {:else if rowPattern === RowPattern.NO_STATS}
+              <td class="no_data" colspan={statsColumnCount}>N/A</td>
+            {:else if rowPattern === RowPattern.NO_SHIP_STATS}
+              <td class="no_data" colspan={shipColumnCount}>N/A</td>
+              {#each overallColumns as column}
+                {#if column.shouldShow()}
+                  <svelte:component
+                    this={column.svelteComponent()}
+                    {column}
+                    {player}
+                  />
+                {/if}
+              {/each}
+            {:else}
+              {#each shipColumns as column}
+                {#if column.shouldShow()}
+                  <svelte:component
+                    this={column.svelteComponent()}
+                    {column}
+                    {player}
+                  />
+                {/if}
+              {/each}
+
+              {#each overallColumns as column}
+                {#if column.shouldShow()}
+                  <svelte:component
+                    this={column.svelteComponent()}
+                    {column}
+                    {player}
+                  />
+                {/if}
+              {/each}
+            {/if}
+          </tr>
+        {/each}
+      </tbody>
+    {/if}
   {/each}
 </UkTable>
 
