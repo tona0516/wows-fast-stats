@@ -16,6 +16,7 @@ import { data } from "wailsjs/go/models";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type SummaryColumn = AbstractStatsColumn<any> & ISummaryColumn;
+type Mean = { value: number; len: number };
 export type SummaryShipType = ShipType | "all";
 
 export interface Summary {
@@ -88,16 +89,23 @@ export namespace Summary {
           );
         }
 
-        const [friendMean, enemyMean] = origin.map((players) =>
-          mean(players, column),
-        );
+        const [friendMean, enemyMean] = origin.map((players) => {
+          return {
+            value: mean(players, column),
+            len: players.length,
+          };
+        });
 
         const digit = column.digit();
-        result.values.get(shipType)!.friends.push(friendMean.toFixed(digit));
-        result.values.get(shipType)!.enemies.push(enemyMean.toFixed(digit));
-        result.values
-          .get(shipType)!
-          .diffs.push(deriveDiff(friendMean, enemyMean, digit));
+        const fixedFriendMean =
+          friendMean.len !== 0 ? friendMean.value.toFixed(digit) : "-";
+        const fixedEnemyMean =
+          enemyMean.len !== 0 ? enemyMean.value.toFixed(digit) : "-";
+        const fixedDiff = deriveDiff(friendMean, enemyMean, digit);
+
+        result.values.get(shipType)!.friends.push(fixedFriendMean);
+        result.values.get(shipType)!.enemies.push(fixedEnemyMean);
+        result.values.get(shipType)!.diffs.push(fixedDiff);
       });
     });
 
@@ -110,7 +118,7 @@ const validate = (battle: OptionalBattle): battle is data.Battle => {
     return false;
   }
 
-  if (battle.teams.length < 2) {
+  if (battle.teams.length !== 2) {
     return false;
   }
 
@@ -185,12 +193,15 @@ const mean = (players: data.Player[], column: SummaryColumn): number => {
     : 0;
 };
 
-const deriveDiff = (
-  friend: number,
-  enemy: number,
-  digit: number,
-): SummaryDiff => {
-  const diffNum = friend - enemy;
+const deriveDiff = (friend: Mean, enemy: Mean, digit: number): SummaryDiff => {
+  if (friend.len === 0 || enemy.len === 0) {
+    return {
+      diff: "-",
+      colorCode: "",
+    };
+  }
+
+  const diffNum = friend.value - enemy.value;
   const sign = diffNum > 0 ? "+" : "";
 
   let colorCode = "";
