@@ -116,8 +116,6 @@ func TestGetRequest(t *testing.T) {
 		}
 
 		for _, res := range responses {
-			res := res
-
 			t.Run(res.name, func(t *testing.T) {
 				t.Parallel()
 
@@ -227,8 +225,6 @@ func TestPostRequestJSON(t *testing.T) {
 		}
 
 		for _, res := range responses {
-			res := res
-
 			t.Run(res.name, func(t *testing.T) {
 				t.Parallel()
 

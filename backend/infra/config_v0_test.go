@@ -53,7 +53,7 @@ func TestConfigV0_User(t *testing.T) {
 		saved := fmt.Sprintf(`{"install_path": "%s","appid": "%s"}`, installPath, appid)
 		err := os.Mkdir(ConfigDir, os.ModePerm)
 		require.NoError(t, err)
-		err = os.WriteFile(filepath.Join(ConfigDir, UserConfigFile), []byte(saved), os.ModePerm)
+		err = os.WriteFile(filepath.Join(ConfigDir, UserConfigFile), []byte(saved), 0o600)
 		require.NoError(t, err)
 
 		instance := NewConfigV0()

@@ -24,7 +24,6 @@ func doParallel[T any](limit uint, values []T, fn func(value T) error) error {
 	eg.SetLimit(int(limit))
 
 	for _, v := range values {
-		v := v
 		eg.Go(func() error {
 			return fn(v)
 		})

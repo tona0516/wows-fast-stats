@@ -2,18 +2,6 @@
 linters:
   enable-all: true
   disable:
-    - scopelint # Deprecated
-    - golint # Deprecated
-    - nosnakecase # Deprecated
-    - ifshort # Deprecated
-    - maligned # Deprecated
-    - varcheck # Deprecated
-    - interfacer # Deprecated
-    - deadcode # Deprecated
-    - exhaustivestruct # Deprecated
-    - structcheck # Deprecated
-    - copyloopvar # Deprecated
-    - intrange # Deprecated
     - execinquery # Deprecated
     - wrapcheck
     - forbidigo

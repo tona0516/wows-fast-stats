@@ -14,7 +14,7 @@ func fieldQuery(target reflect.Type) string {
 }
 
 func fieldsRecursive(parentNames []string, t reflect.Type, result *[]string) {
-	for i := 0; i < t.NumField(); i++ {
+	for i := range t.NumField() {
 		field := t.Field(i)
 
 		if field.Type.Kind() == reflect.Struct {

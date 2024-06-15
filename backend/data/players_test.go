@@ -25,7 +25,7 @@ func TestPlayers_Sorter(t *testing.T) {
 		{ShipInfo: ShipInfo{Name: "SS-Z", Type: ShipTypeSS, Tier: 6, Nation: "japan"}},
 	}
 
-	for i := 0; i < 100; i++ {
+	for i := range 100 {
 		actual := make(Players, len(expected))
 		copy(actual, expected)
 		//nolint:gosec
