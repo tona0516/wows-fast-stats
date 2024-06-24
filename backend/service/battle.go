@@ -4,14 +4,15 @@ import (
 	"context"
 	"regexp"
 	"sort"
+	"strings"
 	"sync"
 	"wfs/backend/apperr"
 	"wfs/backend/data"
+	"wfs/backend/langdet"
 	"wfs/backend/repository"
 	"wfs/backend/yamibuka"
 
 	"github.com/morikuni/failure"
-	"github.com/rylans/getlang"
 )
 
 type Battle struct {
@@ -373,16 +374,17 @@ func (b *Battle) fetchClanLanguage(clanInfoArray []data.WGClansInfoData) map[str
 
 	var mu sync.Mutex
 	err := doParallel(uint(len(clanInfoArray)), clanInfoArray, func(clan data.WGClansInfoData) error {
-		// URLを空文字に置き換える
+		// URLを空文字に
 		description := re.ReplaceAllString(clan.Description, "")
+		// 改行を空文字に
+		description = strings.ReplaceAll(description, "\n", "")
 
 		if len(description) == 0 {
 			return nil
 		}
 
-		info := getlang.FromString(description)
 		mu.Lock()
-		result[clan.Tag] = info.LanguageCode()
+		result[clan.Tag] = string(langdet.Detect(clan.Tag, description))
 		mu.Unlock()
 
 		return nil

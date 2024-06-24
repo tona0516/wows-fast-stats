@@ -8,6 +8,8 @@ import (
 	"wfs/backend/service"
 
 	"github.com/morikuni/failure"
+	"github.com/wailsapp/wails/v2/pkg/logger"
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 type volatileData struct {
@@ -61,6 +63,7 @@ func NewApp(
 
 func (a *App) onStartup(ctx context.Context) {
 	a.ctx = ctx
+	runtime.LogSetLogLevel(ctx, logger.INFO)
 	a.logger.Init(ctx)
 }
 
