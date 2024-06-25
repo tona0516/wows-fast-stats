@@ -20,9 +20,11 @@ require (
 	github.com/morikuni/failure v1.1.2
 	github.com/shopspring/decimal v1.4.0
 	go.uber.org/mock v0.4.0
+	go.uber.org/ratelimit v0.3.1
 )
 
 require (
+	github.com/benbjohnson/clock v1.3.5 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/dgraph-io/ristretto v0.1.1 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect

@@ -16,7 +16,6 @@ import (
 )
 
 type Battle struct {
-	parallels      uint
 	wargaming      repository.WargamingInterface
 	uwargaming     repository.UnofficialWargamingInterface
 	numbers        repository.NumbersInterface
@@ -35,7 +34,6 @@ type Battle struct {
 }
 
 func NewBattle(
-	parallels uint,
 	wargaming repository.WargamingInterface,
 	uwargaming repository.UnofficialWargamingInterface,
 	localFile repository.LocalFileInterface,
@@ -46,7 +44,6 @@ func NewBattle(
 	eventsEmitFunc eventEmitFunc,
 ) *Battle {
 	return &Battle{
-		parallels:                          parallels,
 		wargaming:                          wargaming,
 		uwargaming:                         uwargaming,
 		localFile:                          localFile,
@@ -206,7 +203,7 @@ func (b *Battle) fetchWarships(appID string, channel chan data.Result[data.Warsh
 	addToResult(encycShips)
 
 	pages := makeRange(first+1, pageTotal+1)
-	err = doParallel(b.parallels, pages, func(page int) error {
+	err = doParallel(pages, func(page int) error {
 		res, _, err := b.wargaming.EncycShips(appID, page)
 		if err != nil {
 			return err
@@ -287,7 +284,7 @@ func (b *Battle) fetchAllPlayerShipsStats(
 ) {
 	shipStatsMap := make(data.AllPlayerShipsStats)
 	var mu sync.Mutex
-	err := doParallel(b.parallels, accountIDs, func(accountID int) error {
+	err := doParallel(accountIDs, func(accountID int) error {
 		shipStats, err := b.wargaming.ShipsStats(appID, accountID)
 		if err != nil {
 			return err
@@ -343,7 +340,7 @@ func (b *Battle) fetchClanColor(clanInfoArray []data.WGClansInfoData) map[string
 	result := make(map[string]string)
 
 	var mu sync.Mutex
-	err := doParallel(uint(len(clanInfoArray)), clanInfoArray, func(clan data.WGClansInfoData) error {
+	err := doParallel(clanInfoArray, func(clan data.WGClansInfoData) error {
 		autocomplete, err := b.uwargaming.ClansAutoComplete(clan.Tag)
 		if err != nil {
 			return err
@@ -373,7 +370,7 @@ func (b *Battle) fetchClanLanguage(clanInfoArray []data.WGClansInfoData) map[str
 	re := regexp.MustCompile(urlPattern)
 
 	var mu sync.Mutex
-	err := doParallel(uint(len(clanInfoArray)), clanInfoArray, func(clan data.WGClansInfoData) error {
+	err := doParallel(clanInfoArray, func(clan data.WGClansInfoData) error {
 		// URLを空文字に
 		description := re.ReplaceAllString(clan.Description, "")
 		// 改行を空文字に

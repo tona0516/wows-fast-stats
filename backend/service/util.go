@@ -19,9 +19,8 @@ func makeRange(min, max int) []int {
 	return a
 }
 
-func doParallel[T any](limit uint, values []T, fn func(value T) error) error {
+func doParallel[T any](values []T, fn func(value T) error) error {
 	eg, _ := errgroup.WithContext(context.Background())
-	eg.SetLimit(int(limit))
 
 	for _, v := range values {
 		eg.Go(func() error {

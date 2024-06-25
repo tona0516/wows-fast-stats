@@ -18,6 +18,7 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
+	"go.uber.org/ratelimit"
 )
 
 //go:embed all:frontend/dist
@@ -102,7 +103,7 @@ func initApp(env data.Env) *App {
 		URL:     "https://api.worldofwarships.asia",
 		Retry:   maxRetry,
 		Timeout: timeout,
-	})
+	}, ratelimit.New(10))
 	uwargaming := infra.NewUnofficialWargaming(infra.RequestConfig{
 		URL:     "https://clans.worldofwarships.asia",
 		Retry:   maxRetry,
@@ -128,12 +129,10 @@ func initApp(env data.Env) *App {
 	})
 
 	// usecase
-	var parallels uint = 5
 	watchInterval := 1 * time.Second
 	config := service.NewConfig(localFile, wargaming, storage, logger)
 	screenshot := service.NewScreenshot(localFile, logger)
 	battle := service.NewBattle(
-		parallels,
 		wargaming,
 		uwargaming,
 		localFile,

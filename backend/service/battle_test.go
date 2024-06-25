@@ -85,7 +85,6 @@ func TestBattle_Get_正常系_初回(t *testing.T) {
 
 	// テスト
 	b := NewBattle(
-		5,
 		mockWargaming,
 		mockUnofficialWargaming,
 		mockLocalFile,
@@ -152,7 +151,6 @@ func TestBattle_Get_正常系_2回目以降(t *testing.T) {
 
 	// テスト
 	b := NewBattle(
-		5,
 		mockWargaming,
 		mockUnofficialWargaming,
 		mockLocalFile,
@@ -182,7 +180,6 @@ func TestBattle_Get_異常系(t *testing.T) {
 
 	// テスト
 	b := NewBattle(
-		5,
 		nil,
 		nil,
 		mockLocalFile,

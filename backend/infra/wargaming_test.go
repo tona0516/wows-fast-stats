@@ -13,6 +13,7 @@ import (
 	"github.com/morikuni/failure"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/ratelimit"
 )
 
 const testAppID = "test_appid"
@@ -33,7 +34,7 @@ func TestWargaming_AccountInfo(t *testing.T) {
 
 		wargaming := NewWargaming(RequestConfig{
 			URL: server.URL,
-		})
+		}, ratelimit.New(10))
 
 		result, err := wargaming.AccountInfo(testAppID, []int{123, 456})
 		require.NoError(t, err)
@@ -63,7 +64,7 @@ func TestWargaming_AccountInfo(t *testing.T) {
 
 		wargaming := NewWargaming(RequestConfig{
 			URL: server.URL,
-		})
+		}, ratelimit.New(10))
 
 		_, err := wargaming.AccountInfo(testAppID, []int{123, 456})
 		code, ok := failure.CodeOf(err)
@@ -108,7 +109,7 @@ func TestWargaming_AccountInfo(t *testing.T) {
 			}))
 			defer server.Close()
 
-			wargaming := NewWargaming(RequestConfig{URL: server.URL, Retry: retry})
+			wargaming := NewWargaming(RequestConfig{URL: server.URL, Retry: retry}, ratelimit.New(10))
 
 			_, err := wargaming.AccountInfo(testAppID, []int{123, 456})
 
@@ -145,7 +146,7 @@ func TestWargaming_AccountInfo(t *testing.T) {
 			}))
 			defer server.Close()
 
-			wargaming := NewWargaming(RequestConfig{URL: server.URL, Retry: retry})
+			wargaming := NewWargaming(RequestConfig{URL: server.URL, Retry: retry}, ratelimit.New(10))
 
 			_, err := wargaming.AccountInfo(testAppID, []int{123, 456})
 
@@ -171,7 +172,7 @@ func TestWargaming_AccountListForSearch(t *testing.T) {
 
 	wargaming := NewWargaming(RequestConfig{
 		URL: server.URL,
-	})
+	}, ratelimit.New(10))
 
 	result, err := wargaming.AccountListForSearch(testAppID, "player")
 
@@ -193,7 +194,7 @@ func TestWargaming_ClansAccountInfo(t *testing.T) {
 
 	wargaming := NewWargaming(RequestConfig{
 		URL: server.URL,
-	})
+	}, ratelimit.New(10))
 
 	result, err := wargaming.ClansAccountInfo(testAppID, []int{123, 456})
 
@@ -215,7 +216,7 @@ func TestWargaming_ClansInfo(t *testing.T) {
 
 	wargaming := NewWargaming(RequestConfig{
 		URL: server.URL,
-	})
+	}, ratelimit.New(10))
 
 	result, err := wargaming.ClansInfo(testAppID, []int{123, 456})
 
@@ -237,7 +238,7 @@ func TestWargaming_ShipsStats(t *testing.T) {
 
 	wargaming := NewWargaming(RequestConfig{
 		URL: server.URL,
-	})
+	}, ratelimit.New(10))
 
 	result, err := wargaming.ShipsStats(testAppID, 123)
 
@@ -264,7 +265,7 @@ func TestWargaming_EncycShips(t *testing.T) {
 
 	wargaming := NewWargaming(RequestConfig{
 		URL: server.URL,
-	})
+	}, ratelimit.New(10))
 
 	result, pageTotal, err := wargaming.EncycShips(testAppID, 1)
 
@@ -281,7 +282,7 @@ func TestWargaming_EncycInfo(t *testing.T) {
 
 	wargaming := NewWargaming(RequestConfig{
 		URL: server.URL,
-	})
+	}, ratelimit.New(10))
 
 	result, err := wargaming.EncycInfo(testAppID)
 
@@ -303,7 +304,7 @@ func TestWargaming_BattleArena(t *testing.T) {
 
 	wargaming := NewWargaming(RequestConfig{
 		URL: server.URL,
-	})
+	}, ratelimit.New(10))
 
 	result, err := wargaming.BattleArenas(testAppID)
 
@@ -325,7 +326,7 @@ func TestWargaming_BattleTypes(t *testing.T) {
 
 	wargaming := NewWargaming(RequestConfig{
 		URL: server.URL,
-	})
+	}, ratelimit.New(10))
 	result, err := wargaming.BattleTypes(testAppID)
 
 	require.NoError(t, err)
@@ -340,7 +341,7 @@ func TestWargaming_Test(t *testing.T) {
 
 	wargaming := NewWargaming(RequestConfig{
 		URL: server.URL,
-	})
+	}, ratelimit.New(10))
 
 	valid, err := wargaming.Test("hoge")
 	assert.True(t, valid)

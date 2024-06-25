@@ -27,7 +27,7 @@ func TestUtil_doParallel(t *testing.T) {
 		values := makeRange(1, 5)
 
 		var calls int
-		err := doParallel(2, values, func(value int) error {
+		err := doParallel(values, func(value int) error {
 			calls++
 			return nil
 		})
@@ -41,7 +41,7 @@ func TestUtil_doParallel(t *testing.T) {
 		values := makeRange(1, 5)
 
 		expected := apperr.HTTPRequestError
-		err := doParallel(2, values, func(value int) error {
+		err := doParallel(values, func(value int) error {
 			if value == values[len(values)-1] {
 				return failure.New(expected)
 			}
