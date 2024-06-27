@@ -38,7 +38,7 @@ func TestConfig_UpdateRequired(t *testing.T) {
 		mockWargaming.EXPECT().Test(config.Appid).Return(true, nil)
 
 		mockStorage := repository.NewMockStorageInterface(ctrl)
-		mockStorage.EXPECT().UserConfigV2().Return(data.DefaultUserConfigV2, nil)
+		mockStorage.EXPECT().UserConfigV2().Return(data.DefaultUserConfigV2(), nil)
 		mockStorage.EXPECT().WriteUserConfigV2(config).Return(nil)
 
 		// テスト
@@ -51,7 +51,7 @@ func TestConfig_UpdateRequired(t *testing.T) {
 	})
 
 	t.Run("異常系_不正なインストールパス", func(t *testing.T) {
-		config := data.DefaultUserConfigV2
+		config := data.DefaultUserConfigV2()
 		config.InstallPath = "invalid/path" // Note: 不正なパス
 		config.Appid = "abc123"
 
@@ -96,11 +96,11 @@ func TestConfig_UpdateOptional(t *testing.T) {
 		config := createInputConfig()
 		config.FontSize = "small"
 		// Note: requiredな値を与えてもこれらの値はWriteUserConfigでは含まれない
-		actualWritten := data.DefaultUserConfigV2
+		actualWritten := data.DefaultUserConfigV2()
 		actualWritten.FontSize = "small"
 
 		mockStorage := repository.NewMockStorageInterface(ctrl)
-		mockStorage.EXPECT().UserConfigV2().Return(data.DefaultUserConfigV2, nil)
+		mockStorage.EXPECT().UserConfigV2().Return(data.DefaultUserConfigV2(), nil)
 		mockStorage.EXPECT().WriteUserConfigV2(actualWritten).Return(nil)
 
 		// テスト実行
@@ -233,7 +233,7 @@ func TestConfig_RemoveAlertPlayer(t *testing.T) {
 }
 
 func createInputConfig() data.UserConfigV2 {
-	config := data.DefaultUserConfigV2
+	config := data.DefaultUserConfigV2()
 	config.InstallPath = validInstallPath
 	config.Appid = validAppID
 

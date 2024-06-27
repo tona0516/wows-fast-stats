@@ -179,8 +179,14 @@ func (b *Battle) fetchWarships(appID string, channel chan data.Result[data.Warsh
 	var result data.Result[data.Warships]
 
 	var mu sync.Mutex
-	addToResult := func(encycShips data.WGEncycShips) {
-		for shipID, warship := range encycShips {
+
+	fetch := func(page int) (int, error) {
+		res, pageTotal, err := b.wargaming.EncycShips(appID, page)
+		if err != nil {
+			return 0, err
+		}
+
+		for shipID, warship := range res {
 			mu.Lock()
 			warships[shipID] = data.Warship{
 				Name:      warship.Name,
@@ -191,26 +197,21 @@ func (b *Battle) fetchWarships(appID string, channel chan data.Result[data.Warsh
 			}
 			mu.Unlock()
 		}
+		return pageTotal, nil
 	}
 
 	first := 1
-	encycShips, pageTotal, err := b.wargaming.EncycShips(appID, first)
+	pageTotal, err := fetch(first)
 	if err != nil {
 		result.Error = err
 		channel <- result
 		return
 	}
-	addToResult(encycShips)
 
 	pages := makeRange(first+1, pageTotal+1)
 	err = doParallel(pages, func(page int) error {
-		res, _, err := b.wargaming.EncycShips(appID, page)
-		if err != nil {
-			return err
-		}
-
-		addToResult(res)
-		return nil
+		_, err := fetch(page)
+		return err
 	})
 	if err != nil {
 		result.Error = err
@@ -254,7 +255,6 @@ func (b *Battle) fetchExpectedStats(channel chan data.Result[data.ExpectedStats]
 		return
 	}
 
-	// フェッチもキャッシュもできない場合、殻の構造体を返却して続行する
 	result.Error = failure.New(apperr.ExpectedStatsUnavaillalble, failure.Context{
 		"err_fetch": errFetch.Error(),
 		"err_cache": errCache.Error(),

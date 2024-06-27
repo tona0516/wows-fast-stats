@@ -44,7 +44,7 @@ func (s *Storage) WriteDataVersion(version uint) error {
 func (s *Storage) UserConfig() (data.UserConfig, error) {
 	config, err := read[data.UserConfig](s.db, userConfigKey)
 	if isErrKeyNotFound(err) {
-		return data.DefaultUserConfig, nil
+		return data.DefaultUserConfig(), nil
 	}
 
 	return config, err
@@ -62,7 +62,7 @@ func (s *Storage) IsExistUserConfig() bool {
 func (s *Storage) UserConfigV2() (data.UserConfigV2, error) {
 	config, err := read[data.UserConfigV2](s.db, userConfigKey)
 	if isErrKeyNotFound(err) {
-		return data.DefaultUserConfigV2, nil
+		return data.DefaultUserConfigV2(), nil
 	}
 
 	return config, err

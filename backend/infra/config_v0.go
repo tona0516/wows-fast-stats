@@ -31,9 +31,9 @@ func NewConfigV0() *ConfigV0 {
 }
 
 func (c *ConfigV0) User() (data.UserConfig, error) {
-	config, err := readJSON(c.userConfigPath, data.DefaultUserConfig)
+	config, err := readJSON(c.userConfigPath, data.DefaultUserConfig())
 	if err != nil && failure.Is(err, apperr.FileNotExist) {
-		return data.DefaultUserConfig, nil
+		return data.DefaultUserConfig(), nil
 	}
 
 	return config, err

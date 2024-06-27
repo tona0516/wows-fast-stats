@@ -2,14 +2,15 @@ package data
 
 type AlertPattern string
 
-//nolint:gochecknoglobals
-var AlertPatterns = []string{
-	"bi-check-circle-fill",
-	"bi-exclamation-triangle-fill",
-	"bi-patch-question-fill",
-	"bi-1-square-fill",
-	"bi-2-square-fill",
-	"bi-3-square-fill",
+func AlertPatterns() []string {
+	return []string{
+		"bi-check-circle-fill",
+		"bi-exclamation-triangle-fill",
+		"bi-patch-question-fill",
+		"bi-1-square-fill",
+		"bi-2-square-fill",
+		"bi-3-square-fill",
+	}
 }
 
 type AlertPlayer struct {

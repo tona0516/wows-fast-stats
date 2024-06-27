@@ -70,7 +70,7 @@ func TestStorage_UserConfig(t *testing.T) {
 	// 取得：保存されていない場合はデフォルト値を返却する
 	actual, err := storage.UserConfig()
 	require.NoError(t, err)
-	assert.Equal(t, data.DefaultUserConfig, actual)
+	assert.Equal(t, data.DefaultUserConfig(), actual)
 	assert.False(t, storage.IsExistUserConfig())
 
 	// 書き込み：正常系
@@ -105,7 +105,7 @@ func TestStorage_UserConfigV2(t *testing.T) {
 	// 取得：保存されていない場合はデフォルト値を返却する
 	actual, err := storage.UserConfigV2()
 	require.NoError(t, err)
-	assert.Equal(t, data.DefaultUserConfigV2, actual)
+	assert.Equal(t, data.DefaultUserConfigV2(), actual)
 
 	// 書き込み：正常系
 	expected := data.UserConfigV2{

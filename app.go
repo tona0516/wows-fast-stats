@@ -130,7 +130,7 @@ func (a *App) OpenDirectory(path string) error {
 }
 
 func (a *App) DefaultUserConfig() data.UserConfigV2 {
-	return data.DefaultUserConfigV2
+	return data.DefaultUserConfigV2()
 }
 
 func (a *App) UserConfig() (data.UserConfigV2, error) {
@@ -234,7 +234,7 @@ func (a *App) SearchPlayer(prefix string) data.WGAccountList {
 }
 
 func (a *App) AlertPatterns() []string {
-	return data.AlertPatterns
+	return data.AlertPatterns()
 }
 
 func (a *App) LogError(errString string, contexts map[string]string) {

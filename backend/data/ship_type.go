@@ -12,9 +12,8 @@ const (
 	ShipTypeNONE ShipType = "none"
 )
 
-//nolint:gochecknoglobals
-var (
-	shipTypeNames = map[string]ShipType{
+func shipTypeNames() map[string]ShipType {
+	return map[string]ShipType{
 		"AirCarrier": ShipTypeCV,
 		"Battleship": ShipTypeBB,
 		"Cruiser":    ShipTypeCL,
@@ -22,7 +21,10 @@ var (
 		"Submarine":  ShipTypeSS,
 		"Auxiliary":  ShipTypeAUX,
 	}
-	shipTypePriorities = []ShipType{
+}
+
+func shipTypePriorities() []ShipType {
+	return []ShipType{
 		ShipTypeCV,
 		ShipTypeBB,
 		ShipTypeCL,
@@ -30,9 +32,10 @@ var (
 		ShipTypeSS,
 		ShipTypeAUX,
 	}
-)
+}
 
 func NewShipType(raw string) ShipType {
+	shipTypeNames := shipTypeNames()
 	shipType, ok := shipTypeNames[raw]
 	if !ok {
 		return ShipTypeNONE
@@ -42,6 +45,7 @@ func NewShipType(raw string) ShipType {
 }
 
 func (s ShipType) Priority() int {
+	shipTypePriorities := shipTypePriorities()
 	for i, shipType := range shipTypePriorities {
 		if shipType == s {
 			return i

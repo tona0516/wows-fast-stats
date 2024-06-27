@@ -2,13 +2,14 @@ package data
 
 type StatsPattern string
 
-//nolint:gochecknoglobals
-var StatsPatterns = []string{
-	StatsPatternPvPAll,
-	StatsPatternPvPSolo,
-}
-
 const (
 	StatsPatternPvPAll  = "pvp_all"
 	StatsPatternPvPSolo = "pvp_solo"
 )
+
+func StatsPatterns() []string {
+	return []string{
+		StatsPatternPvPAll,
+		StatsPatternPvPSolo,
+	}
+}

@@ -1,89 +1,90 @@
 package data
 
-//nolint:gochecknoglobals
-var DefaultUserConfigV2 = UserConfigV2{
-	Version:         2,
-	FontSize:        "medium",
-	SendReport:      true,
-	NotifyUpdatable: true,
-	StatsPattern:    StatsPatternPvPAll,
-	Display: UCDisplay{
-		Ship: UCDisplayShip{
-			PR:      true,
-			Damage:  true,
-			WinRate: true,
-			Battles: true,
-		},
-		Overall: UCDisplayOverall{
-			Damage:  true,
-			WinRate: true,
-			Battles: true,
-		},
-	},
-	Color: UCColor{
-		Skill: UCSkillColor{
-			Text: UCSkillColorCode{
-				Bad:         "#ff382d",
-				BelowAvg:    "#fd9234",
-				Avg:         "#ffd351",
-				Good:        "#57e500",
-				VeryGood:    "#44b200",
-				Great:       "#02f7da",
-				Unicum:      "#da6ff5",
-				SuperUnicum: "#bf15ee",
+func DefaultUserConfigV2() UserConfigV2 {
+	return UserConfigV2{
+		Version:         2,
+		FontSize:        "medium",
+		SendReport:      true,
+		NotifyUpdatable: true,
+		StatsPattern:    StatsPatternPvPAll,
+		Display: UCDisplay{
+			Ship: UCDisplayShip{
+				PR:      true,
+				Damage:  true,
+				WinRate: true,
+				Battles: true,
+			},
+			Overall: UCDisplayOverall{
+				Damage:  true,
+				WinRate: true,
+				Battles: true,
 			},
 		},
-		Tier: UCTierColor{
-			Own: UCTierColorCode{
-				Low:    "#8CA113",
-				Middle: "#205B85",
-				High:   "#990F4F",
+		Color: UCColor{
+			Skill: UCSkillColor{
+				Text: UCSkillColorCode{
+					Bad:         "#ff382d",
+					BelowAvg:    "#fd9234",
+					Avg:         "#ffd351",
+					Good:        "#57e500",
+					VeryGood:    "#44b200",
+					Great:       "#02f7da",
+					Unicum:      "#da6ff5",
+					SuperUnicum: "#bf15ee",
+				},
 			},
-			Other: UCTierColorCode{
-				Low:    "#E6F5B0",
-				Middle: "#B3D7DD",
-				High:   "#E3ADD5",
+			Tier: UCTierColor{
+				Own: UCTierColorCode{
+					Low:    "#8CA113",
+					Middle: "#205B85",
+					High:   "#990F4F",
+				},
+				Other: UCTierColorCode{
+					Low:    "#E6F5B0",
+					Middle: "#B3D7DD",
+					High:   "#E3ADD5",
+				},
 			},
+			ShipType: UCShipTypeColor{
+				Own: UCShipTypeColorCode{
+					CV: "#5E2883",
+					BB: "#CA1028",
+					CL: "#27853F",
+					DD: "#D9760F",
+					SS: "#233B8B",
+				},
+				Other: UCShipTypeColorCode{
+					CV: "#CAB2D6",
+					BB: "#FBB4C4",
+					CL: "#CCEBC5",
+					DD: "#FEE6AA",
+					SS: "#B3CDE3",
+				},
+			},
+			PlayerName: PlayerNameColorShip,
 		},
-		ShipType: UCShipTypeColor{
-			Own: UCShipTypeColorCode{
-				CV: "#5E2883",
-				BB: "#CA1028",
-				CL: "#27853F",
-				DD: "#D9760F",
-				SS: "#233B8B",
-			},
-			Other: UCShipTypeColorCode{
-				CV: "#CAB2D6",
-				BB: "#FBB4C4",
-				CL: "#CCEBC5",
-				DD: "#FEE6AA",
-				SS: "#B3CDE3",
-			},
+		Digit: UCDigit{
+			PR:                0,
+			Damage:            0,
+			WinRate:           1,
+			KdRate:            2,
+			Kill:              2,
+			PlanesKilled:      1,
+			Exp:               0,
+			Battles:           0,
+			SurvivedRate:      1,
+			HitRate:           1,
+			AvgTier:           2,
+			UsingShipTypeRate: 1,
+			UsingTierRate:     1,
+			PlatoonRate:       1,
+			ThreatLevel:       0,
 		},
-		PlayerName: PlayerNameColorShip,
-	},
-	Digit: UCDigit{
-		PR:                0,
-		Damage:            0,
-		WinRate:           1,
-		KdRate:            2,
-		Kill:              2,
-		PlanesKilled:      1,
-		Exp:               0,
-		Battles:           0,
-		SurvivedRate:      1,
-		HitRate:           1,
-		AvgTier:           2,
-		UsingShipTypeRate: 1,
-		UsingTierRate:     1,
-		PlatoonRate:       1,
-		ThreatLevel:       0,
-	},
-	TeamSummary: UCTeamSummary{
-		MinShipBattles:    1,
-		MinOverallBattles: 10,
-	},
+		TeamSummary: UCTeamSummary{
+			MinShipBattles:    1,
+			MinOverallBattles: 10,
+		},
+	}
 }
 
 type UserConfigV2 struct {

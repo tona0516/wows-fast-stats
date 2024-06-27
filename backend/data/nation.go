@@ -2,9 +2,8 @@ package data
 
 type Nation string
 
-//nolint:gochecknoglobals
-var (
-	nations = []string{
+func nations() []string {
+	return []string{
 		"japan",
 		"usa",
 		"ussr",
@@ -19,9 +18,10 @@ var (
 		"pan_america",
 		"spain",
 	}
-)
+}
 
 func (n Nation) Priority() int {
+	nations := nations()
 	for i, nation := range nations {
 		if nation == string(n) {
 			return i

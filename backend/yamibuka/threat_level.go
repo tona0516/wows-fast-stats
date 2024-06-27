@@ -7,88 +7,94 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-//nolint:gochecknoglobals
-var specialAAShips = map[int]struct {
+type specialAAShipMap map[int]struct {
 	avg  float64
 	coef float64
-}{
-	4179539920: {avg: 4.2, coef: 0.1},   // Minotaur
-	4273911792: {avg: 4.4, coef: 0.1},   // Des Moines
-	4180588496: {avg: 3.3, coef: 0.075}, // Neptune
-	4277057520: {avg: 3.6, coef: 0.05},  // Baltimore
-	3762206160: {avg: 2.8, coef: 0.05},  // Kutuzov
-	4280203248: {avg: 2.3, coef: 0.05},  // New Orleans
-	3553540080: {avg: 5.9, coef: 0.1},   // Flint
-	4288591856: {avg: 3.3, coef: 0.1},   // Atlanta
-	3763255248: {avg: 1.5, coef: 0.025}, // Belfast
-	4282300400: {avg: 1.8, coef: 0.05},  // Pensacola
-	4287543280: {avg: 3.0, coef: 0.05},  // Cleveland
-	4272830448: {avg: 1.1, coef: 0.025}, // Fletcher
-	4264441840: {avg: 0.7, coef: 0.025}, // Sims
-	4074649040: {avg: 1.9, coef: 0.025}, // Grozovoi
-	4181604048: {avg: 0.7, coef: 0.025}, // Akizuki
 }
 
-//nolint:gochecknoglobals
-var specialShipScores = map[int]float64{
-	3553540080: 1.25,  // Flint
-	3551410160: 1.3,   // Black
-	3763255248: 1.2,   // Belfast
-	3763320816: 1.25,  // Saipan
-	4293866960: 1.15,  // Nikolai
-	4267587280: 1.175, // KamikazeR
-	4293801424: 1.2,   // Gremyashchy
-	4255037136: 1.15,  // Atago
-	4180555568: 1.075, // Z-46
-	3764336624: 1.075, // Arizona
-	3761190896: 1.125, // Missouri
-	4272830448: 1.1,   // Fletcher
-	4264441840: 1.075, // Sims
-	4182718256: 1.1,   // Gneisenau
-	3763287856: 1.075, // Scharnhorst
-	4179572528: 1.1,   // Großer Kurfürst
-	4281219056: 1.05,  // Gearing
-	4279219920: 1.05,  // Taiho
-	4277122768: 1.05,  // Hakuryu
-	4179506992: 1.1,   // Z-52
-	4273911792: 1.05,  // Des Moines
-	3762206160: 1.15,  // Kutuzov
-	3552491216: 1.1,   // ARP Takao
+type specialShipScoreMap map[int]float64
 
-	// マイナス補正
-	4281317360: 0.8,   // Essex
-	4282365936: 0.85,  // Lexington
-	4284463088: 0.8,   // Ranger
-	4282300400: 0.9,   // Pensacola
-	4277057520: 0.925, // Baltimore
-	4288657392: 0.85,  // Independence
-	4183701200: 0.875, // Fubuki
-	4184749776: 0.875, // Mutsuki
-	4076746448: 0.9,   // Kagero
-	4282267344: 0.9,   // Shimakaze
-	4280203248: 0.925, // New Orleans
-	3553539792: 0.9,   // ARP Ashigara
-	4286494416: 0.95,  // Myoko
-	3522082512: 0.9,   // ARP Nachi
-	3543054032: 0.95,  // Southern Dragon
-	4182685488: 0.9,   // Yorck
-	4288591856: 0.9,   // Atlanta
-	4183734064: 0.9,   // Nürnberg
-	3762206512: 0.9,   // Prinz Eugen
-	4272895696: 0.9,   // Izumo
-	4288559088: 0.925, // Mahan
-	4182652624: 0.85,  // Akatsuki
-	4180555216: 0.9,   // Kiev
-	4076746192: 0.9,   // Ognevoi
-	4288558800: 0.9,   // Hatsuharu
-	3865982416: 0.85,  // Tashkent
-	4074649040: 0.85,  // Grozovoi
-	4184782672: 0.9,   // Émile Bertin
-	4183734096: 0.85,  // La Galissonnière
-	4182685520: 0.925, // Algérie
-	4181636944: 0.9,   // Charles Martel
-	4179539792: 0.875, // Henri IV
-	3763320528: 0.9,   // Kaga
+func specialAAShips() specialAAShipMap {
+	return specialAAShipMap{
+		4179539920: {avg: 4.2, coef: 0.1},   // Minotaur
+		4273911792: {avg: 4.4, coef: 0.1},   // Des Moines
+		4180588496: {avg: 3.3, coef: 0.075}, // Neptune
+		4277057520: {avg: 3.6, coef: 0.05},  // Baltimore
+		3762206160: {avg: 2.8, coef: 0.05},  // Kutuzov
+		4280203248: {avg: 2.3, coef: 0.05},  // New Orleans
+		3553540080: {avg: 5.9, coef: 0.1},   // Flint
+		4288591856: {avg: 3.3, coef: 0.1},   // Atlanta
+		3763255248: {avg: 1.5, coef: 0.025}, // Belfast
+		4282300400: {avg: 1.8, coef: 0.05},  // Pensacola
+		4287543280: {avg: 3.0, coef: 0.05},  // Cleveland
+		4272830448: {avg: 1.1, coef: 0.025}, // Fletcher
+		4264441840: {avg: 0.7, coef: 0.025}, // Sims
+		4074649040: {avg: 1.9, coef: 0.025}, // Grozovoi
+		4181604048: {avg: 0.7, coef: 0.025}, // Akizuki
+	}
+}
+
+func specialShipScores() specialShipScoreMap {
+	return specialShipScoreMap{
+		3553540080: 1.25,  // Flint
+		3551410160: 1.3,   // Black
+		3763255248: 1.2,   // Belfast
+		3763320816: 1.25,  // Saipan
+		4293866960: 1.15,  // Nikolai
+		4267587280: 1.175, // KamikazeR
+		4293801424: 1.2,   // Gremyashchy
+		4255037136: 1.15,  // Atago
+		4180555568: 1.075, // Z-46
+		3764336624: 1.075, // Arizona
+		3761190896: 1.125, // Missouri
+		4272830448: 1.1,   // Fletcher
+		4264441840: 1.075, // Sims
+		4182718256: 1.1,   // Gneisenau
+		3763287856: 1.075, // Scharnhorst
+		4179572528: 1.1,   // Großer Kurfürst
+		4281219056: 1.05,  // Gearing
+		4279219920: 1.05,  // Taiho
+		4277122768: 1.05,  // Hakuryu
+		4179506992: 1.1,   // Z-52
+		4273911792: 1.05,  // Des Moines
+		3762206160: 1.15,  // Kutuzov
+		3552491216: 1.1,   // ARP Takao
+
+		// マイナス補正
+		4281317360: 0.8,   // Essex
+		4282365936: 0.85,  // Lexington
+		4284463088: 0.8,   // Ranger
+		4282300400: 0.9,   // Pensacola
+		4277057520: 0.925, // Baltimore
+		4288657392: 0.85,  // Independence
+		4183701200: 0.875, // Fubuki
+		4184749776: 0.875, // Mutsuki
+		4076746448: 0.9,   // Kagero
+		4282267344: 0.9,   // Shimakaze
+		4280203248: 0.925, // New Orleans
+		3553539792: 0.9,   // ARP Ashigara
+		4286494416: 0.95,  // Myoko
+		3522082512: 0.9,   // ARP Nachi
+		3543054032: 0.95,  // Southern Dragon
+		4182685488: 0.9,   // Yorck
+		4288591856: 0.9,   // Atlanta
+		4183734064: 0.9,   // Nürnberg
+		3762206512: 0.9,   // Prinz Eugen
+		4272895696: 0.9,   // Izumo
+		4288559088: 0.925, // Mahan
+		4182652624: 0.85,  // Akatsuki
+		4180555216: 0.9,   // Kiev
+		4076746192: 0.9,   // Ognevoi
+		4288558800: 0.9,   // Hatsuharu
+		3865982416: 0.85,  // Tashkent
+		4074649040: 0.85,  // Grozovoi
+		4184782672: 0.9,   // Émile Bertin
+		4183734096: 0.85,  // La Galissonnière
+		4182685520: 0.925, // Algérie
+		4181636944: 0.9,   // Charles Martel
+		4179539792: 0.875, // Henri IV
+		3763320528: 0.9,   // Kaga
+	}
 }
 
 func CalculateThreatLevel(f ThreatLevelFactor) data.ThreatLevel {
@@ -368,6 +374,7 @@ func antiAirCoefficient(
 	shipID int,
 	shipAvgPlanesKilled float64,
 ) float64 {
+	specialAAShips := specialAAShips()
 	specialAAShip, ok := specialAAShips[shipID]
 	if !ok {
 		return 1.0
@@ -396,6 +403,7 @@ func shipClassScore(
 	shipTier := warship.Tier
 
 	// 特別補正艦はベースをその値にする
+	specialShipScores := specialShipScores()
 	score, ok := specialShipScores[shipID]
 	if ok {
 		result = score
