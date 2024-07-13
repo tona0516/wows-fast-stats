@@ -1,43 +1,42 @@
 package infra
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
+	"time"
 	"wfs/backend/apperr"
-	"wfs/backend/infra/webapi"
 
+	"github.com/go-resty/resty/v2"
 	"github.com/morikuni/failure"
 )
 
 type Discord struct {
-	config RequestConfig
+	baseURL string
 }
 
-type DiscordRequestBody struct {
-	Content string `json:"content"`
-}
-
-func NewDiscord(config RequestConfig) *Discord {
-	return &Discord{config: config}
+func NewDiscord(baseURL string) *Discord {
+	return &Discord{baseURL: baseURL}
 }
 
 func (d *Discord) Comment(message string) error {
-	res, err := webapi.PostRequestJSON[DiscordRequestBody, any](
-		d.config.URL,
-		d.config.Timeout,
-		DiscordRequestBody{Content: message},
-		d.config.Transport,
-	)
+	client := resty.New().
+		SetTimeout(5 * time.Second)
+
+	resp, err := client.R().
+		SetBody(fmt.Sprintf(`{"content": "%s"}`, message)).
+		Post(d.baseURL)
+
 	errCtx := failure.Context{
-		"url":         res.Request.URL,
-		"status_code": strconv.Itoa(res.StatusCode),
-		"body":        string(res.BodyByte),
+		"url":         d.baseURL,
+		"status_code": strconv.Itoa(resp.StatusCode()),
+		"body":        string(resp.Body()),
 	}
 	if err != nil {
 		return failure.Wrap(err, errCtx)
 	}
 
-	if res.StatusCode != http.StatusOK {
+	if resp.StatusCode() != http.StatusOK {
 		return failure.New(apperr.DiscordAPISendLogError, errCtx)
 	}
 

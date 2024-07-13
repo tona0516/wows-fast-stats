@@ -1,28 +1,30 @@
 package infra
 
 import (
+	"encoding/json"
+	"net/http"
 	"strconv"
 	"strings"
+	"time"
 	"wfs/backend/apperr"
 	"wfs/backend/data"
 	"wfs/backend/infra/response"
-	"wfs/backend/infra/webapi"
 
-	"github.com/cenkalti/backoff/v4"
+	"github.com/go-resty/resty/v2"
 	"github.com/morikuni/failure"
 	"go.uber.org/ratelimit"
 	"golang.org/x/exp/slices"
 )
 
 type Wargaming struct {
-	config RequestConfig
-	rl     ratelimit.Limiter
+	baseURL string
+	rl      ratelimit.Limiter
 }
 
-func NewWargaming(config RequestConfig, rl ratelimit.Limiter) *Wargaming {
+func NewWargaming(baseURL string, rl ratelimit.Limiter) *Wargaming {
 	return &Wargaming{
-		config: config,
-		rl:     rl,
+		baseURL: baseURL,
+		rl:      rl,
 	}
 }
 
@@ -202,40 +204,70 @@ func (w *Wargaming) Test(appID string) (bool, error) {
 	return err == nil, err
 }
 
+func convertWGError(body []byte) error {
+	resp := response.WGResponseCommon[any]{}
+	if err := json.Unmarshal(body, &resp); err != nil {
+		return failure.Wrap(err)
+	}
+
+	if resp.Status == "error" {
+		// Note:
+		// https://developers.wargaming.net/documentation/guide/getting-started/#common-errors
+		message := resp.Error.Message
+		if slices.Contains([]string{"REQUEST_LIMIT_EXCEEDED", "SOURCE_NOT_AVAILABLE"}, message) {
+			return failure.New(apperr.WGAPITemporaryUnavaillalble)
+		}
+
+		return failure.New(apperr.WGAPIError)
+	}
+
+	return nil
+}
+
 func request[T response.WGResponse](
 	w *Wargaming,
 	path string,
 	queries map[string]string,
 ) (T, error) {
-	url := w.config.URL + path
-	b := backoff.WithMaxRetries(backoff.NewExponentialBackOff(), w.config.Retry)
-	operation := func() (webapi.Response[any, T], error) {
-		w.rl.Take()
-		res, err := webapi.GetRequest[T](url, w.config.Timeout, queries, w.config.Transport)
-		errCtx := failure.Context{
-			"url":         res.Request.URL,
-			"status_code": strconv.Itoa(res.StatusCode),
-			"body":        string(res.BodyByte),
-		}
+	w.rl.Take()
 
-		if err != nil {
-			return res, failure.Wrap(err, errCtx)
-		}
-
-		if res.Body.GetStatus() == "error" {
-			// Note:
-			// https://developers.wargaming.net/documentation/guide/getting-started/#common-errors
-			message := res.Body.GetError().Message
-			if slices.Contains([]string{"REQUEST_LIMIT_EXCEEDED", "SOURCE_NOT_AVAILABLE"}, message) {
-				return res, failure.New(apperr.WGAPITemporaryUnavaillalble, errCtx)
+	client := resty.New().
+		SetTimeout(5 * time.Second).
+		SetRetryCount(2).
+		AddRetryCondition(func(resp *resty.Response, err error) bool {
+			if err != nil {
+				return true
 			}
 
-			return res, backoff.Permanent(failure.New(apperr.WGAPIError, errCtx))
-		}
+			if err := convertWGError(resp.Body()); failure.Is(err, apperr.WGAPITemporaryUnavaillalble) {
+				return true
+			}
 
-		return res, nil
+			return false
+		})
+
+	var result T
+	resp, err := client.R().
+		SetResult(&result).
+		SetQueryParams(queries).
+		Get(w.baseURL + path)
+
+	errCtx := failure.Context{
+		"url":         resp.Request.URL,
+		"status_code": strconv.Itoa(resp.StatusCode()),
+		"body":        string(resp.Body()),
 	}
-	res, err := backoff.RetryWithData(operation, b)
+	if err != nil {
+		return result, failure.Wrap(err, errCtx)
+	}
 
-	return res.Body, failure.Wrap(err)
+	if resp.StatusCode() != http.StatusOK {
+		return result, failure.New(apperr.GithubAPICheckUpdateError, errCtx)
+	}
+
+	if err := convertWGError(resp.Body()); err != nil {
+		return result, failure.Wrap(err, errCtx)
+	}
+
+	return result, nil
 }

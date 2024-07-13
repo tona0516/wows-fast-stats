@@ -32,9 +32,7 @@ func TestUnofficialWargaming_AccountListForSearch(t *testing.T) {
 		server := simpleMockServer(200, expected)
 		defer server.Close()
 
-		uwargaming := NewUnofficialWargaming(RequestConfig{
-			URL: server.URL,
-		})
+		uwargaming := NewUnofficialWargaming(server.URL)
 
 		result, err := uwargaming.ClansAutoComplete("TEST")
 
@@ -61,9 +59,7 @@ func TestUnofficialWargaming_AccountListForSearch(t *testing.T) {
 		}))
 		defer server.Close()
 
-		uwargaming := NewUnofficialWargaming(RequestConfig{
-			URL: server.URL,
-		})
+		uwargaming := NewUnofficialWargaming(server.URL)
 
 		_, err := uwargaming.ClansAutoComplete("")
 

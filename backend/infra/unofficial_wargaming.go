@@ -3,51 +3,48 @@ package infra
 import (
 	"net/http"
 	"strconv"
+	"time"
 	"wfs/backend/apperr"
 	"wfs/backend/data"
-	"wfs/backend/infra/webapi"
 
-	"github.com/cenkalti/backoff/v4"
+	"github.com/go-resty/resty/v2"
 	"github.com/morikuni/failure"
 )
 
 type UnofficialWargaming struct {
-	config RequestConfig
+	baseURL string
 }
 
-func NewUnofficialWargaming(config RequestConfig) *UnofficialWargaming {
-	return &UnofficialWargaming{config: config}
+func NewUnofficialWargaming(baseURL string) *UnofficialWargaming {
+	return &UnofficialWargaming{baseURL: baseURL}
 }
 
 func (w *UnofficialWargaming) ClansAutoComplete(search string) (data.UWGClansAutocomplete, error) {
-	b := backoff.WithMaxRetries(backoff.NewExponentialBackOff(), w.config.Retry)
-	operation := func() (webapi.Response[any, data.UWGClansAutocomplete], error) {
-		res, err := webapi.GetRequest[data.UWGClansAutocomplete](
-			w.config.URL+"/api/search/autocomplete/",
-			w.config.Timeout,
-			map[string]string{
-				"search": search,
-				"type":   "clans",
-			},
-			w.config.Transport,
-		)
-		errCtx := failure.Context{
-			"url":         res.Request.URL,
-			"status_code": strconv.Itoa(res.StatusCode),
-			"body":        string(res.BodyByte),
-		}
-		if err != nil {
-			return res, failure.Wrap(err, errCtx)
-		}
+	client := resty.New().
+		SetTimeout(5 * time.Second).
+		SetRetryCount(2)
 
-		if res.StatusCode != http.StatusOK {
-			return res, failure.New(apperr.UWGAPIError, errCtx)
-		}
+	var result data.UWGClansAutocomplete
+	resp, err := client.R().
+		SetResult(&result).
+		SetQueryParams(map[string]string{
+			"search": search,
+			"type":   "clans",
+		}).
+		Get(w.baseURL + "/api/search/autocomplete/")
 
-		return res, nil
+	errCtx := failure.Context{
+		"url":         resp.Request.URL,
+		"status_code": strconv.Itoa(resp.StatusCode()),
+		"body":        string(resp.Body()),
+	}
+	if err != nil {
+		return result, failure.Wrap(err, errCtx)
 	}
 
-	res, err := backoff.RetryWithData(operation, b)
+	if resp.StatusCode() != http.StatusOK {
+		return result, failure.New(apperr.UWGAPIError, errCtx)
+	}
 
-	return res.Body, failure.Wrap(err)
+	return result, failure.Wrap(err)
 }

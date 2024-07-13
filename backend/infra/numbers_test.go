@@ -26,7 +26,7 @@ func TestNumbers_ExpectedStats(t *testing.T) {
 		defer server.Close()
 
 		// テスト
-		numbers := NewNumbers(RequestConfig{URL: server.URL})
+		numbers := NewNumbers(server.URL)
 		actual, err := numbers.ExpectedStats()
 		require.NoError(t, err)
 
@@ -56,7 +56,7 @@ func TestNumbers_ExpectedStats(t *testing.T) {
 		defer server.Close()
 
 		// テスト
-		numbers := NewNumbers(RequestConfig{URL: server.URL})
+		numbers := NewNumbers(server.URL)
 		_, err := numbers.ExpectedStats()
 
 		// アサーション

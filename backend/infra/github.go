@@ -3,48 +3,44 @@ package infra
 import (
 	"net/http"
 	"strconv"
+	"time"
 	"wfs/backend/apperr"
 	"wfs/backend/data"
-	"wfs/backend/infra/webapi"
 
-	"github.com/cenkalti/backoff/v4"
+	"github.com/go-resty/resty/v2"
 	"github.com/morikuni/failure"
 )
 
 type Github struct {
-	config RequestConfig
+	baseURL string
 }
 
-func NewGithub(config RequestConfig) *Github {
-	return &Github{config: config}
+func NewGithub(baseURL string) *Github {
+	return &Github{baseURL: baseURL}
 }
 
 func (g *Github) LatestRelease() (data.GHLatestRelease, error) {
-	b := backoff.WithMaxRetries(backoff.NewExponentialBackOff(), g.config.Retry)
-	operation := func() (webapi.Response[any, data.GHLatestRelease], error) {
-		res, err := webapi.GetRequest[data.GHLatestRelease](
-			g.config.URL+"/repos/tona0516/wows-fast-stats/releases/latest",
-			g.config.Timeout,
-			nil,
-			g.config.Transport,
-		)
-		errCtx := failure.Context{
-			"url":         res.Request.URL,
-			"status_code": strconv.Itoa(res.StatusCode),
-			"body":        string(res.BodyByte),
-		}
-		if err != nil {
-			return res, failure.Wrap(err, errCtx)
-		}
+	client := resty.New().
+		SetTimeout(5 * time.Second).
+		SetRetryCount(2)
 
-		if res.StatusCode != http.StatusOK {
-			return res, failure.New(apperr.GithubAPICheckUpdateError, errCtx)
-		}
+	var result data.GHLatestRelease
+	resp, err := client.R().
+		SetResult(&result).
+		Get(g.baseURL + "/repos/tona0516/wows-fast-stats/releases/latest")
 
-		return res, nil
+	errCtx := failure.Context{
+		"url":         resp.Request.URL,
+		"status_code": strconv.Itoa(resp.StatusCode()),
+		"body":        string(resp.Body()),
+	}
+	if err != nil {
+		return result, failure.Wrap(err, errCtx)
 	}
 
-	res, err := backoff.RetryWithData(operation, b)
+	if resp.StatusCode() != http.StatusOK {
+		return result, failure.New(apperr.GithubAPICheckUpdateError, errCtx)
+	}
 
-	return res.Body, failure.Wrap(err)
+	return result, failure.Wrap(err)
 }

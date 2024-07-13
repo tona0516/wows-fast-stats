@@ -3,48 +3,44 @@ package infra
 import (
 	"net/http"
 	"strconv"
+	"time"
 	"wfs/backend/apperr"
 	"wfs/backend/data"
-	"wfs/backend/infra/webapi"
 
-	"github.com/cenkalti/backoff/v4"
+	"github.com/go-resty/resty/v2"
 	"github.com/morikuni/failure"
 )
 
 type Numbers struct {
-	config RequestConfig
+	baseURL string
 }
 
-func NewNumbers(config RequestConfig) *Numbers {
-	return &Numbers{config: config}
+func NewNumbers(baseURL string) *Numbers {
+	return &Numbers{baseURL: baseURL}
 }
 
 func (n *Numbers) ExpectedStats() (data.ExpectedStats, error) {
-	b := backoff.WithMaxRetries(backoff.NewExponentialBackOff(), n.config.Retry)
-	operation := func() (webapi.Response[any, data.NSExpectedStats], error) {
-		res, err := webapi.GetRequest[data.NSExpectedStats](
-			n.config.URL+"/personal/rating/expected/json/",
-			n.config.Timeout,
-			nil,
-			n.config.Transport,
-		)
-		errCtx := failure.Context{
-			"url":         res.Request.URL,
-			"status_code": strconv.Itoa(res.StatusCode),
-			"body":        string(res.BodyByte),
-		}
-		if err != nil {
-			return res, failure.Wrap(err, errCtx)
-		}
+	client := resty.New().
+		SetTimeout(5 * time.Second).
+		SetRetryCount(2)
 
-		if res.StatusCode != http.StatusOK {
-			return res, failure.New(apperr.NumbersAPIError, errCtx)
-		}
+	var result data.NSExpectedStats
+	resp, err := client.R().
+		SetResult(&result).
+		Get(n.baseURL + "/personal/rating/expected/json/")
 
-		return res, nil
+	errCtx := failure.Context{
+		"url":         resp.Request.URL,
+		"status_code": strconv.Itoa(resp.StatusCode()),
+		"body":        string(resp.Body()),
+	}
+	if err != nil {
+		return result.Data, failure.Wrap(err, errCtx)
 	}
 
-	res, err := backoff.RetryWithData(operation, b)
+	if resp.StatusCode() != http.StatusOK {
+		return result.Data, failure.New(apperr.NumbersAPIError, errCtx)
+	}
 
-	return res.Body.Data, failure.Wrap(err)
+	return result.Data, failure.Wrap(err)
 }

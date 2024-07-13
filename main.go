@@ -1,10 +1,8 @@
 package main
 
 import (
-	"crypto/tls"
 	"embed"
 	"fmt"
-	"net/http"
 	"os"
 	"strconv"
 	"time"
@@ -72,20 +70,8 @@ func main() {
 }
 
 func initApp(env data.Env) *App {
-	// infra
-	var maxRetry uint64 = 2
-	timeout := 5 * time.Second
-
-	alertDiscord := infra.NewDiscord(infra.RequestConfig{
-		URL:     AlertDiscordWebhookURL,
-		Retry:   maxRetry,
-		Timeout: timeout,
-	})
-	infoDiscord := infra.NewDiscord(infra.RequestConfig{
-		URL:     InfoDiscordWebhookURL,
-		Retry:   maxRetry,
-		Timeout: timeout,
-	})
+	alertDiscord := infra.NewDiscord(AlertDiscordWebhookURL)
+	infoDiscord := infra.NewDiscord(InfoDiscordWebhookURL)
 	db, err := badger.Open(badger.DefaultOptions("./persistent_data"))
 	if err != nil {
 		logger := infra.NewLogger(env, alertDiscord, infoDiscord)
@@ -99,34 +85,13 @@ func initApp(env data.Env) *App {
 	logger := infra.NewLogger(env, alertDiscord, infoDiscord)
 	logger.SetOwnIGN(ownIGN)
 
-	wargaming := infra.NewWargaming(infra.RequestConfig{
-		URL:     "https://api.worldofwarships.asia",
-		Retry:   maxRetry,
-		Timeout: timeout,
-	}, ratelimit.New(10))
-	uwargaming := infra.NewUnofficialWargaming(infra.RequestConfig{
-		URL:     "https://clans.worldofwarships.asia",
-		Retry:   maxRetry,
-		Timeout: timeout,
-	})
-	numbers := infra.NewNumbers(infra.RequestConfig{
-		URL:     "https://api.wows-numbers.com",
-		Retry:   maxRetry,
-		Timeout: timeout,
-		// workaround for expired SSL certificate
-		Transport: &http.Transport{
-			//nolint:gosec
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-		},
-	})
+	wargaming := infra.NewWargaming("https://api.worldofwarships.asia", ratelimit.New(10))
+	uwargaming := infra.NewUnofficialWargaming("https://clans.worldofwarships.asia")
+	numbers := infra.NewNumbers("https://api.wows-numbers.com")
 	localFile := infra.NewLocalFile()
 	configV0 := infra.NewConfigV0()
 	unregistered := infra.NewUnregistered()
-	github := infra.NewGithub(infra.RequestConfig{
-		URL:     "https://api.github.com",
-		Retry:   maxRetry,
-		Timeout: timeout,
-	})
+	github := infra.NewGithub("https://api.github.com")
 
 	// usecase
 	watchInterval := 1 * time.Second
