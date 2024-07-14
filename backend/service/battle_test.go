@@ -75,10 +75,8 @@ func TestBattle_Get_正常系_初回(t *testing.T) {
 			{ShipID: 2, Name: "player_2", Relation: 2},
 		},
 	}, nil)
-
-	mockStorage := repository.NewMockStorageInterface(ctrl)
-	mockStorage.EXPECT().WriteOwnIGN(gomock.Any()).Return(nil)
-	mockStorage.EXPECT().WriteExpectedStats(gomock.Any()).Return(nil)
+	mockLocalFile.EXPECT().WriteIGN(gomock.Any()).Return(nil)
+	mockLocalFile.EXPECT().WriteExpectedStats(gomock.Any()).Return(nil)
 
 	mockLogger := repository.NewMockLoggerInterface(ctrl)
 	mockLogger.EXPECT().SetOwnIGN(gomock.Any()).Return()
@@ -90,7 +88,6 @@ func TestBattle_Get_正常系_初回(t *testing.T) {
 		mockLocalFile,
 		mockNumbers,
 		mockUnregistered,
-		mockStorage,
 		mockLogger,
 		nil,
 	)
@@ -142,9 +139,7 @@ func TestBattle_Get_正常系_2回目以降(t *testing.T) {
 		},
 		PlayerName: "player_1",
 	}, nil)
-
-	mockStorage := repository.NewMockStorageInterface(ctrl)
-	mockStorage.EXPECT().WriteOwnIGN(gomock.Any()).Return(nil)
+	mockLocalFile.EXPECT().WriteIGN(gomock.Any()).Return(nil)
 
 	mockLogger := repository.NewMockLoggerInterface(ctrl)
 	mockLogger.EXPECT().SetOwnIGN(gomock.Any()).Return()
@@ -156,7 +151,6 @@ func TestBattle_Get_正常系_2回目以降(t *testing.T) {
 		mockLocalFile,
 		mockNumbers,
 		mockUnregistered,
-		mockStorage,
 		mockLogger,
 		nil,
 	)
@@ -183,7 +177,6 @@ func TestBattle_Get_異常系(t *testing.T) {
 		nil,
 		nil,
 		mockLocalFile,
-		nil,
 		nil,
 		nil,
 		nil,

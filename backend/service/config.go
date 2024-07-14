@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"errors"
 	"os"
 	"path/filepath"
 	"wfs/backend/apperr"
@@ -18,7 +19,6 @@ const GameExeName = "WorldOfWarships.exe"
 type Config struct {
 	localFile           repository.LocalFileInterface
 	wargaming           repository.WargamingInterface
-	storage             repository.StorageInterface
 	logger              repository.LoggerInterface
 	OpenDirectoryDialog openDirectoryDialogFunc
 	OpenWithDefaultApp  openWithDefaultAppFunc
@@ -27,21 +27,25 @@ type Config struct {
 func NewConfig(
 	localFile repository.LocalFileInterface,
 	wargaming repository.WargamingInterface,
-	storage repository.StorageInterface,
 	logger repository.LoggerInterface,
 ) *Config {
 	return &Config{
 		localFile:           localFile,
 		wargaming:           wargaming,
-		storage:             storage,
 		logger:              logger,
 		OpenDirectoryDialog: runtime.OpenDirectoryDialog,
 		OpenWithDefaultApp:  open.Run,
 	}
 }
 
+func (c *Config) InitUserIfNeeded() {
+	if _, err := c.localFile.UserConfigV2(); errors.Is(err, os.ErrNotExist) {
+		_ = c.localFile.WriteUserConfigV2(data.DefaultUserConfigV2())
+	}
+}
+
 func (c *Config) User() (data.UserConfigV2, error) {
-	return c.storage.UserConfigV2()
+	return c.localFile.UserConfigV2()
 }
 
 func (c *Config) ValidateRequired(
@@ -81,7 +85,7 @@ func (c *Config) UpdateRequired(
 	}
 
 	// Note: overwrite only required setting
-	config, err := c.storage.UserConfigV2()
+	config, err := c.localFile.UserConfigV2()
 	if err != nil {
 		return validatedResult, err
 	}
@@ -89,14 +93,14 @@ func (c *Config) UpdateRequired(
 	config.Appid = appid
 
 	// write
-	err = c.storage.WriteUserConfigV2(config)
+	err = c.localFile.WriteUserConfigV2(config)
 
 	return validatedResult, err
 }
 
 func (c *Config) UpdateOptional(config data.UserConfigV2) error {
 	// Note: exclulde required setting
-	saved, err := c.storage.UserConfigV2()
+	saved, err := c.localFile.UserConfigV2()
 	if err != nil {
 		return err
 	}
@@ -104,17 +108,23 @@ func (c *Config) UpdateOptional(config data.UserConfigV2) error {
 	config.Appid = saved.Appid
 
 	// write
-	err = c.storage.WriteUserConfigV2(config)
+	err = c.localFile.WriteUserConfigV2(config)
 	return err
 }
 
+func (c *Config) InitAlertPlayersIfNeeded() {
+	if _, err := c.localFile.AlertPlayerV1(); errors.Is(err, os.ErrNotExist) {
+		_ = c.localFile.WriteAlertPlayerV1([]data.AlertPlayer{})
+	}
+}
+
 func (c *Config) AlertPlayers() ([]data.AlertPlayer, error) {
-	players, err := c.storage.AlertPlayers()
+	players, err := c.localFile.AlertPlayerV1()
 	return players, err
 }
 
 func (c *Config) UpdateAlertPlayer(player data.AlertPlayer) error {
-	players, err := c.storage.AlertPlayers()
+	players, err := c.localFile.AlertPlayerV1()
 	if err != nil {
 		return err
 	}
@@ -132,11 +142,11 @@ func (c *Config) UpdateAlertPlayer(player data.AlertPlayer) error {
 		players = append(players, player)
 	}
 
-	return c.storage.WriteAlertPlayers(players)
+	return c.localFile.WriteAlertPlayerV1(players)
 }
 
 func (c *Config) RemoveAlertPlayer(accountID int) error {
-	players, err := c.storage.AlertPlayers()
+	players, err := c.localFile.AlertPlayerV1()
 	if err != nil {
 		return err
 	}
@@ -154,11 +164,11 @@ func (c *Config) RemoveAlertPlayer(accountID int) error {
 		return nil
 	}
 
-	return c.storage.WriteAlertPlayers(players)
+	return c.localFile.WriteAlertPlayerV1(players)
 }
 
 func (c *Config) SearchPlayer(prefix string) data.WGAccountList {
-	config, err := c.storage.UserConfigV2()
+	config, err := c.localFile.UserConfigV2()
 	if err != nil {
 		return data.WGAccountList{}
 	}

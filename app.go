@@ -26,16 +26,15 @@ func newVolatileData() volatileData {
 
 //nolint:containedctx
 type App struct {
-	ctx            context.Context
-	env            data.Env
-	logger         repository.LoggerInterface
-	config         service.Config
-	screenshot     service.Screenshot
-	watcher        service.Watcher
-	battle         service.Battle
-	updater        service.Updater
-	configMigrator service.ConfigMigrator
-	volatileData   volatileData
+	ctx          context.Context
+	env          data.Env
+	logger       repository.LoggerInterface
+	config       service.Config
+	screenshot   service.Screenshot
+	watcher      service.Watcher
+	battle       service.Battle
+	updater      service.Updater
+	volatileData volatileData
 }
 
 func NewApp(
@@ -46,18 +45,16 @@ func NewApp(
 	watcher service.Watcher,
 	battle service.Battle,
 	updater service.Updater,
-	configMigrator service.ConfigMigrator,
 ) *App {
 	return &App{
-		env:            env,
-		logger:         logger,
-		config:         config,
-		screenshot:     screenshot,
-		watcher:        watcher,
-		battle:         battle,
-		updater:        updater,
-		configMigrator: configMigrator,
-		volatileData:   newVolatileData(),
+		env:          env,
+		logger:       logger,
+		config:       config,
+		screenshot:   screenshot,
+		watcher:      watcher,
+		battle:       battle,
+		updater:      updater,
+		volatileData: newVolatileData(),
 	}
 }
 
@@ -65,15 +62,9 @@ func (a *App) onStartup(ctx context.Context) {
 	a.ctx = ctx
 	runtime.LogSetLogLevel(ctx, logger.INFO)
 	a.logger.Init(ctx)
-}
 
-func (a *App) MigrateIfNeeded() error {
-	if err := a.configMigrator.ExecuteIfNeeded(); err != nil {
-		a.logger.Error(err, nil)
-		return apperr.Unwrap(err)
-	}
-
-	return nil
+    a.config.InitUserIfNeeded()
+    a.config.InitAlertPlayersIfNeeded()
 }
 
 func (a *App) StartWatching() error {

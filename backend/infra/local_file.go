@@ -16,20 +16,30 @@ const (
 	// directory.
 	replaysDir       string = "replays"
 	tempArenaInfoDir string = "temp_arena_info"
+	configDir        string = "config_v3"
+	cacheDir         string = "cache_v2"
 
 	// file.
 	tempArenaInfoFile string = "tempArenaInfo.json"
+	ignFile           string = "ign.txt"
+	expectedStatsFile string = "expected_stats.json"
+	userConfigFile    string = "user_config_v2.json"
+	alertPlayerFile   string = "alert_player_v1.json"
 )
 
 type LocalFile struct {
-	userConfigPath  string
-	alertPlayerPath string
+	ignPath           string
+	expectedStatsPath string
+	userConfigPath    string
+	alertPlayerPath   string
 }
 
 func NewLocalFile() *LocalFile {
 	return &LocalFile{
-		userConfigPath:  filepath.Join(ConfigDir, UserConfigFile),
-		alertPlayerPath: filepath.Join(ConfigDir, AlertPlayerFile),
+		ignPath:           filepath.Join(cacheDir, ignFile),
+		expectedStatsPath: filepath.Join(cacheDir, expectedStatsFile),
+		userConfigPath:    filepath.Join(configDir, userConfigFile),
+		alertPlayerPath:   filepath.Join(configDir, alertPlayerFile),
 	}
 }
 
@@ -98,12 +108,12 @@ func decideTempArenaInfo(paths []string) (data.TempArenaInfo, error) {
 	}
 
 	if size == 1 {
-		return readJSON(paths[0], data.TempArenaInfo{})
+		return readJSON[data.TempArenaInfo](paths[0])
 	}
 
 	var latest data.TempArenaInfo
 	for _, path := range paths {
-		tempArenaInfo, err := readJSON(path, data.TempArenaInfo{})
+		tempArenaInfo, err := readJSON[data.TempArenaInfo](path)
 		if err != nil {
 			continue
 		}
@@ -118,4 +128,37 @@ func decideTempArenaInfo(paths []string) (data.TempArenaInfo, error) {
 	}
 
 	return latest, nil
+}
+
+func (l *LocalFile) IGN() (string, error) {
+	b, err := readFile(l.ignPath)
+	return string(b), err
+}
+
+func (l *LocalFile) WriteIGN(ign string) error {
+	return writeFile(l.ignPath, []byte(ign))
+}
+
+func (l *LocalFile) ExpectedStats() (data.ExpectedStats, error) {
+	return readJSON[data.ExpectedStats](l.expectedStatsPath)
+}
+
+func (l *LocalFile) WriteExpectedStats(target data.ExpectedStats) error {
+	return writeJSON(l.expectedStatsPath, target)
+}
+
+func (l *LocalFile) UserConfigV2() (data.UserConfigV2, error) {
+	return readJSON[data.UserConfigV2](l.userConfigPath)
+}
+
+func (l *LocalFile) WriteUserConfigV2(target data.UserConfigV2) error {
+	return writeJSON(l.userConfigPath, target)
+}
+
+func (l *LocalFile) AlertPlayerV1() ([]data.AlertPlayer, error) {
+	return readJSON[[]data.AlertPlayer](l.alertPlayerPath)
+}
+
+func (l *LocalFile) WriteAlertPlayerV1(target []data.AlertPlayer) error {
+	return writeJSON(l.alertPlayerPath, target)
 }

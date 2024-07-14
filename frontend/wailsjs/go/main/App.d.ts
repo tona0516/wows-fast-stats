@@ -28,8 +28,6 @@ export function LogInfo(arg1:string,arg2:{[key: string]: string}):Promise<void>;
 
 export function ManualScreenshot(arg1:string,arg2:string):Promise<boolean>;
 
-export function MigrateIfNeeded():Promise<void>;
-
 export function OpenDirectory(arg1:string):Promise<void>;
 
 export function RemoveAlertPlayer(arg1:number):Promise<void>;

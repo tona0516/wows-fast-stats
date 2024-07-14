@@ -37,12 +37,12 @@ func TestConfig_UpdateRequired(t *testing.T) {
 		mockWargaming := repository.NewMockWargamingInterface(ctrl)
 		mockWargaming.EXPECT().Test(config.Appid).Return(true, nil)
 
-		mockStorage := repository.NewMockStorageInterface(ctrl)
-		mockStorage.EXPECT().UserConfigV2().Return(data.DefaultUserConfigV2(), nil)
-		mockStorage.EXPECT().WriteUserConfigV2(config).Return(nil)
+		mockLocalFile := repository.NewMockLocalFileInterface(ctrl)
+		mockLocalFile.EXPECT().UserConfigV2().Return(config, nil)
+		mockLocalFile.EXPECT().WriteUserConfigV2(config).Return(nil)
 
 		// テスト
-		c := NewConfig(nil, mockWargaming, mockStorage, nil)
+		c := NewConfig(mockLocalFile, mockWargaming, nil)
 		actual, err := c.UpdateRequired(config.InstallPath, config.Appid)
 
 		// アサーション
@@ -59,7 +59,7 @@ func TestConfig_UpdateRequired(t *testing.T) {
 		mockWargaming.EXPECT().Test(config.Appid).Return(true, nil)
 
 		// テスト
-		c := NewConfig(nil, mockWargaming, nil, nil)
+		c := NewConfig(nil, mockWargaming, nil)
 		actual, err := c.UpdateRequired(config.InstallPath, config.Appid)
 
 		// アサーション
@@ -74,7 +74,7 @@ func TestConfig_UpdateRequired(t *testing.T) {
 		mockWargaming.EXPECT().Test(config.Appid).Return(false, errWargaming) // Note: WG APIでエラー
 
 		// テスト
-		c := NewConfig(nil, mockWargaming, nil, nil)
+		c := NewConfig(nil, mockWargaming, nil)
 		actual, err := c.UpdateRequired(config.InstallPath, config.Appid)
 
 		// アサーション
@@ -99,12 +99,12 @@ func TestConfig_UpdateOptional(t *testing.T) {
 		actualWritten := data.DefaultUserConfigV2()
 		actualWritten.FontSize = "small"
 
-		mockStorage := repository.NewMockStorageInterface(ctrl)
-		mockStorage.EXPECT().UserConfigV2().Return(data.DefaultUserConfigV2(), nil)
-		mockStorage.EXPECT().WriteUserConfigV2(actualWritten).Return(nil)
+		mockLocalFile := repository.NewMockLocalFileInterface(ctrl)
+		mockLocalFile.EXPECT().UserConfigV2().Return(config, nil)
+		mockLocalFile.EXPECT().WriteUserConfigV2(config).Return(nil)
 
 		// テスト実行
-		c := NewConfig(nil, nil, mockStorage, nil)
+		c := NewConfig(mockLocalFile, nil, nil)
 		err = c.UpdateOptional(config)
 
 		// アサーション
@@ -126,11 +126,11 @@ func TestConfig_AlertPlayers(t *testing.T) {
 			{AccountID: 2, Name: "Player2"},
 		}
 
-		mockStorage := repository.NewMockStorageInterface(ctrl)
-		mockStorage.EXPECT().AlertPlayers().Return(expected, nil)
+		mockLocalFile := repository.NewMockLocalFileInterface(ctrl)
+		mockLocalFile.EXPECT().AlertPlayerV1().Return(expected, nil)
 
 		// テスト
-		config := NewConfig(nil, nil, mockStorage, nil)
+		config := NewConfig(mockLocalFile, nil, nil)
 		actual, err := config.AlertPlayers()
 
 		// アサーション
@@ -155,12 +155,12 @@ func TestConfig_UpdateAlertPlayer(t *testing.T) {
 		// 準備
 		newPlayer := data.AlertPlayer{AccountID: 3, Name: "Player3"}
 
-		mockStorage := repository.NewMockStorageInterface(ctrl)
-		mockStorage.EXPECT().AlertPlayers().Return(existingPlayers, nil)
-		mockStorage.EXPECT().WriteAlertPlayers(append(existingPlayers, newPlayer)).Return(nil)
+		mockLocalFile := repository.NewMockLocalFileInterface(ctrl)
+		mockLocalFile.EXPECT().AlertPlayerV1().Return(existingPlayers, nil)
+		mockLocalFile.EXPECT().WriteAlertPlayerV1(append(existingPlayers, newPlayer)).Return(nil)
 
 		// テスト
-		config := NewConfig(nil, nil, mockStorage, nil)
+		config := NewConfig(mockLocalFile, nil, nil)
 		err := config.UpdateAlertPlayer(newPlayer)
 
 		// アサーション
@@ -171,15 +171,15 @@ func TestConfig_UpdateAlertPlayer(t *testing.T) {
 		t.Parallel()
 
 		// 準備
-		mockStorage := repository.NewMockStorageInterface(ctrl)
-		mockStorage.EXPECT().AlertPlayers().Return(existingPlayers, nil)
-		mockStorage.EXPECT().WriteAlertPlayers([]data.AlertPlayer{
+		mockLocalFile := repository.NewMockLocalFileInterface(ctrl)
+		mockLocalFile.EXPECT().AlertPlayerV1().Return(existingPlayers, nil)
+		mockLocalFile.EXPECT().WriteAlertPlayerV1([]data.AlertPlayer{
 			{AccountID: 1, Name: "UpdatedPlayer"},
 			{AccountID: 2, Name: "Player2"},
 		}).Return(nil)
 
 		// テスト
-		config := NewConfig(nil, nil, mockStorage, nil)
+		config := NewConfig(mockLocalFile, nil, nil)
 		err := config.UpdateAlertPlayer(data.AlertPlayer{AccountID: 1, Name: "UpdatedPlayer"})
 
 		// アサーション
@@ -196,17 +196,17 @@ func TestConfig_RemoveAlertPlayer(t *testing.T) {
 		t.Parallel()
 
 		// 準備
-		mockStorage := repository.NewMockStorageInterface(ctrl)
-		mockStorage.EXPECT().AlertPlayers().Return([]data.AlertPlayer{
+		mockLocalFile := repository.NewMockLocalFileInterface(ctrl)
+		mockLocalFile.EXPECT().AlertPlayerV1().Return([]data.AlertPlayer{
 			{AccountID: 1, Name: "Player1"},
 			{AccountID: 2, Name: "Player2"},
 		}, nil)
-		mockStorage.EXPECT().WriteAlertPlayers([]data.AlertPlayer{
+		mockLocalFile.EXPECT().WriteAlertPlayerV1([]data.AlertPlayer{
 			{AccountID: 2, Name: "Player2"},
 		}).Return(nil)
 
 		// テスト
-		config := NewConfig(nil, nil, mockStorage, nil)
+		config := NewConfig(mockLocalFile, nil, nil)
 		err := config.RemoveAlertPlayer(1)
 
 		// アサーション
@@ -217,14 +217,14 @@ func TestConfig_RemoveAlertPlayer(t *testing.T) {
 		t.Parallel()
 
 		// 準備
-		mockStorage := repository.NewMockStorageInterface(ctrl)
-		mockStorage.EXPECT().AlertPlayers().Return([]data.AlertPlayer{
+		mockLocalFile := repository.NewMockLocalFileInterface(ctrl)
+		mockLocalFile.EXPECT().AlertPlayerV1().Return([]data.AlertPlayer{
 			{AccountID: 1, Name: "Player1"},
 			{AccountID: 2, Name: "Player2"},
 		}, nil)
 
 		// テスト
-		config := NewConfig(nil, nil, mockStorage, nil)
+		config := NewConfig(mockLocalFile, nil, nil)
 		err := config.RemoveAlertPlayer(3)
 
 		// アサーション

@@ -15,7 +15,6 @@ require (
 require github.com/rs/zerolog v1.33.0
 
 require (
-	github.com/dgraph-io/badger/v4 v4.2.0
 	github.com/go-resty/resty/v2 v2.13.1
 	github.com/morikuni/failure v1.1.2
 	github.com/shopspring/decimal v1.4.0
@@ -25,22 +24,12 @@ require (
 
 require (
 	github.com/benbjohnson/clock v1.3.5 // indirect
-	github.com/cespare/xxhash/v2 v2.3.0 // indirect
-	github.com/dgraph-io/ristretto v0.1.1 // indirect
-	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/godbus/dbus/v5 v5.1.0 // indirect
-	github.com/gogo/protobuf v1.3.2 // indirect
-	github.com/golang/glog v1.2.1 // indirect
-	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
-	github.com/golang/protobuf v1.5.4 // indirect
-	github.com/golang/snappy v0.0.4 // indirect
-	github.com/google/flatbuffers v24.3.25+incompatible // indirect
-	github.com/klauspost/compress v1.17.8 // indirect
+	github.com/kr/pretty v0.1.0 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/leaanthony/u v1.1.1 // indirect
 	github.com/wailsapp/go-webview2 v1.0.10 // indirect
-	go.opencensus.io v0.24.0 // indirect
-	google.golang.org/protobuf v1.34.1 // indirect
+	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 )
 
 require (

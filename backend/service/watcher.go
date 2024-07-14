@@ -21,7 +21,6 @@ const (
 type Watcher struct {
 	interval       time.Duration
 	localFile      repository.LocalFileInterface
-	storage        repository.StorageInterface
 	logger         repository.LoggerInterface
 	eventsEmitFunc eventEmitFunc
 	userConfig     data.UserConfigV2
@@ -30,21 +29,19 @@ type Watcher struct {
 func NewWatcher(
 	interval time.Duration,
 	localFile repository.LocalFileInterface,
-	storage repository.StorageInterface,
 	logger repository.LoggerInterface,
 	eventsEmitFunc eventEmitFunc,
 ) *Watcher {
 	return &Watcher{
 		interval:       interval,
 		localFile:      localFile,
-		storage:        storage,
 		logger:         logger,
 		eventsEmitFunc: eventsEmitFunc,
 	}
 }
 
 func (w *Watcher) Prepare() error {
-	userConfig, err := w.storage.UserConfigV2()
+	userConfig, err := w.localFile.UserConfigV2()
 	if err != nil {
 		return err
 	}

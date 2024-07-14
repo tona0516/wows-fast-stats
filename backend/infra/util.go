@@ -2,44 +2,39 @@ package infra
 
 import (
 	"encoding/json"
-	"errors"
 	"os"
 	"path/filepath"
-	"wfs/backend/apperr"
-
-	"github.com/morikuni/failure"
 )
 
-func readJSON[T any](path string, defaulValue T) (T, error) {
-	errCtx := failure.Context{"path": path}
+func readFile(path string) ([]byte, error) {
+	return os.ReadFile(path)
+}
 
-	f, err := os.ReadFile(path)
+func readJSON[T any](path string) (T, error) {
+	var result T
+	b, err := readFile(path)
 	if err != nil {
-		if errors.Is(err, os.ErrNotExist) {
-			return defaulValue, failure.New(apperr.FileNotExist, errCtx)
-		}
-		return defaulValue, failure.Wrap(err, errCtx)
+		return result, err
 	}
-	errCtx["target"] = string(f)
 
-	err = json.Unmarshal(f, &defaulValue)
-	return defaulValue, failure.Wrap(err, errCtx)
+	err = json.Unmarshal(b, &result)
+	return result, err
+}
+
+func writeFile(path string, target []byte) error {
+	return os.WriteFile(path, target, 0o644)
 }
 
 func writeJSON[T any](path string, target T) error {
-	//nolint:errchkjson
-	marshaled, _ := json.Marshal(target)
-	errCtx := failure.Context{"path": path, "target": string(marshaled)}
-
 	_ = os.MkdirAll(filepath.Dir(path), 0o755)
 	f, err := os.Create(path)
 	if err != nil {
-		return failure.Wrap(err, errCtx)
+		return err
 	}
 	defer f.Close()
 
 	encoder := json.NewEncoder(f)
 	encoder.SetIndent("", "  ")
 	err = encoder.Encode(target)
-	return failure.Wrap(err, errCtx)
+	return err
 }

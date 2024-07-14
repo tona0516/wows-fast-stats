@@ -10,7 +10,6 @@ import (
 	"wfs/backend/infra"
 	"wfs/backend/service"
 
-	"github.com/dgraph-io/badger/v4"
 	"github.com/mitchellh/go-ps"
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
@@ -72,15 +71,9 @@ func main() {
 func initApp(env data.Env) *App {
 	alertDiscord := infra.NewDiscord(AlertDiscordWebhookURL)
 	infoDiscord := infra.NewDiscord(InfoDiscordWebhookURL)
-	db, err := badger.Open(badger.DefaultOptions("./persistent_data"))
-	if err != nil {
-		logger := infra.NewLogger(env, alertDiscord, infoDiscord)
-		logger.Fatal(err, nil)
-		return nil
-	}
+	localFile := infra.NewLocalFile()
 
-	storage := infra.NewStorage(db)
-	ownIGN, _ := storage.OwnIGN()
+	ownIGN, _ := localFile.IGN()
 
 	logger := infra.NewLogger(env, alertDiscord, infoDiscord)
 	logger.SetOwnIGN(ownIGN)
@@ -88,14 +81,12 @@ func initApp(env data.Env) *App {
 	wargaming := infra.NewWargaming("https://api.worldofwarships.asia", ratelimit.New(10))
 	uwargaming := infra.NewUnofficialWargaming("https://clans.worldofwarships.asia")
 	numbers := infra.NewNumbers("https://api.wows-numbers.com")
-	localFile := infra.NewLocalFile()
-	configV0 := infra.NewConfigV0()
 	unregistered := infra.NewUnregistered()
 	github := infra.NewGithub("https://api.github.com")
 
 	// usecase
 	watchInterval := 1 * time.Second
-	config := service.NewConfig(localFile, wargaming, storage, logger)
+	config := service.NewConfig(localFile, wargaming, logger)
 	screenshot := service.NewScreenshot(localFile, logger)
 	battle := service.NewBattle(
 		wargaming,
@@ -103,13 +94,11 @@ func initApp(env data.Env) *App {
 		localFile,
 		numbers,
 		unregistered,
-		storage,
 		logger,
 		runtime.EventsEmit,
 	)
-	watcher := service.NewWatcher(watchInterval, localFile, storage, logger, runtime.EventsEmit)
+	watcher := service.NewWatcher(watchInterval, localFile, logger, runtime.EventsEmit)
 	updater := service.NewUpdater(env, github, logger)
-	configMigrator := service.NewConfigMigrator(configV0, storage, logger)
 
 	return NewApp(
 		env,
@@ -119,7 +108,6 @@ func initApp(env data.Env) *App {
 		*watcher,
 		*battle,
 		*updater,
-		*configMigrator,
 	)
 }
 

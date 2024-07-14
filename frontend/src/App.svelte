@@ -6,12 +6,7 @@
   import "bootstrap-icons/font/bootstrap-icons.css";
   import "charts.css";
 
-  import {
-    LatestRelease,
-    LogError,
-    MigrateIfNeeded,
-    StartWatching,
-  } from "wailsjs/go/main/App";
+  import { LatestRelease, LogError, StartWatching } from "wailsjs/go/main/App";
   import { EventsOn } from "wailsjs/runtime/runtime";
   import { storedConfig, storedRequiredConfigError } from "src/stores";
   import AlertModals from "src/component/modal/AlertModals.svelte";
@@ -60,8 +55,6 @@
 
   const initialize = async (): Promise<data.UserConfigV2 | undefined> => {
     try {
-      await MigrateIfNeeded();
-
       const config = await FetchProxy.getConfig();
       const requiredConfigError = await FetchProxy.validateRequiredConfig(
         config.install_path,

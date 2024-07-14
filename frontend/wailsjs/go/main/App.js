@@ -54,10 +54,6 @@ export function ManualScreenshot(arg1, arg2) {
   return window['go']['main']['App']['ManualScreenshot'](arg1, arg2);
 }
 
-export function MigrateIfNeeded() {
-  return window['go']['main']['App']['MigrateIfNeeded']();
-}
-
 export function OpenDirectory(arg1) {
   return window['go']['main']['App']['OpenDirectory'](arg1);
 }

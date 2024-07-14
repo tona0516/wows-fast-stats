@@ -21,7 +21,6 @@ type Battle struct {
 	numbers        repository.NumbersInterface
 	unregistered   repository.UnregisteredInterface
 	localFile      repository.LocalFileInterface
-	storage        repository.StorageInterface
 	logger         repository.LoggerInterface
 	eventsEmitFunc eventEmitFunc
 
@@ -39,7 +38,6 @@ func NewBattle(
 	localFile repository.LocalFileInterface,
 	numbers repository.NumbersInterface,
 	unregistered repository.UnregisteredInterface,
-	storage repository.StorageInterface,
 	logger repository.LoggerInterface,
 	eventsEmitFunc eventEmitFunc,
 ) *Battle {
@@ -49,7 +47,6 @@ func NewBattle(
 		localFile:                          localFile,
 		numbers:                            numbers,
 		unregistered:                       unregistered,
-		storage:                            storage,
 		logger:                             logger,
 		eventsEmitFunc:                     eventsEmitFunc,
 		isFirstBattle:                      true,
@@ -84,7 +81,7 @@ func (b *Battle) Get(appCtx context.Context, userConfig data.UserConfigV2) (data
 	}
 
 	// persist own ign for reporting
-	_ = b.storage.WriteOwnIGN(tempArenaInfo.PlayerName)
+	_ = b.localFile.WriteIGN(tempArenaInfo.PlayerName)
 	b.logger.SetOwnIGN(tempArenaInfo.PlayerName)
 
 	// Get Account ID list
@@ -241,14 +238,14 @@ func (b *Battle) fetchExpectedStats(channel chan data.Result[data.ExpectedStats]
 	// 最新の予測成績を取得
 	expectedStats, errFetch := b.numbers.ExpectedStats()
 	if errFetch == nil {
-		_ = b.storage.WriteExpectedStats(expectedStats)
+		_ = b.localFile.WriteExpectedStats(expectedStats)
 		result.Value = expectedStats
 		channel <- result
 		return
 	}
 
 	// 取得できない場合、キャッシュを利用する
-	expectedStats, errCache := b.storage.ExpectedStats()
+	expectedStats, errCache := b.localFile.ExpectedStats()
 	if errCache == nil {
 		result.Value = expectedStats
 		channel <- result

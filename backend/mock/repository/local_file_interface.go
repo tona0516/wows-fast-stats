@@ -39,6 +39,51 @@ func (m *MockLocalFileInterface) EXPECT() *MockLocalFileInterfaceMockRecorder {
 	return m.recorder
 }
 
+// AlertPlayerV1 mocks base method.
+func (m *MockLocalFileInterface) AlertPlayerV1() ([]data.AlertPlayer, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AlertPlayerV1")
+	ret0, _ := ret[0].([]data.AlertPlayer)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// AlertPlayerV1 indicates an expected call of AlertPlayerV1.
+func (mr *MockLocalFileInterfaceMockRecorder) AlertPlayerV1() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AlertPlayerV1", reflect.TypeOf((*MockLocalFileInterface)(nil).AlertPlayerV1))
+}
+
+// ExpectedStats mocks base method.
+func (m *MockLocalFileInterface) ExpectedStats() (data.ExpectedStats, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ExpectedStats")
+	ret0, _ := ret[0].(data.ExpectedStats)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ExpectedStats indicates an expected call of ExpectedStats.
+func (mr *MockLocalFileInterfaceMockRecorder) ExpectedStats() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExpectedStats", reflect.TypeOf((*MockLocalFileInterface)(nil).ExpectedStats))
+}
+
+// IGN mocks base method.
+func (m *MockLocalFileInterface) IGN() (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "IGN")
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// IGN indicates an expected call of IGN.
+func (mr *MockLocalFileInterfaceMockRecorder) IGN() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IGN", reflect.TypeOf((*MockLocalFileInterface)(nil).IGN))
+}
+
 // SaveScreenshot mocks base method.
 func (m *MockLocalFileInterface) SaveScreenshot(path, base64Data string) error {
 	m.ctrl.T.Helper()
@@ -80,4 +125,75 @@ func (m *MockLocalFileInterface) TempArenaInfo(installPath string) (data.TempAre
 func (mr *MockLocalFileInterfaceMockRecorder) TempArenaInfo(installPath any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TempArenaInfo", reflect.TypeOf((*MockLocalFileInterface)(nil).TempArenaInfo), installPath)
+}
+
+// UserConfigV2 mocks base method.
+func (m *MockLocalFileInterface) UserConfigV2() (data.UserConfigV2, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UserConfigV2")
+	ret0, _ := ret[0].(data.UserConfigV2)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UserConfigV2 indicates an expected call of UserConfigV2.
+func (mr *MockLocalFileInterfaceMockRecorder) UserConfigV2() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UserConfigV2", reflect.TypeOf((*MockLocalFileInterface)(nil).UserConfigV2))
+}
+
+// WriteAlertPlayerV1 mocks base method.
+func (m *MockLocalFileInterface) WriteAlertPlayerV1(target []data.AlertPlayer) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "WriteAlertPlayerV1", target)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// WriteAlertPlayerV1 indicates an expected call of WriteAlertPlayerV1.
+func (mr *MockLocalFileInterfaceMockRecorder) WriteAlertPlayerV1(target any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WriteAlertPlayerV1", reflect.TypeOf((*MockLocalFileInterface)(nil).WriteAlertPlayerV1), target)
+}
+
+// WriteExpectedStats mocks base method.
+func (m *MockLocalFileInterface) WriteExpectedStats(target data.ExpectedStats) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "WriteExpectedStats", target)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// WriteExpectedStats indicates an expected call of WriteExpectedStats.
+func (mr *MockLocalFileInterfaceMockRecorder) WriteExpectedStats(target any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WriteExpectedStats", reflect.TypeOf((*MockLocalFileInterface)(nil).WriteExpectedStats), target)
+}
+
+// WriteIGN mocks base method.
+func (m *MockLocalFileInterface) WriteIGN(ign string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "WriteIGN", ign)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// WriteIGN indicates an expected call of WriteIGN.
+func (mr *MockLocalFileInterfaceMockRecorder) WriteIGN(ign any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WriteIGN", reflect.TypeOf((*MockLocalFileInterface)(nil).WriteIGN), ign)
+}
+
+// WriteUserConfigV2 mocks base method.
+func (m *MockLocalFileInterface) WriteUserConfigV2(target data.UserConfigV2) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "WriteUserConfigV2", target)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// WriteUserConfigV2 indicates an expected call of WriteUserConfigV2.
+func (mr *MockLocalFileInterfaceMockRecorder) WriteUserConfigV2(target any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WriteUserConfigV2", reflect.TypeOf((*MockLocalFileInterface)(nil).WriteUserConfigV2), target)
 }
