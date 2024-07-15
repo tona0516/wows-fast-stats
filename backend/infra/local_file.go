@@ -45,7 +45,7 @@ func NewLocalFile() *LocalFile {
 
 func (l *LocalFile) SaveScreenshot(path string, base64Data string) error {
 	dir := filepath.Dir(path)
-	_ = os.Mkdir(dir, 0o755)
+	_ = os.MkdirAll(dir, 0o755)
 
 	data, err := base64.StdEncoding.DecodeString(base64Data)
 	if err != nil {
@@ -99,37 +99,6 @@ func (l *LocalFile) SaveTempArenaInfo(tempArenaInfo data.TempArenaInfo) error {
 	return writeJSON(path, tempArenaInfo)
 }
 
-func decideTempArenaInfo(paths []string) (data.TempArenaInfo, error) {
-	var result data.TempArenaInfo
-	size := len(paths)
-
-	if size == 0 {
-		return result, failure.New(apperr.FileNotExist)
-	}
-
-	if size == 1 {
-		return readJSON[data.TempArenaInfo](paths[0])
-	}
-
-	var latest data.TempArenaInfo
-	for _, path := range paths {
-		tempArenaInfo, err := readJSON[data.TempArenaInfo](path)
-		if err != nil {
-			continue
-		}
-
-		if tempArenaInfo.Unixtime() > latest.Unixtime() {
-			latest = tempArenaInfo
-		}
-	}
-
-	if latest.Unixtime() == 0 {
-		return result, failure.New(apperr.FileNotExist)
-	}
-
-	return latest, nil
-}
-
 func (l *LocalFile) IGN() (string, error) {
 	b, err := readFile(l.ignPath)
 	return string(b), err
@@ -161,4 +130,35 @@ func (l *LocalFile) AlertPlayerV1() ([]data.AlertPlayer, error) {
 
 func (l *LocalFile) WriteAlertPlayerV1(target []data.AlertPlayer) error {
 	return writeJSON(l.alertPlayerPath, target)
+}
+
+func decideTempArenaInfo(paths []string) (data.TempArenaInfo, error) {
+	var result data.TempArenaInfo
+	size := len(paths)
+
+	if size == 0 {
+		return result, failure.New(apperr.FileNotExist)
+	}
+
+	if size == 1 {
+		return readJSON[data.TempArenaInfo](paths[0])
+	}
+
+	var latest data.TempArenaInfo
+	for _, path := range paths {
+		tempArenaInfo, err := readJSON[data.TempArenaInfo](path)
+		if err != nil {
+			continue
+		}
+
+		if tempArenaInfo.Unixtime() > latest.Unixtime() {
+			latest = tempArenaInfo
+		}
+	}
+
+	if latest.Unixtime() == 0 {
+		return result, failure.New(apperr.FileNotExist)
+	}
+
+	return latest, nil
 }

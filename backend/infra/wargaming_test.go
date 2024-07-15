@@ -2,10 +2,10 @@ package infra
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 	"wfs/backend/apperr"
 	"wfs/backend/data"
 	"wfs/backend/infra/response"
@@ -18,49 +18,138 @@ import (
 
 const testAppID = "test_appid"
 
+//nolint:gochecknoglobals
+var limiter = ratelimit.NewUnlimited()
+
+func NewWGResponse(
+	status string,
+	errCode int,
+	errMsg string,
+) *response.WGResponse[any] {
+	return &response.WGResponse[any]{
+		Status: status,
+		Error: struct {
+			Code    int    `json:"code"`
+			Message string `json:"message"`
+		}{
+			Code:    errCode,
+			Message: errMsg,
+		},
+	}
+}
+
 func TestWargaming_AccountInfo(t *testing.T) {
 	t.Parallel()
+	successResponse := response.WGResponse[data.WGAccountInfo]{
+		Data: data.WGAccountInfo{},
+	}
+	retryableMessages := []string{
+		"REQUEST_LIMIT_EXCEEDED",
+		"SOURCE_NOT_AVAILABLE",
+	}
 
-	t.Run("正常系", func(t *testing.T) {
+	t.Run("データを取得できる", func(t *testing.T) {
 		t.Parallel()
-		server := simpleMockServer(200, response.WGAccountInfo{
-			WGResponseCommon: response.WGResponseCommon[data.WGAccountInfo]{
-				Status: "",
-				Error:  response.WGError{},
-				Data:   map[int]data.WGAccountInfoData{},
-			},
-		})
+		server := simpleMockServer(200, successResponse)
 		defer server.Close()
 
-		wargaming := NewWargaming(server.URL, ratelimit.New(10))
-
+		wargaming := NewWargaming(*NewAPIConfig(
+			server.URL,
+			1*time.Second,
+			0,
+		), limiter)
 		result, err := wargaming.AccountInfo(testAppID, []int{123, 456})
+
 		require.NoError(t, err)
 		assert.Equal(t, data.WGAccountInfo{}, result)
 	})
 
-	t.Run("異常系_リトライなし", func(t *testing.T) {
+	t.Run("最大回数リトライしてデータを取得できる", func(t *testing.T) {
 		t.Parallel()
-		body := `{
-            "status":"error",
-            "error":{
-                "field":null,
-                "message":"INVALID_APPLICATION_ID",
-                "code":407,
-                "value":null
-            }
-        }`
+		retry := 2
+
+		for _, message := range retryableMessages {
+			body := NewWGResponse("error", 407, message)
+
+			var calls int
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				calls++
+
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(http.StatusOK)
+
+				if calls < retry+1 {
+					jsonStr, _ := json.Marshal(body)
+					_, _ = w.Write(jsonStr)
+					return
+				}
+
+				body, _ := json.Marshal(successResponse)
+				_, _ = w.Write(body)
+			}))
+			defer server.Close()
+
+			wargaming := NewWargaming(*NewAPIConfig(
+				server.URL,
+				1*time.Second,
+				retry,
+			), limiter)
+
+			actual, err := wargaming.AccountInfo(testAppID, []int{123, 456})
+
+			require.NoError(t, err)
+			assert.Equal(t, data.WGAccountInfo{}, actual)
+			assert.Equal(t, retry+1, calls)
+		}
+	})
+
+	t.Run("タイムアウト", func(t *testing.T) {
+		t.Parallel()
+		timeout := 1 * time.Second
+
+		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			time.Sleep(timeout * 2)
+
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			jsonStr, _ := json.Marshal(successResponse)
+			_, _ = w.Write(jsonStr)
+		}))
+		defer server.Close()
+
+		wargaming := NewWargaming(*NewAPIConfig(
+			server.URL,
+			timeout,
+			0,
+		), limiter)
+
+		_, err := wargaming.AccountInfo(testAppID, []int{123, 456})
+		code, ok := failure.CodeOf(err)
+		assert.True(t, ok)
+		assert.Equal(t, apperr.WGAPIError, code)
+	})
+
+	t.Run("リトライせずにエラーを返却する", func(t *testing.T) {
+		t.Parallel()
+		retry := 2
+
+		body := NewWGResponse("error", 407, "INVALID_APPLICATION_ID")
 
 		var calls int
 		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			calls++
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusOK)
-			_, _ = w.Write([]byte(body))
+			jsonStr, _ := json.Marshal(body)
+			_, _ = w.Write(jsonStr)
 		}))
 		defer server.Close()
 
-		wargaming := NewWargaming(server.URL, ratelimit.New(10))
+		wargaming := NewWargaming(*NewAPIConfig(
+			server.URL,
+			1*time.Second,
+			retry,
+		), limiter)
 
 		_, err := wargaming.AccountInfo(testAppID, []int{123, 456})
 		code, ok := failure.CodeOf(err)
@@ -69,79 +158,28 @@ func TestWargaming_AccountInfo(t *testing.T) {
 		assert.Equal(t, 1, calls)
 	})
 
-	t.Run("正常系_最大リトライ", func(t *testing.T) {
+	t.Run("最大回数リトライしてエラーを返却する", func(t *testing.T) {
 		t.Parallel()
-		messages := []string{
-			"REQUEST_LIMIT_EXCEEDED",
-			"SOURCE_NOT_AVAILABLE",
-		}
+		retry := 2
 
-		for _, message := range messages {
-			body := fmt.Sprintf(`{
-                "status":"error",
-                "error":{
-                    "field":null,
-                    "message":"%s",
-                    "code":407,
-                    "value":null
-                }
-            }`, message)
-
-			var calls int
-			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				calls++
-
-				w.Header().Set("Content-Type", "application/json")
-				w.WriteHeader(http.StatusOK)
-
-				// note: SetRetryCount
-				if calls < 3 {
-					_, _ = w.Write([]byte(body))
-					return
-				}
-
-				body, _ := json.Marshal(response.WGAccountInfo{})
-				_, _ = w.Write(body)
-			}))
-			defer server.Close()
-
-			wargaming := NewWargaming(server.URL, ratelimit.New(10))
-
-			_, err := wargaming.AccountInfo(testAppID, []int{123, 456})
-
-			require.NoError(t, err)
-			assert.Equal(t, 3, calls)
-		}
-	})
-
-	t.Run("異常系_最大リトライ", func(t *testing.T) {
-		t.Parallel()
-		messages := []string{
-			"REQUEST_LIMIT_EXCEEDED",
-			"SOURCE_NOT_AVAILABLE",
-		}
-
-		for _, message := range messages {
-			body := fmt.Sprintf(`{
-                "status":"error",
-                "error":{
-                    "field":null,
-                    "message":"%s",
-                    "code":407,
-                    "value":null
-                }
-            }`, message)
+		for _, message := range retryableMessages {
+			body := NewWGResponse("error", 407, message)
 
 			var calls int
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				calls++
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(http.StatusOK)
-				_, _ = w.Write([]byte(body))
+				jsonStr, _ := json.Marshal(body)
+				_, _ = w.Write(jsonStr)
 			}))
 			defer server.Close()
 
-			wargaming := NewWargaming(server.URL, ratelimit.New(10))
+			wargaming := NewWargaming(*NewAPIConfig(
+				server.URL,
+				1*time.Second,
+				retry,
+			), limiter)
 
 			_, err := wargaming.AccountInfo(testAppID, []int{123, 456})
 
@@ -153,19 +191,56 @@ func TestWargaming_AccountInfo(t *testing.T) {
 	})
 }
 
+func TestWargaming_AccountList(t *testing.T) {
+	t.Parallel()
+
+	t.Run("データを取得できる", func(t *testing.T) {
+		t.Parallel()
+		server := simpleMockServer(200, response.WGResponse[data.WGAccountList]{
+			Data: []data.WGAccountListData{},
+		})
+		defer server.Close()
+
+		wargaming := NewWargaming(*NewAPIConfig(
+			server.URL,
+			1*time.Second,
+			0,
+		), limiter)
+
+		result, err := wargaming.AccountList(testAppID, []string{"A", "B"})
+
+		require.NoError(t, err)
+		assert.Equal(t, data.WGAccountList{}, result)
+	})
+
+	t.Run("要素0の場合リクエストせずにデータを返却する", func(t *testing.T) {
+		t.Parallel()
+		wargaming := NewWargaming(*NewAPIConfig(
+			"",
+			1*time.Second,
+			0,
+		), limiter)
+
+		result, err := wargaming.AccountList(testAppID, []string{})
+
+		require.NoError(t, err)
+		assert.Equal(t, data.WGAccountList{}, result)
+	})
+}
+
 func TestWargaming_AccountListForSearch(t *testing.T) {
 	t.Parallel()
 
-	server := simpleMockServer(200, response.WGAccountList{
-		WGResponseCommon: response.WGResponseCommon[data.WGAccountList]{
-			Status: "",
-			Error:  response.WGError{},
-			Data:   []data.WGAccountListData{},
-		},
+	server := simpleMockServer(200, response.WGResponse[data.WGAccountList]{
+		Data: []data.WGAccountListData{},
 	})
 	defer server.Close()
 
-	wargaming := NewWargaming(server.URL, ratelimit.New(10))
+	wargaming := NewWargaming(*NewAPIConfig(
+		server.URL,
+		1*time.Second,
+		0,
+	), limiter)
 
 	result, err := wargaming.AccountListForSearch(testAppID, "player")
 
@@ -173,59 +248,96 @@ func TestWargaming_AccountListForSearch(t *testing.T) {
 	assert.Equal(t, data.WGAccountList{}, result)
 }
 
+//nolint:dupl
 func TestWargaming_ClansAccountInfo(t *testing.T) {
 	t.Parallel()
 
-	server := simpleMockServer(200, response.WGClansAccountInfo{
-		WGResponseCommon: response.WGResponseCommon[data.WGClansAccountInfo]{
-			Status: "",
-			Error:  response.WGError{},
-			Data:   map[int]data.WGClansAccountInfoData{},
-		},
+	t.Run("データを取得できる", func(t *testing.T) {
+		t.Parallel()
+		server := simpleMockServer(200, response.WGResponse[data.WGClansAccountInfo]{
+			Data: map[int]data.WGClansAccountInfoData{},
+		})
+		defer server.Close()
+
+		wargaming := NewWargaming(*NewAPIConfig(
+			server.URL,
+			1*time.Second,
+			0,
+		), limiter)
+
+		result, err := wargaming.ClansAccountInfo(testAppID, []int{123, 456})
+
+		require.NoError(t, err)
+		assert.Equal(t, data.WGClansAccountInfo{}, result)
 	})
-	defer server.Close()
 
-	wargaming := NewWargaming(server.URL, ratelimit.New(10))
+	t.Run("要素0の場合リクエストせずにデータを返却する", func(t *testing.T) {
+		t.Parallel()
+		wargaming := NewWargaming(*NewAPIConfig(
+			"",
+			1*time.Second,
+			0,
+		), limiter)
 
-	result, err := wargaming.ClansAccountInfo(testAppID, []int{123, 456})
+		result, err := wargaming.ClansAccountInfo(testAppID, []int{})
 
-	require.NoError(t, err)
-	assert.Equal(t, data.WGClansAccountInfo{}, result)
+		require.NoError(t, err)
+		assert.Equal(t, data.WGClansAccountInfo{}, result)
+	})
 }
 
+//nolint:dupl
 func TestWargaming_ClansInfo(t *testing.T) {
 	t.Parallel()
 
-	server := simpleMockServer(200, response.WGClansInfo{
-		WGResponseCommon: response.WGResponseCommon[data.WGClansInfo]{
-			Status: "",
-			Error:  response.WGError{},
-			Data:   map[int]data.WGClansInfoData{},
-		},
+	t.Run("データを取得できる", func(t *testing.T) {
+		t.Parallel()
+		server := simpleMockServer(200, response.WGResponse[data.WGClansInfo]{
+			Data: map[int]data.WGClansInfoData{},
+		})
+		defer server.Close()
+
+		wargaming := NewWargaming(*NewAPIConfig(
+			server.URL,
+			1*time.Second,
+			0,
+		), limiter)
+
+		result, err := wargaming.ClansInfo(testAppID, []int{123, 456})
+
+		require.NoError(t, err)
+		assert.Equal(t, data.WGClansInfo{}, result)
 	})
-	defer server.Close()
 
-	wargaming := NewWargaming(server.URL, ratelimit.New(10))
+	t.Run("要素0の場合リクエストせずにデータを返却する", func(t *testing.T) {
+		t.Parallel()
 
-	result, err := wargaming.ClansInfo(testAppID, []int{123, 456})
+		wargaming := NewWargaming(*NewAPIConfig(
+			"",
+			1*time.Second,
+			0,
+		), limiter)
 
-	require.NoError(t, err)
-	assert.Equal(t, data.WGClansInfo{}, result)
+		result, err := wargaming.ClansInfo(testAppID, []int{})
+
+		require.NoError(t, err)
+		assert.Equal(t, data.WGClansInfo{}, result)
+	})
 }
 
 func TestWargaming_ShipsStats(t *testing.T) {
 	t.Parallel()
 
-	server := simpleMockServer(200, response.WGShipsStats{
-		WGResponseCommon: response.WGResponseCommon[data.WGShipsStats]{
-			Status: "",
-			Error:  response.WGError{},
-			Data:   map[int][]data.WGShipsStatsData{},
-		},
+	server := simpleMockServer(200, response.WGResponse[data.WGShipsStats]{
+		Data: map[int][]data.WGShipsStatsData{},
 	})
 	defer server.Close()
 
-	wargaming := NewWargaming(server.URL, ratelimit.New(10))
+	wargaming := NewWargaming(*NewAPIConfig(
+		server.URL,
+		1*time.Second,
+		0,
+	), limiter)
 
 	result, err := wargaming.ShipsStats(testAppID, 123)
 
@@ -238,10 +350,8 @@ func TestWargaming_EncycShips(t *testing.T) {
 
 	expectedPageTotal := 5
 	server := simpleMockServer(200, response.WGEncycShips{
-		WGResponseCommon: response.WGResponseCommon[data.WGEncycShips]{
-			Status: "",
-			Error:  response.WGError{},
-			Data:   map[int]data.WGEncycShipsData{},
+		WGResponse: response.WGResponse[data.WGEncycShips]{
+			Data: map[int]data.WGEncycShipsData{},
 		},
 		Meta: struct {
 			PageTotal int `json:"page_total"`
@@ -250,7 +360,11 @@ func TestWargaming_EncycShips(t *testing.T) {
 	})
 	defer server.Close()
 
-	wargaming := NewWargaming(server.URL, ratelimit.New(10))
+	wargaming := NewWargaming(*NewAPIConfig(
+		server.URL,
+		1*time.Second,
+		0,
+	), limiter)
 
 	result, pageTotal, err := wargaming.EncycShips(testAppID, 1)
 
@@ -265,7 +379,11 @@ func TestWargaming_EncycInfo(t *testing.T) {
 	server := simpleMockServer(200, response.WGEncycInfo{})
 	defer server.Close()
 
-	wargaming := NewWargaming(server.URL, ratelimit.New(10))
+	wargaming := NewWargaming(*NewAPIConfig(
+		server.URL,
+		1*time.Second,
+		0,
+	), limiter)
 
 	result, err := wargaming.EncycInfo(testAppID)
 
@@ -276,16 +394,16 @@ func TestWargaming_EncycInfo(t *testing.T) {
 func TestWargaming_BattleArena(t *testing.T) {
 	t.Parallel()
 
-	server := simpleMockServer(200, response.WGBattleArenas{
-		WGResponseCommon: response.WGResponseCommon[data.WGBattleArenas]{
-			Status: "",
-			Error:  response.WGError{},
-			Data:   map[int]data.WGBattleArenasData{},
-		},
+	server := simpleMockServer(200, response.WGResponse[data.WGBattleArenas]{
+		Data: map[int]data.WGBattleArenasData{},
 	})
 	defer server.Close()
 
-	wargaming := NewWargaming(server.URL, ratelimit.New(10))
+	wargaming := NewWargaming(*NewAPIConfig(
+		server.URL,
+		1*time.Second,
+		0,
+	), limiter)
 
 	result, err := wargaming.BattleArenas(testAppID)
 
@@ -296,16 +414,16 @@ func TestWargaming_BattleArena(t *testing.T) {
 func TestWargaming_BattleTypes(t *testing.T) {
 	t.Parallel()
 
-	server := simpleMockServer(200, response.WGBattleTypes{
-		WGResponseCommon: response.WGResponseCommon[data.WGBattleTypes]{
-			Status: "",
-			Error:  response.WGError{},
-			Data:   map[string]data.WGBattleTypesData{},
-		},
+	server := simpleMockServer(200, response.WGResponse[data.WGBattleTypes]{
+		Data: map[string]data.WGBattleTypesData{},
 	})
 	defer server.Close()
 
-	wargaming := NewWargaming(server.URL, ratelimit.New(10))
+	wargaming := NewWargaming(*NewAPIConfig(
+		server.URL,
+		1*time.Second,
+		0,
+	), limiter)
 	result, err := wargaming.BattleTypes(testAppID)
 
 	require.NoError(t, err)
@@ -318,9 +436,12 @@ func TestWargaming_Test(t *testing.T) {
 	server := simpleMockServer(200, response.WGEncycInfo{})
 	defer server.Close()
 
-	wargaming := NewWargaming(server.URL, ratelimit.New(10))
+	wargaming := NewWargaming(*NewAPIConfig(
+		server.URL,
+		1*time.Second,
+		0,
+	), limiter)
 
-	valid, err := wargaming.Test("hoge")
+	valid := wargaming.Test("hoge")
 	assert.True(t, valid)
-	require.NoError(t, err)
 }

@@ -3,7 +3,6 @@ package infra
 import (
 	"net/http"
 	"strconv"
-	"time"
 	"wfs/backend/apperr"
 	"wfs/backend/data"
 
@@ -12,35 +11,36 @@ import (
 )
 
 type Github struct {
-	baseURL string
+	config apiConfig
 }
 
-func NewGithub(baseURL string) *Github {
-	return &Github{baseURL: baseURL}
+func NewGithub(config apiConfig) *Github {
+	return &Github{config: config}
 }
 
 func (g *Github) LatestRelease() (data.GHLatestRelease, error) {
 	client := resty.New().
-		SetTimeout(5 * time.Second).
-		SetRetryCount(2)
+		SetTimeout(g.config.timeout).
+		SetRetryCount(g.config.retryCount)
 
 	var result data.GHLatestRelease
 	resp, err := client.R().
 		SetResult(&result).
-		Get(g.baseURL + "/repos/tona0516/wows-fast-stats/releases/latest")
+		Get(g.config.baseURL + "/repos/tona0516/wows-fast-stats/releases/latest")
 
 	errCtx := failure.Context{
 		"url":         resp.Request.URL,
 		"status_code": strconv.Itoa(resp.StatusCode()),
 		"body":        string(resp.Body()),
 	}
+
 	if err != nil {
-		return result, failure.Wrap(err, errCtx)
+		return result, failure.New(apperr.GithubAPICheckUpdateError, failure.Messagef(err.Error()), errCtx)
 	}
 
 	if resp.StatusCode() != http.StatusOK {
 		return result, failure.New(apperr.GithubAPICheckUpdateError, errCtx)
 	}
 
-	return result, failure.Wrap(err)
+	return result, nil
 }

@@ -69,8 +69,19 @@ func main() {
 }
 
 func initApp(env data.Env) *App {
-	alertDiscord := infra.NewDiscord(AlertDiscordWebhookURL)
-	infoDiscord := infra.NewDiscord(InfoDiscordWebhookURL)
+	timeout := 5 * time.Second
+	retryCount := 2
+
+	alertDiscord := infra.NewDiscord(*infra.NewAPIConfig(
+		AlertDiscordWebhookURL,
+		timeout,
+		retryCount,
+	))
+	infoDiscord := infra.NewDiscord(*infra.NewAPIConfig(
+		InfoDiscordWebhookURL,
+		timeout,
+		retryCount,
+	))
 	localFile := infra.NewLocalFile()
 
 	ownIGN, _ := localFile.IGN()
@@ -78,11 +89,27 @@ func initApp(env data.Env) *App {
 	logger := infra.NewLogger(env, alertDiscord, infoDiscord)
 	logger.SetOwnIGN(ownIGN)
 
-	wargaming := infra.NewWargaming("https://api.worldofwarships.asia", ratelimit.New(10))
-	uwargaming := infra.NewUnofficialWargaming("https://clans.worldofwarships.asia")
-	numbers := infra.NewNumbers("https://api.wows-numbers.com")
+	wargaming := infra.NewWargaming(*infra.NewAPIConfig(
+		"https://api.worldofwarships.asia",
+		timeout,
+		retryCount,
+	), ratelimit.New(10))
+	uwargaming := infra.NewUnofficialWargaming(*infra.NewAPIConfig(
+		"https://clans.worldofwarships.asia",
+		timeout,
+		retryCount,
+	))
+	numbers := infra.NewNumbers(*infra.NewAPIConfig(
+		"https://api.wows-numbers.com",
+		timeout,
+		retryCount,
+	))
 	unregistered := infra.NewUnregistered()
-	github := infra.NewGithub("https://api.github.com")
+	github := infra.NewGithub(*infra.NewAPIConfig(
+		"https://api.github.com",
+		timeout,
+		retryCount,
+	))
 
 	// usecase
 	watchInterval := 1 * time.Second

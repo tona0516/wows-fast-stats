@@ -2,9 +2,11 @@ package infra
 
 import (
 	"testing"
+	"time"
 	"wfs/backend/apperr"
 	"wfs/backend/data"
 
+	"github.com/morikuni/failure"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -22,7 +24,11 @@ func TestGithub_LatestRelease(t *testing.T) {
 		server := simpleMockServer(200, expected)
 		defer server.Close()
 
-		github := NewGithub(server.URL)
+		github := NewGithub(*NewAPIConfig(
+			server.URL,
+			1*time.Second,
+			0,
+		))
 
 		actual, err := github.LatestRelease()
 		require.NoError(t, err)
@@ -35,9 +41,13 @@ func TestGithub_LatestRelease(t *testing.T) {
 		server := simpleMockServer(400, "{}")
 		defer server.Close()
 
-		github := NewGithub(server.URL)
+		github := NewGithub(*NewAPIConfig(
+			server.URL,
+			1*time.Second,
+			0,
+		))
 
 		_, err := github.LatestRelease()
-		require.EqualError(t, apperr.Unwrap(err), apperr.GithubAPICheckUpdateError.ErrorCode())
+		require.True(t, failure.Is(err, apperr.GithubAPICheckUpdateError))
 	})
 }

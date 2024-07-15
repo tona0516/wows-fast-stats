@@ -11,7 +11,6 @@ import (
 func TestUnregistered_Warship(t *testing.T) {
 	t.Parallel()
 
-	// テスト用ships.json
 	mockShipsJSON := `[
 		{"id": 1, "ja": "Ship 1", "level": 11, "nation": "United_Kingdom", "species": "AirCarrier"},
         {"id": 2, "ja": "Ship 2", "level": 10, "nation": "USA", "species": "Battleship"},
@@ -22,11 +21,9 @@ func TestUnregistered_Warship(t *testing.T) {
 	]`
 	shipsByte = []byte(mockShipsJSON)
 
-	// テスト
 	unregistered := NewUnregistered()
 	actual, err := unregistered.Warship()
 
-	// アサーション
 	expected := data.Warships{
 		1: {
 			Name:      "Ship 1",

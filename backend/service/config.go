@@ -65,7 +65,7 @@ func (c *Config) ValidateRequired(
 	if appid == "" {
 		result.AppID = apperr.EmptyAppID.ErrorCode()
 	} else {
-		if ok, _ := c.wargaming.Test(appid); !ok {
+		if ok := c.wargaming.Test(appid); !ok {
 			result.AppID = apperr.InvalidAppID.ErrorCode()
 		}
 	}

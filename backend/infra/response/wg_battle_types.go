@@ -1,14 +1,13 @@
 package response
 
 import (
-	"reflect"
 	"wfs/backend/data"
 )
 
 type WGBattleTypes struct {
-	WGResponseCommon[data.WGBattleTypes]
+	WGResponse[data.WGBattleTypes]
 }
 
 func (w WGBattleTypes) Field() string {
-	return fieldQuery(reflect.TypeOf(&data.WGBattleTypesData{}).Elem())
+	return wgAPIField(&data.WGBattleTypesData{})
 }

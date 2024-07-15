@@ -9,7 +9,6 @@ import (
 	"wfs/backend/data"
 	"wfs/backend/mock/repository"
 
-	"github.com/morikuni/failure"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
@@ -19,8 +18,6 @@ const (
 	validInstallPath = "install_path_test"
 	validAppID       = "abc123"
 )
-
-var errWargaming = failure.New(apperr.WGAPIError)
 
 //nolint:paralleltest
 func TestConfig_UpdateRequired(t *testing.T) {
@@ -35,7 +32,7 @@ func TestConfig_UpdateRequired(t *testing.T) {
 		config := createInputConfig()
 
 		mockWargaming := repository.NewMockWargamingInterface(ctrl)
-		mockWargaming.EXPECT().Test(config.Appid).Return(true, nil)
+		mockWargaming.EXPECT().Test(config.Appid).Return(true)
 
 		mockLocalFile := repository.NewMockLocalFileInterface(ctrl)
 		mockLocalFile.EXPECT().UserConfigV2().Return(config, nil)
@@ -56,7 +53,7 @@ func TestConfig_UpdateRequired(t *testing.T) {
 		config.Appid = "abc123"
 
 		mockWargaming := repository.NewMockWargamingInterface(ctrl)
-		mockWargaming.EXPECT().Test(config.Appid).Return(true, nil)
+		mockWargaming.EXPECT().Test(config.Appid).Return(true)
 
 		// テスト
 		c := NewConfig(nil, mockWargaming, nil)
@@ -71,7 +68,7 @@ func TestConfig_UpdateRequired(t *testing.T) {
 		config := createInputConfig()
 
 		mockWargaming := repository.NewMockWargamingInterface(ctrl)
-		mockWargaming.EXPECT().Test(config.Appid).Return(false, errWargaming) // Note: WG APIでエラー
+		mockWargaming.EXPECT().Test(config.Appid).Return(false)
 
 		// テスト
 		c := NewConfig(nil, mockWargaming, nil)
@@ -94,18 +91,15 @@ func TestConfig_UpdateOptional(t *testing.T) {
 
 	t.Run("正常系", func(t *testing.T) {
 		config := createInputConfig()
-		config.FontSize = "small"
-		// Note: requiredな値を与えてもこれらの値はWriteUserConfigでは含まれない
-		actualWritten := data.DefaultUserConfigV2()
-		actualWritten.FontSize = "small"
 
 		mockLocalFile := repository.NewMockLocalFileInterface(ctrl)
 		mockLocalFile.EXPECT().UserConfigV2().Return(config, nil)
+		// Note: requiredな値は変更されないこと
 		mockLocalFile.EXPECT().WriteUserConfigV2(config).Return(nil)
 
 		// テスト実行
 		c := NewConfig(mockLocalFile, nil, nil)
-		err = c.UpdateOptional(config)
+		err = c.UpdateOptional(data.DefaultUserConfigV2())
 
 		// アサーション
 		require.NoError(t, err)

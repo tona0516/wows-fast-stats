@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 	"wfs/backend/apperr"
 	"wfs/backend/data"
 
@@ -32,8 +33,11 @@ func TestUnofficialWargaming_AccountListForSearch(t *testing.T) {
 		server := simpleMockServer(200, expected)
 		defer server.Close()
 
-		uwargaming := NewUnofficialWargaming(server.URL)
-
+		uwargaming := NewUnofficialWargaming(*NewAPIConfig(
+			server.URL,
+			1*time.Second,
+			0,
+		))
 		result, err := uwargaming.ClansAutoComplete("TEST")
 
 		require.NoError(t, err)
@@ -59,13 +63,12 @@ func TestUnofficialWargaming_AccountListForSearch(t *testing.T) {
 		}))
 		defer server.Close()
 
-		uwargaming := NewUnofficialWargaming(server.URL)
-
+		uwargaming := NewUnofficialWargaming(*NewAPIConfig(
+			server.URL,
+			1*time.Second,
+			0,
+		))
 		_, err := uwargaming.ClansAutoComplete("")
-
-		require.Error(t, err)
-		code, ok := failure.CodeOf(err)
-		assert.True(t, ok)
-		assert.Equal(t, apperr.UWGAPIError, code)
+		assert.True(t, failure.Is(err, apperr.UWGAPIError))
 	})
 }

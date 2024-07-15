@@ -4,37 +4,39 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+
+	"github.com/morikuni/failure"
 )
 
 func readFile(path string) ([]byte, error) {
-	return os.ReadFile(path)
+	b, err := os.ReadFile(path)
+	return b, failure.Wrap(err)
 }
 
 func readJSON[T any](path string) (T, error) {
 	var result T
+
 	b, err := readFile(path)
 	if err != nil {
-		return result, err
+		return result, failure.Wrap(err)
 	}
 
 	err = json.Unmarshal(b, &result)
-	return result, err
+	return result, failure.Wrap(err)
 }
 
 func writeFile(path string, target []byte) error {
-	return os.WriteFile(path, target, 0o644)
+	_ = os.MkdirAll(filepath.Dir(path), 0o755)
+	//nolint:gosec
+	err := os.WriteFile(path, target, 0o644)
+	return failure.Wrap(err)
 }
 
 func writeJSON[T any](path string, target T) error {
-	_ = os.MkdirAll(filepath.Dir(path), 0o755)
-	f, err := os.Create(path)
+	b, err := json.Marshal(target)
 	if err != nil {
-		return err
+		return failure.Wrap(err)
 	}
-	defer f.Close()
 
-	encoder := json.NewEncoder(f)
-	encoder.SetIndent("", "  ")
-	err = encoder.Encode(target)
-	return err
+	return writeFile(path, b)
 }

@@ -11,6 +11,7 @@ const (
 	ParseExpectedStatsError     failure.StringCode = "ユーザの予測成績データのパースに失敗しました。"
 	HTTPRequestError            failure.StringCode = "HTTPリクエストエラー"
 	WGAPITemporaryUnavaillalble failure.StringCode = "WG APIが一時的に利用できません。リロードしてください。"
+	WGAPIParseResponseError     failure.StringCode = "WG APIが利用できません。再起動してください。"
 	WGAPIError                  failure.StringCode = "WG APIが利用できません。再起動するか、設定を見直してください。"
 	UWGAPIError                 failure.StringCode = "WG APIが利用できません。リロードしてください。"
 	NumbersAPIError             failure.StringCode = "Numbers APIが利用できません。"

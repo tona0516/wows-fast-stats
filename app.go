@@ -63,8 +63,8 @@ func (a *App) onStartup(ctx context.Context) {
 	runtime.LogSetLogLevel(ctx, logger.INFO)
 	a.logger.Init(ctx)
 
-    a.config.InitUserIfNeeded()
-    a.config.InitAlertPlayersIfNeeded()
+	a.config.InitUserIfNeeded()
+	a.config.InitAlertPlayersIfNeeded()
 }
 
 func (a *App) StartWatching() error {

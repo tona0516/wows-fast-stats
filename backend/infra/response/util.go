@@ -3,51 +3,34 @@ package response
 import (
 	"reflect"
 	"strings"
-	"unicode"
 )
 
-func fieldQuery(target reflect.Type) string {
-	fields := []string{}
-	fieldsRecursive([]string{}, target, &fields)
-
-	return strings.Join(fields, ",")
+func wgAPIField(i any) string {
+	parents := make([]string, 0)
+	elem := reflect.TypeOf(i).Elem()
+	fields := jsonTagRecursive(parents, elem)
+	joined := strings.Join(fields, ",")
+	return joined
 }
 
-func fieldsRecursive(parentNames []string, t reflect.Type, result *[]string) {
+func jsonTagRecursive(parents []string, t reflect.Type) []string {
+	tags := make([]string, 0)
+
 	for i := range t.NumField() {
-		field := t.Field(i)
+		f := t.Field(i)
+		tag := f.Tag.Get("json")
 
-		if field.Type.Kind() == reflect.Struct {
-			name := toSnakeCase(field.Name)
-			fieldsRecursive(append(parentNames, name), field.Type, result)
-
+		if f.Type.Kind() == reflect.Struct {
+			childTags := jsonTagRecursive(append(parents, tag), f.Type)
+			tags = append(tags, childTags...)
 			continue
 		}
 
-		column := field.Tag.Get("json")
-		if len(parentNames) > 0 {
-			*result = append(*result, strings.Join(parentNames, ".")+"."+column)
-		} else {
-			*result = append(*result, column)
+		if len(parents) > 0 {
+			tag = strings.Join(parents, ".") + "." + tag
 		}
-	}
-}
-
-func toSnakeCase(s string) string {
-	runes := []rune(s)
-	result := make([]rune, 0)
-
-	for i, r := range runes {
-		if !unicode.IsUpper(r) {
-			result = append(result, r)
-			continue
-		}
-
-		if i > 0 && unicode.IsLower(runes[i-1]) {
-			result = append(result, '_')
-		}
-		result = append(result, unicode.ToLower(r))
+		tags = append(tags, tag)
 	}
 
-	return string(result)
+	return tags
 }

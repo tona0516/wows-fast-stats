@@ -176,12 +176,11 @@ func (mr *MockWargamingInterfaceMockRecorder) ShipsStats(appID, accountID any) *
 }
 
 // Test mocks base method.
-func (m *MockWargamingInterface) Test(appID string) (bool, error) {
+func (m *MockWargamingInterface) Test(appID string) bool {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Test", appID)
 	ret0, _ := ret[0].(bool)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	return ret0
 }
 
 // Test indicates an expected call of Test.

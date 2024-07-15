@@ -3,7 +3,6 @@ package infra
 import (
 	"net/http"
 	"strconv"
-	"time"
 	"wfs/backend/apperr"
 	"wfs/backend/data"
 
@@ -12,35 +11,36 @@ import (
 )
 
 type Numbers struct {
-	baseURL string
+	config apiConfig
 }
 
-func NewNumbers(baseURL string) *Numbers {
-	return &Numbers{baseURL: baseURL}
+func NewNumbers(config apiConfig) *Numbers {
+	return &Numbers{config: config}
 }
 
 func (n *Numbers) ExpectedStats() (data.ExpectedStats, error) {
 	client := resty.New().
-		SetTimeout(5 * time.Second).
-		SetRetryCount(2)
+		SetTimeout(n.config.timeout).
+		SetRetryCount(n.config.retryCount)
 
 	var result data.NSExpectedStats
 	resp, err := client.R().
 		SetResult(&result).
-		Get(n.baseURL + "/personal/rating/expected/json/")
+		Get(n.config.baseURL + "/personal/rating/expected/json/")
 
 	errCtx := failure.Context{
 		"url":         resp.Request.URL,
 		"status_code": strconv.Itoa(resp.StatusCode()),
 		"body":        string(resp.Body()),
 	}
+
 	if err != nil {
-		return result.Data, failure.Wrap(err, errCtx)
+		return result.Data, failure.New(apperr.NumbersAPIError, failure.Messagef(err.Error()), errCtx)
 	}
 
 	if resp.StatusCode() != http.StatusOK {
 		return result.Data, failure.New(apperr.NumbersAPIError, errCtx)
 	}
 
-	return result.Data, failure.Wrap(err)
+	return result.Data, nil
 }
