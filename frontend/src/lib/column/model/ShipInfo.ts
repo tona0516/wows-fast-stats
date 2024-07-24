@@ -14,7 +14,7 @@ import FlagUssr from "src/assets/images/flag_Russia.png";
 import FlagSpain from "src/assets/images/flag_Spain.png";
 import FlagUsa from "src/assets/images/flag_USA.png";
 import FlagUk from "src/assets/images/flag_United_Kingdom.png";
-import FlagNone from "src/assets/images/flag_none.png"
+import FlagNone from "src/assets/images/flag_none.png";
 
 import ShipBB from "src/assets/images/ship_bb.png";
 import ShipPremiumBB from "src/assets/images/ship_bb_premium.png";
@@ -26,7 +26,7 @@ import ShipDD from "src/assets/images/ship_dd.png";
 import ShipPremiumDD from "src/assets/images/ship_dd_premium.png";
 import ShipSS from "src/assets/images/ship_ss.png";
 import ShipPremiumSS from "src/assets/images/ship_ss_premium.png";
-import ShipNone from "src/assets/images/ship_none.png"
+import ShipNone from "src/assets/images/ship_none.png";
 
 import { isShipType, tierString } from "src/lib/util";
 import ShipInfoTableData from "src/component/main/internal/table_data/ShipInfoTableData.svelte";

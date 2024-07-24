@@ -25,11 +25,13 @@ export class Damage
     if (this.category !== "ship") return "";
     const value = this.playerStats(player).ship.damage;
 
-    return RatingInfo.fromDamage(
-      value,
-      player.ship_info.avg_damage,
-      this.config.color.skill.text,
-    )?.textColorCode ?? "";
+    return (
+      RatingInfo.fromDamage(
+        value,
+        player.ship_info.avg_damage,
+        this.config.color.skill.text,
+      )?.textColorCode ?? ""
+    );
   }
 
   value(player: data.Player): number {

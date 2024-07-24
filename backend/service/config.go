@@ -3,13 +3,13 @@ package service
 import (
 	"context"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"wfs/backend/apperr"
 	"wfs/backend/data"
 	"wfs/backend/repository"
 
 	"github.com/morikuni/failure"
-	"github.com/skratchdot/open-golang/open"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
@@ -36,7 +36,9 @@ func NewConfig(
 		storage:             storage,
 		logger:              logger,
 		OpenDirectoryDialog: runtime.OpenDirectoryDialog,
-		OpenWithDefaultApp:  open.Run,
+		OpenWithDefaultApp: func(input string) error {
+			return exec.Command("explorer", input).Start()
+		},
 	}
 }
 

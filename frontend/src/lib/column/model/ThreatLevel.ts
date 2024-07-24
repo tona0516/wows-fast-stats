@@ -18,13 +18,17 @@ export class ThreatLevel extends AbstractStatsColumn<string> {
   }
 
   textColorCode(player: data.Player): string {
-    return ThreatLevelInfo.fromScore(player.pvp_all.overall.threat_level.raw)
-      ?.textColorCode ?? "";
+    return (
+      ThreatLevelInfo.fromScore(player.pvp_all.overall.threat_level.raw)
+        ?.textColorCode ?? ""
+    );
   }
 
   bgColorCode(player: data.Player): string {
-    return ThreatLevelInfo.fromScore(player.pvp_all.overall.threat_level.raw)
-      ?.bgColorCode ?? "";
+    return (
+      ThreatLevelInfo.fromScore(player.pvp_all.overall.threat_level.raw)
+        ?.bgColorCode ?? ""
+    );
   }
 
   svelteComponent() {
