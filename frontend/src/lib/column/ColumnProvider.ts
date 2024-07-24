@@ -47,10 +47,7 @@ export namespace ColumnProvider {
     config: data.UserConfigV2,
   ): [basic: ColumnArray, ship: ColumnArray, overall: ColumnArray] => {
     return [
-      new ColumnArray("basic", [
-        new PlayerName(config),
-        new ShipInfo(config),
-    ]),
+      new ColumnArray("basic", [new PlayerName(config), new ShipInfo(config)]),
       new ColumnArray("ship", [
         new PR(config, "ship"),
         new Damage(config, "ship"),

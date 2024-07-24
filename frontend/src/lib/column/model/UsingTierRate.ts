@@ -17,9 +17,7 @@ export class UsingTierRate extends AbstractStatsColumn<StackedBarGraphParam> {
 
     const items = DispName.TIER_GROUPS.toArray().map((it) => {
       const colorCode =
-        it.key === ownTierGroup
-          ? colors.own[it.key]
-          : colors.other[it.key];
+        it.key === ownTierGroup ? colors.own[it.key] : colors.other[it.key];
       const rate = tierRateGroup[it.key];
 
       return { label: it.value, colorCode: colorCode, value: rate };
