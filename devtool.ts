@@ -84,8 +84,7 @@ function lint() {
 }
 
 function fmt() {
-  exec("golangci-lint run --fix");
-  exec("go fmt");
+  exec("go fmt ./...");
   exec(`${FRONTEND_NPM_COMMAND} run fmt`);
 }
 
