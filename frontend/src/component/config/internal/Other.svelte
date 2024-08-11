@@ -24,24 +24,6 @@
       ><input
         class="uk-checkbox"
         type="checkbox"
-        bind:checked={inputConfig.save_screenshot}
-        on:change={() => dispatch("Change")}
-      /> 自動でスクリーンショットを保存する</label
-    >
-    <div>
-      <!-- svelte-ignore a11y-invalid-attribute -->
-      <a class="td-link" href="#" on:click={() => openDirectory("screenshot")}>
-        <UkIcon name="folder" />
-        <span class="uk-text-middle">保存フォルダを開く</span>
-      </a>
-    </div>
-  </div>
-
-  <div class="uk-margin-small-bottom">
-    <label
-      ><input
-        class="uk-checkbox"
-        type="checkbox"
         bind:checked={inputConfig.save_temp_arena_info}
         on:change={() => dispatch("Change")}
       /> 【開発用】自動で戦闘情報(tempArenaInfo.json)を保存する</label

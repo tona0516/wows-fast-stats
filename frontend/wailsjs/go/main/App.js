@@ -22,10 +22,6 @@ export function ApplyUserConfig(arg1) {
   return window['go']['main']['App']['ApplyUserConfig'](arg1);
 }
 
-export function AutoScreenshot(arg1, arg2) {
-  return window['go']['main']['App']['AutoScreenshot'](arg1, arg2);
-}
-
 export function Battle() {
   return window['go']['main']['App']['Battle']();
 }
@@ -48,10 +44,6 @@ export function LogError(arg1, arg2) {
 
 export function LogInfo(arg1, arg2) {
   return window['go']['main']['App']['LogInfo'](arg1, arg2);
-}
-
-export function ManualScreenshot(arg1, arg2) {
-  return window['go']['main']['App']['ManualScreenshot'](arg1, arg2);
 }
 
 export function MigrateIfNeeded() {

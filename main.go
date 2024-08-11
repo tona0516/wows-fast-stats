@@ -131,7 +131,6 @@ func initApp(env data.Env) *App {
 	// usecase
 	watchInterval := 1 * time.Second
 	config := service.NewConfig(localFile, wargaming, storage, logger)
-	screenshot := service.NewScreenshot(localFile, logger)
 	battle := service.NewBattle(
 		wargaming,
 		uwargaming,
@@ -150,7 +149,6 @@ func initApp(env data.Env) *App {
 		env,
 		logger,
 		*config,
-		*screenshot,
 		*watcher,
 		*battle,
 		*updater,

@@ -30,7 +30,6 @@ type App struct {
 	env            data.Env
 	logger         repository.LoggerInterface
 	config         service.Config
-	screenshot     service.Screenshot
 	watcher        service.Watcher
 	battle         service.Battle
 	updater        service.Updater
@@ -42,7 +41,6 @@ func NewApp(
 	env data.Env,
 	logger repository.LoggerInterface,
 	config service.Config,
-	screenshot service.Screenshot,
 	watcher service.Watcher,
 	battle service.Battle,
 	updater service.Updater,
@@ -52,7 +50,6 @@ func NewApp(
 		env:            env,
 		logger:         logger,
 		config:         config,
-		screenshot:     screenshot,
 		watcher:        watcher,
 		battle:         battle,
 		updater:        updater,
@@ -168,22 +165,6 @@ func (a *App) ApplyRequiredUserConfig(
 	}
 
 	return validatedResult, apperr.Unwrap(err)
-}
-
-func (a *App) ManualScreenshot(filename string, base64Data string) (bool, error) {
-	saved, err := a.screenshot.SaveWithDialog(a.ctx, filename, base64Data)
-	if err != nil {
-		a.logger.Error(err, nil)
-	}
-	return saved, apperr.Unwrap(err)
-}
-
-func (a *App) AutoScreenshot(filename string, base64Data string) error {
-	err := a.screenshot.SaveForAuto(filename, base64Data)
-	if err != nil {
-		a.logger.Error(err, nil)
-	}
-	return apperr.Unwrap(err)
 }
 
 func (a *App) Semver() string {

@@ -41,7 +41,6 @@
     "clone": "^2.1.2",
     "date-fns": "^3.5.0",
     "flag-icons": "^7.2.3",
-    "html-to-image": "^1.11.11",
     "svelte": "^3.59.1",
     "uikit": "3.16.26"
   }

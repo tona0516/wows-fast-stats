@@ -101,7 +101,6 @@ type UserConfigV2 struct {
 	// team summary
 	TeamSummary UCTeamSummary `json:"team_summary"`
 	// other
-	SaveScreenshot    bool         `json:"save_screenshot"`
 	SaveTempArenaInfo bool         `json:"save_temp_arena_info"`
 	SendReport        bool         `json:"send_report"`
 	NotifyUpdatable   bool         `json:"notify_updatable"`
@@ -166,7 +165,6 @@ func FromUserConfigV1(v1 UserConfig) UserConfigV2 {
 			ThreatLevel:       0,
 		},
 		TeamSummary:       UCTeamSummary(v1.TeamAverage),
-		SaveScreenshot:    v1.SaveScreenshot,
 		SaveTempArenaInfo: v1.SaveTempArenaInfo,
 		SendReport:        v1.SendReport,
 		NotifyUpdatable:   v1.NotifyUpdatable,

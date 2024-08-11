@@ -1,7 +1,6 @@
 package infra
 
 import (
-	"encoding/base64"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -31,25 +30,6 @@ func NewLocalFile() *LocalFile {
 		userConfigPath:  filepath.Join(ConfigDir, UserConfigFile),
 		alertPlayerPath: filepath.Join(ConfigDir, AlertPlayerFile),
 	}
-}
-
-func (l *LocalFile) SaveScreenshot(path string, base64Data string) error {
-	dir := filepath.Dir(path)
-	_ = os.Mkdir(dir, 0o755)
-
-	data, err := base64.StdEncoding.DecodeString(base64Data)
-	if err != nil {
-		return failure.Wrap(err)
-	}
-
-	f, err := os.Create(path)
-	if err != nil {
-		return failure.Wrap(err)
-	}
-	defer f.Close()
-
-	_, err = f.Write(data)
-	return failure.Wrap(err)
 }
 
 func (l *LocalFile) TempArenaInfo(installPath string) (data.TempArenaInfo, error) {

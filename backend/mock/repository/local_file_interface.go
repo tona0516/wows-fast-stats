@@ -39,20 +39,6 @@ func (m *MockLocalFileInterface) EXPECT() *MockLocalFileInterfaceMockRecorder {
 	return m.recorder
 }
 
-// SaveScreenshot mocks base method.
-func (m *MockLocalFileInterface) SaveScreenshot(path, base64Data string) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SaveScreenshot", path, base64Data)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// SaveScreenshot indicates an expected call of SaveScreenshot.
-func (mr *MockLocalFileInterfaceMockRecorder) SaveScreenshot(path, base64Data any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveScreenshot", reflect.TypeOf((*MockLocalFileInterface)(nil).SaveScreenshot), path, base64Data)
-}
-
 // SaveTempArenaInfo mocks base method.
 func (m *MockLocalFileInterface) SaveTempArenaInfo(tempArenaInfo data.TempArenaInfo) error {
 	m.ctrl.T.Helper()

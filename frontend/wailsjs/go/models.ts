@@ -841,7 +841,6 @@ export namespace data {
 	    digit: UCDigit;
 	    show_language_frag: boolean;
 	    team_summary: UCTeamSummary;
-	    save_screenshot: boolean;
 	    save_temp_arena_info: boolean;
 	    send_report: boolean;
 	    notify_updatable: boolean;
@@ -862,7 +861,6 @@ export namespace data {
 	        this.digit = this.convertValues(source["digit"], UCDigit);
 	        this.show_language_frag = source["show_language_frag"];
 	        this.team_summary = this.convertValues(source["team_summary"], UCTeamSummary);
-	        this.save_screenshot = source["save_screenshot"];
 	        this.save_temp_arena_info = source["save_temp_arena_info"];
 	        this.send_report = source["send_report"];
 	        this.notify_updatable = source["notify_updatable"];

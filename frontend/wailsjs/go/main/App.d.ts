@@ -12,8 +12,6 @@ export function ApplyRequiredUserConfig(arg1:string,arg2:string):Promise<data.Re
 
 export function ApplyUserConfig(arg1:data.UserConfigV2):Promise<void>;
 
-export function AutoScreenshot(arg1:string,arg2:string):Promise<void>;
-
 export function Battle():Promise<data.Battle>;
 
 export function DefaultUserConfig():Promise<data.UserConfigV2>;
@@ -25,8 +23,6 @@ export function LatestRelease():Promise<data.GHLatestRelease>;
 export function LogError(arg1:string,arg2:{[key: string]: string}):Promise<void>;
 
 export function LogInfo(arg1:string,arg2:{[key: string]: string}):Promise<void>;
-
-export function ManualScreenshot(arg1:string,arg2:string):Promise<boolean>;
 
 export function MigrateIfNeeded():Promise<void>;
 
