@@ -1,6 +1,7 @@
 package infra
 
 import (
+	"fmt"
 	"os"
 	"path"
 	"testing"
@@ -220,6 +221,71 @@ func TestStorage_OwnIGN(t *testing.T) {
 	actual, err := storage.OwnIGN()
 	require.NoError(t, err)
 	assert.Equal(t, expected, actual)
+
+	cleanDB(t, db)
+}
+
+func TestStorage_BattleHistory(t *testing.T) {
+	t.Parallel()
+
+	db := openDB(t)
+	storage := NewStorage(db)
+
+	expected := data.Battle{
+		Meta: data.Meta{
+			Unixtime: 1723585938,
+			Arena:    "test_arena",
+			Type:     "test_type",
+			OwnShip:  "test_ownship",
+		},
+		Teams: []data.Team{
+			{
+				Players: []data.Player{
+					{
+						PlayerInfo: data.PlayerInfo{},
+						ShipInfo:   data.ShipInfo{},
+						PvPSolo:    data.PlayerStats{},
+						PvPAll:     data.PlayerStats{},
+					},
+				},
+			},
+		},
+	}
+	expectedKey := fmt.Sprintf(
+		"battle-%d-%s-%s-%s",
+		expected.Meta.Unixtime,
+		expected.Meta.Type,
+		expected.Meta.OwnShip,
+		expected.Meta.Arena,
+	)
+
+	// 書き込み：正常系
+	err := storage.WriteBattleHistory(expected)
+
+	require.NoError(t, err)
+
+	// 取得：正常系
+	actual, err := storage.BattleHistory(expectedKey)
+
+	require.NoError(t, err)
+	assert.Equal(t, expected, actual)
+
+	// キー取得：正常系
+	actualKeys, err := storage.BattleHistoryKeys()
+
+	require.NoError(t, err)
+	assert.Len(t, actualKeys, 1)
+	assert.Equal(t, expectedKey, actualKeys[0])
+
+	// 削除：正常系
+	err = storage.DeleteBattleHistory(expectedKey)
+
+	require.NoError(t, err)
+	_, err = storage.BattleHistory(expectedKey)
+	require.Error(t, err)
+	actualKeys, err = storage.BattleHistoryKeys()
+	require.NoError(t, err)
+	assert.Empty(t, actualKeys)
 
 	cleanDB(t, db)
 }

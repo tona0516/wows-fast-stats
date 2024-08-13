@@ -18,4 +18,8 @@ type StorageInterface interface {
 	WriteExpectedStats(expectedStats data.ExpectedStats) error
 	OwnIGN() (string, error)
 	WriteOwnIGN(ign string) error
+	BattleHistoryKeys() ([]string, error)
+	BattleHistory(key string) (data.Battle, error)
+	WriteBattleHistory(battle data.Battle) error
+	DeleteBattleHistory(key string) error
 }

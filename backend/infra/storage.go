@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"encoding/gob"
 	"errors"
+	"fmt"
+	"strings"
 	"wfs/backend/data"
 
 	"github.com/dgraph-io/badger/v4"
@@ -107,6 +109,47 @@ func (s *Storage) OwnIGN() (string, error) {
 
 func (s *Storage) WriteOwnIGN(ign string) error {
 	return write(s.db, ownIGNKey, ign)
+}
+
+func (s *Storage) BattleHistoryKeys() ([]string, error) {
+	var result []string
+
+	err := s.db.View(func(txn *badger.Txn) error {
+		opts := badger.DefaultIteratorOptions
+		opts.PrefetchValues = false
+		it := txn.NewIterator(opts)
+		defer it.Close()
+
+		for it.Rewind(); it.Valid(); it.Next() {
+			key := string(it.Item().Key())
+			if strings.HasPrefix(key, "battle-") {
+				result = append(result, key)
+			}
+		}
+
+		return nil
+	})
+
+	return result, err
+}
+
+func (s *Storage) BattleHistory(key string) (data.Battle, error) {
+	return read[data.Battle](s.db, key)
+}
+
+func (s *Storage) WriteBattleHistory(battle data.Battle) error {
+	key := fmt.Sprintf(
+		"battle-%d-%s-%s-%s",
+		battle.Meta.Unixtime,
+		battle.Meta.Type,
+		battle.Meta.OwnShip,
+		battle.Meta.Arena,
+	)
+	return write(s.db, key, battle)
+}
+
+func (s *Storage) DeleteBattleHistory(key string) error {
+	return delete(s.db, key)
 }
 
 func read[T any](db *badger.DB, key string) (T, error) {

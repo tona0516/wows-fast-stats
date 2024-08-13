@@ -54,6 +54,36 @@ func (mr *MockStorageInterfaceMockRecorder) AlertPlayers() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AlertPlayers", reflect.TypeOf((*MockStorageInterface)(nil).AlertPlayers))
 }
 
+// BattleHistory mocks base method.
+func (m *MockStorageInterface) BattleHistory(key string) (data.Battle, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "BattleHistory", key)
+	ret0, _ := ret[0].(data.Battle)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// BattleHistory indicates an expected call of BattleHistory.
+func (mr *MockStorageInterfaceMockRecorder) BattleHistory(key any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BattleHistory", reflect.TypeOf((*MockStorageInterface)(nil).BattleHistory), key)
+}
+
+// BattleHistoryKeys mocks base method.
+func (m *MockStorageInterface) BattleHistoryKeys() ([]string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "BattleHistoryKeys")
+	ret0, _ := ret[0].([]string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// BattleHistoryKeys indicates an expected call of BattleHistoryKeys.
+func (mr *MockStorageInterfaceMockRecorder) BattleHistoryKeys() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BattleHistoryKeys", reflect.TypeOf((*MockStorageInterface)(nil).BattleHistoryKeys))
+}
+
 // DataVersion mocks base method.
 func (m *MockStorageInterface) DataVersion() (uint, error) {
 	m.ctrl.T.Helper()
@@ -67,6 +97,20 @@ func (m *MockStorageInterface) DataVersion() (uint, error) {
 func (mr *MockStorageInterfaceMockRecorder) DataVersion() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DataVersion", reflect.TypeOf((*MockStorageInterface)(nil).DataVersion))
+}
+
+// DeleteBattleHistory mocks base method.
+func (m *MockStorageInterface) DeleteBattleHistory(key string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteBattleHistory", key)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteBattleHistory indicates an expected call of DeleteBattleHistory.
+func (mr *MockStorageInterfaceMockRecorder) DeleteBattleHistory(key any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteBattleHistory", reflect.TypeOf((*MockStorageInterface)(nil).DeleteBattleHistory), key)
 }
 
 // ExpectedStats mocks base method.
@@ -169,6 +213,20 @@ func (m *MockStorageInterface) WriteAlertPlayers(players []data.AlertPlayer) err
 func (mr *MockStorageInterfaceMockRecorder) WriteAlertPlayers(players any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WriteAlertPlayers", reflect.TypeOf((*MockStorageInterface)(nil).WriteAlertPlayers), players)
+}
+
+// WriteBattleHistory mocks base method.
+func (m *MockStorageInterface) WriteBattleHistory(battle data.Battle) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "WriteBattleHistory", battle)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// WriteBattleHistory indicates an expected call of WriteBattleHistory.
+func (mr *MockStorageInterfaceMockRecorder) WriteBattleHistory(battle any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WriteBattleHistory", reflect.TypeOf((*MockStorageInterface)(nil).WriteBattleHistory), battle)
 }
 
 // WriteDataVersion mocks base method.
