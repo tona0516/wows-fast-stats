@@ -2,11 +2,12 @@ package data
 
 func DefaultUserConfigV2() UserConfigV2 {
 	return UserConfigV2{
-		Version:         2,
-		FontSize:        "medium",
-		SendReport:      true,
-		NotifyUpdatable: true,
-		StatsPattern:    StatsPatternPvPAll,
+		Version:            2,
+		FontSize:           "medium",
+		SendReport:         true,
+		NotifyUpdatable:    true,
+		StatsPattern:       StatsPatternPvPAll,
+		MaxBattleHistories: 50,
 		Display: UCDisplay{
 			Ship: UCDisplayShip{
 				PR:      true,
@@ -101,10 +102,11 @@ type UserConfigV2 struct {
 	// team summary
 	TeamSummary UCTeamSummary `json:"team_summary"`
 	// other
-	SaveTempArenaInfo bool         `json:"save_temp_arena_info"`
-	SendReport        bool         `json:"send_report"`
-	NotifyUpdatable   bool         `json:"notify_updatable"`
-	StatsPattern      StatsPattern `json:"stats_pattern"`
+	SaveTempArenaInfo  bool         `json:"save_temp_arena_info"`
+	SendReport         bool         `json:"send_report"`
+	NotifyUpdatable    bool         `json:"notify_updatable"`
+	StatsPattern       StatsPattern `json:"stats_pattern"`
+	MaxBattleHistories uint         `json:"max_battle_histories"`
 }
 
 func FromUserConfigV1(v1 UserConfig) UserConfigV2 {
@@ -164,11 +166,12 @@ func FromUserConfigV1(v1 UserConfig) UserConfigV2 {
 			PlatoonRate:       v1.CustomDigit.PlatoonRate,
 			ThreatLevel:       0,
 		},
-		TeamSummary:       UCTeamSummary(v1.TeamAverage),
-		SaveTempArenaInfo: v1.SaveTempArenaInfo,
-		SendReport:        v1.SendReport,
-		NotifyUpdatable:   v1.NotifyUpdatable,
-		StatsPattern:      v1.StatsPattern,
+		TeamSummary:        UCTeamSummary(v1.TeamAverage),
+		SaveTempArenaInfo:  v1.SaveTempArenaInfo,
+		SendReport:         v1.SendReport,
+		NotifyUpdatable:    v1.NotifyUpdatable,
+		StatsPattern:       v1.StatsPattern,
+		MaxBattleHistories: 50,
 	}
 }
 
