@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"time"
 	"wfs/backend/data"
 
 	"github.com/dgraph-io/badger/v4"
@@ -122,7 +123,7 @@ func (s *Storage) BattleHistoryKeys() ([]string, error) {
 
 		for it.Rewind(); it.Valid(); it.Next() {
 			key := string(it.Item().Key())
-			if strings.HasPrefix(key, "battle-") {
+			if strings.HasPrefix(key, "battle_") {
 				result = append(result, key)
 			}
 		}
@@ -139,8 +140,8 @@ func (s *Storage) BattleHistory(key string) (data.Battle, error) {
 
 func (s *Storage) WriteBattleHistory(battle data.Battle) error {
 	key := fmt.Sprintf(
-		"battle-%d-%s-%s-%s",
-		battle.Meta.Unixtime,
+		"battle_%s_%s_%s_%s",
+		time.Unix(battle.Meta.Unixtime, 0).Format(time.DateTime),
 		battle.Meta.Type,
 		battle.Meta.OwnShip,
 		battle.Meta.Arena,

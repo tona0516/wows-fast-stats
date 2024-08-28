@@ -5,6 +5,7 @@ import (
 	"os"
 	"path"
 	"testing"
+	"time"
 	"wfs/backend/data"
 
 	"github.com/dgraph-io/badger/v4"
@@ -252,8 +253,8 @@ func TestStorage_BattleHistory(t *testing.T) {
 		},
 	}
 	expectedKey := fmt.Sprintf(
-		"battle-%d-%s-%s-%s",
-		expected.Meta.Unixtime,
+		"battle_%s_%s_%s_%s",
+		time.Unix(expected.Meta.Unixtime, 0).Format(time.DateTime),
 		expected.Meta.Type,
 		expected.Meta.OwnShip,
 		expected.Meta.Arena,

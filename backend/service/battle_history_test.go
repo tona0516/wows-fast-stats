@@ -65,6 +65,31 @@ func TestBattleHistory_Add(t *testing.T) {
 	config := data.UserConfigV2{MaxBattleHistories: 2}
 	mockStorage.EXPECT().UserConfigV2().Return(config, nil)
 
+	keys := []string{"battle1", "battle2"}
+	mockStorage.EXPECT().BattleHistoryKeys().Return(keys, nil)
+	mockStorage.EXPECT().WriteBattleHistory(gomock.Any()).Return(nil)
+
+	err := battleHistory.Add(data.Battle{
+		Meta:  data.Meta{},
+		Teams: []data.Team{},
+	})
+
+	require.NoError(t, err)
+}
+
+func TestBattleHistory_Add_上限を超えて保存する場合(t *testing.T) {
+	t.Parallel()
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockStorage := repository.NewMockStorageInterface(ctrl)
+	mockLogger := repository.NewMockLoggerInterface(ctrl)
+
+	battleHistory := NewBattleHistory(mockStorage, mockLogger)
+
+	config := data.UserConfigV2{MaxBattleHistories: 2}
+	mockStorage.EXPECT().UserConfigV2().Return(config, nil)
+
 	keys := []string{"battle1", "battle2", "battle3"}
 	mockStorage.EXPECT().BattleHistoryKeys().Return(keys, nil)
 	mockStorage.EXPECT().DeleteBattleHistory("battle1").Return(nil)
