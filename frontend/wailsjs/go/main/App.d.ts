@@ -8,11 +8,15 @@ export function AlertPatterns():Promise<Array<string>>;
 
 export function AlertPlayers():Promise<Array<data.AlertPlayer>>;
 
+export function AllBattleHistories():Promise<Array<string>>;
+
 export function ApplyRequiredUserConfig(arg1:string,arg2:string):Promise<data.RequiredConfigError>;
 
 export function ApplyUserConfig(arg1:data.UserConfigV2):Promise<void>;
 
 export function Battle():Promise<data.Battle>;
+
+export function BattleHistory(arg1:string):Promise<data.Battle>;
 
 export function DefaultUserConfig():Promise<data.UserConfigV2>;
 

@@ -144,6 +144,7 @@ func initApp(env data.Env) *App {
 	watcher := service.NewWatcher(watchInterval, localFile, storage, logger, runtime.EventsEmit)
 	updater := service.NewUpdater(env, github, logger)
 	configMigrator := service.NewConfigMigrator(configV0, storage, logger)
+	battleHistory := service.NewBattleHistory(storage, logger)
 
 	return NewApp(
 		env,
@@ -153,6 +154,7 @@ func initApp(env data.Env) *App {
 		*battle,
 		*updater,
 		*configMigrator,
+		*battleHistory,
 	)
 }
 

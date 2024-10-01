@@ -1,21 +1,22 @@
 <script lang="ts">
   import BattleMeta from "src/component/main/internal/BattleMeta.svelte";
-  import StatisticsTable from "src/component/main/internal/StatsTable.svelte";
+  import StatsTable from "src/component/main/internal/StatsTable.svelte";
   import {
     storedBattle,
     storedConfig,
     storedSummary,
     storedRequiredConfigError,
   } from "src/stores";
-  import Menu from "./internal/Menu.svelte";
   import Summary from "./internal/Summary.svelte";
   import Ofuse from "./internal/Ofuse.svelte";
   import UkSpinner from "../common/uikit/UkSpinner.svelte";
   import { FetchProxy } from "src/lib/FetchProxy";
   import { Notifier } from "src/lib/Notifier";
   import { LogInfo } from "wailsjs/go/main/App";
+  import { StatsTableOptions } from "src/lib/StatsTableOptions";
 
   let isLoading = false;
+  let options = new StatsTableOptions(true, $storedConfig.stats_pattern);
 
   export const fetchBattle = async () => {
     try {
@@ -38,10 +39,6 @@
 
 <!-- Note: Use the same color as that of body.  -->
 <div class="uk-padding-small uk-light uk-background-secondary">
-  <div class="uk-margin-small uk-flex uk-flex-center">
-    <Menu />
-  </div>
-
   <div class="uk-margin-small">
     {#if $storedBattle}
       {@const teams = $storedBattle.teams}
@@ -49,9 +46,10 @@
       {@const config = $storedConfig}
 
       <div class="uk-flex uk-flex-center">
-        <StatisticsTable
+        <StatsTable
           {teams}
           {config}
+          {options}
           on:EditAlertPlayer
           on:RemoveAlertPlayer
         />

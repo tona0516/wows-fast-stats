@@ -15,9 +15,11 @@
   import { ClipboardSetText } from "wailsjs/runtime/runtime";
   import { Notifier } from "src/lib/Notifier";
   import "/node_modules/flag-icons/css/flag-icons.min.css";
+  import type { StatsTableOptions } from "src/lib/StatsTableOptions";
 
   export let column: PlayerName;
   export let player: data.Player;
+  export let options: StatsTableOptions;
 
   $: accountID = player.player_info.id;
   $: isChecked = !$storedExcludedPlayers.includes(accountID);
@@ -49,7 +51,7 @@
 </script>
 
 <td>
-  {#if !isNPC}
+  {#if !isNPC && options.enableCheckPlayer}
     <input
       class="uk-checkbox"
       type="checkbox"

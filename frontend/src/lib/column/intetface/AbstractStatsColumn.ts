@@ -1,6 +1,7 @@
 import type { ColumnSetting } from "src/lib/ColumnSetting";
 import { CssClass } from "src/lib/CssClass";
 import { DispName } from "src/lib/DispName";
+import type { StatsTableOptions } from "src/lib/StatsTableOptions";
 import { AbstractColumn } from "src/lib/column/intetface/AbstractColumn";
 import type { StatsCategory } from "src/lib/types";
 import { deriveColumnSetting, toPlayerStats } from "src/lib/util";
@@ -14,6 +15,7 @@ export abstract class AbstractStatsColumn<T> extends AbstractColumn {
     readonly innerColumnCount: number,
     readonly config: data.UserConfigV2,
     readonly category: StatsCategory,
+    readonly options: StatsTableOptions,
   ) {
     super(key, DispName.MIN_COLUMN_NAMES.get(key) ?? key, innerColumnCount);
     this.columnSetting = deriveColumnSetting(config, key);
@@ -42,6 +44,6 @@ export abstract class AbstractStatsColumn<T> extends AbstractColumn {
   }
 
   playerStats(player: data.Player): data.PlayerStats {
-    return toPlayerStats(player, this.config.stats_pattern);
+    return toPlayerStats(player, this.options.statsPattern);
   }
 }

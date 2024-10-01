@@ -14,6 +14,10 @@ export function AlertPlayers() {
   return window['go']['main']['App']['AlertPlayers']();
 }
 
+export function AllBattleHistories() {
+  return window['go']['main']['App']['AllBattleHistories']();
+}
+
 export function ApplyRequiredUserConfig(arg1, arg2) {
   return window['go']['main']['App']['ApplyRequiredUserConfig'](arg1, arg2);
 }
@@ -24,6 +28,10 @@ export function ApplyUserConfig(arg1) {
 
 export function Battle() {
   return window['go']['main']['App']['Battle']();
+}
+
+export function BattleHistory(arg1) {
+  return window['go']['main']['App']['BattleHistory'](arg1);
 }
 
 export function DefaultUserConfig() {

@@ -845,6 +845,7 @@ export namespace data {
 	    send_report: boolean;
 	    notify_updatable: boolean;
 	    stats_pattern: string;
+	    max_battle_histories: number;
 	
 	    static createFrom(source: any = {}) {
 	        return new UserConfigV2(source);
@@ -865,6 +866,7 @@ export namespace data {
 	        this.send_report = source["send_report"];
 	        this.notify_updatable = source["notify_updatable"];
 	        this.stats_pattern = source["stats_pattern"];
+	        this.max_battle_histories = source["max_battle_histories"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

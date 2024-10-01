@@ -1,6 +1,7 @@
 <script lang="ts">
   import MainPage from "src/component/main/MainPage.svelte";
   import ConfigPage from "src/component/config/ConfigPage.svelte";
+  import HistoryPage from "src/component/history/HistoryPage.svelte";
   import InfoPage from "src/component/info/InfoPage.svelte";
 
   import "bootstrap-icons/font/bootstrap-icons.css";
@@ -12,7 +13,7 @@
     MigrateIfNeeded,
     StartWatching,
   } from "wailsjs/go/main/App";
-  import { EventsOn } from "wailsjs/runtime/runtime";
+  import { EventsOn, WindowReloadApp } from "wailsjs/runtime/runtime";
   import { storedConfig, storedRequiredConfigError } from "src/stores";
   import AlertModals from "src/component/modal/AlertModals.svelte";
   import { data } from "wailsjs/go/models";
@@ -129,6 +130,10 @@
       </li>
       <li>
         <!-- svelte-ignore a11y-invalid-attribute -->
+        <a href="#"><UkIcon name="history" /></a>
+      </li>
+      <li>
+        <!-- svelte-ignore a11y-invalid-attribute -->
         <a href="#">
           <UkIcon name="cog" />
           {#if !$storedRequiredConfigError.valid}
@@ -142,6 +147,14 @@
         <!-- svelte-ignore a11y-invalid-attribute -->
         <a href="#"><UkIcon name="info" /></a>
       </li>
+      <li class="uk-margin-small-left">
+        <button
+          class="uk-button uk-button-primary uk-button-small"
+          on:click={() => WindowReloadApp()}
+        >
+          <UkIcon name="refresh" />
+        </button>
+      </li>
     </UkTab>
     <ul id={tabID} class="uk-switcher">
       <li>
@@ -150,6 +163,9 @@
           on:EditAlertPlayer={(e) => modals.showEdit(e.detail.target)}
           on:RemoveAlertPlayer={(e) => modals.showRemove(e.detail.target)}
         />
+      </li>
+      <li>
+        <HistoryPage />
       </li>
       <li>
         <ConfigPage

@@ -34,6 +34,7 @@ type App struct {
 	battle         service.Battle
 	updater        service.Updater
 	configMigrator service.ConfigMigrator
+	battleHistory  service.BattleHistory
 	volatileData   volatileData
 }
 
@@ -45,6 +46,7 @@ func NewApp(
 	battle service.Battle,
 	updater service.Updater,
 	configMigrator service.ConfigMigrator,
+	battleHistory service.BattleHistory,
 ) *App {
 	return &App{
 		env:            env,
@@ -54,6 +56,7 @@ func NewApp(
 		battle:         battle,
 		updater:        updater,
 		configMigrator: configMigrator,
+		battleHistory:  battleHistory,
 		volatileData:   newVolatileData(),
 	}
 }
@@ -104,6 +107,8 @@ func (a *App) Battle() (data.Battle, error) {
 		a.logger.Error(err, nil)
 		return result, apperr.Unwrap(err)
 	}
+
+	_ = a.battleHistory.Add(result)
 
 	return result, nil
 }
@@ -230,4 +235,12 @@ func (a *App) LogInfo(message string, contexts map[string]string) {
 func (a *App) LatestRelease() (data.GHLatestRelease, error) {
 	latestRelease, err := a.updater.IsUpdatable()
 	return latestRelease, apperr.Unwrap(err)
+}
+
+func (a *App) AllBattleHistories() ([]string, error) {
+	return a.battleHistory.AllKeys()
+}
+
+func (a *App) BattleHistory(key string) (data.Battle, error) {
+	return a.battleHistory.Get(key)
 }

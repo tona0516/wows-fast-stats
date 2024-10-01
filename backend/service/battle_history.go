@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"slices"
 	"wfs/backend/data"
 	"wfs/backend/repository"
@@ -22,7 +23,10 @@ func NewBattleHistory(
 }
 
 func (h *BattleHistory) AllKeys() ([]string, error) {
-	return h.storage.BattleHistoryKeys()
+	keys, error := h.storage.BattleHistoryKeys()
+	slices.Sort(keys)
+	slices.Reverse(keys)
+	return keys, error
 }
 
 func (h *BattleHistory) Get(key string) (data.Battle, error) {
@@ -41,10 +45,16 @@ func (h *BattleHistory) Add(battle data.Battle) error {
 	}
 
 	maxHistories := config.MaxBattleHistories
+	h.logger.Debug(fmt.Sprintf("MaxBattleHistories: %d", maxHistories), nil)
+
 	slices.Sort(keys)
-	removeKeys := keys[:uint(len(keys))-maxHistories]
-	for _, v := range removeKeys {
-		_ = h.storage.DeleteBattleHistory(v)
+
+	historyLen := uint(len(keys))
+	if historyLen > maxHistories {
+		removeKeys := keys[:historyLen-maxHistories]
+		for _, v := range removeKeys {
+			_ = h.storage.DeleteBattleHistory(v)
+		}
 	}
 
 	return h.storage.WriteBattleHistory(battle)
