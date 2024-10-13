@@ -2,7 +2,6 @@ package data
 
 import (
 	"encoding/json"
-	"fmt"
 	"testing"
 	"wfs/backend/apperr"
 
@@ -87,7 +86,8 @@ func TestNSExpectedStats_UnmarshalJSON(t *testing.T) {
 			require.Error(t, err)
 			code, ok := failure.CodeOf(err)
 			require.True(t, ok)
-			assert.Equal(t, apperr.ParseExpectedStatsError, code, fmt.Sprintf("actual=%s", code))
+			// assert.Equal(t, apperr.ParseExpectedStatsError, code, fmt.Sprintf("actual=%s", code))
+			assert.Equal(t, apperr.ParseExpectedStatsError, code)
 		}
 	})
 }

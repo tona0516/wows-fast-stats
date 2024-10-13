@@ -63,7 +63,7 @@ function exec(command: string) {
 function setup() {
   const goPkgs = [
     "github.com/wailsapp/wails/v2/cmd/wails@latest",
-    "github.com/golangci/golangci-lint/cmd/golangci-lint@latest",
+    "github.com/golangci/golangci-lint/cmd/golangci-lint@v1.60.3",
     "go.uber.org/mock/mockgen@latest",
     "github.com/fdaines/arch-go@latest",
   ];

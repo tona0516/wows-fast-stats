@@ -467,7 +467,7 @@ func floor(value float64) float64 {
 	return result
 }
 
-func round(value float64, digits uint) float64 {
+func round(value float64, digits uint16) float64 {
 	result, _ := decimal.NewFromFloat(value).Round(int32(digits)).Float64()
 	return result
 }

@@ -91,7 +91,7 @@ func TestWargaming_AccountInfo(t *testing.T) {
                 }
             }`, message)
 
-			var retry uint64 = 1
+			retry := 1
 			var calls int
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				calls++
@@ -99,7 +99,7 @@ func TestWargaming_AccountInfo(t *testing.T) {
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(http.StatusOK)
 
-				if calls < int(retry+1) {
+				if calls < retry+1 {
 					_, _ = w.Write([]byte(body))
 					return
 				}
@@ -109,12 +109,12 @@ func TestWargaming_AccountInfo(t *testing.T) {
 			}))
 			defer server.Close()
 
-			wargaming := NewWargaming(RequestConfig{URL: server.URL, Retry: retry}, ratelimit.New(10))
+			wargaming := NewWargaming(RequestConfig{URL: server.URL, Retry: uint64(retry)}, ratelimit.New(10))
 
 			_, err := wargaming.AccountInfo(testAppID, []int{123, 456})
 
 			require.NoError(t, err)
-			assert.Equal(t, int(retry+1), calls)
+			assert.Equal(t, retry+1, calls)
 		}
 	})
 
@@ -136,7 +136,7 @@ func TestWargaming_AccountInfo(t *testing.T) {
                 }
             }`, message)
 
-			var retry uint64 = 1
+			retry := 1
 			var calls int
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				calls++
@@ -146,14 +146,14 @@ func TestWargaming_AccountInfo(t *testing.T) {
 			}))
 			defer server.Close()
 
-			wargaming := NewWargaming(RequestConfig{URL: server.URL, Retry: retry}, ratelimit.New(10))
+			wargaming := NewWargaming(RequestConfig{URL: server.URL, Retry: uint64(retry)}, ratelimit.New(10))
 
 			_, err := wargaming.AccountInfo(testAppID, []int{123, 456})
 
 			code, ok := failure.CodeOf(err)
 			assert.True(t, ok)
 			assert.Equal(t, apperr.WGAPITemporaryUnavaillalble, code)
-			assert.Equal(t, int(retry+1), calls)
+			assert.Equal(t, retry+1, calls)
 		}
 	})
 }
