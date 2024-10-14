@@ -4,7 +4,7 @@ import (
 	"regexp"
 )
 
-func Detect(clanTag string, text string) Lang {
+func Detect(text string) Lang {
 	charKinds := charKinds(text)
 	kana := charKinds[charKindKana]
 	hangul := charKinds[charKindHangul]

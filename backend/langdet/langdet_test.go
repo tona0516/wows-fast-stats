@@ -8,7 +8,7 @@ import (
 
 func Test_Detect(t *testing.T) {
 	t.Parallel()
-	assert.Equal(t, LangJapanese, Detect("", `
+	assert.Equal(t, LangJapanese, Detect(`
     ※無言申請は原則お断りさせていただいております。 \
     -加入条件- 1.勝率50%以上。 \
     2.Tier10艦艇1隻以上所有。 \
@@ -19,7 +19,7 @@ func Test_Detect(t *testing.T) {
     7.クランの平穏を乱さないこと。 \
     -除隊対象- 一定期間ログインが無い クランの名誉を害する行為
     `))
-	assert.Equal(t, LangJapanese, Detect("", `
+	assert.Equal(t, LangJapanese, Detect(`
     『-K2-』神風‐sではTyphoonリーグを目指すクランとなります。 \
     クラン加入については下記のDiscordの招待URLを通して面接申請をお願いします。 \
     もしDiscordをお持ちでない方は、ゲーム内チャットにてmyouko02もしくは、gaku0083、Orca_0313までご連絡してください。

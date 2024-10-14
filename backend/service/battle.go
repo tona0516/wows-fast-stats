@@ -381,7 +381,7 @@ func (b *Battle) fetchClanLanguage(clanInfoArray []data.WGClansInfoData) map[str
 		}
 
 		mu.Lock()
-		result[clan.Tag] = string(langdet.Detect(clan.Tag, description))
+		result[clan.Tag] = string(langdet.Detect(description))
 		mu.Unlock()
 
 		return nil
