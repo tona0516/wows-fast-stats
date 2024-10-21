@@ -48,7 +48,6 @@ func (c *Config) User() (data.UserConfigV2, error) {
 
 func (c *Config) ValidateRequired(
 	installPath string,
-	appid string,
 ) data.RequiredConfigError {
 	result := data.RequiredConfigError{}
 
@@ -60,24 +59,15 @@ func (c *Config) ValidateRequired(
 		}
 	}
 
-	if appid == "" {
-		result.AppID = apperr.EmptyAppID.ErrorCode()
-	} else {
-		if ok, _ := c.wargaming.Test(appid); !ok {
-			result.AppID = apperr.InvalidAppID.ErrorCode()
-		}
-	}
-
-	result.Valid = result.InstallPath == "" && result.AppID == ""
+	result.Valid = result.InstallPath == ""
 	return result
 }
 
 func (c *Config) UpdateRequired(
 	installPath string,
-	appid string,
 ) (data.RequiredConfigError, error) {
 	// validate
-	validatedResult := c.ValidateRequired(installPath, appid)
+	validatedResult := c.ValidateRequired(installPath)
 	if !validatedResult.Valid {
 		return validatedResult, nil
 	}
@@ -88,7 +78,6 @@ func (c *Config) UpdateRequired(
 		return validatedResult, err
 	}
 	config.InstallPath = installPath
-	config.Appid = appid
 
 	// write
 	err = c.storage.WriteUserConfigV2(config)
@@ -103,7 +92,6 @@ func (c *Config) UpdateOptional(config data.UserConfigV2) error {
 		return err
 	}
 	config.InstallPath = saved.InstallPath
-	config.Appid = saved.Appid
 
 	// write
 	err = c.storage.WriteUserConfigV2(config)
@@ -160,21 +148,7 @@ func (c *Config) RemoveAlertPlayer(accountID int) error {
 }
 
 func (c *Config) SearchPlayer(prefix string) data.WGAccountList {
-	config, err := c.storage.UserConfigV2()
-	if err != nil {
-		return data.WGAccountList{}
-	}
-
-	appID := config.Appid
-	if appID == "" {
-		return data.WGAccountList{}
-	}
-
-	result, err := c.wargaming.AccountListForSearch(appID, prefix)
-	if err != nil {
-		return data.WGAccountList{}
-	}
-
+	result, _ := c.wargaming.AccountListForSearch(prefix)
 	return result
 }
 

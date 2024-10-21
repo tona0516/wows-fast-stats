@@ -7,12 +7,14 @@ import readlineSync from "readline-sync";
 
 const APP_NAME = "wows-fast-stats";
 const SEMVER = "0.16.1";
+const WG_APP_ID = "e25e1a2af190880c9e33d3be7cc5313d"
 const BINARY_NAME = `${APP_NAME}-${SEMVER}.exe`;
 const DISCORD_WEBHOOK_JSON = "discord_webhook.json";
 const FRONTEND_NPM_COMMAND = "npm --prefix ./frontend";
 const COMMON_LDFLAGS = {
   "main.AppName": APP_NAME,
   "main.Semver": SEMVER,
+  "main.WGAppID": WG_APP_ID,
 } as const;
 
 function getFormattedLDFlags(isDev: boolean): string {

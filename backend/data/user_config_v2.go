@@ -91,7 +91,6 @@ type UserConfigV2 struct {
 	Version uint `json:"version"`
 	// required
 	InstallPath string `json:"install_path"`
-	Appid       string `json:"appid"`
 	// display
 	FontSize         string    `json:"font_size"`
 	Display          UCDisplay `json:"display"`
@@ -112,7 +111,6 @@ func FromUserConfigV1(v1 UserConfig) UserConfigV2 {
 	return UserConfigV2{
 		Version:     2,
 		InstallPath: v1.InstallPath,
-		Appid:       v1.Appid,
 		FontSize:    v1.FontSize,
 		Display: UCDisplay{
 			Ship: UCDisplayShip(v1.Displays.Ship),

@@ -153,16 +153,14 @@ func (a *App) ApplyUserConfig(config data.UserConfigV2) error {
 
 func (a *App) ValidateRequiredConfig(
 	installPath string,
-	appid string,
 ) data.RequiredConfigError {
-	return a.config.ValidateRequired(installPath, appid)
+	return a.config.ValidateRequired(installPath)
 }
 
 func (a *App) ApplyRequiredUserConfig(
 	installPath string,
-	appid string,
 ) (data.RequiredConfigError, error) {
-	validatedResult, err := a.config.UpdateRequired(installPath, appid)
+	validatedResult, err := a.config.UpdateRequired(installPath)
 	if err != nil {
 		a.logger.Error(err, nil)
 	}

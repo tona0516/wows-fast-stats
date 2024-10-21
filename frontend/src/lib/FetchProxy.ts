@@ -34,18 +34,16 @@ export namespace FetchProxy {
 
   export const validateRequiredConfig = async (
     installPath: string,
-    appid: string,
   ): Promise<data.RequiredConfigError> => {
-    const ret = await ValidateRequiredConfig(installPath, appid);
+    const ret = await ValidateRequiredConfig(installPath);
     storedRequiredConfigError.set(ret);
     return ret;
   };
 
   export const applyRequiredConfig = async (
     installPath: string,
-    appid: string,
   ): Promise<data.RequiredConfigError> => {
-    const ret = await ApplyRequiredUserConfig(installPath, appid);
+    const ret = await ApplyRequiredUserConfig(installPath);
     storedRequiredConfigError.set(ret);
     return ret;
   };

@@ -25,7 +25,6 @@ func TestWatcher_Start(t *testing.T) {
 		// 準備
 		config := data.UserConfigV2{
 			InstallPath: "install_path_test",
-			Appid:       "abc123",
 			FontSize:    "medium",
 		}
 		mockStorage := repository.NewMockStorageInterface(ctrl)
@@ -67,7 +66,6 @@ func TestWatcher_Start(t *testing.T) {
 			// 準備
 			config := data.UserConfigV2{
 				InstallPath: "install_path_test",
-				Appid:       "abc123",
 				FontSize:    "medium",
 			}
 
@@ -105,7 +103,6 @@ func TestWatcher_Start(t *testing.T) {
 		// 準備
 		config := data.UserConfigV2{
 			InstallPath: "install_path_test",
-			Appid:       "abc123",
 			FontSize:    "medium",
 		}
 
@@ -137,7 +134,6 @@ func TestWatcher_Start(t *testing.T) {
 		// 準備
 		config := data.UserConfigV2{
 			InstallPath: "install_path_test",
-			Appid:       "abc123",
 			FontSize:    "medium",
 		}
 

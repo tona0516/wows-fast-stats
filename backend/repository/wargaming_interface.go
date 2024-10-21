@@ -4,14 +4,13 @@ import "wfs/backend/data"
 
 //go:generate mockgen -source=$GOFILE -destination ../mock/$GOPACKAGE/$GOFILE -package $GOPACKAGE
 type WargamingInterface interface {
-	AccountInfo(appID string, accountIDs []int) (data.WGAccountInfo, error)
-	AccountList(appID string, accountNames []string) (data.WGAccountList, error)
-	AccountListForSearch(appID string, prefix string) (data.WGAccountList, error)
-	ClansAccountInfo(appID string, accountIDs []int) (data.WGClansAccountInfo, error)
-	ClansInfo(appID string, clanIDs []int) (data.WGClansInfo, error)
-	EncycShips(appID string, pageNo int) (data.WGEncycShips, int, error)
-	ShipsStats(appID string, accountID int) (data.WGShipsStats, error)
-	BattleArenas(appID string) (data.WGBattleArenas, error)
-	BattleTypes(appID string) (data.WGBattleTypes, error)
-	Test(appID string) (bool, error)
+	AccountInfo(accountIDs []int) (data.WGAccountInfo, error)
+	AccountList(accountNames []string) (data.WGAccountList, error)
+	AccountListForSearch(prefix string) (data.WGAccountList, error)
+	ClansAccountInfo(accountIDs []int) (data.WGClansAccountInfo, error)
+	ClansInfo(clanIDs []int) (data.WGClansInfo, error)
+	EncycShips(pageNo int) (data.WGEncycShips, int, error)
+	ShipsStats(accountID int) (data.WGShipsStats, error)
+	BattleArenas() (data.WGBattleArenas, error)
+	BattleTypes() (data.WGBattleTypes, error)
 }

@@ -178,7 +178,6 @@ func TestConfigMigrator_toV2(t *testing.T) {
 
 		// 準備
 		v2 := data.UserConfigV2{
-			Appid:       "test_appid",
 			InstallPath: "test_install_path",
 			Display: data.UCDisplay{
 				Ship: data.UCDisplayShip{
@@ -189,7 +188,6 @@ func TestConfigMigrator_toV2(t *testing.T) {
 
 		expect := data.UserConfigV2{
 			Version:     2,
-			Appid:       "test_appid",
 			InstallPath: "test_install_path",
 			Display: data.UCDisplay{
 				Ship: data.UCDisplayShip{

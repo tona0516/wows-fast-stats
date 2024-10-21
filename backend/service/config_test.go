@@ -9,18 +9,12 @@ import (
 	"wfs/backend/data"
 	"wfs/backend/mock/repository"
 
-	"github.com/morikuni/failure"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
 )
 
-const (
-	validInstallPath = "install_path_test"
-	validAppID       = "abc123"
-)
-
-var errWargaming = failure.New(apperr.WGAPIError)
+const validInstallPath = "install_path_test"
 
 //nolint:paralleltest
 func TestConfig_UpdateRequired(t *testing.T) {
@@ -35,7 +29,6 @@ func TestConfig_UpdateRequired(t *testing.T) {
 		config := createInputConfig()
 
 		mockWargaming := repository.NewMockWargamingInterface(ctrl)
-		mockWargaming.EXPECT().Test(config.Appid).Return(true, nil)
 
 		mockStorage := repository.NewMockStorageInterface(ctrl)
 		mockStorage.EXPECT().UserConfigV2().Return(data.DefaultUserConfigV2(), nil)
@@ -43,7 +36,7 @@ func TestConfig_UpdateRequired(t *testing.T) {
 
 		// テスト
 		c := NewConfig(nil, mockWargaming, mockStorage, nil)
-		actual, err := c.UpdateRequired(config.InstallPath, config.Appid)
+		actual, err := c.UpdateRequired(config.InstallPath)
 
 		// アサーション
 		assert.Equal(t, data.RequiredConfigError{Valid: true}, actual)
@@ -53,32 +46,15 @@ func TestConfig_UpdateRequired(t *testing.T) {
 	t.Run("異常系_不正なインストールパス", func(t *testing.T) {
 		config := data.DefaultUserConfigV2()
 		config.InstallPath = "invalid/path" // Note: 不正なパス
-		config.Appid = "abc123"
 
 		mockWargaming := repository.NewMockWargamingInterface(ctrl)
-		mockWargaming.EXPECT().Test(config.Appid).Return(true, nil)
 
 		// テスト
 		c := NewConfig(nil, mockWargaming, nil, nil)
-		actual, err := c.UpdateRequired(config.InstallPath, config.Appid)
+		actual, err := c.UpdateRequired(config.InstallPath)
 
 		// アサーション
 		assert.Equal(t, data.RequiredConfigError{InstallPath: apperr.InvalidInstallPath.ErrorCode()}, actual)
-		require.NoError(t, err)
-	})
-
-	t.Run("異常系_不正なAppID", func(t *testing.T) {
-		config := createInputConfig()
-
-		mockWargaming := repository.NewMockWargamingInterface(ctrl)
-		mockWargaming.EXPECT().Test(config.Appid).Return(false, errWargaming) // Note: WG APIでエラー
-
-		// テスト
-		c := NewConfig(nil, mockWargaming, nil, nil)
-		actual, err := c.UpdateRequired(config.InstallPath, config.Appid)
-
-		// アサーション
-		assert.Equal(t, data.RequiredConfigError{AppID: apperr.InvalidAppID.ErrorCode()}, actual)
 		require.NoError(t, err)
 	})
 }
@@ -235,7 +211,6 @@ func TestConfig_RemoveAlertPlayer(t *testing.T) {
 func createInputConfig() data.UserConfigV2 {
 	config := data.DefaultUserConfigV2()
 	config.InstallPath = validInstallPath
-	config.Appid = validAppID
 
 	return config
 }

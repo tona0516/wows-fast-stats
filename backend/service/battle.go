@@ -60,21 +60,16 @@ func NewBattle(
 func (b *Battle) Get(appCtx context.Context, userConfig data.UserConfigV2) (data.Battle, error) {
 	var result data.Battle
 
-	appID := userConfig.Appid
-	if len(appID) == 0 {
-		return result, failure.New(apperr.WGAPIError)
-	}
-
 	// Fetch on-memory stored data
 	warshipResult := make(chan data.Result[data.Warships])
 	allExpectedStatsResult := make(chan data.Result[data.ExpectedStats])
 	battleArenasResult := make(chan data.Result[data.WGBattleArenas])
 	battleTypesResult := make(chan data.Result[data.WGBattleTypes])
 	if b.isFirstBattle {
-		go b.fetchWarships(appID, warshipResult)
+		go b.fetchWarships(warshipResult)
 		go b.fetchExpectedStats(allExpectedStatsResult)
-		go b.fetchBattleArenas(appID, battleArenasResult)
-		go b.fetchBattleTypes(appID, battleTypesResult)
+		go b.fetchBattleArenas(battleArenasResult)
+		go b.fetchBattleTypes(battleTypesResult)
 	}
 
 	// Get tempArenaInfo.json
@@ -88,7 +83,7 @@ func (b *Battle) Get(appCtx context.Context, userConfig data.UserConfigV2) (data
 	b.logger.SetOwnIGN(tempArenaInfo.PlayerName)
 
 	// Get Account ID list
-	accountList, err := b.wargaming.AccountList(appID, tempArenaInfo.AccountNames())
+	accountList, err := b.wargaming.AccountList(tempArenaInfo.AccountNames())
 	if err != nil {
 		return result, err
 	}
@@ -98,9 +93,9 @@ func (b *Battle) Get(appCtx context.Context, userConfig data.UserConfigV2) (data
 	accountInfoResult := make(chan data.Result[data.WGAccountInfo])
 	shipStatsResult := make(chan data.Result[data.AllPlayerShipsStats])
 	clanResult := make(chan data.Result[data.Clans])
-	go b.fetchAccountInfo(appID, accountIDs, accountInfoResult)
-	go b.fetchAllPlayerShipsStats(appID, accountIDs, shipStatsResult)
-	go b.fetchClan(appID, accountIDs, clanResult)
+	go b.fetchAccountInfo(accountIDs, accountInfoResult)
+	go b.fetchAllPlayerShipsStats(accountIDs, shipStatsResult)
+	go b.fetchClan(accountIDs, clanResult)
 
 	errs := make([]error, 0)
 
@@ -174,14 +169,14 @@ func (b *Battle) getTempArenaInfo(userConfig data.UserConfigV2) (data.TempArenaI
 	return tempArenaInfo, nil
 }
 
-func (b *Battle) fetchWarships(appID string, channel chan data.Result[data.Warships]) {
+func (b *Battle) fetchWarships(channel chan data.Result[data.Warships]) {
 	warships := make(data.Warships)
 	var result data.Result[data.Warships]
 
 	var mu sync.Mutex
 
 	fetch := func(page int) (int, error) {
-		res, pageTotal, err := b.wargaming.EncycShips(appID, page)
+		res, pageTotal, err := b.wargaming.EncycShips(page)
 		if err != nil {
 			return 0, err
 		}
@@ -262,30 +257,29 @@ func (b *Battle) fetchExpectedStats(channel chan data.Result[data.ExpectedStats]
 	channel <- result
 }
 
-func (b *Battle) fetchBattleArenas(appID string, channel chan data.Result[data.WGBattleArenas]) {
-	battleArenas, err := b.wargaming.BattleArenas(appID)
+func (b *Battle) fetchBattleArenas(channel chan data.Result[data.WGBattleArenas]) {
+	battleArenas, err := b.wargaming.BattleArenas()
 	channel <- data.Result[data.WGBattleArenas]{Value: battleArenas, Error: err}
 }
 
-func (b *Battle) fetchBattleTypes(appID string, channel chan data.Result[data.WGBattleTypes]) {
-	battleTypes, err := b.wargaming.BattleTypes(appID)
+func (b *Battle) fetchBattleTypes(channel chan data.Result[data.WGBattleTypes]) {
+	battleTypes, err := b.wargaming.BattleTypes()
 	channel <- data.Result[data.WGBattleTypes]{Value: battleTypes, Error: err}
 }
 
-func (b *Battle) fetchAccountInfo(appID string, accountIDs []int, channel chan data.Result[data.WGAccountInfo]) {
-	accountInfo, err := b.wargaming.AccountInfo(appID, accountIDs)
+func (b *Battle) fetchAccountInfo(accountIDs []int, channel chan data.Result[data.WGAccountInfo]) {
+	accountInfo, err := b.wargaming.AccountInfo(accountIDs)
 	channel <- data.Result[data.WGAccountInfo]{Value: accountInfo, Error: err}
 }
 
 func (b *Battle) fetchAllPlayerShipsStats(
-	appID string,
 	accountIDs []int,
 	channel chan data.Result[data.AllPlayerShipsStats],
 ) {
 	shipStatsMap := make(data.AllPlayerShipsStats)
 	var mu sync.Mutex
 	err := doParallel(accountIDs, func(accountID int) error {
-		shipStats, err := b.wargaming.ShipsStats(appID, accountID)
+		shipStats, err := b.wargaming.ShipsStats(accountID)
 		if err != nil {
 			return err
 		}
@@ -300,10 +294,10 @@ func (b *Battle) fetchAllPlayerShipsStats(
 	channel <- data.Result[data.AllPlayerShipsStats]{Value: shipStatsMap, Error: err}
 }
 
-func (b *Battle) fetchClan(appID string, accountIDs []int, channel chan data.Result[data.Clans]) {
+func (b *Battle) fetchClan(accountIDs []int, channel chan data.Result[data.Clans]) {
 	var result data.Result[data.Clans]
 
-	clansAccountInfo, err := b.wargaming.ClansAccountInfo(appID, accountIDs)
+	clansAccountInfo, err := b.wargaming.ClansAccountInfo(accountIDs)
 	if err != nil {
 		result.Error = err
 		channel <- result
@@ -311,7 +305,7 @@ func (b *Battle) fetchClan(appID string, accountIDs []int, channel chan data.Res
 	}
 
 	clanIDs := clansAccountInfo.ClanIDs()
-	clansInfo, err := b.wargaming.ClansInfo(appID, clanIDs)
+	clansInfo, err := b.wargaming.ClansInfo(clanIDs)
 	if err != nil {
 		result.Error = err
 		channel <- result

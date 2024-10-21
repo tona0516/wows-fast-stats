@@ -27,6 +27,7 @@ var assets embed.FS
 //nolint:gochecknoglobals
 var (
 	AppName                string
+	WGAppID                string
 	Semver                 string
 	IsDev                  string
 	AlertDiscordWebhookURL string
@@ -42,6 +43,7 @@ func main() {
 	isDev, _ := strconv.ParseBool(IsDev)
 	env := data.Env{
 		AppName: AppName,
+		WGAppID: WGAppID,
 		Semver:  Semver,
 		IsDev:   isDev,
 	}
@@ -103,7 +105,7 @@ func initApp(env data.Env) *App {
 		URL:     "https://api.worldofwarships.asia",
 		Retry:   maxRetry,
 		Timeout: timeout,
-	}, ratelimit.New(10))
+	}, ratelimit.New(10), WGAppID)
 	uwargaming := infra.NewUnofficialWargaming(infra.RequestConfig{
 		URL:     "https://clans.worldofwarships.asia",
 		Retry:   maxRetry,

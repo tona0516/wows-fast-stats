@@ -18,8 +18,6 @@ const (
 	GithubAPICheckUpdateError   failure.StringCode = "アプリ更新チェックに失敗しました。"
 	InvalidInstallPath          failure.StringCode = "選択したフォルダに「WorldOfWarships.exe」が存在しません。"
 	EmptyInstallPath            failure.StringCode = "インストールフォルダが空です。"
-	InvalidAppID                failure.StringCode = "WG APIと通信できません。アプリケーションIDが間違っている可能性があります。"
-	EmptyAppID                  failure.StringCode = "アプリケーションIDが空です。"
 	OpenDirectoryError          failure.StringCode = "フォルダが開けません。存在しない可能性があります。"
 	FrontendError               failure.StringCode = "フロントエンドエラー"
 	WailsError                  failure.StringCode = "Wailsエラー"

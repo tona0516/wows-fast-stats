@@ -65,7 +65,6 @@
       const config = await FetchProxy.getConfig();
       const requiredConfigError = await FetchProxy.validateRequiredConfig(
         config.install_path,
-        config.appid,
       );
       await FetchProxy.getAlertPlayers();
 

@@ -1,6 +1,5 @@
 <script lang="ts">
   import clone from "clone";
-  import ExternalLink from "src/component/common/ExternalLink.svelte";
   import UkIcon from "src/component/common/uikit/UkIcon.svelte";
   import UkSpinner from "src/component/common/uikit/UkSpinner.svelte";
   import { FetchProxy } from "src/lib/FetchProxy";
@@ -30,7 +29,6 @@
 
       requiredConfigError = await FetchProxy.applyRequiredConfig(
         inputConfig.install_path,
-        inputConfig.appid,
       );
 
       if (!requiredConfigError.valid) {
@@ -69,26 +67,6 @@
     <div class="uk-text-danger">
       <UkIcon name="warning" />
       <span class="uk-text-middle">{requiredConfigError.install_path}</span>
-    </div>
-  {/if}
-</div>
-
-<div class="uk-padding-small">
-  <input
-    class="uk-input"
-    type="text"
-    placeholder="アプリケーションID"
-    bind:value={inputConfig.appid}
-  />
-  <span>
-    <ExternalLink url="https://developers.wargaming.net/"
-      >Developer Room</ExternalLink
-    >で作成したIDを入力してください。</span
-  >
-  {#if requiredConfigError?.appid}
-    <div class="uk-text-danger">
-      <UkIcon name="warning" />
-      <span class="uk-text-middle">{requiredConfigError.appid}</span>
     </div>
   {/if}
 </div>

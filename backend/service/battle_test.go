@@ -15,7 +15,6 @@ import (
 
 //nolint:gochecknoglobals
 var testUserConfig = data.UserConfigV2{
-	Appid:             "test_appid",
 	InstallPath:       "test_install_path",
 	SaveTempArenaInfo: false,
 }
@@ -27,11 +26,11 @@ func TestBattle_Get_正常系_初回(t *testing.T) {
 
 	// 準備
 	mockWargaming := repository.NewMockWargamingInterface(ctrl)
-	mockWargaming.EXPECT().AccountList(gomock.Any(), gomock.Any()).Return(data.WGAccountList{
+	mockWargaming.EXPECT().AccountList(gomock.Any()).Return(data.WGAccountList{
 		{NickName: "player_1", AccountID: 1},
 		{NickName: "player_2", AccountID: 2},
 	}, nil)
-	mockWargaming.EXPECT().EncycShips(gomock.Any(), gomock.Any()).Return(data.WGEncycShips{
+	mockWargaming.EXPECT().EncycShips(gomock.Any()).Return(data.WGEncycShips{
 		1: data.WGEncycShipsData{
 			Tier:      1,
 			Type:      "Battleship",
@@ -40,12 +39,12 @@ func TestBattle_Get_正常系_初回(t *testing.T) {
 			IsPremium: false,
 		},
 	}, 2, nil).Times(2)
-	mockWargaming.EXPECT().BattleArenas(gomock.Any()).Return(data.WGBattleArenas{}, nil)
-	mockWargaming.EXPECT().BattleTypes(gomock.Any()).Return(data.WGBattleTypes{}, nil)
-	mockWargaming.EXPECT().AccountInfo(gomock.Any(), gomock.Any()).Return(data.WGAccountInfo{}, nil)
-	mockWargaming.EXPECT().ShipsStats(gomock.Any(), gomock.Any()).Return(data.WGShipsStats{}, nil).AnyTimes()
-	mockWargaming.EXPECT().ClansAccountInfo(gomock.Any(), gomock.Any()).Return(data.WGClansAccountInfo{}, nil)
-	mockWargaming.EXPECT().ClansInfo(gomock.Any(), gomock.Any()).Return(data.WGClansInfo{}, nil)
+	mockWargaming.EXPECT().BattleArenas().Return(data.WGBattleArenas{}, nil)
+	mockWargaming.EXPECT().BattleTypes().Return(data.WGBattleTypes{}, nil)
+	mockWargaming.EXPECT().AccountInfo(gomock.Any()).Return(data.WGAccountInfo{}, nil)
+	mockWargaming.EXPECT().ShipsStats(gomock.Any()).Return(data.WGShipsStats{}, nil).AnyTimes()
+	mockWargaming.EXPECT().ClansAccountInfo(gomock.Any()).Return(data.WGClansAccountInfo{}, nil)
+	mockWargaming.EXPECT().ClansInfo(gomock.Any()).Return(data.WGClansInfo{}, nil)
 
 	mockUnofficialWargaming := repository.NewMockUnofficialWargamingInterface(ctrl)
 	mockUnofficialWargaming.EXPECT().ClansAutoComplete(gomock.Any()).Return(data.UWGClansAutocomplete{
@@ -106,14 +105,14 @@ func TestBattle_Get_正常系_2回目以降(t *testing.T) {
 
 	// 準備
 	mockWargaming := repository.NewMockWargamingInterface(ctrl)
-	mockWargaming.EXPECT().AccountList(gomock.Any(), gomock.Any()).Return(data.WGAccountList{
+	mockWargaming.EXPECT().AccountList(gomock.Any()).Return(data.WGAccountList{
 		{NickName: "player_1", AccountID: 1},
 		{NickName: "player_2", AccountID: 2},
 	}, nil)
-	mockWargaming.EXPECT().AccountInfo(gomock.Any(), gomock.Any()).Return(data.WGAccountInfo{}, nil)
-	mockWargaming.EXPECT().ShipsStats(gomock.Any(), gomock.Any()).Return(data.WGShipsStats{}, nil).AnyTimes()
-	mockWargaming.EXPECT().ClansAccountInfo(gomock.Any(), gomock.Any()).Return(data.WGClansAccountInfo{}, nil)
-	mockWargaming.EXPECT().ClansInfo(gomock.Any(), gomock.Any()).Return(data.WGClansInfo{}, nil)
+	mockWargaming.EXPECT().AccountInfo(gomock.Any()).Return(data.WGAccountInfo{}, nil)
+	mockWargaming.EXPECT().ShipsStats(gomock.Any()).Return(data.WGShipsStats{}, nil).AnyTimes()
+	mockWargaming.EXPECT().ClansAccountInfo(gomock.Any()).Return(data.WGClansAccountInfo{}, nil)
+	mockWargaming.EXPECT().ClansInfo(gomock.Any()).Return(data.WGClansInfo{}, nil)
 
 	mockUnofficialWargaming := repository.NewMockUnofficialWargamingInterface(ctrl)
 	mockUnofficialWargaming.EXPECT().ClansAutoComplete(gomock.Any()).Return(data.UWGClansAutocomplete{

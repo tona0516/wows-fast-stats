@@ -452,7 +452,6 @@ export namespace data {
 	export class RequiredConfigError {
 	    valid: boolean;
 	    install_path: string;
-	    appid: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new RequiredConfigError(source);
@@ -462,7 +461,6 @@ export namespace data {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.valid = source["valid"];
 	        this.install_path = source["install_path"];
-	        this.appid = source["appid"];
 	    }
 	}
 	
@@ -834,7 +832,6 @@ export namespace data {
 	export class UserConfigV2 {
 	    version: number;
 	    install_path: string;
-	    appid: string;
 	    font_size: string;
 	    display: UCDisplay;
 	    color: UCColor;
@@ -855,7 +852,6 @@ export namespace data {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.version = source["version"];
 	        this.install_path = source["install_path"];
-	        this.appid = source["appid"];
 	        this.font_size = source["font_size"];
 	        this.display = this.convertValues(source["display"], UCDisplay);
 	        this.color = this.convertValues(source["color"], UCColor);
