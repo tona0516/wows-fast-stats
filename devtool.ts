@@ -6,7 +6,7 @@ import shelljs from "shelljs";
 import readlineSync from "readline-sync";
 
 const APP_NAME = "wows-fast-stats";
-const SEMVER = "0.16.1";
+const SEMVER = "0.16.2-alpha1";
 const WG_APP_ID = "e25e1a2af190880c9e33d3be7cc5313d"
 const BINARY_NAME = `${APP_NAME}-${SEMVER}.exe`;
 const DISCORD_WEBHOOK_JSON = "discord_webhook.json";
@@ -125,7 +125,7 @@ function build() {
   exec(
     `wails build -ldflags "${getFormattedLDFlags(
       false
-    )}" -platform windows/amd64 -o ${BINARY_NAME} -trimpath`
+    )}" -platform windows/amd64 -o ${BINARY_NAME} -trimpath -webview2 embed`
   );
 }
 
