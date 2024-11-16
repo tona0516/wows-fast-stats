@@ -5,6 +5,6 @@
 </script>
 
 <!-- svelte-ignore a11y-invalid-attribute -->
-<a class="td-link" href="#" on:click={() => BrowserOpenURL(url)}>
+<a href="#" on:click={() => BrowserOpenURL(url)}>
   <slot />
 </a>

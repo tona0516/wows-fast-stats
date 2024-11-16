@@ -58,7 +58,7 @@
 <div class="uk-padding-small">
   <div>表示項目</div>
   <table
-    class="uk-table uk-table-shrink uk-table-divider uk-table-small uk-table-middle uk-text-nowrap"
+    class="uk-table uk-width-medium uk-table-divider uk-table-middle uk-text-nowrap"
   >
     <thead>
       <tr>

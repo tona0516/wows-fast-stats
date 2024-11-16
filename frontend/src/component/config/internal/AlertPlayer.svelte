@@ -9,14 +9,12 @@
 </script>
 
 <div class="uk-padding-small">
-  <div>
-    <h5>プレイヤー検出機能</h5>
-    <ul class="uk-list uk-list-disc uk-list-collapse">
-      <li>戦闘情報のテーブル内のプレイヤーにアイコンを表示</li>
-      <li>マウスオーバーでメモを表示</li>
-      <li>プレイヤー名をクリックで追加・削除が可能</li>
-    </ul>
-  </div>
+  <h5>プレイヤー検出機能</h5>
+  <ul class="uk-list uk-list-disc uk-list-collapse">
+    <li>戦闘情報のテーブル内のプレイヤーにアイコンを表示</li>
+    <li>マウスオーバーでメモを表示</li>
+    <li>プレイヤー名をクリックで追加・削除が可能</li>
+  </ul>
 </div>
 
 {#if $storedAlertPlayers.length !== 0}

@@ -30,7 +30,7 @@
     >
     <div>
       <!-- svelte-ignore a11y-invalid-attribute -->
-      <a class="td-link" href="#" on:click={() => openDirectory("screenshot")}>
+      <a href="#" on:click={() => openDirectory("screenshot")}>
         <UkIcon name="folder" />
         <span class="uk-text-middle">保存フォルダを開く</span>
       </a>
@@ -48,11 +48,7 @@
     >
     <div>
       <!-- svelte-ignore a11y-invalid-attribute -->
-      <a
-        class="td-link"
-        href="#"
-        on:click={() => openDirectory("temp_arena_info")}
-      >
+      <a href="#" on:click={() => openDirectory("temp_arena_info")}>
         <UkIcon name="folder" />
         <span class="uk-text-middle">保存フォルダを開く</span>
       </a>
