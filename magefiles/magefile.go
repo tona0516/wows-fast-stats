@@ -21,7 +21,7 @@ const (
 	wgAppID            = "e25e1a2af190880c9e33d3be7cc5313d"
 	binaryName         = appName + "-" + semver + ".exe"
 	biscordWebhookJSON = "discord_webhook.json"
-	npm = "npm --prefix ./frontend"
+	npm                = "npm --prefix ./frontend"
 )
 
 var commonLdflags = map[string]string{
