@@ -1,15 +1,15 @@
 <script lang="ts">
-  import { createEventDispatcher } from "svelte";
   import { AlertPatterns, UpdateAlertPlayer } from "wailsjs/go/main/App";
   import type { data } from "wailsjs/go/models";
   import UkModal from "src/component/common/uikit/UkModal.svelte";
   import UIkit from "uikit";
   import { ModalElementID } from "./ModalElementID";
   import clone from "clone";
+  import { Notifier } from "src/lib/Notifier";
 
   export let defaultAlertPlayer: data.AlertPlayer;
   export let maxMemoLength: number;
-  const dispatch = createEventDispatcher();
+
   let target: data.AlertPlayer = clone(defaultAlertPlayer);
   $: disableUpdateButton =
     target.account_id === 0 || target.name === "" || target.pattern === "";
@@ -23,9 +23,8 @@
   const update = async () => {
     try {
       await UpdateAlertPlayer(target);
-      dispatch("Success");
     } catch (error) {
-      dispatch("Failure", { message: error });
+      Notifier.failure(error);
     }
   };
 </script>

@@ -13,6 +13,7 @@ import (
 )
 
 const eventUpdateConfig = "CONFIG_UPDATE"
+const eventUpdateAlertPlayers = "ALERT_PLAYERS_UPDATE"
 
 type volatileData struct {
 	cancelWatcher  context.CancelFunc
@@ -221,18 +222,22 @@ func (a *App) AlertPlayers() ([]data.AlertPlayer, error) {
 }
 
 func (a *App) UpdateAlertPlayer(player data.AlertPlayer) error {
-	err := a.config.UpdateAlertPlayer(player)
+	players, err := a.config.UpdateAlertPlayer(player)
 	if err != nil {
 		a.logger.Error(err, nil)
+	} else {
+		runtime.EventsEmit(a.ctx, eventUpdateAlertPlayers, players)
 	}
 
 	return apperr.Unwrap(err)
 }
 
 func (a *App) RemoveAlertPlayer(accountID int) error {
-	err := a.config.RemoveAlertPlayer(accountID)
+	players, err := a.config.RemoveAlertPlayer(accountID)
 	if err != nil {
 		a.logger.Error(err, nil)
+	} else {
+		runtime.EventsEmit(a.ctx, eventUpdateAlertPlayers, players)
 	}
 
 	return apperr.Unwrap(err)

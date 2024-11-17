@@ -1,10 +1,9 @@
 import {
-  storedAlertPlayers,
   storedBattle,
   storedExcludedPlayers,
   storedLogs,
 } from "src/stores";
-import { AlertPlayers, Battle, ExcludePlayerIDs } from "wailsjs/go/main/App";
+import { Battle, ExcludePlayerIDs } from "wailsjs/go/main/App";
 import { data } from "wailsjs/go/models";
 import { EventsOn } from "wailsjs/runtime/runtime";
 
@@ -14,12 +13,6 @@ export namespace FetchProxy {
     storedBattle.set(undefined);
     const ret = await Battle();
     storedBattle.set(ret);
-    return ret;
-  };
-
-  export const getAlertPlayers = async (): Promise<data.AlertPlayer[]> => {
-    const ret = await AlertPlayers();
-    storedAlertPlayers.set(ret);
     return ret;
   };
 

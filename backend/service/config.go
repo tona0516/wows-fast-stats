@@ -95,10 +95,12 @@ func (c *Config) AlertPlayers() ([]data.AlertPlayer, error) {
 	return players, err
 }
 
-func (c *Config) UpdateAlertPlayer(player data.AlertPlayer) error {
+func (c *Config) UpdateAlertPlayer(player data.AlertPlayer) ([]data.AlertPlayer, error) {
+	var players []data.AlertPlayer
+
 	players, err := c.storage.AlertPlayers()
 	if err != nil {
-		return err
+		return players, err
 	}
 
 	var isMatched bool
@@ -114,13 +116,15 @@ func (c *Config) UpdateAlertPlayer(player data.AlertPlayer) error {
 		players = append(players, player)
 	}
 
-	return c.storage.WriteAlertPlayers(players)
+	return players, c.storage.WriteAlertPlayers(players)
 }
 
-func (c *Config) RemoveAlertPlayer(accountID int) error {
+func (c *Config) RemoveAlertPlayer(accountID int) ([]data.AlertPlayer, error) {
+	var players []data.AlertPlayer
+
 	players, err := c.storage.AlertPlayers()
 	if err != nil {
-		return err
+		return players, err
 	}
 
 	var isMatched bool
@@ -133,10 +137,10 @@ func (c *Config) RemoveAlertPlayer(accountID int) error {
 	}
 
 	if !isMatched {
-		return nil
+		return players, nil
 	}
 
-	return c.storage.WriteAlertPlayers(players)
+	return players, c.storage.WriteAlertPlayers(players)
 }
 
 func (c *Config) SearchPlayer(prefix string) data.WGAccountList {

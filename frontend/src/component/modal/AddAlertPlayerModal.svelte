@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { createEventDispatcher } from "svelte";
   import {
     SearchPlayer,
     AlertPatterns,
@@ -11,10 +10,10 @@
   import UkModal from "src/component/common/uikit/UkModal.svelte";
   import UkIcon from "src/component/common/uikit/UkIcon.svelte";
   import { ModalElementID } from "./ModalElementID";
+  import { Notifier } from "src/lib/Notifier";
 
   export let defaultAlertPlayer: data.AlertPlayer;
   export let maxMemoLength: number;
-  const dispatch = createEventDispatcher();
 
   export const show = () => {
     clean();
@@ -36,9 +35,8 @@
       player.name = searchResult!.nickname;
 
       await UpdateAlertPlayer(player);
-      dispatch("Success");
     } catch (error) {
-      dispatch("Failure", { message: error });
+      Notifier.failure(error);
     }
   };
 

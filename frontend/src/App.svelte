@@ -7,6 +7,7 @@
   import "charts.css";
 
   import {
+    AlertPlayers,
     LatestRelease,
     LogError,
     MigrateIfNeeded,
@@ -15,7 +16,11 @@
     ValidateInstallPath,
   } from "wailsjs/go/main/App";
   import { EventsOn } from "wailsjs/runtime/runtime";
-  import { storedConfig, storedInstallPathError } from "src/stores";
+  import {
+    storedAlertPlayers,
+    storedConfig,
+    storedInstallPathError,
+  } from "src/stores";
   import AlertModals from "src/component/modal/AlertModals.svelte";
   import { data } from "wailsjs/go/models";
   import UkIcon from "src/component/common/uikit/UkIcon.svelte";
@@ -23,7 +28,6 @@
   import UkSpinner from "src/component/common/uikit/UkSpinner.svelte";
   import UkTab from "src/component/common/uikit/UkTab.svelte";
   import { FontSize } from "src/lib/FontSize";
-  import { FetchProxy } from "./lib/FetchProxy";
   import { Notifier } from "./lib/Notifier";
 
   let modals: AlertModals;
@@ -40,6 +44,9 @@
   EventsOn("BATTLE_ERR", (error: string) => Notifier.failure(error));
   EventsOn("CONFIG_UPDATE", (config: data.UserConfigV2) =>
     storedConfig.set(config),
+  );
+  EventsOn("ALERT_PLAYERS_UPDATE", (players: data.AlertPlayer[]) =>
+    storedAlertPlayers.set(players),
   );
 
   window.onunhandledrejection = (event) => {
@@ -75,7 +82,8 @@
         storedInstallPathError.set(installPathError);
       }
 
-      await FetchProxy.getAlertPlayers();
+      const alertPlayers = await AlertPlayers();
+      storedAlertPlayers.set(alertPlayers);
 
       initialized = true;
 

@@ -1,14 +1,13 @@
 <script lang="ts">
-  import { createEventDispatcher } from "svelte";
   import { RemoveAlertPlayer } from "wailsjs/go/main/App";
   import type { data } from "wailsjs/go/models";
   import UkModal from "src/component/common/uikit/UkModal.svelte";
   import UIkit from "uikit";
   import { ModalElementID } from "./ModalElementID";
   import clone from "clone";
+    import { Notifier } from "src/lib/Notifier";
 
   export let defaultAlertPlayer: data.AlertPlayer;
-  const dispatch = createEventDispatcher();
 
   export const show = (_target: data.AlertPlayer) => {
     target = _target;
@@ -20,9 +19,8 @@
   const remove = async () => {
     try {
       await RemoveAlertPlayer(target.account_id);
-      dispatch("Success");
     } catch (error) {
-      dispatch("Failure", { message: error });
+      Notifier.failure(error);
     }
   };
 

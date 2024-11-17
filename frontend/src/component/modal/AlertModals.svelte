@@ -3,8 +3,6 @@
   import EditAlertPlayerModal from "src/component/modal/EditAlertPlayerModal.svelte";
   import AddAlertPlayerModal from "src/component/modal/AddAlertPlayerModal.svelte";
   import type { data } from "wailsjs/go/models";
-  import { FetchProxy } from "src/lib/FetchProxy";
-  import { Notifier } from "src/lib/Notifier";
 
   const MAX_MEMO_LENGTH = 100;
   const EMPTY: data.AlertPlayer = {
@@ -27,24 +25,12 @@
   bind:this={addModal}
   defaultAlertPlayer={EMPTY}
   maxMemoLength={MAX_MEMO_LENGTH}
-  on:Success={() =>
-    FetchProxy.getAlertPlayers().catch((error) => Notifier.failure(error))}
-  on:Failure={(event) => Notifier.failure(event.detail.message)}
 />
 
 <EditAlertPlayerModal
   bind:this={editModal}
   defaultAlertPlayer={EMPTY}
   maxMemoLength={MAX_MEMO_LENGTH}
-  on:Success={() =>
-    FetchProxy.getAlertPlayers().catch((error) => Notifier.failure(error))}
-  on:Failure={(event) => Notifier.failure(event.detail.message)}
 />
 
-<RemoveAlertPlayerModal
-  bind:this={removeModal}
-  defaultAlertPlayer={EMPTY}
-  on:Success={() =>
-    FetchProxy.getAlertPlayers().catch((error) => Notifier.failure(error))}
-  on:Failure={(event) => Notifier.failure(event.detail.message)}
-/>
+<RemoveAlertPlayerModal bind:this={removeModal} defaultAlertPlayer={EMPTY} />

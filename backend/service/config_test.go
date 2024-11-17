@@ -128,36 +128,41 @@ func TestConfig_UpdateAlertPlayer(t *testing.T) {
 
 		// 準備
 		newPlayer := data.AlertPlayer{AccountID: 3, Name: "Player3"}
+		expected := append(existingPlayers, newPlayer)
 
 		mockStorage := repository.NewMockStorageInterface(ctrl)
 		mockStorage.EXPECT().AlertPlayers().Return(existingPlayers, nil)
-		mockStorage.EXPECT().WriteAlertPlayers(append(existingPlayers, newPlayer)).Return(nil)
+		mockStorage.EXPECT().WriteAlertPlayers(expected).Return(nil)
 
 		// テスト
 		config := NewConfig(nil, nil, mockStorage, nil)
-		err := config.UpdateAlertPlayer(newPlayer)
+		actual, err := config.UpdateAlertPlayer(newPlayer)
 
 		// アサーション
 		require.NoError(t, err)
+		assert.Equal(t, expected, actual)
 	})
 
 	t.Run("正常系_更新", func(t *testing.T) {
 		t.Parallel()
 
+		expected := []data.AlertPlayer{
+			{AccountID: 1, Name: "UpdatedPlayer"},
+			{AccountID: 2, Name: "Player2"},
+		}
+
 		// 準備
 		mockStorage := repository.NewMockStorageInterface(ctrl)
 		mockStorage.EXPECT().AlertPlayers().Return(existingPlayers, nil)
-		mockStorage.EXPECT().WriteAlertPlayers([]data.AlertPlayer{
-			{AccountID: 1, Name: "UpdatedPlayer"},
-			{AccountID: 2, Name: "Player2"},
-		}).Return(nil)
+		mockStorage.EXPECT().WriteAlertPlayers(expected).Return(nil)
 
 		// テスト
 		config := NewConfig(nil, nil, mockStorage, nil)
-		err := config.UpdateAlertPlayer(data.AlertPlayer{AccountID: 1, Name: "UpdatedPlayer"})
+		actual, err := config.UpdateAlertPlayer(data.AlertPlayer{AccountID: 1, Name: "UpdatedPlayer"})
 
 		// アサーション
 		require.NoError(t, err)
+		assert.Equal(t, expected, actual)
 	})
 }
 
@@ -169,40 +174,46 @@ func TestConfig_RemoveAlertPlayer(t *testing.T) {
 	t.Run("正常系_対象IDあり", func(t *testing.T) {
 		t.Parallel()
 
+		expected := []data.AlertPlayer{
+			{AccountID: 2, Name: "Player2"},
+		}
+
 		// 準備
 		mockStorage := repository.NewMockStorageInterface(ctrl)
 		mockStorage.EXPECT().AlertPlayers().Return([]data.AlertPlayer{
 			{AccountID: 1, Name: "Player1"},
 			{AccountID: 2, Name: "Player2"},
 		}, nil)
-		mockStorage.EXPECT().WriteAlertPlayers([]data.AlertPlayer{
-			{AccountID: 2, Name: "Player2"},
-		}).Return(nil)
+		mockStorage.EXPECT().WriteAlertPlayers(expected).Return(nil)
 
 		// テスト
 		config := NewConfig(nil, nil, mockStorage, nil)
-		err := config.RemoveAlertPlayer(1)
+		actual, err := config.RemoveAlertPlayer(1)
 
 		// アサーション
 		require.NoError(t, err)
+		assert.Equal(t, expected, actual)
 	})
 
 	t.Run("正常系_対象IDなし", func(t *testing.T) {
 		t.Parallel()
 
-		// 準備
-		mockStorage := repository.NewMockStorageInterface(ctrl)
-		mockStorage.EXPECT().AlertPlayers().Return([]data.AlertPlayer{
+		expected := []data.AlertPlayer{
 			{AccountID: 1, Name: "Player1"},
 			{AccountID: 2, Name: "Player2"},
-		}, nil)
+		}
+
+		// 準備
+		mockStorage := repository.NewMockStorageInterface(ctrl)
+		mockStorage.EXPECT().AlertPlayers().Return(expected, nil)
 
 		// テスト
 		config := NewConfig(nil, nil, mockStorage, nil)
-		err := config.RemoveAlertPlayer(3)
+		actual, err := config.RemoveAlertPlayer(3)
 
 		// アサーション
 		require.NoError(t, err)
+		assert.Equal(t, expected, actual)
 	})
 }
 
