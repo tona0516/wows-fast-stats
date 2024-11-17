@@ -11,9 +11,11 @@
     LogError,
     MigrateIfNeeded,
     StartWatching,
+    UserConfig,
+    ValidateInstallPath,
   } from "wailsjs/go/main/App";
   import { EventsOn } from "wailsjs/runtime/runtime";
-  import { storedConfig, storedRequiredConfigError } from "src/stores";
+  import { storedConfig, storedInstallPathError } from "src/stores";
   import AlertModals from "src/component/modal/AlertModals.svelte";
   import { data } from "wailsjs/go/models";
   import UkIcon from "src/component/common/uikit/UkIcon.svelte";
@@ -36,6 +38,9 @@
 
   EventsOn("BATTLE_START", () => mainPage?.fetchBattle());
   EventsOn("BATTLE_ERR", (error: string) => Notifier.failure(error));
+  EventsOn("CONFIG_UPDATE", (config: data.UserConfigV2) =>
+    storedConfig.set(config),
+  );
 
   window.onunhandledrejection = (event) => {
     const message = "window.onunhandledrejection";
@@ -62,15 +67,19 @@
     try {
       await MigrateIfNeeded();
 
-      const config = await FetchProxy.getConfig();
-      const requiredConfigError = await FetchProxy.validateRequiredConfig(
-        config.install_path,
-      );
+      const config = await UserConfig();
+      storedConfig.set(config);
+
+      const installPathError = await ValidateInstallPath(config.install_path);
+      if (installPathError) {
+        storedInstallPathError.set(installPathError);
+      }
+
       await FetchProxy.getAlertPlayers();
 
       initialized = true;
 
-      if (requiredConfigError.valid) {
+      if (!$storedInstallPathError) {
         StartWatching();
       }
 
@@ -130,7 +139,7 @@
         <!-- svelte-ignore a11y-invalid-attribute -->
         <a href="#">
           <UkIcon name="cog" />
-          {#if !$storedRequiredConfigError.valid}
+          {#if $storedInstallPathError}
             <span class="uk-text-warning uk-text-small">
               <UkIcon name="warning" />
             </span>

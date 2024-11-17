@@ -1,17 +1,18 @@
 <script lang="ts">
-  import clone from "clone";
   import UkIcon from "src/component/common/uikit/UkIcon.svelte";
   import UkSpinner from "src/component/common/uikit/UkSpinner.svelte";
-  import { FetchProxy } from "src/lib/FetchProxy";
   import { Notifier } from "src/lib/Notifier";
-  import { storedConfig } from "src/stores";
-  import { SelectDirectory, StartWatching } from "wailsjs/go/main/App";
-  import { data } from "wailsjs/go/models";
-
-  export let inputConfig: data.UserConfigV2;
+  import { storedConfig, storedInstallPathError } from "src/stores";
+  import {
+    SelectDirectory,
+    StartWatching,
+    UpdateInstallPath,
+  } from "wailsjs/go/main/App";
 
   let isLoading = false;
-  let requiredConfigError: data.RequiredConfigError;
+  let inputInstallPathError: unknown = $storedInstallPathError;
+
+  $: inputConfig = $storedConfig;
 
   const clickSelectDirectory = async () => {
     try {
@@ -26,22 +27,11 @@
   const clickApply = async () => {
     try {
       isLoading = true;
-
-      requiredConfigError = await FetchProxy.applyRequiredConfig(
-        inputConfig.install_path,
-      );
-
-      if (!requiredConfigError.valid) {
-        return;
-      }
-
-      await FetchProxy.getConfig();
-
+      await UpdateInstallPath(inputConfig.install_path);
       Notifier.success("設定を更新しました");
       StartWatching();
     } catch (error) {
-      inputConfig = clone($storedConfig);
-      Notifier.failure(error);
+      inputInstallPathError = error;
     } finally {
       isLoading = false;
     }
@@ -63,10 +53,10 @@
   </div>
   <span>ゲームクライアントの実行ファイルがあるフォルダを選択してください。</span
   >
-  {#if requiredConfigError?.install_path}
+  {#if inputInstallPathError}
     <div class="uk-text-danger">
       <UkIcon name="warning" />
-      <span class="uk-text-middle">{requiredConfigError.install_path}</span>
+      <span class="uk-text-middle">{inputInstallPathError}</span>
     </div>
   {/if}
 </div>

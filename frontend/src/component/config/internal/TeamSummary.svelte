@@ -1,23 +1,18 @@
 <script lang="ts">
-  import clone from "clone";
   import UkSpinner from "src/component/common/uikit/UkSpinner.svelte";
-  import { FetchProxy } from "src/lib/FetchProxy";
   import { Notifier } from "src/lib/Notifier";
   import { storedConfig } from "src/stores";
-  import { ApplyUserConfig } from "wailsjs/go/main/App";
-  import { data } from "wailsjs/go/models";
-
-  export let inputConfig: data.UserConfigV2;
+  import { UpdateUserConfig } from "wailsjs/go/main/App";
 
   let isLoading = false;
-  let teamSummary: data.UCTeamSummary = inputConfig.team_summary;
 
+  $: inputConfig = $storedConfig;
   $: isValidMinShipBattles =
-    teamSummary.min_ship_battles > 0 &&
-    Number.isSafeInteger(teamSummary.min_ship_battles);
+    inputConfig.team_summary.min_ship_battles > 0 &&
+    Number.isSafeInteger(inputConfig.team_summary.min_ship_battles);
   $: isValidMinOverallBattles =
-    teamSummary.min_overall_battles > 0 &&
-    Number.isSafeInteger(teamSummary.min_overall_battles);
+  inputConfig.team_summary.min_overall_battles > 0 &&
+    Number.isSafeInteger(inputConfig.team_summary.min_overall_battles);
   $: isValidAll = isValidMinShipBattles && isValidMinOverallBattles;
 
   const clickApply = async () => {
@@ -27,12 +22,10 @@
 
     try {
       isLoading = true;
-      inputConfig.team_summary = teamSummary;
-      await ApplyUserConfig(inputConfig);
-      await FetchProxy.getConfig();
+      await UpdateUserConfig(inputConfig);
       Notifier.success("設定を更新しました");
     } catch (error) {
-      inputConfig = clone($storedConfig);
+      inputConfig.team_summary = $storedConfig.team_summary;
       Notifier.failure(error);
     } finally {
       isLoading = false;
@@ -47,7 +40,7 @@
     <input
       class="uk-input uk-form-width-small"
       type="number"
-      bind:value={teamSummary.min_ship_battles}
+      bind:value={inputConfig.team_summary.min_ship_battles}
     />
     {#if !isValidMinShipBattles}
       <div class="uk-text-danger">1以上の整数を入力してください。</div>
@@ -59,7 +52,7 @@
     <input
       class="uk-input uk-form-width-small"
       type="number"
-      bind:value={teamSummary.min_overall_battles}
+      bind:value={inputConfig.team_summary.min_overall_battles}
     />
     {#if !isValidMinOverallBattles}
       <div class="uk-text-danger">1以上の整数を入力してください。</div>

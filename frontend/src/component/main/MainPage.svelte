@@ -4,8 +4,8 @@
   import {
     storedBattle,
     storedConfig,
+    storedInstallPathError,
     storedSummary,
-    storedRequiredConfigError,
   } from "src/stores";
   import Menu from "./internal/Menu.svelte";
   import Summary from "./internal/Summary.svelte";
@@ -131,7 +131,7 @@
       {/if}
     {:else}
       <p class="uk-text-center">
-        {#if $storedRequiredConfigError.valid}
+        {#if $storedInstallPathError}
           戦闘中ではありません。開始時に自動的にリロードします。
         {:else}
           設定画面から初期設定を行ってください。

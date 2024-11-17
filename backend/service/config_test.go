@@ -9,6 +9,7 @@ import (
 	"wfs/backend/data"
 	"wfs/backend/mock/repository"
 
+	"github.com/morikuni/failure"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
@@ -17,7 +18,7 @@ import (
 const validInstallPath = "install_path_test"
 
 //nolint:paralleltest
-func TestConfig_UpdateRequired(t *testing.T) {
+func TestConfig_UpdateInstallPath(t *testing.T) {
 	ctrl := gomock.NewController(t)
 
 	// 準備
@@ -26,36 +27,33 @@ func TestConfig_UpdateRequired(t *testing.T) {
 	defer os.RemoveAll(validInstallPath)
 
 	t.Run("正常系", func(t *testing.T) {
-		config := createInputConfig()
-
-		mockWargaming := repository.NewMockWargamingInterface(ctrl)
-
 		mockStorage := repository.NewMockStorageInterface(ctrl)
 		mockStorage.EXPECT().UserConfigV2().Return(data.DefaultUserConfigV2(), nil)
-		mockStorage.EXPECT().WriteUserConfigV2(config).Return(nil)
+		mockStorage.EXPECT().WriteUserConfigV2(gomock.Any()).Return(nil)
 
 		// テスト
-		c := NewConfig(nil, mockWargaming, mockStorage, nil)
-		actual, err := c.UpdateRequired(config.InstallPath)
+		c := NewConfig(nil, nil, mockStorage, nil)
+		actual, err := c.UpdateInstallPath(validInstallPath)
 
 		// アサーション
-		assert.Equal(t, data.RequiredConfigError{Valid: true}, actual)
 		require.NoError(t, err)
+		assert.Equal(t, validInstallPath, actual.InstallPath)
 	})
 
-	t.Run("異常系_不正なインストールパス", func(t *testing.T) {
-		config := data.DefaultUserConfigV2()
-		config.InstallPath = "invalid/path" // Note: 不正なパス
+	t.Run("異常系", func(t *testing.T) {
+		params := map[string]failure.StringCode{
+			"":             apperr.EmptyInstallPath,   // 空文字
+			"invalid/path": apperr.InvalidInstallPath, // 配下にWorldOfWarships.exeが存在しないパス
+		}
 
-		mockWargaming := repository.NewMockWargamingInterface(ctrl)
+		for path, expected := range params {
+			// テスト
+			c := NewConfig(nil, nil, nil, nil)
+			_, err := c.UpdateInstallPath(path)
 
-		// テスト
-		c := NewConfig(nil, mockWargaming, nil, nil)
-		actual, err := c.UpdateRequired(config.InstallPath)
-
-		// アサーション
-		assert.Equal(t, data.RequiredConfigError{InstallPath: apperr.InvalidInstallPath.ErrorCode()}, actual)
-		require.NoError(t, err)
+			// アサーション
+			require.EqualError(t, apperr.Unwrap(err), expected.ErrorCode())
+		}
 	})
 }
 

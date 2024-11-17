@@ -12,6 +12,8 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
+const eventUpdateConfig = "CONFIG_UPDATE"
+
 type volatileData struct {
 	cancelWatcher  context.CancelFunc
 	excludePlayers data.ExcludedPlayers
@@ -142,30 +144,39 @@ func (a *App) UserConfig() (data.UserConfigV2, error) {
 	return config, apperr.Unwrap(err)
 }
 
-func (a *App) ApplyUserConfig(config data.UserConfigV2) error {
+func (a *App) UpdateUserConfig(config data.UserConfigV2) error {
 	err := a.config.UpdateOptional(config)
 	if err != nil {
 		a.logger.Error(err, nil)
+	} else {
+		runtime.EventsEmit(a.ctx, eventUpdateConfig, config)
 	}
 
 	return apperr.Unwrap(err)
 }
 
-func (a *App) ValidateRequiredConfig(
-	installPath string,
-) data.RequiredConfigError {
-	return a.config.ValidateRequired(installPath)
-}
-
-func (a *App) ApplyRequiredUserConfig(
-	installPath string,
-) (data.RequiredConfigError, error) {
-	validatedResult, err := a.config.UpdateRequired(installPath)
+func (a *App) ValidateInstallPath(path string) string {
+	err := a.config.ValidateInstallPath(path)
 	if err != nil {
 		a.logger.Error(err, nil)
 	}
 
-	return validatedResult, apperr.Unwrap(err)
+	if err := apperr.Unwrap(err); err != nil {
+		return err.Error()
+	}
+
+	return ""
+}
+
+func (a *App) UpdateInstallPath(path string) error {
+	config, err := a.config.UpdateInstallPath(path)
+	if err != nil {
+		a.logger.Error(err, nil)
+	} else {
+		runtime.EventsEmit(a.ctx, eventUpdateConfig, config)
+	}
+
+	return apperr.Unwrap(err)
 }
 
 func (a *App) ManualScreenshot(filename string, base64Data string) (bool, error) {

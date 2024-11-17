@@ -2,19 +2,13 @@
   import { DispName } from "src/lib/DispName";
   import ConfirmModal from "src/component/modal/ConfirmModal.svelte";
   import { storedConfig } from "src/stores";
-  import { createEventDispatcher } from "svelte";
   import UIkit from "uikit";
-  import { ApplyUserConfig, DefaultUserConfig } from "wailsjs/go/main/App";
-  import { data } from "wailsjs/go/models";
-  import clone from "clone";
+  import { DefaultUserConfig, UpdateUserConfig } from "wailsjs/go/main/App";
   import { ModalElementID } from "src/component/modal/ModalElementID";
-  import { FetchProxy } from "src/lib/FetchProxy";
   import { Notifier } from "src/lib/Notifier";
   import { deriveColumnSettings } from "src/lib/util";
 
-  export let inputConfig: data.UserConfigV2;
-
-  const dispatch = createEventDispatcher();
+  $: inputConfig = $storedConfig;
 
   const reset = async () => {
     try {
@@ -25,12 +19,19 @@
       inputConfig.color = defaultConfig.color;
       inputConfig.digit = defaultConfig.digit;
 
-      await ApplyUserConfig(inputConfig);
-      await FetchProxy.getConfig();
-
+      await UpdateUserConfig(inputConfig);
       Notifier.success("設定を更新しました");
     } catch (error) {
-      inputConfig = clone($storedConfig);
+      inputConfig = $storedConfig;
+      Notifier.failure(error);
+    }
+  };
+
+  const change = async () => {
+    try {
+      await UpdateUserConfig(inputConfig);
+    } catch (error) {
+      inputConfig = $storedConfig;
       Notifier.failure(error);
     }
   };
@@ -45,7 +46,7 @@
   <select
     class="uk-select uk-form-width-small"
     bind:value={inputConfig.font_size}
-    on:change={() => dispatch("Change")}
+    on:change={change}
   >
     {#each DispName.FONT_SIZES.toArray() as fs}
       <option selected={fs.key === $storedConfig.font_size} value={fs.key}
@@ -80,7 +81,7 @@
                 class="uk-checkbox"
                 type="checkbox"
                 bind:checked={inputConfig.display.ship[column.ship.key]}
-                on:change={() => dispatch("Change")}
+                on:change={change}
               />
             </td>
           {:else}
@@ -93,7 +94,7 @@
                 class="uk-checkbox"
                 type="checkbox"
                 bind:checked={inputConfig.display.overall[column.overall.key]}
-                on:change={() => dispatch("Change")}
+                on:change={change}
               />
             </td>
           {:else}
@@ -105,7 +106,7 @@
               <select
                 class="uk-select uk-form-small uk-form-width-xsmall"
                 bind:value={inputConfig.digit[column.digit.key]}
-                on:change={() => dispatch("Change")}
+                on:change={change}
               >
                 {#each [0, 1, 2] as digit}
                   <option
@@ -145,7 +146,7 @@
               class="uk-input"
               type="color"
               bind:value={inputConfig.color.skill.text[sl.key]}
-              on:input={() => dispatch("Change")}
+              on:input={change}
             />
           </td>
         </tr>
@@ -172,7 +173,7 @@
               class="uk-input"
               type="color"
               bind:value={inputConfig.color.tier.own[tg.key]}
-              on:input={() => dispatch("Change")}
+              on:input={change}
             />
           </td>
 
@@ -181,7 +182,7 @@
               class="uk-input"
               type="color"
               bind:value={inputConfig.color.tier.other[tg.key]}
-              on:input={() => dispatch("Change")}
+              on:input={change}
             />
           </td>
         </tr>
@@ -208,7 +209,7 @@
               class="uk-input"
               type="color"
               bind:value={inputConfig.color.ship_type.own[st.key]}
-              on:input={() => dispatch("Change")}
+              on:input={change}
             />
           </td>
 
@@ -217,7 +218,7 @@
               class="uk-input"
               type="color"
               bind:value={inputConfig.color.ship_type.other[st.key]}
-              on:input={() => dispatch("Change")}
+              on:input={change}
             />
           </td>
         </tr>
@@ -231,7 +232,7 @@
   <select
     class="uk-select uk-form-width-medium"
     bind:value={inputConfig.color.player_name}
-    on:change={() => dispatch("Change")}
+    on:change={change}
   >
     {#each DispName.PLAYER_NAME_COLORS.toArray() as pnc}
       <option
@@ -248,7 +249,7 @@
     class="uk-checkbox"
     type="checkbox"
     bind:checked={inputConfig.show_language_frag}
-    on:change={() => dispatch("Change")}
+    on:change={change}
   /> クラン国籍を表示する（クラン説明から言語検出）
 </div>
 

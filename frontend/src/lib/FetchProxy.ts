@@ -1,19 +1,10 @@
 import {
   storedAlertPlayers,
   storedBattle,
-  storedConfig,
   storedExcludedPlayers,
   storedLogs,
-  storedRequiredConfigError,
 } from "src/stores";
-import {
-  AlertPlayers,
-  ApplyRequiredUserConfig,
-  Battle,
-  ExcludePlayerIDs,
-  UserConfig,
-  ValidateRequiredConfig,
-} from "wailsjs/go/main/App";
+import { AlertPlayers, Battle, ExcludePlayerIDs } from "wailsjs/go/main/App";
 import { data } from "wailsjs/go/models";
 import { EventsOn } from "wailsjs/runtime/runtime";
 
@@ -23,28 +14,6 @@ export namespace FetchProxy {
     storedBattle.set(undefined);
     const ret = await Battle();
     storedBattle.set(ret);
-    return ret;
-  };
-
-  export const getConfig = async (): Promise<data.UserConfigV2> => {
-    const ret = await UserConfig();
-    storedConfig.set(ret);
-    return ret;
-  };
-
-  export const validateRequiredConfig = async (
-    installPath: string,
-  ): Promise<data.RequiredConfigError> => {
-    const ret = await ValidateRequiredConfig(installPath);
-    storedRequiredConfigError.set(ret);
-    return ret;
-  };
-
-  export const applyRequiredConfig = async (
-    installPath: string,
-  ): Promise<data.RequiredConfigError> => {
-    const ret = await ApplyRequiredUserConfig(installPath);
-    storedRequiredConfigError.set(ret);
     return ret;
   };
 

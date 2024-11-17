@@ -14,14 +14,6 @@ export function AlertPlayers() {
   return window['go']['main']['App']['AlertPlayers']();
 }
 
-export function ApplyRequiredUserConfig(arg1) {
-  return window['go']['main']['App']['ApplyRequiredUserConfig'](arg1);
-}
-
-export function ApplyUserConfig(arg1) {
-  return window['go']['main']['App']['ApplyUserConfig'](arg1);
-}
-
 export function AutoScreenshot(arg1, arg2) {
   return window['go']['main']['App']['AutoScreenshot'](arg1, arg2);
 }
@@ -90,10 +82,18 @@ export function UpdateAlertPlayer(arg1) {
   return window['go']['main']['App']['UpdateAlertPlayer'](arg1);
 }
 
+export function UpdateInstallPath(arg1) {
+  return window['go']['main']['App']['UpdateInstallPath'](arg1);
+}
+
+export function UpdateUserConfig(arg1) {
+  return window['go']['main']['App']['UpdateUserConfig'](arg1);
+}
+
 export function UserConfig() {
   return window['go']['main']['App']['UserConfig']();
 }
 
-export function ValidateRequiredConfig(arg1) {
-  return window['go']['main']['App']['ValidateRequiredConfig'](arg1);
+export function ValidateInstallPath(arg1) {
+  return window['go']['main']['App']['ValidateInstallPath'](arg1);
 }

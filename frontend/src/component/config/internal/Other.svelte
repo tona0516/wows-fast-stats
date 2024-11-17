@@ -1,18 +1,24 @@
 <script lang="ts">
   import UkIcon from "src/component/common/uikit/UkIcon.svelte";
   import { Notifier } from "src/lib/Notifier";
-  import { createEventDispatcher } from "svelte";
-  import { OpenDirectory } from "wailsjs/go/main/App";
-  import { data } from "wailsjs/go/models";
+  import { storedConfig } from "src/stores";
+  import { OpenDirectory, UpdateUserConfig } from "wailsjs/go/main/App";
 
-  export let inputConfig: data.UserConfigV2;
-
-  const dispatch = createEventDispatcher();
+  $: inputConfig = $storedConfig;
 
   const openDirectory = async (path: string) => {
     try {
       await OpenDirectory(path);
     } catch (error) {
+      Notifier.failure(error);
+    }
+  };
+
+  const change = async () => {
+    try {
+      await UpdateUserConfig(inputConfig);
+    } catch (error) {
+      inputConfig = $storedConfig;
       Notifier.failure(error);
     }
   };
@@ -25,7 +31,7 @@
         class="uk-checkbox"
         type="checkbox"
         bind:checked={inputConfig.save_screenshot}
-        on:change={() => dispatch("Change")}
+        on:change={change}
       /> 自動でスクリーンショットを保存する</label
     >
     <div>
@@ -43,7 +49,7 @@
         class="uk-checkbox"
         type="checkbox"
         bind:checked={inputConfig.save_temp_arena_info}
-        on:change={() => dispatch("Change")}
+        on:change={change}
       /> 【開発用】自動で戦闘情報(tempArenaInfo.json)を保存する</label
     >
     <div>
@@ -61,7 +67,7 @@
         class="uk-checkbox"
         type="checkbox"
         bind:checked={inputConfig.send_report}
-        on:change={() => dispatch("Change")}
+        on:change={change}
       /> アプリ改善のためのデータ送信を許可する</label
     >
     <div>
@@ -81,7 +87,7 @@
         class="uk-checkbox"
         type="checkbox"
         bind:checked={inputConfig.notify_updatable}
-        on:change={() => dispatch("Change")}
+        on:change={change}
       /> 新しいバージョンがある場合に通知する</label
     >
   </div>

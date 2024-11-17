@@ -46,43 +46,35 @@ func (c *Config) User() (data.UserConfigV2, error) {
 	return c.storage.UserConfigV2()
 }
 
-func (c *Config) ValidateRequired(
-	installPath string,
-) data.RequiredConfigError {
-	result := data.RequiredConfigError{}
-
-	if installPath == "" {
-		result.InstallPath = apperr.EmptyInstallPath.ErrorCode()
-	} else {
-		if _, err := os.Stat(filepath.Join(installPath, GameExeName)); err != nil {
-			result.InstallPath = apperr.InvalidInstallPath.ErrorCode()
-		}
+func (c *Config) ValidateInstallPath(path string) error {
+	if path == "" {
+		return failure.New(apperr.EmptyInstallPath)
 	}
 
-	result.Valid = result.InstallPath == ""
-	return result
+	if _, err := os.Stat(filepath.Join(path, GameExeName)); err != nil {
+		return failure.New(apperr.InvalidInstallPath)
+	}
+
+	return nil
 }
 
-func (c *Config) UpdateRequired(
-	installPath string,
-) (data.RequiredConfigError, error) {
+func (c *Config) UpdateInstallPath(path string) (data.UserConfigV2, error) {
+	var config data.UserConfigV2
+
 	// validate
-	validatedResult := c.ValidateRequired(installPath)
-	if !validatedResult.Valid {
-		return validatedResult, nil
+	if err := c.ValidateInstallPath(path); err != nil {
+		return config, err
 	}
 
 	// Note: overwrite only required setting
 	config, err := c.storage.UserConfigV2()
 	if err != nil {
-		return validatedResult, err
+		return config, err
 	}
-	config.InstallPath = installPath
+	config.InstallPath = path
 
 	// write
-	err = c.storage.WriteUserConfigV2(config)
-
-	return validatedResult, err
+	return config, c.storage.WriteUserConfigV2(config)
 }
 
 func (c *Config) UpdateOptional(config data.UserConfigV2) error {

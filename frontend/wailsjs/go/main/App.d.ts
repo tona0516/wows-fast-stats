@@ -8,10 +8,6 @@ export function AlertPatterns():Promise<Array<string>>;
 
 export function AlertPlayers():Promise<Array<data.AlertPlayer>>;
 
-export function ApplyRequiredUserConfig(arg1:string):Promise<data.RequiredConfigError>;
-
-export function ApplyUserConfig(arg1:data.UserConfigV2):Promise<void>;
-
 export function AutoScreenshot(arg1:string,arg2:string):Promise<void>;
 
 export function Battle():Promise<data.Battle>;
@@ -46,6 +42,10 @@ export function StartWatching():Promise<void>;
 
 export function UpdateAlertPlayer(arg1:data.AlertPlayer):Promise<void>;
 
+export function UpdateInstallPath(arg1:string):Promise<void>;
+
+export function UpdateUserConfig(arg1:data.UserConfigV2):Promise<void>;
+
 export function UserConfig():Promise<data.UserConfigV2>;
 
-export function ValidateRequiredConfig(arg1:string):Promise<data.RequiredConfigError>;
+export function ValidateInstallPath(arg1:string):Promise<string>;

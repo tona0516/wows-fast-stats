@@ -1,6 +1,5 @@
 <script lang="ts">
-  import { storedConfig, storedRequiredConfigError } from "src/stores";
-  import { ApplyUserConfig } from "wailsjs/go/main/App";
+  import { storedInstallPathError } from "src/stores";
   import Required from "./internal/Required.svelte";
   import Other from "./internal/Other.svelte";
   import TeamSummary from "./internal/TeamSummary.svelte";
@@ -8,26 +7,8 @@
   import AlertPlayer from "./internal/AlertPlayer.svelte";
   import UkIcon from "src/component/common/uikit/UkIcon.svelte";
   import UkTab from "src/component/common/uikit/UkTab.svelte";
-  import clone from "clone";
-  import { FetchProxy } from "src/lib/FetchProxy";
-  import { Notifier } from "src/lib/Notifier";
 
   const CONFIG_MENU_ID = "config-menu-id";
-
-  let inputConfig = clone($storedConfig);
-  storedConfig.subscribe((it) => {
-    inputConfig = clone(it);
-  });
-
-  const silentApply = async () => {
-    try {
-      await ApplyUserConfig(inputConfig);
-      await FetchProxy.getConfig();
-    } catch (error) {
-      inputConfig = clone($storedConfig);
-      Notifier.failure(error);
-    }
-  };
 </script>
 
 <div class="uk-padding-small uk-grid">
@@ -37,7 +18,7 @@
         <!-- svelte-ignore a11y-invalid-attribute -->
         <a href="#">
           必須設定
-          {#if !$storedRequiredConfigError.valid}
+          {#if $storedInstallPathError}
             <span class="uk-text-warning uk-text-small">
               <UkIcon name="warning" />
             </span>
@@ -53,13 +34,13 @@
   <div class="uk-width-expand@m">
     <ul id={CONFIG_MENU_ID} class="uk-switcher">
       <li>
-        <Required {inputConfig} />
+        <Required />
       </li>
       <li>
-        <Display {inputConfig} on:Change={silentApply} />
+        <Display />
       </li>
       <li>
-        <TeamSummary {inputConfig} />
+        <TeamSummary />
       </li>
       <li>
         <AlertPlayer
@@ -69,7 +50,7 @@
         />
       </li>
       <li>
-        <Other {inputConfig} on:Change={silentApply} />
+        <Other />
       </li>
     </ul>
   </div>
