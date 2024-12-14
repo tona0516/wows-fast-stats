@@ -1,11 +1,6 @@
-import {
-  storedBattle,
-  storedExcludedPlayers,
-  storedLogs,
-} from "src/stores";
-import { Battle, ExcludePlayerIDs } from "wailsjs/go/main/App";
+import { storedBattle } from "src/stores";
+import { Battle } from "wailsjs/go/main/App";
 import { data } from "wailsjs/go/models";
-import { EventsOn } from "wailsjs/runtime/runtime";
 
 export namespace FetchProxy {
   export const getBattle = async (): Promise<data.Battle> => {
@@ -15,17 +10,4 @@ export namespace FetchProxy {
     storedBattle.set(ret);
     return ret;
   };
-
-  export const getExcludedPlayers = async (): Promise<number[]> => {
-    const ret = await ExcludePlayerIDs();
-    storedExcludedPlayers.set(ret);
-    return ret;
-  };
 }
-
-EventsOn("LOG", (log: string) =>
-  storedLogs.update((logs) => {
-    logs.push(log);
-    return logs;
-  }),
-);

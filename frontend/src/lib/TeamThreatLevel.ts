@@ -9,7 +9,7 @@ export class TeamThreatLevel {
 
   static fromBattle = (
     battle: OptionalBattle,
-    excludedIDs: number[],
+    excludedPlayers: Set<number>,
   ): OptionalTeamThreatLevels => {
     if (!battle) {
       return undefined;
@@ -22,7 +22,7 @@ export class TeamThreatLevel {
           const id = player.player_info.id;
           return !(
             id === 0 ||
-            excludedIDs.includes(id) ||
+            excludedPlayers.has(id) ||
             player.player_info.is_hidden
           );
         })

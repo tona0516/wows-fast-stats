@@ -3,7 +3,6 @@
   import { RowPattern } from "src/lib/RowPattern";
   import type { data } from "wailsjs/go/models";
   import { ColumnProvider } from "src/lib/column/ColumnProvider";
-  import { FetchProxy } from "src/lib/FetchProxy";
   import { storedTeamThreatLevels } from "src/stores";
 
   export let teams: data.Team[];
@@ -76,7 +75,6 @@
                 {player}
                 on:EditAlertPlayer
                 on:RemoveAlertPlayer
-                on:CheckPlayer={() => FetchProxy.getExcludedPlayers()}
               />
             {/each}
 

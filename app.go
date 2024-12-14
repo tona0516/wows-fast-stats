@@ -16,14 +16,12 @@ const eventUpdateConfig = "CONFIG_UPDATE"
 const eventUpdateAlertPlayers = "ALERT_PLAYERS_UPDATE"
 
 type volatileData struct {
-	cancelWatcher  context.CancelFunc
-	excludePlayers data.ExcludedPlayers
+	cancelWatcher context.CancelFunc
 }
 
 func newVolatileData() volatileData {
 	return volatileData{
-		cancelWatcher:  nil,
-		excludePlayers: make(data.ExcludedPlayers),
+		cancelWatcher: nil,
 	}
 }
 
@@ -198,18 +196,6 @@ func (a *App) AutoScreenshot(filename string, base64Data string) error {
 
 func (a *App) Semver() string {
 	return a.env.Semver
-}
-
-func (a *App) ExcludePlayerIDs() []int {
-	return a.volatileData.excludePlayers.IDs()
-}
-
-func (a *App) AddExcludePlayerID(playerID int) {
-	a.volatileData.excludePlayers.Add(playerID)
-}
-
-func (a *App) RemoveExcludePlayerID(playerID int) {
-	a.volatileData.excludePlayers.Remove(playerID)
 }
 
 func (a *App) AlertPlayers() ([]data.AlertPlayer, error) {

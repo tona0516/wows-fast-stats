@@ -48,7 +48,7 @@ interface SummaryDiff {
 export namespace Summary {
   export const calculate = (
     battle: OptionalBattle,
-    excludedIDs: number[],
+    excludedPlayers: Set<number>,
     config: data.UserConfigV2,
   ): OptionalSummary => {
     if (!validate(battle)) {
@@ -74,7 +74,7 @@ export namespace Summary {
       const filtered = battle.teams.map((team) => {
         return team.players.filter(
           (player) =>
-            !isExcluded(player, excludedIDs) &&
+            !isExcluded(player, excludedPlayers) &&
             isMinBattlesOrMore(player, config, column.category),
         );
       });
@@ -158,9 +158,12 @@ const deriveColumns = (
   return { columns, headers };
 };
 
-const isExcluded = (player: data.Player, excludedIDs: number[]): boolean => {
+const isExcluded = (
+  player: data.Player,
+  excludedPlayers: Set<number>,
+): boolean => {
   const accountID = player.player_info.id;
-  return accountID === 0 || excludedIDs.includes(accountID);
+  return accountID === 0 || excludedPlayers.has(accountID);
 };
 
 const isMinBattlesOrMore = (

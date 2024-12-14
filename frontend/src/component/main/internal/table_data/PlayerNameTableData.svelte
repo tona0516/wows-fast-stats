@@ -6,21 +6,18 @@
   import { CssClass } from "src/lib/CssClass";
   import { storedAlertPlayers, storedExcludedPlayers } from "src/stores";
   import { createEventDispatcher } from "svelte";
-  import {
-    AddExcludePlayerID,
-    RemoveExcludePlayerID,
-  } from "wailsjs/go/main/App";
   import type { data } from "wailsjs/go/models";
   import type { PlayerName } from "src/lib/column/model/PlayerName";
   import { ClipboardSetText } from "wailsjs/runtime/runtime";
   import { Notifier } from "src/lib/Notifier";
   import "/node_modules/flag-icons/css/flag-icons.min.css";
+  import { ExcludedPlayers } from "src/lib/ExcludedPlayers";
 
   export let column: PlayerName;
   export let player: data.Player;
 
   $: accountID = player.player_info.id;
-  $: isChecked = !$storedExcludedPlayers.includes(accountID);
+  $: isChecked = !$storedExcludedPlayers.has(accountID);
   $: alertPlayer = $storedAlertPlayers.find(
     (it) => it.account_id === accountID,
   );
@@ -32,11 +29,10 @@
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onCheck = async (e: any) => {
     if (e.target.checked) {
-      await RemoveExcludePlayerID(accountID);
+      ExcludedPlayers.remove(accountID);
     } else {
-      await AddExcludePlayerID(accountID);
+      ExcludedPlayers.add(accountID);
     }
-    dispatch("CheckPlayer");
   };
 
   const setPlayerNameToClipboard = async () => {

@@ -5,7 +5,9 @@ import { derived, writable, type Writable } from "svelte/store";
 import { data } from "wailsjs/go/models";
 
 export const storedBattle = writable(undefined) as Writable<OptionalBattle>;
-export const storedExcludedPlayers = writable([]) as Writable<number[]>;
+export const storedExcludedPlayers = writable(new Set()) as Writable<
+  Set<number>
+>;
 export const storedConfig = writable({}) as Writable<data.UserConfigV2>;
 
 export const storedSummary = derived(
