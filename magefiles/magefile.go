@@ -88,7 +88,7 @@ func Setup() {
 		"github.com/wailsapp/wails/v2/cmd/wails@latest",
 		"github.com/golangci/golangci-lint/cmd/golangci-lint@v1.60.3",
 		"go.uber.org/mock/mockgen@latest",
-		"github.com/fdaines/arch-go@latest",
+		"github.com/arch-go/arch-go@latest",
 	}
 	for _, pkg := range pkgs {
 		run("go install " + pkg)
