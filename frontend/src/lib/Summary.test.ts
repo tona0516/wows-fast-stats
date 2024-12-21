@@ -48,7 +48,7 @@ test("calculate - invalid battle", () => {
   ];
 
   battles.forEach((it) => {
-    const actual = Summary.calculate(it, [], new data.UserConfigV2());
+    const actual = Summary.calculate(it, new Set(), new data.UserConfigV2());
     expect(actual).toBeUndefined();
   });
 });
@@ -95,7 +95,11 @@ test("calculate - all types, ship, pvp_all, excluded player", () => {
   config.team_summary.min_ship_battles = 20;
   config.stats_pattern = extra;
 
-  const summary = Summary.calculate(battle, [enemy2.player_info.id], config);
+  const summary = Summary.calculate(
+    battle,
+    new Set([enemy2.player_info.id]),
+    config,
+  );
 
   expect(summary?.values.get("all")?.friends).toEqual([
     friend1[extra].ship.pr.toFixed(config.digit.pr),
@@ -185,7 +189,7 @@ test("calculate - each ship type, overall, pvp_solo", () => {
   config.team_summary.min_overall_battles = 1;
   config.stats_pattern = extra;
 
-  const summary = Summary.calculate(battle, [], config);
+  const summary = Summary.calculate(battle, new Set(), config);
 
   shipTypes.forEach((shipType) => {
     expect(summary?.values.get(shipType)?.friends).toEqual([
