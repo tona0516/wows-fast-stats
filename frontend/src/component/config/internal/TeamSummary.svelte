@@ -11,7 +11,7 @@
     inputConfig.team_summary.min_ship_battles > 0 &&
     Number.isSafeInteger(inputConfig.team_summary.min_ship_battles);
   $: isValidMinOverallBattles =
-  inputConfig.team_summary.min_overall_battles > 0 &&
+    inputConfig.team_summary.min_overall_battles > 0 &&
     Number.isSafeInteger(inputConfig.team_summary.min_overall_battles);
   $: isValidAll = isValidMinShipBattles && isValidMinOverallBattles;
 

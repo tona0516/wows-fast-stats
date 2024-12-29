@@ -5,7 +5,7 @@
   import UIkit from "uikit";
   import { ModalElementID } from "./ModalElementID";
   import clone from "clone";
-    import { Notifier } from "src/lib/Notifier";
+  import { Notifier } from "src/lib/Notifier";
 
   export let defaultAlertPlayer: data.AlertPlayer;
 

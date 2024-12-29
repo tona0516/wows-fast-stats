@@ -128,7 +128,9 @@ func TestConfig_UpdateAlertPlayer(t *testing.T) {
 
 		// 準備
 		newPlayer := data.AlertPlayer{AccountID: 3, Name: "Player3"}
-		expected := append(existingPlayers, newPlayer)
+		expected := make([]data.AlertPlayer, 0)
+		expected = append(expected, existingPlayers...)
+		expected = append(expected, newPlayer)
 
 		mockStorage := repository.NewMockStorageInterface(ctrl)
 		mockStorage.EXPECT().AlertPlayers().Return(existingPlayers, nil)

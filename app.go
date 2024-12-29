@@ -12,8 +12,10 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
-const eventUpdateConfig = "CONFIG_UPDATE"
-const eventUpdateAlertPlayers = "ALERT_PLAYERS_UPDATE"
+const (
+	eventUpdateConfig       = "CONFIG_UPDATE"
+	eventUpdateAlertPlayers = "ALERT_PLAYERS_UPDATE"
+)
 
 type volatileData struct {
 	cancelWatcher context.CancelFunc

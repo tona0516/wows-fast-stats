@@ -10,7 +10,6 @@
   } from "wailsjs/go/main/App";
 
   let isLoading = false;
-  let inputInstallPathError: unknown = $storedInstallPathError;
 
   $: inputConfig = $storedConfig;
 
@@ -28,10 +27,11 @@
     try {
       isLoading = true;
       await UpdateInstallPath(inputConfig.install_path);
+      storedInstallPathError.set("");
       Notifier.success("設定を更新しました");
       StartWatching();
     } catch (error) {
-      inputInstallPathError = error;
+      storedInstallPathError.set(error as string);
     } finally {
       isLoading = false;
     }
@@ -53,10 +53,10 @@
   </div>
   <span>ゲームクライアントの実行ファイルがあるフォルダを選択してください。</span
   >
-  {#if inputInstallPathError}
+  {#if $storedInstallPathError}
     <div class="uk-text-danger">
       <UkIcon name="warning" />
-      <span class="uk-text-middle">{inputInstallPathError}</span>
+      <span class="uk-text-middle">{$storedInstallPathError}</span>
     </div>
   {/if}
 </div>
