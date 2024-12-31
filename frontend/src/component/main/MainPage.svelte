@@ -132,9 +132,9 @@
     {:else}
       <p class="uk-text-center">
         {#if $storedInstallPathError}
-          戦闘中ではありません。開始時に自動的にリロードします。
-        {:else}
           設定画面から初期設定を行ってください。
+        {:else}
+          戦闘中ではありません。開始時に自動的にリロードします。
         {/if}
       </p>
     {/if}
