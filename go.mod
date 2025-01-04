@@ -8,7 +8,6 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/stretchr/testify v1.9.0
 	github.com/wailsapp/wails/v2 v2.9.2
-	golang.org/x/exp v0.0.0-20241009180824-f66d83c29e7c
 	golang.org/x/sync v0.8.0
 )
 
@@ -17,7 +16,6 @@ require github.com/rs/zerolog v1.33.0
 require (
 	github.com/abadojack/whatlanggo v1.0.1
 	github.com/dgraph-io/badger/v4 v4.3.1
-	github.com/magefile/mage v1.15.0
 	github.com/morikuni/failure v1.1.2
 	github.com/shopspring/decimal v1.4.0
 	go.uber.org/mock v0.4.0
@@ -34,6 +32,7 @@ require (
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/google/flatbuffers v24.3.25+incompatible // indirect
+	github.com/google/go-cmp v0.6.0 // indirect
 	github.com/klauspost/compress v1.17.11 // indirect
 	github.com/leaanthony/u v1.1.1 // indirect
 	github.com/wailsapp/go-webview2 v1.0.16 // indirect
