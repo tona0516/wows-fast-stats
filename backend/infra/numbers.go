@@ -26,7 +26,7 @@ func (n *Numbers) ExpectedStats() (data.ExpectedStats, error) {
 		_, body, err := webapi.NewClient(n.config.URL,
 			webapi.WithPath("/personal/rating/expected/json/"),
 			webapi.WithTimeout(n.config.Timeout),
-			webapi.WithIsInsecure(true),
+			webapi.WithIsInsecure(true), // workaround for expired SSL certificate
 		).GET()
 		if err != nil {
 			return result, failure.Wrap(err)
