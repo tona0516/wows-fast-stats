@@ -1,6 +1,7 @@
 package infra
 
 import (
+	"encoding/json"
 	"strconv"
 	"strings"
 	"wfs/backend/apperr"
@@ -196,35 +197,39 @@ func request[T response.WGResponse](
 	path string,
 	queries map[string]string,
 ) (T, error) {
-	url := w.config.URL + path
 	b := backoff.WithMaxRetries(backoff.NewExponentialBackOff(), w.config.Retry)
-	operation := func() (webapi.Response[any, T], error) {
+	operation := func() (T, error) {
 		w.rl.Take()
-		res, err := webapi.GetRequest[T](url, w.config.Timeout, queries, w.config.Transport)
-		errCtx := failure.Context{
-			"url":         res.Request.URL,
-			"status_code": strconv.Itoa(res.StatusCode),
-			"body":        string(res.BodyByte),
-		}
+		var result T
 
+		_, body, err := webapi.NewClient(w.config.URL,
+			webapi.WithPath(path),
+			webapi.WithQuery(queries),
+			webapi.WithTimeout(w.config.Timeout),
+		).GET()
 		if err != nil {
-			return res, failure.Wrap(err, errCtx)
+			return result, failure.Translate(err, apperr.WGAPIError)
 		}
 
-		if res.Body.GetStatus() == "error" {
+		if err := json.Unmarshal(body, &result); err != nil {
+			return result, failure.Translate(err, apperr.WGAPIError)
+		}
+
+		if result.GetStatus() == "error" {
 			// Note:
 			// https://developers.wargaming.net/documentation/guide/getting-started/#common-errors
-			message := res.Body.GetError().Message
+			message := result.GetError().Message
 			if slices.Contains([]string{"REQUEST_LIMIT_EXCEEDED", "SOURCE_NOT_AVAILABLE"}, message) {
-				return res, failure.New(apperr.WGAPITemporaryUnavaillalble, errCtx)
+				return result, failure.New(apperr.WGAPITemporaryUnavaillalble)
 			}
 
-			return res, backoff.Permanent(failure.New(apperr.WGAPIError, errCtx))
+			return result, backoff.Permanent(failure.New(apperr.WGAPIError))
 		}
 
-		return res, nil
+		return result, nil
 	}
+
 	res, err := backoff.RetryWithData(operation, b)
 
-	return res.Body, failure.Wrap(err)
+	return res, failure.Wrap(err)
 }

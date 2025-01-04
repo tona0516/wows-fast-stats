@@ -1,8 +1,7 @@
 package infra
 
 import (
-	"net/http"
-	"strconv"
+	"encoding/json"
 	"wfs/backend/apperr"
 	"wfs/backend/data"
 	"wfs/backend/infra/webapi"
@@ -21,33 +20,33 @@ func NewUnofficialWargaming(config RequestConfig) *UnofficialWargaming {
 
 func (w *UnofficialWargaming) ClansAutoComplete(search string) (data.UWGClansAutocomplete, error) {
 	b := backoff.WithMaxRetries(backoff.NewExponentialBackOff(), w.config.Retry)
-	operation := func() (webapi.Response[any, data.UWGClansAutocomplete], error) {
-		res, err := webapi.GetRequest[data.UWGClansAutocomplete](
-			w.config.URL+"/api/search/autocomplete/",
-			w.config.Timeout,
-			map[string]string{
+	operation := func() (data.UWGClansAutocomplete, error) {
+		var result data.UWGClansAutocomplete
+
+		_, body, err := webapi.NewClient(w.config.URL,
+			webapi.WithPath("/api/search/autocomplete/"),
+			webapi.WithQuery(map[string]string{
 				"search": search,
 				"type":   "clans",
-			},
-			w.config.Transport,
-		)
-		errCtx := failure.Context{
-			"url":         res.Request.URL,
-			"status_code": strconv.Itoa(res.StatusCode),
-			"body":        string(res.BodyByte),
-		}
+			}),
+			webapi.WithTimeout(w.config.Timeout),
+			webapi.WithIsInsecure(true),
+		).GET()
 		if err != nil {
-			return res, failure.Wrap(err, errCtx)
+			return result, failure.Wrap(err)
 		}
 
-		if res.StatusCode != http.StatusOK {
-			return res, failure.New(apperr.UWGAPIError, errCtx)
+		if err := json.Unmarshal(body, &result); err != nil {
+			return result, failure.Wrap(err)
 		}
 
-		return res, nil
+		return result, nil
 	}
 
 	res, err := backoff.RetryWithData(operation, b)
+	if err != nil {
+		return res, failure.Translate(err, apperr.UWGAPIError)
+	}
 
-	return res.Body, failure.Wrap(err)
+	return res, failure.Wrap(err)
 }

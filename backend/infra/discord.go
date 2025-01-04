@@ -1,8 +1,6 @@
 package infra
 
 import (
-	"net/http"
-	"strconv"
 	"wfs/backend/apperr"
 	"wfs/backend/infra/webapi"
 
@@ -22,23 +20,13 @@ func NewDiscord(config RequestConfig) *Discord {
 }
 
 func (d *Discord) Comment(message string) error {
-	res, err := webapi.PostRequestJSON[DiscordRequestBody, any](
-		d.config.URL,
-		d.config.Timeout,
-		DiscordRequestBody{Content: message},
-		d.config.Transport,
-	)
-	errCtx := failure.Context{
-		"url":         res.Request.URL,
-		"status_code": strconv.Itoa(res.StatusCode),
-		"body":        string(res.BodyByte),
-	}
+	_, _, err := webapi.NewClient(d.config.URL,
+		webapi.WithTimeout(d.config.Timeout),
+		webapi.WithHeaders(map[string]string{"Content-Type": "application/json"}),
+		webapi.WithBody(map[string]string{"content": message}),
+	).POST()
 	if err != nil {
-		return failure.Wrap(err, errCtx)
-	}
-
-	if res.StatusCode != http.StatusOK {
-		return failure.New(apperr.DiscordAPISendLogError, errCtx)
+		return failure.Translate(err, apperr.DiscordAPISendLogError)
 	}
 
 	return nil

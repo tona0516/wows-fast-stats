@@ -1,7 +1,7 @@
 package webapi
 
 import (
-	"encoding/json"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -11,233 +11,143 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// テスト用のデータ型.
-type TestRequestBody struct {
-	ID string `json:"ID"`
-}
+func TestClient_GET_Success(t *testing.T) {
+	t.Parallel()
 
-type TestResponseBody struct {
-	Name string `json:"name"`
-}
+	// モックサーバーの作成
+	mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
+		assert.Equal(t, "/test-path", r.URL.Path)
+		assert.Equal(t, "value", r.URL.Query().Get("key"))
+		assert.Equal(t, "Bearer token", r.Header.Get("Authorization"))
 
-func mockServer[T, U any](response Response[T, U], responseTime time.Duration) *httptest.Server {
-	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		time.Sleep(responseTime)
-
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(response.StatusCode)
-		_, _ = w.Write(response.BodyByte)
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte(`{"message":"GET success"}`))
 	}))
+	defer mockServer.Close()
+
+	// クライアントの作成
+	client := NewClient(mockServer.URL,
+		WithPath("test-path"),
+		WithQuery(map[string]string{"key": "value"}),
+		WithHeaders(map[string]string{"Authorization": "Bearer token"}),
+	)
+
+	// GETリクエストの実行
+	res, body, err := client.GET()
+
+	// 結果の検証
+	require.NoError(t, err)
+	assert.Equal(t, http.StatusOK, res.StatusCode)
+	assert.JSONEq(t, `{"message":"GET success"}`, string(body))
 }
 
-func TestGetRequest(t *testing.T) {
+func TestClient_POST_Success(t *testing.T) {
 	t.Parallel()
 
-	t.Run("正常系_クエリなし", func(t *testing.T) {
-		t.Parallel()
+	// モックサーバーの作成
+	mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodPost, r.Method)
+		assert.Equal(t, "/test-path", r.URL.Path)
+		body, _ := io.ReadAll(r.Body)
+		assert.JSONEq(t, `{"key":"value"}`, string(body))
 
-		responseBody := TestResponseBody{Name: "test_name"}
-		responseBodyByte, _ := json.Marshal(responseBody)
-		expected := Response[any, TestResponseBody]{
-			Request: Request[any]{
-				Method: http.MethodGet,
-			},
-			StatusCode: http.StatusOK,
-			Body:       responseBody,
-			BodyByte:   responseBodyByte,
-		}
+		w.WriteHeader(http.StatusCreated)
+		_, _ = w.Write([]byte(`{"message":"POST success"}`))
+	}))
+	defer mockServer.Close()
 
-		server := mockServer(expected, 0)
-		defer server.Close()
-		expected.Request.URL = server.URL
+	// クライアントの作成
+	client := NewClient(mockServer.URL,
+		WithPath("test-path"),
+		WithBody(map[string]string{"key": "value"}),
+		WithHeaders(map[string]string{"Content-Type": "application/json"}),
+	)
 
-		actual, err := GetRequest[TestResponseBody](server.URL, 1*time.Second, nil, nil)
+	// POSTリクエストの実行
+	res, body, err := client.POST()
 
-		assert.Equal(t, expected, actual)
-		require.NoError(t, err)
-	})
-
-	t.Run("正常系_クエリあり", func(t *testing.T) {
-		t.Parallel()
-
-		responseBody := TestResponseBody{Name: "test_name"}
-		responseBodyByte, _ := json.Marshal(responseBody)
-		expected := Response[any, TestResponseBody]{
-			Request: Request[any]{
-				Method: http.MethodGet,
-			},
-			StatusCode: http.StatusOK,
-			Body:       responseBody,
-			BodyByte:   responseBodyByte,
-		}
-
-		server := mockServer(expected, 0)
-		defer server.Close()
-		expected.Request.URL = server.URL + "?hoge=fuga"
-
-		actual, err := GetRequest[TestResponseBody](server.URL, 1*time.Second, map[string]string{"hoge": "fuga"}, nil)
-
-		assert.Equal(t, expected, actual)
-		require.NoError(t, err)
-	})
-
-	t.Run("異常系_タイムアウト", func(t *testing.T) {
-		t.Parallel()
-
-		responseBody := TestResponseBody{Name: "test_name"}
-		responseBodyByte, _ := json.Marshal(responseBody)
-		expected := Response[any, TestResponseBody]{
-			Request: Request[any]{
-				Method: http.MethodGet,
-			},
-			StatusCode: http.StatusOK,
-			Body:       responseBody,
-			BodyByte:   responseBodyByte,
-		}
-
-		server := mockServer(expected, 1*time.Second)
-		defer server.Close()
-		expected.Request.URL = server.URL
-
-		_, err := GetRequest[TestResponseBody](server.URL, 100*time.Millisecond, nil, nil)
-
-		require.Error(t, err)
-	})
-
-	t.Run("異常系_不正なレスポンス", func(t *testing.T) {
-		t.Parallel()
-
-		responses := []struct {
-			name string
-			body string
-		}{
-			{name: "HTML", body: "<html></html>"},
-			{name: "不正なJSON", body: `{"name":}`},
-		}
-
-		for _, res := range responses {
-			t.Run(res.name, func(t *testing.T) {
-				t.Parallel()
-
-				server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-					w.WriteHeader(http.StatusOK)
-					_, _ = w.Write([]byte(res.body))
-				}))
-				defer server.Close()
-
-				_, err := GetRequest[TestResponseBody](server.URL, 1*time.Second, nil, nil)
-
-				require.Error(t, err)
-			})
-		}
-	})
+	// 結果の検証
+	require.NoError(t, err)
+	assert.Equal(t, http.StatusCreated, res.StatusCode)
+	assert.JSONEq(t, `{"message":"POST success"}`, string(body))
 }
 
-func TestPostRequestJSON(t *testing.T) {
+func TestClient_GET_ErrorResponse(t *testing.T) {
 	t.Parallel()
 
-	t.Run("正常系_ボディなし", func(t *testing.T) {
-		t.Parallel()
+	// モックサーバーの作成
+	mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+		_, _ = w.Write([]byte(`{"error":"Internal server error"}`))
+	}))
+	defer mockServer.Close()
 
-		responseBody := TestResponseBody{Name: "test_name"}
-		responseBodyByte, _ := json.Marshal(responseBody)
-		expected := Response[any, TestResponseBody]{
-			Request: Request[any]{
-				Method: http.MethodPost,
-			},
-			StatusCode: http.StatusOK,
-			Body:       responseBody,
-			BodyByte:   responseBodyByte,
-		}
+	// クライアントの作成
+	client := NewClient(mockServer.URL)
 
-		server := mockServer(expected, 0)
-		defer server.Close()
-		expected.Request.URL = server.URL
+	// GETリクエストの実行
+	res, body, err := client.GET()
 
-		actual, err := PostRequestJSON[any, TestResponseBody](server.URL, 1*time.Second, nil, nil)
+	// 結果の検証
+	require.Error(t, err)
+	assert.Equal(t, http.StatusInternalServerError, res.StatusCode)
+	assert.JSONEq(t, `{"error":"Internal server error"}`, string(body))
+}
 
-		assert.Equal(t, expected, actual)
-		require.NoError(t, err)
-	})
+func TestClient_Timeout(t *testing.T) {
+	t.Parallel()
 
-	t.Run("正常系_ボディあり", func(t *testing.T) {
-		t.Parallel()
+	// モックサーバーの作成
+	mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		time.Sleep(2 * time.Second)
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer mockServer.Close()
 
-		responseBody := TestResponseBody{Name: "test_name"}
-		responseBodyByte, _ := json.Marshal(responseBody)
-		expected := Response[TestRequestBody, TestResponseBody]{
-			Request: Request[TestRequestBody]{
-				Method: http.MethodPost,
-				Body:   TestRequestBody{ID: "test_id"},
-			},
-			StatusCode: http.StatusOK,
-			Body:       responseBody,
-			BodyByte:   responseBodyByte,
-		}
+	// クライアントの作成
+	client := NewClient(mockServer.URL, WithTimeout(1*time.Second))
 
-		server := mockServer(expected, 0)
-		defer server.Close()
-		expected.Request.URL = server.URL
+	// GETリクエストの実行
+	_, _, err := client.GET()
 
-		actual, err := PostRequestJSON[TestRequestBody, TestResponseBody](
-			server.URL,
-			1*time.Second,
-			TestRequestBody{ID: "test_id"},
-			nil,
-		)
+	// 結果の検証
+	assert.Error(t, err)
+}
 
-		assert.Equal(t, expected, actual)
-		require.NoError(t, err)
-	})
+func TestClient_InsecureTLS(t *testing.T) {
+	t.Parallel()
 
-	t.Run("異常系_タイムアウト", func(t *testing.T) {
-		t.Parallel()
+	// HTTPSモックサーバーの作成
+	mockServer := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte(`{"message":"Insecure TLS success"}`))
+	}))
+	defer mockServer.Close()
 
-		responseBody := TestResponseBody{Name: "test_name"}
-		responseBodyByte, _ := json.Marshal(responseBody)
-		expected := Response[TestRequestBody, TestResponseBody]{
-			Request: Request[TestRequestBody]{
-				Method: http.MethodPost,
-			},
-			StatusCode: http.StatusOK,
-			Body:       responseBody,
-			BodyByte:   responseBodyByte,
-		}
+	// クライアントの作成
+	client := NewClient(mockServer.URL,
+		WithIsInsecure(true),
+	)
 
-		server := mockServer(expected, 1*time.Second)
-		defer server.Close()
-		expected.Request.URL = server.URL
+	// GETリクエストの実行
+	res, body, err := client.GET()
 
-		_, err := PostRequestJSON[TestRequestBody, TestResponseBody](server.URL, 100*time.Millisecond, TestRequestBody{}, nil)
+	// 結果の検証
+	require.NoError(t, err)
+	assert.Equal(t, http.StatusOK, res.StatusCode)
+	assert.JSONEq(t, `{"message":"Insecure TLS success"}`, string(body))
+}
 
-		require.Error(t, err)
-	})
+func TestClient_MissingBaseURL(t *testing.T) {
+	t.Parallel()
 
-	t.Run("異常系_不正なレスポンス", func(t *testing.T) {
-		t.Parallel()
+	// クライアントの作成
+	client := NewClient("")
 
-		responses := []struct {
-			name string
-			body string
-		}{
-			{name: "HTML", body: "<html></html>"},
-			{name: "不正なJSON", body: `{"name":}`},
-		}
+	// GETリクエストの実行
+	_, _, err := client.GET()
 
-		for _, res := range responses {
-			t.Run(res.name, func(t *testing.T) {
-				t.Parallel()
-
-				server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-					w.WriteHeader(http.StatusOK)
-					_, _ = w.Write([]byte(res.body))
-				}))
-				defer server.Close()
-
-				_, err := PostRequestJSON[TestRequestBody, TestResponseBody](server.URL, 1*time.Second, TestRequestBody{}, nil)
-
-				require.Error(t, err)
-			})
-		}
-	})
+	// 結果の検証
+	assert.Error(t, err)
 }

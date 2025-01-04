@@ -1,8 +1,7 @@
 package infra
 
 import (
-	"net/http"
-	"strconv"
+	"encoding/json"
 	"wfs/backend/apperr"
 	"wfs/backend/data"
 	"wfs/backend/infra/webapi"
@@ -21,30 +20,28 @@ func NewGithub(config RequestConfig) *Github {
 
 func (g *Github) LatestRelease() (data.GHLatestRelease, error) {
 	b := backoff.WithMaxRetries(backoff.NewExponentialBackOff(), g.config.Retry)
-	operation := func() (webapi.Response[any, data.GHLatestRelease], error) {
-		res, err := webapi.GetRequest[data.GHLatestRelease](
-			g.config.URL+"/repos/tona0516/wows-fast-stats/releases/latest",
-			g.config.Timeout,
-			nil,
-			g.config.Transport,
-		)
-		errCtx := failure.Context{
-			"url":         res.Request.URL,
-			"status_code": strconv.Itoa(res.StatusCode),
-			"body":        string(res.BodyByte),
-		}
+	operation := func() (data.GHLatestRelease, error) {
+		var result data.GHLatestRelease
+
+		_, body, err := webapi.NewClient(g.config.URL,
+			webapi.WithPath("/repos/tona0516/wows-fast-stats/releases/latest"),
+			webapi.WithTimeout(g.config.Timeout),
+		).GET()
 		if err != nil {
-			return res, failure.Wrap(err, errCtx)
+			return result, failure.Wrap(err)
 		}
 
-		if res.StatusCode != http.StatusOK {
-			return res, failure.New(apperr.GithubAPICheckUpdateError, errCtx)
+		if err := json.Unmarshal(body, &result); err != nil {
+			return result, failure.Wrap(err)
 		}
 
-		return res, nil
+		return result, nil
 	}
 
 	res, err := backoff.RetryWithData(operation, b)
+	if err != nil {
+		return res, failure.Translate(err, apperr.GithubAPICheckUpdateError)
+	}
 
-	return res.Body, failure.Wrap(err)
+	return res, nil
 }
