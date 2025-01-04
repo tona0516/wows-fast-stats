@@ -15,7 +15,7 @@ TEST_REPLAY_PATH := ./test_install_dir/replays
 
 setup:
 	go install github.com/wailsapp/wails/v2/cmd/wails@latest
-	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.60.3
+	go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 	go install go.uber.org/mock/mockgen@latest
 	go install github.com/arch-go/arch-go@latest
 	$(NPM) ci

@@ -89,8 +89,8 @@ func TestWargaming_AccountInfo(t *testing.T) {
                 }
             }`, message)
 
-			retry := 1
-			var calls int
+			var retry uint64 = 1
+			var calls uint64
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				calls++
 
@@ -107,7 +107,7 @@ func TestWargaming_AccountInfo(t *testing.T) {
 			}))
 			defer server.Close()
 
-			wargaming := NewWargaming(RequestConfig{URL: server.URL, Retry: uint64(retry)}, ratelimit.New(10), "")
+			wargaming := NewWargaming(RequestConfig{URL: server.URL, Retry: retry}, ratelimit.New(10), "")
 
 			_, err := wargaming.AccountInfo([]int{123, 456})
 
@@ -134,8 +134,8 @@ func TestWargaming_AccountInfo(t *testing.T) {
                 }
             }`, message)
 
-			retry := 1
-			var calls int
+			var retry uint64 = 1
+			var calls uint64
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				calls++
 				w.Header().Set("Content-Type", "application/json")
@@ -144,7 +144,7 @@ func TestWargaming_AccountInfo(t *testing.T) {
 			}))
 			defer server.Close()
 
-			wargaming := NewWargaming(RequestConfig{URL: server.URL, Retry: uint64(retry)}, ratelimit.New(10), "")
+			wargaming := NewWargaming(RequestConfig{URL: server.URL, Retry: retry}, ratelimit.New(10), "")
 
 			_, err := wargaming.AccountInfo([]int{123, 456})
 

@@ -1,9 +1,8 @@
 package data
 
 import (
+	"slices"
 	"sort"
-
-	"golang.org/x/exp/slices"
 )
 
 type WGClansAccountInfo map[int]WGClansAccountInfoData

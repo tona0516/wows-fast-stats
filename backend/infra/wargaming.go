@@ -2,6 +2,7 @@ package infra
 
 import (
 	"encoding/json"
+	"slices"
 	"strconv"
 	"strings"
 	"wfs/backend/apperr"
@@ -12,7 +13,6 @@ import (
 	"github.com/cenkalti/backoff/v4"
 	"github.com/morikuni/failure"
 	"go.uber.org/ratelimit"
-	"golang.org/x/exp/slices"
 )
 
 type Wargaming struct {

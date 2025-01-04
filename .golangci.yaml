@@ -2,13 +2,12 @@
 linters:
   enable-all: true
   disable:
-    - execinquery # Deprecated
+    - exportloopref # deprecated
     - wrapcheck
     - forbidigo
     - funlen
     - wsl
     - exhaustruct
-    - gomnd
     - ireturn
     - tagliatelle
     - varnamelen
