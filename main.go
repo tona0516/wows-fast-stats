@@ -3,6 +3,7 @@ package main
 import (
 	"embed"
 	"fmt"
+	"log"
 	"os"
 	"strconv"
 	"time"
@@ -86,10 +87,14 @@ func initApp(env data.Env) *App {
 		Retry:   maxRetry,
 		Timeout: timeout,
 	})
-	db, err := badger.Open(badger.DefaultOptions("./persistent_data"))
+
+	options := badger.DefaultOptions("./persistent_data")
+	if env.IsDev {
+		options = options.WithBypassLockGuard(true)
+	}
+	db, err := badger.Open(options)
 	if err != nil {
-		logger := infra.NewLogger(env, alertDiscord, infoDiscord)
-		logger.Fatal(err, nil)
+		log.Fatalln(err)
 		return nil
 	}
 
