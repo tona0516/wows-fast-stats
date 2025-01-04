@@ -8,10 +8,10 @@ import (
 	"sync"
 	"wfs/backend/apperr"
 	"wfs/backend/data"
-	"wfs/backend/langdet"
 	"wfs/backend/repository"
 	"wfs/backend/yamibuka"
 
+	"github.com/abadojack/whatlanggo"
 	"github.com/morikuni/failure"
 )
 
@@ -363,6 +363,14 @@ func (b *Battle) fetchClanLanguage(clanInfoArray []data.WGClansInfoData) map[str
 	urlPattern := `https?://[^\s]+`
 	re := regexp.MustCompile(urlPattern)
 
+	options := whatlanggo.Options{
+		Whitelist: map[whatlanggo.Lang]bool{
+			whatlanggo.Jpn: true,
+			whatlanggo.Kor: true,
+			whatlanggo.Cmn: true,
+		},
+	}
+
 	var mu sync.Mutex
 	err := doParallel(clanInfoArray, func(clan data.WGClansInfoData) error {
 		// URLを空文字に
@@ -374,8 +382,10 @@ func (b *Battle) fetchClanLanguage(clanInfoArray []data.WGClansInfoData) map[str
 			return nil
 		}
 
+		info := whatlanggo.DetectWithOptions(description, options)
+
 		mu.Lock()
-		result[clan.Tag] = string(langdet.Detect(description))
+		result[clan.Tag] = info.Lang.Iso6391()
 		mu.Unlock()
 
 		return nil

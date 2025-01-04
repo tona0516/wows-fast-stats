@@ -15,6 +15,7 @@ require (
 require github.com/rs/zerolog v1.33.0
 
 require (
+	github.com/abadojack/whatlanggo v1.0.1
 	github.com/dgraph-io/badger/v4 v4.3.1
 	github.com/magefile/mage v1.15.0
 	github.com/morikuni/failure v1.1.2
