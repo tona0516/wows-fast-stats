@@ -9,7 +9,6 @@ import (
 
 	"github.com/morikuni/failure"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
 )
 
@@ -96,7 +95,7 @@ func TestBattle_Get_正常系_初回(t *testing.T) {
 	_, err := b.Get(context.TODO(), testUserConfig)
 
 	// アサーション
-	require.NoError(t, err)
+	assert.NoError(t, err)
 }
 
 func TestBattle_Get_正常系_2回目以降(t *testing.T) {
@@ -163,7 +162,7 @@ func TestBattle_Get_正常系_2回目以降(t *testing.T) {
 	_, err := b.Get(context.TODO(), testUserConfig)
 
 	// アサーション
-	require.NoError(t, err)
+	assert.NoError(t, err)
 }
 
 func TestBattle_Get_異常系(t *testing.T) {
