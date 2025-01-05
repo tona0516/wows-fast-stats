@@ -44,12 +44,6 @@ dev:
 build: test
 	wails build -platform windows/amd64 -o $(BINARY_NAME) $(BUILD_FLAGS) -ldflags "$(COMMON_LDFLAGS) -X main.AlertDiscordWebhookURL=$(DISCORD_WEBHOOK_URL_PROD_ALERT) -X main.InfoDiscordWebhookURL=$(DISCORD_WEBHOOK_URL_PROD_INFO)"
 
-pkg: build
-	$(eval TEMP_DIR := $(shell mktemp -d))
-	mkdir -p $(TEMP_DIR)/$(APP_NAME)
-	mv ./build/bin/$(BINARY_NAME) $(TEMP_DIR)/$(APP_NAME)
-	zip -r $(APP_NAME).zip $(TEMP_DIR)/$(APP_NAME)
-
 chbtl:
 	$(eval TEMP_ARENA_INFO := $(shell ls $(TEST_REPLAY_PATH) | grep -v tempArenaInfo.json | fzf))
 	cp $(TEST_REPLAY_PATH)/$(TEMP_ARENA_INFO) $(TEST_REPLAY_PATH)/tempArenaInfo.json
