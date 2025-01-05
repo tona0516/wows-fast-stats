@@ -154,7 +154,10 @@ func (w *reportWriter) WriteLevel(level zerolog.Level, p []byte) (int, error) {
 	} else {
 		discord = w.infoDiscord
 	}
-	_ = discord.Comment(formatted)
+	err := discord.Comment(formatted)
+	if err != nil {
+		fmt.Printf("Failed to send to discord: %s", err.Error())
+	}
 
 	return len(p), nil
 }

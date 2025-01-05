@@ -14,7 +14,7 @@ const (
 	WGAPIError                  failure.StringCode = "WG APIが利用できません。再起動するか、設定を見直してください。"
 	UWGAPIError                 failure.StringCode = "WG APIが利用できません。リロードしてください。"
 	NumbersAPIError             failure.StringCode = "Numbers APIが利用できません。"
-	DiscordAPISendLogError      failure.StringCode = "ログ送信にに失敗しました。"
+	DiscordAPISendLogError      failure.StringCode = "ログ送信に失敗しました。"
 	GithubAPICheckUpdateError   failure.StringCode = "アプリ更新チェックに失敗しました。"
 	InvalidInstallPath          failure.StringCode = "選択したフォルダに「WorldOfWarships.exe」が存在しません。"
 	EmptyInstallPath            failure.StringCode = "インストールフォルダが空です。"

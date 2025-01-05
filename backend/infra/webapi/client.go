@@ -101,9 +101,13 @@ func makeClient(rb Client) *http.Client {
 }
 
 func makeGetRequest(rb Client) (*http.Request, error) {
-	u, err := url.Parse(rb.baseURL + "/" + rb.path)
+	u, err := url.Parse(rb.baseURL)
 	if err != nil {
 		return nil, failure.Wrap(err)
+	}
+
+	if len(rb.path) > 0 {
+		u.Path = rb.path
 	}
 
 	q := u.Query()
@@ -130,7 +134,16 @@ func makePostRequest(rb Client) (*http.Request, error) {
 		return nil, failure.Wrap(err)
 	}
 
-	req, err := http.NewRequest(http.MethodPost, rb.baseURL+"/"+rb.path, bytes.NewBuffer(b))
+	u, err := url.Parse(rb.baseURL)
+	if err != nil {
+		return nil, failure.Wrap(err)
+	}
+
+	if len(rb.path) > 0 {
+		u.Path = rb.path
+	}
+
+	req, err := http.NewRequest(http.MethodPost, u.String(), bytes.NewBuffer(b))
 	if err != nil {
 		return nil, failure.Wrap(err)
 	}

@@ -11,10 +11,6 @@ type Discord struct {
 	config RequestConfig
 }
 
-type DiscordRequestBody struct {
-	Content string `json:"content"`
-}
-
 func NewDiscord(config RequestConfig) *Discord {
 	return &Discord{config: config}
 }
