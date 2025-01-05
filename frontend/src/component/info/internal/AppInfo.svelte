@@ -32,7 +32,7 @@
     <div class="uk-flex uk-flex-center">
       <div class="uk-flex uk-text-emphasis">
         wows-fast-stats
-        {#await Semver() then semver} v{semver} {/await}
+        {#await Semver() then semver} {semver} {/await}
       </div>
     </div>
   </div>
