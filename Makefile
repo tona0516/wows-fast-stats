@@ -1,5 +1,5 @@
 APP_NAME := wows-fast-stats
-SEMVER := 0.16.2-alpha1
+SEMVER := 0.17.0
 WG_APP_ID := e25e1a2af190880c9e33d3be7cc5313d
 BINARY_NAME := $(APP_NAME)-$(SEMVER).exe
 NPM := npm --prefix ./frontend
