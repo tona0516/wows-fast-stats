@@ -19,6 +19,8 @@ export const toPlayerStats = (
       return player.pvp_solo;
     case "pvp_all":
       return player.pvp_all;
+    case "rank_solo":
+      return player.rank_solo;
     default:
       throw Error(`unexpeted error: statsPattern: ${statsPattern}`);
   }

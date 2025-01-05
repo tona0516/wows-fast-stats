@@ -473,8 +473,9 @@ func (b *Battle) compose(
 				IsPremium: warship.IsPremium,
 				AvgDamage: allExpectedStats[vehicle.ShipID].AverageDamageDealt,
 			},
-			PvPSolo: playerStats(data.StatsPatternPvPSolo, stats, threatLevel),
-			PvPAll:  playerStats(data.StatsPatternPvPAll, stats, threatLevel),
+			PvPSolo:  playerStats(data.StatsPatternPvPSolo, stats, threatLevel),
+			PvPAll:   playerStats(data.StatsPatternPvPAll, stats, threatLevel),
+			RankSolo: playerStats(data.StatsPatternRankSolo, stats, threatLevel),
 		}
 
 		if vehicle.IsFriend() {

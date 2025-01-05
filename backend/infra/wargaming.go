@@ -42,7 +42,12 @@ func (w *Wargaming) AccountInfo(accountIDs []int) (data.WGAccountInfo, error) {
 			"application_id": w.appID,
 			"account_id":     strings.Join(strAccountIDs, ","),
 			"fields":         response.WGAccountInfo{}.Field(),
-			"extra":          "statistics.pvp_solo,statistics.pvp_div2,statistics.pvp_div3",
+			"extra": strings.Join([]string{
+				"statistics.pvp_solo",
+				"statistics.pvp_div2",
+				"statistics.pvp_div3",
+				"statistics.rank_solo",
+			}, ","),
 		},
 	)
 
@@ -129,7 +134,12 @@ func (w *Wargaming) ShipsStats(accountID int) (data.WGShipsStats, error) {
 			"application_id": w.appID,
 			"account_id":     strconv.Itoa(accountID),
 			"fields":         response.WGShipsStats{}.Field(),
-			"extra":          "pvp_solo,pvp_div2,pvp_div3",
+			"extra": strings.Join([]string{
+				"pvp_solo",
+				"pvp_div2",
+				"pvp_div3",
+				"rank_solo",
+			}, ","),
 		},
 	)
 

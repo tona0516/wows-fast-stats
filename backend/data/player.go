@@ -62,4 +62,5 @@ type Player struct {
 	ShipInfo   ShipInfo    `json:"ship_info"`
 	PvPSolo    PlayerStats `json:"pvp_solo"`
 	PvPAll     PlayerStats `json:"pvp_all"`
+	RankSolo   PlayerStats `json:"rank_solo"`
 }

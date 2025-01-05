@@ -19,6 +19,7 @@ export namespace DispName {
   export const STATS_PATTERNS = new ArrayMap<StatsExtra, string>([
     ["pvp_all", "ランダム戦"],
     ["pvp_solo", "ランダム戦(ソロ)"],
+    ["rank_solo", "ランク戦"],
   ]);
 
   export const COLUMN_CATEGORIES = new ArrayMap<ColumnCategory, string>([

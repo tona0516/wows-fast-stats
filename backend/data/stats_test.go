@@ -144,10 +144,11 @@ func TestStats_AvgDamage_Overall(t *testing.T) {
 		0,
 		WGAccountInfoData{
 			Statistics: struct {
-				Pvp     WGPlayerStatsValues `json:"pvp"`
-				PvpSolo WGPlayerStatsValues `json:"pvp_solo"`
-				PvpDiv2 WGPlayerStatsValues `json:"pvp_div2"`
-				PvpDiv3 WGPlayerStatsValues `json:"pvp_div3"`
+				Pvp      WGPlayerStatsValues `json:"pvp"`
+				PvpSolo  WGPlayerStatsValues `json:"pvp_solo"`
+				PvpDiv2  WGPlayerStatsValues `json:"pvp_div2"`
+				PvpDiv3  WGPlayerStatsValues `json:"pvp_div3"`
+				RankSolo WGPlayerStatsValues `json:"rank_solo"`
 			}{
 				Pvp: WGPlayerStatsValues{
 					Battles:     100,
@@ -171,10 +172,11 @@ func TestStats_AvgDamage_Overall_Solo(t *testing.T) {
 		0,
 		WGAccountInfoData{
 			Statistics: struct {
-				Pvp     WGPlayerStatsValues `json:"pvp"`
-				PvpSolo WGPlayerStatsValues `json:"pvp_solo"`
-				PvpDiv2 WGPlayerStatsValues `json:"pvp_div2"`
-				PvpDiv3 WGPlayerStatsValues `json:"pvp_div3"`
+				Pvp      WGPlayerStatsValues `json:"pvp"`
+				PvpSolo  WGPlayerStatsValues `json:"pvp_solo"`
+				PvpDiv2  WGPlayerStatsValues `json:"pvp_div2"`
+				PvpDiv3  WGPlayerStatsValues `json:"pvp_div3"`
+				RankSolo WGPlayerStatsValues `json:"rank_solo"`
 			}{
 				PvpSolo: WGPlayerStatsValues{
 					Battles:     100,
@@ -189,6 +191,34 @@ func TestStats_AvgDamage_Overall_Solo(t *testing.T) {
 	)
 
 	assert.InDelta(t, 10000, stats.AvgDamage(StatsCategoryOverall, StatsPatternPvPSolo), allowableDelta)
+}
+
+func TestStats_AvgDamage_Overall_Rank(t *testing.T) {
+	t.Parallel()
+
+	stats := NewStats(
+		0,
+		WGAccountInfoData{
+			Statistics: struct {
+				Pvp      WGPlayerStatsValues `json:"pvp"`
+				PvpSolo  WGPlayerStatsValues `json:"pvp_solo"`
+				PvpDiv2  WGPlayerStatsValues `json:"pvp_div2"`
+				PvpDiv3  WGPlayerStatsValues `json:"pvp_div3"`
+				RankSolo WGPlayerStatsValues `json:"rank_solo"`
+			}{
+				RankSolo: WGPlayerStatsValues{
+					Battles:     100,
+					DamageDealt: 1000000,
+				},
+			},
+		},
+		emptyShipsStats,
+		emptyExpectedStats,
+		emptyWarships,
+		emptyTempArenaInfo,
+	)
+
+	assert.InDelta(t, 10000, stats.AvgDamage(StatsCategoryOverall, StatsPatternRankSolo), allowableDelta)
 }
 
 func TestStats_AvgDamage_Ship(t *testing.T) {
@@ -235,6 +265,28 @@ func TestStats_AvgDamage_Ship_Solo(t *testing.T) {
 	assert.InDelta(t, 10000, stats.AvgDamage(StatsCategoryShip, StatsPatternPvPSolo), allowableDelta)
 }
 
+func TestStats_AvgDamage_Ship_Rank(t *testing.T) {
+	t.Parallel()
+
+	stats := NewStats(
+		0,
+		emptyAccountInfo,
+		[]WGShipsStatsData{
+			{
+				RankSolo: WGShipStatsValues{
+					Battles:     100,
+					DamageDealt: 1000000,
+				},
+			},
+		},
+		emptyExpectedStats,
+		emptyWarships,
+		emptyTempArenaInfo,
+	)
+
+	assert.InDelta(t, 10000, stats.AvgDamage(StatsCategoryShip, StatsPatternRankSolo), allowableDelta)
+}
+
 func TestStats_MaxDamage_Ship(t *testing.T) {
 	t.Parallel()
 
@@ -276,10 +328,11 @@ func TestStats_MaxDamage_Overall(t *testing.T) {
 		0,
 		WGAccountInfoData{
 			Statistics: struct {
-				Pvp     WGPlayerStatsValues `json:"pvp"`
-				PvpSolo WGPlayerStatsValues `json:"pvp_solo"`
-				PvpDiv2 WGPlayerStatsValues `json:"pvp_div2"`
-				PvpDiv3 WGPlayerStatsValues `json:"pvp_div3"`
+				Pvp      WGPlayerStatsValues `json:"pvp"`
+				PvpSolo  WGPlayerStatsValues `json:"pvp_solo"`
+				PvpDiv2  WGPlayerStatsValues `json:"pvp_div2"`
+				PvpDiv3  WGPlayerStatsValues `json:"pvp_div3"`
+				RankSolo WGPlayerStatsValues `json:"rank_solo"`
 			}{
 				Pvp: WGPlayerStatsValues{
 					MaxDamageDealt:       expected.Value,
@@ -308,10 +361,11 @@ func TestStats_Battles(t *testing.T) {
 		0,
 		WGAccountInfoData{
 			Statistics: struct {
-				Pvp     WGPlayerStatsValues `json:"pvp"`
-				PvpSolo WGPlayerStatsValues `json:"pvp_solo"`
-				PvpDiv2 WGPlayerStatsValues `json:"pvp_div2"`
-				PvpDiv3 WGPlayerStatsValues `json:"pvp_div3"`
+				Pvp      WGPlayerStatsValues `json:"pvp"`
+				PvpSolo  WGPlayerStatsValues `json:"pvp_solo"`
+				PvpDiv2  WGPlayerStatsValues `json:"pvp_div2"`
+				PvpDiv3  WGPlayerStatsValues `json:"pvp_div3"`
+				RankSolo WGPlayerStatsValues `json:"rank_solo"`
 			}{
 				Pvp: WGPlayerStatsValues{
 					Battles: 100,
@@ -334,10 +388,11 @@ func TestStats_KdRate(t *testing.T) {
 		0,
 		WGAccountInfoData{
 			Statistics: struct {
-				Pvp     WGPlayerStatsValues `json:"pvp"`
-				PvpSolo WGPlayerStatsValues `json:"pvp_solo"`
-				PvpDiv2 WGPlayerStatsValues `json:"pvp_div2"`
-				PvpDiv3 WGPlayerStatsValues `json:"pvp_div3"`
+				Pvp      WGPlayerStatsValues `json:"pvp"`
+				PvpSolo  WGPlayerStatsValues `json:"pvp_solo"`
+				PvpDiv2  WGPlayerStatsValues `json:"pvp_div2"`
+				PvpDiv3  WGPlayerStatsValues `json:"pvp_div3"`
+				RankSolo WGPlayerStatsValues `json:"rank_solo"`
 			}{
 				Pvp: WGPlayerStatsValues{
 					Battles:         100,
@@ -362,10 +417,11 @@ func TestStats_AvgKill(t *testing.T) {
 		0,
 		WGAccountInfoData{
 			Statistics: struct {
-				Pvp     WGPlayerStatsValues `json:"pvp"`
-				PvpSolo WGPlayerStatsValues `json:"pvp_solo"`
-				PvpDiv2 WGPlayerStatsValues `json:"pvp_div2"`
-				PvpDiv3 WGPlayerStatsValues `json:"pvp_div3"`
+				Pvp      WGPlayerStatsValues `json:"pvp"`
+				PvpSolo  WGPlayerStatsValues `json:"pvp_solo"`
+				PvpDiv2  WGPlayerStatsValues `json:"pvp_div2"`
+				PvpDiv3  WGPlayerStatsValues `json:"pvp_div3"`
+				RankSolo WGPlayerStatsValues `json:"rank_solo"`
 			}{
 				Pvp: WGPlayerStatsValues{
 					Battles: 100,
@@ -389,10 +445,11 @@ func TestStats_AvgExp(t *testing.T) {
 		0,
 		WGAccountInfoData{
 			Statistics: struct {
-				Pvp     WGPlayerStatsValues `json:"pvp"`
-				PvpSolo WGPlayerStatsValues `json:"pvp_solo"`
-				PvpDiv2 WGPlayerStatsValues `json:"pvp_div2"`
-				PvpDiv3 WGPlayerStatsValues `json:"pvp_div3"`
+				Pvp      WGPlayerStatsValues `json:"pvp"`
+				PvpSolo  WGPlayerStatsValues `json:"pvp_solo"`
+				PvpDiv2  WGPlayerStatsValues `json:"pvp_div2"`
+				PvpDiv3  WGPlayerStatsValues `json:"pvp_div3"`
+				RankSolo WGPlayerStatsValues `json:"rank_solo"`
 			}{
 				Pvp: WGPlayerStatsValues{
 					Battles: 100,
@@ -416,10 +473,11 @@ func TestStats_WinRate(t *testing.T) {
 		0,
 		WGAccountInfoData{
 			Statistics: struct {
-				Pvp     WGPlayerStatsValues `json:"pvp"`
-				PvpSolo WGPlayerStatsValues `json:"pvp_solo"`
-				PvpDiv2 WGPlayerStatsValues `json:"pvp_div2"`
-				PvpDiv3 WGPlayerStatsValues `json:"pvp_div3"`
+				Pvp      WGPlayerStatsValues `json:"pvp"`
+				PvpSolo  WGPlayerStatsValues `json:"pvp_solo"`
+				PvpDiv2  WGPlayerStatsValues `json:"pvp_div2"`
+				PvpDiv3  WGPlayerStatsValues `json:"pvp_div3"`
+				RankSolo WGPlayerStatsValues `json:"rank_solo"`
 			}{
 				Pvp: WGPlayerStatsValues{
 					Battles: 100,
@@ -443,10 +501,11 @@ func TestStats_WinSurvivedRate(t *testing.T) {
 		0,
 		WGAccountInfoData{
 			Statistics: struct {
-				Pvp     WGPlayerStatsValues `json:"pvp"`
-				PvpSolo WGPlayerStatsValues `json:"pvp_solo"`
-				PvpDiv2 WGPlayerStatsValues `json:"pvp_div2"`
-				PvpDiv3 WGPlayerStatsValues `json:"pvp_div3"`
+				Pvp      WGPlayerStatsValues `json:"pvp"`
+				PvpSolo  WGPlayerStatsValues `json:"pvp_solo"`
+				PvpDiv2  WGPlayerStatsValues `json:"pvp_div2"`
+				PvpDiv3  WGPlayerStatsValues `json:"pvp_div3"`
+				RankSolo WGPlayerStatsValues `json:"rank_solo"`
 			}{
 				Pvp: WGPlayerStatsValues{
 					Wins:         100,
@@ -470,10 +529,11 @@ func TestStats_LoseSurvivedRate(t *testing.T) {
 		0,
 		WGAccountInfoData{
 			Statistics: struct {
-				Pvp     WGPlayerStatsValues `json:"pvp"`
-				PvpSolo WGPlayerStatsValues `json:"pvp_solo"`
-				PvpDiv2 WGPlayerStatsValues `json:"pvp_div2"`
-				PvpDiv3 WGPlayerStatsValues `json:"pvp_div3"`
+				Pvp      WGPlayerStatsValues `json:"pvp"`
+				PvpSolo  WGPlayerStatsValues `json:"pvp_solo"`
+				PvpDiv2  WGPlayerStatsValues `json:"pvp_div2"`
+				PvpDiv3  WGPlayerStatsValues `json:"pvp_div3"`
+				RankSolo WGPlayerStatsValues `json:"rank_solo"`
 			}{
 				Pvp: WGPlayerStatsValues{
 					Battles:         100,
@@ -685,10 +745,11 @@ func TestStats_PlatoonRate(t *testing.T) {
 		0,
 		WGAccountInfoData{
 			Statistics: struct {
-				Pvp     WGPlayerStatsValues `json:"pvp"`
-				PvpSolo WGPlayerStatsValues `json:"pvp_solo"`
-				PvpDiv2 WGPlayerStatsValues `json:"pvp_div2"`
-				PvpDiv3 WGPlayerStatsValues `json:"pvp_div3"`
+				Pvp      WGPlayerStatsValues `json:"pvp"`
+				PvpSolo  WGPlayerStatsValues `json:"pvp_solo"`
+				PvpDiv2  WGPlayerStatsValues `json:"pvp_div2"`
+				PvpDiv3  WGPlayerStatsValues `json:"pvp_div3"`
+				RankSolo WGPlayerStatsValues `json:"rank_solo"`
 			}{
 				Pvp: WGPlayerStatsValues{
 					Battles: 100,

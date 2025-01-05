@@ -385,6 +385,8 @@ func (s *Stats) statsValues(pattern StatsPattern) (WGShipStatsValues, WGPlayerSt
 		return s.useShipStats.Pvp, s.accountInfo.Statistics.Pvp
 	case StatsPatternPvPSolo:
 		return s.useShipStats.PvpSolo, s.accountInfo.Statistics.PvpSolo
+	case StatsPatternRankSolo:
+		return s.useShipStats.RankSolo, s.accountInfo.Statistics.RankSolo
 	}
 
 	return WGShipStatsValues{}, WGPlayerStatsValues{}
@@ -396,6 +398,8 @@ func (s *Stats) statsValuesForm(statsData WGShipsStatsData, pattern StatsPattern
 		return statsData.Pvp
 	case StatsPatternPvPSolo:
 		return statsData.PvpSolo
+	case StatsPatternRankSolo:
+		return statsData.RankSolo
 	}
 
 	return WGShipStatsValues{}

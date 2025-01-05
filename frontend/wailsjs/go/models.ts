@@ -315,6 +315,7 @@ export namespace data {
 	    ship_info: ShipInfo;
 	    pvp_solo: PlayerStats;
 	    pvp_all: PlayerStats;
+	    rank_solo: PlayerStats;
 	
 	    static createFrom(source: any = {}) {
 	        return new Player(source);
@@ -326,6 +327,7 @@ export namespace data {
 	        this.ship_info = this.convertValues(source["ship_info"], ShipInfo);
 	        this.pvp_solo = this.convertValues(source["pvp_solo"], PlayerStats);
 	        this.pvp_all = this.convertValues(source["pvp_all"], PlayerStats);
+	        this.rank_solo = this.convertValues(source["rank_solo"], PlayerStats);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

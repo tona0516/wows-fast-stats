@@ -17,5 +17,6 @@ type WGShipsStatsData struct {
 	PvpDiv3 struct {
 		Battles uint `json:"battles"`
 	} `json:"pvp_div3"`
-	ShipID int `json:"ship_id"`
+	RankSolo WGShipStatsValues `json:"rank_solo"`
+	ShipID   int               `json:"ship_id"`
 }
