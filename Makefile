@@ -51,7 +51,7 @@ pkg: build
 	zip -r $(APP_NAME).zip $(TEMP_DIR)/$(APP_NAME)
 
 chbtl:
-	$(eval TEMP_ARENA_INFO := $(shell ls $(TEST_REPLAY_PATH) | fzf))
+	$(eval TEMP_ARENA_INFO := $(shell ls $(TEST_REPLAY_PATH) | grep -v tempArenaInfo.json | fzf))
 	cp $(TEST_REPLAY_PATH)/$(TEMP_ARENA_INFO) $(TEST_REPLAY_PATH)/tempArenaInfo.json
 
 clean:
