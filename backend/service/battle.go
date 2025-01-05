@@ -440,23 +440,6 @@ func (b *Battle) compose(
 			tempArenaInfo,
 		)
 
-		threatLevel := yamibuka.CalculateThreatLevel(yamibuka.NewThreatLevelFactor(
-			accountID,
-			tempArenaInfo,
-			warships,
-			vehicle.ShipID,
-			stats.Battles(data.StatsCategoryShip, data.StatsPatternPvPAll),
-			stats.AvgDamage(data.StatsCategoryShip, data.StatsPatternPvPAll),
-			stats.WinRate(data.StatsCategoryShip, data.StatsPatternPvPAll),
-			stats.SurvivedRate(data.StatsCategoryShip, data.StatsPatternPvPAll),
-			stats.PlanesKilled(data.StatsCategoryShip),
-			stats.Battles(data.StatsCategoryOverall, data.StatsPatternPvPAll),
-			stats.AvgDamage(data.StatsCategoryOverall, data.StatsPatternPvPAll),
-			stats.WinRate(data.StatsCategoryOverall, data.StatsPatternPvPAll),
-			stats.AvgKill(data.StatsCategoryOverall, data.StatsPatternPvPAll),
-			stats.KdRate(data.StatsCategoryOverall, data.StatsPatternPvPAll),
-		))
-
 		player := data.Player{
 			PlayerInfo: data.PlayerInfo{
 				ID:       accountID,
@@ -473,9 +456,9 @@ func (b *Battle) compose(
 				IsPremium: warship.IsPremium,
 				AvgDamage: allExpectedStats[vehicle.ShipID].AverageDamageDealt,
 			},
-			PvPSolo:  playerStats(data.StatsPatternPvPSolo, stats, threatLevel),
-			PvPAll:   playerStats(data.StatsPatternPvPAll, stats, threatLevel),
-			RankSolo: playerStats(data.StatsPatternRankSolo, stats, threatLevel),
+			PvPSolo:  playerStats(data.StatsPatternPvPSolo, stats, accountID, vehicle.ShipID, tempArenaInfo, warships),
+			PvPAll:   playerStats(data.StatsPatternPvPAll, stats, accountID, vehicle.ShipID, tempArenaInfo, warships),
+			RankSolo: playerStats(data.StatsPatternRankSolo, stats, accountID, vehicle.ShipID, tempArenaInfo, warships),
 		}
 
 		if vehicle.IsFriend() {
@@ -509,8 +492,28 @@ func (b *Battle) compose(
 func playerStats(
 	statsPattern data.StatsPattern,
 	stats *data.Stats,
-	threatLevel data.ThreatLevel,
+	accountID int,
+	shipID int,
+	tempArenaInfo data.TempArenaInfo,
+	warships data.Warships,
 ) data.PlayerStats {
+	threatLevel := yamibuka.CalculateThreatLevel(yamibuka.NewThreatLevelFactor(
+		accountID,
+		tempArenaInfo,
+		warships,
+		shipID,
+		stats.Battles(data.StatsCategoryShip, statsPattern),
+		stats.AvgDamage(data.StatsCategoryShip, statsPattern),
+		stats.WinRate(data.StatsCategoryShip, statsPattern),
+		stats.SurvivedRate(data.StatsCategoryShip, statsPattern),
+		stats.PlanesKilled(data.StatsCategoryShip),
+		stats.Battles(data.StatsCategoryOverall, statsPattern),
+		stats.AvgDamage(data.StatsCategoryOverall, statsPattern),
+		stats.WinRate(data.StatsCategoryOverall, statsPattern),
+		stats.AvgKill(data.StatsCategoryOverall, statsPattern),
+		stats.KdRate(data.StatsCategoryOverall, statsPattern),
+	))
+
 	return data.PlayerStats{
 		ShipStats: data.ShipStats{
 			Battles:            stats.Battles(data.StatsCategoryShip, statsPattern),

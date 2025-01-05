@@ -2,7 +2,9 @@ import { TeamThreatLevel } from "src/lib/TeamThreatLevel";
 import { data } from "wailsjs/go/models";
 
 test("fromBattle - 異常系", () => {
-  expect(TeamThreatLevel.fromBattle(undefined, new Set())).toBeUndefined();
+  expect(
+    TeamThreatLevel.fromBattle(undefined, new Set(), "pvp_all"),
+  ).toBeUndefined();
 });
 
 test("fromBattle - 正常系", () => {
@@ -35,7 +37,7 @@ test("fromBattle - 正常系", () => {
     meta: new data.Meta(),
   };
 
-  const actual = TeamThreatLevel.fromBattle(battle, new Set())![0];
+  const actual = TeamThreatLevel.fromBattle(battle, new Set(), "pvp_all")![0];
   const expected = new TeamThreatLevel(12599, 59, 75);
 
   expect(actual.average.toFixed()).toBe(expected.average.toFixed());

@@ -1,4 +1,8 @@
-import type { OptionalBattle, OptionalTeamThreatLevels } from "src/lib/types";
+import type {
+  OptionalBattle,
+  OptionalTeamThreatLevels,
+  StatsExtra,
+} from "src/lib/types";
 
 export class TeamThreatLevel {
   constructor(
@@ -10,6 +14,7 @@ export class TeamThreatLevel {
   static fromBattle = (
     battle: OptionalBattle,
     excludedPlayers: Set<number>,
+    statsExtra: StatsExtra,
   ): OptionalTeamThreatLevels => {
     if (!battle) {
       return undefined;
@@ -26,7 +31,7 @@ export class TeamThreatLevel {
             player.player_info.is_hidden
           );
         })
-        .map((player) => player.pvp_all.overall.threat_level.modified);
+        .map((player) => player[statsExtra].overall.threat_level.modified);
       const maxScore = Math.max(...values);
       const average = calcGeometricMean(values);
 
