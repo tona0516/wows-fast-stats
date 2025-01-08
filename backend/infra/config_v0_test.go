@@ -9,7 +9,6 @@ import (
 	"wfs/backend/data"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 func TestConfigV0_User(t *testing.T) {
@@ -26,20 +25,20 @@ func TestConfigV0_User(t *testing.T) {
 
 		instance := NewConfigV0()
 		err := writeJSON(instance.userConfigPath, expected)
-		require.NoError(t, err)
+		assert.NoError(t, err)
 
 		// 取得
 		actual, err := instance.User()
-		require.NoError(t, err)
+		assert.NoError(t, err)
 		assert.Equal(t, expected, actual)
 
 		// 削除
 		err = os.Remove(instance.userConfigPath)
-		require.NoError(t, err)
+		assert.NoError(t, err)
 
 		// 取得 存在しない場合 デフォルト値を返却する
 		actual, err = instance.User()
-		require.NoError(t, err)
+		assert.NoError(t, err)
 		assert.Equal(t, data.DefaultUserConfig(), actual)
 	})
 
@@ -52,19 +51,19 @@ func TestConfigV0_User(t *testing.T) {
 		appid := "abc"
 		saved := fmt.Sprintf(`{"install_path": "%s","appid": "%s"}`, installPath, appid)
 		err := os.Mkdir(ConfigDir, os.ModePerm)
-		require.NoError(t, err)
+		assert.NoError(t, err)
 		err = os.WriteFile(filepath.Join(ConfigDir, UserConfigFile), []byte(saved), 0o600)
-		require.NoError(t, err)
+		assert.NoError(t, err)
 
 		instance := NewConfigV0()
 		actual, err := instance.User()
-		require.NoError(t, err)
+		assert.NoError(t, err)
 
 		// 存在するパラメータはその値、存在しないパラメータはデフォルト値が格納されていること
 		expected := data.DefaultUserConfig()
 		expected.InstallPath = installPath
 		expected.Appid = appid
-		require.Equal(t, expected, actual)
+		assert.Equal(t, expected, actual)
 	})
 }
 
@@ -89,18 +88,18 @@ func TestConfigV0_AlertPlayers(t *testing.T) {
 
 	instance := NewConfigV0()
 	err := writeJSON(instance.alertPlayerPath, expected)
-	require.NoError(t, err)
+	assert.NoError(t, err)
 
 	// 取得：正常系
 	actual, err := instance.AlertPlayers()
-	require.NoError(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, expected, actual)
 
 	// 取得：存在しない場合 デフォルト値を返却する
 	err = os.Remove(filepath.Join(ConfigDir, AlertPlayerFile))
-	require.NoError(t, err)
+	assert.NoError(t, err)
 
 	actual, err = instance.AlertPlayers()
-	require.NoError(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, []data.AlertPlayer{}, actual)
 }

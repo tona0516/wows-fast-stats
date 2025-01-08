@@ -23,3 +23,4 @@ linters:
     - revive
     - predeclared
     - mnd
+    - testifylint

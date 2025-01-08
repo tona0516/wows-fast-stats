@@ -28,7 +28,7 @@ func (g *Github) LatestRelease() (data.GHLatestRelease, error) {
 			webapi.WithTimeout(g.config.Timeout),
 		).GET()
 		if err != nil {
-			return result, failure.Wrap(err)
+			return result, err
 		}
 
 		if err := json.Unmarshal(body, &result); err != nil {

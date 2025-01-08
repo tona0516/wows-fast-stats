@@ -11,7 +11,7 @@ import (
 
 	"github.com/morikuni/failure"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
+
 	"go.uber.org/mock/gomock"
 )
 
@@ -23,7 +23,7 @@ func TestConfig_UpdateInstallPath(t *testing.T) {
 
 	// 準備
 	err := createGameClientPath()
-	require.NoError(t, err)
+	assert.NoError(t, err)
 	defer os.RemoveAll(validInstallPath)
 
 	t.Run("正常系", func(t *testing.T) {
@@ -36,7 +36,7 @@ func TestConfig_UpdateInstallPath(t *testing.T) {
 		actual, err := c.UpdateInstallPath(validInstallPath)
 
 		// アサーション
-		require.NoError(t, err)
+		assert.NoError(t, err)
 		assert.Equal(t, validInstallPath, actual.InstallPath)
 	})
 
@@ -52,7 +52,7 @@ func TestConfig_UpdateInstallPath(t *testing.T) {
 			_, err := c.UpdateInstallPath(path)
 
 			// アサーション
-			require.EqualError(t, apperr.Unwrap(err), expected.ErrorCode())
+			assert.EqualError(t, apperr.Unwrap(err), expected.ErrorCode())
 		}
 	})
 }
@@ -63,7 +63,7 @@ func TestConfig_UpdateOptional(t *testing.T) {
 
 	// 準備
 	err := createGameClientPath()
-	require.NoError(t, err)
+	assert.NoError(t, err)
 	defer os.RemoveAll(validInstallPath)
 
 	t.Run("正常系", func(t *testing.T) {
@@ -82,7 +82,7 @@ func TestConfig_UpdateOptional(t *testing.T) {
 		err = c.UpdateOptional(config)
 
 		// アサーション
-		require.NoError(t, err)
+		assert.NoError(t, err)
 	})
 }
 
@@ -108,7 +108,7 @@ func TestConfig_AlertPlayers(t *testing.T) {
 		actual, err := config.AlertPlayers()
 
 		// アサーション
-		require.NoError(t, err)
+		assert.NoError(t, err)
 		assert.Equal(t, expected, actual)
 	})
 }
@@ -141,7 +141,7 @@ func TestConfig_UpdateAlertPlayer(t *testing.T) {
 		actual, err := config.UpdateAlertPlayer(newPlayer)
 
 		// アサーション
-		require.NoError(t, err)
+		assert.NoError(t, err)
 		assert.Equal(t, expected, actual)
 	})
 
@@ -163,7 +163,7 @@ func TestConfig_UpdateAlertPlayer(t *testing.T) {
 		actual, err := config.UpdateAlertPlayer(data.AlertPlayer{AccountID: 1, Name: "UpdatedPlayer"})
 
 		// アサーション
-		require.NoError(t, err)
+		assert.NoError(t, err)
 		assert.Equal(t, expected, actual)
 	})
 }
@@ -193,7 +193,7 @@ func TestConfig_RemoveAlertPlayer(t *testing.T) {
 		actual, err := config.RemoveAlertPlayer(1)
 
 		// アサーション
-		require.NoError(t, err)
+		assert.NoError(t, err)
 		assert.Equal(t, expected, actual)
 	})
 
@@ -214,7 +214,7 @@ func TestConfig_RemoveAlertPlayer(t *testing.T) {
 		actual, err := config.RemoveAlertPlayer(3)
 
 		// アサーション
-		require.NoError(t, err)
+		assert.NoError(t, err)
 		assert.Equal(t, expected, actual)
 	})
 }

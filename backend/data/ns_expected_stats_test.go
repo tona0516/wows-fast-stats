@@ -7,7 +7,6 @@ import (
 
 	"github.com/morikuni/failure"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 func TestNSExpectedStats_UnmarshalJSON(t *testing.T) {
@@ -54,7 +53,8 @@ func TestNSExpectedStats_UnmarshalJSON(t *testing.T) {
 
 		var actual NSExpectedStats
 		err := json.Unmarshal([]byte(input), &actual)
-		require.NoError(t, err)
+
+		assert.NoError(t, err)
 		assert.Equal(t, NSExpectedStats{
 			Data: ExpectedStats{
 				1: {
@@ -83,11 +83,7 @@ func TestNSExpectedStats_UnmarshalJSON(t *testing.T) {
 
 		for _, input := range inputs {
 			err := json.Unmarshal([]byte(input), &NSExpectedStats{})
-			require.Error(t, err)
-			code, ok := failure.CodeOf(err)
-			require.True(t, ok)
-			// assert.Equal(t, apperr.ParseExpectedStatsError, code, fmt.Sprintf("actual=%s", code))
-			assert.Equal(t, apperr.ParseExpectedStatsError, code)
+			assert.True(t, failure.Is(err, apperr.ParseExpectedStatsError))
 		}
 	})
 }

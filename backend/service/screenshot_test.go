@@ -9,7 +9,7 @@ import (
 
 	"github.com/morikuni/failure"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
+
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 	"go.uber.org/mock/gomock"
 )
@@ -41,7 +41,7 @@ func TestScreenshot_SaveForAuto(t *testing.T) {
 		err := s.SaveForAuto(filename, base64Data)
 
 		// アサーション
-		require.NoError(t, err)
+		assert.NoError(t, err)
 	})
 }
 
@@ -67,8 +67,8 @@ func TestScreenshot_SaveWithDialog(t *testing.T) {
 		saved, err := s.SaveWithDialog(context.Background(), filename, base64Data)
 
 		// アサーション
-		require.True(t, saved)
-		require.NoError(t, err)
+		assert.True(t, saved)
+		assert.NoError(t, err)
 	})
 
 	t.Run("異常系", func(t *testing.T) {
@@ -102,6 +102,6 @@ func TestScreenshot_SaveWithDialog(t *testing.T) {
 
 		// アサーション
 		assert.False(t, saved)
-		require.NoError(t, err)
+		assert.NoError(t, err)
 	})
 }

@@ -58,12 +58,12 @@ func (l *LocalFile) TempArenaInfo(installPath string) (data.TempArenaInfo, error
 	tempArenaInfoPaths := []string{}
 	root := filepath.Join(installPath, replaysDir)
 	if _, err := os.Stat(root); err != nil {
-		return tempArenaInfo, failure.New(apperr.ReplayDirNotFoundError, failure.Messagef("%s", err.Error()))
+		return tempArenaInfo, failure.Translate(err, apperr.ReplayDirNotFoundError)
 	}
 
 	err := filepath.WalkDir(root, func(path string, info fs.DirEntry, err error) error {
 		if err != nil {
-			return err
+			return failure.Wrap(err)
 		}
 
 		if info.IsDir() {
@@ -78,7 +78,7 @@ func (l *LocalFile) TempArenaInfo(installPath string) (data.TempArenaInfo, error
 		return nil
 	})
 	if err != nil {
-		return tempArenaInfo, failure.Wrap(err)
+		return tempArenaInfo, err
 	}
 
 	return decideTempArenaInfo(tempArenaInfoPaths)

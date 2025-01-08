@@ -5,8 +5,8 @@ import (
 	"wfs/backend/apperr"
 	"wfs/backend/data"
 
+	"github.com/morikuni/failure"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 func TestGithub_LatestRelease(t *testing.T) {
@@ -27,7 +27,7 @@ func TestGithub_LatestRelease(t *testing.T) {
 		})
 
 		actual, err := github.LatestRelease()
-		require.NoError(t, err)
+		assert.NoError(t, err)
 		assert.Equal(t, expected, actual)
 	})
 
@@ -42,6 +42,6 @@ func TestGithub_LatestRelease(t *testing.T) {
 		})
 
 		_, err := github.LatestRelease()
-		require.EqualError(t, apperr.Unwrap(err), apperr.GithubAPICheckUpdateError.ErrorCode())
+		assert.True(t, failure.Is(err, apperr.GithubAPICheckUpdateError))
 	})
 }

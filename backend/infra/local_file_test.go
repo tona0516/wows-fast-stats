@@ -30,10 +30,10 @@ func TestLocalFile_SaveScreenshot(t *testing.T) {
 		err := instance.SaveScreenshot(path, base64Data)
 
 		// アサーション
-		require.NoError(t, err)
+		assert.NoError(t, err)
 		assert.FileExists(t, path)
 		content, err := os.ReadFile(path)
-		require.NoError(t, err)
+		assert.NoError(t, err)
 		assert.Equal(t, content, []byte(rawData))
 	})
 }
@@ -64,11 +64,11 @@ func TestLocalFile_GetTempArenaInfo(t *testing.T) {
 
 				filePath := filepath.Join(path...)
 				err := writeJSON(filePath, expected)
-				require.NoError(t, err)
+				assert.NoError(t, err)
 
 				localFile := NewLocalFile()
 				actual, err := localFile.TempArenaInfo(path[0])
-				require.NoError(t, err)
+				assert.NoError(t, err)
 				assert.Equal(t, expected, actual)
 			}(path)
 		}
@@ -108,7 +108,7 @@ func TestLocalFile_GetTempArenaInfo(t *testing.T) {
 
 		instance := NewLocalFile()
 		actual, err := instance.TempArenaInfo(testInstallPath)
-		require.NoError(t, err)
+		assert.NoError(t, err)
 		assert.Equal(t, expected, actual)
 	})
 
@@ -123,24 +123,22 @@ func TestLocalFile_GetTempArenaInfo(t *testing.T) {
 				defer os.RemoveAll(testInstallPath)
 
 				err := writeJSON(path, data.TempArenaInfo{})
-				require.NoError(t, err)
+				assert.NoError(t, err)
 
 				instance := NewLocalFile()
 				_, err = instance.TempArenaInfo(testInstallPath)
-				require.Error(t, err)
+				assert.True(t, failure.Is(err, apperr.FileNotExist))
 			}(path)
 		}
 	})
 	t.Run("異常系_replayフォルダなし", func(t *testing.T) {
 		err := os.Mkdir(testInstallPath, os.ModePerm)
-		require.NoError(t, err)
+		assert.NoError(t, err)
 		defer os.RemoveAll(testInstallPath)
 
 		instance := NewLocalFile()
 		_, err = instance.TempArenaInfo(testInstallPath)
 
-		code, ok := failure.CodeOf(err)
-		assert.True(t, ok)
-		assert.Equal(t, apperr.ReplayDirNotFoundError, code)
+		assert.True(t, failure.Is(err, apperr.ReplayDirNotFoundError))
 	})
 }

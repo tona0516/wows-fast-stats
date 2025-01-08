@@ -8,7 +8,7 @@ import (
 
 	"github.com/morikuni/failure"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
+
 	"go.uber.org/mock/gomock"
 )
 
@@ -35,7 +35,7 @@ func TestUpdater_IsUpdatable(t *testing.T) {
 
 		// アサーション
 		assert.Equal(t, expected, actual)
-		require.NoError(t, err)
+		assert.NoError(t, err)
 	})
 
 	t.Run("正常系_アップデートなし", func(t *testing.T) {
@@ -56,7 +56,7 @@ func TestUpdater_IsUpdatable(t *testing.T) {
 
 		// アサーション
 		assert.Equal(t, expected, actual)
-		require.NoError(t, err)
+		assert.NoError(t, err)
 	})
 
 	t.Run("異常系", func(t *testing.T) {

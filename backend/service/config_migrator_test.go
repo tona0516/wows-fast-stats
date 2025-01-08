@@ -5,7 +5,7 @@ import (
 	"wfs/backend/data"
 	"wfs/backend/mock/repository"
 
-	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 )
 
@@ -62,7 +62,7 @@ func TestConfigMigrator_Migrate(t *testing.T) {
 		err := cm.ExecuteIfNeeded()
 
 		// アサーション
-		require.NoError(t, err)
+		assert.NoError(t, err)
 	})
 }
 
@@ -83,7 +83,7 @@ func TestConfigMigrator_toV1(t *testing.T) {
 		err := cm.toV1()
 
 		// アサーション
-		require.NoError(t, err)
+		assert.NoError(t, err)
 	})
 
 	t.Run("正常系_マイグレ不要_すでにストレージに存在", func(t *testing.T) {
@@ -105,7 +105,7 @@ func TestConfigMigrator_toV1(t *testing.T) {
 		err := cm.toV1()
 
 		// アサーション
-		require.NoError(t, err)
+		assert.NoError(t, err)
 	})
 
 	t.Run("正常系_成功", func(t *testing.T) {
@@ -150,7 +150,7 @@ func TestConfigMigrator_toV1(t *testing.T) {
 		err := cm.toV1()
 
 		// アサーション
-		require.NoError(t, err)
+		assert.NoError(t, err)
 	})
 }
 
@@ -171,7 +171,7 @@ func TestConfigMigrator_toV2(t *testing.T) {
 		err := cm.toV2()
 
 		// アサーション
-		require.NoError(t, err)
+		assert.NoError(t, err)
 	})
 	t.Run("正常系_UserConfigV2のVersionのみ更新", func(t *testing.T) {
 		t.Parallel()
@@ -207,7 +207,7 @@ func TestConfigMigrator_toV2(t *testing.T) {
 		err := cm.toV2()
 
 		// アサーション
-		require.NoError(t, err)
+		assert.NoError(t, err)
 	})
 	t.Run("正常系_成功", func(t *testing.T) {
 		t.Parallel()
@@ -280,6 +280,6 @@ func TestConfigMigrator_toV2(t *testing.T) {
 		err := cm.toV2()
 
 		// アサーション
-		require.NoError(t, err)
+		assert.NoError(t, err)
 	})
 }

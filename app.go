@@ -240,7 +240,7 @@ func (a *App) AlertPatterns() []string {
 }
 
 func (a *App) LogError(errString string, contexts map[string]string) {
-	err := failure.New(apperr.FrontendError, failure.Messagef("%s", errString))
+	err := failure.New(apperr.FrontendError, failure.Message(errString))
 	a.logger.Error(err, contexts)
 }
 

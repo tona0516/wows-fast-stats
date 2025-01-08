@@ -9,7 +9,6 @@ import (
 
 	"github.com/morikuni/failure"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 func TestUnofficialWargaming_AccountListForSearch(t *testing.T) {
@@ -38,7 +37,7 @@ func TestUnofficialWargaming_AccountListForSearch(t *testing.T) {
 
 		result, err := uwargaming.ClansAutoComplete("TEST")
 
-		require.NoError(t, err)
+		assert.NoError(t, err)
 		assert.Equal(t, expected, result)
 	})
 
@@ -67,9 +66,6 @@ func TestUnofficialWargaming_AccountListForSearch(t *testing.T) {
 
 		_, err := uwargaming.ClansAutoComplete("")
 
-		require.Error(t, err)
-		code, ok := failure.CodeOf(err)
-		assert.True(t, ok)
-		assert.Equal(t, apperr.UWGAPIError, code)
+		assert.True(t, failure.Is(err, apperr.UWGAPIError))
 	})
 }

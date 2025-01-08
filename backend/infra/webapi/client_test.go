@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 func TestClient_GET_Success(t *testing.T) {
@@ -37,7 +36,7 @@ func TestClient_GET_Success(t *testing.T) {
 	res, body, err := client.GET()
 
 	// 結果の検証
-	require.NoError(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, http.StatusOK, res.StatusCode)
 	assert.JSONEq(t, `{"message":"GET success"}`, string(body))
 }
@@ -68,7 +67,7 @@ func TestClient_POST_Success(t *testing.T) {
 	res, body, err := client.POST()
 
 	// 結果の検証
-	require.NoError(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, http.StatusCreated, res.StatusCode)
 	assert.JSONEq(t, `{"message":"POST success"}`, string(body))
 }
@@ -90,7 +89,7 @@ func TestClient_GET_ErrorResponse(t *testing.T) {
 	res, body, err := client.GET()
 
 	// 結果の検証
-	require.Error(t, err)
+	assert.Error(t, err)
 	assert.Equal(t, http.StatusInternalServerError, res.StatusCode)
 	assert.JSONEq(t, `{"error":"Internal server error"}`, string(body))
 }
@@ -134,7 +133,7 @@ func TestClient_InsecureTLS(t *testing.T) {
 	res, body, err := client.GET()
 
 	// 結果の検証
-	require.NoError(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, http.StatusOK, res.StatusCode)
 	assert.JSONEq(t, `{"message":"Insecure TLS success"}`, string(body))
 }

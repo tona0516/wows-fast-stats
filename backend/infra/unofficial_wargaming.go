@@ -33,7 +33,7 @@ func (w *UnofficialWargaming) ClansAutoComplete(search string) (data.UWGClansAut
 			webapi.WithIsInsecure(true),
 		).GET()
 		if err != nil {
-			return result, failure.Wrap(err)
+			return result, err
 		}
 
 		if err := json.Unmarshal(body, &result); err != nil {
@@ -48,5 +48,5 @@ func (w *UnofficialWargaming) ClansAutoComplete(search string) (data.UWGClansAut
 		return res, failure.Translate(err, apperr.UWGAPIError)
 	}
 
-	return res, failure.Wrap(err)
+	return res, nil
 }

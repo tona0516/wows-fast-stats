@@ -28,11 +28,11 @@ func NewConfigMigrator(
 
 func (m *ConfigMigrator) ExecuteIfNeeded() error {
 	if err := m.toV1(); err != nil {
-		return failure.New(apperr.MigrationError, failure.Messagef("%s", err.Error()))
+		return failure.Translate(err, apperr.MigrationError)
 	}
 
 	if err := m.toV2(); err != nil {
-		return failure.New(apperr.MigrationError, failure.Messagef("%s", err.Error()))
+		return failure.Translate(err, apperr.MigrationError)
 	}
 
 	return nil

@@ -29,7 +29,7 @@ func (n *Numbers) ExpectedStats() (data.ExpectedStats, error) {
 			webapi.WithIsInsecure(true), // workaround for expired SSL certificate
 		).GET()
 		if err != nil {
-			return result, failure.Wrap(err)
+			return result, err
 		}
 
 		if err := json.Unmarshal(body, &result); err != nil {

@@ -191,7 +191,5 @@ func TestBattle_Get_異常系(t *testing.T) {
 	_, err := b.Get(context.TODO(), testUserConfig)
 
 	// アサーション
-	code, ok := failure.CodeOf(err)
-	assert.True(t, ok)
-	assert.Equal(t, apperr.FileNotExist, code)
+	assert.True(t, failure.Is(err, apperr.FileNotExist))
 }

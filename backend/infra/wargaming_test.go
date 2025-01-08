@@ -12,7 +12,7 @@ import (
 
 	"github.com/morikuni/failure"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
+
 	"go.uber.org/ratelimit"
 )
 
@@ -35,7 +35,7 @@ func TestWargaming_AccountInfo(t *testing.T) {
 		}, ratelimit.New(10), "")
 
 		result, err := wargaming.AccountInfo([]int{123, 456})
-		require.NoError(t, err)
+		assert.NoError(t, err)
 		assert.Equal(t, data.WGAccountInfo{}, result)
 	})
 
@@ -65,9 +65,7 @@ func TestWargaming_AccountInfo(t *testing.T) {
 		}, ratelimit.New(10), "")
 
 		_, err := wargaming.AccountInfo([]int{123, 456})
-		code, ok := failure.CodeOf(err)
-		assert.True(t, ok)
-		assert.Equal(t, apperr.WGAPIError, code)
+		assert.True(t, failure.Is(err, apperr.WGAPIError))
 		assert.Equal(t, 1, calls)
 	})
 
@@ -111,7 +109,7 @@ func TestWargaming_AccountInfo(t *testing.T) {
 
 			_, err := wargaming.AccountInfo([]int{123, 456})
 
-			require.NoError(t, err)
+			assert.NoError(t, err)
 			assert.Equal(t, retry+1, calls)
 		}
 	})
@@ -148,9 +146,7 @@ func TestWargaming_AccountInfo(t *testing.T) {
 
 			_, err := wargaming.AccountInfo([]int{123, 456})
 
-			code, ok := failure.CodeOf(err)
-			assert.True(t, ok)
-			assert.Equal(t, apperr.WGAPITemporaryUnavaillalble, code)
+			assert.True(t, failure.Is(err, apperr.WGAPITemporaryUnavaillalble))
 			assert.Equal(t, retry+1, calls)
 		}
 	})
@@ -174,7 +170,7 @@ func TestWargaming_AccountListForSearch(t *testing.T) {
 
 	result, err := wargaming.AccountListForSearch("player")
 
-	require.NoError(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, data.WGAccountList{}, result)
 }
 
@@ -196,7 +192,7 @@ func TestWargaming_ClansAccountInfo(t *testing.T) {
 
 	result, err := wargaming.ClansAccountInfo([]int{123, 456})
 
-	require.NoError(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, data.WGClansAccountInfo{}, result)
 }
 
@@ -218,7 +214,7 @@ func TestWargaming_ClansInfo(t *testing.T) {
 
 	result, err := wargaming.ClansInfo([]int{123, 456})
 
-	require.NoError(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, data.WGClansInfo{}, result)
 }
 
@@ -240,7 +236,7 @@ func TestWargaming_ShipsStats(t *testing.T) {
 
 	result, err := wargaming.ShipsStats(123)
 
-	require.NoError(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, data.WGShipsStats{}, result)
 }
 
@@ -267,7 +263,7 @@ func TestWargaming_EncycShips(t *testing.T) {
 
 	result, pageTotal, err := wargaming.EncycShips(1)
 
-	require.NoError(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, data.WGEncycShips{}, result)
 	assert.Equal(t, expectedPageTotal, pageTotal)
 }
@@ -284,7 +280,7 @@ func TestWargaming_EncycInfo(t *testing.T) {
 
 	result, err := wargaming.EncycInfo()
 
-	require.NoError(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, data.WGEncycInfoData{}, result)
 }
 
@@ -306,7 +302,7 @@ func TestWargaming_BattleArena(t *testing.T) {
 
 	result, err := wargaming.BattleArenas()
 
-	require.NoError(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, data.WGBattleArenas{}, result)
 }
 
@@ -327,6 +323,6 @@ func TestWargaming_BattleTypes(t *testing.T) {
 	}, ratelimit.New(10), "")
 	result, err := wargaming.BattleTypes()
 
-	require.NoError(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, data.WGBattleTypes{}, result)
 }

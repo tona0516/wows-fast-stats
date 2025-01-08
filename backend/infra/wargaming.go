@@ -218,7 +218,7 @@ func request[T response.WGResponse](
 			webapi.WithTimeout(w.config.Timeout),
 		).GET()
 		if err != nil {
-			return result, failure.Translate(err, apperr.WGAPIError)
+			return result, err
 		}
 
 		if err := json.Unmarshal(body, &result); err != nil {
@@ -241,5 +241,5 @@ func request[T response.WGResponse](
 
 	res, err := backoff.RetryWithData(operation, b)
 
-	return res, failure.Wrap(err)
+	return res, err
 }

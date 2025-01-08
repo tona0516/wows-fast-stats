@@ -151,7 +151,7 @@ func (c *Config) SearchPlayer(prefix string) data.WGAccountList {
 func (c *Config) SelectDirectory(appCtx context.Context) (string, error) {
 	selected, err := c.OpenDirectoryDialog(appCtx, runtime.OpenDialogOptions{})
 	if err != nil {
-		return selected, failure.New(apperr.WailsError, failure.Messagef("%s", err.Error()))
+		return selected, failure.Translate(err, apperr.WailsError)
 	}
 
 	return selected, nil
@@ -160,7 +160,7 @@ func (c *Config) SelectDirectory(appCtx context.Context) (string, error) {
 func (c *Config) OpenDirectory(path string) error {
 	err := c.OpenWithDefaultApp(path)
 	if err != nil {
-		return failure.New(apperr.OpenDirectoryError, failure.Context{"path": path}, failure.Messagef("%s", err.Error()))
+		return failure.Translate(err, apperr.OpenDirectoryError, failure.Context{"path": path})
 	}
 
 	return nil

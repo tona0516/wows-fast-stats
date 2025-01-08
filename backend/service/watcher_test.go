@@ -10,7 +10,7 @@ import (
 
 	"github.com/morikuni/failure"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
+
 	"go.uber.org/mock/gomock"
 )
 
@@ -47,7 +47,7 @@ func TestWatcher_Start(t *testing.T) {
 		go watcher.Start(ctx, ctx)
 
 		// アサーション
-		require.NoError(t, err)
+		assert.NoError(t, err)
 		time.Sleep(100 * time.Millisecond)
 
 		assert.Len(t, events, 1)
@@ -89,7 +89,7 @@ func TestWatcher_Start(t *testing.T) {
 
 			// アサーション
 			err := watcher.Prepare()
-			require.NoError(t, err)
+			assert.NoError(t, err)
 
 			events = nil
 			time.Sleep(100 * time.Millisecond)
@@ -122,7 +122,7 @@ func TestWatcher_Start(t *testing.T) {
 		cancel()
 
 		// アサーション
-		require.NoError(t, err)
+		assert.NoError(t, err)
 		time.Sleep(100 * time.Millisecond)
 
 		assert.Empty(t, events)
@@ -163,7 +163,7 @@ func TestWatcher_Start(t *testing.T) {
 		go watcher.Start(ctx, ctx)
 
 		// アサーション
-		require.NoError(t, err)
+		assert.NoError(t, err)
 		time.Sleep(100 * time.Millisecond)
 
 		assert.Len(t, events, 1)

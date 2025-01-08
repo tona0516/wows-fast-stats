@@ -163,7 +163,7 @@ func do(rb Client, makeReqFunc func(rb Client) (*http.Request, error)) (http.Res
 	client := makeClient(rb)
 	req, err := makeReqFunc(rb)
 	if err != nil {
-		return res, body, failure.Wrap(err)
+		return res, body, err
 	}
 
 	url := req.URL.Scheme + "://" + req.URL.Host
@@ -196,7 +196,7 @@ func do(rb Client, makeReqFunc func(rb Client) (*http.Request, error)) (http.Res
 		return res, body, failure.Wrap(ErrErrorResponse, errCtx)
 	}
 
-	return res, body, failure.Wrap(err, errCtx)
+	return res, body, nil
 }
 
 func isError(res http.Response) bool {

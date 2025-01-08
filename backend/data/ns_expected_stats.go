@@ -31,12 +31,12 @@ func (n *NSExpectedStats) UnmarshalJSON(b []byte) error {
 
 	root := make(map[string]interface{})
 	if err := json.Unmarshal(b, &root); err != nil {
-		return failure.New(apperr.ParseExpectedStatsError, errCtx, failure.Messagef("%s", err.Error()))
+		return failure.Translate(err, apperr.ParseExpectedStatsError, errCtx)
 	}
 
 	data, ok := root["data"].(map[string]interface{})
 	if !ok {
-		return failure.New(apperr.ParseExpectedStatsError, errCtx, failure.Messagef("%s", "no data key"))
+		return failure.New(apperr.ParseExpectedStatsError, errCtx)
 	}
 
 	es := make(ExpectedStats)

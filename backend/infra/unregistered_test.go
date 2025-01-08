@@ -5,7 +5,6 @@ import (
 	"wfs/backend/data"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 func TestUnregistered_Warship(t *testing.T) {
@@ -71,6 +70,6 @@ func TestUnregistered_Warship(t *testing.T) {
 			IsPremium: false,
 		},
 	}
-	require.NoError(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, expected, actual)
 }
