@@ -3,6 +3,7 @@ package yamibuka
 import (
 	"math"
 	"wfs/backend/data"
+	"wfs/backend/domain/model"
 
 	"github.com/shopspring/decimal"
 )
@@ -145,7 +146,7 @@ func CalculateThreatLevel(f ThreatLevelFactor) data.ThreatLevel {
 //nolint:nonamedreturns
 func matchInfo(
 	tempArenaInfo data.TempArenaInfo,
-	warships data.Warships,
+	warships model.Warships,
 ) (isCVMatch bool, topTier uint, bottomTier uint) {
 	isCVMatch = false
 	topTier = 1
@@ -157,7 +158,7 @@ func matchInfo(
 			continue
 		}
 
-		if warship.Type == data.ShipTypeCV {
+		if warship.Type == model.ShipTypeCV {
 			isCVMatch = true
 		}
 
@@ -264,7 +265,7 @@ func playerOverallScore(
 
 //nolint:cyclop
 func playerShipScore(
-	warships data.Warships,
+	warships model.Warships,
 	shipID int,
 	shipBattles uint,
 	shipAvgDamage float64,
@@ -296,28 +297,28 @@ func playerShipScore(
 	var std shipClassStd
 	//nolint:exhaustive
 	switch shipType {
-	case data.ShipTypeDD:
+	case model.ShipTypeDD:
 		std = shipClassStd{
 			damage:       shipTier * 4000,
 			aaScore:      0,
 			survivedRate: 0.4,
 			influence:    1.3,
 		}
-	case data.ShipTypeCL:
+	case model.ShipTypeCL:
 		std = shipClassStd{
 			damage:       shipTier * 6000,
 			aaScore:      0,
 			survivedRate: 0.5,
 			influence:    1,
 		}
-	case data.ShipTypeBB:
+	case model.ShipTypeBB:
 		std = shipClassStd{
 			damage:       shipTier * 7200,
 			aaScore:      0,
 			survivedRate: 0.45,
 			influence:    1.1,
 		}
-	case data.ShipTypeCV:
+	case model.ShipTypeCV:
 		std = shipClassStd{
 			damage:       shipTier * 8000,
 			aaScore:      (shipTier - 2) * 3.5,
@@ -348,7 +349,7 @@ func playerShipScore(
 
 	// 空母の場合、制空の補正を考慮
 	var shipAAScore float64
-	if shipType == data.ShipTypeCV {
+	if shipType == model.ShipTypeCV {
 		shipAAScore = shipAvgPlanesKilled / std.aaScore
 		if shipAAScore > 1 {
 			shipAAScore = floorU4((shipAAScore - 1) / 2)
@@ -362,7 +363,7 @@ func playerShipScore(
 	winRate := shipWinRate / 100 // %で与えられるため0~100に変換する
 	shipWinRateScore := limitedValue(winRate, 0.6, 0.4) - 0.5
 	// 空母の場合、勝率の影響を3割増加
-	if shipType == data.ShipTypeCV {
+	if shipType == model.ShipTypeCV {
 		shipWinRateScore *= 1.3
 	}
 	shipWinRateScore = floorU4(shipWinRateScore * std.influence * 1.5)
@@ -390,7 +391,7 @@ func antiAirCoefficient(
 }
 
 func shipClassScore(
-	warships data.Warships,
+	warships model.Warships,
 	shipID int,
 ) float64 {
 	result := 1.0
@@ -419,7 +420,7 @@ func shipClassScore(
 
 func correctBasedOnMatch(
 	raw float64,
-	warships data.Warships,
+	warships model.Warships,
 	shipID int,
 	shipAAIndex float64,
 	isCVMatch bool,

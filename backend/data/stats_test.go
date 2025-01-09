@@ -2,6 +2,7 @@ package data
 
 import (
 	"testing"
+	"wfs/backend/domain/model"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -14,8 +15,7 @@ const (
 var (
 	emptyAccountInfo   = WGAccountInfoData{}
 	emptyShipsStats    = []WGShipsStatsData{}
-	emptyExpectedStats = ExpectedStats{}
-	emptyWarships      = Warships{}
+	emptyWarships      = model.Warships{}
 	emptyTempArenaInfo = TempArenaInfo{}
 )
 
@@ -47,14 +47,13 @@ func TestStats_PR_Ship(t *testing.T) {
 					ShipID: useShipID,
 				},
 			},
-			ExpectedStats{
+			model.Warships{
 				useShipID: {
-					AverageDamageDealt: 8000,
-					AverageFrags:       1,
-					WinRate:            50,
+					AverageDamage: 8000,
+					AverageFrags:  1,
+					WinRate:       50,
 				},
 			},
-			emptyWarships,
 			emptyTempArenaInfo,
 		)
 
@@ -108,29 +107,28 @@ func TestStats_PR_Overall(t *testing.T) {
 				ShipID: 4,
 			},
 		},
-		ExpectedStats{
+		model.Warships{
 			1: {
-				AverageDamageDealt: 53792.23172971,
-				WinRate:            50.092406353286,
-				AverageFrags:       0.6935181784796,
+				AverageDamage: 53792.23172971,
+				WinRate:       50.092406353286,
+				AverageFrags:  0.6935181784796,
 			},
 			2: {
-				AverageDamageDealt: 46228.419395466,
-				WinRate:            51.202824307302,
-				AverageFrags:       0.80128883291351,
+				AverageDamage: 46228.419395466,
+				WinRate:       51.202824307302,
+				AverageFrags:  0.80128883291351,
 			},
 			3: {
-				AverageDamageDealt: 25864.417248367,
-				WinRate:            51.11762215717,
-				AverageFrags:       0.69715604593558,
+				AverageDamage: 25864.417248367,
+				WinRate:       51.11762215717,
+				AverageFrags:  0.69715604593558,
 			},
 			4: {
-				AverageDamageDealt: 77931.580907796,
-				WinRate:            50.386342357012,
-				AverageFrags:       0.68628943618969,
+				AverageDamage: 77931.580907796,
+				WinRate:       50.386342357012,
+				AverageFrags:  0.68628943618969,
 			},
 		},
-		emptyWarships,
 		emptyTempArenaInfo,
 	)
 
@@ -157,7 +155,6 @@ func TestStats_AvgDamage_Overall(t *testing.T) {
 			},
 		},
 		emptyShipsStats,
-		emptyExpectedStats,
 		emptyWarships,
 		emptyTempArenaInfo,
 	)
@@ -185,7 +182,6 @@ func TestStats_AvgDamage_Overall_Solo(t *testing.T) {
 			},
 		},
 		emptyShipsStats,
-		emptyExpectedStats,
 		emptyWarships,
 		emptyTempArenaInfo,
 	)
@@ -213,7 +209,6 @@ func TestStats_AvgDamage_Overall_Rank(t *testing.T) {
 			},
 		},
 		emptyShipsStats,
-		emptyExpectedStats,
 		emptyWarships,
 		emptyTempArenaInfo,
 	)
@@ -235,7 +230,6 @@ func TestStats_AvgDamage_Ship(t *testing.T) {
 				},
 			},
 		},
-		emptyExpectedStats,
 		emptyWarships,
 		emptyTempArenaInfo,
 	)
@@ -257,7 +251,6 @@ func TestStats_AvgDamage_Ship_Solo(t *testing.T) {
 				},
 			},
 		},
-		emptyExpectedStats,
 		emptyWarships,
 		emptyTempArenaInfo,
 	)
@@ -279,7 +272,6 @@ func TestStats_AvgDamage_Ship_Rank(t *testing.T) {
 				},
 			},
 		},
-		emptyExpectedStats,
 		emptyWarships,
 		emptyTempArenaInfo,
 	)
@@ -306,7 +298,6 @@ func TestStats_MaxDamage_Ship(t *testing.T) {
 				ShipID: useShipID,
 			},
 		},
-		emptyExpectedStats,
 		emptyWarships,
 		emptyTempArenaInfo,
 	)
@@ -341,8 +332,7 @@ func TestStats_MaxDamage_Overall(t *testing.T) {
 			},
 		},
 		emptyShipsStats,
-		emptyExpectedStats,
-		Warships{
+		model.Warships{
 			expected.ShipID: {
 				Name: expected.ShipName,
 				Tier: expected.ShipTier,
@@ -373,7 +363,6 @@ func TestStats_Battles(t *testing.T) {
 			},
 		},
 		emptyShipsStats,
-		emptyExpectedStats,
 		emptyWarships,
 		emptyTempArenaInfo,
 	)
@@ -402,7 +391,6 @@ func TestStats_KdRate(t *testing.T) {
 			},
 		},
 		emptyShipsStats,
-		emptyExpectedStats,
 		emptyWarships,
 		emptyTempArenaInfo,
 	)
@@ -430,7 +418,6 @@ func TestStats_AvgKill(t *testing.T) {
 			},
 		},
 		emptyShipsStats,
-		emptyExpectedStats,
 		emptyWarships,
 		emptyTempArenaInfo,
 	)
@@ -458,7 +445,6 @@ func TestStats_AvgExp(t *testing.T) {
 			},
 		},
 		emptyShipsStats,
-		emptyExpectedStats,
 		emptyWarships,
 		emptyTempArenaInfo,
 	)
@@ -486,7 +472,6 @@ func TestStats_WinRate(t *testing.T) {
 			},
 		},
 		emptyShipsStats,
-		emptyExpectedStats,
 		emptyWarships,
 		emptyTempArenaInfo,
 	)
@@ -514,7 +499,6 @@ func TestStats_WinSurvivedRate(t *testing.T) {
 			},
 		},
 		emptyShipsStats,
-		emptyExpectedStats,
 		emptyWarships,
 		emptyTempArenaInfo,
 	)
@@ -544,7 +528,6 @@ func TestStats_LoseSurvivedRate(t *testing.T) {
 			},
 		},
 		emptyShipsStats,
-		emptyExpectedStats,
 		emptyWarships,
 		emptyTempArenaInfo,
 	)
@@ -573,7 +556,6 @@ func TestStats_MainBatteryHitRate(t *testing.T) {
 				ShipID: useShipID,
 			},
 		},
-		emptyExpectedStats,
 		emptyWarships,
 		emptyTempArenaInfo,
 	)
@@ -602,7 +584,6 @@ func TestStats_TorpedoesHitRate(t *testing.T) {
 				ShipID: useShipID,
 			},
 		},
-		emptyExpectedStats,
 		emptyWarships,
 		emptyTempArenaInfo,
 	)
@@ -626,7 +607,6 @@ func TestStats_PlanesKilled(t *testing.T) {
 				ShipID: useShipID,
 			},
 		},
-		emptyExpectedStats,
 		emptyWarships,
 		emptyTempArenaInfo,
 	)
@@ -650,8 +630,7 @@ func TestStats_AvgTier(t *testing.T) {
 				ShipID: 200,
 			},
 		},
-		emptyExpectedStats,
-		Warships{
+		model.Warships{
 			100: {Tier: 5},
 			200: {Tier: 8},
 		},
@@ -681,8 +660,7 @@ func TestStats_UsingTierRate(t *testing.T) {
 				ShipID: 300,
 			},
 		},
-		emptyExpectedStats,
-		Warships{
+		model.Warships{
 			100: {Tier: 5},
 			200: {Tier: 8},
 			300: {Tier: 4},
@@ -720,12 +698,11 @@ func TestStats_UsingShipTypeRate(t *testing.T) {
 				ShipID: 400,
 			},
 		},
-		emptyExpectedStats,
-		Warships{
-			100: {Type: ShipTypeDD},
-			200: {Type: ShipTypeCL},
-			300: {Type: ShipTypeBB},
-			400: {Type: ShipTypeCV},
+		model.Warships{
+			100: {Type: model.ShipTypeDD},
+			200: {Type: model.ShipTypeCL},
+			300: {Type: model.ShipTypeBB},
+			400: {Type: model.ShipTypeCV},
 		},
 		emptyTempArenaInfo,
 	)
@@ -766,7 +743,6 @@ func TestStats_PlatoonRate(t *testing.T) {
 			},
 		},
 		emptyShipsStats,
-		emptyExpectedStats,
 		emptyWarships,
 		emptyTempArenaInfo,
 	)

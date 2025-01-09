@@ -1,8 +1,10 @@
 package repository
 
-import "wfs/backend/domain/model"
+import (
+	"wfs/backend/domain/model"
+)
 
 //go:generate mockgen -source=$GOFILE -destination ../mock/$GOPACKAGE/$GOFILE -package $GOPACKAGE
-type UnregisteredInterface interface {
-	Warship() (model.Warships, error)
+type WarshipFetcherInterface interface {
+	Fetch() (model.Warships, error)
 }

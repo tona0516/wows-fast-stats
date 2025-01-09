@@ -20,6 +20,7 @@ import (
 type MockLocalFileInterface struct {
 	ctrl     *gomock.Controller
 	recorder *MockLocalFileInterfaceMockRecorder
+	isgomock struct{}
 }
 
 // MockLocalFileInterfaceMockRecorder is the mock recorder for MockLocalFileInterface.

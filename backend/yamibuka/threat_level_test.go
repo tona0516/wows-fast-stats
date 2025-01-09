@@ -3,6 +3,7 @@ package yamibuka
 import (
 	"testing"
 	"wfs/backend/data"
+	"wfs/backend/domain/model"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -32,21 +33,21 @@ func TestThreatLevel_CalculateThreatLevel_CV_CVあり_Tierミドル(t *testing.T
 				{ShipID: shipIDKitakaze},
 			},
 		},
-		data.Warships{
+		model.Warships{
 			shipIDNagato: {
 				Name: "長門",
 				Tier: 7,
-				Type: data.ShipTypeBB,
+				Type: model.ShipTypeBB,
 			},
 			shipIDYorktown: {
 				Name: "Yorktown",
 				Tier: 8,
-				Type: data.ShipTypeCV,
+				Type: model.ShipTypeCV,
 			},
 			shipIDKitakaze: {
 				Name: "北風",
 				Tier: 9,
-				Type: data.ShipTypeDD,
+				Type: model.ShipTypeDD,
 			},
 		},
 		shipIDYorktown,
@@ -82,21 +83,21 @@ func TestThreatLevel_CalculateThreatLevel_BB_CVあり_Tierトップ(t *testing.T
 				{ShipID: shipIDSinop},
 			},
 		},
-		data.Warships{
+		model.Warships{
 			shipIDMutsuki: {
 				Name: "睦月",
 				Tier: 5,
-				Type: data.ShipTypeDD,
+				Type: model.ShipTypeDD,
 			},
 			shipIDRanger: {
 				Name: "Ranger",
 				Tier: 6,
-				Type: data.ShipTypeCV,
+				Type: model.ShipTypeCV,
 			},
 			shipIDSinop: {
 				Name: "Sinop",
 				Tier: 7,
-				Type: data.ShipTypeBB,
+				Type: model.ShipTypeBB,
 			},
 		},
 		shipIDSinop,
@@ -130,11 +131,11 @@ func TestThreatLevel_CalculateThreatLevel_CL_CVなし_Tierミドル(t *testing.T
 				{ShipID: shipIDYoshino},
 			},
 		},
-		data.Warships{
+		model.Warships{
 			shipIDYoshino: {
 				Name: "吉野",
 				Tier: 10,
-				Type: data.ShipTypeCL,
+				Type: model.ShipTypeCL,
 			},
 		},
 		shipIDYoshino,
@@ -174,21 +175,21 @@ func TestThreatLevel_CalculateThreatLevel_DD_CVあり_Tierボトム_特殊補正
 				{ShipID: shipIDAlaska},
 			},
 		},
-		data.Warships{
+		model.Warships{
 			shipIDSims: {
 				Name: "Sims",
 				Tier: 7,
-				Type: data.ShipTypeDD,
+				Type: model.ShipTypeDD,
 			},
 			shipIDYorktown: {
 				Name: "Yorktown",
 				Tier: 8,
-				Type: data.ShipTypeCV,
+				Type: model.ShipTypeCV,
 			},
 			shipIDAlaska: {
 				Name: "Alaska",
 				Tier: 9,
-				Type: data.ShipTypeCL,
+				Type: model.ShipTypeCL,
 			},
 		},
 		shipIDSims,

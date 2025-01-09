@@ -2,12 +2,13 @@ package yamibuka
 
 import (
 	"wfs/backend/data"
+	"wfs/backend/domain/model"
 )
 
 type ThreatLevelFactor struct {
 	accountID        int
 	tempArenaInfo    data.TempArenaInfo
-	warships         data.Warships
+	warships         model.Warships
 	shipID           int
 	shipBattles      uint
 	shipDamage       float64
@@ -24,7 +25,7 @@ type ThreatLevelFactor struct {
 func NewThreatLevelFactor(
 	accountID int,
 	tempArenaInfo data.TempArenaInfo,
-	warships data.Warships,
+	warships model.Warships,
 	shipID int,
 	shipBattles uint,
 	shipDamage float64,

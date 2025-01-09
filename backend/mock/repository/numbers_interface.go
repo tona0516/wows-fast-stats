@@ -20,6 +20,7 @@ import (
 type MockNumbersInterface struct {
 	ctrl     *gomock.Controller
 	recorder *MockNumbersInterfaceMockRecorder
+	isgomock struct{}
 }
 
 // MockNumbersInterfaceMockRecorder is the mock recorder for MockNumbersInterface.

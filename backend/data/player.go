@@ -1,5 +1,7 @@
 package data
 
+import "wfs/backend/domain/model"
+
 type PlayerInfo struct {
 	ID       int    `json:"id"`
 	Name     string `json:"name"`
@@ -8,13 +10,13 @@ type PlayerInfo struct {
 }
 
 type ShipInfo struct {
-	ID        int      `json:"id"`
-	Name      string   `json:"name"`
-	Nation    Nation   `json:"nation"`
-	Tier      uint     `json:"tier"`
-	Type      ShipType `json:"type"`
-	IsPremium bool     `json:"is_premium"`
-	AvgDamage float64  `json:"avg_damage"`
+	ID        int            `json:"id"`
+	Name      string         `json:"name"`
+	Nation    model.Nation   `json:"nation"`
+	Tier      uint           `json:"tier"`
+	Type      model.ShipType `json:"type"`
+	IsPremium bool           `json:"is_premium"`
+	AvgDamage float64        `json:"avg_damage"`
 }
 
 type PlayerStats struct {

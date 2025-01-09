@@ -20,6 +20,7 @@ import (
 type MockConfigV0Interface struct {
 	ctrl     *gomock.Controller
 	recorder *MockConfigV0InterfaceMockRecorder
+	isgomock struct{}
 }
 
 // MockConfigV0InterfaceMockRecorder is the mock recorder for MockConfigV0Interface.

@@ -25,6 +25,7 @@ const (
 	ReplayDirNotFoundError      failure.StringCode = "replayフォルダが存在しません。"
 	ExpectedStatsUnavaillalble  failure.StringCode = "PRを算出できませんでした。予測成績の取得に失敗しました。"
 	InvalidTempArenaInfo        failure.StringCode = "不正なtempArenaInfo.jsonです。"
+	FetchShipError              failure.StringCode = "艦艇情報の取得に失敗しました。"
 	UnexpectedError             failure.StringCode = "予期しないエラーが発生しました。"
 )
 

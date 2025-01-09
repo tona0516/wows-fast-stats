@@ -127,6 +127,11 @@ func initApp(env data.Env) *App {
 		Retry:   maxRetry,
 		Timeout: timeout,
 	})
+	warshipFercher := infra.NewWarshipFetcher(
+		*wargaming,
+		*unregistered,
+		*numbers,
+	)
 
 	// usecase
 	watchInterval := 1 * time.Second
@@ -136,8 +141,7 @@ func initApp(env data.Env) *App {
 		wargaming,
 		uwargaming,
 		localFile,
-		numbers,
-		unregistered,
+		warshipFercher,
 		storage,
 		logger,
 		runtime.EventsEmit,

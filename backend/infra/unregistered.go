@@ -4,7 +4,7 @@ import (
 	_ "embed"
 	"encoding/json"
 	"strings"
-	"wfs/backend/data"
+	"wfs/backend/domain/model"
 
 	"github.com/morikuni/failure"
 )
@@ -27,20 +27,20 @@ func NewUnregistered() *Unregistered {
 	return &Unregistered{}
 }
 
-func (u *Unregistered) Warship() (data.Warships, error) {
+func (u *Unregistered) Warship() (model.Warships, error) {
 	var ships []unregisteredShip
-	result := make(data.Warships)
+	result := make(model.Warships)
 
 	if err := json.Unmarshal(shipsByte, &ships); err != nil {
 		return result, failure.Wrap(err)
 	}
 
 	for _, us := range ships {
-		result[us.ID] = data.Warship{
+		result[us.ID] = model.Warship{
 			Name:   us.Ja,
 			Tier:   us.Level,
-			Type:   data.NewShipType(us.Species),
-			Nation: data.Nation(toOfficialNation(us.Nation)),
+			Type:   model.NewShipType(us.Species),
+			Nation: model.Nation(toOfficialNation(us.Nation)),
 		}
 	}
 

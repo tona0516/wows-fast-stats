@@ -5,6 +5,7 @@ import (
 	"testing"
 	"wfs/backend/apperr"
 	"wfs/backend/data"
+	"wfs/backend/domain/model"
 	"wfs/backend/mock/repository"
 
 	"github.com/morikuni/failure"
@@ -29,15 +30,6 @@ func TestBattle_Get_正常系_初回(t *testing.T) {
 		{NickName: "player_1", AccountID: 1},
 		{NickName: "player_2", AccountID: 2},
 	}, nil)
-	mockWargaming.EXPECT().EncycShips(gomock.Any()).Return(data.WGEncycShips{
-		1: data.WGEncycShipsData{
-			Tier:      1,
-			Type:      "Battleship",
-			Name:      "ship_1",
-			Nation:    "japan",
-			IsPremium: false,
-		},
-	}, 2, nil).Times(2)
 	mockWargaming.EXPECT().BattleArenas().Return(data.WGBattleArenas{}, nil)
 	mockWargaming.EXPECT().BattleTypes().Return(data.WGBattleTypes{}, nil)
 	mockWargaming.EXPECT().AccountInfo(gomock.Any()).Return(data.WGAccountInfo{}, nil)
@@ -60,11 +52,16 @@ func TestBattle_Get_正常系_初回(t *testing.T) {
 		},
 	}, nil).AnyTimes()
 
-	mockNumbers := repository.NewMockNumbersInterface(ctrl)
-	mockNumbers.EXPECT().ExpectedStats().Return(data.ExpectedStats{}, nil)
-
-	mockUnregistered := repository.NewMockUnregisteredInterface(ctrl)
-	mockUnregistered.EXPECT().Warship().Return(data.Warships{}, nil)
+	mockWarshipFetcher := repository.NewMockWarshipFetcherInterface(ctrl)
+	mockWarshipFetcher.EXPECT().Fetch().Return(model.Warships{
+		1: {
+			Tier:      1,
+			Type:      "bb",
+			Name:      "ship_1",
+			Nation:    "japan",
+			IsPremium: false,
+		},
+	}, nil)
 
 	mockLocalFile := repository.NewMockLocalFileInterface(ctrl)
 	mockLocalFile.EXPECT().TempArenaInfo(gomock.Any()).Return(data.TempArenaInfo{
@@ -76,7 +73,6 @@ func TestBattle_Get_正常系_初回(t *testing.T) {
 
 	mockStorage := repository.NewMockStorageInterface(ctrl)
 	mockStorage.EXPECT().WriteOwnIGN(gomock.Any()).Return(nil)
-	mockStorage.EXPECT().WriteExpectedStats(gomock.Any()).Return(nil)
 
 	mockLogger := repository.NewMockLoggerInterface(ctrl)
 	mockLogger.EXPECT().SetOwnIGN(gomock.Any()).Return()
@@ -86,8 +82,7 @@ func TestBattle_Get_正常系_初回(t *testing.T) {
 		mockWargaming,
 		mockUnofficialWargaming,
 		mockLocalFile,
-		mockNumbers,
-		mockUnregistered,
+		mockWarshipFetcher,
 		mockStorage,
 		mockLogger,
 		nil,
@@ -128,9 +123,16 @@ func TestBattle_Get_正常系_2回目以降(t *testing.T) {
 		},
 	}, nil).AnyTimes()
 
-	mockNumbers := repository.NewMockNumbersInterface(ctrl)
-
-	mockUnregistered := repository.NewMockUnregisteredInterface(ctrl)
+	mockWarshipFetcher := repository.NewMockWarshipFetcherInterface(ctrl)
+	mockWarshipFetcher.EXPECT().Fetch().Return(model.Warships{
+		1: {
+			Tier:      1,
+			Type:      "Battleship",
+			Name:      "ship_1",
+			Nation:    "japan",
+			IsPremium: false,
+		},
+	}, nil)
 
 	mockLocalFile := repository.NewMockLocalFileInterface(ctrl)
 	mockLocalFile.EXPECT().TempArenaInfo(gomock.Any()).Return(data.TempArenaInfo{
@@ -152,8 +154,7 @@ func TestBattle_Get_正常系_2回目以降(t *testing.T) {
 		mockWargaming,
 		mockUnofficialWargaming,
 		mockLocalFile,
-		mockNumbers,
-		mockUnregistered,
+		mockWarshipFetcher,
 		mockStorage,
 		mockLogger,
 		nil,
@@ -181,7 +182,6 @@ func TestBattle_Get_異常系(t *testing.T) {
 		nil,
 		nil,
 		mockLocalFile,
-		nil,
 		nil,
 		nil,
 		nil,

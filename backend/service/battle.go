@@ -6,54 +6,47 @@ import (
 	"sort"
 	"strings"
 	"sync"
-	"wfs/backend/apperr"
 	"wfs/backend/data"
+	"wfs/backend/domain/model"
+	domainRepository "wfs/backend/domain/repository"
 	"wfs/backend/repository"
 	"wfs/backend/yamibuka"
 
 	"github.com/abadojack/whatlanggo"
-	"github.com/morikuni/failure"
 )
 
 type Battle struct {
 	wargaming      repository.WargamingInterface
 	uwargaming     repository.UnofficialWargamingInterface
-	numbers        repository.NumbersInterface
-	unregistered   repository.UnregisteredInterface
 	localFile      repository.LocalFileInterface
+	warshipFetcher domainRepository.WarshipFetcherInterface
 	storage        repository.StorageInterface
 	logger         repository.LoggerInterface
 	eventsEmitFunc eventEmitFunc
 
-	isFirstBattle                      bool
-	isNotifyExpectedStatsUnavaillalble bool
-	warship                            data.Warships
-	allExpectedStats                   data.ExpectedStats
-	battleArenas                       data.WGBattleArenas
-	battleTypes                        data.WGBattleTypes
+	isFirstBattle bool
+	battleArenas  data.WGBattleArenas
+	battleTypes   data.WGBattleTypes
 }
 
 func NewBattle(
 	wargaming repository.WargamingInterface,
 	uwargaming repository.UnofficialWargamingInterface,
 	localFile repository.LocalFileInterface,
-	numbers repository.NumbersInterface,
-	unregistered repository.UnregisteredInterface,
+	warshipFetcher domainRepository.WarshipFetcherInterface,
 	storage repository.StorageInterface,
 	logger repository.LoggerInterface,
 	eventsEmitFunc eventEmitFunc,
 ) *Battle {
 	return &Battle{
-		wargaming:                          wargaming,
-		uwargaming:                         uwargaming,
-		localFile:                          localFile,
-		numbers:                            numbers,
-		unregistered:                       unregistered,
-		storage:                            storage,
-		logger:                             logger,
-		eventsEmitFunc:                     eventsEmitFunc,
-		isFirstBattle:                      true,
-		isNotifyExpectedStatsUnavaillalble: false,
+		wargaming:      wargaming,
+		uwargaming:     uwargaming,
+		localFile:      localFile,
+		warshipFetcher: warshipFetcher,
+		storage:        storage,
+		logger:         logger,
+		eventsEmitFunc: eventsEmitFunc,
+		isFirstBattle:  true,
 	}
 }
 
@@ -61,13 +54,9 @@ func (b *Battle) Get(appCtx context.Context, userConfig data.UserConfigV2) (data
 	var result data.Battle
 
 	// Fetch on-memory stored data
-	warshipResult := make(chan data.Result[data.Warships])
-	allExpectedStatsResult := make(chan data.Result[data.ExpectedStats])
 	battleArenasResult := make(chan data.Result[data.WGBattleArenas])
 	battleTypesResult := make(chan data.Result[data.WGBattleTypes])
 	if b.isFirstBattle {
-		go b.fetchWarships(warshipResult)
-		go b.fetchExpectedStats(allExpectedStatsResult)
 		go b.fetchBattleArenas(battleArenasResult)
 		go b.fetchBattleTypes(battleTypesResult)
 	}
@@ -81,6 +70,9 @@ func (b *Battle) Get(appCtx context.Context, userConfig data.UserConfigV2) (data
 	// persist own ign for reporting
 	_ = b.storage.WriteOwnIGN(tempArenaInfo.PlayerName)
 	b.logger.SetOwnIGN(tempArenaInfo.PlayerName)
+
+	warshipResult := make(chan data.Result[model.Warships])
+	go b.fetchWarships(warshipResult)
 
 	// Get Account ID list
 	accountList, err := b.wargaming.AccountList(tempArenaInfo.AccountNames())
@@ -100,14 +92,6 @@ func (b *Battle) Get(appCtx context.Context, userConfig data.UserConfigV2) (data
 	errs := make([]error, 0)
 
 	if b.isFirstBattle {
-		warship := <-warshipResult
-		b.warship = warship.Value
-		errs = append(errs, warship.Error)
-
-		expectedStats := <-allExpectedStatsResult
-		b.allExpectedStats = expectedStats.Value
-		errs = append(errs, expectedStats.Error)
-
 		battleArenas := <-battleArenasResult
 		b.battleArenas = battleArenas.Value
 		errs = append(errs, battleArenas.Error)
@@ -116,6 +100,9 @@ func (b *Battle) Get(appCtx context.Context, userConfig data.UserConfigV2) (data
 		b.battleTypes = battleTypes.Value
 		errs = append(errs, battleTypes.Error)
 	}
+
+	warship := <-warshipResult
+	errs = append(errs, warship.Error)
 
 	accountInfo := <-accountInfoResult
 	errs = append(errs, accountInfo.Error)
@@ -128,11 +115,6 @@ func (b *Battle) Get(appCtx context.Context, userConfig data.UserConfigV2) (data
 
 	for _, err := range errs {
 		if err != nil {
-			if failure.Is(err, apperr.ExpectedStatsUnavaillalble) && !b.isNotifyExpectedStatsUnavaillalble {
-				b.eventsEmitFunc(appCtx, EventErr, apperr.ExpectedStatsUnavaillalble.ErrorCode())
-				b.isNotifyExpectedStatsUnavaillalble = true
-				continue
-			}
 			return result, err
 		}
 	}
@@ -143,8 +125,7 @@ func (b *Battle) Get(appCtx context.Context, userConfig data.UserConfigV2) (data
 		accountList,
 		clan.Value,
 		shipStats.Value,
-		b.warship,
-		b.allExpectedStats,
+		warship.Value,
 		b.battleArenas,
 		b.battleTypes,
 	)
@@ -169,92 +150,12 @@ func (b *Battle) getTempArenaInfo(userConfig data.UserConfigV2) (data.TempArenaI
 	return tempArenaInfo, nil
 }
 
-func (b *Battle) fetchWarships(channel chan data.Result[data.Warships]) {
-	warships := make(data.Warships)
-	var result data.Result[data.Warships]
-
-	var mu sync.Mutex
-
-	fetch := func(page int) (int, error) {
-		res, pageTotal, err := b.wargaming.EncycShips(page)
-		if err != nil {
-			return 0, err
-		}
-
-		for shipID, warship := range res {
-			mu.Lock()
-			warships[shipID] = data.Warship{
-				Name:      warship.Name,
-				Tier:      warship.Tier,
-				Type:      data.NewShipType(warship.Type),
-				Nation:    data.Nation(warship.Nation),
-				IsPremium: warship.IsPremium,
-			}
-			mu.Unlock()
-		}
-		return pageTotal, nil
+func (b *Battle) fetchWarships(channel chan data.Result[model.Warships]) {
+	warships, err := b.warshipFetcher.Fetch()
+	channel <- data.Result[model.Warships]{
+		Value: warships,
+		Error: err,
 	}
-
-	first := 1
-	pageTotal, err := fetch(first)
-	if err != nil {
-		result.Error = err
-		channel <- result
-		return
-	}
-
-	pages := makeRange(first+1, pageTotal+1)
-	err = doParallel(pages, func(page int) error {
-		_, err := fetch(page)
-		return err
-	})
-	if err != nil {
-		result.Error = err
-		channel <- result
-		return
-	}
-
-	unregisteredShipInfo, err := b.unregistered.Warship()
-	if err != nil {
-		result.Error = err
-		channel <- result
-		return
-	}
-	for k, v := range unregisteredShipInfo {
-		if _, ok := warships[k]; !ok {
-			warships[k] = v
-		}
-	}
-
-	result.Value = warships
-	channel <- result
-}
-
-func (b *Battle) fetchExpectedStats(channel chan data.Result[data.ExpectedStats]) {
-	var result data.Result[data.ExpectedStats]
-
-	// 最新の予測成績を取得
-	expectedStats, errFetch := b.numbers.ExpectedStats()
-	if errFetch == nil {
-		_ = b.storage.WriteExpectedStats(expectedStats)
-		result.Value = expectedStats
-		channel <- result
-		return
-	}
-
-	// 取得できない場合、キャッシュを利用する
-	expectedStats, errCache := b.storage.ExpectedStats()
-	if errCache == nil {
-		result.Value = expectedStats
-		channel <- result
-		return
-	}
-
-	result.Error = failure.New(apperr.ExpectedStatsUnavaillalble, failure.Context{
-		"err_fetch": errFetch.Error(),
-		"err_cache": errCache.Error(),
-	})
-	channel <- result
 }
 
 func (b *Battle) fetchBattleArenas(channel chan data.Result[data.WGBattleArenas]) {
@@ -403,8 +304,7 @@ func (b *Battle) compose(
 	accountList data.WGAccountList,
 	clans data.Clans,
 	allPlayerShipsStats data.AllPlayerShipsStats,
-	warships data.Warships,
-	allExpectedStats data.ExpectedStats,
+	warships model.Warships,
 	battleArenas data.WGBattleArenas,
 	battleTypes data.WGBattleTypes,
 ) data.Battle {
@@ -420,10 +320,10 @@ func (b *Battle) compose(
 
 		warship, ok := warships[vehicle.ShipID]
 		if !ok {
-			warship = data.Warship{
+			warship = model.Warship{
 				Name:   "Unknown",
 				Tier:   0,
-				Type:   data.ShipTypeNONE,
+				Type:   model.ShipTypeNONE,
 				Nation: "",
 			}
 		}
@@ -435,7 +335,6 @@ func (b *Battle) compose(
 			vehicle.ShipID,
 			accountInfo[accountID],
 			allPlayerShipsStats.Player(accountID),
-			allExpectedStats,
 			warships,
 			tempArenaInfo,
 		)
@@ -454,7 +353,7 @@ func (b *Battle) compose(
 				Tier:      warship.Tier,
 				Type:      warship.Type,
 				IsPremium: warship.IsPremium,
-				AvgDamage: allExpectedStats[vehicle.ShipID].AverageDamageDealt,
+				AvgDamage: warship.AverageDamage,
 			},
 			PvPSolo:  playerStats(data.StatsPatternPvPSolo, stats, accountID, vehicle.ShipID, tempArenaInfo, warships),
 			PvPAll:   playerStats(data.StatsPatternPvPAll, stats, accountID, vehicle.ShipID, tempArenaInfo, warships),
@@ -495,7 +394,7 @@ func playerStats(
 	accountID int,
 	shipID int,
 	tempArenaInfo data.TempArenaInfo,
-	warships data.Warships,
+	warships model.Warships,
 ) data.PlayerStats {
 	threatLevel := yamibuka.CalculateThreatLevel(yamibuka.NewThreatLevelFactor(
 		accountID,

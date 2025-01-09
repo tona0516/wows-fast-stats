@@ -2,24 +2,23 @@ package data
 
 import (
 	"math"
+	"wfs/backend/domain/model"
 )
 
 type Stats struct {
-	useShipID        int
-	accountInfo      WGAccountInfoData
-	useShipStats     WGShipsStatsData
-	allShipsStats    []WGShipsStatsData
-	allExpectedStats ExpectedStats
-	warships         Warships
-	tempArenaInfo    TempArenaInfo
+	useShipID     int
+	accountInfo   WGAccountInfoData
+	useShipStats  WGShipsStatsData
+	allShipsStats []WGShipsStatsData
+	warships      model.Warships
+	tempArenaInfo TempArenaInfo
 }
 
 func NewStats(
 	useShipID int,
 	accountInfo WGAccountInfoData,
 	allShipsStats []WGShipsStatsData,
-	expectedStats ExpectedStats,
-	warships Warships,
+	warships model.Warships,
 	tempArenaInfo TempArenaInfo,
 ) *Stats {
 	var useShipStats WGShipsStatsData
@@ -31,13 +30,12 @@ func NewStats(
 	}
 
 	return &Stats{
-		useShipID:        useShipID,
-		accountInfo:      accountInfo,
-		useShipStats:     useShipStats,
-		allShipsStats:    allShipsStats,
-		allExpectedStats: expectedStats,
-		warships:         warships,
-		tempArenaInfo:    tempArenaInfo,
+		useShipID:     useShipID,
+		accountInfo:   accountInfo,
+		useShipStats:  useShipStats,
+		allShipsStats: allShipsStats,
+		warships:      warships,
+		tempArenaInfo: tempArenaInfo,
 	}
 }
 
@@ -54,9 +52,9 @@ func (s *Stats) PR(category StatsCategory, pattern StatsPattern) float64 {
 				wins:   winRate(values.Wins, battles),
 			},
 			PRFactor{
-				damage: s.allExpectedStats[s.useShipID].AverageDamageDealt,
-				frags:  s.allExpectedStats[s.useShipID].AverageFrags,
-				wins:   s.allExpectedStats[s.useShipID].WinRate,
+				damage: s.warships[s.useShipID].AverageDamage,
+				frags:  s.warships[s.useShipID].AverageFrags,
+				wins:   s.warships[s.useShipID].WinRate,
 			},
 			battles,
 		)
@@ -72,7 +70,7 @@ func (s *Stats) PR(category StatsCategory, pattern StatsPattern) float64 {
 			values := s.statsValuesForm(ship, pattern)
 			battles := values.Battles
 
-			es, ok := s.allExpectedStats[ship.ShipID]
+			warship, ok := s.warships[ship.ShipID]
 			if !ok {
 				continue
 			}
@@ -81,9 +79,9 @@ func (s *Stats) PR(category StatsCategory, pattern StatsPattern) float64 {
 			actual.frags += float64(values.Frags)
 			actual.wins += float64(values.Wins)
 
-			expected.damage += es.AverageDamageDealt * float64(battles)
-			expected.frags += es.AverageFrags * float64(battles)
-			expected.wins += es.WinRate / 100 * float64(battles)
+			expected.damage += warship.AverageDamage * float64(battles)
+			expected.frags += warship.AverageFrags * float64(battles)
+			expected.wins += warship.WinRate / 100 * float64(battles)
 
 			allBattles += battles
 		}
@@ -328,7 +326,7 @@ func (s *Stats) UsingTierRate(
 func (s *Stats) UsingShipTypeRate(
 	pattern StatsPattern,
 ) ShipTypeGroup {
-	shipTypeMap := make(map[ShipType]uint)
+	shipTypeMap := make(map[model.ShipType]uint)
 
 	for _, ship := range s.allShipsStats {
 		warship, ok := s.warships[ship.ShipID]
@@ -346,11 +344,11 @@ func (s *Stats) UsingShipTypeRate(
 	}
 
 	return ShipTypeGroup{
-		SS: percentage(shipTypeMap[ShipTypeSS], allBattles),
-		DD: percentage(shipTypeMap[ShipTypeDD], allBattles),
-		CL: percentage(shipTypeMap[ShipTypeCL], allBattles),
-		BB: percentage(shipTypeMap[ShipTypeBB], allBattles),
-		CV: percentage(shipTypeMap[ShipTypeCV], allBattles),
+		SS: percentage(shipTypeMap[model.ShipTypeSS], allBattles),
+		DD: percentage(shipTypeMap[model.ShipTypeDD], allBattles),
+		CL: percentage(shipTypeMap[model.ShipTypeCL], allBattles),
+		BB: percentage(shipTypeMap[model.ShipTypeBB], allBattles),
+		CV: percentage(shipTypeMap[model.ShipTypeCV], allBattles),
 	}
 }
 

@@ -11,7 +11,7 @@ package repository
 
 import (
 	reflect "reflect"
-	data "wfs/backend/data"
+	model "wfs/backend/domain/model"
 
 	gomock "go.uber.org/mock/gomock"
 )
@@ -20,6 +20,7 @@ import (
 type MockUnregisteredInterface struct {
 	ctrl     *gomock.Controller
 	recorder *MockUnregisteredInterfaceMockRecorder
+	isgomock struct{}
 }
 
 // MockUnregisteredInterfaceMockRecorder is the mock recorder for MockUnregisteredInterface.
@@ -40,10 +41,10 @@ func (m *MockUnregisteredInterface) EXPECT() *MockUnregisteredInterfaceMockRecor
 }
 
 // Warship mocks base method.
-func (m *MockUnregisteredInterface) Warship() (data.Warships, error) {
+func (m *MockUnregisteredInterface) Warship() (model.Warships, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Warship")
-	ret0, _ := ret[0].(data.Warships)
+	ret0, _ := ret[0].(model.Warships)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

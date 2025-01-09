@@ -19,6 +19,7 @@ import (
 type MockDiscordInterface struct {
 	ctrl     *gomock.Controller
 	recorder *MockDiscordInterfaceMockRecorder
+	isgomock struct{}
 }
 
 // MockDiscordInterfaceMockRecorder is the mock recorder for MockDiscordInterface.
