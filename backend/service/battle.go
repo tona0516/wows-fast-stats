@@ -2,24 +2,20 @@ package service
 
 import (
 	"context"
-	"regexp"
 	"sort"
-	"strings"
 	"sync"
 	"wfs/backend/data"
 	"wfs/backend/domain/model"
 	domainRepository "wfs/backend/domain/repository"
 	"wfs/backend/repository"
 	"wfs/backend/yamibuka"
-
-	"github.com/abadojack/whatlanggo"
 )
 
 type Battle struct {
 	wargaming      repository.WargamingInterface
-	uwargaming     repository.UnofficialWargamingInterface
 	localFile      repository.LocalFileInterface
 	warshipFetcher domainRepository.WarshipFetcherInterface
+	clanFetcher    domainRepository.ClanFetcherInterface
 	storage        repository.StorageInterface
 	logger         repository.LoggerInterface
 	eventsEmitFunc eventEmitFunc
@@ -31,18 +27,18 @@ type Battle struct {
 
 func NewBattle(
 	wargaming repository.WargamingInterface,
-	uwargaming repository.UnofficialWargamingInterface,
 	localFile repository.LocalFileInterface,
 	warshipFetcher domainRepository.WarshipFetcherInterface,
+	clanFetcher domainRepository.ClanFetcherInterface,
 	storage repository.StorageInterface,
 	logger repository.LoggerInterface,
 	eventsEmitFunc eventEmitFunc,
 ) *Battle {
 	return &Battle{
 		wargaming:      wargaming,
-		uwargaming:     uwargaming,
 		localFile:      localFile,
 		warshipFetcher: warshipFetcher,
+		clanFetcher:    clanFetcher,
 		storage:        storage,
 		logger:         logger,
 		eventsEmitFunc: eventsEmitFunc,
@@ -84,10 +80,10 @@ func (b *Battle) Get(appCtx context.Context, userConfig data.UserConfigV2) (data
 	// Fetch each stats
 	accountInfoResult := make(chan data.Result[data.WGAccountInfo])
 	shipStatsResult := make(chan data.Result[data.AllPlayerShipsStats])
-	clanResult := make(chan data.Result[data.Clans])
+	clanResult := make(chan data.Result[model.Clans])
 	go b.fetchAccountInfo(accountIDs, accountInfoResult)
 	go b.fetchAllPlayerShipsStats(accountIDs, shipStatsResult)
-	go b.fetchClan(accountIDs, clanResult)
+	go b.fetchClans(accountIDs, clanResult)
 
 	errs := make([]error, 0)
 
@@ -123,9 +119,9 @@ func (b *Battle) Get(appCtx context.Context, userConfig data.UserConfigV2) (data
 		tempArenaInfo,
 		accountInfo.Value,
 		accountList,
-		clan.Value,
 		shipStats.Value,
 		warship.Value,
+		clan.Value,
 		b.battleArenas,
 		b.battleTypes,
 	)
@@ -154,6 +150,14 @@ func (b *Battle) fetchWarships(channel chan data.Result[model.Warships]) {
 	warships, err := b.warshipFetcher.Fetch()
 	channel <- data.Result[model.Warships]{
 		Value: warships,
+		Error: err,
+	}
+}
+
+func (b *Battle) fetchClans(accountIDs []int, channel chan data.Result[model.Clans]) {
+	clans, err := b.clanFetcher.Fetch(accountIDs)
+	channel <- data.Result[model.Clans]{
+		Value: clans,
 		Error: err,
 	}
 }
@@ -195,116 +199,13 @@ func (b *Battle) fetchAllPlayerShipsStats(
 	channel <- data.Result[data.AllPlayerShipsStats]{Value: shipStatsMap, Error: err}
 }
 
-func (b *Battle) fetchClan(accountIDs []int, channel chan data.Result[data.Clans]) {
-	var result data.Result[data.Clans]
-
-	clansAccountInfo, err := b.wargaming.ClansAccountInfo(accountIDs)
-	if err != nil {
-		result.Error = err
-		channel <- result
-		return
-	}
-
-	clanIDs := clansAccountInfo.ClanIDs()
-	clansInfo, err := b.wargaming.ClansInfo(clanIDs)
-	if err != nil {
-		result.Error = err
-		channel <- result
-		return
-	}
-
-	clanInfoArray := clansInfo.ToArray()
-	colorMap := b.fetchClanColor(clanInfoArray)
-	languageMap := b.fetchClanLanguage(clanInfoArray)
-
-	clans := make(data.Clans)
-	for _, accountID := range accountIDs {
-		clanID := clansAccountInfo[accountID].ClanID
-		clanTag := clansInfo[clanID].Tag
-		hexColor := colorMap[clanTag]
-		language := languageMap[clanTag]
-
-		clans[accountID] = data.Clan{Tag: clanTag, ID: clanID, HexColor: hexColor, Language: language}
-	}
-
-	result.Value = clans
-	channel <- result
-}
-
-func (b *Battle) fetchClanColor(clanInfoArray []data.WGClansInfoData) map[string]string {
-	result := make(map[string]string)
-
-	var mu sync.Mutex
-	err := doParallel(clanInfoArray, func(clan data.WGClansInfoData) error {
-		autocomplete, err := b.uwargaming.ClansAutoComplete(clan.Tag)
-		if err != nil {
-			return err
-		}
-
-		hexColor := autocomplete.HexColor(clan.Tag)
-		if hexColor != "" {
-			mu.Lock()
-			result[clan.Tag] = hexColor
-			mu.Unlock()
-		}
-
-		return nil
-	})
-	if err != nil {
-		b.logger.Warn(err, nil)
-	}
-
-	return result
-}
-
-func (b *Battle) fetchClanLanguage(clanInfoArray []data.WGClansInfoData) map[string]string {
-	result := make(map[string]string)
-
-	// URLを検出する正規表現パターン
-	urlPattern := `https?://[^\s]+`
-	re := regexp.MustCompile(urlPattern)
-
-	options := whatlanggo.Options{
-		Whitelist: map[whatlanggo.Lang]bool{
-			whatlanggo.Jpn: true,
-			whatlanggo.Kor: true,
-			whatlanggo.Cmn: true,
-		},
-	}
-
-	var mu sync.Mutex
-	err := doParallel(clanInfoArray, func(clan data.WGClansInfoData) error {
-		// URLを空文字に
-		description := re.ReplaceAllString(clan.Description, "")
-		// 改行を空文字に
-		description = strings.ReplaceAll(description, "\n", "")
-
-		if len(description) == 0 {
-			return nil
-		}
-
-		info := whatlanggo.DetectWithOptions(description, options)
-
-		mu.Lock()
-		result[clan.Tag] = info.Lang.Iso6391()
-		mu.Unlock()
-
-		return nil
-	})
-	if err != nil {
-		b.logger.Warn(err, nil)
-	}
-
-	return result
-}
-
 func (b *Battle) compose(
 	tempArenaInfo data.TempArenaInfo,
 	accountInfo data.WGAccountInfo,
 	accountList data.WGAccountList,
-	clans data.Clans,
 	allPlayerShipsStats data.AllPlayerShipsStats,
 	warships model.Warships,
+	clans model.Clans,
 	battleArenas data.WGBattleArenas,
 	battleTypes data.WGBattleTypes,
 ) data.Battle {
@@ -341,9 +242,14 @@ func (b *Battle) compose(
 
 		player := data.Player{
 			PlayerInfo: data.PlayerInfo{
-				ID:       accountID,
-				Name:     nickname,
-				Clan:     clan,
+				ID:   accountID,
+				Name: nickname,
+				Clan: data.Clan{
+					Tag:      clan.Tag,
+					ID:       clan.ID,
+					HexColor: clan.HexColor,
+					Language: clan.Lang,
+				},
 				IsHidden: accountInfo[accountID].HiddenProfile,
 			},
 			ShipInfo: data.ShipInfo{

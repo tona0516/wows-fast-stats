@@ -5,6 +5,7 @@ import (
 	"testing"
 	"wfs/backend/apperr"
 	"wfs/backend/data"
+	domainRepository "wfs/backend/domain/mock/repository"
 	"wfs/backend/domain/model"
 	"wfs/backend/mock/repository"
 
@@ -34,25 +35,8 @@ func TestBattle_Get_正常系_初回(t *testing.T) {
 	mockWargaming.EXPECT().BattleTypes().Return(data.WGBattleTypes{}, nil)
 	mockWargaming.EXPECT().AccountInfo(gomock.Any()).Return(data.WGAccountInfo{}, nil)
 	mockWargaming.EXPECT().ShipsStats(gomock.Any()).Return(data.WGShipsStats{}, nil).AnyTimes()
-	mockWargaming.EXPECT().ClansAccountInfo(gomock.Any()).Return(data.WGClansAccountInfo{}, nil)
-	mockWargaming.EXPECT().ClansInfo(gomock.Any()).Return(data.WGClansInfo{}, nil)
 
-	mockUnofficialWargaming := repository.NewMockUnofficialWargamingInterface(ctrl)
-	mockUnofficialWargaming.EXPECT().ClansAutoComplete(gomock.Any()).Return(data.UWGClansAutocomplete{
-		SearchAutocompleteResult: []struct {
-			HexColor string `json:"hex_color"`
-			Tag      string `json:"tag"`
-			ID       int    `json:"id"`
-		}{
-			{
-				HexColor: "#114514",
-				Tag:      "TEST",
-				ID:       1919810,
-			},
-		},
-	}, nil).AnyTimes()
-
-	mockWarshipFetcher := repository.NewMockWarshipFetcherInterface(ctrl)
+	mockWarshipFetcher := domainRepository.NewMockWarshipFetcherInterface(ctrl)
 	mockWarshipFetcher.EXPECT().Fetch().Return(model.Warships{
 		1: {
 			Tier:      1,
@@ -60,6 +44,15 @@ func TestBattle_Get_正常系_初回(t *testing.T) {
 			Name:      "ship_1",
 			Nation:    "japan",
 			IsPremium: false,
+		},
+	}, nil)
+
+	mockClanFetcher := domainRepository.NewMockClanFetcherInterface(ctrl)
+	mockClanFetcher.EXPECT().Fetch(gomock.Any()).Return(model.Clans{
+		1: {
+			ID:       1919810,
+			Tag:      "TEST",
+			HexColor: "#114514",
 		},
 	}, nil)
 
@@ -80,9 +73,9 @@ func TestBattle_Get_正常系_初回(t *testing.T) {
 	// テスト
 	b := NewBattle(
 		mockWargaming,
-		mockUnofficialWargaming,
 		mockLocalFile,
 		mockWarshipFetcher,
+		mockClanFetcher,
 		mockStorage,
 		mockLogger,
 		nil,
@@ -105,25 +98,8 @@ func TestBattle_Get_正常系_2回目以降(t *testing.T) {
 	}, nil)
 	mockWargaming.EXPECT().AccountInfo(gomock.Any()).Return(data.WGAccountInfo{}, nil)
 	mockWargaming.EXPECT().ShipsStats(gomock.Any()).Return(data.WGShipsStats{}, nil).AnyTimes()
-	mockWargaming.EXPECT().ClansAccountInfo(gomock.Any()).Return(data.WGClansAccountInfo{}, nil)
-	mockWargaming.EXPECT().ClansInfo(gomock.Any()).Return(data.WGClansInfo{}, nil)
 
-	mockUnofficialWargaming := repository.NewMockUnofficialWargamingInterface(ctrl)
-	mockUnofficialWargaming.EXPECT().ClansAutoComplete(gomock.Any()).Return(data.UWGClansAutocomplete{
-		SearchAutocompleteResult: []struct {
-			HexColor string `json:"hex_color"`
-			Tag      string `json:"tag"`
-			ID       int    `json:"id"`
-		}{
-			{
-				HexColor: "#114514",
-				Tag:      "TEST",
-				ID:       1919810,
-			},
-		},
-	}, nil).AnyTimes()
-
-	mockWarshipFetcher := repository.NewMockWarshipFetcherInterface(ctrl)
+	mockWarshipFetcher := domainRepository.NewMockWarshipFetcherInterface(ctrl)
 	mockWarshipFetcher.EXPECT().Fetch().Return(model.Warships{
 		1: {
 			Tier:      1,
@@ -131,6 +107,15 @@ func TestBattle_Get_正常系_2回目以降(t *testing.T) {
 			Name:      "ship_1",
 			Nation:    "japan",
 			IsPremium: false,
+		},
+	}, nil)
+
+	mockClanFetcher := domainRepository.NewMockClanFetcherInterface(ctrl)
+	mockClanFetcher.EXPECT().Fetch(gomock.Any()).Return(model.Clans{
+		1: {
+			ID:       1919810,
+			Tag:      "TEST",
+			HexColor: "#114514",
 		},
 	}, nil)
 
@@ -152,9 +137,9 @@ func TestBattle_Get_正常系_2回目以降(t *testing.T) {
 	// テスト
 	b := NewBattle(
 		mockWargaming,
-		mockUnofficialWargaming,
 		mockLocalFile,
 		mockWarshipFetcher,
+		mockClanFetcher,
 		mockStorage,
 		mockLogger,
 		nil,
@@ -180,8 +165,8 @@ func TestBattle_Get_異常系(t *testing.T) {
 	// テスト
 	b := NewBattle(
 		nil,
-		nil,
 		mockLocalFile,
+		nil,
 		nil,
 		nil,
 		nil,

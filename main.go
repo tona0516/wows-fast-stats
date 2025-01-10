@@ -132,6 +132,10 @@ func initApp(env data.Env) *App {
 		*unregistered,
 		*numbers,
 	)
+	clanFercher := infra.NewClanFetcher(
+		*wargaming,
+		*uwargaming,
+	)
 
 	// usecase
 	watchInterval := 1 * time.Second
@@ -139,9 +143,9 @@ func initApp(env data.Env) *App {
 	screenshot := service.NewScreenshot(localFile, logger)
 	battle := service.NewBattle(
 		wargaming,
-		uwargaming,
 		localFile,
 		warshipFercher,
+		clanFercher,
 		storage,
 		logger,
 		runtime.EventsEmit,
