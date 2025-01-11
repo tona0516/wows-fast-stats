@@ -30,7 +30,6 @@ func (w *UnofficialWargaming) ClansAutoComplete(search string) (data.UWGClansAut
 				"type":   "clans",
 			}),
 			webapi.WithTimeout(w.config.Timeout),
-			webapi.WithIsInsecure(true),
 		).GET()
 		if err != nil {
 			return result, err
