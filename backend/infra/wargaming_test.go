@@ -268,22 +268,6 @@ func TestWargaming_EncycShips(t *testing.T) {
 	assert.Equal(t, expectedPageTotal, pageTotal)
 }
 
-func TestWargaming_EncycInfo(t *testing.T) {
-	t.Parallel()
-
-	server := simpleMockServer(200, response.WGEncycInfo{})
-	defer server.Close()
-
-	wargaming := NewWargaming(RequestConfig{
-		URL: server.URL,
-	}, ratelimit.New(10), "")
-
-	result, err := wargaming.EncycInfo()
-
-	assert.NoError(t, err)
-	assert.Equal(t, data.WGEncycInfoData{}, result)
-}
-
 func TestWargaming_BattleArena(t *testing.T) {
 	t.Parallel()
 

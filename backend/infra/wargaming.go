@@ -161,19 +161,6 @@ func (w *Wargaming) EncycShips(pageNo int) (data.WGEncycShips, int, error) {
 	return res.Data, res.Meta.PageTotal, err
 }
 
-func (w *Wargaming) EncycInfo() (data.WGEncycInfoData, error) {
-	res, err := request[response.WGEncycInfo](
-		w,
-		"/wows/encyclopedia/info/",
-		map[string]string{
-			"application_id": w.appID,
-			"fields":         response.WGEncycInfo{}.Field(),
-		},
-	)
-
-	return res.Data, err
-}
-
 func (w *Wargaming) BattleArenas() (data.WGBattleArenas, error) {
 	res, err := request[response.WGBattleArenas](
 		w,
