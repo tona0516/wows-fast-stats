@@ -237,7 +237,6 @@ func (b *Battle) compose(
 			accountInfo[accountID],
 			allPlayerShipsStats.Player(accountID),
 			warships,
-			tempArenaInfo,
 		)
 
 		player := data.Player{

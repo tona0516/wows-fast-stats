@@ -11,7 +11,6 @@ type Stats struct {
 	useShipStats  WGShipsStatsData
 	allShipsStats []WGShipsStatsData
 	warships      model.Warships
-	tempArenaInfo TempArenaInfo
 }
 
 func NewStats(
@@ -19,7 +18,6 @@ func NewStats(
 	accountInfo WGAccountInfoData,
 	allShipsStats []WGShipsStatsData,
 	warships model.Warships,
-	tempArenaInfo TempArenaInfo,
 ) *Stats {
 	var useShipStats WGShipsStatsData
 	for _, v := range allShipsStats {
@@ -35,7 +33,6 @@ func NewStats(
 		useShipStats:  useShipStats,
 		allShipsStats: allShipsStats,
 		warships:      warships,
-		tempArenaInfo: tempArenaInfo,
 	}
 }
 
