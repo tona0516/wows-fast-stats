@@ -1,4 +1,4 @@
-package data
+package model
 
 import (
 	"strings"
@@ -39,15 +39,6 @@ func (t *TempArenaInfo) Unixtime() int64 {
 	}
 
 	return date.Unix()
-}
-
-func (t *TempArenaInfo) BattleArena(battleArenas WGBattleArenas) string {
-	return battleArenas[t.MapID].Name
-}
-
-func (t *TempArenaInfo) BattleType(battleTypes WGBattleTypes) string {
-	rawBattleType := battleTypes[strings.ToUpper(t.MatchGroup)].Name
-	return strings.ReplaceAll(rawBattleType, " ", "")
 }
 
 type Vehicle struct {

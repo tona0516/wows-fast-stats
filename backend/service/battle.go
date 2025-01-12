@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"sort"
+	"strings"
 	"sync"
 	"wfs/backend/data"
 	"wfs/backend/domain/model"
@@ -16,6 +17,7 @@ type Battle struct {
 	localFile      repository.LocalFileInterface
 	warshipFetcher domainRepository.WarshipFetcherInterface
 	clanFetcher    domainRepository.ClanFetcherInterface
+	taiFetcher     domainRepository.TAIFetcherInterface
 	storage        repository.StorageInterface
 	logger         repository.LoggerInterface
 	eventsEmitFunc eventEmitFunc
@@ -30,6 +32,7 @@ func NewBattle(
 	localFile repository.LocalFileInterface,
 	warshipFetcher domainRepository.WarshipFetcherInterface,
 	clanFetcher domainRepository.ClanFetcherInterface,
+	taiFetcher domainRepository.TAIFetcherInterface,
 	storage repository.StorageInterface,
 	logger repository.LoggerInterface,
 	eventsEmitFunc eventEmitFunc,
@@ -39,6 +42,7 @@ func NewBattle(
 		localFile:      localFile,
 		warshipFetcher: warshipFetcher,
 		clanFetcher:    clanFetcher,
+		taiFetcher:     taiFetcher,
 		storage:        storage,
 		logger:         logger,
 		eventsEmitFunc: eventsEmitFunc,
@@ -131,8 +135,8 @@ func (b *Battle) Get(appCtx context.Context, userConfig data.UserConfigV2) (data
 	return result, nil
 }
 
-func (b *Battle) getTempArenaInfo(userConfig data.UserConfigV2) (data.TempArenaInfo, error) {
-	tempArenaInfo, err := b.localFile.TempArenaInfo(userConfig.InstallPath)
+func (b *Battle) getTempArenaInfo(userConfig data.UserConfigV2) (model.TempArenaInfo, error) {
+	tempArenaInfo, err := b.taiFetcher.Get(userConfig.InstallPath)
 	if err != nil {
 		return tempArenaInfo, err
 	}
@@ -200,7 +204,7 @@ func (b *Battle) fetchAllPlayerShipsStats(
 }
 
 func (b *Battle) compose(
-	tempArenaInfo data.TempArenaInfo,
+	tempArenaInfo model.TempArenaInfo,
 	accountInfo data.WGAccountInfo,
 	accountList data.WGAccountList,
 	allPlayerShipsStats data.AllPlayerShipsStats,
@@ -270,8 +274,8 @@ func (b *Battle) compose(
 	battle := data.Battle{
 		Meta: data.Meta{
 			Unixtime: tempArenaInfo.Unixtime(),
-			Arena:    tempArenaInfo.BattleArena(battleArenas),
-			Type:     tempArenaInfo.BattleType(battleTypes),
+			Arena:    battleArenas[tempArenaInfo.MapID].Name,
+			Type:     strings.ReplaceAll(battleTypes[strings.ToUpper(tempArenaInfo.MatchGroup)].Name, " ", ""),
 			OwnShip:  ownShip,
 		},
 		Teams: teams,
@@ -285,7 +289,7 @@ func playerStats(
 	stats *data.Stats,
 	accountID int,
 	shipID int,
-	tempArenaInfo data.TempArenaInfo,
+	tempArenaInfo model.TempArenaInfo,
 	warships model.Warships,
 ) data.PlayerStats {
 	threatLevel := yamibuka.CalculateThreatLevel(yamibuka.NewThreatLevelFactor(

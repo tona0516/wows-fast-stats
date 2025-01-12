@@ -56,9 +56,9 @@ func TestBattle_Get_正常系_初回(t *testing.T) {
 		},
 	}, nil)
 
-	mockLocalFile := repository.NewMockLocalFileInterface(ctrl)
-	mockLocalFile.EXPECT().TempArenaInfo(gomock.Any()).Return(data.TempArenaInfo{
-		Vehicles: []data.Vehicle{
+	mockTAIFetcher := domainRepository.NewMockTAIFetcherInterface(ctrl)
+	mockTAIFetcher.EXPECT().Get(gomock.Any()).Return(model.TempArenaInfo{
+		Vehicles: []model.Vehicle{
 			{ShipID: 1, Name: "player_1", Relation: 0},
 			{ShipID: 2, Name: "player_2", Relation: 2},
 		},
@@ -73,9 +73,10 @@ func TestBattle_Get_正常系_初回(t *testing.T) {
 	// テスト
 	b := NewBattle(
 		mockWargaming,
-		mockLocalFile,
+		nil,
 		mockWarshipFetcher,
 		mockClanFetcher,
+		mockTAIFetcher,
 		mockStorage,
 		mockLogger,
 		nil,
@@ -119,9 +120,9 @@ func TestBattle_Get_正常系_2回目以降(t *testing.T) {
 		},
 	}, nil)
 
-	mockLocalFile := repository.NewMockLocalFileInterface(ctrl)
-	mockLocalFile.EXPECT().TempArenaInfo(gomock.Any()).Return(data.TempArenaInfo{
-		Vehicles: []data.Vehicle{
+	mockTAIFetcher := domainRepository.NewMockTAIFetcherInterface(ctrl)
+	mockTAIFetcher.EXPECT().Get(gomock.Any()).Return(model.TempArenaInfo{
+		Vehicles: []model.Vehicle{
 			{ShipID: 1, Name: "player_1", Relation: 0},
 			{ShipID: 2, Name: "player_2", Relation: 2},
 		},
@@ -137,9 +138,10 @@ func TestBattle_Get_正常系_2回目以降(t *testing.T) {
 	// テスト
 	b := NewBattle(
 		mockWargaming,
-		mockLocalFile,
+		nil,
 		mockWarshipFetcher,
 		mockClanFetcher,
+		mockTAIFetcher,
 		mockStorage,
 		mockLogger,
 		nil,
@@ -158,16 +160,17 @@ func TestBattle_Get_異常系(t *testing.T) {
 	ctrl := gomock.NewController(t)
 
 	// 準備
-	mockLocalFile := repository.NewMockLocalFileInterface(ctrl)
 	expectedError := failure.New(apperr.FileNotExist)
-	mockLocalFile.EXPECT().TempArenaInfo(gomock.Any()).Return(data.TempArenaInfo{}, expectedError)
+	mockTAIFetcher := domainRepository.NewMockTAIFetcherInterface(ctrl)
+	mockTAIFetcher.EXPECT().Get(gomock.Any()).Return(model.TempArenaInfo{}, expectedError)
 
 	// テスト
 	b := NewBattle(
 		nil,
-		mockLocalFile,
 		nil,
 		nil,
+		nil,
+		mockTAIFetcher,
 		nil,
 		nil,
 		nil,

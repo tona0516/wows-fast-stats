@@ -136,6 +136,7 @@ func initApp(env data.Env) *App {
 		*wargaming,
 		*uwargaming,
 	)
+	taiFetcher := infra.NewTaiFetcher()
 
 	// usecase
 	watchInterval := 1 * time.Second
@@ -146,11 +147,12 @@ func initApp(env data.Env) *App {
 		localFile,
 		warshipFercher,
 		clanFercher,
+		taiFetcher,
 		storage,
 		logger,
 		runtime.EventsEmit,
 	)
-	watcher := service.NewWatcher(watchInterval, localFile, storage, logger, runtime.EventsEmit)
+	watcher := service.NewWatcher(watchInterval, taiFetcher, storage, logger, runtime.EventsEmit)
 	updater := service.NewUpdater(env, github, logger)
 	configMigrator := service.NewConfigMigrator(configV0, storage, logger)
 

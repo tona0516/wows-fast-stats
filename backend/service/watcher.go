@@ -7,6 +7,7 @@ import (
 	"time"
 	"wfs/backend/apperr"
 	"wfs/backend/data"
+	domainRepository "wfs/backend/domain/repository"
 	"wfs/backend/repository"
 
 	"github.com/morikuni/failure"
@@ -20,7 +21,7 @@ const (
 
 type Watcher struct {
 	interval       time.Duration
-	localFile      repository.LocalFileInterface
+	taiFetcher     domainRepository.TAIFetcherInterface
 	storage        repository.StorageInterface
 	logger         repository.LoggerInterface
 	eventsEmitFunc eventEmitFunc
@@ -29,14 +30,14 @@ type Watcher struct {
 
 func NewWatcher(
 	interval time.Duration,
-	localFile repository.LocalFileInterface,
+	taiFetcher domainRepository.TAIFetcherInterface,
 	storage repository.StorageInterface,
 	logger repository.LoggerInterface,
 	eventsEmitFunc eventEmitFunc,
 ) *Watcher {
 	return &Watcher{
 		interval:       interval,
-		localFile:      localFile,
+		taiFetcher:     taiFetcher,
 		storage:        storage,
 		logger:         logger,
 		eventsEmitFunc: eventsEmitFunc,
@@ -67,7 +68,7 @@ func (w *Watcher) Start(appCtx context.Context, cancelCtx context.Context) {
 		default:
 			time.Sleep(w.interval)
 
-			tempArenaInfo, err := w.localFile.TempArenaInfo(w.userConfig.InstallPath)
+			tempArenaInfo, err := w.taiFetcher.Get(w.userConfig.InstallPath)
 			if err != nil {
 				if failure.Is(err, apperr.FileNotExist) || failure.Is(err, apperr.ReplayDirNotFoundError) {
 					w.eventsEmitFunc(appCtx, EventEnd)

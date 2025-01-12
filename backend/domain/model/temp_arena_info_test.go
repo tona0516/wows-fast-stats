@@ -1,4 +1,4 @@
-package data
+package model
 
 import (
 	"testing"
@@ -35,38 +35,4 @@ func TestTempArenaInfo_Unixtime(t *testing.T) {
 	actual := info.Unixtime()
 
 	assert.Equal(t, expected, actual)
-}
-
-func TestTempArenaInfo_BattleArena(t *testing.T) {
-	t.Parallel()
-	w := WGBattleArenas{
-		1: {Name: "Arena1"},
-		2: {Name: "Arena2"},
-	}
-
-	info := &TempArenaInfo{
-		MapID: 2,
-	}
-
-	expectedBattleArena := "Arena2"
-	actualBattleArena := info.BattleArena(w)
-
-	assert.Equal(t, expectedBattleArena, actualBattleArena)
-}
-
-func TestTempArenaInfo_BattleType(t *testing.T) {
-	t.Parallel()
-	w := WGBattleTypes{
-		"RANDOM": {Name: "Random Battle"},
-		"COOP":   {Name: "Co-op Battle"},
-	}
-
-	info := &TempArenaInfo{
-		MatchGroup: "random",
-	}
-
-	expectedBattleType := "RandomBattle"
-	actualBattleType := info.BattleType(w)
-
-	assert.Equal(t, expectedBattleType, actualBattleType)
 }

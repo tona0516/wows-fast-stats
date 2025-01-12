@@ -11,7 +11,7 @@ package repository
 
 import (
 	reflect "reflect"
-	data "wfs/backend/data"
+	model "wfs/backend/domain/model"
 
 	gomock "go.uber.org/mock/gomock"
 )
@@ -55,7 +55,7 @@ func (mr *MockLocalFileInterfaceMockRecorder) SaveScreenshot(path, base64Data an
 }
 
 // SaveTempArenaInfo mocks base method.
-func (m *MockLocalFileInterface) SaveTempArenaInfo(tempArenaInfo data.TempArenaInfo) error {
+func (m *MockLocalFileInterface) SaveTempArenaInfo(tempArenaInfo model.TempArenaInfo) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SaveTempArenaInfo", tempArenaInfo)
 	ret0, _ := ret[0].(error)
@@ -66,19 +66,4 @@ func (m *MockLocalFileInterface) SaveTempArenaInfo(tempArenaInfo data.TempArenaI
 func (mr *MockLocalFileInterfaceMockRecorder) SaveTempArenaInfo(tempArenaInfo any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveTempArenaInfo", reflect.TypeOf((*MockLocalFileInterface)(nil).SaveTempArenaInfo), tempArenaInfo)
-}
-
-// TempArenaInfo mocks base method.
-func (m *MockLocalFileInterface) TempArenaInfo(installPath string) (data.TempArenaInfo, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "TempArenaInfo", installPath)
-	ret0, _ := ret[0].(data.TempArenaInfo)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// TempArenaInfo indicates an expected call of TempArenaInfo.
-func (mr *MockLocalFileInterfaceMockRecorder) TempArenaInfo(installPath any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TempArenaInfo", reflect.TypeOf((*MockLocalFileInterface)(nil).TempArenaInfo), installPath)
 }

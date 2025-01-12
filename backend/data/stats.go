@@ -40,6 +40,9 @@ func (s *Stats) PR(category StatsCategory, pattern StatsPattern) float64 {
 	case StatsCategoryShip:
 		values, _ := s.statsValues(pattern)
 		battles := values.Battles
+		if battles == 0 {
+			return -1
+		}
 
 		warship := s.warships[s.useShipID]
 		pr, err := model.NewPR(
@@ -84,6 +87,9 @@ func (s *Stats) PR(category StatsCategory, pattern StatsPattern) float64 {
 			expectedWins += warship.WinRate / 100 * float64(battles)
 
 			allBattles += battles
+		}
+		if allBattles == 0 {
+			return -1
 		}
 
 		pr, err := model.NewPR(

@@ -145,7 +145,7 @@ func CalculateThreatLevel(f ThreatLevelFactor) data.ThreatLevel {
 
 //nolint:nonamedreturns
 func matchInfo(
-	tempArenaInfo data.TempArenaInfo,
+	tempArenaInfo model.TempArenaInfo,
 	warships model.Warships,
 ) (isCVMatch bool, topTier uint, bottomTier uint) {
 	isCVMatch = false

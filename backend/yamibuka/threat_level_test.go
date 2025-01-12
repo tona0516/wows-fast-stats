@@ -26,8 +26,8 @@ func TestThreatLevel_CalculateThreatLevel_CV_CVあり_Tierミドル(t *testing.T
 
 	actual := CalculateThreatLevel(NewThreatLevelFactor(
 		0,
-		data.TempArenaInfo{
-			Vehicles: []data.Vehicle{
+		model.TempArenaInfo{
+			Vehicles: []model.Vehicle{
 				{ShipID: shipIDNagato},
 				{ShipID: shipIDYorktown},
 				{ShipID: shipIDKitakaze},
@@ -76,8 +76,8 @@ func TestThreatLevel_CalculateThreatLevel_BB_CVあり_Tierトップ(t *testing.T
 
 	actual := CalculateThreatLevel(NewThreatLevelFactor(
 		0,
-		data.TempArenaInfo{
-			Vehicles: []data.Vehicle{
+		model.TempArenaInfo{
+			Vehicles: []model.Vehicle{
 				{ShipID: shipIDMutsuki},
 				{ShipID: shipIDRanger},
 				{ShipID: shipIDSinop},
@@ -126,8 +126,8 @@ func TestThreatLevel_CalculateThreatLevel_CL_CVなし_Tierミドル(t *testing.T
 
 	actual := CalculateThreatLevel(NewThreatLevelFactor(
 		0,
-		data.TempArenaInfo{
-			Vehicles: []data.Vehicle{
+		model.TempArenaInfo{
+			Vehicles: []model.Vehicle{
 				{ShipID: shipIDYoshino},
 			},
 		},
@@ -168,8 +168,8 @@ func TestThreatLevel_CalculateThreatLevel_DD_CVあり_Tierボトム_特殊補正
 
 	actual := CalculateThreatLevel(NewThreatLevelFactor(
 		0,
-		data.TempArenaInfo{
-			Vehicles: []data.Vehicle{
+		model.TempArenaInfo{
+			Vehicles: []model.Vehicle{
 				{ShipID: shipIDSims},
 				{ShipID: shipIDYorktown},
 				{ShipID: shipIDAlaska},

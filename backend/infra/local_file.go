@@ -2,24 +2,15 @@ package infra
 
 import (
 	"encoding/base64"
-	"io/fs"
 	"os"
 	"path/filepath"
 	"strconv"
-	"wfs/backend/apperr"
-	"wfs/backend/data"
+	"wfs/backend/domain/model"
 
 	"github.com/morikuni/failure"
 )
 
-const (
-	// directory.
-	replaysDir       string = "replays"
-	tempArenaInfoDir string = "temp_arena_info"
-
-	// file.
-	tempArenaInfoFile string = "tempArenaInfo.json"
-)
+const tempArenaInfoDir string = "temp_arena_info"
 
 type LocalFile struct {
 	userConfigPath  string
@@ -52,70 +43,7 @@ func (l *LocalFile) SaveScreenshot(path string, base64Data string) error {
 	return failure.Wrap(err)
 }
 
-func (l *LocalFile) TempArenaInfo(installPath string) (data.TempArenaInfo, error) {
-	var tempArenaInfo data.TempArenaInfo
-
-	tempArenaInfoPaths := []string{}
-	root := filepath.Join(installPath, replaysDir)
-	if _, err := os.Stat(root); err != nil {
-		return tempArenaInfo, failure.Translate(err, apperr.ReplayDirNotFoundError)
-	}
-
-	err := filepath.WalkDir(root, func(path string, info fs.DirEntry, err error) error {
-		if err != nil {
-			return failure.Wrap(err)
-		}
-
-		if info.IsDir() {
-			return nil
-		}
-
-		if info.Name() != tempArenaInfoFile {
-			return nil
-		}
-
-		tempArenaInfoPaths = append(tempArenaInfoPaths, path)
-		return nil
-	})
-	if err != nil {
-		return tempArenaInfo, err
-	}
-
-	return decideTempArenaInfo(tempArenaInfoPaths)
-}
-
-func (l *LocalFile) SaveTempArenaInfo(tempArenaInfo data.TempArenaInfo) error {
+func (l *LocalFile) SaveTempArenaInfo(tempArenaInfo model.TempArenaInfo) error {
 	path := filepath.Join(tempArenaInfoDir, "tempArenaInfo_"+strconv.FormatInt(tempArenaInfo.Unixtime(), 10)+".json")
 	return writeJSON(path, tempArenaInfo)
-}
-
-func decideTempArenaInfo(paths []string) (data.TempArenaInfo, error) {
-	var result data.TempArenaInfo
-	size := len(paths)
-
-	if size == 0 {
-		return result, failure.New(apperr.FileNotExist)
-	}
-
-	if size == 1 {
-		return readJSON(paths[0], data.TempArenaInfo{})
-	}
-
-	var latest data.TempArenaInfo
-	for _, path := range paths {
-		tempArenaInfo, err := readJSON(path, data.TempArenaInfo{})
-		if err != nil {
-			continue
-		}
-
-		if tempArenaInfo.Unixtime() > latest.Unixtime() {
-			latest = tempArenaInfo
-		}
-	}
-
-	if latest.Unixtime() == 0 {
-		return result, failure.New(apperr.FileNotExist)
-	}
-
-	return latest, nil
 }
