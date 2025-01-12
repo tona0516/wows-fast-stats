@@ -12,7 +12,7 @@ import { PR } from "src/lib/column/model/PR";
 import { PlanesKilled } from "src/lib/column/model/PlanesKilled";
 import { PlatoonRate } from "src/lib/column/model/PlatoonRate";
 import { PlayerName } from "src/lib/column/model/PlayerName";
-import { ShipInfo } from "src/lib/column/model/ShipInfo";
+import { Warship } from "src/lib/column/model/Warship";
 import { SurvivedRate } from "src/lib/column/model/SurvivedRate";
 import { ThreatLevel } from "src/lib/column/model/ThreatLevel";
 import { UsingShipTypeRate } from "src/lib/column/model/UsingShipTypeRate";
@@ -47,7 +47,7 @@ export namespace ColumnProvider {
     config: data.UserConfigV2,
   ): [basic: ColumnArray, ship: ColumnArray, overall: ColumnArray] => {
     return [
-      new ColumnArray("basic", [new PlayerName(config), new ShipInfo(config)]),
+      new ColumnArray("basic", [new PlayerName(config), new Warship(config)]),
       new ColumnArray("ship", [
         new PR(config, "ship"),
         new Damage(config, "ship"),

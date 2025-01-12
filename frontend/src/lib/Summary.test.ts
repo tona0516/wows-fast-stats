@@ -1,7 +1,7 @@
 import { DispName } from "src/lib/DispName";
 import { Summary } from "src/lib/Summary";
 import type { StatsExtra } from "src/lib/types";
-import { data } from "wailsjs/go/models";
+import { data, model } from "wailsjs/go/models";
 
 const makePlayer = (): data.Player => {
   const pvpSolo = new data.PlayerStats();
@@ -14,7 +14,7 @@ const makePlayer = (): data.Player => {
 
   const player = new data.Player();
   player.player_info = new data.PlayerInfo();
-  player.ship_info = new data.ShipInfo();
+  player.warship = new model.Warship();
   player.pvp_solo = pvpSolo;
   player.pvp_all = pvpAll;
 
@@ -152,7 +152,7 @@ test("calculate - each ship type, overall, pvp_solo", () => {
 
   const friends = shipTypes.map((it) => {
     const friend = makePlayer();
-    friend.ship_info.type = it;
+    friend.warship.type = it;
     friend.player_info.id = 1;
     friend[extra].overall.battles = battles;
     friend[extra].overall.pr = pr;
@@ -164,7 +164,7 @@ test("calculate - each ship type, overall, pvp_solo", () => {
 
   const enemies = shipTypes.map((it) => {
     const enemy = makePlayer();
-    enemy.ship_info.type = it;
+    enemy.warship.type = it;
     enemy.player_info.id = 1;
     enemy[extra].overall.battles = 0;
     enemy[extra].overall.pr = 0;

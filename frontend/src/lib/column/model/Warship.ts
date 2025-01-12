@@ -29,7 +29,7 @@ import ShipPremiumSS from "src/assets/images/ship_ss_premium.png";
 import ShipNone from "src/assets/images/ship_none.png";
 
 import { isShipType, tierString } from "src/lib/util";
-import ShipInfoTableData from "src/component/main/internal/table_data/ShipInfoTableData.svelte";
+import WarshipTableData from "src/component/main/internal/table_data/WarshipTableData.svelte";
 
 const FLAGS: { [key: string]: string } = {
   japan: FlagJapan,
@@ -63,13 +63,13 @@ const PREMIUM_SHIP_ICONS: { [key: string]: string } = {
   ss: ShipPremiumSS,
 };
 
-export class ShipInfo extends AbstractColumn {
+export class Warship extends AbstractColumn {
   constructor(private config: data.UserConfigV2) {
-    super("ship_info", "艦", 3);
+    super("warship", "艦", 3);
   }
 
   svelteComponent() {
-    return ShipInfoTableData;
+    return WarshipTableData;
   }
 
   shouldShow(): boolean {
@@ -77,25 +77,25 @@ export class ShipInfo extends AbstractColumn {
   }
 
   displayValue(player: data.Player): string {
-    return `${tierString(player.ship_info.tier)} ${player.ship_info.name}`;
+    return `${tierString(player.warship.tier)} ${player.warship.name}`;
   }
 
   bgColorCode(player: data.Player): string {
-    const type = player.ship_info.type;
+    const type = player.warship.type;
     if (!isShipType(type)) return "";
 
     return this.config.color.ship_type.own[type];
   }
 
   shipTypeIconPath(player: data.Player): string {
-    const shipInfo = player.ship_info;
-    const type = shipInfo.type;
+    const warship = player.warship;
+    const type = warship.type;
     if (!isShipType(type)) return ShipNone;
 
-    return shipInfo.is_premium ? PREMIUM_SHIP_ICONS[type] : SHIP_ICONS[type];
+    return warship.is_premium ? PREMIUM_SHIP_ICONS[type] : SHIP_ICONS[type];
   }
 
   nationIconPath(player: data.Player): string {
-    return FLAGS[player.ship_info.nation] ?? FlagNone;
+    return FLAGS[player.warship.nation] ?? FlagNone;
   }
 }

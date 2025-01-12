@@ -28,7 +28,7 @@ export class Damage
     return (
       RatingInfo.fromDamage(
         value,
-        player.ship_info.avg_damage,
+        player.warship.average_damage,
         this.config.color.skill.text,
       )?.textColorCode ?? ""
     );

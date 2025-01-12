@@ -12,7 +12,7 @@ export class UsingTierRate extends AbstractStatsColumn<StackedBarGraphParam> {
 
   displayValue(player: data.Player): StackedBarGraphParam {
     const tierRateGroup = this.playerStats(player).overall.using_tier_rate;
-    const ownTierGroup = this.toTierGroup(player.ship_info.tier);
+    const ownTierGroup = this.toTierGroup(player.warship.tier);
     const colors = this.config.color.tier;
 
     const items = DispName.TIER_GROUPS.toArray().map((it) => {

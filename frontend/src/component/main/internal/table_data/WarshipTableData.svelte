@@ -3,9 +3,9 @@
   import type { data } from "wailsjs/go/models";
   import { CssClass } from "src/lib/CssClass";
   import { NumbersURL } from "src/lib/NumbersURL";
-  import type { ShipInfo } from "src/lib/column/model/ShipInfo";
+  import type { Warship } from "src/lib/column/model/Warship";
 
-  export let column: ShipInfo;
+  export let column: Warship;
   export let player: data.Player;
 </script>
 
@@ -26,7 +26,7 @@
 </td>
 
 <td class={CssClass.TD_STR}>
-  <ExternalLink url={NumbersURL.ship(player.ship_info.id)}
+  <ExternalLink url={NumbersURL.ship(player.warship.id)}
     ><div class="uk-text-truncate">
       {column.displayValue(player)}
     </div></ExternalLink

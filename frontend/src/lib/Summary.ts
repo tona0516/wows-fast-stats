@@ -85,7 +85,7 @@ export namespace Summary {
           origin = filtered;
         } else {
           origin = filtered.map((it) =>
-            it.filter((it) => it.ship_info.type === shipType.toString()),
+            it.filter((it) => it.warship.type === shipType.toString()),
           );
         }
 

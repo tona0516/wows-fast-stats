@@ -7,7 +7,7 @@ import type { data } from "wailsjs/go/models";
 
 export interface MaxDamageParam {
   damage: string;
-  shipInfo?: {
+  warship?: {
     url: string;
     name: string;
   };
@@ -40,7 +40,7 @@ export class MaxDamage extends AbstractStatsColumn<MaxDamageParam> {
         const name = `${tierString(maxDamage.ship_tier)} ${maxDamage.ship_name}`;
         return {
           damage: value,
-          shipInfo: { url, name },
+          warship: { url, name },
         };
       }
     }

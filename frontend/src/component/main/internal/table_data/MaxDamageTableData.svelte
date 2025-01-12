@@ -14,10 +14,10 @@
   {param.damage}
 </td>
 
-{#if param.shipInfo}
+{#if param.warship}
   <td class={CssClass.TD_STR}>
-    <ExternalLink url={param.shipInfo.url}
-      ><div class="uk-text-truncate">{param.shipInfo.name}</div></ExternalLink
+    <ExternalLink url={param.warship.url}
+      ><div class="uk-text-truncate">{param.warship.name}</div></ExternalLink
     >
   </td>
 {/if}

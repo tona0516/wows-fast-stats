@@ -4,7 +4,7 @@ import { data } from "wailsjs/go/models";
 
 export const BasicKey = {
   player_info: "player_info",
-  ship_info: "ship_info",
+  warship: "warship",
 };
 export type BasicKey = (typeof BasicKey)[keyof typeof BasicKey];
 
