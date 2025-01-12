@@ -31,7 +31,7 @@ export class PlayerName extends AbstractColumn {
     }
 
     let fragIcon = "";
-    switch (player.player_info.clan.language) {
+    switch (player.player_info.clan.lang) {
       case "ja":
         fragIcon = "jp";
         break;

@@ -241,14 +241,9 @@ func (b *Battle) compose(
 
 		player := data.Player{
 			PlayerInfo: data.PlayerInfo{
-				ID:   accountID,
-				Name: nickname,
-				Clan: data.Clan{
-					Tag:      clan.Tag,
-					ID:       clan.ID,
-					HexColor: clan.HexColor,
-					Language: clan.Lang,
-				},
+				ID:       accountID,
+				Name:     nickname,
+				Clan:     clan,
 				IsHidden: accountInfo[accountID].HiddenProfile,
 			},
 			ShipInfo: data.ShipInfo{

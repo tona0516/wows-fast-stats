@@ -3,10 +3,10 @@ package data
 import "wfs/backend/domain/model"
 
 type PlayerInfo struct {
-	ID       int    `json:"id"`
-	Name     string `json:"name"`
-	Clan     Clan   `json:"clan"`
-	IsHidden bool   `json:"is_hidden"`
+	ID       int        `json:"id"`
+	Name     string     `json:"name"`
+	Clan     model.Clan `json:"clan"`
+	IsHidden bool       `json:"is_hidden"`
 }
 
 type ShipInfo struct {

@@ -256,28 +256,10 @@ export namespace data {
 	        this.avg_damage = source["avg_damage"];
 	    }
 	}
-	export class Clan {
-	    tag: string;
-	    id: number;
-	    hex_color: string;
-	    language: string;
-	
-	    static createFrom(source: any = {}) {
-	        return new Clan(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.tag = source["tag"];
-	        this.id = source["id"];
-	        this.hex_color = source["hex_color"];
-	        this.language = source["language"];
-	    }
-	}
 	export class PlayerInfo {
 	    id: number;
 	    name: string;
-	    clan: Clan;
+	    clan: model.Clan;
 	    is_hidden: boolean;
 	
 	    static createFrom(source: any = {}) {
@@ -288,7 +270,7 @@ export namespace data {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.id = source["id"];
 	        this.name = source["name"];
-	        this.clan = this.convertValues(source["clan"], Clan);
+	        this.clan = this.convertValues(source["clan"], model.Clan);
 	        this.is_hidden = source["is_hidden"];
 	    }
 	
@@ -428,7 +410,6 @@ export namespace data {
 		    return a;
 		}
 	}
-	
 	export class GHLatestRelease {
 	    tag_name: string;
 	    html_url: string;
@@ -883,6 +864,31 @@ export namespace data {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.nickname = source["nickname"];
 	        this.account_id = source["account_id"];
+	    }
+	}
+
+}
+
+export namespace model {
+	
+	export class Clan {
+	    id: number;
+	    tag: string;
+	    description: string;
+	    hex_color: string;
+	    lang: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new Clan(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.id = source["id"];
+	        this.tag = source["tag"];
+	        this.description = source["description"];
+	        this.hex_color = source["hex_color"];
+	        this.lang = source["lang"];
 	    }
 	}
 
