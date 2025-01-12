@@ -1,7 +1,6 @@
 package data
 
 import (
-	"math"
 	"wfs/backend/domain/model"
 )
 
@@ -42,25 +41,29 @@ func (s *Stats) PR(category StatsCategory, pattern StatsPattern) float64 {
 		values, _ := s.statsValues(pattern)
 		battles := values.Battles
 
-		return s.pr(
-			PRFactor{
-				damage: avgDamage(values.DamageDealt, battles),
-				frags:  avgKill(values.Frags, battles),
-				wins:   winRate(values.Wins, battles),
-			},
-			PRFactor{
-				damage: s.warships[s.useShipID].AverageDamage,
-				frags:  s.warships[s.useShipID].AverageFrags,
-				wins:   s.warships[s.useShipID].WinRate,
-			},
-			battles,
+		warship := s.warships[s.useShipID]
+		pr, err := model.NewPR(
+			avgDamage(values.DamageDealt, battles),
+			avgKill(values.Frags, battles),
+			winRate(values.Wins, battles),
+			warship.AverageDamage,
+			warship.AverageFrags,
+			warship.WinRate,
 		)
+		if err != nil {
+			return -1
+		}
 
+		return pr.Value()
 	case StatsCategoryOverall:
 		var (
-			actual     PRFactor
-			expected   PRFactor
-			allBattles uint
+			actualDamage   float64
+			actualFrags    float64
+			actualWins     float64
+			expectedDamage float64
+			expectedFrags  float64
+			expectedWins   float64
+			allBattles     uint
 		)
 
 		for _, ship := range s.allShipsStats {
@@ -72,18 +75,30 @@ func (s *Stats) PR(category StatsCategory, pattern StatsPattern) float64 {
 				continue
 			}
 
-			actual.damage += float64(values.DamageDealt)
-			actual.frags += float64(values.Frags)
-			actual.wins += float64(values.Wins)
+			actualDamage += float64(values.DamageDealt)
+			actualFrags += float64(values.Frags)
+			actualWins += float64(values.Wins)
 
-			expected.damage += warship.AverageDamage * float64(battles)
-			expected.frags += warship.AverageFrags * float64(battles)
-			expected.wins += warship.WinRate / 100 * float64(battles)
+			expectedDamage += warship.AverageDamage * float64(battles)
+			expectedFrags += warship.AverageFrags * float64(battles)
+			expectedWins += warship.WinRate / 100 * float64(battles)
 
 			allBattles += battles
 		}
 
-		return s.pr(actual, expected, allBattles)
+		pr, err := model.NewPR(
+			actualDamage,
+			actualFrags,
+			actualWins,
+			expectedDamage,
+			expectedFrags,
+			expectedWins,
+		)
+		if err != nil {
+			return -1
+		}
+
+		return pr.Value()
 	}
 
 	return -1
@@ -398,34 +413,6 @@ func (s *Stats) statsValuesForm(statsData WGShipsStatsData, pattern StatsPattern
 	}
 
 	return WGShipStatsValues{}
-}
-
-func (s *Stats) pr(
-	actual PRFactor,
-	expected PRFactor,
-	battles uint,
-) float64 {
-	if battles < 1 {
-		return -1
-	}
-
-	ratio := PRFactor{
-		damage: actual.damage / expected.damage,
-		frags:  actual.frags / expected.frags,
-		wins:   actual.wins / expected.wins,
-	}
-
-	if !ratio.Valid() {
-		return -1
-	}
-
-	norm := PRFactor{
-		damage: math.Max(0, (ratio.damage-0.4)/(1-0.4)),
-		frags:  math.Max(0, (ratio.frags-0.1)/(1-0.1)),
-		wins:   math.Max(0, (ratio.wins-0.7)/(1-0.7)),
-	}
-
-	return 700*norm.damage + 300*norm.frags + 150*norm.wins
 }
 
 func avgDamage(damageDealt uint, battles uint) float64 {
