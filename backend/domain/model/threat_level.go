@@ -1,12 +1,15 @@
-package yamibuka
+package model
 
 import (
 	"math"
-	"wfs/backend/data"
-	"wfs/backend/domain/model"
 
 	"github.com/shopspring/decimal"
 )
+
+type ThreatLevel struct {
+	Raw      float64 `json:"raw"`
+	Modified float64 `json:"modified"`
+}
 
 type specialAAShipMap map[int]struct {
 	avg  float64
@@ -98,46 +101,61 @@ func specialShipScores() specialShipScoreMap {
 	}
 }
 
-func CalculateThreatLevel(f ThreatLevelFactor) data.ThreatLevel {
+func CalculateThreatLevel(
+	accountID int,
+	tempArenaInfo TempArenaInfo,
+	warships Warships,
+	shipID int,
+	shipBattles uint,
+	shipDamage float64,
+	shipWinRate float64,
+	shipSurvivedRate float64,
+	shipPlanesKilled float64,
+	overallBattles uint,
+	overallDamage float64,
+	overallWinRate float64,
+	overallKill float64,
+	overallKdRate float64,
+) ThreatLevel {
 	// 戦闘情報の取得
-	isCVMatch, topTier, bottomTier := matchInfo(f.tempArenaInfo, f.warships)
+	isCVMatch, topTier, bottomTier := matchInfo(tempArenaInfo, warships)
 
 	// プレイヤー総合補正指数
 	playerOverallScore := playerOverallScore(
-		f.overallBattles,
-		f.overallDamage,
-		f.overallKill,
-		f.overallKdRate,
-		f.overallWinRate,
+		overallBattles,
+		overallDamage,
+		overallKill,
+		overallKdRate,
+		overallWinRate,
 	)
 
 	// 艦成績補正
 	playerShipScore := playerShipScore(
-		f.warships,
-		f.shipID,
-		f.shipBattles,
-		f.shipDamage,
-		f.shipSurvivedRate,
-		f.shipPlanesKilled,
-		f.shipWinRate,
+		warships,
+		shipID,
+		shipBattles,
+		shipDamage,
+		shipSurvivedRate,
+		shipPlanesKilled,
+		shipWinRate,
 	)
 
 	// 最後に数値の幅を作る係数を設定
 	playerTotalSkillScore := (playerOverallScore + playerShipScore) * 0.5
 
 	// 特に補正が必要だと思う艦級を含めた脅威度補正
-	shipClassScore := shipClassScore(f.warships, f.shipID)
+	shipClassScore := shipClassScore(warships, shipID)
 
 	// AA特化艦補正
-	shipAAIndex := antiAirCoefficient(f.shipID, f.shipPlanesKilled)
+	shipAAIndex := antiAirCoefficient(shipID, shipPlanesKilled)
 
 	// 脅威レベルの算出
 	raw := (playerTotalSkillScore + 1) * shipClassScore * 10000
 
 	// マッチのおける脅威レベルの補正
-	modified := correctBasedOnMatch(raw, f.warships, f.shipID, shipAAIndex, isCVMatch, topTier, bottomTier)
+	modified := correctBasedOnMatch(raw, warships, shipID, shipAAIndex, isCVMatch, topTier, bottomTier)
 
-	return data.ThreatLevel{
+	return ThreatLevel{
 		Raw:      raw,
 		Modified: modified,
 	}
@@ -145,8 +163,8 @@ func CalculateThreatLevel(f ThreatLevelFactor) data.ThreatLevel {
 
 //nolint:nonamedreturns
 func matchInfo(
-	tempArenaInfo model.TempArenaInfo,
-	warships model.Warships,
+	tempArenaInfo TempArenaInfo,
+	warships Warships,
 ) (isCVMatch bool, topTier uint, bottomTier uint) {
 	isCVMatch = false
 	topTier = 1
@@ -158,7 +176,7 @@ func matchInfo(
 			continue
 		}
 
-		if warship.Type == model.ShipTypeCV {
+		if warship.Type == ShipTypeCV {
 			isCVMatch = true
 		}
 
@@ -265,7 +283,7 @@ func playerOverallScore(
 
 //nolint:cyclop
 func playerShipScore(
-	warships model.Warships,
+	warships Warships,
 	shipID int,
 	shipBattles uint,
 	shipAvgDamage float64,
@@ -297,28 +315,28 @@ func playerShipScore(
 	var std shipClassStd
 	//nolint:exhaustive
 	switch shipType {
-	case model.ShipTypeDD:
+	case ShipTypeDD:
 		std = shipClassStd{
 			damage:       shipTier * 4000,
 			aaScore:      0,
 			survivedRate: 0.4,
 			influence:    1.3,
 		}
-	case model.ShipTypeCL:
+	case ShipTypeCL:
 		std = shipClassStd{
 			damage:       shipTier * 6000,
 			aaScore:      0,
 			survivedRate: 0.5,
 			influence:    1,
 		}
-	case model.ShipTypeBB:
+	case ShipTypeBB:
 		std = shipClassStd{
 			damage:       shipTier * 7200,
 			aaScore:      0,
 			survivedRate: 0.45,
 			influence:    1.1,
 		}
-	case model.ShipTypeCV:
+	case ShipTypeCV:
 		std = shipClassStd{
 			damage:       shipTier * 8000,
 			aaScore:      (shipTier - 2) * 3.5,
@@ -349,7 +367,7 @@ func playerShipScore(
 
 	// 空母の場合、制空の補正を考慮
 	var shipAAScore float64
-	if shipType == model.ShipTypeCV {
+	if shipType == ShipTypeCV {
 		shipAAScore = shipAvgPlanesKilled / std.aaScore
 		if shipAAScore > 1 {
 			shipAAScore = floorU4((shipAAScore - 1) / 2)
@@ -363,7 +381,7 @@ func playerShipScore(
 	winRate := shipWinRate / 100 // %で与えられるため0~100に変換する
 	shipWinRateScore := limitedValue(winRate, 0.6, 0.4) - 0.5
 	// 空母の場合、勝率の影響を3割増加
-	if shipType == model.ShipTypeCV {
+	if shipType == ShipTypeCV {
 		shipWinRateScore *= 1.3
 	}
 	shipWinRateScore = floorU4(shipWinRateScore * std.influence * 1.5)
@@ -391,7 +409,7 @@ func antiAirCoefficient(
 }
 
 func shipClassScore(
-	warships model.Warships,
+	warships Warships,
 	shipID int,
 ) float64 {
 	result := 1.0
@@ -420,7 +438,7 @@ func shipClassScore(
 
 func correctBasedOnMatch(
 	raw float64,
-	warships model.Warships,
+	warships Warships,
 	shipID int,
 	shipAAIndex float64,
 	isCVMatch bool,

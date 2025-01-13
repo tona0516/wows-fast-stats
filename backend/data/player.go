@@ -32,21 +32,21 @@ type ShipStats struct {
 }
 
 type OverallStats struct {
-	Battles           uint          `json:"battles"`
-	Damage            float64       `json:"damage"`
-	MaxDamage         MaxDamage     `json:"max_damage"`
-	WinRate           float64       `json:"win_rate"`
-	WinSurvivedRate   float64       `json:"win_survived_rate"`
-	LoseSurvivedRate  float64       `json:"lose_survived_rate"`
-	KdRate            float64       `json:"kd_rate"`
-	Kill              float64       `json:"kill"`
-	Exp               float64       `json:"exp"`
-	PR                float64       `json:"pr"`
-	ThreatLevel       ThreatLevel   `json:"threat_level"`
-	AvgTier           float64       `json:"avg_tier"`
-	UsingShipTypeRate ShipTypeGroup `json:"using_ship_type_rate"`
-	UsingTierRate     TierGroup     `json:"using_tier_rate"`
-	PlatoonRate       float64       `json:"platoon_rate"`
+	Battles           uint              `json:"battles"`
+	Damage            float64           `json:"damage"`
+	MaxDamage         MaxDamage         `json:"max_damage"`
+	WinRate           float64           `json:"win_rate"`
+	WinSurvivedRate   float64           `json:"win_survived_rate"`
+	LoseSurvivedRate  float64           `json:"lose_survived_rate"`
+	KdRate            float64           `json:"kd_rate"`
+	Kill              float64           `json:"kill"`
+	Exp               float64           `json:"exp"`
+	PR                float64           `json:"pr"`
+	ThreatLevel       model.ThreatLevel `json:"threat_level"`
+	AvgTier           float64           `json:"avg_tier"`
+	UsingShipTypeRate ShipTypeGroup     `json:"using_ship_type_rate"`
+	UsingTierRate     TierGroup         `json:"using_tier_rate"`
+	PlatoonRate       float64           `json:"platoon_rate"`
 }
 
 type Player struct {

@@ -9,7 +9,6 @@ import (
 	"wfs/backend/domain/model"
 	domainRepository "wfs/backend/domain/repository"
 	"wfs/backend/repository"
-	"wfs/backend/yamibuka"
 )
 
 type Battle struct {
@@ -292,7 +291,7 @@ func playerStats(
 	tempArenaInfo model.TempArenaInfo,
 	warships model.Warships,
 ) data.PlayerStats {
-	threatLevel := yamibuka.CalculateThreatLevel(yamibuka.NewThreatLevelFactor(
+	threatLevel := model.CalculateThreatLevel(
 		accountID,
 		tempArenaInfo,
 		warships,
@@ -307,7 +306,7 @@ func playerStats(
 		stats.WinRate(data.StatsCategoryOverall, statsPattern),
 		stats.AvgKill(data.StatsCategoryOverall, statsPattern),
 		stats.KdRate(data.StatsCategoryOverall, statsPattern),
-	))
+	)
 
 	return data.PlayerStats{
 		ShipStats: data.ShipStats{
