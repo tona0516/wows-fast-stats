@@ -6,6 +6,7 @@ import (
 	"wfs/backend/apperr"
 	"wfs/backend/data"
 	"wfs/backend/domain/model"
+	"wfs/backend/infra/response"
 
 	"github.com/morikuni/failure"
 )
@@ -36,7 +37,7 @@ func (f *WarshipFetcher) Fetch() (model.Warships, error) {
 
 	encycShipsChan := make(chan data.Result[model.Warships])
 	unregisteredChan := make(chan data.Result[model.Warships])
-	expectedStatsChan := make(chan data.Result[data.ExpectedStats])
+	expectedStatsChan := make(chan data.Result[response.ExpectedStats])
 
 	go f.encycShips(encycShipsChan)
 	go f.unregisteredShips(unregisteredChan)
@@ -100,12 +101,12 @@ func (f *WarshipFetcher) encycShips(channel chan data.Result[model.Warships]) {
 
 	var mu sync.Mutex
 	fetch := func(page int) (int, error) {
-		res, pageTotal, err := f.wargaming.EncycShips(page)
+		res, pageTotal, err := f.wargaming.encycShips(page)
 		if err != nil {
 			return 0, err
 		}
 
-		for shipID, warship := range res {
+		for shipID, warship := range res.Data {
 			mu.Lock()
 			warships[shipID] = model.Warship{
 				ID:        shipID,
@@ -142,7 +143,7 @@ func (f *WarshipFetcher) encycShips(channel chan data.Result[model.Warships]) {
 }
 
 func (f *WarshipFetcher) unregisteredShips(channel chan data.Result[model.Warships]) {
-	warships, err := f.unregistered.Warship()
+	warships, err := f.unregistered.warship()
 
 	channel <- data.Result[model.Warships]{
 		Value: warships,
@@ -150,10 +151,10 @@ func (f *WarshipFetcher) unregisteredShips(channel chan data.Result[model.Warshi
 	}
 }
 
-func (f *WarshipFetcher) expectedStats(channel chan data.Result[data.ExpectedStats]) {
-	es, err := f.numbers.ExpectedStats()
+func (f *WarshipFetcher) expectedStats(channel chan data.Result[response.ExpectedStats]) {
+	es, err := f.numbers.expectedStats()
 
-	channel <- data.Result[data.ExpectedStats]{
+	channel <- data.Result[response.ExpectedStats]{
 		Value: es,
 		Error: err,
 	}

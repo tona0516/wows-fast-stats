@@ -1,6 +1,9 @@
 package repository
 
-import "wfs/backend/data"
+import (
+	"wfs/backend/data"
+	"wfs/backend/infra/response"
+)
 
 //go:generate mockgen -source=$GOFILE -destination ../mock/$GOPACKAGE/$GOFILE -package $GOPACKAGE
 type StorageInterface interface {
@@ -14,8 +17,8 @@ type StorageInterface interface {
 	IsExistAlertPlayers() bool
 	AlertPlayers() ([]data.AlertPlayer, error)
 	WriteAlertPlayers(players []data.AlertPlayer) error
-	ExpectedStats() (data.ExpectedStats, error)
-	WriteExpectedStats(expectedStats data.ExpectedStats) error
+	ExpectedStats() (response.ExpectedStats, error)
+	WriteExpectedStats(expectedStats response.ExpectedStats) error
 	OwnIGN() (string, error)
 	WriteOwnIGN(ign string) error
 }

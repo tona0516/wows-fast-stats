@@ -2,13 +2,19 @@ package response
 
 import (
 	"reflect"
-	"wfs/backend/data"
 )
 
-type WGClansInfo struct {
-	WGResponseCommon[data.WGClansInfo]
+type WGClansInfoResponse struct {
+	WGResponseCommon[WGClansInfo]
 }
 
-func (w WGClansInfo) Field() string {
-	return fieldQuery(reflect.TypeOf(&data.WGClansInfoData{}).Elem())
+func (w WGClansInfoResponse) Field() string {
+	return fieldQuery(reflect.TypeOf(&WGClansInfoData{}).Elem())
+}
+
+type WGClansInfo map[int]WGClansInfoData
+
+type WGClansInfoData struct {
+	Tag         string `json:"tag"`
+	Description string `json:"description"`
 }

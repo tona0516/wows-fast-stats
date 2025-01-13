@@ -67,7 +67,7 @@ func (f *ClanFetcher) Fetch(accountIDs []int) (model.Clans, error) {
 func (f *ClanFetcher) clansAccountInfo(accountIDs []int) (map[int]int, error) {
 	result := make(map[int]int, 0)
 
-	clansAccountInfo, err := f.wargaming.ClansAccountInfo(accountIDs)
+	clansAccountInfo, err := f.wargaming.clansAccountInfo(accountIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -90,7 +90,7 @@ func (f *ClanFetcher) clanInfo(clanIDMap map[int]int) (model.Clans, error) {
 		clanIDs = append(clanIDs, clanID)
 	}
 
-	clansInfo, err := f.wargaming.ClansInfo(clanIDs)
+	clansInfo, err := f.wargaming.clansInfo(clanIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -116,7 +116,7 @@ func (f *ClanFetcher) hexColor(tags []string) (map[string]string, error) {
 
 	var mu sync.Mutex
 	err := doParallel(tags, func(tag string) error {
-		autocomplete, err := f.unofficialWargaming.ClansAutoComplete(tag)
+		autocomplete, err := f.unofficialWargaming.clansAutoComplete(tag)
 		if err != nil {
 			return err
 		}

@@ -5,7 +5,7 @@ import (
 	"net/http/httptest"
 	"testing"
 	"wfs/backend/apperr"
-	"wfs/backend/data"
+	"wfs/backend/infra/response"
 
 	"github.com/morikuni/failure"
 	"github.com/stretchr/testify/assert"
@@ -17,7 +17,7 @@ func TestUnofficialWargaming_AccountListForSearch(t *testing.T) {
 	t.Run("正常系", func(t *testing.T) {
 		t.Parallel()
 
-		expected := data.UWGClansAutocomplete{
+		expected := response.UWGClansAutocomplete{
 			SearchAutocompleteResult: []struct {
 				HexColor string `json:"hex_color"`
 				Tag      string `json:"tag"`
@@ -35,7 +35,7 @@ func TestUnofficialWargaming_AccountListForSearch(t *testing.T) {
 			URL: server.URL,
 		})
 
-		result, err := uwargaming.ClansAutoComplete("TEST")
+		result, err := uwargaming.clansAutoComplete("TEST")
 
 		assert.NoError(t, err)
 		assert.Equal(t, expected, result)
@@ -64,7 +64,7 @@ func TestUnofficialWargaming_AccountListForSearch(t *testing.T) {
 			URL: server.URL,
 		})
 
-		_, err := uwargaming.ClansAutoComplete("")
+		_, err := uwargaming.clansAutoComplete("")
 
 		assert.True(t, failure.Is(err, apperr.UWGAPIError))
 	})

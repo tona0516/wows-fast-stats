@@ -54,20 +54,6 @@ export namespace data {
 	        this.cv = source["cv"];
 	    }
 	}
-	export class ThreatLevel {
-	    raw: number;
-	    modified: number;
-	
-	    static createFrom(source: any = {}) {
-	        return new ThreatLevel(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.raw = source["raw"];
-	        this.modified = source["modified"];
-	    }
-	}
 	export class OverallStats {
 	    battles: number;
 	    damage: number;
@@ -79,7 +65,7 @@ export namespace data {
 	    kill: number;
 	    exp: number;
 	    pr: number;
-	    threat_level: ThreatLevel;
+	    threat_level: model.ThreatLevel;
 	    avg_tier: number;
 	    using_ship_type_rate: ShipTypeGroup;
 	    using_tier_rate: TierGroup;
@@ -101,7 +87,7 @@ export namespace data {
 	        this.kill = source["kill"];
 	        this.exp = source["exp"];
 	        this.pr = source["pr"];
-	        this.threat_level = this.convertValues(source["threat_level"], ThreatLevel);
+	        this.threat_level = this.convertValues(source["threat_level"], model.ThreatLevel);
 	        this.avg_tier = source["avg_tier"];
 	        this.using_ship_type_rate = this.convertValues(source["using_ship_type_rate"], ShipTypeGroup);
 	        this.using_tier_rate = this.convertValues(source["using_tier_rate"], TierGroup);
@@ -402,7 +388,6 @@ export namespace data {
 	        this.updatable = source["updatable"];
 	    }
 	}
-	
 	
 	
 	
@@ -864,6 +849,20 @@ export namespace model {
 	        this.description = source["description"];
 	        this.hex_color = source["hex_color"];
 	        this.lang = source["lang"];
+	    }
+	}
+	export class ThreatLevel {
+	    raw: number;
+	    modified: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new ThreatLevel(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.raw = source["raw"];
+	        this.modified = source["modified"];
 	    }
 	}
 	export class Warship {

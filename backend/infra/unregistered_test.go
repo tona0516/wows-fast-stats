@@ -23,7 +23,7 @@ func TestUnregistered_Warship(t *testing.T) {
 
 	// テスト
 	unregistered := NewUnregistered()
-	actual, err := unregistered.Warship()
+	actual, err := unregistered.warship()
 
 	// アサーション
 	expected := model.Warships{

@@ -3,7 +3,7 @@ package infra
 import (
 	"testing"
 	"wfs/backend/apperr"
-	"wfs/backend/data"
+	"wfs/backend/infra/response"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -26,11 +26,11 @@ func TestNumbers_ExpectedStats(t *testing.T) {
 
 		// テスト
 		numbers := NewNumbers(RequestConfig{URL: server.URL})
-		actual, err := numbers.ExpectedStats()
+		actual, err := numbers.expectedStats()
 
 		// アサーション
 		assert.NoError(t, err)
-		expected := data.ExpectedStats{
+		expected := response.ExpectedStats{
 			1234: {
 				AverageDamageDealt: 50000,
 				AverageFrags:       1.2,
@@ -56,7 +56,7 @@ func TestNumbers_ExpectedStats(t *testing.T) {
 
 		// テスト
 		numbers := NewNumbers(RequestConfig{URL: server.URL})
-		_, err := numbers.ExpectedStats()
+		_, err := numbers.expectedStats()
 
 		// アサーション
 		assert.EqualError(t, apperr.Unwrap(err), apperr.NumbersAPIError.ErrorCode())

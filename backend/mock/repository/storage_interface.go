@@ -12,6 +12,7 @@ package repository
 import (
 	reflect "reflect"
 	data "wfs/backend/data"
+	response "wfs/backend/infra/response"
 
 	gomock "go.uber.org/mock/gomock"
 )
@@ -71,10 +72,10 @@ func (mr *MockStorageInterfaceMockRecorder) DataVersion() *gomock.Call {
 }
 
 // ExpectedStats mocks base method.
-func (m *MockStorageInterface) ExpectedStats() (data.ExpectedStats, error) {
+func (m *MockStorageInterface) ExpectedStats() (response.ExpectedStats, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ExpectedStats")
-	ret0, _ := ret[0].(data.ExpectedStats)
+	ret0, _ := ret[0].(response.ExpectedStats)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -187,7 +188,7 @@ func (mr *MockStorageInterfaceMockRecorder) WriteDataVersion(version any) *gomoc
 }
 
 // WriteExpectedStats mocks base method.
-func (m *MockStorageInterface) WriteExpectedStats(expectedStats data.ExpectedStats) error {
+func (m *MockStorageInterface) WriteExpectedStats(expectedStats response.ExpectedStats) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "WriteExpectedStats", expectedStats)
 	ret0, _ := ret[0].(error)

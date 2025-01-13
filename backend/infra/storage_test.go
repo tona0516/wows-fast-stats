@@ -5,6 +5,7 @@ import (
 	"path"
 	"testing"
 	"wfs/backend/data"
+	"wfs/backend/infra/response"
 
 	"github.com/dgraph-io/badger/v4"
 	"github.com/stretchr/testify/assert"
@@ -180,13 +181,13 @@ func TestStorage_ExpectedStats(t *testing.T) {
 	db := openDB(t)
 	storage := NewStorage(db)
 
-	expected := data.ExpectedStats{
-		1: data.ExpectedValues{
+	expected := response.ExpectedStats{
+		1: response.ExpectedValues{
 			AverageDamageDealt: 123,
 			AverageFrags:       456,
 			WinRate:            789,
 		},
-		10: data.ExpectedValues{
+		10: response.ExpectedValues{
 			AverageDamageDealt: 1,
 			AverageFrags:       2,
 			WinRate:            3,

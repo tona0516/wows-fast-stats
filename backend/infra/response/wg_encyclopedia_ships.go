@@ -2,11 +2,10 @@ package response
 
 import (
 	"reflect"
-	"wfs/backend/data"
 )
 
 type WGEncycShips struct {
-	WGResponseCommon[data.WGEncycShips]
+	WGResponseCommon[map[int]WGEncycShipsData]
 	Meta struct {
 		PageTotal int `json:"page_total"`
 		Page      int `json:"page"`
@@ -14,5 +13,13 @@ type WGEncycShips struct {
 }
 
 func (w WGEncycShips) Field() string {
-	return fieldQuery(reflect.TypeOf(&data.WGEncycShipsData{}).Elem())
+	return fieldQuery(reflect.TypeOf(&WGEncycShipsData{}).Elem())
+}
+
+type WGEncycShipsData struct {
+	Tier      uint   `json:"tier"`
+	Type      string `json:"type"`
+	Name      string `json:"name"`
+	Nation    string `json:"nation"`
+	IsPremium bool   `json:"is_premium"`
 }

@@ -27,7 +27,7 @@ func NewUnregistered() *Unregistered {
 	return &Unregistered{}
 }
 
-func (u *Unregistered) Warship() (model.Warships, error) {
+func (u *Unregistered) warship() (model.Warships, error) {
 	var ships []unregisteredShip
 	result := make(model.Warships)
 

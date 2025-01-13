@@ -84,42 +84,42 @@ func (w *Wargaming) AccountListForSearch(prefix string) (data.WGAccountList, err
 	return res.Data, err
 }
 
-func (w *Wargaming) ClansAccountInfo(accountIDs []int) (data.WGClansAccountInfo, error) {
+func (w *Wargaming) clansAccountInfo(accountIDs []int) (response.WGClansAccountInfo, error) {
 	strAccountIDs := make([]string, len(accountIDs))
 	for i, v := range accountIDs {
 		strAccountIDs[i] = strconv.Itoa(v)
 	}
 
-	res, err := request[response.WGClansAccountInfo](
+	res, err := request[response.WGClansAccountInfoResponse](
 		w,
 		"/wows/clans/accountinfo/",
 		map[string]string{
 			"application_id": w.appID,
 			"account_id":     strings.Join(strAccountIDs, ","),
-			"fields":         response.WGClansAccountInfo{}.Field(),
+			"fields":         response.WGClansAccountInfoResponse{}.Field(),
 		},
 	)
 
 	return res.Data, err
 }
 
-func (w *Wargaming) ClansInfo(clanIDs []int) (data.WGClansInfo, error) {
+func (w *Wargaming) clansInfo(clanIDs []int) (response.WGClansInfo, error) {
 	strClanIDs := make([]string, len(clanIDs))
 	for i, v := range clanIDs {
 		strClanIDs[i] = strconv.Itoa(v)
 	}
 
 	if len(strClanIDs) == 0 {
-		return data.WGClansInfo{}, nil
+		return response.WGClansInfo{}, nil
 	}
 
-	res, err := request[response.WGClansInfo](
+	res, err := request[response.WGClansInfoResponse](
 		w,
 		"/wows/clans/info/",
 		map[string]string{
 			"application_id": w.appID,
 			"clan_id":        strings.Join(strClanIDs, ","),
-			"fields":         response.WGClansInfo{}.Field(),
+			"fields":         response.WGClansInfoResponse{}.Field(),
 		},
 	)
 
@@ -146,7 +146,7 @@ func (w *Wargaming) ShipsStats(accountID int) (data.WGShipsStats, error) {
 	return res.Data, err
 }
 
-func (w *Wargaming) EncycShips(pageNo int) (data.WGEncycShips, int, error) {
+func (w *Wargaming) encycShips(pageNo int) (response.WGEncycShips, int, error) {
 	res, err := request[response.WGEncycShips](
 		w,
 		"/wows/encyclopedia/ships/",
@@ -158,7 +158,7 @@ func (w *Wargaming) EncycShips(pageNo int) (data.WGEncycShips, int, error) {
 		},
 	)
 
-	return res.Data, res.Meta.PageTotal, err
+	return res, res.Meta.PageTotal, err
 }
 
 func (w *Wargaming) BattleArenas() (data.WGBattleArenas, error) {

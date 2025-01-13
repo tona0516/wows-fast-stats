@@ -1,4 +1,4 @@
-package data
+package response
 
 type UWGClansAutocomplete struct {
 	SearchAutocompleteResult []struct {

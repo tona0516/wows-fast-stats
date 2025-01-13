@@ -177,45 +177,58 @@ func TestWargaming_AccountListForSearch(t *testing.T) {
 func TestWargaming_ClansAccountInfo(t *testing.T) {
 	t.Parallel()
 
-	server := simpleMockServer(200, response.WGClansAccountInfo{
-		WGResponseCommon: response.WGResponseCommon[data.WGClansAccountInfo]{
+	expected := response.WGClansAccountInfo{
+		114514: response.WGClansAccountInfoData{ClanID: 1919},
+	}
+	res := response.WGClansAccountInfoResponse{
+		WGResponseCommon: response.WGResponseCommon[response.WGClansAccountInfo]{
 			Status: "",
 			Error:  response.WGError{},
-			Data:   map[int]data.WGClansAccountInfoData{},
+			Data:   expected,
 		},
-	})
+	}
+
+	server := simpleMockServer(200, res)
 	defer server.Close()
 
 	wargaming := NewWargaming(RequestConfig{
 		URL: server.URL,
 	}, ratelimit.New(10), "")
 
-	result, err := wargaming.ClansAccountInfo([]int{123, 456})
+	result, err := wargaming.clansAccountInfo([]int{123, 456})
 
 	assert.NoError(t, err)
-	assert.Equal(t, data.WGClansAccountInfo{}, result)
+	assert.Equal(t, expected, result)
 }
 
 func TestWargaming_ClansInfo(t *testing.T) {
 	t.Parallel()
 
-	server := simpleMockServer(200, response.WGClansInfo{
-		WGResponseCommon: response.WGResponseCommon[data.WGClansInfo]{
+	expected := response.WGClansInfo{
+		114: {
+			Tag:         "514",
+			Description: "1919",
+		},
+	}
+	res := response.WGClansInfoResponse{
+		WGResponseCommon: response.WGResponseCommon[response.WGClansInfo]{
 			Status: "",
 			Error:  response.WGError{},
-			Data:   map[int]data.WGClansInfoData{},
+			Data:   expected,
 		},
-	})
+	}
+
+	server := simpleMockServer(200, res)
 	defer server.Close()
 
 	wargaming := NewWargaming(RequestConfig{
 		URL: server.URL,
 	}, ratelimit.New(10), "")
 
-	result, err := wargaming.ClansInfo([]int{123, 456})
+	result, err := wargaming.clansInfo([]int{123, 456})
 
 	assert.NoError(t, err)
-	assert.Equal(t, data.WGClansInfo{}, result)
+	assert.Equal(t, expected, result)
 }
 
 func TestWargaming_ShipsStats(t *testing.T) {
@@ -244,27 +257,29 @@ func TestWargaming_EncycShips(t *testing.T) {
 	t.Parallel()
 
 	expectedPageTotal := 5
-	server := simpleMockServer(200, response.WGEncycShips{
-		WGResponseCommon: response.WGResponseCommon[data.WGEncycShips]{
+	expected := response.WGEncycShips{
+		WGResponseCommon: response.WGResponseCommon[map[int]response.WGEncycShipsData]{
 			Status: "",
 			Error:  response.WGError{},
-			Data:   map[int]data.WGEncycShipsData{},
+			Data:   map[int]response.WGEncycShipsData{},
 		},
 		Meta: struct {
 			PageTotal int `json:"page_total"`
 			Page      int `json:"page"`
 		}{PageTotal: expectedPageTotal},
-	})
+	}
+
+	server := simpleMockServer(200, expected)
 	defer server.Close()
 
 	wargaming := NewWargaming(RequestConfig{
 		URL: server.URL,
 	}, ratelimit.New(10), "")
 
-	result, pageTotal, err := wargaming.EncycShips(1)
+	result, pageTotal, err := wargaming.encycShips(1)
 
 	assert.NoError(t, err)
-	assert.Equal(t, data.WGEncycShips{}, result)
+	assert.Equal(t, expected, result)
 	assert.Equal(t, expectedPageTotal, pageTotal)
 }
 

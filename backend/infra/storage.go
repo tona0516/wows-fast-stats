@@ -5,6 +5,7 @@ import (
 	"encoding/gob"
 	"errors"
 	"wfs/backend/data"
+	"wfs/backend/infra/response"
 
 	"github.com/dgraph-io/badger/v4"
 	"github.com/morikuni/failure"
@@ -93,11 +94,11 @@ func (s *Storage) WriteAlertPlayers(players []data.AlertPlayer) error {
 	return write(s.db, alertPlayersKey, players)
 }
 
-func (s *Storage) ExpectedStats() (data.ExpectedStats, error) {
-	return read[data.ExpectedStats](s.db, expectedStatsKey)
+func (s *Storage) ExpectedStats() (response.ExpectedStats, error) {
+	return read[response.ExpectedStats](s.db, expectedStatsKey)
 }
 
-func (s *Storage) WriteExpectedStats(expectedStats data.ExpectedStats) error {
+func (s *Storage) WriteExpectedStats(expectedStats response.ExpectedStats) error {
 	return write(s.db, expectedStatsKey, expectedStats)
 }
 

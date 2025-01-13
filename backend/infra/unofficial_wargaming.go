@@ -3,7 +3,7 @@ package infra
 import (
 	"encoding/json"
 	"wfs/backend/apperr"
-	"wfs/backend/data"
+	"wfs/backend/infra/response"
 	"wfs/backend/infra/webapi"
 
 	"github.com/cenkalti/backoff/v4"
@@ -18,10 +18,10 @@ func NewUnofficialWargaming(config RequestConfig) *UnofficialWargaming {
 	return &UnofficialWargaming{config: config}
 }
 
-func (w *UnofficialWargaming) ClansAutoComplete(search string) (data.UWGClansAutocomplete, error) {
+func (w *UnofficialWargaming) clansAutoComplete(search string) (response.UWGClansAutocomplete, error) {
 	b := backoff.WithMaxRetries(backoff.NewExponentialBackOff(), w.config.Retry)
-	operation := func() (data.UWGClansAutocomplete, error) {
-		var result data.UWGClansAutocomplete
+	operation := func() (response.UWGClansAutocomplete, error) {
+		var result response.UWGClansAutocomplete
 
 		_, body, err := webapi.NewClient(w.config.URL,
 			webapi.WithPath("/api/search/autocomplete/"),

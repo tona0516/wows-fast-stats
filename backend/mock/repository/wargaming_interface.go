@@ -115,52 +115,6 @@ func (mr *MockWargamingInterfaceMockRecorder) BattleTypes() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BattleTypes", reflect.TypeOf((*MockWargamingInterface)(nil).BattleTypes))
 }
 
-// ClansAccountInfo mocks base method.
-func (m *MockWargamingInterface) ClansAccountInfo(accountIDs []int) (data.WGClansAccountInfo, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ClansAccountInfo", accountIDs)
-	ret0, _ := ret[0].(data.WGClansAccountInfo)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// ClansAccountInfo indicates an expected call of ClansAccountInfo.
-func (mr *MockWargamingInterfaceMockRecorder) ClansAccountInfo(accountIDs any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ClansAccountInfo", reflect.TypeOf((*MockWargamingInterface)(nil).ClansAccountInfo), accountIDs)
-}
-
-// ClansInfo mocks base method.
-func (m *MockWargamingInterface) ClansInfo(clanIDs []int) (data.WGClansInfo, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ClansInfo", clanIDs)
-	ret0, _ := ret[0].(data.WGClansInfo)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// ClansInfo indicates an expected call of ClansInfo.
-func (mr *MockWargamingInterfaceMockRecorder) ClansInfo(clanIDs any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ClansInfo", reflect.TypeOf((*MockWargamingInterface)(nil).ClansInfo), clanIDs)
-}
-
-// EncycShips mocks base method.
-func (m *MockWargamingInterface) EncycShips(pageNo int) (data.WGEncycShips, int, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "EncycShips", pageNo)
-	ret0, _ := ret[0].(data.WGEncycShips)
-	ret1, _ := ret[1].(int)
-	ret2, _ := ret[2].(error)
-	return ret0, ret1, ret2
-}
-
-// EncycShips indicates an expected call of EncycShips.
-func (mr *MockWargamingInterfaceMockRecorder) EncycShips(pageNo any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EncycShips", reflect.TypeOf((*MockWargamingInterface)(nil).EncycShips), pageNo)
-}
-
 // ShipsStats mocks base method.
 func (m *MockWargamingInterface) ShipsStats(accountID int) (data.WGShipsStats, error) {
 	m.ctrl.T.Helper()
