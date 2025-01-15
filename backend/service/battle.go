@@ -11,19 +11,16 @@ import (
 )
 
 type Battle struct {
-	wargaming      repository.WargamingInterface
-	localFile      repository.LocalFileInterface
-	warshipFetcher domainRepository.WarshipFetcherInterface
-	clanFetcher    domainRepository.ClanFetcherInterface
-	taiFetcher     domainRepository.TAIFetcherInterface
-	rawStatFetcher domainRepository.RawStatFetcherInterface
-	storage        repository.StorageInterface
-	logger         repository.LoggerInterface
-	eventsEmitFunc eventEmitFunc
-
-	isFirstBattle bool
-	battleArenas  data.WGBattleArenas
-	battleTypes   data.WGBattleTypes
+	wargaming         repository.WargamingInterface
+	localFile         repository.LocalFileInterface
+	warshipFetcher    domainRepository.WarshipFetcherInterface
+	clanFetcher       domainRepository.ClanFetcherInterface
+	taiFetcher        domainRepository.TAIFetcherInterface
+	rawStatFetcher    domainRepository.RawStatFetcherInterface
+	battleMeraFetcher domainRepository.BattleMetaFetcherInterface
+	storage           repository.StorageInterface
+	logger            repository.LoggerInterface
+	eventsEmitFunc    eventEmitFunc
 }
 
 func NewBattle(
@@ -33,34 +30,27 @@ func NewBattle(
 	clanFetcher domainRepository.ClanFetcherInterface,
 	taiFetcher domainRepository.TAIFetcherInterface,
 	rawStatFetcher domainRepository.RawStatFetcherInterface,
+	battleMeraFetcher domainRepository.BattleMetaFetcherInterface,
 	storage repository.StorageInterface,
 	logger repository.LoggerInterface,
 	eventsEmitFunc eventEmitFunc,
 ) *Battle {
 	return &Battle{
-		wargaming:      wargaming,
-		localFile:      localFile,
-		warshipFetcher: warshipFetcher,
-		clanFetcher:    clanFetcher,
-		taiFetcher:     taiFetcher,
-		rawStatFetcher: rawStatFetcher,
-		storage:        storage,
-		logger:         logger,
-		eventsEmitFunc: eventsEmitFunc,
-		isFirstBattle:  true,
+		wargaming:         wargaming,
+		localFile:         localFile,
+		warshipFetcher:    warshipFetcher,
+		clanFetcher:       clanFetcher,
+		taiFetcher:        taiFetcher,
+		rawStatFetcher:    rawStatFetcher,
+		battleMeraFetcher: battleMeraFetcher,
+		storage:           storage,
+		logger:            logger,
+		eventsEmitFunc:    eventsEmitFunc,
 	}
 }
 
 func (b *Battle) Get(appCtx context.Context, userConfig data.UserConfigV2) (data.Battle, error) {
 	var result data.Battle
-
-	// Fetch on-memory stored data
-	battleArenasResult := make(chan data.Result[data.WGBattleArenas])
-	battleTypesResult := make(chan data.Result[data.WGBattleTypes])
-	if b.isFirstBattle {
-		go b.fetchBattleArenas(battleArenasResult)
-		go b.fetchBattleTypes(battleTypesResult)
-	}
 
 	// Get tempArenaInfo.json
 	tempArenaInfo, err := b.getTempArenaInfo(userConfig)
@@ -74,6 +64,9 @@ func (b *Battle) Get(appCtx context.Context, userConfig data.UserConfigV2) (data
 
 	warshipResult := make(chan data.Result[model.Warships])
 	go b.fetchWarships(warshipResult)
+
+	battleMetaResult := make(chan data.Result[model.BattleMeta])
+	go b.fetchBattleMeta(battleMetaResult)
 
 	// Get Account ID list
 	accountList, err := b.wargaming.AccountList(tempArenaInfo.AccountNames())
@@ -89,19 +82,11 @@ func (b *Battle) Get(appCtx context.Context, userConfig data.UserConfigV2) (data
 	go b.fetchClans(accountIDs, clanResult)
 
 	errs := make([]error, 0)
-
-	if b.isFirstBattle {
-		battleArenas := <-battleArenasResult
-		b.battleArenas = battleArenas.Value
-		errs = append(errs, battleArenas.Error)
-
-		battleTypes := <-battleTypesResult
-		b.battleTypes = battleTypes.Value
-		errs = append(errs, battleTypes.Error)
-	}
-
 	warship := <-warshipResult
 	errs = append(errs, warship.Error)
+
+	battleMeta := <-battleMetaResult
+	errs = append(errs, battleMeta.Error)
 
 	clan := <-clanResult
 	errs = append(errs, clan.Error)
@@ -121,11 +106,8 @@ func (b *Battle) Get(appCtx context.Context, userConfig data.UserConfigV2) (data
 		warship.Value,
 		clan.Value,
 		rawStats.Value,
-		b.battleArenas,
-		b.battleTypes,
+		battleMeta.Value,
 	)
-
-	b.isFirstBattle = false
 
 	return result, nil
 }
@@ -161,19 +143,14 @@ func (b *Battle) fetchClans(accountIDs []int, channel chan data.Result[model.Cla
 	}
 }
 
-func (b *Battle) fetchBattleArenas(channel chan data.Result[data.WGBattleArenas]) {
-	battleArenas, err := b.wargaming.BattleArenas()
-	channel <- data.Result[data.WGBattleArenas]{Value: battleArenas, Error: err}
-}
-
-func (b *Battle) fetchBattleTypes(channel chan data.Result[data.WGBattleTypes]) {
-	battleTypes, err := b.wargaming.BattleTypes()
-	channel <- data.Result[data.WGBattleTypes]{Value: battleTypes, Error: err}
-}
-
 func (b *Battle) fetchRawStats(accountIDs []int, channel chan data.Result[model.RawStats]) {
 	rawStats, err := b.rawStatFetcher.Fetch(accountIDs)
 	channel <- data.Result[model.RawStats]{Value: rawStats, Error: err}
+}
+
+func (b *Battle) fetchBattleMeta(channel chan data.Result[model.BattleMeta]) {
+	battleMeta, err := b.battleMeraFetcher.Fetch()
+	channel <- data.Result[model.BattleMeta]{Value: battleMeta, Error: err}
 }
 
 func (b *Battle) compose(
@@ -182,8 +159,7 @@ func (b *Battle) compose(
 	warships model.Warships,
 	clans model.Clans,
 	rawStats model.RawStats,
-	battleArenas data.WGBattleArenas,
-	battleTypes data.WGBattleTypes,
+	battleMeta model.BattleMeta,
 ) data.Battle {
 	friends := make(data.Players, 0)
 	enemies := make(data.Players, 0)
@@ -245,8 +221,8 @@ func (b *Battle) compose(
 	battle := data.Battle{
 		Meta: data.Meta{
 			Unixtime: tempArenaInfo.Unixtime(),
-			Arena:    battleArenas[tempArenaInfo.MapID].Name,
-			Type:     strings.ReplaceAll(battleTypes[strings.ToUpper(tempArenaInfo.MatchGroup)].Name, " ", ""),
+			Arena:    battleMeta.Arena(tempArenaInfo.MapID),
+			Type:     strings.ReplaceAll(battleMeta.Type(tempArenaInfo.MatchGroup), " ", ""),
 			OwnShip:  ownShip,
 		},
 		Teams: teams,

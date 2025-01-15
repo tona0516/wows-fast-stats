@@ -161,13 +161,13 @@ func (w *Wargaming) encycShips(pageNo int) (response.WGEncycShips, int, error) {
 	return res, res.Meta.PageTotal, err
 }
 
-func (w *Wargaming) BattleArenas() (data.WGBattleArenas, error) {
-	res, err := request[response.WGBattleArenas](
+func (w *Wargaming) battleArenas() (response.WGBattleArenas, error) {
+	res, err := request[response.WGBattleArenasResponse](
 		w,
 		"/wows/encyclopedia/battlearenas/",
 		map[string]string{
 			"application_id": w.appID,
-			"fields":         response.WGBattleArenas{}.Field(),
+			"fields":         response.WGBattleArenasResponse{}.Field(),
 			"language":       "ja",
 		},
 	)
@@ -175,13 +175,13 @@ func (w *Wargaming) BattleArenas() (data.WGBattleArenas, error) {
 	return res.Data, err
 }
 
-func (w *Wargaming) BattleTypes() (data.WGBattleTypes, error) {
-	res, err := request[response.WGBattleTypes](
+func (w *Wargaming) battleTypes() (response.WGBattleTypes, error) {
+	res, err := request[response.WGBattleTypesResponse](
 		w,
 		"/wows/encyclopedia/battletypes/",
 		map[string]string{
 			"application_id": w.appID,
-			"fields":         response.WGBattleTypes{}.Field(),
+			"fields":         response.WGBattleTypesResponse{}.Field(),
 			"language":       "ja",
 		},
 	)

@@ -69,33 +69,3 @@ func (mr *MockWargamingInterfaceMockRecorder) AccountListForSearch(prefix any) *
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AccountListForSearch", reflect.TypeOf((*MockWargamingInterface)(nil).AccountListForSearch), prefix)
 }
-
-// BattleArenas mocks base method.
-func (m *MockWargamingInterface) BattleArenas() (data.WGBattleArenas, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "BattleArenas")
-	ret0, _ := ret[0].(data.WGBattleArenas)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// BattleArenas indicates an expected call of BattleArenas.
-func (mr *MockWargamingInterfaceMockRecorder) BattleArenas() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BattleArenas", reflect.TypeOf((*MockWargamingInterface)(nil).BattleArenas))
-}
-
-// BattleTypes mocks base method.
-func (m *MockWargamingInterface) BattleTypes() (data.WGBattleTypes, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "BattleTypes")
-	ret0, _ := ret[0].(data.WGBattleTypes)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// BattleTypes indicates an expected call of BattleTypes.
-func (mr *MockWargamingInterfaceMockRecorder) BattleTypes() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BattleTypes", reflect.TypeOf((*MockWargamingInterface)(nil).BattleTypes))
-}

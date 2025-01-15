@@ -2,13 +2,18 @@ package response
 
 import (
 	"reflect"
-	"wfs/backend/data"
 )
 
-type WGBattleArenas struct {
-	WGResponseCommon[data.WGBattleArenas]
+type WGBattleArenasResponse struct {
+	WGResponseCommon[WGBattleArenas]
 }
 
-func (w WGBattleArenas) Field() string {
-	return fieldQuery(reflect.TypeOf(&data.WGBattleArenasData{}).Elem())
+func (w WGBattleArenasResponse) Field() string {
+	return fieldQuery(reflect.TypeOf(&WGBattleArenasData{}).Elem())
+}
+
+type WGBattleArenas map[int]WGBattleArenasData
+
+type WGBattleArenasData struct {
+	Name string `json:"name"`
 }

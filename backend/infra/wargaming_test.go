@@ -299,11 +299,15 @@ func TestWargaming_EncycShips(t *testing.T) {
 func TestWargaming_BattleArena(t *testing.T) {
 	t.Parallel()
 
-	server := simpleMockServer(200, response.WGBattleArenas{
-		WGResponseCommon: response.WGResponseCommon[data.WGBattleArenas]{
+	expected := response.WGBattleArenas{
+		114: {Name: "いつもの"},
+	}
+
+	server := simpleMockServer(200, response.WGBattleArenasResponse{
+		WGResponseCommon: response.WGResponseCommon[response.WGBattleArenas]{
 			Status: "",
 			Error:  response.WGError{},
-			Data:   map[int]data.WGBattleArenasData{},
+			Data:   expected,
 		},
 	})
 	defer server.Close()
@@ -312,20 +316,24 @@ func TestWargaming_BattleArena(t *testing.T) {
 		URL: server.URL,
 	}, ratelimit.New(10), "")
 
-	result, err := wargaming.BattleArenas()
+	result, err := wargaming.battleArenas()
 
 	assert.NoError(t, err)
-	assert.Equal(t, data.WGBattleArenas{}, result)
+	assert.Equal(t, expected, result)
 }
 
 func TestWargaming_BattleTypes(t *testing.T) {
 	t.Parallel()
 
-	server := simpleMockServer(200, response.WGBattleTypes{
-		WGResponseCommon: response.WGResponseCommon[data.WGBattleTypes]{
+	expected := response.WGBattleTypes{
+		"PVP": {Name: "ランダム戦"},
+	}
+
+	server := simpleMockServer(200, response.WGBattleTypesResponse{
+		WGResponseCommon: response.WGResponseCommon[response.WGBattleTypes]{
 			Status: "",
 			Error:  response.WGError{},
-			Data:   map[string]data.WGBattleTypesData{},
+			Data:   expected,
 		},
 	})
 	defer server.Close()
@@ -333,8 +341,8 @@ func TestWargaming_BattleTypes(t *testing.T) {
 	wargaming := NewWargaming(RequestConfig{
 		URL: server.URL,
 	}, ratelimit.New(10), "")
-	result, err := wargaming.BattleTypes()
+	result, err := wargaming.battleTypes()
 
 	assert.NoError(t, err)
-	assert.Equal(t, data.WGBattleTypes{}, result)
+	assert.Equal(t, expected, result)
 }

@@ -6,6 +6,4 @@ import "wfs/backend/data"
 type WargamingInterface interface {
 	AccountList(accountNames []string) (data.WGAccountList, error)
 	AccountListForSearch(prefix string) (data.WGAccountList, error)
-	BattleArenas() (data.WGBattleArenas, error)
-	BattleTypes() (data.WGBattleTypes, error)
 }

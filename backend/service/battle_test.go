@@ -31,8 +31,6 @@ func TestBattle_Get_正常系_初回(t *testing.T) {
 		{NickName: "player_1", AccountID: 1},
 		{NickName: "player_2", AccountID: 2},
 	}, nil)
-	mockWargaming.EXPECT().BattleArenas().Return(data.WGBattleArenas{}, nil)
-	mockWargaming.EXPECT().BattleTypes().Return(data.WGBattleTypes{}, nil)
 
 	mockWarshipFetcher := domainRepository.NewMockWarshipFetcherInterface(ctrl)
 	mockWarshipFetcher.EXPECT().Fetch().Return(model.Warships{
@@ -65,6 +63,9 @@ func TestBattle_Get_正常系_初回(t *testing.T) {
 	mockRawStatFetcher := domainRepository.NewMockRawStatFetcherInterface(ctrl)
 	mockRawStatFetcher.EXPECT().Fetch(gomock.Any()).Return(model.RawStats{}, nil)
 
+	mockBattleMetaFetcher := domainRepository.NewMockBattleMetaFetcherInterface(ctrl)
+	mockBattleMetaFetcher.EXPECT().Fetch().Return(model.BattleMeta{}, nil)
+
 	mockStorage := repository.NewMockStorageInterface(ctrl)
 	mockStorage.EXPECT().WriteOwnIGN(gomock.Any()).Return(nil)
 
@@ -79,6 +80,7 @@ func TestBattle_Get_正常系_初回(t *testing.T) {
 		mockClanFetcher,
 		mockTAIFetcher,
 		mockRawStatFetcher,
+		mockBattleMetaFetcher,
 		mockStorage,
 		mockLogger,
 		nil,
@@ -132,6 +134,9 @@ func TestBattle_Get_正常系_2回目以降(t *testing.T) {
 	mockRawStatFetcher := domainRepository.NewMockRawStatFetcherInterface(ctrl)
 	mockRawStatFetcher.EXPECT().Fetch(gomock.Any()).Return(model.RawStats{}, nil)
 
+	mockBattleMetaFetcher := domainRepository.NewMockBattleMetaFetcherInterface(ctrl)
+	mockBattleMetaFetcher.EXPECT().Fetch().Return(model.BattleMeta{}, nil)
+
 	mockStorage := repository.NewMockStorageInterface(ctrl)
 	mockStorage.EXPECT().WriteOwnIGN(gomock.Any()).Return(nil)
 
@@ -146,11 +151,11 @@ func TestBattle_Get_正常系_2回目以降(t *testing.T) {
 		mockClanFetcher,
 		mockTAIFetcher,
 		mockRawStatFetcher,
+		mockBattleMetaFetcher,
 		mockStorage,
 		mockLogger,
 		nil,
 	)
-	b.isFirstBattle = false
 	_, err := b.Get(context.TODO(), testUserConfig)
 
 	// アサーション
@@ -179,8 +184,8 @@ func TestBattle_Get_異常系(t *testing.T) {
 		nil,
 		nil,
 		nil,
+		nil,
 	)
-	b.isFirstBattle = false
 	_, err := b.Get(context.TODO(), testUserConfig)
 
 	// アサーション
