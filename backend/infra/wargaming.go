@@ -29,19 +29,19 @@ func NewWargaming(config RequestConfig, rl ratelimit.Limiter, appID string) *War
 	}
 }
 
-func (w *Wargaming) AccountInfo(accountIDs []int) (data.WGAccountInfo, error) {
+func (w *Wargaming) accountInfo(accountIDs []int) (response.WGAccountInfo, error) {
 	strAccountIDs := make([]string, len(accountIDs))
 	for i, v := range accountIDs {
 		strAccountIDs[i] = strconv.Itoa(v)
 	}
 
-	res, err := request[response.WGAccountInfo](
+	res, err := request[response.WGAccountInfoResponse](
 		w,
 		"/wows/account/info/",
 		map[string]string{
 			"application_id": w.appID,
 			"account_id":     strings.Join(strAccountIDs, ","),
-			"fields":         response.WGAccountInfo{}.Field(),
+			"fields":         response.WGAccountInfoResponse{}.Field(),
 			"extra": strings.Join([]string{
 				"statistics.pvp_solo",
 				"statistics.pvp_div2",
@@ -126,14 +126,14 @@ func (w *Wargaming) clansInfo(clanIDs []int) (response.WGClansInfo, error) {
 	return res.Data, err
 }
 
-func (w *Wargaming) ShipsStats(accountID int) (data.WGShipsStats, error) {
-	res, err := request[response.WGShipsStats](
+func (w *Wargaming) shipsStats(accountID int) (response.WGShipsStats, error) {
+	res, err := request[response.WGShipsStatsResponse](
 		w,
 		"/wows/ships/stats/",
 		map[string]string{
 			"application_id": w.appID,
 			"account_id":     strconv.Itoa(accountID),
-			"fields":         response.WGShipsStats{}.Field(),
+			"fields":         response.WGShipsStatsResponse{}.Field(),
 			"extra": strings.Join([]string{
 				"pvp_solo",
 				"pvp_div2",

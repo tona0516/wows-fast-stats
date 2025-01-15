@@ -4,7 +4,6 @@ import (
 	"context"
 	"sort"
 	"strings"
-	"sync"
 	"wfs/backend/data"
 	"wfs/backend/domain/model"
 	domainRepository "wfs/backend/domain/repository"
@@ -17,6 +16,7 @@ type Battle struct {
 	warshipFetcher domainRepository.WarshipFetcherInterface
 	clanFetcher    domainRepository.ClanFetcherInterface
 	taiFetcher     domainRepository.TAIFetcherInterface
+	rawStatFetcher domainRepository.RawStatFetcherInterface
 	storage        repository.StorageInterface
 	logger         repository.LoggerInterface
 	eventsEmitFunc eventEmitFunc
@@ -32,6 +32,7 @@ func NewBattle(
 	warshipFetcher domainRepository.WarshipFetcherInterface,
 	clanFetcher domainRepository.ClanFetcherInterface,
 	taiFetcher domainRepository.TAIFetcherInterface,
+	rawStatFetcher domainRepository.RawStatFetcherInterface,
 	storage repository.StorageInterface,
 	logger repository.LoggerInterface,
 	eventsEmitFunc eventEmitFunc,
@@ -42,6 +43,7 @@ func NewBattle(
 		warshipFetcher: warshipFetcher,
 		clanFetcher:    clanFetcher,
 		taiFetcher:     taiFetcher,
+		rawStatFetcher: rawStatFetcher,
 		storage:        storage,
 		logger:         logger,
 		eventsEmitFunc: eventsEmitFunc,
@@ -81,11 +83,9 @@ func (b *Battle) Get(appCtx context.Context, userConfig data.UserConfigV2) (data
 	accountIDs := accountList.AccountIDs()
 
 	// Fetch each stats
-	accountInfoResult := make(chan data.Result[data.WGAccountInfo])
-	shipStatsResult := make(chan data.Result[data.AllPlayerShipsStats])
+	rawStatsResult := make(chan data.Result[model.RawStats])
 	clanResult := make(chan data.Result[model.Clans])
-	go b.fetchAccountInfo(accountIDs, accountInfoResult)
-	go b.fetchAllPlayerShipsStats(accountIDs, shipStatsResult)
+	go b.fetchRawStats(accountIDs, rawStatsResult)
 	go b.fetchClans(accountIDs, clanResult)
 
 	errs := make([]error, 0)
@@ -103,14 +103,11 @@ func (b *Battle) Get(appCtx context.Context, userConfig data.UserConfigV2) (data
 	warship := <-warshipResult
 	errs = append(errs, warship.Error)
 
-	accountInfo := <-accountInfoResult
-	errs = append(errs, accountInfo.Error)
-
-	shipStats := <-shipStatsResult
-	errs = append(errs, shipStats.Error)
-
 	clan := <-clanResult
 	errs = append(errs, clan.Error)
+
+	rawStats := <-rawStatsResult
+	errs = append(errs, rawStats.Error)
 
 	for _, err := range errs {
 		if err != nil {
@@ -120,11 +117,10 @@ func (b *Battle) Get(appCtx context.Context, userConfig data.UserConfigV2) (data
 
 	result = b.compose(
 		tempArenaInfo,
-		accountInfo.Value,
 		accountList,
-		shipStats.Value,
 		warship.Value,
 		clan.Value,
+		rawStats.Value,
 		b.battleArenas,
 		b.battleTypes,
 	)
@@ -175,40 +171,17 @@ func (b *Battle) fetchBattleTypes(channel chan data.Result[data.WGBattleTypes]) 
 	channel <- data.Result[data.WGBattleTypes]{Value: battleTypes, Error: err}
 }
 
-func (b *Battle) fetchAccountInfo(accountIDs []int, channel chan data.Result[data.WGAccountInfo]) {
-	accountInfo, err := b.wargaming.AccountInfo(accountIDs)
-	channel <- data.Result[data.WGAccountInfo]{Value: accountInfo, Error: err}
-}
-
-func (b *Battle) fetchAllPlayerShipsStats(
-	accountIDs []int,
-	channel chan data.Result[data.AllPlayerShipsStats],
-) {
-	shipStatsMap := make(data.AllPlayerShipsStats)
-	var mu sync.Mutex
-	err := doParallel(accountIDs, func(accountID int) error {
-		shipStats, err := b.wargaming.ShipsStats(accountID)
-		if err != nil {
-			return err
-		}
-
-		mu.Lock()
-		shipStatsMap[accountID] = shipStats
-		mu.Unlock()
-
-		return nil
-	})
-
-	channel <- data.Result[data.AllPlayerShipsStats]{Value: shipStatsMap, Error: err}
+func (b *Battle) fetchRawStats(accountIDs []int, channel chan data.Result[model.RawStats]) {
+	rawStats, err := b.rawStatFetcher.Fetch(accountIDs)
+	channel <- data.Result[model.RawStats]{Value: rawStats, Error: err}
 }
 
 func (b *Battle) compose(
 	tempArenaInfo model.TempArenaInfo,
-	accountInfo data.WGAccountInfo,
 	accountList data.WGAccountList,
-	allPlayerShipsStats data.AllPlayerShipsStats,
 	warships model.Warships,
 	clans model.Clans,
+	rawStats model.RawStats,
 	battleArenas data.WGBattleArenas,
 	battleTypes data.WGBattleTypes,
 ) data.Battle {
@@ -237,8 +210,7 @@ func (b *Battle) compose(
 
 		stats := data.NewStats(
 			vehicle.ShipID,
-			accountInfo[accountID],
-			allPlayerShipsStats.Player(accountID),
+			rawStats[accountID],
 			warships,
 		)
 
@@ -247,7 +219,7 @@ func (b *Battle) compose(
 				ID:       accountID,
 				Name:     nickname,
 				Clan:     clan,
-				IsHidden: accountInfo[accountID].HiddenProfile,
+				IsHidden: rawStats[accountID].Overall.IsHidden,
 			},
 			Warship:  warship,
 			PvPSolo:  playerStats(data.StatsPatternPvPSolo, stats, accountID, vehicle.ShipID, tempArenaInfo, warships),

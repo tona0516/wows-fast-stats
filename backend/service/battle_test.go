@@ -33,8 +33,6 @@ func TestBattle_Get_正常系_初回(t *testing.T) {
 	}, nil)
 	mockWargaming.EXPECT().BattleArenas().Return(data.WGBattleArenas{}, nil)
 	mockWargaming.EXPECT().BattleTypes().Return(data.WGBattleTypes{}, nil)
-	mockWargaming.EXPECT().AccountInfo(gomock.Any()).Return(data.WGAccountInfo{}, nil)
-	mockWargaming.EXPECT().ShipsStats(gomock.Any()).Return(data.WGShipsStats{}, nil).AnyTimes()
 
 	mockWarshipFetcher := domainRepository.NewMockWarshipFetcherInterface(ctrl)
 	mockWarshipFetcher.EXPECT().Fetch().Return(model.Warships{
@@ -64,6 +62,9 @@ func TestBattle_Get_正常系_初回(t *testing.T) {
 		},
 	}, nil)
 
+	mockRawStatFetcher := domainRepository.NewMockRawStatFetcherInterface(ctrl)
+	mockRawStatFetcher.EXPECT().Fetch(gomock.Any()).Return(model.RawStats{}, nil)
+
 	mockStorage := repository.NewMockStorageInterface(ctrl)
 	mockStorage.EXPECT().WriteOwnIGN(gomock.Any()).Return(nil)
 
@@ -77,6 +78,7 @@ func TestBattle_Get_正常系_初回(t *testing.T) {
 		mockWarshipFetcher,
 		mockClanFetcher,
 		mockTAIFetcher,
+		mockRawStatFetcher,
 		mockStorage,
 		mockLogger,
 		nil,
@@ -97,8 +99,6 @@ func TestBattle_Get_正常系_2回目以降(t *testing.T) {
 		{NickName: "player_1", AccountID: 1},
 		{NickName: "player_2", AccountID: 2},
 	}, nil)
-	mockWargaming.EXPECT().AccountInfo(gomock.Any()).Return(data.WGAccountInfo{}, nil)
-	mockWargaming.EXPECT().ShipsStats(gomock.Any()).Return(data.WGShipsStats{}, nil).AnyTimes()
 
 	mockWarshipFetcher := domainRepository.NewMockWarshipFetcherInterface(ctrl)
 	mockWarshipFetcher.EXPECT().Fetch().Return(model.Warships{
@@ -129,6 +129,9 @@ func TestBattle_Get_正常系_2回目以降(t *testing.T) {
 		PlayerName: "player_1",
 	}, nil)
 
+	mockRawStatFetcher := domainRepository.NewMockRawStatFetcherInterface(ctrl)
+	mockRawStatFetcher.EXPECT().Fetch(gomock.Any()).Return(model.RawStats{}, nil)
+
 	mockStorage := repository.NewMockStorageInterface(ctrl)
 	mockStorage.EXPECT().WriteOwnIGN(gomock.Any()).Return(nil)
 
@@ -142,6 +145,7 @@ func TestBattle_Get_正常系_2回目以降(t *testing.T) {
 		mockWarshipFetcher,
 		mockClanFetcher,
 		mockTAIFetcher,
+		mockRawStatFetcher,
 		mockStorage,
 		mockLogger,
 		nil,
@@ -171,6 +175,7 @@ func TestBattle_Get_異常系(t *testing.T) {
 		nil,
 		nil,
 		mockTAIFetcher,
+		nil,
 		nil,
 		nil,
 		nil,

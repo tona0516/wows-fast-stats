@@ -21,11 +21,17 @@ func TestWargaming_AccountInfo(t *testing.T) {
 
 	t.Run("正常系", func(t *testing.T) {
 		t.Parallel()
-		server := simpleMockServer(200, response.WGAccountInfo{
-			WGResponseCommon: response.WGResponseCommon[data.WGAccountInfo]{
+
+		expected := response.WGAccountInfo{
+			114: {
+				HiddenProfile: true,
+			},
+		}
+		server := simpleMockServer(200, response.WGAccountInfoResponse{
+			WGResponseCommon: response.WGResponseCommon[response.WGAccountInfo]{
 				Status: "",
 				Error:  response.WGError{},
-				Data:   map[int]data.WGAccountInfoData{},
+				Data:   expected,
 			},
 		})
 		defer server.Close()
@@ -34,9 +40,9 @@ func TestWargaming_AccountInfo(t *testing.T) {
 			URL: server.URL,
 		}, ratelimit.New(10), "")
 
-		result, err := wargaming.AccountInfo([]int{123, 456})
+		result, err := wargaming.accountInfo([]int{123, 456})
 		assert.NoError(t, err)
-		assert.Equal(t, data.WGAccountInfo{}, result)
+		assert.Equal(t, expected, result)
 	})
 
 	t.Run("異常系_リトライなし", func(t *testing.T) {
@@ -64,7 +70,7 @@ func TestWargaming_AccountInfo(t *testing.T) {
 			URL: server.URL,
 		}, ratelimit.New(10), "")
 
-		_, err := wargaming.AccountInfo([]int{123, 456})
+		_, err := wargaming.accountInfo([]int{123, 456})
 		assert.True(t, failure.Is(err, apperr.WGAPIError))
 		assert.Equal(t, 1, calls)
 	})
@@ -107,7 +113,7 @@ func TestWargaming_AccountInfo(t *testing.T) {
 
 			wargaming := NewWargaming(RequestConfig{URL: server.URL, Retry: retry}, ratelimit.New(10), "")
 
-			_, err := wargaming.AccountInfo([]int{123, 456})
+			_, err := wargaming.accountInfo([]int{123, 456})
 
 			assert.NoError(t, err)
 			assert.Equal(t, retry+1, calls)
@@ -144,7 +150,7 @@ func TestWargaming_AccountInfo(t *testing.T) {
 
 			wargaming := NewWargaming(RequestConfig{URL: server.URL, Retry: retry}, ratelimit.New(10), "")
 
-			_, err := wargaming.AccountInfo([]int{123, 456})
+			_, err := wargaming.accountInfo([]int{123, 456})
 
 			assert.True(t, failure.Is(err, apperr.WGAPITemporaryUnavaillalble))
 			assert.Equal(t, retry+1, calls)
@@ -234,11 +240,18 @@ func TestWargaming_ClansInfo(t *testing.T) {
 func TestWargaming_ShipsStats(t *testing.T) {
 	t.Parallel()
 
-	server := simpleMockServer(200, response.WGShipsStats{
-		WGResponseCommon: response.WGResponseCommon[data.WGShipsStats]{
+	expected := response.WGShipsStats{
+		114: {
+			{
+				ShipID: 514,
+			},
+		},
+	}
+	server := simpleMockServer(200, response.WGShipsStatsResponse{
+		WGResponseCommon: response.WGResponseCommon[response.WGShipsStats]{
 			Status: "",
 			Error:  response.WGError{},
-			Data:   map[int][]data.WGShipsStatsData{},
+			Data:   expected,
 		},
 	})
 	defer server.Close()
@@ -247,10 +260,10 @@ func TestWargaming_ShipsStats(t *testing.T) {
 		URL: server.URL,
 	}, ratelimit.New(10), "")
 
-	result, err := wargaming.ShipsStats(123)
+	result, err := wargaming.shipsStats(123)
 
 	assert.NoError(t, err)
-	assert.Equal(t, data.WGShipsStats{}, result)
+	assert.Equal(t, expected, result)
 }
 
 func TestWargaming_EncycShips(t *testing.T) {

@@ -137,6 +137,7 @@ func initApp(env data.Env) *App {
 		*uwargaming,
 	)
 	taiFetcher := infra.NewTaiFetcher()
+	rawStatFetcher := infra.NewRawStatFetcher(*wargaming)
 
 	// usecase
 	watchInterval := 1 * time.Second
@@ -148,6 +149,7 @@ func initApp(env data.Env) *App {
 		warshipFercher,
 		clanFercher,
 		taiFetcher,
+		rawStatFetcher,
 		storage,
 		logger,
 		runtime.EventsEmit,

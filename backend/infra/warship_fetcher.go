@@ -43,7 +43,6 @@ func (f *WarshipFetcher) Fetch() (model.Warships, error) {
 	go f.unregisteredShips(unregisteredChan)
 	go f.expectedStats(expectedStatsChan)
 
-	var warships model.Warships
 	var err error
 	ships := <-encycShipsChan
 	err = errors.Join(err, ships.Error)
@@ -57,7 +56,7 @@ func (f *WarshipFetcher) Fetch() (model.Warships, error) {
 		return nil, failure.Translate(err, apperr.FetchShipError)
 	}
 
-	warships = ships.Value
+	warships := ships.Value
 	for shipID, ship := range unregisteredShips.Value {
 		if _, ok := warships[shipID]; ok {
 			continue

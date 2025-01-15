@@ -5,33 +5,30 @@ import (
 )
 
 type Stats struct {
-	useShipID     int
-	accountInfo   WGAccountInfoData
-	useShipStats  WGShipsStatsData
-	allShipsStats []WGShipsStatsData
-	warships      model.Warships
+	useShipID    int
+	useShipStats model.ShipStat
+	rawStat      model.RawStat
+	warships     model.Warships
 }
 
 func NewStats(
 	useShipID int,
-	accountInfo WGAccountInfoData,
-	allShipsStats []WGShipsStatsData,
+	rawStat model.RawStat,
 	warships model.Warships,
 ) *Stats {
-	var useShipStats WGShipsStatsData
-	for _, v := range allShipsStats {
-		if v.ShipID == useShipID {
+	var useShipStats model.ShipStat
+	for shipID, v := range rawStat.Ship {
+		if shipID == useShipID {
 			useShipStats = v
 			break
 		}
 	}
 
 	return &Stats{
-		useShipID:     useShipID,
-		accountInfo:   accountInfo,
-		useShipStats:  useShipStats,
-		allShipsStats: allShipsStats,
-		warships:      warships,
+		useShipID:    useShipID,
+		useShipStats: useShipStats,
+		rawStat:      rawStat,
+		warships:     warships,
 	}
 }
 
@@ -69,11 +66,11 @@ func (s *Stats) PR(category StatsCategory, pattern StatsPattern) float64 {
 			allBattles     uint
 		)
 
-		for _, ship := range s.allShipsStats {
-			values := s.statsValuesForm(ship, pattern)
+		for shipID, v := range s.rawStat.Ship {
+			values := s.statsValuesForm(v, pattern)
 			battles := values.Battles
 
-			warship, ok := s.warships[ship.ShipID]
+			warship, ok := s.warships[shipID]
 			if !ok {
 				continue
 			}
@@ -291,13 +288,13 @@ func (s *Stats) AvgTier(
 		allBattles uint
 	)
 
-	for _, stats := range s.allShipsStats {
-		warship, ok := s.warships[stats.ShipID]
+	for shipID, v := range s.rawStat.Ship {
+		warship, ok := s.warships[shipID]
 		if !ok {
 			continue
 		}
 
-		values := s.statsValuesForm(stats, pattern)
+		values := s.statsValuesForm(v, pattern)
 		sum += values.Battles * warship.Tier
 		allBattles += values.Battles
 	}
@@ -310,13 +307,13 @@ func (s *Stats) UsingTierRate(
 ) TierGroup {
 	tierGroupMap := make(map[string]uint)
 
-	for _, ship := range s.allShipsStats {
-		warship, ok := s.warships[ship.ShipID]
+	for shipID, v := range s.rawStat.Ship {
+		warship, ok := s.warships[shipID]
 		if !ok {
 			continue
 		}
 
-		values := s.statsValuesForm(ship, pattern)
+		values := s.statsValuesForm(v, pattern)
 		tier := warship.Tier
 		battles := values.Battles
 		switch {
@@ -346,13 +343,13 @@ func (s *Stats) UsingShipTypeRate(
 ) ShipTypeGroup {
 	shipTypeMap := make(map[model.ShipType]uint)
 
-	for _, ship := range s.allShipsStats {
-		warship, ok := s.warships[ship.ShipID]
+	for shipID, v := range s.rawStat.Ship {
+		warship, ok := s.warships[shipID]
 		if !ok {
 			continue
 		}
 
-		values := s.statsValuesForm(ship, pattern)
+		values := s.statsValuesForm(v, pattern)
 		shipTypeMap[warship.Type] += values.Battles
 	}
 
@@ -383,7 +380,7 @@ func (s *Stats) PlatoonRate(
 			stats.PvpDiv3.Battles,
 		)
 	case StatsCategoryOverall:
-		stats := s.accountInfo.Statistics
+		stats := s.rawStat.Overall
 		return platoonRate(
 			stats.Pvp.Battles,
 			stats.PvpSolo.Battles,
@@ -395,20 +392,20 @@ func (s *Stats) PlatoonRate(
 	return 0
 }
 
-func (s *Stats) statsValues(pattern StatsPattern) (WGShipStatsValues, WGPlayerStatsValues) {
+func (s *Stats) statsValues(pattern StatsPattern) (model.ShipStatsValues, model.OverallStatsValues) {
 	switch pattern {
 	case StatsPatternPvPAll:
-		return s.useShipStats.Pvp, s.accountInfo.Statistics.Pvp
+		return s.useShipStats.Pvp, s.rawStat.Overall.Pvp
 	case StatsPatternPvPSolo:
-		return s.useShipStats.PvpSolo, s.accountInfo.Statistics.PvpSolo
+		return s.useShipStats.PvpSolo, s.rawStat.Overall.PvpSolo
 	case StatsPatternRankSolo:
-		return s.useShipStats.RankSolo, s.accountInfo.Statistics.RankSolo
+		return s.useShipStats.RankSolo, s.rawStat.Overall.RankSolo
 	}
 
-	return WGShipStatsValues{}, WGPlayerStatsValues{}
+	return model.ShipStatsValues{}, model.OverallStatsValues{}
 }
 
-func (s *Stats) statsValuesForm(statsData WGShipsStatsData, pattern StatsPattern) WGShipStatsValues {
+func (s *Stats) statsValuesForm(statsData model.ShipStat, pattern StatsPattern) model.ShipStatsValues {
 	switch pattern {
 	case StatsPatternPvPAll:
 		return statsData.Pvp
@@ -418,7 +415,7 @@ func (s *Stats) statsValuesForm(statsData WGShipsStatsData, pattern StatsPattern
 		return statsData.RankSolo
 	}
 
-	return WGShipStatsValues{}
+	return model.ShipStatsValues{}
 }
 
 func avgDamage(damageDealt uint, battles uint) float64 {

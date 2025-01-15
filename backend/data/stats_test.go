@@ -12,11 +12,7 @@ const (
 )
 
 //nolint:gochecknoglobals
-var (
-	emptyAccountInfo = WGAccountInfoData{}
-	emptyShipsStats  = []WGShipsStatsData{}
-	emptyWarships    = model.Warships{}
-)
+var emptyWarships = model.Warships{}
 
 // ref: https://asia.wows-numbers.com/personal/rating
 func TestStats_PR_Ship(t *testing.T) {
@@ -34,16 +30,16 @@ func TestStats_PR_Ship(t *testing.T) {
 	for _, p := range params {
 		stats := NewStats(
 			useShipID,
-			emptyAccountInfo,
-			[]WGShipsStatsData{
-				{
-					Pvp: WGShipStatsValues{
-						Battles:     p.battles,
-						DamageDealt: 1000000,
-						Frags:       200,
-						Wins:        60,
+			model.RawStat{
+				Ship: map[int]model.ShipStat{
+					useShipID: {
+						Pvp: model.ShipStatsValues{
+							Battles:     p.battles,
+							DamageDealt: 1000000,
+							Wins:        60,
+							Frags:       200,
+						},
 					},
-					ShipID: useShipID,
 				},
 			},
 			model.Warships{
@@ -66,43 +62,40 @@ func TestStats_PR_Overall(t *testing.T) {
 	useShipID := 0
 	stats := NewStats(
 		useShipID,
-		emptyAccountInfo,
-		[]WGShipsStatsData{
-			{
-				Pvp: WGShipStatsValues{
-					Battles:     2,
-					DamageDealt: 54468,
-					Wins:        1,
-					Frags:       1,
+		model.RawStat{
+			Ship: map[int]model.ShipStat{
+				1: {
+					Pvp: model.ShipStatsValues{
+						Battles:     2,
+						DamageDealt: 54468,
+						Wins:        1,
+						Frags:       1,
+					},
 				},
-				ShipID: 1,
-			},
-			{
-				Pvp: WGShipStatsValues{
-					Battles:     1,
-					DamageDealt: 155185,
-					Wins:        1,
-					Frags:       1,
+				2: {
+					Pvp: model.ShipStatsValues{
+						Battles:     1,
+						DamageDealt: 155185,
+						Wins:        1,
+						Frags:       1,
+					},
 				},
-				ShipID: 2,
-			},
-			{
-				Pvp: WGShipStatsValues{
-					Battles:     1,
-					DamageDealt: 51576,
-					Wins:        1,
-					Frags:       2,
+				3: {
+					Pvp: model.ShipStatsValues{
+						Battles:     1,
+						DamageDealt: 51576,
+						Wins:        1,
+						Frags:       2,
+					},
 				},
-				ShipID: 3,
-			},
-			{
-				Pvp: WGShipStatsValues{
-					Battles:     1,
-					DamageDealt: 117285,
-					Wins:        1,
-					Frags:       2,
+				4: {
+					Pvp: model.ShipStatsValues{
+						Battles:     1,
+						DamageDealt: 117285,
+						Wins:        1,
+						Frags:       2,
+					},
 				},
-				ShipID: 4,
 			},
 		},
 		model.Warships{
@@ -137,21 +130,14 @@ func TestStats_AvgDamage_Overall(t *testing.T) {
 
 	stats := NewStats(
 		0,
-		WGAccountInfoData{
-			Statistics: struct {
-				Pvp      WGPlayerStatsValues `json:"pvp"`
-				PvpSolo  WGPlayerStatsValues `json:"pvp_solo"`
-				PvpDiv2  WGPlayerStatsValues `json:"pvp_div2"`
-				PvpDiv3  WGPlayerStatsValues `json:"pvp_div3"`
-				RankSolo WGPlayerStatsValues `json:"rank_solo"`
-			}{
-				Pvp: WGPlayerStatsValues{
+		model.RawStat{
+			Overall: model.OverallStat{
+				Pvp: model.OverallStatsValues{
 					Battles:     100,
 					DamageDealt: 1000000,
 				},
 			},
 		},
-		emptyShipsStats,
 		emptyWarships,
 	)
 
@@ -163,21 +149,14 @@ func TestStats_AvgDamage_Overall_Solo(t *testing.T) {
 
 	stats := NewStats(
 		0,
-		WGAccountInfoData{
-			Statistics: struct {
-				Pvp      WGPlayerStatsValues `json:"pvp"`
-				PvpSolo  WGPlayerStatsValues `json:"pvp_solo"`
-				PvpDiv2  WGPlayerStatsValues `json:"pvp_div2"`
-				PvpDiv3  WGPlayerStatsValues `json:"pvp_div3"`
-				RankSolo WGPlayerStatsValues `json:"rank_solo"`
-			}{
-				PvpSolo: WGPlayerStatsValues{
+		model.RawStat{
+			Overall: model.OverallStat{
+				PvpSolo: model.OverallStatsValues{
 					Battles:     100,
 					DamageDealt: 1000000,
 				},
 			},
 		},
-		emptyShipsStats,
 		emptyWarships,
 	)
 
@@ -189,21 +168,14 @@ func TestStats_AvgDamage_Overall_Rank(t *testing.T) {
 
 	stats := NewStats(
 		0,
-		WGAccountInfoData{
-			Statistics: struct {
-				Pvp      WGPlayerStatsValues `json:"pvp"`
-				PvpSolo  WGPlayerStatsValues `json:"pvp_solo"`
-				PvpDiv2  WGPlayerStatsValues `json:"pvp_div2"`
-				PvpDiv3  WGPlayerStatsValues `json:"pvp_div3"`
-				RankSolo WGPlayerStatsValues `json:"rank_solo"`
-			}{
-				RankSolo: WGPlayerStatsValues{
+		model.RawStat{
+			Overall: model.OverallStat{
+				RankSolo: model.OverallStatsValues{
 					Battles:     100,
 					DamageDealt: 1000000,
 				},
 			},
 		},
-		emptyShipsStats,
 		emptyWarships,
 	)
 
@@ -215,12 +187,13 @@ func TestStats_AvgDamage_Ship(t *testing.T) {
 
 	stats := NewStats(
 		0,
-		emptyAccountInfo,
-		[]WGShipsStatsData{
-			{
-				Pvp: WGShipStatsValues{
-					Battles:     100,
-					DamageDealt: 1000000,
+		model.RawStat{
+			Ship: map[int]model.ShipStat{
+				0: {
+					Pvp: model.ShipStatsValues{
+						Battles:     100,
+						DamageDealt: 1000000,
+					},
 				},
 			},
 		},
@@ -235,12 +208,13 @@ func TestStats_AvgDamage_Ship_Solo(t *testing.T) {
 
 	stats := NewStats(
 		0,
-		emptyAccountInfo,
-		[]WGShipsStatsData{
-			{
-				PvpSolo: WGShipStatsValues{
-					Battles:     100,
-					DamageDealt: 1000000,
+		model.RawStat{
+			Ship: map[int]model.ShipStat{
+				0: {
+					PvpSolo: model.ShipStatsValues{
+						Battles:     100,
+						DamageDealt: 1000000,
+					},
 				},
 			},
 		},
@@ -255,12 +229,13 @@ func TestStats_AvgDamage_Ship_Rank(t *testing.T) {
 
 	stats := NewStats(
 		0,
-		emptyAccountInfo,
-		[]WGShipsStatsData{
-			{
-				RankSolo: WGShipStatsValues{
-					Battles:     100,
-					DamageDealt: 1000000,
+		model.RawStat{
+			Ship: map[int]model.ShipStat{
+				0: {
+					RankSolo: model.ShipStatsValues{
+						Battles:     100,
+						DamageDealt: 1000000,
+					},
 				},
 			},
 		},
@@ -280,13 +255,13 @@ func TestStats_MaxDamage_Ship(t *testing.T) {
 	useShipID := 100
 	stats := NewStats(
 		useShipID,
-		emptyAccountInfo,
-		[]WGShipsStatsData{
-			{
-				Pvp: WGShipStatsValues{
-					MaxDamageDealt: expected.Value,
+		model.RawStat{
+			Ship: map[int]model.ShipStat{
+				useShipID: {
+					Pvp: model.ShipStatsValues{
+						MaxDamageDealt: expected.Value,
+					},
 				},
-				ShipID: useShipID,
 			},
 		},
 		emptyWarships,
@@ -307,21 +282,14 @@ func TestStats_MaxDamage_Overall(t *testing.T) {
 
 	stats := NewStats(
 		0,
-		WGAccountInfoData{
-			Statistics: struct {
-				Pvp      WGPlayerStatsValues `json:"pvp"`
-				PvpSolo  WGPlayerStatsValues `json:"pvp_solo"`
-				PvpDiv2  WGPlayerStatsValues `json:"pvp_div2"`
-				PvpDiv3  WGPlayerStatsValues `json:"pvp_div3"`
-				RankSolo WGPlayerStatsValues `json:"rank_solo"`
-			}{
-				Pvp: WGPlayerStatsValues{
+		model.RawStat{
+			Overall: model.OverallStat{
+				Pvp: model.OverallStatsValues{
 					MaxDamageDealt:       expected.Value,
 					MaxDamageDealtShipID: expected.ShipID,
 				},
 			},
 		},
-		emptyShipsStats,
 		model.Warships{
 			expected.ShipID: {
 				Name: expected.ShipName,
@@ -338,20 +306,13 @@ func TestStats_Battles(t *testing.T) {
 
 	stats := NewStats(
 		0,
-		WGAccountInfoData{
-			Statistics: struct {
-				Pvp      WGPlayerStatsValues `json:"pvp"`
-				PvpSolo  WGPlayerStatsValues `json:"pvp_solo"`
-				PvpDiv2  WGPlayerStatsValues `json:"pvp_div2"`
-				PvpDiv3  WGPlayerStatsValues `json:"pvp_div3"`
-				RankSolo WGPlayerStatsValues `json:"rank_solo"`
-			}{
-				Pvp: WGPlayerStatsValues{
+		model.RawStat{
+			Overall: model.OverallStat{
+				Pvp: model.OverallStatsValues{
 					Battles: 100,
 				},
 			},
 		},
-		emptyShipsStats,
 		emptyWarships,
 	)
 
@@ -363,22 +324,15 @@ func TestStats_KdRate(t *testing.T) {
 
 	stats := NewStats(
 		0,
-		WGAccountInfoData{
-			Statistics: struct {
-				Pvp      WGPlayerStatsValues `json:"pvp"`
-				PvpSolo  WGPlayerStatsValues `json:"pvp_solo"`
-				PvpDiv2  WGPlayerStatsValues `json:"pvp_div2"`
-				PvpDiv3  WGPlayerStatsValues `json:"pvp_div3"`
-				RankSolo WGPlayerStatsValues `json:"rank_solo"`
-			}{
-				Pvp: WGPlayerStatsValues{
+		model.RawStat{
+			Overall: model.OverallStat{
+				Pvp: model.OverallStatsValues{
 					Battles:         100,
 					SurvivedBattles: 60,
 					Frags:           20,
 				},
 			},
 		},
-		emptyShipsStats,
 		emptyWarships,
 	)
 
@@ -390,21 +344,14 @@ func TestStats_AvgKill(t *testing.T) {
 
 	stats := NewStats(
 		0,
-		WGAccountInfoData{
-			Statistics: struct {
-				Pvp      WGPlayerStatsValues `json:"pvp"`
-				PvpSolo  WGPlayerStatsValues `json:"pvp_solo"`
-				PvpDiv2  WGPlayerStatsValues `json:"pvp_div2"`
-				PvpDiv3  WGPlayerStatsValues `json:"pvp_div3"`
-				RankSolo WGPlayerStatsValues `json:"rank_solo"`
-			}{
-				Pvp: WGPlayerStatsValues{
+		model.RawStat{
+			Overall: model.OverallStat{
+				Pvp: model.OverallStatsValues{
 					Battles: 100,
 					Frags:   30,
 				},
 			},
 		},
-		emptyShipsStats,
 		emptyWarships,
 	)
 
@@ -416,21 +363,14 @@ func TestStats_AvgExp(t *testing.T) {
 
 	stats := NewStats(
 		0,
-		WGAccountInfoData{
-			Statistics: struct {
-				Pvp      WGPlayerStatsValues `json:"pvp"`
-				PvpSolo  WGPlayerStatsValues `json:"pvp_solo"`
-				PvpDiv2  WGPlayerStatsValues `json:"pvp_div2"`
-				PvpDiv3  WGPlayerStatsValues `json:"pvp_div3"`
-				RankSolo WGPlayerStatsValues `json:"rank_solo"`
-			}{
-				Pvp: WGPlayerStatsValues{
+		model.RawStat{
+			Overall: model.OverallStat{
+				Pvp: model.OverallStatsValues{
 					Battles: 100,
 					Xp:      150000,
 				},
 			},
 		},
-		emptyShipsStats,
 		emptyWarships,
 	)
 
@@ -442,21 +382,14 @@ func TestStats_WinRate(t *testing.T) {
 
 	stats := NewStats(
 		0,
-		WGAccountInfoData{
-			Statistics: struct {
-				Pvp      WGPlayerStatsValues `json:"pvp"`
-				PvpSolo  WGPlayerStatsValues `json:"pvp_solo"`
-				PvpDiv2  WGPlayerStatsValues `json:"pvp_div2"`
-				PvpDiv3  WGPlayerStatsValues `json:"pvp_div3"`
-				RankSolo WGPlayerStatsValues `json:"rank_solo"`
-			}{
-				Pvp: WGPlayerStatsValues{
+		model.RawStat{
+			Overall: model.OverallStat{
+				Pvp: model.OverallStatsValues{
 					Battles: 100,
 					Wins:    60,
 				},
 			},
 		},
-		emptyShipsStats,
 		emptyWarships,
 	)
 
@@ -468,21 +401,14 @@ func TestStats_WinSurvivedRate(t *testing.T) {
 
 	stats := NewStats(
 		0,
-		WGAccountInfoData{
-			Statistics: struct {
-				Pvp      WGPlayerStatsValues `json:"pvp"`
-				PvpSolo  WGPlayerStatsValues `json:"pvp_solo"`
-				PvpDiv2  WGPlayerStatsValues `json:"pvp_div2"`
-				PvpDiv3  WGPlayerStatsValues `json:"pvp_div3"`
-				RankSolo WGPlayerStatsValues `json:"rank_solo"`
-			}{
-				Pvp: WGPlayerStatsValues{
+		model.RawStat{
+			Overall: model.OverallStat{
+				Pvp: model.OverallStatsValues{
 					Wins:         100,
 					SurvivedWins: 20,
 				},
 			},
 		},
-		emptyShipsStats,
 		emptyWarships,
 	)
 
@@ -494,15 +420,9 @@ func TestStats_LoseSurvivedRate(t *testing.T) {
 
 	stats := NewStats(
 		0,
-		WGAccountInfoData{
-			Statistics: struct {
-				Pvp      WGPlayerStatsValues `json:"pvp"`
-				PvpSolo  WGPlayerStatsValues `json:"pvp_solo"`
-				PvpDiv2  WGPlayerStatsValues `json:"pvp_div2"`
-				PvpDiv3  WGPlayerStatsValues `json:"pvp_div3"`
-				RankSolo WGPlayerStatsValues `json:"rank_solo"`
-			}{
-				Pvp: WGPlayerStatsValues{
+		model.RawStat{
+			Overall: model.OverallStat{
+				Pvp: model.OverallStatsValues{
 					Battles:         100,
 					SurvivedBattles: 40,
 					Wins:            60,
@@ -510,7 +430,6 @@ func TestStats_LoseSurvivedRate(t *testing.T) {
 				},
 			},
 		},
-		emptyShipsStats,
 		emptyWarships,
 	)
 
@@ -523,19 +442,19 @@ func TestStats_MainBatteryHitRate(t *testing.T) {
 	useShipID := 0
 	stats := NewStats(
 		useShipID,
-		emptyAccountInfo,
-		[]WGShipsStatsData{
-			{
-				Pvp: WGShipStatsValues{
-					MainBattery: struct {
-						Hits  uint `json:"hits"`
-						Shots uint `json:"shots"`
-					}{
-						Hits:  100,
-						Shots: 200,
+		model.RawStat{
+			Ship: map[int]model.ShipStat{
+				useShipID: {
+					Pvp: model.ShipStatsValues{
+						MainBattery: struct {
+							Hits  uint
+							Shots uint
+						}{
+							Hits:  100,
+							Shots: 200,
+						},
 					},
 				},
-				ShipID: useShipID,
 			},
 		},
 		emptyWarships,
@@ -550,19 +469,19 @@ func TestStats_TorpedoesHitRate(t *testing.T) {
 	useShipID := 0
 	stats := NewStats(
 		useShipID,
-		emptyAccountInfo,
-		[]WGShipsStatsData{
-			{
-				Pvp: WGShipStatsValues{
-					Torpedoes: struct {
-						Hits  uint `json:"hits"`
-						Shots uint `json:"shots"`
-					}{
-						Hits:  10,
-						Shots: 40,
+		model.RawStat{
+			Ship: map[int]model.ShipStat{
+				useShipID: {
+					Pvp: model.ShipStatsValues{
+						Torpedoes: struct {
+							Hits  uint
+							Shots uint
+						}{
+							Hits:  10,
+							Shots: 40,
+						},
 					},
 				},
-				ShipID: useShipID,
 			},
 		},
 		emptyWarships,
@@ -577,14 +496,14 @@ func TestStats_PlanesKilled(t *testing.T) {
 	useShipID := 0
 	stats := NewStats(
 		useShipID,
-		emptyAccountInfo,
-		[]WGShipsStatsData{
-			{
-				Pvp: WGShipStatsValues{
-					PlanesKilled: 334,
-					Battles:      10,
+		model.RawStat{
+			Ship: map[int]model.ShipStat{
+				useShipID: {
+					Pvp: model.ShipStatsValues{
+						PlanesKilled: 334,
+						Battles:      10,
+					},
 				},
-				ShipID: useShipID,
 			},
 		},
 		emptyWarships,
@@ -598,15 +517,18 @@ func TestStats_AvgTier(t *testing.T) {
 
 	stats := NewStats(
 		0,
-		emptyAccountInfo,
-		[]WGShipsStatsData{
-			{
-				Pvp:    WGShipStatsValues{Battles: 20},
-				ShipID: 100,
-			},
-			{
-				Pvp:    WGShipStatsValues{Battles: 50},
-				ShipID: 200,
+		model.RawStat{
+			Ship: map[int]model.ShipStat{
+				100: {
+					Pvp: model.ShipStatsValues{
+						Battles: 20,
+					},
+				},
+				200: {
+					Pvp: model.ShipStatsValues{
+						Battles: 50,
+					},
+				},
 			},
 		},
 		model.Warships{
@@ -623,19 +545,23 @@ func TestStats_UsingTierRate(t *testing.T) {
 
 	stats := NewStats(
 		0,
-		emptyAccountInfo,
-		[]WGShipsStatsData{
-			{
-				Pvp:    WGShipStatsValues{Battles: 30},
-				ShipID: 100,
-			},
-			{
-				Pvp:    WGShipStatsValues{Battles: 50},
-				ShipID: 200,
-			},
-			{
-				Pvp:    WGShipStatsValues{Battles: 20},
-				ShipID: 300,
+		model.RawStat{
+			Ship: map[int]model.ShipStat{
+				100: {
+					Pvp: model.ShipStatsValues{
+						Battles: 30,
+					},
+				},
+				200: {
+					Pvp: model.ShipStatsValues{
+						Battles: 50,
+					},
+				},
+				300: {
+					Pvp: model.ShipStatsValues{
+						Battles: 20,
+					},
+				},
 			},
 		},
 		model.Warships{
@@ -656,23 +582,28 @@ func TestStats_UsingShipTypeRate(t *testing.T) {
 
 	stats := NewStats(
 		0,
-		emptyAccountInfo,
-		[]WGShipsStatsData{
-			{
-				Pvp:    WGShipStatsValues{Battles: 30},
-				ShipID: 100,
-			},
-			{
-				Pvp:    WGShipStatsValues{Battles: 50},
-				ShipID: 200,
-			},
-			{
-				Pvp:    WGShipStatsValues{Battles: 20},
-				ShipID: 300,
-			},
-			{
-				Pvp:    WGShipStatsValues{Battles: 100},
-				ShipID: 400,
+		model.RawStat{
+			Ship: map[int]model.ShipStat{
+				100: {
+					Pvp: model.ShipStatsValues{
+						Battles: 30,
+					},
+				},
+				200: {
+					Pvp: model.ShipStatsValues{
+						Battles: 50,
+					},
+				},
+				300: {
+					Pvp: model.ShipStatsValues{
+						Battles: 20,
+					},
+				},
+				400: {
+					Pvp: model.ShipStatsValues{
+						Battles: 100,
+					},
+				},
 			},
 		},
 		model.Warships{
@@ -696,29 +627,22 @@ func TestStats_PlatoonRate(t *testing.T) {
 
 	stats := NewStats(
 		0,
-		WGAccountInfoData{
-			Statistics: struct {
-				Pvp      WGPlayerStatsValues `json:"pvp"`
-				PvpSolo  WGPlayerStatsValues `json:"pvp_solo"`
-				PvpDiv2  WGPlayerStatsValues `json:"pvp_div2"`
-				PvpDiv3  WGPlayerStatsValues `json:"pvp_div3"`
-				RankSolo WGPlayerStatsValues `json:"rank_solo"`
-			}{
-				Pvp: WGPlayerStatsValues{
+		model.RawStat{
+			Overall: model.OverallStat{
+				Pvp: model.OverallStatsValues{
 					Battles: 100,
 				},
-				PvpSolo: WGPlayerStatsValues{
+				PvpSolo: model.OverallStatsValues{
 					Battles: 10,
 				},
-				PvpDiv2: WGPlayerStatsValues{
+				PvpDiv2: model.OverallStatsValues{
 					Battles: 40,
 				},
-				PvpDiv3: WGPlayerStatsValues{
+				PvpDiv3: model.OverallStatsValues{
 					Battles: 50,
 				},
 			},
 		},
-		emptyShipsStats,
 		emptyWarships,
 	)
 
