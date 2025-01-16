@@ -163,44 +163,39 @@ func (b *Battle) compose(
 ) data.Battle {
 	friends := make(data.Players, 0)
 	enemies := make(data.Players, 0)
-
 	var ownShip string
 
 	for _, vehicle := range tempArenaInfo.Vehicles {
 		nickname := vehicle.Name
 		accountID := accountList.AccountID(nickname)
 		clan := clans[accountID]
+		rawStat := rawStats[accountID]
+		shipID := vehicle.ShipID
 
-		warship, ok := warships[vehicle.ShipID]
+		warship, ok := warships[shipID]
 		if !ok {
 			warship = model.Warship{
-				Name:   "Unknown",
-				Tier:   0,
-				Type:   model.ShipTypeNONE,
-				Nation: "",
+				Name: "Unknown",
+				Type: model.ShipTypeNONE,
 			}
 		}
 		if nickname == tempArenaInfo.PlayerName {
 			ownShip = warship.Name
 		}
 
-		stats := data.NewStats(
-			vehicle.ShipID,
-			rawStats[accountID],
-			warships,
-		)
+		stats := data.NewStats(shipID, rawStat, warships)
 
 		player := data.Player{
 			PlayerInfo: data.PlayerInfo{
 				ID:       accountID,
 				Name:     nickname,
 				Clan:     clan,
-				IsHidden: rawStats[accountID].Overall.IsHidden,
+				IsHidden: rawStat.Overall.IsHidden,
 			},
 			Warship:  warship,
-			PvPSolo:  playerStats(data.StatsPatternPvPSolo, stats, accountID, vehicle.ShipID, tempArenaInfo, warships),
-			PvPAll:   playerStats(data.StatsPatternPvPAll, stats, accountID, vehicle.ShipID, tempArenaInfo, warships),
-			RankSolo: playerStats(data.StatsPatternRankSolo, stats, accountID, vehicle.ShipID, tempArenaInfo, warships),
+			PvPSolo:  playerStats(data.StatsPatternPvPSolo, stats, accountID, shipID, tempArenaInfo, warships),
+			PvPAll:   playerStats(data.StatsPatternPvPAll, stats, accountID, shipID, tempArenaInfo, warships),
+			RankSolo: playerStats(data.StatsPatternRankSolo, stats, accountID, shipID, tempArenaInfo, warships),
 		}
 
 		if vehicle.IsFriend() {
