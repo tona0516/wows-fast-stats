@@ -7,6 +7,7 @@ import (
 	"wfs/backend/data"
 	"wfs/backend/domain/model"
 	"wfs/backend/infra/response"
+	"wfs/backend/infra/webapi"
 
 	"github.com/morikuni/failure"
 )
@@ -17,11 +18,11 @@ type (
 )
 
 type RawStatFetcher struct {
-	wargaming Wargaming
+	wargaming webapi.Wargaming
 }
 
 func NewRawStatFetcher(
-	wargaming Wargaming,
+	wargaming webapi.Wargaming,
 ) *RawStatFetcher {
 	return &RawStatFetcher{
 		wargaming: wargaming,
@@ -77,7 +78,7 @@ func (f *RawStatFetcher) Fetch(accountIDs []int) (model.RawStats, error) {
 }
 
 func (f *RawStatFetcher) accountInfo(accountIDs []int, channel chan data.Result[response.WGAccountInfo]) {
-	accountInfo, err := f.wargaming.accountInfo(accountIDs)
+	accountInfo, err := f.wargaming.AccountInfo(accountIDs)
 	channel <- data.Result[response.WGAccountInfo]{Value: accountInfo, Error: err}
 }
 
@@ -89,7 +90,7 @@ func (f *RawStatFetcher) shipStats(
 	var mu sync.Mutex
 
 	err := doParallel(accountIDs, func(accountID int) error {
-		wgShipStats, err := f.wargaming.shipsStats(accountID)
+		wgShipStats, err := f.wargaming.ShipsStats(accountID)
 		if err != nil {
 			return err
 		}

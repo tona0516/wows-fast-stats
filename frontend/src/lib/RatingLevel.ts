@@ -1,6 +1,6 @@
-import { data } from "wailsjs/go/models";
+import { model } from "wailsjs/go/models";
 
-export type RatingLevel = Readonly<keyof data.UCSkillColorCode>;
+export type RatingLevel = Readonly<keyof model.UCSkillColorCode>;
 
 export class RatingInfo {
   constructor(
@@ -10,7 +10,7 @@ export class RatingInfo {
 
   static fromPR(
     value: number,
-    colorCode: data.UCSkillColorCode,
+    colorCode: model.UCSkillColorCode,
   ): RatingInfo | undefined {
     const rating = RATING_DEFS.findLast((it) => value >= it.pr);
     return !rating
@@ -20,7 +20,7 @@ export class RatingInfo {
 
   static fromWinRate(
     value: number,
-    colorCode: data.UCSkillColorCode,
+    colorCode: model.UCSkillColorCode,
   ): RatingInfo | undefined {
     const rating = RATING_DEFS.findLast((it) => value >= it.winRate);
     return !rating
@@ -31,7 +31,7 @@ export class RatingInfo {
   static fromDamage(
     value: number,
     expected: number,
-    colorCode: data.UCSkillColorCode,
+    colorCode: model.UCSkillColorCode,
   ): RatingInfo | undefined {
     if (expected === 0) {
       return undefined;

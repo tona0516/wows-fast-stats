@@ -1,4 +1,4 @@
-import type { data } from "wailsjs/go/models";
+import type { model } from "wailsjs/go/models";
 
 export enum FontSize {
   XX_SMALL = "xx-small",
@@ -21,7 +21,7 @@ const ZOOM_RATIO = new Map<FontSize, number>([
 ]);
 
 export namespace FontSize {
-  export const getZoomRate = (config: data.UserConfigV2): number => {
+  export const getZoomRate = (config: model.UserConfigV2): number => {
     const fontSize = config.font_size as FontSize;
     const zoomRatio = ZOOM_RATIO.get(fontSize);
 

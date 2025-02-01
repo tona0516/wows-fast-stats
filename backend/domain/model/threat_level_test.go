@@ -7,16 +7,16 @@ import (
 )
 
 const (
-	allowableDelta = 1.0
-	shipIDMutsuki  = 4184749776
-	shipIDRanger   = 4183799792
-	shipIDSims     = 4264441840
-	shipIDNagato   = 4284430032
-	shipIDSinop    = 4182717904
-	shipIDYorktown = 4265588720
-	shipIDKitakaze = 4065212112
-	shipIDAlaska   = 3760109552
-	shipIDYoshino  = 3749623504
+	allowableDeltaTL = 1.0
+	shipIDMutsuki    = 4184749776
+	shipIDRanger     = 4183799792
+	shipIDSims       = 4264441840
+	shipIDNagato     = 4284430032
+	shipIDSinop      = 4182717904
+	shipIDYorktown   = 4265588720
+	shipIDKitakaze   = 4065212112
+	shipIDAlaska     = 3760109552
+	shipIDYoshino    = 3749623504
 )
 
 func TestThreatLevel_CalculateThreatLevel_CV_CVあり_Tierミドル(t *testing.T) {
@@ -65,8 +65,8 @@ func TestThreatLevel_CalculateThreatLevel_CV_CVあり_Tierミドル(t *testing.T
 		Modified: 18111,
 	}
 
-	assert.InDelta(t, expected.Raw, actual.Raw, allowableDelta)
-	assert.InDelta(t, expected.Modified, actual.Modified, allowableDelta)
+	assert.InDelta(t, expected.Raw, actual.Raw, allowableDeltaTL)
+	assert.InDelta(t, expected.Modified, actual.Modified, allowableDeltaTL)
 }
 
 func TestThreatLevel_CalculateThreatLevel_BB_CVあり_Tierトップ(t *testing.T) {
@@ -115,8 +115,8 @@ func TestThreatLevel_CalculateThreatLevel_BB_CVあり_Tierトップ(t *testing.T
 		Modified: 21497,
 	}
 
-	assert.InDelta(t, expected.Raw, actual.Raw, allowableDelta)
-	assert.InDelta(t, expected.Modified, actual.Modified, allowableDelta)
+	assert.InDelta(t, expected.Raw, actual.Raw, allowableDeltaTL)
+	assert.InDelta(t, expected.Modified, actual.Modified, allowableDeltaTL)
 }
 
 func TestThreatLevel_CalculateThreatLevel_CL_CVなし_Tierミドル(t *testing.T) {
@@ -153,8 +153,8 @@ func TestThreatLevel_CalculateThreatLevel_CL_CVなし_Tierミドル(t *testing.T
 		Modified: 24184,
 	}
 
-	assert.InDelta(t, expected.Raw, actual.Raw, allowableDelta)
-	assert.InDelta(t, expected.Modified, actual.Modified, allowableDelta)
+	assert.InDelta(t, expected.Raw, actual.Raw, allowableDeltaTL)
+	assert.InDelta(t, expected.Modified, actual.Modified, allowableDeltaTL)
 }
 
 func TestThreatLevel_CalculateThreatLevel_DD_CVあり_Tierボトム_特殊補正艦(t *testing.T) {
@@ -207,6 +207,6 @@ func TestThreatLevel_CalculateThreatLevel_DD_CVあり_Tierボトム_特殊補正
 		Modified: 22331,
 	}
 
-	assert.InDelta(t, expected.Raw, actual.Raw, allowableDelta)
-	assert.InDelta(t, expected.Modified, actual.Modified, allowableDelta)
+	assert.InDelta(t, expected.Raw, actual.Raw, allowableDeltaTL)
+	assert.InDelta(t, expected.Modified, actual.Modified, allowableDeltaTL)
 }

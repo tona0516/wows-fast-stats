@@ -1,19 +1,19 @@
 import { DispName } from "src/lib/DispName";
 import { Summary } from "src/lib/Summary";
 import type { StatsExtra } from "src/lib/types";
-import { data, model } from "wailsjs/go/models";
+import { model } from "wailsjs/go/models";
 
-const makePlayer = (): data.Player => {
-  const pvpSolo = new data.PlayerStats();
-  pvpSolo.ship = new data.ShipStats();
-  pvpSolo.overall = new data.OverallStats();
+const makePlayer = (): model.Player => {
+  const pvpSolo = new model.PlayerStats();
+  pvpSolo.ship = new model.ShipStats();
+  pvpSolo.overall = new model.OverallStats();
 
-  const pvpAll = new data.PlayerStats();
-  pvpAll.ship = new data.ShipStats();
-  pvpAll.overall = new data.OverallStats();
+  const pvpAll = new model.PlayerStats();
+  pvpAll.ship = new model.ShipStats();
+  pvpAll.overall = new model.OverallStats();
 
-  const player = new data.Player();
-  player.player_info = new data.PlayerInfo();
+  const player = new model.Player();
+  player.player_info = new model.PlayerInfo();
   player.warship = new model.Warship();
   player.pvp_solo = pvpSolo;
   player.pvp_all = pvpAll;
@@ -21,15 +21,15 @@ const makePlayer = (): data.Player => {
   return player;
 };
 
-const makeConfig = (): data.UserConfigV2 => {
-  const digit = new data.UCDigit();
-  const teamSummary = new data.UCTeamSummary();
+const makeConfig = (): model.UserConfigV2 => {
+  const digit = new model.UCDigit();
+  const teamSummary = new model.UCTeamSummary();
 
-  const display = new data.UCDisplay();
-  display.ship = new data.UCDisplayShip();
-  display.overall = new data.UCDisplayOverall();
+  const display = new model.UCDisplay();
+  display.ship = new model.UCDisplayShip();
+  display.overall = new model.UCDisplayOverall();
 
-  const config = new data.UserConfigV2();
+  const config = new model.UserConfigV2();
   config.digit = digit;
   config.team_summary = teamSummary;
   config.display = display;
@@ -41,14 +41,14 @@ test("calculate - invalid battle", () => {
   const battles = [
     undefined, // battleが存在しない
     (() => {
-      const battle = new data.Battle();
-      battle.teams = [new data.Team()];
+      const battle = new model.Battle();
+      battle.teams = [new model.Team()];
       return battle;
     })(), // teamが1つ
   ];
 
   battles.forEach((it) => {
-    const actual = Summary.calculate(it, new Set(), new data.UserConfigV2());
+    const actual = Summary.calculate(it, new Set(), new model.UserConfigV2());
     expect(actual).toBeUndefined();
   });
 });
@@ -80,12 +80,12 @@ test("calculate - all types, ship, pvp_all, excluded player", () => {
   enemy2.player_info.id = 12;
   enemy2[extra].ship.battles = 100;
 
-  const friendTeam = new data.Team();
+  const friendTeam = new model.Team();
   friendTeam.players = [friend1, friend2];
-  const enemyTeam = new data.Team();
+  const enemyTeam = new model.Team();
   enemyTeam.players = [enemy1, enemy2];
 
-  const battle = new data.Battle();
+  const battle = new model.Battle();
   battle.teams = [friendTeam, enemyTeam];
 
   const config = makeConfig();
@@ -174,12 +174,12 @@ test("calculate - each ship type, overall, pvp_solo", () => {
     return enemy;
   });
 
-  const friendTeam = new data.Team();
+  const friendTeam = new model.Team();
   friendTeam.players = friends;
-  const enemyTeam = new data.Team();
+  const enemyTeam = new model.Team();
   enemyTeam.players = enemies;
 
-  const battle = new data.Battle();
+  const battle = new model.Battle();
   battle.teams = [friendTeam, enemyTeam];
 
   const config = makeConfig();

@@ -2,55 +2,47 @@ package service
 
 import (
 	"context"
+	"path/filepath"
 	"sort"
+	"strconv"
 	"strings"
 	"wfs/backend/data"
 	"wfs/backend/domain/model"
-	domainRepository "wfs/backend/domain/repository"
-	"wfs/backend/repository"
+	"wfs/backend/domain/repository"
 )
 
 type Battle struct {
-	wargaming         repository.WargamingInterface
-	localFile         repository.LocalFileInterface
-	warshipFetcher    domainRepository.WarshipFetcherInterface
-	clanFetcher       domainRepository.ClanFetcherInterface
-	taiFetcher        domainRepository.TAIFetcherInterface
-	rawStatFetcher    domainRepository.RawStatFetcherInterface
-	battleMeraFetcher domainRepository.BattleMetaFetcherInterface
-	storage           repository.StorageInterface
-	logger            repository.LoggerInterface
-	eventsEmitFunc    eventEmitFunc
+	localFile         repository.LocalFile
+	warshipStore      repository.WarshipFetcher
+	clanFetcher       repository.ClanFetcher
+	rawStatFetcher    repository.RawStatFetcher
+	battleMetaFetcher repository.BattleMetaFetcher
+	accountFetcher    repository.AccountFetcher
+	logger            repository.Logger
 }
 
 func NewBattle(
-	wargaming repository.WargamingInterface,
-	localFile repository.LocalFileInterface,
-	warshipFetcher domainRepository.WarshipFetcherInterface,
-	clanFetcher domainRepository.ClanFetcherInterface,
-	taiFetcher domainRepository.TAIFetcherInterface,
-	rawStatFetcher domainRepository.RawStatFetcherInterface,
-	battleMeraFetcher domainRepository.BattleMetaFetcherInterface,
-	storage repository.StorageInterface,
-	logger repository.LoggerInterface,
-	eventsEmitFunc eventEmitFunc,
+	localFile repository.LocalFile,
+	warshipFetcher repository.WarshipFetcher,
+	clanFetcher repository.ClanFetcher,
+	rawStatFetcher repository.RawStatFetcher,
+	battleMetaFetcher repository.BattleMetaFetcher,
+	accountFetcher repository.AccountFetcher,
+	logger repository.Logger,
 ) *Battle {
 	return &Battle{
-		wargaming:         wargaming,
 		localFile:         localFile,
-		warshipFetcher:    warshipFetcher,
+		warshipStore:      warshipFetcher,
 		clanFetcher:       clanFetcher,
-		taiFetcher:        taiFetcher,
 		rawStatFetcher:    rawStatFetcher,
-		battleMeraFetcher: battleMeraFetcher,
-		storage:           storage,
+		battleMetaFetcher: battleMetaFetcher,
+		accountFetcher:    accountFetcher,
 		logger:            logger,
-		eventsEmitFunc:    eventsEmitFunc,
 	}
 }
 
-func (b *Battle) Get(appCtx context.Context, userConfig data.UserConfigV2) (data.Battle, error) {
-	var result data.Battle
+func (b *Battle) Get(appCtx context.Context, userConfig model.UserConfigV2) (model.Battle, error) {
+	var result model.Battle
 
 	// Get tempArenaInfo.json
 	tempArenaInfo, err := b.getTempArenaInfo(userConfig)
@@ -59,7 +51,6 @@ func (b *Battle) Get(appCtx context.Context, userConfig data.UserConfigV2) (data
 	}
 
 	// persist own ign for reporting
-	_ = b.storage.WriteOwnIGN(tempArenaInfo.PlayerName)
 	b.logger.SetOwnIGN(tempArenaInfo.PlayerName)
 
 	warshipResult := make(chan data.Result[model.Warships])
@@ -69,11 +60,14 @@ func (b *Battle) Get(appCtx context.Context, userConfig data.UserConfigV2) (data
 	go b.fetchBattleMeta(battleMetaResult)
 
 	// Get Account ID list
-	accountList, err := b.wargaming.AccountList(tempArenaInfo.AccountNames())
+	accountList, err := b.accountFetcher.Fetch(tempArenaInfo.AccountNames())
 	if err != nil {
 		return result, err
 	}
-	accountIDs := accountList.AccountIDs()
+	accountIDs := make([]int, 0, len(accountList))
+	for _, id := range accountList {
+		accountIDs = append(accountIDs, id)
+	}
 
 	// Fetch each stats
 	rawStatsResult := make(chan data.Result[model.RawStats])
@@ -112,14 +106,15 @@ func (b *Battle) Get(appCtx context.Context, userConfig data.UserConfigV2) (data
 	return result, nil
 }
 
-func (b *Battle) getTempArenaInfo(userConfig data.UserConfigV2) (model.TempArenaInfo, error) {
-	tempArenaInfo, err := b.taiFetcher.Get(userConfig.InstallPath)
+func (b *Battle) getTempArenaInfo(userConfig model.UserConfigV2) (model.TempArenaInfo, error) {
+	tempArenaInfo, err := b.localFile.ReadTempArenaInfo(userConfig.InstallPath)
 	if err != nil {
 		return tempArenaInfo, err
 	}
 
 	if userConfig.SaveTempArenaInfo {
-		if err := b.localFile.SaveTempArenaInfo(tempArenaInfo); err != nil {
+		path := filepath.Join("temp_arena_info", "tempArenaInfo_"+strconv.FormatInt(tempArenaInfo.Unixtime(), 10)+".json")
+		if err := b.localFile.SaveTempArenaInfo(path, tempArenaInfo); err != nil {
 			return tempArenaInfo, err
 		}
 	}
@@ -128,7 +123,7 @@ func (b *Battle) getTempArenaInfo(userConfig data.UserConfigV2) (model.TempArena
 }
 
 func (b *Battle) fetchWarships(channel chan data.Result[model.Warships]) {
-	warships, err := b.warshipFetcher.Fetch()
+	warships, err := b.warshipStore.Fetch()
 	channel <- data.Result[model.Warships]{
 		Value: warships,
 		Error: err,
@@ -149,25 +144,25 @@ func (b *Battle) fetchRawStats(accountIDs []int, channel chan data.Result[model.
 }
 
 func (b *Battle) fetchBattleMeta(channel chan data.Result[model.BattleMeta]) {
-	battleMeta, err := b.battleMeraFetcher.Fetch()
+	battleMeta, err := b.battleMetaFetcher.Fetch()
 	channel <- data.Result[model.BattleMeta]{Value: battleMeta, Error: err}
 }
 
 func (b *Battle) compose(
 	tempArenaInfo model.TempArenaInfo,
-	accountList data.WGAccountList,
+	accounts model.Accounts,
 	warships model.Warships,
 	clans model.Clans,
 	rawStats model.RawStats,
 	battleMeta model.BattleMeta,
-) data.Battle {
-	friends := make(data.Players, 0)
-	enemies := make(data.Players, 0)
+) model.Battle {
+	friends := make(model.Players, 0)
+	enemies := make(model.Players, 0)
 	var ownShip string
 
 	for _, vehicle := range tempArenaInfo.Vehicles {
 		nickname := vehicle.Name
-		accountID := accountList.AccountID(nickname)
+		accountID := accounts[nickname]
 		clan := clans[accountID]
 		rawStat := rawStats[accountID]
 		shipID := vehicle.ShipID
@@ -183,19 +178,19 @@ func (b *Battle) compose(
 			ownShip = warship.Name
 		}
 
-		stats := data.NewStats(shipID, rawStat, warships)
+		stats := model.NewStats(shipID, rawStat, warships)
 
-		player := data.Player{
-			PlayerInfo: data.PlayerInfo{
+		player := model.Player{
+			PlayerInfo: model.PlayerInfo{
 				ID:       accountID,
 				Name:     nickname,
 				Clan:     clan,
 				IsHidden: rawStat.Overall.IsHidden,
 			},
 			Warship:  warship,
-			PvPSolo:  playerStats(data.StatsPatternPvPSolo, stats, accountID, shipID, tempArenaInfo, warships),
-			PvPAll:   playerStats(data.StatsPatternPvPAll, stats, accountID, shipID, tempArenaInfo, warships),
-			RankSolo: playerStats(data.StatsPatternRankSolo, stats, accountID, shipID, tempArenaInfo, warships),
+			PvPSolo:  playerStats(model.StatsPatternPvPSolo, stats, accountID, shipID, tempArenaInfo, warships),
+			PvPAll:   playerStats(model.StatsPatternPvPAll, stats, accountID, shipID, tempArenaInfo, warships),
+			RankSolo: playerStats(model.StatsPatternRankSolo, stats, accountID, shipID, tempArenaInfo, warships),
 		}
 
 		if vehicle.IsFriend() {
@@ -208,13 +203,13 @@ func (b *Battle) compose(
 	sort.Sort(friends)
 	sort.Sort(enemies)
 
-	teams := []data.Team{
+	teams := []model.Team{
 		{Players: friends},
 		{Players: enemies},
 	}
 
-	battle := data.Battle{
-		Meta: data.Meta{
+	battle := model.Battle{
+		Meta: model.Meta{
 			Unixtime: tempArenaInfo.Unixtime(),
 			Arena:    battleMeta.Arena(tempArenaInfo.MapID),
 			Type:     strings.ReplaceAll(battleMeta.Type(tempArenaInfo.MatchGroup), " ", ""),
@@ -227,62 +222,62 @@ func (b *Battle) compose(
 }
 
 func playerStats(
-	statsPattern data.StatsPattern,
-	stats *data.Stats,
+	statsPattern model.StatsPattern,
+	stats *model.Stats,
 	accountID int,
 	shipID int,
 	tempArenaInfo model.TempArenaInfo,
 	warships model.Warships,
-) data.PlayerStats {
+) model.PlayerStats {
 	threatLevel := model.CalculateThreatLevel(
 		accountID,
 		tempArenaInfo,
 		warships,
 		shipID,
-		stats.Battles(data.StatsCategoryShip, statsPattern),
-		stats.AvgDamage(data.StatsCategoryShip, statsPattern),
-		stats.WinRate(data.StatsCategoryShip, statsPattern),
-		stats.SurvivedRate(data.StatsCategoryShip, statsPattern),
-		stats.PlanesKilled(data.StatsCategoryShip),
-		stats.Battles(data.StatsCategoryOverall, statsPattern),
-		stats.AvgDamage(data.StatsCategoryOverall, statsPattern),
-		stats.WinRate(data.StatsCategoryOverall, statsPattern),
-		stats.AvgKill(data.StatsCategoryOverall, statsPattern),
-		stats.KdRate(data.StatsCategoryOverall, statsPattern),
+		stats.Battles(model.StatsCategoryShip, statsPattern),
+		stats.AvgDamage(model.StatsCategoryShip, statsPattern),
+		stats.WinRate(model.StatsCategoryShip, statsPattern),
+		stats.SurvivedRate(model.StatsCategoryShip, statsPattern),
+		stats.PlanesKilled(model.StatsCategoryShip),
+		stats.Battles(model.StatsCategoryOverall, statsPattern),
+		stats.AvgDamage(model.StatsCategoryOverall, statsPattern),
+		stats.WinRate(model.StatsCategoryOverall, statsPattern),
+		stats.AvgKill(model.StatsCategoryOverall, statsPattern),
+		stats.KdRate(model.StatsCategoryOverall, statsPattern),
 	)
 
-	return data.PlayerStats{
-		ShipStats: data.ShipStats{
-			Battles:            stats.Battles(data.StatsCategoryShip, statsPattern),
-			Damage:             stats.AvgDamage(data.StatsCategoryShip, statsPattern),
-			MaxDamage:          stats.MaxDamage(data.StatsCategoryShip, statsPattern),
-			WinRate:            stats.WinRate(data.StatsCategoryShip, statsPattern),
-			WinSurvivedRate:    stats.WinSurvivedRate(data.StatsCategoryShip, statsPattern),
-			LoseSurvivedRate:   stats.LoseSurvivedRate(data.StatsCategoryShip, statsPattern),
-			KdRate:             stats.KdRate(data.StatsCategoryShip, statsPattern),
-			Kill:               stats.AvgKill(data.StatsCategoryShip, statsPattern),
-			Exp:                stats.AvgExp(data.StatsCategoryShip, statsPattern),
-			PR:                 stats.PR(data.StatsCategoryShip, statsPattern),
+	return model.PlayerStats{
+		ShipStats: model.ShipStats{
+			Battles:            stats.Battles(model.StatsCategoryShip, statsPattern),
+			Damage:             stats.AvgDamage(model.StatsCategoryShip, statsPattern),
+			MaxDamage:          stats.MaxDamage(model.StatsCategoryShip, statsPattern),
+			WinRate:            stats.WinRate(model.StatsCategoryShip, statsPattern),
+			WinSurvivedRate:    stats.WinSurvivedRate(model.StatsCategoryShip, statsPattern),
+			LoseSurvivedRate:   stats.LoseSurvivedRate(model.StatsCategoryShip, statsPattern),
+			KdRate:             stats.KdRate(model.StatsCategoryShip, statsPattern),
+			Kill:               stats.AvgKill(model.StatsCategoryShip, statsPattern),
+			Exp:                stats.AvgExp(model.StatsCategoryShip, statsPattern),
+			PR:                 stats.PR(model.StatsCategoryShip, statsPattern),
 			MainBatteryHitRate: stats.MainBatteryHitRate(statsPattern),
 			TorpedoesHitRate:   stats.TorpedoesHitRate(statsPattern),
 			PlanesKilled:       stats.PlanesKilled(statsPattern),
-			PlatoonRate:        stats.PlatoonRate(data.StatsCategoryShip),
+			PlatoonRate:        stats.PlatoonRate(model.StatsCategoryShip),
 		},
-		OverallStats: data.OverallStats{
-			Battles:           stats.Battles(data.StatsCategoryOverall, statsPattern),
-			Damage:            stats.AvgDamage(data.StatsCategoryOverall, statsPattern),
-			MaxDamage:         stats.MaxDamage(data.StatsCategoryOverall, statsPattern),
-			WinRate:           stats.WinRate(data.StatsCategoryOverall, statsPattern),
-			WinSurvivedRate:   stats.WinSurvivedRate(data.StatsCategoryOverall, statsPattern),
-			LoseSurvivedRate:  stats.LoseSurvivedRate(data.StatsCategoryOverall, statsPattern),
-			KdRate:            stats.KdRate(data.StatsCategoryOverall, statsPattern),
-			Kill:              stats.AvgKill(data.StatsCategoryOverall, statsPattern),
-			Exp:               stats.AvgExp(data.StatsCategoryOverall, statsPattern),
-			PR:                stats.PR(data.StatsCategoryOverall, statsPattern),
+		OverallStats: model.OverallStats{
+			Battles:           stats.Battles(model.StatsCategoryOverall, statsPattern),
+			Damage:            stats.AvgDamage(model.StatsCategoryOverall, statsPattern),
+			MaxDamage:         stats.MaxDamage(model.StatsCategoryOverall, statsPattern),
+			WinRate:           stats.WinRate(model.StatsCategoryOverall, statsPattern),
+			WinSurvivedRate:   stats.WinSurvivedRate(model.StatsCategoryOverall, statsPattern),
+			LoseSurvivedRate:  stats.LoseSurvivedRate(model.StatsCategoryOverall, statsPattern),
+			KdRate:            stats.KdRate(model.StatsCategoryOverall, statsPattern),
+			Kill:              stats.AvgKill(model.StatsCategoryOverall, statsPattern),
+			Exp:               stats.AvgExp(model.StatsCategoryOverall, statsPattern),
+			PR:                stats.PR(model.StatsCategoryOverall, statsPattern),
 			AvgTier:           stats.AvgTier(statsPattern),
 			UsingShipTypeRate: stats.UsingShipTypeRate(statsPattern),
 			UsingTierRate:     stats.UsingTierRate(statsPattern),
-			PlatoonRate:       stats.PlatoonRate(data.StatsCategoryOverall),
+			PlatoonRate:       stats.PlatoonRate(model.StatsCategoryOverall),
 			ThreatLevel:       threatLevel,
 		},
 	}

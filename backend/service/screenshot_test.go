@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 	"wfs/backend/apperr"
-	"wfs/backend/mock/repository"
+	"wfs/backend/domain/mock/repository"
 
 	"github.com/morikuni/failure"
 	"github.com/stretchr/testify/assert"
@@ -29,10 +29,10 @@ func TestScreenshot_SaveForAuto(t *testing.T) {
 
 		// 準備
 		screenshotPath := filepath.Join("screenshot", filename)
-		mockLocalFile := repository.NewMockLocalFileInterface(ctrl)
+		mockLocalFile := repository.NewMockLocalFile(ctrl)
 		mockLocalFile.EXPECT().SaveScreenshot(screenshotPath, base64Data).Return(nil).AnyTimes()
 
-		s := NewScreenshot(mockLocalFile, nil)
+		s := NewScreenshot(mockLocalFile)
 		s.SaveFileDialog = func(ctx context.Context, dialogOptions runtime.SaveDialogOptions) (string, error) {
 			return screenshotPath, nil
 		}
@@ -55,10 +55,10 @@ func TestScreenshot_SaveWithDialog(t *testing.T) {
 
 		// 準備
 		screenshotPath := filepath.Join("directory", filename)
-		mockLocalFile := repository.NewMockLocalFileInterface(ctrl)
+		mockLocalFile := repository.NewMockLocalFile(ctrl)
 		mockLocalFile.EXPECT().SaveScreenshot(screenshotPath, base64Data).Return(nil).AnyTimes()
 
-		s := NewScreenshot(mockLocalFile, nil)
+		s := NewScreenshot(mockLocalFile)
 		s.SaveFileDialog = func(ctx context.Context, dialogOptions runtime.SaveDialogOptions) (string, error) {
 			return screenshotPath, nil
 		}
@@ -74,7 +74,7 @@ func TestScreenshot_SaveWithDialog(t *testing.T) {
 	t.Run("異常系", func(t *testing.T) {
 		t.Parallel()
 		// 準備
-		s := NewScreenshot(nil, nil)
+		s := NewScreenshot(nil)
 		s.SaveFileDialog = func(ctx context.Context, dialogOptions runtime.SaveDialogOptions) (string, error) {
 			return "", failure.New(apperr.WailsError)
 		}
@@ -92,7 +92,7 @@ func TestScreenshot_SaveWithDialog(t *testing.T) {
 	t.Run("異常系_キャンセル", func(t *testing.T) {
 		t.Parallel()
 		// 準備
-		s := NewScreenshot(nil, nil)
+		s := NewScreenshot(nil)
 		s.SaveFileDialog = func(ctx context.Context, dialogOptions runtime.SaveDialogOptions) (string, error) {
 			return "", nil
 		}

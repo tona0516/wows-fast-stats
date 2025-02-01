@@ -156,14 +156,12 @@ func makePostRequest(rb Client) (*http.Request, error) {
 }
 
 func do(rb Client, makeReqFunc func(rb Client) (*http.Request, error)) (http.Response, []byte, error) {
-	var res http.Response
-	var body []byte
 	errCtx := make(failure.Context)
 
 	client := makeClient(rb)
 	req, err := makeReqFunc(rb)
 	if err != nil {
-		return res, body, err
+		return http.Response{}, nil, err
 	}
 
 	url := req.URL.Scheme + "://" + req.URL.Host
@@ -176,30 +174,24 @@ func do(rb Client, makeReqFunc func(rb Client) (*http.Request, error)) (http.Res
 
 	errCtx["url"] = url
 
-	_res, err := client.Do(req)
+	res, err := client.Do(req)
 	if err != nil {
-		return res, body, failure.Wrap(err, errCtx)
+		return http.Response{}, nil, failure.Wrap(err, errCtx)
 	}
-	defer _res.Body.Close()
-	res = *_res
+	defer res.Body.Close()
 
 	errCtx["status_code"] = strconv.Itoa(res.StatusCode)
 
-	body, err = io.ReadAll(res.Body)
+	body, err := io.ReadAll(res.Body)
 	if err != nil {
-		return res, nil, failure.Wrap(err, errCtx)
+		return *res, nil, failure.Wrap(err, errCtx)
 	}
 
 	errCtx["body"] = string(body)
 
-	if isError(res) {
-		return res, body, failure.Wrap(ErrErrorResponse, errCtx)
+	if res.StatusCode > 399 && res.StatusCode < 600 {
+		return *res, body, failure.Wrap(ErrErrorResponse, errCtx)
 	}
 
-	return res, body, nil
-}
-
-func isError(res http.Response) bool {
-	code := res.StatusCode
-	return code > 399 && code < 600
+	return *res, body, nil
 }

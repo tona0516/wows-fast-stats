@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"testing"
 	"wfs/backend/apperr"
-	"wfs/backend/data"
-	"wfs/backend/mock/repository"
+	"wfs/backend/domain/mock/repository"
+	"wfs/backend/domain/model"
 
 	"github.com/morikuni/failure"
 	"github.com/stretchr/testify/assert"
@@ -27,12 +27,12 @@ func TestConfig_UpdateInstallPath(t *testing.T) {
 	defer os.RemoveAll(validInstallPath)
 
 	t.Run("正常系", func(t *testing.T) {
-		mockStorage := repository.NewMockStorageInterface(ctrl)
-		mockStorage.EXPECT().UserConfigV2().Return(data.DefaultUserConfigV2(), nil)
-		mockStorage.EXPECT().WriteUserConfigV2(gomock.Any()).Return(nil)
+		mockUserConfig := repository.NewMockUserConfigStore(ctrl)
+		mockUserConfig.EXPECT().GetV2().Return(model.DefaultUserConfigV2(), nil)
+		mockUserConfig.EXPECT().SaveV2(gomock.Any()).Return(nil)
 
 		// テスト
-		c := NewConfig(nil, nil, mockStorage, nil)
+		c := NewConfig(nil, mockUserConfig, nil)
 		actual, err := c.UpdateInstallPath(validInstallPath)
 
 		// アサーション
@@ -48,7 +48,7 @@ func TestConfig_UpdateInstallPath(t *testing.T) {
 
 		for path, expected := range params {
 			// テスト
-			c := NewConfig(nil, nil, nil, nil)
+			c := NewConfig(nil, nil, nil)
 			_, err := c.UpdateInstallPath(path)
 
 			// アサーション
@@ -70,15 +70,15 @@ func TestConfig_UpdateOptional(t *testing.T) {
 		config := createInputConfig()
 		config.FontSize = "small"
 		// Note: requiredな値を与えてもこれらの値はWriteUserConfigでは含まれない
-		actualWritten := data.DefaultUserConfigV2()
+		actualWritten := model.DefaultUserConfigV2()
 		actualWritten.FontSize = "small"
 
-		mockStorage := repository.NewMockStorageInterface(ctrl)
-		mockStorage.EXPECT().UserConfigV2().Return(data.DefaultUserConfigV2(), nil)
-		mockStorage.EXPECT().WriteUserConfigV2(actualWritten).Return(nil)
+		mockUserConfig := repository.NewMockUserConfigStore(ctrl)
+		mockUserConfig.EXPECT().GetV2().Return(model.DefaultUserConfigV2(), nil)
+		mockUserConfig.EXPECT().SaveV2(actualWritten).Return(nil)
 
 		// テスト実行
-		c := NewConfig(nil, nil, mockStorage, nil)
+		c := NewConfig(nil, mockUserConfig, nil)
 		err = c.UpdateOptional(config)
 
 		// アサーション
@@ -95,16 +95,16 @@ func TestConfig_AlertPlayers(t *testing.T) {
 		t.Parallel()
 
 		// 準備
-		expected := []data.AlertPlayer{
+		expected := []model.AlertPlayer{
 			{AccountID: 1, Name: "Player1"},
 			{AccountID: 2, Name: "Player2"},
 		}
 
-		mockStorage := repository.NewMockStorageInterface(ctrl)
-		mockStorage.EXPECT().AlertPlayers().Return(expected, nil)
+		mockAlertPlayer := repository.NewMockAlertPlayerStore(ctrl)
+		mockAlertPlayer.EXPECT().GetV1().Return(expected, nil)
 
 		// テスト
-		config := NewConfig(nil, nil, mockStorage, nil)
+		config := NewConfig(nil, nil, mockAlertPlayer)
 		actual, err := config.AlertPlayers()
 
 		// アサーション
@@ -118,7 +118,7 @@ func TestConfig_UpdateAlertPlayer(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 
-	existingPlayers := []data.AlertPlayer{
+	existingPlayers := []model.AlertPlayer{
 		{AccountID: 1, Name: "Player1"},
 		{AccountID: 2, Name: "Player2"},
 	}
@@ -127,17 +127,17 @@ func TestConfig_UpdateAlertPlayer(t *testing.T) {
 		t.Parallel()
 
 		// 準備
-		newPlayer := data.AlertPlayer{AccountID: 3, Name: "Player3"}
-		expected := make([]data.AlertPlayer, 0)
+		newPlayer := model.AlertPlayer{AccountID: 3, Name: "Player3"}
+		expected := make([]model.AlertPlayer, 0)
 		expected = append(expected, existingPlayers...)
 		expected = append(expected, newPlayer)
 
-		mockStorage := repository.NewMockStorageInterface(ctrl)
-		mockStorage.EXPECT().AlertPlayers().Return(existingPlayers, nil)
-		mockStorage.EXPECT().WriteAlertPlayers(expected).Return(nil)
+		mockAlertPlayer := repository.NewMockAlertPlayerStore(ctrl)
+		mockAlertPlayer.EXPECT().GetV1().Return(existingPlayers, nil)
+		mockAlertPlayer.EXPECT().SaveV1(expected).Return(nil)
 
 		// テスト
-		config := NewConfig(nil, nil, mockStorage, nil)
+		config := NewConfig(nil, nil, mockAlertPlayer)
 		actual, err := config.UpdateAlertPlayer(newPlayer)
 
 		// アサーション
@@ -148,19 +148,19 @@ func TestConfig_UpdateAlertPlayer(t *testing.T) {
 	t.Run("正常系_更新", func(t *testing.T) {
 		t.Parallel()
 
-		expected := []data.AlertPlayer{
+		expected := []model.AlertPlayer{
 			{AccountID: 1, Name: "UpdatedPlayer"},
 			{AccountID: 2, Name: "Player2"},
 		}
 
 		// 準備
-		mockStorage := repository.NewMockStorageInterface(ctrl)
-		mockStorage.EXPECT().AlertPlayers().Return(existingPlayers, nil)
-		mockStorage.EXPECT().WriteAlertPlayers(expected).Return(nil)
+		mockAlertPlayer := repository.NewMockAlertPlayerStore(ctrl)
+		mockAlertPlayer.EXPECT().GetV1().Return(existingPlayers, nil)
+		mockAlertPlayer.EXPECT().SaveV1(expected).Return(nil)
 
 		// テスト
-		config := NewConfig(nil, nil, mockStorage, nil)
-		actual, err := config.UpdateAlertPlayer(data.AlertPlayer{AccountID: 1, Name: "UpdatedPlayer"})
+		config := NewConfig(nil, nil, mockAlertPlayer)
+		actual, err := config.UpdateAlertPlayer(model.AlertPlayer{AccountID: 1, Name: "UpdatedPlayer"})
 
 		// アサーション
 		assert.NoError(t, err)
@@ -176,20 +176,20 @@ func TestConfig_RemoveAlertPlayer(t *testing.T) {
 	t.Run("正常系_対象IDあり", func(t *testing.T) {
 		t.Parallel()
 
-		expected := []data.AlertPlayer{
+		expected := []model.AlertPlayer{
 			{AccountID: 2, Name: "Player2"},
 		}
 
 		// 準備
-		mockStorage := repository.NewMockStorageInterface(ctrl)
-		mockStorage.EXPECT().AlertPlayers().Return([]data.AlertPlayer{
+		mockAlertPlayer := repository.NewMockAlertPlayerStore(ctrl)
+		mockAlertPlayer.EXPECT().GetV1().Return([]model.AlertPlayer{
 			{AccountID: 1, Name: "Player1"},
 			{AccountID: 2, Name: "Player2"},
 		}, nil)
-		mockStorage.EXPECT().WriteAlertPlayers(expected).Return(nil)
+		mockAlertPlayer.EXPECT().SaveV1(expected).Return(nil)
 
 		// テスト
-		config := NewConfig(nil, nil, mockStorage, nil)
+		config := NewConfig(nil, nil, mockAlertPlayer)
 		actual, err := config.RemoveAlertPlayer(1)
 
 		// アサーション
@@ -200,17 +200,17 @@ func TestConfig_RemoveAlertPlayer(t *testing.T) {
 	t.Run("正常系_対象IDなし", func(t *testing.T) {
 		t.Parallel()
 
-		expected := []data.AlertPlayer{
+		expected := []model.AlertPlayer{
 			{AccountID: 1, Name: "Player1"},
 			{AccountID: 2, Name: "Player2"},
 		}
 
 		// 準備
-		mockStorage := repository.NewMockStorageInterface(ctrl)
-		mockStorage.EXPECT().AlertPlayers().Return(expected, nil)
+		mockAlertPlayer := repository.NewMockAlertPlayerStore(ctrl)
+		mockAlertPlayer.EXPECT().GetV1().Return(expected, nil)
 
 		// テスト
-		config := NewConfig(nil, nil, mockStorage, nil)
+		config := NewConfig(nil, nil, mockAlertPlayer)
 		actual, err := config.RemoveAlertPlayer(3)
 
 		// アサーション
@@ -219,8 +219,8 @@ func TestConfig_RemoveAlertPlayer(t *testing.T) {
 	})
 }
 
-func createInputConfig() data.UserConfigV2 {
-	config := data.DefaultUserConfigV2()
+func createInputConfig() model.UserConfigV2 {
+	config := model.DefaultUserConfigV2()
 	config.InstallPath = validInstallPath
 
 	return config

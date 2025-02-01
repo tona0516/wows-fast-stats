@@ -1,8 +1,8 @@
 import { RatingInfo } from "src/lib/RatingLevel";
-import { data } from "wailsjs/go/models";
+import { model } from "wailsjs/go/models";
 
 test("ファクトリメソッド - 異常系", () => {
-  const skillColorCode = new data.UCSkillColorCode();
+  const skillColorCode = new model.UCSkillColorCode();
 
   const pr = RatingInfo.fromPR(-1, skillColorCode);
   expect(pr).toBeUndefined();
@@ -20,7 +20,7 @@ test("ファクトリメソッド - 異常系", () => {
 test("ファクトリメソッド - 正常系", () => {
   const expectedTextColor = "#114514";
 
-  const skillColorCode = new data.UCSkillColorCode({
+  const skillColorCode = new model.UCSkillColorCode({
     super_unicum: expectedTextColor,
   });
 

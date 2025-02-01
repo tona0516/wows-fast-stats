@@ -46,6 +46,19 @@ func writeJSON[T any](path string, target T) error {
 	return failure.Wrap(err, errCtx)
 }
 
+func writeData(path string, target []byte) error {
+	_ = os.MkdirAll(filepath.Dir(path), 0o755)
+
+	f, err := os.Create(path)
+	if err != nil {
+		return failure.Wrap(err)
+	}
+	defer f.Close()
+
+	_, err = f.Write(target)
+	return failure.Wrap(err)
+}
+
 func makeRange(min, max int) []int {
 	if min > max {
 		return []int{}

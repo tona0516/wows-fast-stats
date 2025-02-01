@@ -1,12 +1,12 @@
 <script lang="ts">
   import UkTable from "src/component/common/uikit/UkTable.svelte";
   import { RowPattern } from "src/lib/RowPattern";
-  import type { data } from "wailsjs/go/models";
+  import type { model } from "wailsjs/go/models";
   import { ColumnProvider } from "src/lib/column/ColumnProvider";
   import { storedTeamThreatLevels } from "src/stores";
 
-  export let teams: data.Team[];
-  export let config: data.UserConfigV2;
+  export let teams: model.Team[];
+  export let config: model.UserConfigV2;
 
   $: categories = ColumnProvider.getAllColumns(config);
   $: [basicColumns, shipColumns, overallColumns] = categories;

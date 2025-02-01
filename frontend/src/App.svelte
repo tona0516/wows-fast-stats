@@ -23,18 +23,18 @@
     storedLogs,
   } from "src/stores";
   import AlertModals from "src/component/modal/AlertModals.svelte";
-  import { data } from "wailsjs/go/models";
   import UkIcon from "src/component/common/uikit/UkIcon.svelte";
   import ExternalLink from "src/component/common/ExternalLink.svelte";
   import UkSpinner from "src/component/common/uikit/UkSpinner.svelte";
   import UkTab from "src/component/common/uikit/UkTab.svelte";
   import { FontSize } from "src/lib/FontSize";
   import { Notifier } from "./lib/Notifier";
+  import { model } from "wailsjs/go/models";
 
   let modals: AlertModals;
   let mainPage: MainPage | undefined;
   let initialized = false;
-  let updatableRelease: data.GHLatestRelease;
+  let updatableRelease: model.LatestRelease;
 
   $: {
     // @ts-ignore
@@ -43,10 +43,10 @@
 
   EventsOn("BATTLE_START", () => mainPage?.fetchBattle());
   EventsOn("BATTLE_ERR", (error: string) => Notifier.failure(error));
-  EventsOn("CONFIG_UPDATE", (config: data.UserConfigV2) =>
+  EventsOn("CONFIG_UPDATE", (config: model.UserConfigV2) =>
     storedConfig.set(config),
   );
-  EventsOn("ALERT_PLAYERS_UPDATE", (players: data.AlertPlayer[]) =>
+  EventsOn("ALERT_PLAYERS_UPDATE", (players: model.AlertPlayer[]) =>
     storedAlertPlayers.set(players),
   );
   EventsOn("LOG", (log: string) =>
@@ -77,7 +77,7 @@
     });
   };
 
-  const initialize = async (): Promise<data.UserConfigV2 | undefined> => {
+  const initialize = async (): Promise<model.UserConfigV2 | undefined> => {
     try {
       await MigrateIfNeeded();
 
@@ -105,7 +105,7 @@
     }
   };
 
-  const notifyUpdate = async (config: data.UserConfigV2) => {
+  const notifyUpdate = async (config: model.UserConfigV2) => {
     if (!config.notify_updatable) return;
 
     try {
@@ -137,8 +137,8 @@
   {#if updatableRelease}
     <div class="uk-flex uk-flex-center uk-background-secondary">
       新しいバージョンがあります:
-      <ExternalLink url={updatableRelease.html_url}>
-        {updatableRelease.tag_name}
+      <ExternalLink url={updatableRelease.url}>
+        {updatableRelease.semver}
       </ExternalLink>
     </div>
   {/if}

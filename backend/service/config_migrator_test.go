@@ -2,8 +2,8 @@ package service
 
 import (
 	"testing"
-	"wfs/backend/data"
-	"wfs/backend/mock/repository"
+	"wfs/backend/domain/mock/repository"
+	"wfs/backend/domain/model"
 
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
@@ -17,15 +17,15 @@ func TestConfigMigrator_Migrate(t *testing.T) {
 		t.Parallel()
 
 		// 準備
-		savedUserConfig := data.UserConfig{
+		savedUserConfig := model.UserConfig{
 			InstallPath: "a",
 			Appid:       "a",
 			FontSize:    "large",
-			Displays: data.Displays{
-				Ship: data.Ship{PR: true},
+			Displays: model.Displays{
+				Ship: model.Ship{PR: true},
 			},
 		}
-		savedAlertPlayers := []data.AlertPlayer{
+		savedAlertPlayers := []model.AlertPlayer{
 			{
 				AccountID: 1,
 				Name:      "a",
@@ -33,32 +33,36 @@ func TestConfigMigrator_Migrate(t *testing.T) {
 				Message:   "a",
 			},
 		}
-		// toV1()
-		mockConfigV0 := repository.NewMockConfigV0Interface(ctrl)
-		mockConfigV0.EXPECT().IsExistUser().Return(true)
-		mockConfigV0.EXPECT().User().Return(savedUserConfig, nil)
-		mockConfigV0.EXPECT().DeleteUser().Return(nil)
-		mockConfigV0.EXPECT().IsExistAlertPlayers().Return(true).MaxTimes(1)
-		mockConfigV0.EXPECT().AlertPlayers().Return(savedAlertPlayers, nil)
-		mockConfigV0.EXPECT().DeleteAlertPlayers().Return(nil)
 
-		mockStorage := repository.NewMockStorageInterface(ctrl)
-		mockStorage.EXPECT().DataVersion().Return(uint(0), nil).MaxTimes(1)
-		mockStorage.EXPECT().IsExistUserConfig().Return(false)
-		mockStorage.EXPECT().WriteUserConfig(savedUserConfig).Return(nil)
-		mockStorage.EXPECT().IsExistAlertPlayers().Return(false).MaxTimes(1)
-		mockStorage.EXPECT().WriteAlertPlayers(savedAlertPlayers).Return(nil)
-		mockStorage.EXPECT().WriteDataVersion(uint(1)).Return(nil).MaxTimes(1)
+		mockUserConfig := repository.NewMockUserConfigStore(ctrl)
+		mockAlertPlayer := repository.NewMockAlertPlayerStore(ctrl)
+		mockStorage := repository.NewMockStorage(ctrl)
+
+		// toV1()
+		mockUserConfig.EXPECT().IsExistV0().Return(true)
+		mockUserConfig.EXPECT().IsExistV1().Return(false)
+		mockUserConfig.EXPECT().GetV0().Return(savedUserConfig, nil)
+		mockUserConfig.EXPECT().DeleteV0().Return(nil)
+		mockUserConfig.EXPECT().SaveV1(savedUserConfig).Return(nil)
+
+		mockAlertPlayer.EXPECT().IsExistV0().Return(true)
+		mockAlertPlayer.EXPECT().IsExistV1().Return(false)
+		mockAlertPlayer.EXPECT().GetV0().Return(savedAlertPlayers, nil)
+		mockAlertPlayer.EXPECT().DeleteV0().Return(nil)
+		mockAlertPlayer.EXPECT().SaveV1(savedAlertPlayers).Return(nil)
+
+		mockStorage.EXPECT().DataVersion().Return(uint(0), nil)
+		mockStorage.EXPECT().WriteDataVersion(uint(1)).Return(nil)
 
 		// toV2()
-		mockStorage.EXPECT().DataVersion().Return(uint(1), nil).MaxTimes(1)
-		mockStorage.EXPECT().UserConfigV2().Return(data.UserConfigV2{}, nil)
-		mockStorage.EXPECT().UserConfig().Return(savedUserConfig, nil)
-		mockStorage.EXPECT().WriteUserConfigV2(data.FromUserConfigV1(savedUserConfig)).Return(nil)
-		mockStorage.EXPECT().WriteDataVersion(uint(2)).Return(nil).MaxTimes(1)
+		mockStorage.EXPECT().DataVersion().Return(uint(1), nil)
+		mockUserConfig.EXPECT().GetV2().Return(model.UserConfigV2{}, nil)
+		mockUserConfig.EXPECT().GetV1().Return(savedUserConfig, nil)
+		mockUserConfig.EXPECT().SaveV2(model.FromUserConfigV1(savedUserConfig)).Return(nil)
+		mockStorage.EXPECT().WriteDataVersion(uint(2)).Return(nil)
 
 		// テスト
-		cm := NewConfigMigrator(mockConfigV0, mockStorage, nil)
+		cm := NewConfigMigrator(mockStorage, mockUserConfig, mockAlertPlayer)
 		err := cm.ExecuteIfNeeded()
 
 		// アサーション
@@ -75,11 +79,11 @@ func TestConfigMigrator_toV1(t *testing.T) {
 		t.Parallel()
 
 		// 準備
-		mockStorage := repository.NewMockStorageInterface(ctrl)
+		mockStorage := repository.NewMockStorage(ctrl)
 		mockStorage.EXPECT().DataVersion().Return(uint(1), nil)
 
 		// テスト
-		cm := NewConfigMigrator(nil, mockStorage, nil)
+		cm := NewConfigMigrator(mockStorage, nil, nil)
 		err := cm.toV1()
 
 		// アサーション
@@ -90,18 +94,20 @@ func TestConfigMigrator_toV1(t *testing.T) {
 		t.Parallel()
 
 		// 準備
-		mockConfigV0 := repository.NewMockConfigV0Interface(ctrl)
-		mockConfigV0.EXPECT().IsExistUser().Return(true)
-		mockConfigV0.EXPECT().IsExistAlertPlayers().Return(true)
+		mockUserConfig := repository.NewMockUserConfigStore(ctrl)
+		mockAlertPlayer := repository.NewMockAlertPlayerStore(ctrl)
+		mockStorage := repository.NewMockStorage(ctrl)
 
-		mockStorage := repository.NewMockStorageInterface(ctrl)
+		mockUserConfig.EXPECT().IsExistV0().Return(true)
+		mockUserConfig.EXPECT().IsExistV1().Return(true)
+		mockAlertPlayer.EXPECT().IsExistV0().Return(true)
+		mockAlertPlayer.EXPECT().IsExistV1().Return(true)
+
 		mockStorage.EXPECT().DataVersion().Return(uint(0), nil)
-		mockStorage.EXPECT().IsExistUserConfig().Return(true)
-		mockStorage.EXPECT().IsExistAlertPlayers().Return(true)
 		mockStorage.EXPECT().WriteDataVersion(uint(1)).Return(nil)
 
 		// テスト
-		cm := NewConfigMigrator(mockConfigV0, mockStorage, nil)
+		cm := NewConfigMigrator(mockStorage, mockUserConfig, mockAlertPlayer)
 		err := cm.toV1()
 
 		// アサーション
@@ -112,15 +118,15 @@ func TestConfigMigrator_toV1(t *testing.T) {
 		t.Parallel()
 
 		// 準備
-		savedUserConfig := data.UserConfig{
+		savedUserConfig := model.UserConfig{
 			InstallPath: "a",
 			Appid:       "a",
 			FontSize:    "large",
-			Displays: data.Displays{
-				Ship: data.Ship{PR: true},
+			Displays: model.Displays{
+				Ship: model.Ship{PR: true},
 			},
 		}
-		savedAlertPlayers := []data.AlertPlayer{
+		savedAlertPlayers := []model.AlertPlayer{
 			{
 				AccountID: 1,
 				Name:      "a",
@@ -128,25 +134,29 @@ func TestConfigMigrator_toV1(t *testing.T) {
 				Message:   "a",
 			},
 		}
-		// toV1()
-		mockConfigV0 := repository.NewMockConfigV0Interface(ctrl)
-		mockConfigV0.EXPECT().IsExistUser().Return(true)
-		mockConfigV0.EXPECT().User().Return(savedUserConfig, nil)
-		mockConfigV0.EXPECT().DeleteUser().Return(nil)
-		mockConfigV0.EXPECT().IsExistAlertPlayers().Return(true)
-		mockConfigV0.EXPECT().AlertPlayers().Return(savedAlertPlayers, nil)
-		mockConfigV0.EXPECT().DeleteAlertPlayers().Return(nil)
 
-		mockStorage := repository.NewMockStorageInterface(ctrl)
+		mockUserConfig := repository.NewMockUserConfigStore(ctrl)
+		mockAlertPlayer := repository.NewMockAlertPlayerStore(ctrl)
+		mockStorage := repository.NewMockStorage(ctrl)
+
+		// toV1()
+		mockUserConfig.EXPECT().IsExistV0().Return(true)
+		mockUserConfig.EXPECT().IsExistV1().Return(false)
+		mockUserConfig.EXPECT().GetV0().Return(savedUserConfig, nil)
+		mockUserConfig.EXPECT().DeleteV0().Return(nil)
+		mockUserConfig.EXPECT().SaveV1(savedUserConfig).Return(nil)
+
+		mockAlertPlayer.EXPECT().IsExistV0().Return(true)
+		mockAlertPlayer.EXPECT().IsExistV1().Return(false)
+		mockAlertPlayer.EXPECT().GetV0().Return(savedAlertPlayers, nil)
+		mockAlertPlayer.EXPECT().DeleteV0().Return(nil)
+		mockAlertPlayer.EXPECT().SaveV1(savedAlertPlayers).Return(nil)
+
 		mockStorage.EXPECT().DataVersion().Return(uint(0), nil)
-		mockStorage.EXPECT().IsExistUserConfig().Return(false)
-		mockStorage.EXPECT().WriteUserConfig(savedUserConfig).Return(nil)
-		mockStorage.EXPECT().IsExistAlertPlayers().Return(false)
-		mockStorage.EXPECT().WriteAlertPlayers(savedAlertPlayers).Return(nil)
 		mockStorage.EXPECT().WriteDataVersion(uint(1)).Return(nil)
 
 		// テスト
-		cm := NewConfigMigrator(mockConfigV0, mockStorage, nil)
+		cm := NewConfigMigrator(mockStorage, mockUserConfig, mockAlertPlayer)
 		err := cm.toV1()
 
 		// アサーション
@@ -163,11 +173,11 @@ func TestConfigMigrator_toV2(t *testing.T) {
 		t.Parallel()
 
 		// 準備
-		mockStorage := repository.NewMockStorageInterface(ctrl)
+		mockStorage := repository.NewMockStorage(ctrl)
 		mockStorage.EXPECT().DataVersion().Return(uint(2), nil)
 
 		// テスト
-		cm := NewConfigMigrator(nil, mockStorage, nil)
+		cm := NewConfigMigrator(mockStorage, nil, nil)
 		err := cm.toV2()
 
 		// アサーション
@@ -177,33 +187,35 @@ func TestConfigMigrator_toV2(t *testing.T) {
 		t.Parallel()
 
 		// 準備
-		v2 := data.UserConfigV2{
+		v2 := model.UserConfigV2{
 			InstallPath: "test_install_path",
-			Display: data.UCDisplay{
-				Ship: data.UCDisplayShip{
+			Display: model.UCDisplay{
+				Ship: model.UCDisplayShip{
 					PR: true,
 				},
 			},
 		}
 
-		expect := data.UserConfigV2{
+		expect := model.UserConfigV2{
 			Version:     2,
 			InstallPath: "test_install_path",
-			Display: data.UCDisplay{
-				Ship: data.UCDisplayShip{
+			Display: model.UCDisplay{
+				Ship: model.UCDisplayShip{
 					PR: true,
 				},
 			},
 		}
 
-		mockStorage := repository.NewMockStorageInterface(ctrl)
+		mockUserConfig := repository.NewMockUserConfigStore(ctrl)
+		mockStorage := repository.NewMockStorage(ctrl)
+
 		mockStorage.EXPECT().DataVersion().Return(uint(1), nil)
-		mockStorage.EXPECT().UserConfigV2().Return(v2, nil)
-		mockStorage.EXPECT().WriteUserConfigV2(expect).Return(nil)
+		mockUserConfig.EXPECT().GetV2().Return(v2, nil)
+		mockUserConfig.EXPECT().SaveV2(expect).Return(nil)
 		mockStorage.EXPECT().WriteDataVersion(uint(2)).Return(nil)
 
 		// テスト
-		cm := NewConfigMigrator(nil, mockStorage, nil)
+		cm := NewConfigMigrator(mockStorage, mockUserConfig, nil)
 		err := cm.toV2()
 
 		// アサーション
@@ -213,49 +225,49 @@ func TestConfigMigrator_toV2(t *testing.T) {
 		t.Parallel()
 
 		// 準備
-		v1 := data.UserConfig{
+		v1 := model.UserConfig{
 			InstallPath: "test_install_path",
 			Appid:       "test_appid",
 			FontSize:    "test_font_size",
-			Displays: data.Displays{
-				Ship: data.Ship{
+			Displays: model.Displays{
+				Ship: model.Ship{
 					PR: true,
 				},
-				Overall: data.Overall{
+				Overall: model.Overall{
 					PR: true,
 				},
 			},
-			CustomColor: data.CustomColor{
-				Skill: data.SkillColor{
-					Text: data.SkillColorCode{
+			CustomColor: model.CustomColor{
+				Skill: model.SkillColor{
+					Text: model.SkillColorCode{
 						Bad: "#000001",
 					},
-					Background: data.SkillColorCode{
+					Background: model.SkillColorCode{
 						Bad: "#000002",
 					},
 				},
-				Tier: data.TierColor{
-					Own: data.TierColorCode{
+				Tier: model.TierColor{
+					Own: model.TierColorCode{
 						Low: "#000003",
 					},
-					Other: data.TierColorCode{
+					Other: model.TierColorCode{
 						Low: "#000004",
 					},
 				},
-				ShipType: data.ShipTypeColor{
-					Own: data.ShipTypeColorCode{
+				ShipType: model.ShipTypeColor{
+					Own: model.ShipTypeColorCode{
 						SS: "#000005",
 					},
-					Other: data.ShipTypeColorCode{
+					Other: model.ShipTypeColorCode{
 						SS: "#000006",
 					},
 				},
-				PlayerName: data.StatsPatternPvPSolo,
+				PlayerName: model.StatsPatternPvPSolo,
 			},
-			CustomDigit: data.CustomDigit{
+			CustomDigit: model.CustomDigit{
 				KdRate: 2,
 			},
-			TeamAverage: data.TeamAverage{
+			TeamAverage: model.TeamAverage{
 				MinShipBattles:    1,
 				MinOverallBattles: 10,
 			},
@@ -266,17 +278,19 @@ func TestConfigMigrator_toV2(t *testing.T) {
 			StatsPattern:      "pvp_solo",
 		}
 
-		expected := data.FromUserConfigV1(v1)
+		expected := model.FromUserConfigV1(v1)
 
-		mockStorage := repository.NewMockStorageInterface(ctrl)
+		mockUserConfig := repository.NewMockUserConfigStore(ctrl)
+		mockStorage := repository.NewMockStorage(ctrl)
+
 		mockStorage.EXPECT().DataVersion().Return(uint(1), nil)
-		mockStorage.EXPECT().UserConfigV2().Return(data.UserConfigV2{}, nil)
-		mockStorage.EXPECT().UserConfig().Return(v1, nil)
-		mockStorage.EXPECT().WriteUserConfigV2(expected).Return(nil)
+		mockUserConfig.EXPECT().GetV2().Return(model.UserConfigV2{}, nil)
+		mockUserConfig.EXPECT().GetV1().Return(v1, nil)
+		mockUserConfig.EXPECT().SaveV2(expected).Return(nil)
 		mockStorage.EXPECT().WriteDataVersion(uint(2)).Return(nil)
 
 		// テスト
-		cm := NewConfigMigrator(nil, mockStorage, nil)
+		cm := NewConfigMigrator(mockStorage, mockUserConfig, nil)
 		err := cm.toV2()
 
 		// アサーション

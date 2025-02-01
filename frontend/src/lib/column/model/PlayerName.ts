@@ -3,10 +3,10 @@ import { RatingInfo } from "src/lib/RatingLevel";
 import { AbstractColumn } from "src/lib/column/intetface/AbstractColumn";
 import { type StatsCategory } from "src/lib/types";
 import { toPlayerStats } from "src/lib/util";
-import type { data } from "wailsjs/go/models";
+import type { model } from "wailsjs/go/models";
 
 export class PlayerName extends AbstractColumn {
-  constructor(private config: data.UserConfigV2) {
+  constructor(private config: model.UserConfigV2) {
     super("player_name", "プレイヤー", 2);
   }
 
@@ -18,14 +18,14 @@ export class PlayerName extends AbstractColumn {
     return true;
   }
 
-  clanTag(player: data.Player): string | undefined {
+  clanTag(player: model.Player): string | undefined {
     const clanID = player.player_info.clan.id;
     const clanTag = player.player_info.clan.tag;
 
     return clanID !== 0 ? `[${clanTag}] ` : undefined;
   }
 
-  clanFlagIconClass(player: data.Player): string | undefined {
+  clanFlagIconClass(player: model.Player): string | undefined {
     if (!this.config.show_language_frag) {
       return undefined;
     }
@@ -50,19 +50,19 @@ export class PlayerName extends AbstractColumn {
     return `fi fi-${fragIcon}`;
   }
 
-  playerName(player: data.Player): string {
+  playerName(player: model.Player): string {
     return player.player_info.name;
   }
 
-  isNPC(player: data.Player): boolean {
+  isNPC(player: model.Player): boolean {
     return player.player_info.id === 0;
   }
 
-  clanColorCode(player: data.Player): string {
+  clanColorCode(player: model.Player): string {
     return player.player_info.clan.hex_color;
   }
 
-  textColorCode(player: data.Player): string {
+  textColorCode(player: model.Player): string {
     let statsCategory: StatsCategory | undefined;
 
     if (this.config.color.player_name === "ship") {

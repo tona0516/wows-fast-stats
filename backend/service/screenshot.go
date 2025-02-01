@@ -4,25 +4,22 @@ import (
 	"context"
 	"path/filepath"
 	"wfs/backend/apperr"
-	"wfs/backend/repository"
+	"wfs/backend/domain/repository"
 
 	"github.com/morikuni/failure"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 type Screenshot struct {
-	localFile      repository.LocalFileInterface
-	logger         repository.LoggerInterface
+	localFile      repository.LocalFile
 	SaveFileDialog saveFileDialogFunc
 }
 
 func NewScreenshot(
-	localFile repository.LocalFileInterface,
-	logger repository.LoggerInterface,
+	localFile repository.LocalFile,
 ) *Screenshot {
 	return &Screenshot{
 		localFile:      localFile,
-		logger:         logger,
 		SaveFileDialog: runtime.SaveFileDialog,
 	}
 }

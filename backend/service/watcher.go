@@ -6,9 +6,8 @@ import (
 	"fmt"
 	"time"
 	"wfs/backend/apperr"
-	"wfs/backend/data"
-	domainRepository "wfs/backend/domain/repository"
-	"wfs/backend/repository"
+	"wfs/backend/domain/model"
+	"wfs/backend/domain/repository"
 
 	"github.com/morikuni/failure"
 )
@@ -21,40 +20,40 @@ const (
 
 type Watcher struct {
 	interval       time.Duration
-	taiFetcher     domainRepository.TAIFetcherInterface
-	storage        repository.StorageInterface
-	logger         repository.LoggerInterface
+	localFile      repository.LocalFile
+	userConfig     repository.UserConfigStore
+	logger         repository.Logger
 	eventsEmitFunc eventEmitFunc
-	userConfig     data.UserConfigV2
+	config         model.UserConfigV2
 }
 
 func NewWatcher(
 	interval time.Duration,
-	taiFetcher domainRepository.TAIFetcherInterface,
-	storage repository.StorageInterface,
-	logger repository.LoggerInterface,
+	localFile repository.LocalFile,
+	userConfig repository.UserConfigStore,
+	logger repository.Logger,
 	eventsEmitFunc eventEmitFunc,
 ) *Watcher {
 	return &Watcher{
 		interval:       interval,
-		taiFetcher:     taiFetcher,
-		storage:        storage,
+		localFile:      localFile,
+		userConfig:     userConfig,
 		logger:         logger,
 		eventsEmitFunc: eventsEmitFunc,
 	}
 }
 
 func (w *Watcher) Prepare() error {
-	userConfig, err := w.storage.UserConfigV2()
+	config, err := w.userConfig.GetV2()
 	if err != nil {
 		return err
 	}
 
-	if userConfig.InstallPath == "" {
+	if config.InstallPath == "" {
 		return failure.New(apperr.InvalidInstallPath)
 	}
 
-	w.userConfig = userConfig
+	w.config = config
 	return nil
 }
 
@@ -68,7 +67,7 @@ func (w *Watcher) Start(appCtx context.Context, cancelCtx context.Context) {
 		default:
 			time.Sleep(w.interval)
 
-			tempArenaInfo, err := w.taiFetcher.Get(w.userConfig.InstallPath)
+			tempArenaInfo, err := w.localFile.ReadTempArenaInfo(w.config.InstallPath)
 			if err != nil {
 				if failure.Is(err, apperr.FileNotExist) || failure.Is(err, apperr.ReplayDirNotFoundError) {
 					w.eventsEmitFunc(appCtx, EventEnd)

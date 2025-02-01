@@ -28,6 +28,7 @@ const (
 	FetchShipError              failure.StringCode = "艦艇情報の取得に失敗しました。"
 	FetchRawStatError           failure.StringCode = "プレイヤー成績の取得に失敗しました。"
 	FetchBattleMetaError        failure.StringCode = "戦闘メタデータの取得に失敗しました。"
+	FetchAccountListError       failure.StringCode = "プレイヤーアカウントの取得に失敗しました。"
 	UnexpectedError             failure.StringCode = "予期しないエラーが発生しました。"
 )
 

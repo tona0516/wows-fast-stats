@@ -9,6 +9,7 @@ import (
 	"time"
 	"wfs/backend/data"
 	"wfs/backend/infra"
+	"wfs/backend/infra/webapi"
 	"wfs/backend/service"
 
 	"github.com/dgraph-io/badger/v4"
@@ -77,12 +78,12 @@ func initApp(env data.Env) *App {
 	var maxRetry uint64 = 2
 	timeout := 10 * time.Second
 
-	alertDiscord := infra.NewDiscord(infra.RequestConfig{
+	alertDiscord := webapi.NewDiscord(webapi.RequestConfig{
 		URL:     AlertDiscordWebhookURL,
 		Retry:   maxRetry,
 		Timeout: timeout,
 	})
-	infoDiscord := infra.NewDiscord(infra.RequestConfig{
+	infoDiscord := webapi.NewDiscord(webapi.RequestConfig{
 		URL:     InfoDiscordWebhookURL,
 		Retry:   maxRetry,
 		Timeout: timeout,
@@ -99,75 +100,72 @@ func initApp(env data.Env) *App {
 	}
 
 	storage := infra.NewStorage(db)
-	ownIGN, _ := storage.OwnIGN()
 
-	logger := infra.NewLogger(env, alertDiscord, infoDiscord)
-	logger.SetOwnIGN(ownIGN)
+	logger := infra.NewLogger(env, alertDiscord, infoDiscord, *storage)
 
-	wargaming := infra.NewWargaming(infra.RequestConfig{
+	wargaming := webapi.NewWargaming(webapi.RequestConfig{
 		URL:     "https://api.worldofwarships.asia",
 		Retry:   maxRetry,
 		Timeout: timeout,
 	}, ratelimit.New(10), WGAppID)
-	uwargaming := infra.NewUnofficialWargaming(infra.RequestConfig{
+	uwargaming := webapi.NewUnofficialWargaming(webapi.RequestConfig{
 		URL:     "https://clans.worldofwarships.asia",
 		Retry:   maxRetry,
 		Timeout: timeout,
 	})
-	numbers := infra.NewNumbers(infra.RequestConfig{
+	numbers := webapi.NewNumbers(webapi.RequestConfig{
 		URL:     "https://api.wows-numbers.com",
 		Retry:   maxRetry,
 		Timeout: timeout,
 	})
 	localFile := infra.NewLocalFile()
-	configV0 := infra.NewConfigV0()
 	unregistered := infra.NewUnregistered()
-	github := infra.NewGithub(infra.RequestConfig{
+	github := webapi.NewGithub(webapi.RequestConfig{
 		URL:     "https://api.github.com",
 		Retry:   maxRetry,
 		Timeout: timeout,
 	})
-	warshipFercher := infra.NewWarshipFetcher(
-		*wargaming,
+	warshipStore := infra.NewWarshipStore(
+		db,
+		wargaming,
 		*unregistered,
-		*numbers,
+		numbers,
 	)
 	clanFercher := infra.NewClanFetcher(
-		*wargaming,
-		*uwargaming,
+		wargaming,
+		uwargaming,
 	)
-	taiFetcher := infra.NewTaiFetcher()
-	rawStatFetcher := infra.NewRawStatFetcher(*wargaming)
-	battleMetaFetcher := infra.NewBattleMetaFetcher(*wargaming)
+	rawStatFetcher := infra.NewRawStatFetcher(wargaming)
+	battleMetaFetcher := infra.NewBattleMetaFetcher(wargaming)
+	accountFetcher := infra.NewAccountFetcher(wargaming)
+	userConfig := infra.NewUserConfigStore(db)
+	alertPlayer := infra.NewAlertPlayerStore(db)
+	versionFetcher := infra.NewVersionFetcher(github)
 
 	// usecase
 	watchInterval := 1 * time.Second
-	config := service.NewConfig(localFile, wargaming, storage, logger)
-	screenshot := service.NewScreenshot(localFile, logger)
+	config := service.NewConfig(accountFetcher, userConfig, alertPlayer)
+	screenshot := service.NewScreenshot(localFile)
 	battle := service.NewBattle(
-		wargaming,
 		localFile,
-		warshipFercher,
+		warshipStore,
 		clanFercher,
-		taiFetcher,
 		rawStatFetcher,
 		battleMetaFetcher,
-		storage,
+		accountFetcher,
 		logger,
-		runtime.EventsEmit,
 	)
-	watcher := service.NewWatcher(watchInterval, taiFetcher, storage, logger, runtime.EventsEmit)
-	updater := service.NewUpdater(env, github, logger)
-	configMigrator := service.NewConfigMigrator(configV0, storage, logger)
+	watcher := service.NewWatcher(watchInterval, localFile, userConfig, logger, runtime.EventsEmit)
+	configMigrator := service.NewConfigMigrator(storage, userConfig, alertPlayer)
 
 	return NewApp(
 		env,
 		logger,
+		versionFetcher,
 		*config,
 		*screenshot,
 		*watcher,
 		*battle,
-		*updater,
 		*configMigrator,
 	)
 }

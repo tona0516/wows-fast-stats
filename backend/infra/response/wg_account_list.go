@@ -2,13 +2,19 @@ package response
 
 import (
 	"reflect"
-	"wfs/backend/data"
 )
 
-type WGAccountList struct {
-	WGResponseCommon[data.WGAccountList]
+type WGAccountListResponse struct {
+	WGResponseCommon[WGAccountList]
 }
 
-func (w WGAccountList) Field() string {
-	return fieldQuery(reflect.TypeOf(&data.WGAccountListData{}).Elem())
+func (w WGAccountListResponse) Field() string {
+	return fieldQuery(reflect.TypeOf(&WGAccountListData{}).Elem())
+}
+
+type WGAccountList []WGAccountListData
+
+type WGAccountListData struct {
+	NickName  string `json:"nickname"`
+	AccountID int    `json:"account_id"`
 }

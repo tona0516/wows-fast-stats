@@ -8,35 +8,39 @@ import (
 	"os"
 	"time"
 	"wfs/backend/data"
-	"wfs/backend/repository"
+	"wfs/backend/infra/webapi"
 
 	"github.com/rs/zerolog"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 type Logger struct {
-	zlog         zerolog.Logger
 	env          data.Env
-	alertDiscord repository.DiscordInterface
-	infoDiscord  repository.DiscordInterface
+	alertDiscord webapi.Discord
+	infoDiscord  webapi.Discord
+	storage      Storage
 
-	ownIGN string
+	zlog zerolog.Logger
+	ign  string
 }
 
 func NewLogger(
 	env data.Env,
-	alertDiscord repository.DiscordInterface,
-	infoDiscord repository.DiscordInterface,
+	alertDiscord webapi.Discord,
+	infoDiscord webapi.Discord,
+	storage Storage,
 ) *Logger {
 	return &Logger{
 		env:          env,
 		alertDiscord: alertDiscord,
 		infoDiscord:  infoDiscord,
+		storage:      storage,
 	}
 }
 
-func (l *Logger) SetOwnIGN(ownIGN string) {
-	l.ownIGN = ownIGN
+func (l *Logger) SetOwnIGN(ign string) {
+	_ = l.storage.WriteOwnIGN(ign)
+	l.ign = ign
 }
 
 func (l *Logger) Init(appCtx context.Context) {
@@ -72,11 +76,14 @@ func (l *Logger) Init(appCtx context.Context) {
 		Timestamp().
 		Str("semver", l.env.Semver).
 		Logger()
+
+	ign, _ := l.storage.OwnIGN()
+	l.ign = ign
 }
 
 func (l *Logger) Debug(message string, contexts map[string]string) {
 	e := l.zlog.Debug().
-		Str("ign", l.ownIGN).
+		Str("ign", l.ign).
 		Str("message", message)
 
 	addContext(e, contexts)
@@ -85,7 +92,7 @@ func (l *Logger) Debug(message string, contexts map[string]string) {
 
 func (l *Logger) Info(message string, contexts map[string]string) {
 	e := l.zlog.Info().
-		Str("ign", l.ownIGN).
+		Str("ign", l.ign).
 		Str("message", message)
 
 	addContext(e, contexts)
@@ -94,7 +101,7 @@ func (l *Logger) Info(message string, contexts map[string]string) {
 
 func (l *Logger) Warn(err error, contexts map[string]string) {
 	e := l.zlog.Warn().
-		Str("ign", l.ownIGN).
+		Str("ign", l.ign).
 		Str("error", fmt.Sprintf("%+v", err))
 
 	addContext(e, contexts)
@@ -103,7 +110,7 @@ func (l *Logger) Warn(err error, contexts map[string]string) {
 
 func (l *Logger) Error(err error, contexts map[string]string) {
 	e := l.zlog.Error().
-		Str("ign", l.ownIGN).
+		Str("ign", l.ign).
 		Str("error", fmt.Sprintf("%+v", err))
 
 	addContext(e, contexts)
@@ -112,7 +119,7 @@ func (l *Logger) Error(err error, contexts map[string]string) {
 
 func (l *Logger) Fatal(err error, contexts map[string]string) {
 	e := l.zlog.Fatal().
-		Str("ign", l.ownIGN).
+		Str("ign", l.ign).
 		Str("error", fmt.Sprintf("%+v", err))
 
 	addContext(e, contexts)
@@ -141,14 +148,14 @@ func (w *frontendWriter) Write(p []byte) (int, error) {
 
 type reportWriter struct {
 	zerolog.FilteredLevelWriter
-	alertDiscord repository.DiscordInterface
-	infoDiscord  repository.DiscordInterface
+	alertDiscord webapi.Discord
+	infoDiscord  webapi.Discord
 }
 
 func (w *reportWriter) WriteLevel(level zerolog.Level, p []byte) (int, error) {
 	formatted := fmt.Sprintf("```%s```", pretty(string(p)))
 
-	var discord repository.DiscordInterface
+	var discord webapi.Discord
 	if level >= zerolog.WarnLevel {
 		discord = w.alertDiscord
 	} else {

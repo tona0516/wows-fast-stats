@@ -1,5 +1,5 @@
 import { TeamThreatLevel } from "src/lib/TeamThreatLevel";
-import { data } from "wailsjs/go/models";
+import { model } from "wailsjs/go/models";
 
 test("fromBattle - 異常系", () => {
   expect(
@@ -15,7 +15,7 @@ test("fromBattle - 正常系", () => {
     { threatLevel: 10000, isHidden: false, id: 0 }, // npc
   ];
 
-  const battle: data.Battle = {
+  const battle: model.Battle = {
     teams: [
       {
         players: values.map((value) => {
@@ -28,13 +28,13 @@ test("fromBattle - 正常系", () => {
                 },
               },
             },
-          } as data.Player;
+          } as model.Player;
         }),
         convertValues: () => {},
       },
     ],
     convertValues: () => {},
-    meta: new data.Meta(),
+    meta: new model.Meta(),
   };
 
   const actual = TeamThreatLevel.fromBattle(battle, new Set(), "pvp_all")![0];

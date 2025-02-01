@@ -4,15 +4,16 @@
     AlertPatterns,
     UpdateAlertPlayer,
   } from "wailsjs/go/main/App";
-  import type { data } from "wailsjs/go/models";
+  import type { model } from "wailsjs/go/models";
   import clone from "clone";
   import UIkit from "uikit";
   import UkModal from "src/component/common/uikit/UkModal.svelte";
   import UkIcon from "src/component/common/uikit/UkIcon.svelte";
   import { ModalElementID } from "./ModalElementID";
   import { Notifier } from "src/lib/Notifier";
+  import UkSpinner from "../common/uikit/UkSpinner.svelte";
 
-  export let defaultAlertPlayer: data.AlertPlayer;
+  export let defaultAlertPlayer: model.AlertPlayer;
   export let maxMemoLength: number;
 
   export const show = () => {
@@ -21,18 +22,20 @@
     UIkit.modal(elem!).show();
   };
 
+  const MIN_SEARCH_LENGTH = 3;
+
   const clean = () => {
     target = clone(defaultAlertPlayer);
     isSearching = false;
     searchInput = "";
-    searchPlayers = [];
+    searchPlayers = {};
     searchResult = undefined;
   };
 
-  const add = async (player: data.AlertPlayer) => {
+  const add = async (player: model.AlertPlayer) => {
     try {
-      player.account_id = searchResult!.account_id;
-      player.name = searchResult!.nickname;
+      player.name = searchResult![0];
+      player.account_id = searchResult![1];
 
       await UpdateAlertPlayer(player);
     } catch (error) {
@@ -45,13 +48,8 @@
       return;
     }
 
-    if (input.length < 3) {
-      searchPlayers = [];
-      return;
-    }
-
-    if (input === "") {
-      searchPlayers = [];
+    if (input.length < MIN_SEARCH_LENGTH) {
+      searchPlayers = {};
       return;
     }
 
@@ -59,23 +57,22 @@
       isSearching = true;
       searchPlayers = await SearchPlayer(input);
     } catch (error) {
-      searchPlayers = [];
-      return;
+      searchPlayers = {};
     } finally {
       isSearching = false;
     }
   };
 
-  let target: data.AlertPlayer = clone(defaultAlertPlayer);
+  let target: model.AlertPlayer = clone(defaultAlertPlayer);
   let isSearching: boolean = false;
   let searchInput: string = "";
-  let searchPlayers: data.WGAccountListData[] = [];
-  let searchResult: data.WGAccountListData | undefined = undefined;
+  let searchPlayers: { [key: string]: number } = {};
+  let searchResult: [string, number] | undefined = undefined;
 
   $: disableAddButton =
     searchResult === undefined ||
-    searchResult.account_id === 0 ||
-    searchResult.nickname === "" ||
+    searchResult[0] === "" ||
+    searchResult[1] === 0 ||
     target.pattern === "";
 </script>
 
@@ -95,22 +92,29 @@
       {#if searchResult}
         <span class="uk-margin-small">
           <UkIcon name="check" />
-          {searchResult.nickname}
+          {searchResult[0]}
         </span>
       {/if}
 
-      {#if searchPlayers.length !== 0}
+      {#if searchInput.length >= MIN_SEARCH_LENGTH}
         <div class="uk-dropdown uk-position-absolute">
+          {#if isSearching}
+            <div class="uk-flex uk-flex-center">
+              <UkSpinner />
+            </div>
+          {/if}
+
           <ul class="uk-nav uk-dropdown-nav">
-            {#each searchPlayers as player}
+            {#each Object.entries(searchPlayers) as player}
               <li>
                 <!-- svelte-ignore a11y-invalid-attribute -->
                 <a
                   href="#"
                   on:click={() => {
+                    searchInput = "";
                     searchResult = player;
-                    searchPlayers = [];
-                  }}>{player.nickname}</a
+                    searchPlayers = {};
+                  }}>{player[0]}</a
                 >
               </li>
             {/each}

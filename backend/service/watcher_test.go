@@ -5,10 +5,8 @@ import (
 	"testing"
 	"time"
 	"wfs/backend/apperr"
-	"wfs/backend/data"
-	domainRepository "wfs/backend/domain/mock/repository"
+	"wfs/backend/domain/mock/repository"
 	"wfs/backend/domain/model"
-	"wfs/backend/mock/repository"
 
 	"github.com/morikuni/failure"
 	"github.com/stretchr/testify/assert"
@@ -25,15 +23,15 @@ func TestWatcher_Start(t *testing.T) {
 		t.Parallel()
 
 		// 準備
-		config := data.UserConfigV2{
+		config := model.UserConfigV2{
 			InstallPath: "install_path_test",
 			FontSize:    "medium",
 		}
-		mockStorage := repository.NewMockStorageInterface(ctrl)
-		mockStorage.EXPECT().UserConfigV2().Return(config, nil)
+		mockUserConfig := repository.NewMockUserConfigStore(ctrl)
+		mockUserConfig.EXPECT().GetV2().Return(config, nil)
 
-		mockTAIFetcher := domainRepository.NewMockTAIFetcherInterface(ctrl)
-		mockTAIFetcher.EXPECT().Get(config.InstallPath).Return(model.TempArenaInfo{}, nil).AnyTimes()
+		mockLocalFile := repository.NewMockLocalFile(ctrl)
+		mockLocalFile.EXPECT().ReadTempArenaInfo(config.InstallPath).Return(model.TempArenaInfo{}, nil).AnyTimes()
 
 		var events []string
 		emitFunc := func(ctx context.Context, eventName string, optionalData ...interface{}) {
@@ -44,7 +42,7 @@ func TestWatcher_Start(t *testing.T) {
 		defer cancel()
 
 		// テスト
-		watcher := NewWatcher(10*time.Millisecond, mockTAIFetcher, mockStorage, nil, emitFunc)
+		watcher := NewWatcher(10*time.Millisecond, mockLocalFile, mockUserConfig, nil, emitFunc)
 		err := watcher.Prepare()
 		go watcher.Start(ctx, ctx)
 
@@ -66,16 +64,19 @@ func TestWatcher_Start(t *testing.T) {
 
 		for _, ie := range ignoreErrs {
 			// 準備
-			config := data.UserConfigV2{
+			config := model.UserConfigV2{
 				InstallPath: "install_path_test",
 				FontSize:    "medium",
 			}
 
-			mockStorage := repository.NewMockStorageInterface(ctrl)
-			mockStorage.EXPECT().UserConfigV2().Return(config, nil)
+			mockUserConfig := repository.NewMockUserConfigStore(ctrl)
+			mockUserConfig.EXPECT().GetV2().Return(config, nil)
 
-			mockTAIFetcher := domainRepository.NewMockTAIFetcherInterface(ctrl)
-			mockTAIFetcher.EXPECT().Get(config.InstallPath).Return(model.TempArenaInfo{}, failure.New(ie)).AnyTimes()
+			mockLocalFile := repository.NewMockLocalFile(ctrl)
+			mockLocalFile.EXPECT().ReadTempArenaInfo(config.InstallPath).Return(
+				model.TempArenaInfo{},
+				failure.New(ie),
+			).AnyTimes()
 
 			var events []string
 			emitFunc := func(ctx context.Context, eventName string, optionalData ...interface{}) {
@@ -86,7 +87,7 @@ func TestWatcher_Start(t *testing.T) {
 			defer cancel()
 
 			// テスト
-			watcher := NewWatcher(10*time.Millisecond, mockTAIFetcher, mockStorage, nil, emitFunc)
+			watcher := NewWatcher(10*time.Millisecond, mockLocalFile, mockUserConfig, nil, emitFunc)
 			go watcher.Start(ctx, ctx)
 
 			// アサーション
@@ -103,13 +104,13 @@ func TestWatcher_Start(t *testing.T) {
 		t.Parallel()
 
 		// 準備
-		config := data.UserConfigV2{
+		config := model.UserConfigV2{
 			InstallPath: "install_path_test",
 			FontSize:    "medium",
 		}
 
-		mockStorage := repository.NewMockStorageInterface(ctrl)
-		mockStorage.EXPECT().UserConfigV2().Return(config, nil)
+		mockUserConfig := repository.NewMockUserConfigStore(ctrl)
+		mockUserConfig.EXPECT().GetV2().Return(config, nil)
 
 		var events []string
 		emitFunc := func(ctx context.Context, eventName string, optionalData ...interface{}) {
@@ -118,7 +119,7 @@ func TestWatcher_Start(t *testing.T) {
 		ctx, cancel := context.WithCancel(context.Background())
 
 		// テスト
-		watcher := NewWatcher(10*time.Millisecond, nil, mockStorage, nil, emitFunc)
+		watcher := NewWatcher(10*time.Millisecond, nil, mockUserConfig, nil, emitFunc)
 		err := watcher.Prepare()
 		go watcher.Start(ctx, ctx)
 		cancel()
@@ -134,21 +135,21 @@ func TestWatcher_Start(t *testing.T) {
 		t.Parallel()
 
 		// 準備
-		config := data.UserConfigV2{
+		config := model.UserConfigV2{
 			InstallPath: "install_path_test",
 			FontSize:    "medium",
 		}
 
-		mockStorage := repository.NewMockStorageInterface(ctrl)
-		mockStorage.EXPECT().UserConfigV2().Return(config, nil)
+		mockUserConfig := repository.NewMockUserConfigStore(ctrl)
+		mockUserConfig.EXPECT().GetV2().Return(config, nil)
 
-		mockTAIFetcher := domainRepository.NewMockTAIFetcherInterface(ctrl)
-		mockTAIFetcher.EXPECT().Get(config.InstallPath).Return(
+		mockLocalFile := repository.NewMockLocalFile(ctrl)
+		mockLocalFile.EXPECT().ReadTempArenaInfo(config.InstallPath).Return(
 			model.TempArenaInfo{},
 			failure.New(apperr.UnexpectedError),
 		).AnyTimes()
 
-		mockLogger := repository.NewMockLoggerInterface(ctrl)
+		mockLogger := repository.NewMockLogger(ctrl)
 		mockLogger.EXPECT().Error(gomock.Any(), gomock.Any())
 
 		var events []string
@@ -160,7 +161,7 @@ func TestWatcher_Start(t *testing.T) {
 		defer cancel()
 
 		// テスト
-		watcher := NewWatcher(10*time.Millisecond, mockTAIFetcher, mockStorage, mockLogger, emitFunc)
+		watcher := NewWatcher(10*time.Millisecond, mockLocalFile, mockUserConfig, mockLogger, emitFunc)
 		err := watcher.Prepare()
 		go watcher.Start(ctx, ctx)
 

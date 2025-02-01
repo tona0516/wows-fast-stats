@@ -3,7 +3,7 @@ import { AbstractStatsColumn } from "src/lib/column/intetface/AbstractStatsColum
 import { NumbersURL } from "src/lib/NumbersURL";
 import { type StatsCategory } from "src/lib/types";
 import { tierString } from "src/lib/util";
-import type { data } from "wailsjs/go/models";
+import type { model } from "wailsjs/go/models";
 
 export interface MaxDamageParam {
   damage: string;
@@ -14,7 +14,7 @@ export interface MaxDamageParam {
 }
 
 export class MaxDamage extends AbstractStatsColumn<MaxDamageParam> {
-  constructor(config: data.UserConfigV2, category: StatsCategory) {
+  constructor(config: model.UserConfigV2, category: StatsCategory) {
     let innerColumnCount: number;
     switch (category) {
       case "ship":
@@ -28,7 +28,7 @@ export class MaxDamage extends AbstractStatsColumn<MaxDamageParam> {
     super("max_damage", innerColumnCount, config, category);
   }
 
-  displayValue(player: data.Player): MaxDamageParam {
+  displayValue(player: model.Player): MaxDamageParam {
     const maxDamage = this.playerStats(player)[this.category].max_damage;
     const value = maxDamage.value.toFixed(this.digit());
 

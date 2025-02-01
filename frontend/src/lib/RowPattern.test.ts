@@ -1,8 +1,8 @@
 import { RowPattern } from "src/lib/RowPattern";
-import { data } from "wailsjs/go/models";
+import { model } from "wailsjs/go/models";
 
 const STATS_PATTERN: string = "pvp_all";
-const PLAYER = new data.Player({
+const PLAYER = new model.Player({
   player_info: {
     is_hidden: false,
     id: 1,
@@ -26,7 +26,7 @@ test("no column", () => {
 });
 
 test("private", () => {
-  const player = new data.Player({
+  const player = new model.Player({
     player_info: {
       is_hidden: true,
     },
@@ -43,7 +43,7 @@ test("private", () => {
 });
 
 test("no data - 無効なアカウントID", () => {
-  const player = new data.Player({
+  const player = new model.Player({
     player_info: {
       is_hidden: false,
       id: 0,
@@ -61,7 +61,7 @@ test("no data - 無効なアカウントID", () => {
 });
 
 test("no data - 総合戦闘数=0", () => {
-  const player = new data.Player({
+  const player = new model.Player({
     player_info: {
       is_hidden: false,
       id: 1,
@@ -84,7 +84,7 @@ test("no data - 総合戦闘数=0", () => {
 });
 
 test("no ship stats", () => {
-  const player = new data.Player({
+  const player = new model.Player({
     player_info: {
       is_hidden: false,
       id: 1,

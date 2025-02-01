@@ -1,6 +1,6 @@
 import type { ColumnSetting } from "src/lib/ColumnSetting";
 import type { DigitKey, OverallKey, ShipKey, ShipType } from "src/lib/types";
-import { data } from "wailsjs/go/models";
+import { model } from "wailsjs/go/models";
 
 const ROMAN_NUMERALS: { decimal: number; numeral: string }[] = [
   { decimal: 10, numeral: "X" },
@@ -11,9 +11,9 @@ const ROMAN_NUMERALS: { decimal: number; numeral: string }[] = [
 ];
 
 export const toPlayerStats = (
-  player: data.Player,
+  player: model.Player,
   statsPattern: string,
-): data.PlayerStats => {
+): model.PlayerStats => {
   switch (statsPattern) {
     case "pvp_solo":
       return player.pvp_solo;
@@ -41,23 +41,23 @@ export const tierString = (value: number): string => {
 };
 
 export const isShipType = (type: string): type is ShipType => {
-  return Object.keys(new data.ShipTypeGroup()).includes(type);
+  return Object.keys(new model.ShipTypeGroup()).includes(type);
 };
 
 export const isDigitKey = (key: string): key is DigitKey => {
-  return Object.keys(new data.UCDigit()).includes(key);
+  return Object.keys(new model.UCDigit()).includes(key);
 };
 
 export const isShipKey = (key: string): key is ShipKey => {
-  return Object.keys(new data.UCDisplayShip()).includes(key);
+  return Object.keys(new model.UCDisplayShip()).includes(key);
 };
 
 export const isOverallKey = (key: string): key is OverallKey => {
-  return Object.keys(new data.UCDisplayOverall()).includes(key);
+  return Object.keys(new model.UCDisplayOverall()).includes(key);
 };
 
 export const deriveColumnSetting = (
-  config: data.UserConfigV2,
+  config: model.UserConfigV2,
   key: string,
 ): ColumnSetting => {
   const shipKey = isShipKey(key) ? key : undefined;
@@ -82,7 +82,7 @@ export const deriveColumnSetting = (
 };
 
 export const deriveColumnSettings = (
-  config: data.UserConfigV2,
+  config: model.UserConfigV2,
 ): ColumnSetting[] => {
   const shipKeys = Object.keys(config.display.ship);
   const overallKeys = Object.keys(config.display.overall);

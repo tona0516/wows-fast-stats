@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { data } from "wailsjs/go/models";
+  import { model } from "wailsjs/go/models";
   import ExternalLink from "src/component/common/ExternalLink.svelte";
   import { DispName } from "src/lib/DispName";
   import { RATING_DEFS, RatingInfo, type RatingDef } from "src/lib/RatingLevel";
@@ -10,7 +10,7 @@
   } from "src/component/info/internal/DispColorTableInfo";
   import DispColorTable from "./DispColorTable.svelte";
 
-  export let config: data.UserConfigV2;
+  export let config: model.UserConfigV2;
 
   const LINKS = [
     {
@@ -29,7 +29,7 @@
 
   const getPRTableInfo = (
     defs: RatingDef[],
-    skillColorCode: data.UCSkillColorCode,
+    skillColorCode: model.UCSkillColorCode,
   ): DispColorTableInfo => {
     const rows: Row[] = [];
 

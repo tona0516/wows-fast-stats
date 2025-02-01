@@ -14,7 +14,7 @@
   import { FetchProxy } from "src/lib/FetchProxy";
   import { Notifier } from "src/lib/Notifier";
   import { LogInfo } from "wailsjs/go/main/App";
-  import { data } from "wailsjs/go/models";
+  import { model } from "wailsjs/go/models";
   import { format, fromUnixTime } from "date-fns";
   import { Screenshot } from "src/lib/Screenshot";
 
@@ -79,7 +79,7 @@
     }
   };
 
-  const deriveFileName = (meta: data.Meta): string => {
+  const deriveFileName = (meta: model.Meta): string => {
     const items = [
       format(fromUnixTime(meta.unixtime), "yyyy-MM-dd-HH-mm-ss"),
       meta.own_ship.replaceAll(" ", "-"),

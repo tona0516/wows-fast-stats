@@ -1,5 +1,5 @@
-import type { data } from "wailsjs/go/models";
+import type { model } from "wailsjs/go/models";
 
 export interface ISummaryColumn {
-  value(player: data.Player): number;
+  value(player: model.Player): number;
 }

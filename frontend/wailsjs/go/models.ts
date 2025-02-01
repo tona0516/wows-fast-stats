@@ -1,4 +1,4 @@
-export namespace data {
+export namespace model {
 	
 	export class AlertPlayer {
 	    account_id: number;
@@ -54,6 +54,20 @@ export namespace data {
 	        this.cv = source["cv"];
 	    }
 	}
+	export class ThreatLevel {
+	    raw: number;
+	    modified: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new ThreatLevel(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.raw = source["raw"];
+	        this.modified = source["modified"];
+	    }
+	}
 	export class OverallStats {
 	    battles: number;
 	    damage: number;
@@ -65,7 +79,7 @@ export namespace data {
 	    kill: number;
 	    exp: number;
 	    pr: number;
-	    threat_level: model.ThreatLevel;
+	    threat_level: ThreatLevel;
 	    avg_tier: number;
 	    using_ship_type_rate: ShipTypeGroup;
 	    using_tier_rate: TierGroup;
@@ -87,7 +101,7 @@ export namespace data {
 	        this.kill = source["kill"];
 	        this.exp = source["exp"];
 	        this.pr = source["pr"];
-	        this.threat_level = this.convertValues(source["threat_level"], model.ThreatLevel);
+	        this.threat_level = this.convertValues(source["threat_level"], ThreatLevel);
 	        this.avg_tier = source["avg_tier"];
 	        this.using_ship_type_rate = this.convertValues(source["using_ship_type_rate"], ShipTypeGroup);
 	        this.using_tier_rate = this.convertValues(source["using_tier_rate"], TierGroup);
@@ -218,10 +232,58 @@ export namespace data {
 		    return a;
 		}
 	}
+	export class Warship {
+	    id: number;
+	    name: string;
+	    tier: number;
+	    type: string;
+	    nation: string;
+	    is_premium: boolean;
+	    average_damage: number;
+	    average_frags: number;
+	    win_rate: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new Warship(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.id = source["id"];
+	        this.name = source["name"];
+	        this.tier = source["tier"];
+	        this.type = source["type"];
+	        this.nation = source["nation"];
+	        this.is_premium = source["is_premium"];
+	        this.average_damage = source["average_damage"];
+	        this.average_frags = source["average_frags"];
+	        this.win_rate = source["win_rate"];
+	    }
+	}
+	export class Clan {
+	    id: number;
+	    tag: string;
+	    description: string;
+	    hex_color: string;
+	    lang: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new Clan(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.id = source["id"];
+	        this.tag = source["tag"];
+	        this.description = source["description"];
+	        this.hex_color = source["hex_color"];
+	        this.lang = source["lang"];
+	    }
+	}
 	export class PlayerInfo {
 	    id: number;
 	    name: string;
-	    clan: model.Clan;
+	    clan: Clan;
 	    is_hidden: boolean;
 	
 	    static createFrom(source: any = {}) {
@@ -232,7 +294,7 @@ export namespace data {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.id = source["id"];
 	        this.name = source["name"];
-	        this.clan = this.convertValues(source["clan"], model.Clan);
+	        this.clan = this.convertValues(source["clan"], Clan);
 	        this.is_hidden = source["is_hidden"];
 	    }
 	
@@ -256,7 +318,7 @@ export namespace data {
 	}
 	export class Player {
 	    player_info: PlayerInfo;
-	    warship: model.Warship;
+	    warship: Warship;
 	    pvp_solo: PlayerStats;
 	    pvp_all: PlayerStats;
 	    rank_solo: PlayerStats;
@@ -268,7 +330,7 @@ export namespace data {
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.player_info = this.convertValues(source["player_info"], PlayerInfo);
-	        this.warship = this.convertValues(source["warship"], model.Warship);
+	        this.warship = this.convertValues(source["warship"], Warship);
 	        this.pvp_solo = this.convertValues(source["pvp_solo"], PlayerStats);
 	        this.pvp_all = this.convertValues(source["pvp_all"], PlayerStats);
 	        this.rank_solo = this.convertValues(source["rank_solo"], PlayerStats);
@@ -372,22 +434,24 @@ export namespace data {
 		    return a;
 		}
 	}
-	export class GHLatestRelease {
-	    tag_name: string;
-	    html_url: string;
+	
+	export class LatestRelease {
+	    semver: string;
+	    url: string;
 	    updatable: boolean;
 	
 	    static createFrom(source: any = {}) {
-	        return new GHLatestRelease(source);
+	        return new LatestRelease(source);
 	    }
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.tag_name = source["tag_name"];
-	        this.html_url = source["html_url"];
+	        this.semver = source["semver"];
+	        this.url = source["url"];
 	        this.updatable = source["updatable"];
 	    }
 	}
+	
 	
 	
 	
@@ -811,87 +875,6 @@ export namespace data {
 		    }
 		    return a;
 		}
-	}
-	export class WGAccountListData {
-	    nickname: string;
-	    account_id: number;
-	
-	    static createFrom(source: any = {}) {
-	        return new WGAccountListData(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.nickname = source["nickname"];
-	        this.account_id = source["account_id"];
-	    }
-	}
-
-}
-
-export namespace model {
-	
-	export class Clan {
-	    id: number;
-	    tag: string;
-	    description: string;
-	    hex_color: string;
-	    lang: string;
-	
-	    static createFrom(source: any = {}) {
-	        return new Clan(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.id = source["id"];
-	        this.tag = source["tag"];
-	        this.description = source["description"];
-	        this.hex_color = source["hex_color"];
-	        this.lang = source["lang"];
-	    }
-	}
-	export class ThreatLevel {
-	    raw: number;
-	    modified: number;
-	
-	    static createFrom(source: any = {}) {
-	        return new ThreatLevel(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.raw = source["raw"];
-	        this.modified = source["modified"];
-	    }
-	}
-	export class Warship {
-	    id: number;
-	    name: string;
-	    tier: number;
-	    type: string;
-	    nation: string;
-	    is_premium: boolean;
-	    average_damage: number;
-	    average_frags: number;
-	    win_rate: number;
-	
-	    static createFrom(source: any = {}) {
-	        return new Warship(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.id = source["id"];
-	        this.name = source["name"];
-	        this.tier = source["tier"];
-	        this.type = source["type"];
-	        this.nation = source["nation"];
-	        this.is_premium = source["is_premium"];
-	        this.average_damage = source["average_damage"];
-	        this.average_frags = source["average_frags"];
-	        this.win_rate = source["win_rate"];
-	    }
 	}
 
 }

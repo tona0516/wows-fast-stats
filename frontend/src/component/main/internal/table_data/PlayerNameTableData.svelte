@@ -6,7 +6,7 @@
   import { CssClass } from "src/lib/CssClass";
   import { storedAlertPlayers, storedExcludedPlayers } from "src/stores";
   import { createEventDispatcher } from "svelte";
-  import type { data } from "wailsjs/go/models";
+  import type { model } from "wailsjs/go/models";
   import type { PlayerName } from "src/lib/column/model/PlayerName";
   import { ClipboardSetText } from "wailsjs/runtime/runtime";
   import { Notifier } from "src/lib/Notifier";
@@ -14,7 +14,7 @@
   import { ExcludedPlayers } from "src/lib/ExcludedPlayers";
 
   export let column: PlayerName;
-  export let player: data.Player;
+  export let player: model.Player;
 
   $: accountID = player.player_info.id;
   $: isChecked = !$storedExcludedPlayers.has(accountID);

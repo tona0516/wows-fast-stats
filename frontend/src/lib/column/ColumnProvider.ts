@@ -19,7 +19,7 @@ import { UsingShipTypeRate } from "src/lib/column/model/UsingShipTypeRate";
 import { UsingTierRate } from "src/lib/column/model/UsingTierRate";
 import { WinRate } from "src/lib/column/model/WinRate";
 import { type ColumnCategory } from "src/lib/types";
-import { data } from "wailsjs/go/models";
+import { model } from "wailsjs/go/models";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 class ColumnArray extends Array<AbstractColumn> {
@@ -44,7 +44,7 @@ class ColumnArray extends Array<AbstractColumn> {
 
 export namespace ColumnProvider {
   export const getAllColumns = (
-    config: data.UserConfigV2,
+    config: model.UserConfigV2,
   ): [basic: ColumnArray, ship: ColumnArray, overall: ColumnArray] => {
     return [
       new ColumnArray("basic", [new PlayerName(config), new Warship(config)]),

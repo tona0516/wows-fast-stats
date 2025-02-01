@@ -6,17 +6,18 @@ import (
 	"wfs/backend/data"
 	"wfs/backend/domain/model"
 	"wfs/backend/infra/response"
+	"wfs/backend/infra/webapi"
 
 	"github.com/morikuni/failure"
 )
 
 type BattleMetaFetcher struct {
-	wargaming Wargaming
+	wargaming webapi.Wargaming
 	cache     *model.BattleMeta
 }
 
 func NewBattleMetaFetcher(
-	wargaming Wargaming,
+	wargaming webapi.Wargaming,
 ) *BattleMetaFetcher {
 	return &BattleMetaFetcher{
 		wargaming: wargaming,
@@ -57,11 +58,11 @@ func (f *BattleMetaFetcher) Fetch() (model.BattleMeta, error) {
 }
 
 func (f *BattleMetaFetcher) fetchBattleArenas(channel chan data.Result[response.WGBattleArenas]) {
-	battleArenas, err := f.wargaming.battleArenas()
+	battleArenas, err := f.wargaming.BattleArenas()
 	channel <- data.Result[response.WGBattleArenas]{Value: battleArenas, Error: err}
 }
 
 func (f *BattleMetaFetcher) fetchBattleTypes(channel chan data.Result[response.WGBattleTypes]) {
-	battleTypes, err := f.wargaming.battleTypes()
+	battleTypes, err := f.wargaming.BattleTypes()
 	channel <- data.Result[response.WGBattleTypes]{Value: battleTypes, Error: err}
 }

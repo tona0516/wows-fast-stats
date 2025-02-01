@@ -7,32 +7,45 @@ import (
 	"wfs/backend/data"
 	"wfs/backend/domain/model"
 	"wfs/backend/infra/response"
+	"wfs/backend/infra/webapi"
 
+	"github.com/dgraph-io/badger/v4"
 	"github.com/morikuni/failure"
 )
 
 type WarshipFetcher struct {
-	wargaming    Wargaming
-	unregistered Unregistered
-	numbers      Numbers
-	cache        model.Warships
+	db               *badger.DB
+	wargaming        webapi.Wargaming
+	unregistered     Unregistered
+	numbers          webapi.Numbers
+	localDataKeyName string
 }
 
-func NewWarshipFetcher(
-	wargaming Wargaming,
+func NewWarshipStore(
+	db *badger.DB,
+	wargaming webapi.Wargaming,
 	unregistered Unregistered,
-	numbers Numbers,
+	numbers webapi.Numbers,
 ) *WarshipFetcher {
 	return &WarshipFetcher{
-		wargaming:    wargaming,
-		unregistered: unregistered,
-		numbers:      numbers,
+		db:               db,
+		wargaming:        wargaming,
+		unregistered:     unregistered,
+		numbers:          numbers,
+		localDataKeyName: "warships",
 	}
 }
 
 func (f *WarshipFetcher) Fetch() (model.Warships, error) {
-	if len(f.cache) != 0 {
-		return f.cache, nil
+	cache, errCache := f.readCache()
+
+	currentGameVersion, err := f.wargaming.GameVersion()
+	if err != nil {
+		return f.toError(cache, errCache, err)
+	}
+
+	if currentGameVersion == cache.gameVersion {
+		return cache.warships, nil
 	}
 
 	encycShipsChan := make(chan data.Result[model.Warships])
@@ -43,7 +56,6 @@ func (f *WarshipFetcher) Fetch() (model.Warships, error) {
 	go f.unregisteredShips(unregisteredChan)
 	go f.expectedStats(expectedStatsChan)
 
-	var err error
 	ships := <-encycShipsChan
 	err = errors.Join(err, ships.Error)
 
@@ -53,7 +65,7 @@ func (f *WarshipFetcher) Fetch() (model.Warships, error) {
 	expectedStats := <-expectedStatsChan
 	err = errors.Join(err, expectedStats.Error)
 	if err != nil {
-		return nil, failure.Translate(err, apperr.FetchShipError)
+		return f.toError(cache, errCache, err)
 	}
 
 	warships := ships.Value
@@ -91,7 +103,8 @@ func (f *WarshipFetcher) Fetch() (model.Warships, error) {
 		}
 	}
 
-	f.cache = warships
+	_ = f.saveCache(warships, currentGameVersion)
+
 	return warships, nil
 }
 
@@ -100,7 +113,7 @@ func (f *WarshipFetcher) encycShips(channel chan data.Result[model.Warships]) {
 
 	var mu sync.Mutex
 	fetch := func(page int) (int, error) {
-		res, pageTotal, err := f.wargaming.encycShips(page)
+		res, pageTotal, err := f.wargaming.EncycShips(page)
 		if err != nil {
 			return 0, err
 		}
@@ -151,10 +164,32 @@ func (f *WarshipFetcher) unregisteredShips(channel chan data.Result[model.Warshi
 }
 
 func (f *WarshipFetcher) expectedStats(channel chan data.Result[response.ExpectedStats]) {
-	es, err := f.numbers.expectedStats()
+	es, err := f.numbers.ExpectedStats()
 
 	channel <- data.Result[response.ExpectedStats]{
 		Value: es,
 		Error: err,
 	}
+}
+
+func (f *WarshipFetcher) readCache() (warshipsCache, error) {
+	cache, err := read[warshipsCache](f.db, f.localDataKeyName)
+	return cache, failure.Translate(err, apperr.FetchShipError)
+}
+
+func (f *WarshipFetcher) saveCache(warships model.Warships, gameVersion string) error {
+	cache := warshipsCache{
+		warships:    warships,
+		gameVersion: gameVersion,
+	}
+	return write(f.db, f.localDataKeyName, cache)
+}
+
+func (f *WarshipFetcher) toError(cache warshipsCache, errCache error, err error) (model.Warships, error) {
+	if errCache != nil {
+		err = errors.Join(errCache, failure.Translate(err, apperr.FetchShipError))
+		return cache.warships, err
+	}
+
+	return cache.warships, nil
 }

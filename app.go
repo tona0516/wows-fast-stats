@@ -4,7 +4,8 @@ import (
 	"context"
 	"wfs/backend/apperr"
 	"wfs/backend/data"
-	"wfs/backend/repository"
+	"wfs/backend/domain/model"
+	"wfs/backend/domain/repository"
 	"wfs/backend/service"
 
 	"github.com/morikuni/failure"
@@ -17,50 +18,40 @@ const (
 	eventUpdateAlertPlayers = "ALERT_PLAYERS_UPDATE"
 )
 
-type volatileData struct {
-	cancelWatcher context.CancelFunc
-}
-
-func newVolatileData() volatileData {
-	return volatileData{
-		cancelWatcher: nil,
-	}
-}
-
 //nolint:containedctx
 type App struct {
 	ctx            context.Context
 	env            data.Env
-	logger         repository.LoggerInterface
+	logger         repository.Logger
+	versionFetcher repository.VersionFetcher
 	config         service.Config
 	screenshot     service.Screenshot
 	watcher        service.Watcher
 	battle         service.Battle
-	updater        service.Updater
 	configMigrator service.ConfigMigrator
-	volatileData   volatileData
+
+	cancelWacthFunc context.CancelFunc
 }
 
 func NewApp(
 	env data.Env,
-	logger repository.LoggerInterface,
+	logger repository.Logger,
+	versionFetcher repository.VersionFetcher,
 	config service.Config,
 	screenshot service.Screenshot,
 	watcher service.Watcher,
 	battle service.Battle,
-	updater service.Updater,
 	configMigrator service.ConfigMigrator,
 ) *App {
 	return &App{
 		env:            env,
 		logger:         logger,
+		versionFetcher: versionFetcher,
 		config:         config,
 		screenshot:     screenshot,
 		watcher:        watcher,
 		battle:         battle,
-		updater:        updater,
 		configMigrator: configMigrator,
-		volatileData:   newVolatileData(),
 	}
 }
 
@@ -85,19 +76,20 @@ func (a *App) StartWatching() error {
 		return apperr.Unwrap(err)
 	}
 
-	if a.volatileData.cancelWatcher != nil {
-		a.volatileData.cancelWatcher()
+	if a.cancelWacthFunc != nil {
+		a.cancelWacthFunc()
 	}
+
 	cancelCtx, cancel := context.WithCancel(context.Background())
-	a.volatileData.cancelWatcher = cancel
+	a.cancelWacthFunc = cancel
 
 	go a.watcher.Start(a.ctx, cancelCtx)
 
 	return nil
 }
 
-func (a *App) Battle() (data.Battle, error) {
-	result := data.Battle{}
+func (a *App) Battle() (model.Battle, error) {
+	result := model.Battle{}
 
 	userConfig, err := a.config.User()
 	if err != nil {
@@ -132,11 +124,11 @@ func (a *App) OpenDirectory(path string) error {
 	return apperr.Unwrap(err)
 }
 
-func (a *App) DefaultUserConfig() data.UserConfigV2 {
-	return data.DefaultUserConfigV2()
+func (a *App) DefaultUserConfig() model.UserConfigV2 {
+	return model.DefaultUserConfigV2()
 }
 
-func (a *App) UserConfig() (data.UserConfigV2, error) {
+func (a *App) UserConfig() (model.UserConfigV2, error) {
 	config, err := a.config.User()
 	if err != nil {
 		a.logger.Error(err, nil)
@@ -145,7 +137,7 @@ func (a *App) UserConfig() (data.UserConfigV2, error) {
 	return config, apperr.Unwrap(err)
 }
 
-func (a *App) UpdateUserConfig(config data.UserConfigV2) error {
+func (a *App) UpdateUserConfig(config model.UserConfigV2) error {
 	err := a.config.UpdateOptional(config)
 	if err != nil {
 		a.logger.Error(err, nil)
@@ -200,7 +192,7 @@ func (a *App) Semver() string {
 	return a.env.Semver
 }
 
-func (a *App) AlertPlayers() ([]data.AlertPlayer, error) {
+func (a *App) AlertPlayers() ([]model.AlertPlayer, error) {
 	players, err := a.config.AlertPlayers()
 	if err != nil {
 		a.logger.Error(err, nil)
@@ -209,7 +201,7 @@ func (a *App) AlertPlayers() ([]data.AlertPlayer, error) {
 	return players, apperr.Unwrap(err)
 }
 
-func (a *App) UpdateAlertPlayer(player data.AlertPlayer) error {
+func (a *App) UpdateAlertPlayer(player model.AlertPlayer) error {
 	players, err := a.config.UpdateAlertPlayer(player)
 	if err != nil {
 		a.logger.Error(err, nil)
@@ -231,12 +223,12 @@ func (a *App) RemoveAlertPlayer(accountID int) error {
 	return apperr.Unwrap(err)
 }
 
-func (a *App) SearchPlayer(prefix string) data.WGAccountList {
+func (a *App) SearchPlayer(prefix string) map[string]int {
 	return a.config.SearchPlayer(prefix)
 }
 
 func (a *App) AlertPatterns() []string {
-	return data.AlertPatterns()
+	return model.AlertPatterns()
 }
 
 func (a *App) LogError(errString string, contexts map[string]string) {
@@ -248,7 +240,7 @@ func (a *App) LogInfo(message string, contexts map[string]string) {
 	a.logger.Info(message, contexts)
 }
 
-func (a *App) LatestRelease() (data.GHLatestRelease, error) {
-	latestRelease, err := a.updater.IsUpdatable()
+func (a *App) LatestRelease() (model.LatestRelease, error) {
+	latestRelease, err := a.versionFetcher.Fetch(a.env.Semver)
 	return latestRelease, apperr.Unwrap(err)
 }

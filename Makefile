@@ -21,6 +21,8 @@ setup:
 	$(NPM) ci
 
 gen-mock:
+	rm -rf backend/domain/mock
+	rm -rf backend/infra/mock
 	go generate ./...
 
 lint:
