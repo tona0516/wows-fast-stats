@@ -1,6 +1,7 @@
 package infra
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -44,6 +45,14 @@ func writeJSON[T any](path string, target T) error {
 	encoder.SetIndent("", "  ")
 	err = encoder.Encode(target)
 	return failure.Wrap(err, errCtx)
+}
+
+func prettyJSON(str string) string {
+	var buf bytes.Buffer
+	if err := json.Indent(&buf, []byte(str), "", "    "); err != nil {
+		return str
+	}
+	return buf.String()
 }
 
 func writeData(path string, target []byte) error {

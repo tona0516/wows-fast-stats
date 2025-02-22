@@ -16,7 +16,6 @@ export const storedSummary = derived(
     Summary.calculate($storedBattle, $storedExcludedPlayers, $storedConfig),
 );
 export const storedAlertPlayers = writable([]) as Writable<model.AlertPlayer[]>;
-export const storedLogs = writable([]) as Writable<string[]>;
 export const storedInstallPathError = writable("") as Writable<string>;
 export const storedTeamThreatLevels = derived(
   [storedBattle, storedExcludedPlayers, storedConfig],

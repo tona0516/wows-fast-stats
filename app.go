@@ -58,7 +58,6 @@ func NewApp(
 func (a *App) onStartup(ctx context.Context) {
 	a.ctx = ctx
 	runtime.LogSetLogLevel(ctx, logger.INFO)
-	a.logger.Init(ctx)
 }
 
 func (a *App) MigrateIfNeeded() error {

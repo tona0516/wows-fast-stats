@@ -20,7 +20,6 @@
     storedAlertPlayers,
     storedConfig,
     storedInstallPathError,
-    storedLogs,
   } from "src/stores";
   import AlertModals from "src/component/modal/AlertModals.svelte";
   import UkIcon from "src/component/common/uikit/UkIcon.svelte";
@@ -48,12 +47,6 @@
   );
   EventsOn("ALERT_PLAYERS_UPDATE", (players: model.AlertPlayer[]) =>
     storedAlertPlayers.set(players),
-  );
-  EventsOn("LOG", (log: string) =>
-    storedLogs.update((logs) => {
-      logs.push(log);
-      return logs;
-    }),
   );
 
   window.onunhandledrejection = (event) => {
