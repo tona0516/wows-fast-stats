@@ -14,11 +14,10 @@ TEST_REPLAY_PATH := ./test_install_dir/replays
 .PHONY: setup gen-mock lint fmt test dev build pkg clean uddep chbtl
 
 setup:
-	go install github.com/wailsapp/wails/v2/cmd/wails@latest
+	go install github.com/wailsapp/wails/v2/cmd/wails@v2.9.3
 	go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 	go install go.uber.org/mock/mockgen@latest
 	go install github.com/arch-go/arch-go@latest
-	$(NPM) ci
 
 gen-mock:
 	rm -rf backend/domain/mock
@@ -53,6 +52,6 @@ chbtl:
 clean:
 	rm -rf config/ cache/ temp_arena_info/ screenshot/ persistent_data/
 
-uddep:
-	go get -u
+update:
+	go get
 	$(NPM) update
