@@ -2,7 +2,7 @@
 linters:
   enable-all: true
   disable:
-    - exportloopref # deprecated
+    - tenv # Deprecated
     - wrapcheck
     - forbidigo
     - funlen
