@@ -1,0 +1,88 @@
+# https://taskfile.dev
+
+version: '3'
+
+vars:
+  APP_NAME: wows-fast-stats
+  SEMVER: 0.17.0
+  WG_APP_ID: e25e1a2af190880c9e33d3be7cc5313d
+  NPM: npm --prefix ./frontend
+  COMMON_LDFLAGS:
+    -X main.AppName={{.APP_NAME}}
+    -X main.Semver={{.SEMVER}}
+    -X main.WGAppID={{.WG_APP_ID}}
+
+tasks:
+  setup:
+    desc: Setup the project
+    cmds:
+      - for:
+        - github.com/wailsapp/wails/v2/cmd/wails@v2.9.3
+        - github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+        - go.uber.org/mock/mockgen@latest
+        - github.com/arch-go/arch-go@latest
+        cmd: go install {{.ITEM}}
+  gen-mock:
+    desc: Generate mocks
+    cmds:
+      - rm -rf backend/domain/mock
+      - rm -rf backend/infra/mock
+      - go generate ./...
+  lint:
+    desc: Run linters
+    cmds:
+      - golangci-lint run
+      - "{{.NPM}} run check"
+      - "{{.NPM}} run lint"
+  fmt:
+    desc: Format code
+    cmds:
+      - golangci-lint run --fix
+      - go fmt
+      - "{{.NPM}} run fmt"
+  test:
+    desc: Run tests
+    cmds:
+      - arch-go
+      - go test -cover ./... -count=1
+      - "{{.NPM}} run test"
+  dev:
+    desc: Run the app in development mode
+    dotenv: ['.env.development']
+    vars:
+      LDFLAGS:
+        -X main.AlertDiscordWebhookURL=<URL>
+        -X main.InfoDiscordWebhookURL=<URL>
+    cmds:
+      - wails dev -ldflags "{{.COMMON_LDFLAGS}} {{.LDFLAGS}} -X main.IsDev=true"
+  build:
+    desc: Build the app
+    deps: [test]
+    vars:
+      LDFLAGS:
+        -X main.AlertDiscordWebhookURL=<URL>
+        -X main.InfoDiscordWebhookURL=<URL>
+    cmds:
+      - wails build -ldflags "{{.COMMON_LDFLAGS}} {{.LDFLAGS}}" -platform windows/amd64 -o {{.APP_NAME}}-{{.SEMVER}}.exe -trimpath -webview2 embed
+  chbtl:
+    desc: Change Battle
+    vars:
+      TEST_REPLAY_PATH: ./test_install_dir/replays
+      TEMP_ARENA_INFO: tempArenaInfo.json
+    cmds:
+      - cp {{.TEST_REPLAY_PATH}}/$(ls {{.TEST_REPLAY_PATH}} | grep -v {{.TEMP_ARENA_INFO}} | fzf) {{.TEST_REPLAY_PATH}}/{{.TEMP_ARENA_INFO}}
+  clean:
+    desc: Clean the project
+    cmds:
+      - for:
+        - config/
+        - cache/
+        - temp_arena_info/
+        - screenshot/
+        - persistent_data/
+        cmd: rm -rf {{.ITEM}}
+  update:
+    desc: Update dependencies
+    cmds:
+      - go get
+      - "{{.NPM}} update"
