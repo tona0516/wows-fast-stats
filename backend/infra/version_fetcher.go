@@ -10,18 +10,20 @@ import (
 
 type VersionFetcher struct {
 	github webapi.Github
+	semver string
 }
 
-func NewVersionFetcher(github webapi.Github) *VersionFetcher {
+func NewVersionFetcher(github webapi.Github, semver string) *VersionFetcher {
 	return &VersionFetcher{
 		github: github,
+		semver: semver,
 	}
 }
 
-func (f *VersionFetcher) Fetch(currentSemver string) (model.LatestRelease, error) {
+func (f *VersionFetcher) Fetch() (model.LatestRelease, error) {
 	var latestRelease model.LatestRelease
 
-	constant, err := semver.NewConstraint("> " + currentSemver)
+	constant, err := semver.NewConstraint("> " + f.semver)
 	if err != nil {
 		return latestRelease, failure.Wrap(err)
 	}

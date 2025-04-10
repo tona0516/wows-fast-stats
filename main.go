@@ -5,9 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strconv"
 	"time"
-	"wfs/backend/data"
 	"wfs/backend/infra"
 	"wfs/backend/infra/webapi"
 	"wfs/backend/service"
@@ -40,24 +38,20 @@ func main() {
 		return
 	}
 
-	isDev, _ := strconv.ParseBool(IsDev)
-	env := data.Env{
-		AppName: AppName,
-		WGAppID: WGAppID,
-		Semver:  Semver,
-		IsDev:   isDev,
-	}
+	env := infra.NewEnv(
+		AppName,
+		Semver,
+		AlertDiscordWebhookURL,
+		InfoDiscordWebhookURL,
+		WGAppID,
+		IsDev,
+	)
 
 	app := initApp(env)
 
-	title := AppName
-	if isDev {
-		title += " [dev]"
-	}
-
 	// Create application with options
 	err := wails.Run(&options.App{
-		Title:  title,
+		Title:  env.AppName,
 		Width:  1280,
 		Height: 720,
 		AssetServer: &assetserver.Options{
@@ -73,18 +67,18 @@ func main() {
 	}
 }
 
-func initApp(env data.Env) *App {
+func initApp(env infra.Env) *App {
 	// infra
 	var maxRetry uint64 = 2
 	timeout := 10 * time.Second
 
 	alertDiscord := webapi.NewDiscord(webapi.RequestConfig{
-		URL:     AlertDiscordWebhookURL,
+		URL:     env.AlertDiscordWebhookURL,
 		Retry:   maxRetry,
 		Timeout: timeout,
 	})
 	infoDiscord := webapi.NewDiscord(webapi.RequestConfig{
-		URL:     InfoDiscordWebhookURL,
+		URL:     env.InfoDiscordWebhookURL,
 		Retry:   maxRetry,
 		Timeout: timeout,
 	})
@@ -140,7 +134,7 @@ func initApp(env data.Env) *App {
 	accountFetcher := infra.NewAccountFetcher(wargaming)
 	userConfig := infra.NewUserConfigStore(db)
 	alertPlayer := infra.NewAlertPlayerStore(db)
-	versionFetcher := infra.NewVersionFetcher(github)
+	versionFetcher := infra.NewVersionFetcher(github, env.AppVer)
 
 	// usecase
 	watchInterval := 1 * time.Second

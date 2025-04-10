@@ -3,9 +3,9 @@ package main
 import (
 	"context"
 	"wfs/backend/apperr"
-	"wfs/backend/data"
 	"wfs/backend/domain/model"
 	"wfs/backend/domain/repository"
+	"wfs/backend/infra"
 	"wfs/backend/service"
 
 	"github.com/morikuni/failure"
@@ -21,7 +21,7 @@ const (
 //nolint:containedctx
 type App struct {
 	ctx            context.Context
-	env            data.Env
+	env            infra.Env
 	logger         repository.Logger
 	versionFetcher repository.VersionFetcher
 	config         service.Config
@@ -34,7 +34,7 @@ type App struct {
 }
 
 func NewApp(
-	env data.Env,
+	env infra.Env,
 	logger repository.Logger,
 	versionFetcher repository.VersionFetcher,
 	config service.Config,
@@ -188,7 +188,7 @@ func (a *App) AutoScreenshot(filename string, base64Data string) error {
 }
 
 func (a *App) Semver() string {
-	return a.env.Semver
+	return a.env.AppVer
 }
 
 func (a *App) AlertPlayers() ([]model.AlertPlayer, error) {
@@ -240,6 +240,6 @@ func (a *App) LogInfo(message string, contexts map[string]string) {
 }
 
 func (a *App) LatestRelease() (model.LatestRelease, error) {
-	latestRelease, err := a.versionFetcher.Fetch(a.env.Semver)
+	latestRelease, err := a.versionFetcher.Fetch()
 	return latestRelease, apperr.Unwrap(err)
 }

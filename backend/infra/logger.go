@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"time"
-	"wfs/backend/data"
 	"wfs/backend/infra/webapi"
 
 	"github.com/rs/zerolog"
@@ -17,7 +16,7 @@ type Logger struct {
 }
 
 func NewLogger(
-	env data.Env,
+	env Env,
 	alertDiscord webapi.Discord,
 	infoDiscord webapi.Discord,
 	storage Storage,
@@ -52,7 +51,7 @@ func NewLogger(
 	zlog := zerolog.New(multi).
 		With().
 		Timestamp().
-		Str("semver", env.Semver).
+		Str("semver", env.AppVer).
 		Logger()
 
 	ign, _ := storage.OwnIGN()
