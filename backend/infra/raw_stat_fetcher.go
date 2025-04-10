@@ -4,7 +4,6 @@ import (
 	"errors"
 	"sync"
 	"wfs/backend/apperr"
-	"wfs/backend/data"
 	"wfs/backend/domain/model"
 	"wfs/backend/infra/response"
 	"wfs/backend/infra/webapi"
@@ -30,8 +29,8 @@ func NewRawStatFetcher(
 }
 
 func (f *RawStatFetcher) Fetch(accountIDs []int) (model.RawStats, error) {
-	accountInfoChan := make(chan data.Result[response.WGAccountInfo])
-	shipStatsChan := make(chan data.Result[shipStatsAccountsMap])
+	accountInfoChan := make(chan model.Result[response.WGAccountInfo])
+	shipStatsChan := make(chan model.Result[shipStatsAccountsMap])
 
 	go f.accountInfo(accountIDs, accountInfoChan)
 	go f.shipStats(accountIDs, shipStatsChan)
@@ -77,14 +76,14 @@ func (f *RawStatFetcher) Fetch(accountIDs []int) (model.RawStats, error) {
 	return rawStats, nil
 }
 
-func (f *RawStatFetcher) accountInfo(accountIDs []int, channel chan data.Result[response.WGAccountInfo]) {
+func (f *RawStatFetcher) accountInfo(accountIDs []int, channel chan model.Result[response.WGAccountInfo]) {
 	accountInfo, err := f.wargaming.AccountInfo(accountIDs)
-	channel <- data.Result[response.WGAccountInfo]{Value: accountInfo, Error: err}
+	channel <- model.Result[response.WGAccountInfo]{Value: accountInfo, Error: err}
 }
 
 func (f *RawStatFetcher) shipStats(
 	accountIDs []int,
-	channel chan data.Result[shipStatsAccountsMap],
+	channel chan model.Result[shipStatsAccountsMap],
 ) {
 	shipStatsAccounts := make(shipStatsAccountsMap)
 	var mu sync.Mutex
@@ -107,5 +106,5 @@ func (f *RawStatFetcher) shipStats(
 		return nil
 	})
 
-	channel <- data.Result[shipStatsAccountsMap]{Value: shipStatsAccounts, Error: err}
+	channel <- model.Result[shipStatsAccountsMap]{Value: shipStatsAccounts, Error: err}
 }

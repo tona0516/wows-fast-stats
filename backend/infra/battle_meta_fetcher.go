@@ -3,7 +3,6 @@ package infra
 import (
 	"errors"
 	"wfs/backend/apperr"
-	"wfs/backend/data"
 	"wfs/backend/domain/model"
 	"wfs/backend/infra/response"
 	"wfs/backend/infra/webapi"
@@ -29,8 +28,8 @@ func (f *BattleMetaFetcher) Fetch() (model.BattleMeta, error) {
 		return *f.cache, nil
 	}
 
-	arenaResultChan := make(chan data.Result[response.WGBattleArenas])
-	typeResultChan := make(chan data.Result[response.WGBattleTypes])
+	arenaResultChan := make(chan model.Result[response.WGBattleArenas])
+	typeResultChan := make(chan model.Result[response.WGBattleTypes])
 
 	go f.fetchBattleArenas(arenaResultChan)
 	go f.fetchBattleTypes(typeResultChan)
@@ -57,12 +56,12 @@ func (f *BattleMetaFetcher) Fetch() (model.BattleMeta, error) {
 	return *model.NewBattleMeta(arenas, types), nil
 }
 
-func (f *BattleMetaFetcher) fetchBattleArenas(channel chan data.Result[response.WGBattleArenas]) {
+func (f *BattleMetaFetcher) fetchBattleArenas(channel chan model.Result[response.WGBattleArenas]) {
 	battleArenas, err := f.wargaming.BattleArenas()
-	channel <- data.Result[response.WGBattleArenas]{Value: battleArenas, Error: err}
+	channel <- model.Result[response.WGBattleArenas]{Value: battleArenas, Error: err}
 }
 
-func (f *BattleMetaFetcher) fetchBattleTypes(channel chan data.Result[response.WGBattleTypes]) {
+func (f *BattleMetaFetcher) fetchBattleTypes(channel chan model.Result[response.WGBattleTypes]) {
 	battleTypes, err := f.wargaming.BattleTypes()
-	channel <- data.Result[response.WGBattleTypes]{Value: battleTypes, Error: err}
+	channel <- model.Result[response.WGBattleTypes]{Value: battleTypes, Error: err}
 }

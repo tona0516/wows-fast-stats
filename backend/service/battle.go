@@ -6,7 +6,6 @@ import (
 	"sort"
 	"strconv"
 	"strings"
-	"wfs/backend/data"
 	"wfs/backend/domain/model"
 	"wfs/backend/domain/repository"
 )
@@ -53,10 +52,10 @@ func (b *Battle) Get(appCtx context.Context, userConfig model.UserConfigV2) (mod
 	// persist own ign for reporting
 	b.logger.SetOwnIGN(tempArenaInfo.PlayerName)
 
-	warshipResult := make(chan data.Result[model.Warships])
+	warshipResult := make(chan model.Result[model.Warships])
 	go b.fetchWarships(warshipResult)
 
-	battleMetaResult := make(chan data.Result[model.BattleMeta])
+	battleMetaResult := make(chan model.Result[model.BattleMeta])
 	go b.fetchBattleMeta(battleMetaResult)
 
 	// Get Account ID list
@@ -70,8 +69,8 @@ func (b *Battle) Get(appCtx context.Context, userConfig model.UserConfigV2) (mod
 	}
 
 	// Fetch each stats
-	rawStatsResult := make(chan data.Result[model.RawStats])
-	clanResult := make(chan data.Result[model.Clans])
+	rawStatsResult := make(chan model.Result[model.RawStats])
+	clanResult := make(chan model.Result[model.Clans])
 	go b.fetchRawStats(accountIDs, rawStatsResult)
 	go b.fetchClans(accountIDs, clanResult)
 
@@ -122,30 +121,30 @@ func (b *Battle) getTempArenaInfo(userConfig model.UserConfigV2) (model.TempAren
 	return tempArenaInfo, nil
 }
 
-func (b *Battle) fetchWarships(channel chan data.Result[model.Warships]) {
+func (b *Battle) fetchWarships(channel chan model.Result[model.Warships]) {
 	warships, err := b.warshipStore.Fetch()
-	channel <- data.Result[model.Warships]{
+	channel <- model.Result[model.Warships]{
 		Value: warships,
 		Error: err,
 	}
 }
 
-func (b *Battle) fetchClans(accountIDs []int, channel chan data.Result[model.Clans]) {
+func (b *Battle) fetchClans(accountIDs []int, channel chan model.Result[model.Clans]) {
 	clans, err := b.clanFetcher.Fetch(accountIDs)
-	channel <- data.Result[model.Clans]{
+	channel <- model.Result[model.Clans]{
 		Value: clans,
 		Error: err,
 	}
 }
 
-func (b *Battle) fetchRawStats(accountIDs []int, channel chan data.Result[model.RawStats]) {
+func (b *Battle) fetchRawStats(accountIDs []int, channel chan model.Result[model.RawStats]) {
 	rawStats, err := b.rawStatFetcher.Fetch(accountIDs)
-	channel <- data.Result[model.RawStats]{Value: rawStats, Error: err}
+	channel <- model.Result[model.RawStats]{Value: rawStats, Error: err}
 }
 
-func (b *Battle) fetchBattleMeta(channel chan data.Result[model.BattleMeta]) {
+func (b *Battle) fetchBattleMeta(channel chan model.Result[model.BattleMeta]) {
 	battleMeta, err := b.battleMetaFetcher.Fetch()
-	channel <- data.Result[model.BattleMeta]{Value: battleMeta, Error: err}
+	channel <- model.Result[model.BattleMeta]{Value: battleMeta, Error: err}
 }
 
 func (b *Battle) compose(

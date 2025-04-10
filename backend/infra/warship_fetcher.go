@@ -4,7 +4,6 @@ import (
 	"errors"
 	"sync"
 	"wfs/backend/apperr"
-	"wfs/backend/data"
 	"wfs/backend/domain/model"
 	"wfs/backend/infra/response"
 	"wfs/backend/infra/webapi"
@@ -48,9 +47,9 @@ func (f *WarshipFetcher) Fetch() (model.Warships, error) {
 		return cache.warships, nil
 	}
 
-	encycShipsChan := make(chan data.Result[model.Warships])
-	unregisteredChan := make(chan data.Result[model.Warships])
-	expectedStatsChan := make(chan data.Result[response.ExpectedStats])
+	encycShipsChan := make(chan model.Result[model.Warships])
+	unregisteredChan := make(chan model.Result[model.Warships])
+	expectedStatsChan := make(chan model.Result[response.ExpectedStats])
 
 	go f.encycShips(encycShipsChan)
 	go f.unregisteredShips(unregisteredChan)
@@ -108,7 +107,7 @@ func (f *WarshipFetcher) Fetch() (model.Warships, error) {
 	return warships, nil
 }
 
-func (f *WarshipFetcher) encycShips(channel chan data.Result[model.Warships]) {
+func (f *WarshipFetcher) encycShips(channel chan model.Result[model.Warships]) {
 	warships := make(model.Warships)
 
 	var mu sync.Mutex
@@ -136,7 +135,7 @@ func (f *WarshipFetcher) encycShips(channel chan data.Result[model.Warships]) {
 	first := 1
 	pageTotal, err := fetch(first)
 	if err != nil {
-		channel <- data.Result[model.Warships]{
+		channel <- model.Result[model.Warships]{
 			Error: err,
 		}
 		return
@@ -148,25 +147,25 @@ func (f *WarshipFetcher) encycShips(channel chan data.Result[model.Warships]) {
 		return err
 	})
 
-	channel <- data.Result[model.Warships]{
+	channel <- model.Result[model.Warships]{
 		Value: warships,
 		Error: err,
 	}
 }
 
-func (f *WarshipFetcher) unregisteredShips(channel chan data.Result[model.Warships]) {
+func (f *WarshipFetcher) unregisteredShips(channel chan model.Result[model.Warships]) {
 	warships, err := f.unregistered.warship()
 
-	channel <- data.Result[model.Warships]{
+	channel <- model.Result[model.Warships]{
 		Value: warships,
 		Error: err,
 	}
 }
 
-func (f *WarshipFetcher) expectedStats(channel chan data.Result[response.ExpectedStats]) {
+func (f *WarshipFetcher) expectedStats(channel chan model.Result[response.ExpectedStats]) {
 	es, err := f.numbers.ExpectedStats()
 
-	channel <- data.Result[response.ExpectedStats]{
+	channel <- model.Result[response.ExpectedStats]{
 		Value: es,
 		Error: err,
 	}
