@@ -1,0 +1,89 @@
+package numbers
+
+import (
+	"encoding/json"
+	"testing"
+	"wfs/backend/apperr"
+
+	"github.com/morikuni/failure"
+	"github.com/stretchr/testify/assert"
+)
+
+func TestExpected_UnmarshalJSON(t *testing.T) {
+	t.Parallel()
+	t.Run("正常系", func(t *testing.T) {
+		t.Parallel()
+
+		input := `{
+            "time": 1621845600,
+            "data": {
+                "1": {
+                    "average_damage_dealt": 50000,
+                    "average_frags": 1.5,
+                    "win_rate": 0.6
+                },
+                "2": {
+                    "average_damage_dealt": 60000,
+                    "average_frags": 2.0,
+                    "win_rate": 0.7
+                },
+                "3": [],
+                "4": {
+                    "average_damage_dealt": "value_not_float",
+                    "average_frags": 1.0,
+                    "win_rate": 0.1
+                },
+                "5": {
+                    "average_damage_dealt": 60000,
+                    "average_frags": "value_not_float",
+                    "win_rate": 0.1
+                },
+                "6": {
+                    "average_damage_dealt": 60000,
+                    "average_frags": 1.0,
+                    "win_rate": "value_not_float"
+                },
+                "key_not_int": {
+                    "average_damage_dealt": 10000,
+                    "average_frags": 1.0,
+                    "win_rate": 0.1
+                }
+            }
+        }`
+
+		var actual Expected
+		err := json.Unmarshal([]byte(input), &actual)
+
+		assert.NoError(t, err)
+		assert.Equal(t, Expected{
+			Data: map[int]ExpectedValues{
+				1: {
+					AverageDamageDealt: 50000.0,
+					AverageFrags:       1.5,
+					WinRate:            0.6,
+				},
+				2: {
+					AverageDamageDealt: 60000.0,
+					AverageFrags:       2.0,
+					WinRate:            0.7,
+				},
+			},
+		}, actual)
+	})
+	t.Run("異常系", func(t *testing.T) {
+		t.Parallel()
+
+		inputs := []string{
+			"{}",
+			`{
+                "time": 1,
+                "data": []
+            }`,
+		}
+
+		for _, input := range inputs {
+			err := json.Unmarshal([]byte(input), &Expected{})
+			assert.True(t, failure.Is(err, apperr.ParseExpectedStatsError))
+		}
+	})
+}
