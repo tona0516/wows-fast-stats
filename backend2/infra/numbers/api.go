@@ -5,7 +5,7 @@ import (
 )
 
 //go:generate mockgen -source=$GOFILE -destination ../mock/$GOPACKAGE/$GOFILE -package $GOPACKAGE
-type Numbers interface {
+type API interface {
 	Fetch() (Expected, error)
 }
 
@@ -13,7 +13,7 @@ type api struct {
 	client *req.Client
 }
 
-func NewAPI(client *req.Client) Numbers {
+func NewAPI(client *req.Client) API {
 	return &api{client: client}
 }
 

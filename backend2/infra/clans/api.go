@@ -9,7 +9,7 @@ import (
 )
 
 //go:generate mockgen -source=$GOFILE -destination ../mock/$GOPACKAGE/$GOFILE -package $GOPACKAGE
-type ClansWargaming interface {
+type API interface {
 	FetchAutoComplete(search string) (Autocomplete, error)
 }
 
@@ -17,7 +17,7 @@ type api struct {
 	client *req.Client
 }
 
-func NewAPI(client *req.Client) ClansWargaming {
+func NewAPI(client *req.Client) API {
 	return &api{client: client}
 }
 
