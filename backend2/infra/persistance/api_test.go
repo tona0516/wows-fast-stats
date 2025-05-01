@@ -10,6 +10,8 @@ import (
 )
 
 func TestAPI_SaveAndGetUserSetting(t *testing.T) {
+	t.Parallel()
+
 	tmpDir := t.TempDir()
 	api := NewAPI(func() (string, error) {
 		return tmpDir, nil
@@ -44,6 +46,8 @@ func TestAPI_SaveAndGetUserSetting(t *testing.T) {
 }
 
 func TestAPI_SaveAndGetAlertPlayers(t *testing.T) {
+	t.Parallel()
+
 	tmpDir := t.TempDir()
 	api := NewAPI(func() (string, error) {
 		return tmpDir, nil

@@ -32,7 +32,20 @@ func TestClansWargaming_FetchAutoComplete(t *testing.T) {
 	t.Run("正常系", func(t *testing.T) {
 		t.Parallel()
 
-		server := newMockServer(http.StatusOK, `{"search_autocomplete_result": [{"tag": "-K2-", "name": "\u795e\u98a8-s", "id": 2000036632, "hex_color": "#cc9966"}], "_meta_": {"collection": "search_autocomplete_result", "total_clans": 1}}`)
+		server := newMockServer(http.StatusOK, `{
+  "search_autocomplete_result":[
+    {
+      "tag":"-K2-",
+      "name":"\u795e\u98a8-s",
+      "id":2000036632,
+      "hex_color":"#cc9966"
+    }
+  ],
+  "_meta_":{
+    "collection":"search_autocomplete_result",
+    "total_clans":1
+  }
+}`)
 		defer server.Close()
 
 		client := newMockClient(server)
@@ -50,7 +63,14 @@ func TestClansWargaming_FetchAutoComplete(t *testing.T) {
 	t.Run("異常系", func(t *testing.T) {
 		t.Parallel()
 
-		server := newMockServer(http.StatusConflict, `{"status": "error", "data": {"search": ["Length must be between 2 and 70."]}}`)
+		server := newMockServer(http.StatusConflict, `{
+  "status":"error",
+  "data":{
+    "search":[
+      "Length must be between 2 and 70."
+    ]
+  }
+}`)
 		defer server.Close()
 
 		client := newMockClient(server)

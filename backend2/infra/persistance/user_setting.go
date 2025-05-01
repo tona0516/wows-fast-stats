@@ -121,7 +121,7 @@ type UserSetting struct {
 				OwnColor   string `json:"own_color"`
 				OtherColor string `json:"other_color"`
 			} `json:"high"` // tier 8~★
-		}
+		} `json:"tier_group"`
 		ShipType struct {
 			SS struct {
 				OwnColor   string `json:"own_color"`
@@ -143,7 +143,7 @@ type UserSetting struct {
 				OwnColor   string `json:"own_color"`
 				OtherColor string `json:"other_color"`
 			} `json:"cv"`
-		} `json:"optional"`
+		} `json:"ship_type"`
 		TeamSummary struct {
 			MinShipBattles    uint `json:"min_ship_battles"`
 			MinOverallBattles uint `json:"min_overall_battles"`
@@ -155,5 +155,5 @@ type UserSetting struct {
 		SaveTempArenaInfo bool   `json:"save_temp_arena_info"`
 		SendReport        bool   `json:"send_report"`
 		NotifyUpdatable   bool   `json:"notify_updatable"`
-	}
+	} `json:"optional"`
 }
