@@ -230,6 +230,7 @@ func TestAPI_ClansAccountInfo(t *testing.T) {
 func TestAPI_ClansInfo(t *testing.T) {
 	t.Parallel()
 
+	//nolint:lll
 	server := newMockServer(`{
   "status":"ok",
   "meta":{
@@ -264,9 +265,7 @@ func TestAPI_ClansInfo(t *testing.T) {
       "renamed_at":null,
       "old_tag":null,
       "leader_id":2038889037,
-      "description":"『-K2-』神風‐sではTyphoonリーグを目指すクランとなります。
-	  クラン加入については下記のDiscordの招待URLを通して面接申請をお願いします。
-	  もしDiscordをお持ちでない方は、ゲーム内チャットにてmyouko02もしくは、gaku0083ご連絡してください。"
+      "description":"『-K2-』神風‐sではTyphoonリーグを目指すクランとなります。\nクラン加入については下記のDiscordの招待URLを通して面接申請をお願いします。\nもしDiscordをお持ちでない方は、ゲーム内チャットにてmyouko02もしくは、gaku0083ご連絡してください。"
     }
   }
 }`)

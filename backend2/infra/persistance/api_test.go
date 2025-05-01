@@ -82,7 +82,7 @@ func TestAPI_SaveAndGetAlertPlayers(t *testing.T) {
 	assert.Equal(t, ap[1].Message, loaded[1].Message)
 
 	// ファイルの中身も検証
-	path := filepath.Join(tmpDir, "wows-fast-stats", "alert_player.json")
+	path := filepath.Join(tmpDir, "wows-fast-stats", "alert_players.json")
 	data, err := os.ReadFile(path)
 	assert.NoError(t, err)
 	var fileContent AlertPlayers
