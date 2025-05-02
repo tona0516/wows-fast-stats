@@ -119,7 +119,7 @@ func initApp(env infra.Env) *App {
 		Retry:   maxRetry,
 		Timeout: timeout,
 	})
-	warshipStore := infra.NewWarshipStore(
+	warshipStore := infra.NewWarshipFetcher(
 		db,
 		wargaming,
 		*unregistered,

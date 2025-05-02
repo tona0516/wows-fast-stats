@@ -20,7 +20,7 @@ type WarshipFetcher struct {
 	localDataKeyName string
 }
 
-func NewWarshipStore(
+func NewWarshipFetcher(
 	db *badger.DB,
 	wargaming webapi.Wargaming,
 	unregistered Unregistered,
