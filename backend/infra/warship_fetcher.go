@@ -15,7 +15,6 @@ import (
 type WarshipFetcher struct {
 	db               *badger.DB
 	wargaming        webapi.Wargaming
-	unregistered     Unregistered
 	numbers          webapi.Numbers
 	localDataKeyName string
 }
@@ -23,13 +22,11 @@ type WarshipFetcher struct {
 func NewWarshipFetcher(
 	db *badger.DB,
 	wargaming webapi.Wargaming,
-	unregistered Unregistered,
 	numbers webapi.Numbers,
 ) *WarshipFetcher {
 	return &WarshipFetcher{
 		db:               db,
 		wargaming:        wargaming,
-		unregistered:     unregistered,
 		numbers:          numbers,
 		localDataKeyName: "warships",
 	}
@@ -48,18 +45,13 @@ func (f *WarshipFetcher) Fetch() (model.Warships, error) {
 	}
 
 	encycShipsChan := make(chan model.Result[model.Warships])
-	unregisteredChan := make(chan model.Result[model.Warships])
 	expectedStatsChan := make(chan model.Result[response.ExpectedStats])
 
 	go f.encycShips(encycShipsChan)
-	go f.unregisteredShips(unregisteredChan)
 	go f.expectedStats(expectedStatsChan)
 
 	ships := <-encycShipsChan
 	err = errors.Join(err, ships.Error)
-
-	unregisteredShips := <-unregisteredChan
-	err = errors.Join(err, unregisteredShips.Error)
 
 	expectedStats := <-expectedStatsChan
 	err = errors.Join(err, expectedStats.Error)
@@ -68,21 +60,6 @@ func (f *WarshipFetcher) Fetch() (model.Warships, error) {
 	}
 
 	warships := ships.Value
-	for shipID, ship := range unregisteredShips.Value {
-		if _, ok := warships[shipID]; ok {
-			continue
-		}
-
-		warships[shipID] = model.Warship{
-			ID:        shipID,
-			Name:      ship.Name,
-			Tier:      ship.Tier,
-			Type:      ship.Type,
-			Nation:    ship.Nation,
-			IsPremium: ship.IsPremium,
-		}
-	}
-
 	for shipID, ship := range expectedStats.Value {
 		if _, ok := warships[shipID]; !ok {
 			continue
@@ -146,15 +123,6 @@ func (f *WarshipFetcher) encycShips(channel chan model.Result[model.Warships]) {
 		_, err := fetch(page)
 		return err
 	})
-
-	channel <- model.Result[model.Warships]{
-		Value: warships,
-		Error: err,
-	}
-}
-
-func (f *WarshipFetcher) unregisteredShips(channel chan model.Result[model.Warships]) {
-	warships, err := f.unregistered.warship()
 
 	channel <- model.Result[model.Warships]{
 		Value: warships,

@@ -113,7 +113,6 @@ func initApp(env infra.Env) *App {
 		Timeout: timeout,
 	})
 	localFile := infra.NewLocalFile()
-	unregistered := infra.NewUnregistered()
 	github := webapi.NewGithub(webapi.RequestConfig{
 		URL:     "https://api.github.com",
 		Retry:   maxRetry,
@@ -122,7 +121,6 @@ func initApp(env infra.Env) *App {
 	warshipStore := infra.NewWarshipFetcher(
 		db,
 		wargaming,
-		*unregistered,
 		numbers,
 	)
 	clanFercher := infra.NewClanFetcher(
