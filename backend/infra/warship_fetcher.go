@@ -1,33 +1,34 @@
 package infra
 
 import (
+	"encoding/json"
 	"errors"
 	"sync"
 	"wfs/backend/apperr"
 	"wfs/backend/domain/model"
-	"wfs/backend/infra/response"
 	"wfs/backend/infra/webapi"
 
 	"github.com/dgraph-io/badger/v4"
+	"github.com/imroc/req/v3"
 	"github.com/morikuni/failure"
 )
 
 type WarshipFetcher struct {
 	db               *badger.DB
 	wargaming        webapi.Wargaming
-	numbers          webapi.Numbers
+	numbersClient    req.Client
 	localDataKeyName string
 }
 
 func NewWarshipFetcher(
 	db *badger.DB,
 	wargaming webapi.Wargaming,
-	numbers webapi.Numbers,
+	numbersClient req.Client,
 ) *WarshipFetcher {
 	return &WarshipFetcher{
 		db:               db,
 		wargaming:        wargaming,
-		numbers:          numbers,
+		numbersClient:    numbersClient,
 		localDataKeyName: "warships",
 	}
 }
@@ -45,7 +46,7 @@ func (f *WarshipFetcher) Fetch() (model.Warships, error) {
 	}
 
 	encycShipsChan := make(chan model.Result[model.Warships])
-	expectedStatsChan := make(chan model.Result[response.ExpectedStats])
+	expectedStatsChan := make(chan model.Result[NumbersExpectedStats])
 
 	go f.encycShips(encycShipsChan)
 	go f.expectedStats(expectedStatsChan)
@@ -60,7 +61,7 @@ func (f *WarshipFetcher) Fetch() (model.Warships, error) {
 	}
 
 	warships := ships.Value
-	for shipID, ship := range expectedStats.Value {
+	for shipID, ship := range expectedStats.Value.Data {
 		if _, ok := warships[shipID]; !ok {
 			continue
 		}
@@ -130,13 +131,25 @@ func (f *WarshipFetcher) encycShips(channel chan model.Result[model.Warships]) {
 	}
 }
 
-func (f *WarshipFetcher) expectedStats(channel chan model.Result[response.ExpectedStats]) {
-	es, err := f.numbers.ExpectedStats()
+func (f *WarshipFetcher) expectedStats(channel chan model.Result[NumbersExpectedStats]) {
+	result := model.Result[NumbersExpectedStats]{}
+	defer func() {
+		channel <- result
+	}()
 
-	channel <- model.Result[response.ExpectedStats]{
-		Value: es,
-		Error: err,
+	resp, err := f.numbersClient.R().Get("/personal/rating/expected/json/")
+	if err != nil {
+		result.Error = failure.Wrap(err)
+		return
 	}
+
+	var stats NumbersExpectedStats
+	if err := json.Unmarshal(resp.Bytes(), &stats); err != nil {
+		result.Error = failure.Wrap(err)
+		return
+	}
+
+	result.Value = stats
 }
 
 func (f *WarshipFetcher) readCache() (warshipsCache, error) {

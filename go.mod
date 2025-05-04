@@ -1,8 +1,8 @@
 module wfs
 
-go 1.23.6
+go 1.24
 
-toolchain go1.24.0
+toolchain go1.24.2
 
 require (
 	github.com/cenkalti/backoff/v4 v4.3.0
@@ -10,7 +10,7 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/stretchr/testify v1.10.0
 	github.com/wailsapp/wails/v2 v2.9.3
-	golang.org/x/sync v0.11.0
+	golang.org/x/sync v0.13.0
 )
 
 require github.com/rs/zerolog v1.33.0
@@ -18,25 +18,38 @@ require github.com/rs/zerolog v1.33.0
 require (
 	github.com/abadojack/whatlanggo v1.0.1
 	github.com/dgraph-io/badger/v4 v4.5.1
+	github.com/imroc/req/v3 v3.51.0
 	github.com/morikuni/failure v1.1.2
 	github.com/shopspring/decimal v1.4.0
-	go.uber.org/mock v0.4.0
+	go.uber.org/mock v0.5.2
 	go.uber.org/ratelimit v0.3.1
 )
 
 require (
+	github.com/andybalholm/brotli v1.1.1 // indirect
 	github.com/benbjohnson/clock v1.3.5 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
+	github.com/cloudflare/circl v1.6.1 // indirect
 	github.com/dgraph-io/ristretto/v2 v2.1.0 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
+	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
 	github.com/godbus/dbus/v5 v5.1.0 // indirect
 	github.com/golang/groupcache v0.0.0-20241129210726-2c02b8208cf8 // indirect
 	github.com/google/flatbuffers v25.2.10+incompatible // indirect
-	github.com/google/go-cmp v0.6.0 // indirect
+	github.com/google/pprof v0.0.0-20250501235452-c0086092b71a // indirect
+	github.com/hashicorp/errwrap v1.1.0 // indirect
+	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/klauspost/compress v1.18.0 // indirect
 	github.com/leaanthony/u v1.1.1 // indirect
+	github.com/onsi/ginkgo/v2 v2.23.4 // indirect
+	github.com/quic-go/qpack v0.5.1 // indirect
+	github.com/quic-go/quic-go v0.51.0 // indirect
+	github.com/refraction-networking/utls v1.7.1 // indirect
 	github.com/wailsapp/go-webview2 v1.0.19 // indirect
 	go.opencensus.io v0.24.0 // indirect
+	go.uber.org/automaxprocs v1.6.0 // indirect
+	golang.org/x/mod v0.24.0 // indirect
+	golang.org/x/tools v0.32.0 // indirect
 	google.golang.org/protobuf v1.36.5 // indirect
 )
 
@@ -62,9 +75,9 @@ require (
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	github.com/wailsapp/mimetype v1.4.1 // indirect
-	golang.org/x/crypto v0.34.0 // indirect
-	golang.org/x/net v0.35.0 // indirect
-	golang.org/x/sys v0.30.0 // indirect
-	golang.org/x/text v0.22.0 // indirect
+	golang.org/x/crypto v0.37.0 // indirect
+	golang.org/x/net v0.39.0 // indirect
+	golang.org/x/sys v0.32.0 // indirect
+	golang.org/x/text v0.24.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

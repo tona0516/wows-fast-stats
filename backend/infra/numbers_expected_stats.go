@@ -1,4 +1,4 @@
-package response
+package infra
 
 import (
 	"encoding/json"
@@ -8,25 +8,19 @@ import (
 	"github.com/morikuni/failure"
 )
 
-const (
-	NumbersAvgDamage = "average_damage_dealt"
-	NumbersAvgFrags  = "average_frags"
-	NumbersWinrate   = "win_rate"
-)
-
 type ExpectedValues struct {
 	AverageDamageDealt float64 `json:"average_damage_dealt"`
 	AverageFrags       float64 `json:"average_frags"`
 	WinRate            float64 `json:"win_rate"`
 }
 
-type ExpectedStats map[int]ExpectedValues
+type ExpectedStatsData map[int]ExpectedValues
 
-type NSExpectedStats struct {
-	Data ExpectedStats `json:"data"`
+type NumbersExpectedStats struct {
+	Data ExpectedStatsData `json:"data"`
 }
 
-func (n *NSExpectedStats) UnmarshalJSON(b []byte) error {
+func (n *NumbersExpectedStats) UnmarshalJSON(b []byte) error {
 	errCtx := failure.Context{"body": string(b)}
 
 	root := make(map[string]interface{})
@@ -39,7 +33,7 @@ func (n *NSExpectedStats) UnmarshalJSON(b []byte) error {
 		return failure.New(apperr.ParseExpectedStatsError, errCtx)
 	}
 
-	es := make(ExpectedStats)
+	es := make(ExpectedStatsData)
 	for key, value := range data {
 		shipID, err := strconv.Atoi(key)
 		if err != nil {
@@ -51,17 +45,17 @@ func (n *NSExpectedStats) UnmarshalJSON(b []byte) error {
 			continue
 		}
 
-		damage, ok := values[NumbersAvgDamage].(float64)
+		damage, ok := values["average_damage_dealt"].(float64)
 		if !ok {
 			continue
 		}
 
-		frags, ok := values[NumbersAvgFrags].(float64)
+		frags, ok := values["average_frags"].(float64)
 		if !ok {
 			continue
 		}
 
-		wr, ok := values[NumbersWinrate].(float64)
+		wr, ok := values["win_rate"].(float64)
 		if !ok {
 			continue
 		}
@@ -73,7 +67,7 @@ func (n *NSExpectedStats) UnmarshalJSON(b []byte) error {
 		}
 	}
 
-	*n = NSExpectedStats{
+	*n = NumbersExpectedStats{
 		Data: es,
 	}
 

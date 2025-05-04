@@ -38,7 +38,7 @@ func TestWatcher_Start(t *testing.T) {
 			events = append(events, eventName)
 		}
 
-		ctx, cancel := context.WithCancel(context.Background())
+		ctx, cancel := context.WithCancel(t.Context())
 		defer cancel()
 
 		// テスト
@@ -83,7 +83,7 @@ func TestWatcher_Start(t *testing.T) {
 				events = append(events, eventName)
 			}
 
-			ctx, cancel := context.WithCancel(context.Background())
+			ctx, cancel := context.WithCancel(t.Context())
 			defer cancel()
 
 			// テスト
@@ -116,7 +116,7 @@ func TestWatcher_Start(t *testing.T) {
 		emitFunc := func(ctx context.Context, eventName string, optionalData ...interface{}) {
 			events = append(events, eventName)
 		}
-		ctx, cancel := context.WithCancel(context.Background())
+		ctx, cancel := context.WithCancel(t.Context())
 
 		// テスト
 		watcher := NewWatcher(10*time.Millisecond, nil, mockUserConfig, nil, emitFunc)
@@ -157,7 +157,7 @@ func TestWatcher_Start(t *testing.T) {
 			events = append(events, eventName)
 		}
 
-		ctx, cancel := context.WithCancel(context.Background())
+		ctx, cancel := context.WithCancel(t.Context())
 		defer cancel()
 
 		// テスト

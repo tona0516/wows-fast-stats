@@ -12,6 +12,7 @@ import (
 	"wfs/backend/service"
 
 	"github.com/dgraph-io/badger/v4"
+	"github.com/imroc/req/v3"
 	"github.com/morikuni/failure"
 	"github.com/wailsapp/wails/v2/pkg/logger"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
@@ -277,11 +278,6 @@ func (a *App) inject(config Config) error {
 		Retry:   a.config.UnofficialWargaming.MaxRetry,
 		Timeout: time.Duration(a.config.UnofficialWargaming.TimeoutSec) * time.Second,
 	})
-	numbers := webapi.NewNumbers(webapi.RequestConfig{
-		URL:     a.config.Numbers.URL,
-		Retry:   a.config.Numbers.MaxRetry,
-		Timeout: time.Duration(a.config.Numbers.TimeoutSec) * time.Second,
-	})
 	localFile := infra.NewLocalFile()
 	github := webapi.NewGithub(webapi.RequestConfig{
 		URL:     a.config.Github.URL,
@@ -291,7 +287,11 @@ func (a *App) inject(config Config) error {
 	warshipStore := infra.NewWarshipFetcher(
 		db,
 		wargaming,
-		numbers,
+		*req.C().
+			SetBaseURL(a.config.Numbers.URL).
+			SetCommonRetryCount(a.config.Numbers.MaxRetry).
+			SetTimeout(time.Duration(a.config.Numbers.TimeoutSec) * time.Second).
+			EnableInsecureSkipVerify(),
 	)
 	clanFercher := infra.NewClanFetcher(
 		wargaming,

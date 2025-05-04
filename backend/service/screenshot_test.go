@@ -64,7 +64,7 @@ func TestScreenshot_SaveWithDialog(t *testing.T) {
 		}
 
 		// テスト
-		saved, err := s.SaveWithDialog(context.Background(), filename, base64Data)
+		saved, err := s.SaveWithDialog(t.Context(), filename, base64Data)
 
 		// アサーション
 		assert.True(t, saved)
@@ -80,7 +80,7 @@ func TestScreenshot_SaveWithDialog(t *testing.T) {
 		}
 
 		// テスト
-		saved, err := s.SaveWithDialog(context.Background(), filename, base64Data)
+		saved, err := s.SaveWithDialog(t.Context(), filename, base64Data)
 
 		// アサーション
 		assert.False(t, saved)
@@ -98,7 +98,7 @@ func TestScreenshot_SaveWithDialog(t *testing.T) {
 		}
 
 		// テスト
-		saved, err := s.SaveWithDialog(context.Background(), filename, base64Data)
+		saved, err := s.SaveWithDialog(t.Context(), filename, base64Data)
 
 		// アサーション
 		assert.False(t, saved)

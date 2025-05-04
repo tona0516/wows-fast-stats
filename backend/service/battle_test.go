@@ -1,7 +1,6 @@
 package service
 
 import (
-	"context"
 	"testing"
 	"wfs/backend/apperr"
 	"wfs/backend/domain/mock/repository"
@@ -78,7 +77,7 @@ func TestBattle_Get_正常系(t *testing.T) {
 		mockAccountFetcher,
 		mockLogger,
 	)
-	_, err := b.Get(context.TODO(), testUserConfig)
+	_, err := b.Get(t.Context(), testUserConfig)
 
 	// アサーション
 	assert.NoError(t, err)
@@ -105,7 +104,7 @@ func TestBattle_Get_異常系(t *testing.T) {
 		nil,
 		nil,
 	)
-	_, err := b.Get(context.TODO(), testUserConfig)
+	_, err := b.Get(t.Context(), testUserConfig)
 
 	// アサーション
 	assert.True(t, failure.Is(err, apperr.FileNotExist))

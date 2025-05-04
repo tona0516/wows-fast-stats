@@ -19,7 +19,7 @@ type Config struct {
 	} `yaml:"unofficial_wargaming"`
 	Numbers struct {
 		URL        string `yaml:"url"`
-		MaxRetry   uint64 `yaml:"max_retry"`
+		MaxRetry   int    `yaml:"max_retry"`
 		TimeoutSec int    `yaml:"timeout_sec"`
 	} `yaml:"numbers"`
 	Github struct {

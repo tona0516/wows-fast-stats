@@ -1,4 +1,4 @@
-package response
+package infra
 
 import (
 	"encoding/json"
@@ -51,12 +51,12 @@ func TestNSExpectedStats_UnmarshalJSON(t *testing.T) {
             }
         }`
 
-		var actual NSExpectedStats
+		var actual NumbersExpectedStats
 		err := json.Unmarshal([]byte(input), &actual)
 
 		assert.NoError(t, err)
-		assert.Equal(t, NSExpectedStats{
-			Data: ExpectedStats{
+		assert.Equal(t, NumbersExpectedStats{
+			Data: ExpectedStatsData{
 				1: {
 					AverageDamageDealt: 50000.0,
 					AverageFrags:       1.5,
@@ -82,7 +82,7 @@ func TestNSExpectedStats_UnmarshalJSON(t *testing.T) {
 		}
 
 		for _, input := range inputs {
-			err := json.Unmarshal([]byte(input), &NSExpectedStats{})
+			err := json.Unmarshal([]byte(input), &NumbersExpectedStats{})
 			assert.True(t, failure.Is(err, apperr.ParseExpectedStatsError))
 		}
 	})
