@@ -9,16 +9,11 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const dbPrefix = "storage_test"
-
 func openDB(t *testing.T) *badger.DB {
 	t.Helper()
 
-	storagePath := path.Join(dbPrefix, t.Name())
+	storagePath := path.Join(os.TempDir(), t.Name())
 	db, err := badger.Open(badger.DefaultOptions(storagePath))
-	assert.NoError(t, err)
-
-	err = db.DropAll()
 	assert.NoError(t, err)
 
 	return db
@@ -29,7 +24,6 @@ func cleanDB(t *testing.T, db *badger.DB) {
 
 	_ = db.DropAll()
 	_ = db.Close()
-	_ = os.RemoveAll(path.Join(dbPrefix, t.Name()))
 }
 
 func TestStorage_DataVersion(t *testing.T) {
