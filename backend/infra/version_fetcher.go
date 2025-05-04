@@ -29,6 +29,7 @@ func (f *VersionFetcher) Fetch() (model.LatestRelease, error) {
 		return latestRelease, failure.Wrap(err)
 	}
 
+	// TODO: https://docs.github.com/rest/overview/resources-in-the-rest-api#rate-limiting
 	resp, err := f.githubClient.R().Get("/repos/tona0516/wows-fast-stats/releases/latest")
 	if err != nil {
 		return latestRelease, failure.Wrap(err)
