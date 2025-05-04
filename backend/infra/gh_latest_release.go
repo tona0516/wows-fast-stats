@@ -1,4 +1,4 @@
-package response
+package infra
 
 type GHLatestRelease struct {
 	TagName string `json:"tag_name"`

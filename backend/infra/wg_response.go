@@ -1,4 +1,4 @@
-package response
+package infra
 
 type WGResponseCommon[T any] struct {
 	Status string  `json:"status"`

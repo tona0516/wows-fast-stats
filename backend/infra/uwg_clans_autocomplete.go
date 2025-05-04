@@ -1,4 +1,4 @@
-package response
+package infra
 
 type UWGClansAutocomplete struct {
 	SearchAutocompleteResult []struct {

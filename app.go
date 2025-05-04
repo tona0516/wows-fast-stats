@@ -248,16 +248,14 @@ func (a *App) inject(config Config) error {
 	storage := infra.NewStorage(db)
 
 	a.logger = infra.NewLogger(
-		webapi.NewDiscord(webapi.RequestConfig{
-			URL:     a.config.Discord.AlertURL,
-			Retry:   a.config.Discord.MaxRetry,
-			Timeout: time.Duration(a.config.Discord.TimeoutSec) * time.Second,
-		}),
-		webapi.NewDiscord(webapi.RequestConfig{
-			URL:     a.config.Discord.InfoURL,
-			Retry:   a.config.Discord.MaxRetry,
-			Timeout: time.Duration(a.config.Discord.TimeoutSec) * time.Second,
-		}),
+		*req.C().
+			SetBaseURL(a.config.Discord.AlertURL).
+			SetCommonRetryCount(a.config.Discord.MaxRetry).
+			SetTimeout(time.Duration(a.config.Discord.TimeoutSec) * time.Second),
+		*req.C().
+			SetBaseURL(a.config.Discord.InfoURL).
+			SetCommonRetryCount(a.config.Discord.MaxRetry).
+			SetTimeout(time.Duration(a.config.Discord.TimeoutSec) * time.Second),
 		*storage,
 		a.config.App.Name,
 		a.config.App.Semver,

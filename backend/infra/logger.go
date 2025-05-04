@@ -2,10 +2,11 @@ package infra
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"time"
-	"wfs/backend/infra/webapi"
 
+	"github.com/imroc/req/v3"
 	"github.com/rs/zerolog"
 )
 
@@ -16,8 +17,8 @@ type Logger struct {
 }
 
 func NewLogger(
-	alertDiscord webapi.Discord,
-	infoDiscord webapi.Discord,
+	alertDiscordClient req.Client,
+	infoDiscordClient req.Client,
 	storage Storage,
 	appName string,
 	appSemver string,
@@ -35,8 +36,8 @@ func NewLogger(
 		Out: os.Stdout,
 	}
 	reportWriter := reportWriter{
-		alertDiscord: alertDiscord,
-		infoDiscord:  infoDiscord,
+		alertDiscordClient: alertDiscordClient,
+		infoDiscordClient:  infoDiscordClient,
 	}
 
 	var logFile *os.File
@@ -118,23 +119,25 @@ func addContext(e *zerolog.Event, contexts map[string]string) {
 
 type reportWriter struct {
 	zerolog.FilteredLevelWriter
-	alertDiscord webapi.Discord
-	infoDiscord  webapi.Discord
+	alertDiscordClient req.Client
+	infoDiscordClient  req.Client
 }
 
 func (w *reportWriter) WriteLevel(level zerolog.Level, p []byte) (int, error) {
 	formatted := fmt.Sprintf("```%s```", prettyJSON(string(p)))
 
-	var discord webapi.Discord
+	var client req.Client
 	if level >= zerolog.WarnLevel {
-		discord = w.alertDiscord
+		client = w.alertDiscordClient
 	} else {
-		discord = w.infoDiscord
+		client = w.infoDiscordClient
 	}
 
-	err := discord.Comment(formatted)
+	_, err := client.R().
+		SetBody(map[string]string{"content": formatted}).
+		Post("/")
 	if err != nil {
-		fmt.Printf("Failed to send to discord: %s", err.Error())
+		log.Println("Failed to send to discord: %s", err.Error())
 	}
 
 	return len(p), nil
