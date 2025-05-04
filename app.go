@@ -277,11 +277,6 @@ func (a *App) inject(config Config) error {
 		Timeout: time.Duration(a.config.UnofficialWargaming.TimeoutSec) * time.Second,
 	})
 	localFile := infra.NewLocalFile()
-	github := webapi.NewGithub(webapi.RequestConfig{
-		URL:     a.config.Github.URL,
-		Retry:   a.config.Github.MaxRetry,
-		Timeout: time.Duration(a.config.Github.TimeoutSec) * time.Second,
-	})
 	warshipStore := infra.NewWarshipFetcher(
 		db,
 		wargaming,
@@ -300,7 +295,13 @@ func (a *App) inject(config Config) error {
 	accountFetcher := infra.NewAccountFetcher(wargaming)
 	userConfig := infra.NewUserConfigStore(db)
 	alertPlayer := infra.NewAlertPlayerStore(db)
-	a.versionFetcher = infra.NewVersionFetcher(github, config.App.Semver)
+	a.versionFetcher = infra.NewVersionFetcher(
+		*req.C().
+			SetBaseURL(a.config.Github.URL).
+			SetCommonRetryCount(a.config.Github.MaxRetry).
+			SetTimeout(time.Duration(a.config.Github.TimeoutSec) * time.Second),
+		config.App.Semver,
+	)
 
 	// service
 	a.configService = service.NewConfig(accountFetcher, userConfig, alertPlayer)

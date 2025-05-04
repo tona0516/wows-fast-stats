@@ -1,22 +1,23 @@
 package infra
 
 import (
+	"encoding/json"
 	"wfs/backend/domain/model"
-	"wfs/backend/infra/webapi"
 
 	"github.com/Masterminds/semver/v3"
+	"github.com/imroc/req/v3"
 	"github.com/morikuni/failure"
 )
 
 type VersionFetcher struct {
-	github webapi.Github
-	semver string
+	githubClient req.Client
+	semver       string
 }
 
-func NewVersionFetcher(github webapi.Github, semver string) *VersionFetcher {
+func NewVersionFetcher(githubClient req.Client, semver string) *VersionFetcher {
 	return &VersionFetcher{
-		github: github,
-		semver: semver,
+		githubClient: githubClient,
+		semver:       semver,
 	}
 }
 
@@ -28,10 +29,16 @@ func (f *VersionFetcher) Fetch() (model.LatestRelease, error) {
 		return latestRelease, failure.Wrap(err)
 	}
 
-	ghLatestRelease, err := f.github.LatestRelease()
+	resp, err := f.githubClient.R().Get("/repos/tona0516/wows-fast-stats/releases/latest")
 	if err != nil {
-		return latestRelease, err
+		return latestRelease, failure.Wrap(err)
 	}
+
+	var ghLatestRelease GHLatestRelease
+	if err := json.Unmarshal(resp.Bytes(), &ghLatestRelease); err != nil {
+		return latestRelease, failure.Wrap(err)
+	}
+
 	latest, err := semver.NewVersion(ghLatestRelease.TagName)
 	if err != nil {
 		return latestRelease, failure.Wrap(err)
