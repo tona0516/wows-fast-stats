@@ -1,6 +1,7 @@
 package infra
 
 import (
+	"encoding/json"
 	"regexp"
 	"slices"
 	"strings"
@@ -9,22 +10,24 @@ import (
 	"wfs/backend/infra/webapi"
 
 	"github.com/abadojack/whatlanggo"
+	"github.com/imroc/req/v3"
+	"github.com/morikuni/failure"
 )
 
 var urlRegExp = regexp.MustCompile(`https?://[^\s]+`)
 
 type ClanFetcher struct {
-	wargaming           webapi.Wargaming
-	unofficialWargaming webapi.UnofficialWargaming
+	wargaming                 webapi.Wargaming
+	unofficialWargamingClient req.Client
 }
 
 func NewClanFetcher(
 	wargaming webapi.Wargaming,
-	unofficialWargaming webapi.UnofficialWargaming,
+	unofficialWargamingClient req.Client,
 ) *ClanFetcher {
 	return &ClanFetcher{
-		wargaming:           wargaming,
-		unofficialWargaming: unofficialWargaming,
+		wargaming:                 wargaming,
+		unofficialWargamingClient: unofficialWargamingClient,
 	}
 }
 
@@ -117,9 +120,17 @@ func (f *ClanFetcher) hexColor(tags []string) (map[string]string, error) {
 
 	var mu sync.Mutex
 	err := doParallel(tags, func(tag string) error {
-		autocomplete, err := f.unofficialWargaming.ClansAutoComplete(tag)
+		resp, err := f.unofficialWargamingClient.R().SetQueryParams(map[string]string{
+			"search": tag,
+			"type":   "clans",
+		}).Get("/api/search/autocomplete/")
 		if err != nil {
-			return err
+			return failure.Wrap(err)
+		}
+
+		var autocomplete UWGClansAutocomplete
+		if err := json.Unmarshal(resp.Bytes(), &autocomplete); err != nil {
+			return failure.Wrap(err)
 		}
 
 		hexColor := autocomplete.HexColor(tag)

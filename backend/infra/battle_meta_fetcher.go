@@ -1,25 +1,25 @@
 package infra
 
 import (
+	"encoding/json"
 	"errors"
 	"wfs/backend/apperr"
 	"wfs/backend/domain/model"
-	"wfs/backend/infra/response"
-	"wfs/backend/infra/webapi"
 
+	"github.com/imroc/req/v3"
 	"github.com/morikuni/failure"
 )
 
 type BattleMetaFetcher struct {
-	wargaming webapi.Wargaming
-	cache     *model.BattleMeta
+	wargamingClient req.Client
+	cache           *model.BattleMeta
 }
 
 func NewBattleMetaFetcher(
-	wargaming webapi.Wargaming,
+	wargamingClient req.Client,
 ) *BattleMetaFetcher {
 	return &BattleMetaFetcher{
-		wargaming: wargaming,
+		wargamingClient: wargamingClient,
 	}
 }
 
@@ -28,8 +28,8 @@ func (f *BattleMetaFetcher) Fetch() (model.BattleMeta, error) {
 		return *f.cache, nil
 	}
 
-	arenaResultChan := make(chan model.Result[response.WGBattleArenas])
-	typeResultChan := make(chan model.Result[response.WGBattleTypes])
+	arenaResultChan := make(chan model.Result[WGBattleArenas])
+	typeResultChan := make(chan model.Result[WGBattleTypes])
 
 	go f.fetchBattleArenas(arenaResultChan)
 	go f.fetchBattleTypes(typeResultChan)
@@ -56,12 +56,52 @@ func (f *BattleMetaFetcher) Fetch() (model.BattleMeta, error) {
 	return *model.NewBattleMeta(arenas, types), nil
 }
 
-func (f *BattleMetaFetcher) fetchBattleArenas(channel chan model.Result[response.WGBattleArenas]) {
-	battleArenas, err := f.wargaming.BattleArenas()
-	channel <- model.Result[response.WGBattleArenas]{Value: battleArenas, Error: err}
+func (f *BattleMetaFetcher) fetchBattleArenas(channel chan model.Result[WGBattleArenas]) {
+	result := model.Result[WGBattleArenas]{}
+	defer func() {
+		channel <- result
+	}()
+
+	resp, err := f.wargamingClient.R().
+		AddQueryParam("fields", WGBattleArenasResponse{}.Field()).
+		AddQueryParam("language", "ja").
+		Get("/wows/encyclopedia/battlearenas/")
+
+	if err != nil {
+		result.Error = failure.Wrap(err)
+		return
+	}
+
+	var ba WGBattleArenas
+	if err := json.Unmarshal(resp.Bytes(), &ba); err != nil {
+		result.Error = failure.Wrap(err)
+		return
+	}
+
+	result.Value = ba
 }
 
-func (f *BattleMetaFetcher) fetchBattleTypes(channel chan model.Result[response.WGBattleTypes]) {
-	battleTypes, err := f.wargaming.BattleTypes()
-	channel <- model.Result[response.WGBattleTypes]{Value: battleTypes, Error: err}
+func (f *BattleMetaFetcher) fetchBattleTypes(channel chan model.Result[WGBattleTypes]) {
+	result := model.Result[WGBattleTypes]{}
+	defer func() {
+		channel <- result
+	}()
+
+	resp, err := f.wargamingClient.R().
+		AddQueryParam("fields", WGBattleTypesResponse{}.Field()).
+		AddQueryParam("language", "ja").
+		Get("/wows/encyclopedia/battlearenas/")
+
+	if err != nil {
+		result.Error = failure.Wrap(err)
+		return
+	}
+
+	var bt WGBattleTypes
+	if err := json.Unmarshal(resp.Bytes(), &bt); err != nil {
+		result.Error = failure.Wrap(err)
+		return
+	}
+
+	result.Value = bt
 }

@@ -271,11 +271,6 @@ func (a *App) inject(config Config) error {
 		ratelimit.New(a.config.Wargaming.RateLimitRPS),
 		a.config.Wargaming.AppID,
 	)
-	uwargaming := webapi.NewUnofficialWargaming(webapi.RequestConfig{
-		URL:     a.config.UnofficialWargaming.URL,
-		Retry:   a.config.UnofficialWargaming.MaxRetry,
-		Timeout: time.Duration(a.config.UnofficialWargaming.TimeoutSec) * time.Second,
-	})
 	localFile := infra.NewLocalFile()
 	warshipStore := infra.NewWarshipFetcher(
 		db,
@@ -288,7 +283,10 @@ func (a *App) inject(config Config) error {
 	)
 	clanFercher := infra.NewClanFetcher(
 		wargaming,
-		uwargaming,
+		*req.C().
+			SetBaseURL(a.config.UnofficialWargaming.URL).
+			SetCommonRetryCount(a.config.UnofficialWargaming.MaxRetry).
+			SetTimeout(time.Duration(a.config.UnofficialWargaming.TimeoutSec) * time.Second),
 	)
 	rawStatFetcher := infra.NewRawStatFetcher(wargaming)
 	battleMetaFetcher := infra.NewBattleMetaFetcher(wargaming)
