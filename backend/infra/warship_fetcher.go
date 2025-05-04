@@ -3,10 +3,10 @@ package infra
 import (
 	"encoding/json"
 	"errors"
+	"strconv"
 	"sync"
 	"wfs/backend/apperr"
 	"wfs/backend/domain/model"
-	"wfs/backend/infra/webapi"
 
 	"github.com/dgraph-io/badger/v4"
 	"github.com/imroc/req/v3"
@@ -15,19 +15,19 @@ import (
 
 type WarshipFetcher struct {
 	db               *badger.DB
-	wargaming        webapi.Wargaming
+	wargamingClient  req.Client
 	numbersClient    req.Client
 	localDataKeyName string
 }
 
 func NewWarshipFetcher(
 	db *badger.DB,
-	wargaming webapi.Wargaming,
+	wargamingClient req.Client,
 	numbersClient req.Client,
 ) *WarshipFetcher {
 	return &WarshipFetcher{
 		db:               db,
-		wargaming:        wargaming,
+		wargamingClient:  wargamingClient,
 		numbersClient:    numbersClient,
 		localDataKeyName: "warships",
 	}
@@ -36,7 +36,7 @@ func NewWarshipFetcher(
 func (f *WarshipFetcher) Fetch() (model.Warships, error) {
 	cache, errCache := f.readCache()
 
-	currentGameVersion, err := f.wargaming.GameVersion()
+	currentGameVersion, err := f.fetchGameVersion()
 	if err != nil {
 		return f.toError(cache, errCache, err)
 	}
@@ -90,7 +90,7 @@ func (f *WarshipFetcher) encycShips(channel chan model.Result[model.Warships]) {
 
 	var mu sync.Mutex
 	fetch := func(page int) (int, error) {
-		res, pageTotal, err := f.wargaming.EncycShips(page)
+		res, err := f.fetchEncycShips(page)
 		if err != nil {
 			return 0, err
 		}
@@ -107,7 +107,7 @@ func (f *WarshipFetcher) encycShips(channel chan model.Result[model.Warships]) {
 			}
 			mu.Unlock()
 		}
-		return pageTotal, nil
+		return res.Meta.PageTotal, nil
 	}
 
 	first := 1
@@ -172,4 +172,39 @@ func (f *WarshipFetcher) toError(cache warshipsCache, errCache error, err error)
 	}
 
 	return cache.warships, nil
+}
+
+func (f *WarshipFetcher) fetchGameVersion() (string, error) {
+	resp, err := f.wargamingClient.R().
+		AddQueryParam("fields", "game_version").
+		Get("/wows/encyclopedia/info/")
+	if err != nil {
+		return "", failure.Wrap(err)
+	}
+
+	var result WGEncycInfo
+	if err := json.Unmarshal(resp.Bytes(), &result); err != nil {
+		return "", failure.Wrap(err)
+	}
+
+	return result.Data.GameVersion, nil
+}
+
+func (f *WarshipFetcher) fetchEncycShips(pageNo int) (WGEncycShips, error) {
+	var result WGEncycShips
+
+	resp, err := f.wargamingClient.R().
+		AddQueryParam("fields", WGEncycShips{}.Field()).
+		AddQueryParam("language", "ja").
+		AddQueryParam("page_no", strconv.Itoa(pageNo)).
+		Get("/wows/encyclopedia/ships/")
+	if err != nil {
+		return result, failure.Wrap(err)
+	}
+
+	if err := json.Unmarshal(resp.Bytes(), &result); err != nil {
+		return result, failure.Wrap(err)
+	}
+
+	return result, nil
 }

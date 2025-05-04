@@ -2,13 +2,14 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"log"
+	"slices"
 	"time"
 	"wfs/backend/apperr"
 	"wfs/backend/domain/model"
 	"wfs/backend/domain/repository"
 	"wfs/backend/infra"
-	"wfs/backend/infra/webapi"
 	"wfs/backend/service"
 
 	"github.com/dgraph-io/badger/v4"
@@ -262,19 +263,42 @@ func (a *App) inject(config Config) error {
 		a.config.Logger.ZerologLogLevel,
 	)
 
-	wargaming := webapi.NewWargaming(
-		webapi.RequestConfig{
-			URL:     a.config.Wargaming.URL,
-			Retry:   a.config.Wargaming.MaxRetry,
-			Timeout: time.Duration(a.config.Wargaming.TimeoutSec) * time.Second,
-		},
-		ratelimit.New(a.config.Wargaming.RateLimitRPS),
-		a.config.Wargaming.AppID,
-	)
+	rateLimiter := ratelimit.New(a.config.Wargaming.RateLimitRPS)
+	wargamingClient := *req.C().
+		SetBaseURL(a.config.Wargaming.URL).
+		AddCommonQueryParam("application_id", a.config.Wargaming.AppID).
+		SetCommonRetryCount(a.config.Wargaming.MaxRetry).
+		SetTimeout(time.Duration(a.config.Wargaming.TimeoutSec) * time.Second).
+		OnBeforeRequest(func(client *req.Client, req *req.Request) error {
+			rateLimiter.Take()
+			return nil
+		}).
+		AddCommonRetryCondition(func(resp *req.Response, err error) bool {
+			if err != nil {
+				return true
+			}
+
+			var rb infra.WGResponse
+			if err := json.Unmarshal(resp.Bytes(), &rb); err != nil {
+				return true
+			}
+
+			if rb.GetStatus() == "error" {
+				// Note:
+				// https://developers.wargaming.net/documentation/guide/getting-started/#common-errors
+				message := rb.GetError().Message
+				if slices.Contains([]string{"REQUEST_LIMIT_EXCEEDED", "SOURCE_NOT_AVAILABLE"}, message) {
+					return true
+				}
+			}
+
+			return false
+		})
+
 	localFile := infra.NewLocalFile()
 	warshipStore := infra.NewWarshipFetcher(
 		db,
-		wargaming,
+		wargamingClient,
 		*req.C().
 			SetBaseURL(a.config.Numbers.URL).
 			SetCommonRetryCount(a.config.Numbers.MaxRetry).
@@ -282,15 +306,15 @@ func (a *App) inject(config Config) error {
 			EnableInsecureSkipVerify(),
 	)
 	clanFercher := infra.NewClanFetcher(
-		wargaming,
+		wargamingClient,
 		*req.C().
 			SetBaseURL(a.config.UnofficialWargaming.URL).
 			SetCommonRetryCount(a.config.UnofficialWargaming.MaxRetry).
 			SetTimeout(time.Duration(a.config.UnofficialWargaming.TimeoutSec) * time.Second),
 	)
-	rawStatFetcher := infra.NewRawStatFetcher(wargaming)
-	battleMetaFetcher := infra.NewBattleMetaFetcher(wargaming)
-	accountFetcher := infra.NewAccountFetcher(wargaming)
+	rawStatFetcher := infra.NewRawStatFetcher(wargamingClient)
+	battleMetaFetcher := infra.NewBattleMetaFetcher(wargamingClient)
+	accountFetcher := infra.NewAccountFetcher(wargamingClient)
 	userConfig := infra.NewUserConfigStore(db)
 	alertPlayer := infra.NewAlertPlayerStore(db)
 	a.versionFetcher = infra.NewVersionFetcher(

@@ -1,35 +1,37 @@
 package infra
 
 import (
+	"encoding/json"
 	"errors"
+	"strconv"
+	"strings"
 	"sync"
 	"wfs/backend/apperr"
 	"wfs/backend/domain/model"
-	"wfs/backend/infra/response"
-	"wfs/backend/infra/webapi"
 
+	"github.com/imroc/req/v3"
 	"github.com/morikuni/failure"
 )
 
 type (
-	shipStatsMap         map[int]response.WGShipsStatsData
+	shipStatsMap         map[int]WGShipsStatsData
 	shipStatsAccountsMap map[int]shipStatsMap
 )
 
 type RawStatFetcher struct {
-	wargaming webapi.Wargaming
+	wargamingClient req.Client
 }
 
 func NewRawStatFetcher(
-	wargaming webapi.Wargaming,
+	wargamingClient req.Client,
 ) *RawStatFetcher {
 	return &RawStatFetcher{
-		wargaming: wargaming,
+		wargamingClient: wargamingClient,
 	}
 }
 
 func (f *RawStatFetcher) Fetch(accountIDs []int) (model.RawStats, error) {
-	accountInfoChan := make(chan model.Result[response.WGAccountInfo])
+	accountInfoChan := make(chan model.Result[WGAccountInfo])
 	shipStatsChan := make(chan model.Result[shipStatsAccountsMap])
 
 	go f.accountInfo(accountIDs, accountInfoChan)
@@ -76,9 +78,39 @@ func (f *RawStatFetcher) Fetch(accountIDs []int) (model.RawStats, error) {
 	return rawStats, nil
 }
 
-func (f *RawStatFetcher) accountInfo(accountIDs []int, channel chan model.Result[response.WGAccountInfo]) {
-	accountInfo, err := f.wargaming.AccountInfo(accountIDs)
-	channel <- model.Result[response.WGAccountInfo]{Value: accountInfo, Error: err}
+func (f *RawStatFetcher) accountInfo(accountIDs []int, channel chan model.Result[WGAccountInfo]) {
+	strAccountIDs := make([]string, len(accountIDs))
+	for i, v := range accountIDs {
+		strAccountIDs[i] = strconv.Itoa(v)
+	}
+
+	var result model.Result[WGAccountInfo]
+	defer func() {
+		channel <- result
+	}()
+
+	var rb WGAccountInfo
+	resp, err := f.wargamingClient.R().
+		AddQueryParam("account_id", strings.Join(strAccountIDs, ",")).
+		AddQueryParam("fields", WGAccountInfoResponse{}.Field()).
+		AddQueryParam("extra", strings.Join([]string{
+			"statistics.pvp_solo",
+			"statistics.pvp_div2",
+			"statistics.pvp_div3",
+			"statistics.rank_solo",
+		}, ",")).
+		Get("/wows/account/info/")
+	if err != nil {
+		result.Error = failure.Wrap(err)
+		return
+	}
+
+	if err := json.Unmarshal(resp.Bytes(), &rb); err != nil {
+		result.Error = failure.Wrap(err)
+		return
+	}
+
+	result.Value = rb
 }
 
 func (f *RawStatFetcher) shipStats(
@@ -89,13 +121,27 @@ func (f *RawStatFetcher) shipStats(
 	var mu sync.Mutex
 
 	err := doParallel(accountIDs, func(accountID int) error {
-		wgShipStats, err := f.wargaming.ShipsStats(accountID)
+		var rb WGShipsStats
+		resp, err := f.wargamingClient.R().
+			AddQueryParam("account_id", strconv.Itoa(accountID)).
+			AddQueryParam("fields", WGShipsStatsResponse{}.Field()).
+			AddQueryParam("extra", strings.Join([]string{
+				"pvp_solo",
+				"pvp_div2",
+				"pvp_div3",
+				"rank_solo",
+			}, ",")).
+			Get("/wows/ships/stats/")
 		if err != nil {
-			return err
+			return failure.Wrap(err)
+		}
+
+		if err := json.Unmarshal(resp.Bytes(), &rb); err != nil {
+			return failure.Wrap(err)
 		}
 
 		shipStats := make(shipStatsMap)
-		for _, v := range wgShipStats[accountID] {
+		for _, v := range rb[accountID] {
 			shipStats[v.ShipID] = v
 		}
 

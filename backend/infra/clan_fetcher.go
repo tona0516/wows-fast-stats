@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"regexp"
 	"slices"
+	"strconv"
 	"strings"
 	"sync"
 	"wfs/backend/domain/model"
-	"wfs/backend/infra/webapi"
 
 	"github.com/abadojack/whatlanggo"
 	"github.com/imroc/req/v3"
@@ -17,16 +17,16 @@ import (
 var urlRegExp = regexp.MustCompile(`https?://[^\s]+`)
 
 type ClanFetcher struct {
-	wargaming                 webapi.Wargaming
+	wargamingClient           req.Client
 	unofficialWargamingClient req.Client
 }
 
 func NewClanFetcher(
-	wargaming webapi.Wargaming,
+	wargamingClient req.Client,
 	unofficialWargamingClient req.Client,
 ) *ClanFetcher {
 	return &ClanFetcher{
-		wargaming:                 wargaming,
+		wargamingClient:           wargamingClient,
 		unofficialWargamingClient: unofficialWargamingClient,
 	}
 }
@@ -71,7 +71,7 @@ func (f *ClanFetcher) Fetch(accountIDs []int) (model.Clans, error) {
 func (f *ClanFetcher) clansAccountInfo(accountIDs []int) (map[int]int, error) {
 	result := make(map[int]int, 0)
 
-	clansAccountInfo, err := f.wargaming.ClansAccountInfo(accountIDs)
+	clansAccountInfo, err := f.fetchClansAccountInfo(accountIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -94,7 +94,7 @@ func (f *ClanFetcher) clanInfo(clanIDMap map[int]int) (model.Clans, error) {
 		clanIDs = append(clanIDs, clanID)
 	}
 
-	clansInfo, err := f.wargaming.ClansInfo(clanIDs)
+	clansInfo, err := f.fetchClansInfo(clanIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -165,4 +165,52 @@ func (f *ClanFetcher) lang(description string) string {
 	info := whatlanggo.DetectWithOptions(description, options)
 
 	return info.Lang.Iso6391()
+}
+
+func (f *ClanFetcher) fetchClansAccountInfo(accountIDs []int) (WGClansAccountInfo, error) {
+	strAccountIDs := make([]string, len(accountIDs))
+	for i, v := range accountIDs {
+		strAccountIDs[i] = strconv.Itoa(v)
+	}
+
+	var result WGClansAccountInfo
+	resp, err := f.wargamingClient.R().
+		AddQueryParam("account_id", strings.Join(strAccountIDs, ",")).
+		AddQueryParam("fields", WGClansAccountInfoResponse{}.Field()).
+		Get("/wows/clans/accountinfo/")
+	if err != nil {
+		return result, failure.Wrap(err)
+	}
+
+	if err := json.Unmarshal(resp.Bytes(), &result); err != nil {
+		return result, failure.Wrap(err)
+	}
+
+	return result, nil
+}
+
+func (f *ClanFetcher) fetchClansInfo(clanIDs []int) (WGClansInfo, error) {
+	strClanIDs := make([]string, len(clanIDs))
+	for i, v := range clanIDs {
+		strClanIDs[i] = strconv.Itoa(v)
+	}
+
+	if len(strClanIDs) == 0 {
+		return WGClansInfo{}, nil
+	}
+
+	var result WGClansInfo
+	resp, err := f.wargamingClient.R().
+		AddQueryParam("clan_id", strings.Join(strClanIDs, ",")).
+		AddQueryParam("fields", WGClansInfoResponse{}.Field()).
+		Get("/wows/clans/info/")
+	if err != nil {
+		return result, failure.Wrap(err)
+	}
+
+	if err := json.Unmarshal(resp.Bytes(), &result); err != nil {
+		return result, failure.Wrap(err)
+	}
+
+	return result, nil
 }

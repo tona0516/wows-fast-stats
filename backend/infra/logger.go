@@ -137,7 +137,7 @@ func (w *reportWriter) WriteLevel(level zerolog.Level, p []byte) (int, error) {
 		SetBody(map[string]string{"content": formatted}).
 		Post("/")
 	if err != nil {
-		log.Println("Failed to send to discord: %s", err.Error())
+		log.Println("Failed to send to discord: ", err.Error())
 	}
 
 	return len(p), nil

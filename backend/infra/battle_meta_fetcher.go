@@ -66,7 +66,6 @@ func (f *BattleMetaFetcher) fetchBattleArenas(channel chan model.Result[WGBattle
 		AddQueryParam("fields", WGBattleArenasResponse{}.Field()).
 		AddQueryParam("language", "ja").
 		Get("/wows/encyclopedia/battlearenas/")
-
 	if err != nil {
 		result.Error = failure.Wrap(err)
 		return
@@ -90,8 +89,7 @@ func (f *BattleMetaFetcher) fetchBattleTypes(channel chan model.Result[WGBattleT
 	resp, err := f.wargamingClient.R().
 		AddQueryParam("fields", WGBattleTypesResponse{}.Field()).
 		AddQueryParam("language", "ja").
-		Get("/wows/encyclopedia/battlearenas/")
-
+		Get("/wows/encyclopedia/battletypes/")
 	if err != nil {
 		result.Error = failure.Wrap(err)
 		return

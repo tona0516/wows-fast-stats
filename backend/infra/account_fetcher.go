@@ -1,31 +1,41 @@
 package infra
 
 import (
-	"wfs/backend/apperr"
+	"encoding/json"
+	"strings"
 	"wfs/backend/domain/model"
-	"wfs/backend/infra/webapi"
 
+	"github.com/imroc/req/v3"
 	"github.com/morikuni/failure"
 )
 
 type AccountFetcher struct {
-	wargaming webapi.Wargaming
+	wargamingClient req.Client
 }
 
 func NewAccountFetcher(
-	wargaming webapi.Wargaming,
+	wargamingClient req.Client,
 ) *AccountFetcher {
-	return &AccountFetcher{wargaming: wargaming}
+	return &AccountFetcher{wargamingClient: wargamingClient}
 }
 
 func (f *AccountFetcher) Search(prefix string) (model.Accounts, error) {
-	res, err := f.wargaming.AccountListForSearch(prefix)
+	var rb WGAccountList
+	resp, err := f.wargamingClient.R().
+		AddQueryParam("search", prefix).
+		AddQueryParam("fields", WGAccountListResponse{}.Field()).
+		AddQueryParam("limit", "10").
+		Get("/wows/account/list/")
 	if err != nil {
-		return nil, failure.Translate(err, apperr.FetchAccountListError)
+		return nil, failure.Wrap(err)
+	}
+
+	if err := json.Unmarshal(resp.Bytes(), &rb); err != nil {
+		return nil, failure.Wrap(err)
 	}
 
 	result := make(model.Accounts)
-	for _, v := range res {
+	for _, v := range rb {
 		result[v.NickName] = v.AccountID
 	}
 
@@ -33,13 +43,22 @@ func (f *AccountFetcher) Search(prefix string) (model.Accounts, error) {
 }
 
 func (f *AccountFetcher) Fetch(playerNames []string) (model.Accounts, error) {
-	res, err := f.wargaming.AccountList(playerNames)
+	var rb WGAccountList
+	resp, err := f.wargamingClient.R().
+		AddQueryParam("search", strings.Join(playerNames, ",")).
+		AddQueryParam("fields", WGAccountListResponse{}.Field()).
+		AddQueryParam("type", "exact").
+		Get("/wows/account/list/")
 	if err != nil {
-		return nil, failure.Translate(err, apperr.FetchAccountListError)
+		return nil, failure.Wrap(err)
+	}
+
+	if err := json.Unmarshal(resp.Bytes(), &rb); err != nil {
+		return nil, failure.Wrap(err)
 	}
 
 	result := make(model.Accounts)
-	for _, v := range res {
+	for _, v := range rb {
 		result[v.NickName] = v.AccountID
 	}
 
