@@ -71,13 +71,13 @@ func (f *BattleMetaFetcher) fetchBattleArenas(channel chan model.Result[WGBattle
 		return
 	}
 
-	var ba WGBattleArenas
+	var ba WGBattleArenasResponse
 	if err := json.Unmarshal(resp.Bytes(), &ba); err != nil {
 		result.Error = failure.Wrap(err)
 		return
 	}
 
-	result.Value = ba
+	result.Value = ba.Data
 }
 
 func (f *BattleMetaFetcher) fetchBattleTypes(channel chan model.Result[WGBattleTypes]) {
@@ -95,11 +95,11 @@ func (f *BattleMetaFetcher) fetchBattleTypes(channel chan model.Result[WGBattleT
 		return
 	}
 
-	var bt WGBattleTypes
+	var bt WGBattleTypesResponse
 	if err := json.Unmarshal(resp.Bytes(), &bt); err != nil {
 		result.Error = failure.Wrap(err)
 		return
 	}
 
-	result.Value = bt
+	result.Value = bt.Data
 }

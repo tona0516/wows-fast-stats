@@ -89,7 +89,7 @@ func (f *RawStatFetcher) accountInfo(accountIDs []int, channel chan model.Result
 		channel <- result
 	}()
 
-	var rb WGAccountInfo
+	var rb WGAccountInfoResponse
 	resp, err := f.wargamingClient.R().
 		AddQueryParam("account_id", strings.Join(strAccountIDs, ",")).
 		AddQueryParam("fields", WGAccountInfoResponse{}.Field()).
@@ -110,7 +110,7 @@ func (f *RawStatFetcher) accountInfo(accountIDs []int, channel chan model.Result
 		return
 	}
 
-	result.Value = rb
+	result.Value = rb.Data
 }
 
 func (f *RawStatFetcher) shipStats(
@@ -121,7 +121,7 @@ func (f *RawStatFetcher) shipStats(
 	var mu sync.Mutex
 
 	err := doParallel(accountIDs, func(accountID int) error {
-		var rb WGShipsStats
+		var rb WGShipsStatsResponse
 		resp, err := f.wargamingClient.R().
 			AddQueryParam("account_id", strconv.Itoa(accountID)).
 			AddQueryParam("fields", WGShipsStatsResponse{}.Field()).
@@ -141,7 +141,7 @@ func (f *RawStatFetcher) shipStats(
 		}
 
 		shipStats := make(shipStatsMap)
-		for _, v := range rb[accountID] {
+		for _, v := range rb.Data[accountID] {
 			shipStats[v.ShipID] = v
 		}
 

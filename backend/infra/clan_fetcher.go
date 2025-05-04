@@ -173,20 +173,20 @@ func (f *ClanFetcher) fetchClansAccountInfo(accountIDs []int) (WGClansAccountInf
 		strAccountIDs[i] = strconv.Itoa(v)
 	}
 
-	var result WGClansAccountInfo
+	var result WGClansAccountInfoResponse
 	resp, err := f.wargamingClient.R().
 		AddQueryParam("account_id", strings.Join(strAccountIDs, ",")).
 		AddQueryParam("fields", WGClansAccountInfoResponse{}.Field()).
 		Get("/wows/clans/accountinfo/")
 	if err != nil {
-		return result, failure.Wrap(err)
+		return nil, failure.Wrap(err)
 	}
 
 	if err := json.Unmarshal(resp.Bytes(), &result); err != nil {
-		return result, failure.Wrap(err)
+		return nil, failure.Wrap(err)
 	}
 
-	return result, nil
+	return result.Data, nil
 }
 
 func (f *ClanFetcher) fetchClansInfo(clanIDs []int) (WGClansInfo, error) {
@@ -199,18 +199,18 @@ func (f *ClanFetcher) fetchClansInfo(clanIDs []int) (WGClansInfo, error) {
 		return WGClansInfo{}, nil
 	}
 
-	var result WGClansInfo
+	var result WGClansInfoResponse
 	resp, err := f.wargamingClient.R().
 		AddQueryParam("clan_id", strings.Join(strClanIDs, ",")).
 		AddQueryParam("fields", WGClansInfoResponse{}.Field()).
 		Get("/wows/clans/info/")
 	if err != nil {
-		return result, failure.Wrap(err)
+		return nil, failure.Wrap(err)
 	}
 
 	if err := json.Unmarshal(resp.Bytes(), &result); err != nil {
-		return result, failure.Wrap(err)
+		return nil, failure.Wrap(err)
 	}
 
-	return result, nil
+	return result.Data, nil
 }

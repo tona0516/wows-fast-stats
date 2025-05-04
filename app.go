@@ -278,7 +278,7 @@ func (a *App) inject(config Config) error {
 				return true
 			}
 
-			var rb infra.WGResponse
+			var rb infra.WGResponseCommon[any]
 			if err := json.Unmarshal(resp.Bytes(), &rb); err != nil {
 				return true
 			}

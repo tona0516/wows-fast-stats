@@ -20,7 +20,7 @@ func NewAccountFetcher(
 }
 
 func (f *AccountFetcher) Search(prefix string) (model.Accounts, error) {
-	var rb WGAccountList
+	var rb WGAccountListResponse
 	resp, err := f.wargamingClient.R().
 		AddQueryParam("search", prefix).
 		AddQueryParam("fields", WGAccountListResponse{}.Field()).
@@ -35,7 +35,7 @@ func (f *AccountFetcher) Search(prefix string) (model.Accounts, error) {
 	}
 
 	result := make(model.Accounts)
-	for _, v := range rb {
+	for _, v := range rb.Data {
 		result[v.NickName] = v.AccountID
 	}
 
@@ -43,7 +43,7 @@ func (f *AccountFetcher) Search(prefix string) (model.Accounts, error) {
 }
 
 func (f *AccountFetcher) Fetch(playerNames []string) (model.Accounts, error) {
-	var rb WGAccountList
+	var rb WGAccountListResponse
 	resp, err := f.wargamingClient.R().
 		AddQueryParam("search", strings.Join(playerNames, ",")).
 		AddQueryParam("fields", WGAccountListResponse{}.Field()).
@@ -58,7 +58,7 @@ func (f *AccountFetcher) Fetch(playerNames []string) (model.Accounts, error) {
 	}
 
 	result := make(model.Accounts)
-	for _, v := range rb {
+	for _, v := range rb.Data {
 		result[v.NickName] = v.AccountID
 	}
 
