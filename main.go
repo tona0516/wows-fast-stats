@@ -2,35 +2,22 @@ package main
 
 import (
 	"embed"
-	"fmt"
+	"encoding/base64"
 	"log"
 	"os"
-	"time"
-	"wfs/backend/infra"
-	"wfs/backend/infra/webapi"
-	"wfs/backend/service"
 
-	"github.com/dgraph-io/badger/v4"
 	"github.com/mitchellh/go-ps"
+	"github.com/stretchr/testify/assert/yaml"
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
-	"github.com/wailsapp/wails/v2/pkg/runtime"
-	"go.uber.org/ratelimit"
 )
 
 //go:embed all:frontend/dist
 var assets embed.FS
 
 //nolint:gochecknoglobals
-var (
-	AppName                string
-	WGAppID                string
-	Semver                 string
-	IsDev                  string
-	AlertDiscordWebhookURL string
-	InfoDiscordWebhookURL  string
-)
+var Base64ConfigYml string
 
 func main() {
 	if isAlreadyRunning() {
@@ -38,20 +25,15 @@ func main() {
 		return
 	}
 
-	env := infra.NewEnv(
-		AppName,
-		Semver,
-		AlertDiscordWebhookURL,
-		InfoDiscordWebhookURL,
-		WGAppID,
-		IsDev,
-	)
+	config, err := getConfig()
+	if err != nil {
+		log.Fatalln(err)
+	}
 
-	app := initApp(env)
+	app := NewApp(*config)
 
-	// Create application with options
-	err := wails.Run(&options.App{
-		Title:  env.AppName,
+	err = wails.Run(&options.App{
+		Title:  config.App.Name,
 		Width:  1280,
 		Height: 720,
 		AssetServer: &assetserver.Options{
@@ -63,103 +45,8 @@ func main() {
 		},
 	})
 	if err != nil {
-		fmt.Println("Error:", err.Error())
-	}
-}
-
-func initApp(env infra.Env) *App {
-	// infra
-	var maxRetry uint64 = 2
-	timeout := 10 * time.Second
-
-	alertDiscord := webapi.NewDiscord(webapi.RequestConfig{
-		URL:     env.AlertDiscordWebhookURL,
-		Retry:   maxRetry,
-		Timeout: timeout,
-	})
-	infoDiscord := webapi.NewDiscord(webapi.RequestConfig{
-		URL:     env.InfoDiscordWebhookURL,
-		Retry:   maxRetry,
-		Timeout: timeout,
-	})
-
-	options := badger.DefaultOptions("./persistent_data")
-	if env.IsDev {
-		options = options.WithBypassLockGuard(true)
-	}
-	db, err := badger.Open(options)
-	if err != nil {
 		log.Fatalln(err)
-		return nil
 	}
-
-	storage := infra.NewStorage(db)
-
-	logger := infra.NewLogger(env, alertDiscord, infoDiscord, *storage)
-
-	wargaming := webapi.NewWargaming(webapi.RequestConfig{
-		URL:     "https://api.worldofwarships.asia",
-		Retry:   maxRetry,
-		Timeout: timeout,
-	}, ratelimit.New(10), WGAppID)
-	uwargaming := webapi.NewUnofficialWargaming(webapi.RequestConfig{
-		URL:     "https://clans.worldofwarships.asia",
-		Retry:   maxRetry,
-		Timeout: timeout,
-	})
-	numbers := webapi.NewNumbers(webapi.RequestConfig{
-		URL:     "https://api.wows-numbers.com",
-		Retry:   maxRetry,
-		Timeout: timeout,
-	})
-	localFile := infra.NewLocalFile()
-	github := webapi.NewGithub(webapi.RequestConfig{
-		URL:     "https://api.github.com",
-		Retry:   maxRetry,
-		Timeout: timeout,
-	})
-	warshipStore := infra.NewWarshipFetcher(
-		db,
-		wargaming,
-		numbers,
-	)
-	clanFercher := infra.NewClanFetcher(
-		wargaming,
-		uwargaming,
-	)
-	rawStatFetcher := infra.NewRawStatFetcher(wargaming)
-	battleMetaFetcher := infra.NewBattleMetaFetcher(wargaming)
-	accountFetcher := infra.NewAccountFetcher(wargaming)
-	userConfig := infra.NewUserConfigStore(db)
-	alertPlayer := infra.NewAlertPlayerStore(db)
-	versionFetcher := infra.NewVersionFetcher(github, env.AppVer)
-
-	// usecase
-	watchInterval := 1 * time.Second
-	config := service.NewConfig(accountFetcher, userConfig, alertPlayer)
-	screenshot := service.NewScreenshot(localFile)
-	battle := service.NewBattle(
-		localFile,
-		warshipStore,
-		clanFercher,
-		rawStatFetcher,
-		battleMetaFetcher,
-		accountFetcher,
-		logger,
-	)
-	watcher := service.NewWatcher(watchInterval, localFile, userConfig, logger, runtime.EventsEmit)
-	configMigrator := service.NewConfigMigrator(storage, userConfig, alertPlayer)
-
-	return NewApp(
-		env,
-		logger,
-		versionFetcher,
-		*config,
-		*screenshot,
-		*watcher,
-		*battle,
-		*configMigrator,
-	)
 }
 
 func isAlreadyRunning() bool {
@@ -185,4 +72,18 @@ func isAlreadyRunning() bool {
 	}
 
 	return isRunning
+}
+
+func getConfig() (*Config, error) {
+	configYml, err := base64.StdEncoding.DecodeString(Base64ConfigYml)
+	if err != nil {
+		return nil, err
+	}
+
+	config := Config{}
+	if err := yaml.Unmarshal(configYml, &config); err != nil {
+		return nil, err
+	}
+
+	return &config, nil
 }

@@ -2,15 +2,20 @@ package main
 
 import (
 	"context"
+	"log"
+	"time"
 	"wfs/backend/apperr"
 	"wfs/backend/domain/model"
 	"wfs/backend/domain/repository"
 	"wfs/backend/infra"
+	"wfs/backend/infra/webapi"
 	"wfs/backend/service"
 
+	"github.com/dgraph-io/badger/v4"
 	"github.com/morikuni/failure"
 	"github.com/wailsapp/wails/v2/pkg/logger"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
+	"go.uber.org/ratelimit"
 )
 
 const (
@@ -20,48 +25,37 @@ const (
 
 //nolint:containedctx
 type App struct {
-	ctx            context.Context
-	env            infra.Env
-	logger         repository.Logger
-	versionFetcher repository.VersionFetcher
-	config         service.Config
-	screenshot     service.Screenshot
-	watcher        service.Watcher
-	battle         service.Battle
-	configMigrator service.ConfigMigrator
+	config Config
+
+	ctx                   context.Context
+	logger                repository.Logger
+	versionFetcher        repository.VersionFetcher
+	configService         *service.Config
+	screenshotService     *service.Screenshot
+	watcherService        *service.Watcher
+	battleService         *service.Battle
+	configMigratorService *service.ConfigMigrator
 
 	cancelWacthFunc context.CancelFunc
 }
 
-func NewApp(
-	env infra.Env,
-	logger repository.Logger,
-	versionFetcher repository.VersionFetcher,
-	config service.Config,
-	screenshot service.Screenshot,
-	watcher service.Watcher,
-	battle service.Battle,
-	configMigrator service.ConfigMigrator,
-) *App {
+func NewApp(config Config) *App {
 	return &App{
-		env:            env,
-		logger:         logger,
-		versionFetcher: versionFetcher,
-		config:         config,
-		screenshot:     screenshot,
-		watcher:        watcher,
-		battle:         battle,
-		configMigrator: configMigrator,
+		config: config,
 	}
 }
 
 func (a *App) onStartup(ctx context.Context) {
 	a.ctx = ctx
 	runtime.LogSetLogLevel(ctx, logger.INFO)
+
+	if err := a.inject(a.config); err != nil {
+		log.Fatalln(err)
+	}
 }
 
 func (a *App) MigrateIfNeeded() error {
-	if err := a.configMigrator.ExecuteIfNeeded(); err != nil {
+	if err := a.configMigratorService.ExecuteIfNeeded(); err != nil {
 		a.logger.Error(err, nil)
 		return apperr.Unwrap(err)
 	}
@@ -70,7 +64,7 @@ func (a *App) MigrateIfNeeded() error {
 }
 
 func (a *App) StartWatching() error {
-	if err := a.watcher.Prepare(); err != nil {
+	if err := a.watcherService.Prepare(); err != nil {
 		a.logger.Error(err, nil)
 		return apperr.Unwrap(err)
 	}
@@ -82,7 +76,7 @@ func (a *App) StartWatching() error {
 	cancelCtx, cancel := context.WithCancel(context.Background())
 	a.cancelWacthFunc = cancel
 
-	go a.watcher.Start(a.ctx, cancelCtx)
+	go a.watcherService.Start(a.ctx, cancelCtx)
 
 	return nil
 }
@@ -90,13 +84,13 @@ func (a *App) StartWatching() error {
 func (a *App) Battle() (model.Battle, error) {
 	result := model.Battle{}
 
-	userConfig, err := a.config.User()
+	userConfig, err := a.configService.User()
 	if err != nil {
 		a.logger.Error(err, nil)
 		return result, apperr.Unwrap(err)
 	}
 
-	result, err = a.battle.Get(a.ctx, userConfig)
+	result, err = a.battleService.Get(a.ctx, userConfig)
 	if err != nil {
 		a.logger.Error(err, nil)
 		return result, apperr.Unwrap(err)
@@ -106,7 +100,7 @@ func (a *App) Battle() (model.Battle, error) {
 }
 
 func (a *App) SelectDirectory() (string, error) {
-	path, err := a.config.SelectDirectory(a.ctx)
+	path, err := a.configService.SelectDirectory(a.ctx)
 	if err != nil {
 		a.logger.Error(err, nil)
 	}
@@ -115,7 +109,7 @@ func (a *App) SelectDirectory() (string, error) {
 }
 
 func (a *App) OpenDirectory(path string) error {
-	err := a.config.OpenDirectory(path)
+	err := a.configService.OpenDirectory(path)
 	if err != nil {
 		a.logger.Warn(err, nil)
 	}
@@ -128,7 +122,7 @@ func (a *App) DefaultUserConfig() model.UserConfigV2 {
 }
 
 func (a *App) UserConfig() (model.UserConfigV2, error) {
-	config, err := a.config.User()
+	config, err := a.configService.User()
 	if err != nil {
 		a.logger.Error(err, nil)
 	}
@@ -137,7 +131,7 @@ func (a *App) UserConfig() (model.UserConfigV2, error) {
 }
 
 func (a *App) UpdateUserConfig(config model.UserConfigV2) error {
-	err := a.config.UpdateOptional(config)
+	err := a.configService.UpdateOptional(config)
 	if err != nil {
 		a.logger.Error(err, nil)
 	} else {
@@ -148,7 +142,7 @@ func (a *App) UpdateUserConfig(config model.UserConfigV2) error {
 }
 
 func (a *App) ValidateInstallPath(path string) string {
-	err := a.config.ValidateInstallPath(path)
+	err := a.configService.ValidateInstallPath(path)
 	if err != nil {
 		a.logger.Error(err, nil)
 	}
@@ -161,7 +155,7 @@ func (a *App) ValidateInstallPath(path string) string {
 }
 
 func (a *App) UpdateInstallPath(path string) error {
-	config, err := a.config.UpdateInstallPath(path)
+	config, err := a.configService.UpdateInstallPath(path)
 	if err != nil {
 		a.logger.Error(err, nil)
 	} else {
@@ -172,7 +166,7 @@ func (a *App) UpdateInstallPath(path string) error {
 }
 
 func (a *App) ManualScreenshot(filename string, base64Data string) (bool, error) {
-	saved, err := a.screenshot.SaveWithDialog(a.ctx, filename, base64Data)
+	saved, err := a.screenshotService.SaveWithDialog(a.ctx, filename, base64Data)
 	if err != nil {
 		a.logger.Error(err, nil)
 	}
@@ -180,7 +174,7 @@ func (a *App) ManualScreenshot(filename string, base64Data string) (bool, error)
 }
 
 func (a *App) AutoScreenshot(filename string, base64Data string) error {
-	err := a.screenshot.SaveForAuto(filename, base64Data)
+	err := a.screenshotService.SaveForAuto(filename, base64Data)
 	if err != nil {
 		a.logger.Error(err, nil)
 	}
@@ -188,11 +182,11 @@ func (a *App) AutoScreenshot(filename string, base64Data string) error {
 }
 
 func (a *App) Semver() string {
-	return a.env.AppVer
+	return a.config.App.Semver
 }
 
 func (a *App) AlertPlayers() ([]model.AlertPlayer, error) {
-	players, err := a.config.AlertPlayers()
+	players, err := a.configService.AlertPlayers()
 	if err != nil {
 		a.logger.Error(err, nil)
 	}
@@ -201,7 +195,7 @@ func (a *App) AlertPlayers() ([]model.AlertPlayer, error) {
 }
 
 func (a *App) UpdateAlertPlayer(player model.AlertPlayer) error {
-	players, err := a.config.UpdateAlertPlayer(player)
+	players, err := a.configService.UpdateAlertPlayer(player)
 	if err != nil {
 		a.logger.Error(err, nil)
 	} else {
@@ -212,7 +206,7 @@ func (a *App) UpdateAlertPlayer(player model.AlertPlayer) error {
 }
 
 func (a *App) RemoveAlertPlayer(accountID int) error {
-	players, err := a.config.RemoveAlertPlayer(accountID)
+	players, err := a.configService.RemoveAlertPlayer(accountID)
 	if err != nil {
 		a.logger.Error(err, nil)
 	} else {
@@ -223,7 +217,7 @@ func (a *App) RemoveAlertPlayer(accountID int) error {
 }
 
 func (a *App) SearchPlayer(prefix string) map[string]int {
-	return a.config.SearchPlayer(prefix)
+	return a.configService.SearchPlayer(prefix)
 }
 
 func (a *App) AlertPatterns() []string {
@@ -242,4 +236,88 @@ func (a *App) LogInfo(message string, contexts map[string]string) {
 func (a *App) LatestRelease() (model.LatestRelease, error) {
 	latestRelease, err := a.versionFetcher.Fetch()
 	return latestRelease, apperr.Unwrap(err)
+}
+
+func (a *App) inject(config Config) error {
+	db, err := badger.Open(badger.DefaultOptions("./persistent_data"))
+	if err != nil {
+		return err
+	}
+
+	storage := infra.NewStorage(db)
+
+	a.logger = infra.NewLogger(
+		webapi.NewDiscord(webapi.RequestConfig{
+			URL:     a.config.Discord.AlertURL,
+			Retry:   a.config.Discord.MaxRetry,
+			Timeout: time.Duration(a.config.Discord.TimeoutSec) * time.Second,
+		}),
+		webapi.NewDiscord(webapi.RequestConfig{
+			URL:     a.config.Discord.InfoURL,
+			Retry:   a.config.Discord.MaxRetry,
+			Timeout: time.Duration(a.config.Discord.TimeoutSec) * time.Second,
+		}),
+		*storage,
+		a.config.App.Name,
+		a.config.App.Semver,
+		a.config.Logger.ZerologLogLevel,
+	)
+
+	wargaming := webapi.NewWargaming(
+		webapi.RequestConfig{
+			URL:     a.config.Wargaming.URL,
+			Retry:   a.config.Wargaming.MaxRetry,
+			Timeout: time.Duration(a.config.Wargaming.TimeoutSec) * time.Second,
+		},
+		ratelimit.New(a.config.Wargaming.RateLimitRPS),
+		a.config.Wargaming.AppID,
+	)
+	uwargaming := webapi.NewUnofficialWargaming(webapi.RequestConfig{
+		URL:     a.config.UnofficialWargaming.URL,
+		Retry:   a.config.UnofficialWargaming.MaxRetry,
+		Timeout: time.Duration(a.config.UnofficialWargaming.TimeoutSec) * time.Second,
+	})
+	numbers := webapi.NewNumbers(webapi.RequestConfig{
+		URL:     a.config.Numbers.URL,
+		Retry:   a.config.Numbers.MaxRetry,
+		Timeout: time.Duration(a.config.Numbers.TimeoutSec) * time.Second,
+	})
+	localFile := infra.NewLocalFile()
+	github := webapi.NewGithub(webapi.RequestConfig{
+		URL:     a.config.Github.URL,
+		Retry:   a.config.Github.MaxRetry,
+		Timeout: time.Duration(a.config.Github.TimeoutSec) * time.Second,
+	})
+	warshipStore := infra.NewWarshipFetcher(
+		db,
+		wargaming,
+		numbers,
+	)
+	clanFercher := infra.NewClanFetcher(
+		wargaming,
+		uwargaming,
+	)
+	rawStatFetcher := infra.NewRawStatFetcher(wargaming)
+	battleMetaFetcher := infra.NewBattleMetaFetcher(wargaming)
+	accountFetcher := infra.NewAccountFetcher(wargaming)
+	userConfig := infra.NewUserConfigStore(db)
+	alertPlayer := infra.NewAlertPlayerStore(db)
+	a.versionFetcher = infra.NewVersionFetcher(github, config.App.Semver)
+
+	// service
+	a.configService = service.NewConfig(accountFetcher, userConfig, alertPlayer)
+	a.screenshotService = service.NewScreenshot(localFile)
+	a.battleService = service.NewBattle(
+		localFile,
+		warshipStore,
+		clanFercher,
+		rawStatFetcher,
+		battleMetaFetcher,
+		accountFetcher,
+		a.logger,
+	)
+	a.watcherService = service.NewWatcher(1*time.Second, localFile, userConfig, a.logger, runtime.EventsEmit)
+	a.configMigratorService = service.NewConfigMigrator(storage, userConfig, alertPlayer)
+
+	return nil
 }

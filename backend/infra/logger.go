@@ -16,17 +16,19 @@ type Logger struct {
 }
 
 func NewLogger(
-	env Env,
 	alertDiscord webapi.Discord,
 	infoDiscord webapi.Discord,
 	storage Storage,
+	appName string,
+	appSemver string,
+	logLevel string,
 ) *Logger {
 	zerolog.TimeFieldFormat = time.DateTime
-
-	if env.IsDev {
-		zerolog.SetGlobalLevel(zerolog.DebugLevel)
-	} else {
+	level, err := zerolog.ParseLevel(logLevel)
+	if err != nil {
 		zerolog.SetGlobalLevel(zerolog.InfoLevel)
+	} else {
+		zerolog.SetGlobalLevel(level)
 	}
 
 	consoleWriter := zerolog.ConsoleWriter{
@@ -38,9 +40,9 @@ func NewLogger(
 	}
 
 	var logFile *os.File
-	if len(env.AppName) > 0 {
+	if len(appName) > 0 {
 		logFile, _ = os.OpenFile(
-			env.AppName+".log",
+			appName+".log",
 			os.O_APPEND|os.O_CREATE|os.O_WRONLY,
 			0o664,
 		)
@@ -51,7 +53,7 @@ func NewLogger(
 	zlog := zerolog.New(multi).
 		With().
 		Timestamp().
-		Str("semver", env.AppVer).
+		Str("semver", appSemver).
 		Logger()
 
 	ign, _ := storage.OwnIGN()

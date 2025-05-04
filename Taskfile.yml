@@ -1,88 +1,85 @@
 # https://taskfile.dev
 
-version: '3'
+version: "3"
 
 vars:
-  APP_NAME: wows-fast-stats
-  SEMVER: 0.17.0
-  WG_APP_ID: e25e1a2af190880c9e33d3be7cc5313d
   NPM: npm --prefix ./frontend
-  COMMON_LDFLAGS:
-    -X main.AppName={{.APP_NAME}}
-    -X main.Semver={{.SEMVER}}
-    -X main.WGAppID={{.WG_APP_ID}}
+  CONFIG_PROD: config.prod.yml
+  CONFIG_DEV: config.dev.yml
 
 tasks:
   setup:
-    desc: Setup the project
+    desc: setup project
     cmds:
       - for:
-        - github.com/wailsapp/wails/v2/cmd/wails@v2.9.3
-        - github.com/golangci/golangci-lint/cmd/golangci-lint@latest
-        - go.uber.org/mock/mockgen@latest
-        - github.com/arch-go/arch-go@latest
+          - github.com/wailsapp/wails/v2/cmd/wails@v2.9.3
+          - github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+          - go.uber.org/mock/mockgen@latest
+          - github.com/arch-go/arch-go@latest
+          - github.com/mikefarah/yq/v4@latest
         cmd: go install {{.ITEM}}
   gen-mock:
-    desc: Generate mocks
+    desc: generate mocks
     cmds:
       - rm -rf backend/domain/mock
       - rm -rf backend/infra/mock
       - go generate ./...
   lint:
-    desc: Run linters
+    desc: lint
     cmds:
       - golangci-lint run
       - "{{.NPM}} run check"
       - "{{.NPM}} run lint"
   fmt:
-    desc: Format code
+    desc: format
     cmds:
       - golangci-lint run --fix
       - go fmt
       - "{{.NPM}} run fmt"
   test:
-    desc: Run tests
+    desc: unit testing
     cmds:
       - arch-go
       - go test -cover ./... -count=1
       - "{{.NPM}} run test"
   dev:
-    desc: Run the app in development mode
-    dotenv: ['.env.development']
+    desc: run app in development mode
     vars:
-      LDFLAGS:
-        -X main.AlertDiscordWebhookURL=<URL>
-        -X main.InfoDiscordWebhookURL=<URL>
+      BASE64_CONFIG:
+        sh: yq -n 'load("{{.CONFIG_PROD}}") * load("{{.CONFIG_DEV}}")' | base64
     cmds:
-      - wails dev -ldflags "{{.COMMON_LDFLAGS}} {{.LDFLAGS}} -X main.IsDev=true"
+      - wails dev -ldflags="-X main.Base64ConfigYml={{.BASE64_CONFIG}}"
   build:
-    desc: Build the app
+    desc: build
     deps: [test]
     vars:
-      LDFLAGS:
-        -X main.AlertDiscordWebhookURL=<URL>
-        -X main.InfoDiscordWebhookURL=<URL>
+      BASE64_CONFIG:
+        sh: cat {{.CONFIG_PROD}} | base64
+      CONFIG_JSON:
+        sh: yq {{.CONFIG_PROD}} | yq -o=json
+      CONFIG_MAP:
+        ref: "fromJson .CONFIG_JSON" # https://github.com/go-task/task/issues/2217
     cmds:
-      - wails build -ldflags "{{.COMMON_LDFLAGS}} {{.LDFLAGS}}" -platform windows/amd64 -o {{.APP_NAME}}-{{.SEMVER}}.exe -trimpath -webview2 embed
+      - wails build -ldflags="-X main.Base64ConfigYml={{.BASE64_CONFIG}}" -platform windows/amd64 -o {{.CONFIG_MAP.app.name}}-{{.CONFIG_MAP.app.semver}}.exe -trimpath -webview2 embed
   chbtl:
-    desc: Change Battle
+    desc: change battle
     vars:
       TEST_REPLAY_PATH: ./test_install_dir/replays
       TEMP_ARENA_INFO: tempArenaInfo.json
     cmds:
       - cp {{.TEST_REPLAY_PATH}}/$(ls {{.TEST_REPLAY_PATH}} | grep -v {{.TEMP_ARENA_INFO}} | fzf) {{.TEST_REPLAY_PATH}}/{{.TEMP_ARENA_INFO}}
   clean:
-    desc: Clean the project
+    desc: clean project
     cmds:
       - for:
-        - config/
-        - cache/
-        - temp_arena_info/
-        - screenshot/
-        - persistent_data/
+          - config/
+          - cache/
+          - temp_arena_info/
+          - screenshot/
+          - persistent_data/
         cmd: rm -rf {{.ITEM}}
   update:
-    desc: Update dependencies
+    desc: update dependencies
     cmds:
       - go get
       - "{{.NPM}} update"

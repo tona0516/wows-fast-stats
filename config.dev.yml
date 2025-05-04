@@ -1,0 +1,5 @@
+discord:
+  alert_url: https://discord.com/api/webhooks/1206175852686082089/3_CEFO1eP-H1mTgUUU3f5JM2NnIkpu9PvLUDsuT9MMW6CxUMdKUJjCJGadAhMZQK28sP
+  info_url: https://discord.com/api/webhooks/1206175883681861633/LOGbuFoOIWcrthI81tKkOEAnUwqks3kl_2bFIjdr8ilRGRTEiIORHESJwmOleQ_1R74F
+logger:
+  zerolog_log_level: debug
