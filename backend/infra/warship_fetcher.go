@@ -14,15 +14,15 @@ import (
 
 type WarshipFetcher struct {
 	db               *badger.DB
-	wargamingClient  req.Client
-	numbersClient    req.Client
+	wargamingClient  *req.Client
+	numbersClient    *req.Client
 	localDataKeyName string
 }
 
 func NewWarshipFetcher(
 	db *badger.DB,
-	wargamingClient req.Client,
-	numbersClient req.Client,
+	wargamingClient *req.Client,
+	numbersClient *req.Client,
 ) *WarshipFetcher {
 	return &WarshipFetcher{
 		db:               db,

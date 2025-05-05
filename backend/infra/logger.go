@@ -17,8 +17,8 @@ type Logger struct {
 }
 
 func NewLogger(
-	alertDiscordClient req.Client,
-	infoDiscordClient req.Client,
+	alertDiscordClient *req.Client,
+	infoDiscordClient *req.Client,
 	storage Storage,
 	appName string,
 	appSemver string,
@@ -119,14 +119,14 @@ func addContext(e *zerolog.Event, contexts map[string]string) {
 
 type reportWriter struct {
 	zerolog.FilteredLevelWriter
-	alertDiscordClient req.Client
-	infoDiscordClient  req.Client
+	alertDiscordClient *req.Client
+	infoDiscordClient  *req.Client
 }
 
 func (w *reportWriter) WriteLevel(level zerolog.Level, p []byte) (int, error) {
 	formatted := fmt.Sprintf("```%s```", prettyJSON(string(p)))
 
-	var client req.Client
+	var client *req.Client
 	if level >= zerolog.WarnLevel {
 		client = w.alertDiscordClient
 	} else {

@@ -16,13 +16,13 @@ import (
 var urlRegExp = regexp.MustCompile(`https?://[^\s]+`)
 
 type ClanFetcher struct {
-	wargamingClient           req.Client
-	unofficialWargamingClient req.Client
+	wargamingClient           *req.Client
+	unofficialWargamingClient *req.Client
 }
 
 func NewClanFetcher(
-	wargamingClient req.Client,
-	unofficialWargamingClient req.Client,
+	wargamingClient *req.Client,
+	unofficialWargamingClient *req.Client,
 ) *ClanFetcher {
 	return &ClanFetcher{
 		wargamingClient:           wargamingClient,

@@ -9,11 +9,11 @@ import (
 )
 
 type AccountFetcher struct {
-	wargamingClient req.Client
+	wargamingClient *req.Client
 }
 
 func NewAccountFetcher(
-	wargamingClient req.Client,
+	wargamingClient *req.Client,
 ) *AccountFetcher {
 	return &AccountFetcher{wargamingClient: wargamingClient}
 }

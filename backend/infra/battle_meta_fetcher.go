@@ -10,12 +10,12 @@ import (
 )
 
 type BattleMetaFetcher struct {
-	wargamingClient req.Client
+	wargamingClient *req.Client
 	cache           *model.BattleMeta
 }
 
 func NewBattleMetaFetcher(
-	wargamingClient req.Client,
+	wargamingClient *req.Client,
 ) *BattleMetaFetcher {
 	return &BattleMetaFetcher{
 		wargamingClient: wargamingClient,

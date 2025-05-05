@@ -9,11 +9,11 @@ import (
 )
 
 type VersionFetcher struct {
-	githubClient req.Client
+	githubClient *req.Client
 	semver       string
 }
 
-func NewVersionFetcher(githubClient req.Client, semver string) *VersionFetcher {
+func NewVersionFetcher(githubClient *req.Client, semver string) *VersionFetcher {
 	return &VersionFetcher{
 		githubClient: githubClient,
 		semver:       semver,

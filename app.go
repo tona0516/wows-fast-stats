@@ -249,14 +249,14 @@ func (a *App) inject(config Config) error {
 	storage := infra.NewStorage(db)
 
 	a.logger = infra.NewLogger(
-		*req.C().
+		req.C().
 			SetBaseURL(a.config.Discord.AlertURL).
 			SetCommonRetryCount(a.config.Discord.MaxRetry).
-			SetTimeout(time.Duration(a.config.Discord.TimeoutSec) * time.Second),
-		*req.C().
+			SetTimeout(time.Duration(a.config.Discord.TimeoutSec)*time.Second),
+		req.C().
 			SetBaseURL(a.config.Discord.InfoURL).
 			SetCommonRetryCount(a.config.Discord.MaxRetry).
-			SetTimeout(time.Duration(a.config.Discord.TimeoutSec) * time.Second),
+			SetTimeout(time.Duration(a.config.Discord.TimeoutSec)*time.Second),
 		*storage,
 		a.config.App.Name,
 		a.config.App.Semver,
@@ -264,7 +264,7 @@ func (a *App) inject(config Config) error {
 	)
 
 	rateLimiter := ratelimit.New(a.config.Wargaming.RateLimitRPS)
-	wargamingClient := *req.C().
+	wargamingClient := req.C().
 		SetBaseURL(a.config.Wargaming.URL).
 		AddCommonQueryParam("application_id", a.config.Wargaming.AppID).
 		SetCommonRetryCount(a.config.Wargaming.MaxRetry).
@@ -299,18 +299,18 @@ func (a *App) inject(config Config) error {
 	warshipStore := infra.NewWarshipFetcher(
 		db,
 		wargamingClient,
-		*req.C().
+		req.C().
 			SetBaseURL(a.config.Numbers.URL).
 			SetCommonRetryCount(a.config.Numbers.MaxRetry).
-			SetTimeout(time.Duration(a.config.Numbers.TimeoutSec) * time.Second).
+			SetTimeout(time.Duration(a.config.Numbers.TimeoutSec)*time.Second).
 			EnableInsecureSkipVerify(),
 	)
 	clanFercher := infra.NewClanFetcher(
 		wargamingClient,
-		*req.C().
+		req.C().
 			SetBaseURL(a.config.UnofficialWargaming.URL).
 			SetCommonRetryCount(a.config.UnofficialWargaming.MaxRetry).
-			SetTimeout(time.Duration(a.config.UnofficialWargaming.TimeoutSec) * time.Second),
+			SetTimeout(time.Duration(a.config.UnofficialWargaming.TimeoutSec)*time.Second),
 	)
 	rawStatFetcher := infra.NewRawStatFetcher(wargamingClient)
 	battleMetaFetcher := infra.NewBattleMetaFetcher(wargamingClient)
@@ -318,10 +318,10 @@ func (a *App) inject(config Config) error {
 	userConfig := infra.NewUserConfigStore(db)
 	alertPlayer := infra.NewAlertPlayerStore(db)
 	a.versionFetcher = infra.NewVersionFetcher(
-		*req.C().
+		req.C().
 			SetBaseURL(a.config.Github.URL).
 			SetCommonRetryCount(a.config.Github.MaxRetry).
-			SetTimeout(time.Duration(a.config.Github.TimeoutSec) * time.Second),
+			SetTimeout(time.Duration(a.config.Github.TimeoutSec)*time.Second),
 		config.App.Semver,
 	)
 

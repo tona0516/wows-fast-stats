@@ -18,11 +18,11 @@ type (
 )
 
 type RawStatFetcher struct {
-	wargamingClient req.Client
+	wargamingClient *req.Client
 }
 
 func NewRawStatFetcher(
-	wargamingClient req.Client,
+	wargamingClient *req.Client,
 ) *RawStatFetcher {
 	return &RawStatFetcher{
 		wargamingClient: wargamingClient,
