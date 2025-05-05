@@ -1,7 +1,6 @@
 package infra
 
 import (
-	"encoding/json"
 	"errors"
 	"strconv"
 	"strings"
@@ -89,8 +88,9 @@ func (f *RawStatFetcher) accountInfo(accountIDs []int, channel chan model.Result
 		channel <- result
 	}()
 
-	var rb WGAccountInfoResponse
-	resp, err := f.wargamingClient.R().
+	var body WGAccountInfoResponse
+	_, err := f.wargamingClient.R().
+		SetSuccessResult(&body).
 		AddQueryParam("account_id", strings.Join(strAccountIDs, ",")).
 		AddQueryParam("fields", WGAccountInfoResponse{}.Field()).
 		AddQueryParam("extra", strings.Join([]string{
@@ -105,12 +105,7 @@ func (f *RawStatFetcher) accountInfo(accountIDs []int, channel chan model.Result
 		return
 	}
 
-	if err := json.Unmarshal(resp.Bytes(), &rb); err != nil {
-		result.Error = failure.Wrap(err)
-		return
-	}
-
-	result.Value = rb.Data
+	result.Value = body.Data
 }
 
 func (f *RawStatFetcher) shipStats(
@@ -121,8 +116,9 @@ func (f *RawStatFetcher) shipStats(
 	var mu sync.Mutex
 
 	err := doParallel(accountIDs, func(accountID int) error {
-		var rb WGShipsStatsResponse
-		resp, err := f.wargamingClient.R().
+		var body WGShipsStatsResponse
+		_, err := f.wargamingClient.R().
+			SetSuccessResult(&body).
 			AddQueryParam("account_id", strconv.Itoa(accountID)).
 			AddQueryParam("fields", WGShipsStatsResponse{}.Field()).
 			AddQueryParam("extra", strings.Join([]string{
@@ -136,12 +132,8 @@ func (f *RawStatFetcher) shipStats(
 			return failure.Wrap(err)
 		}
 
-		if err := json.Unmarshal(resp.Bytes(), &rb); err != nil {
-			return failure.Wrap(err)
-		}
-
 		shipStats := make(shipStatsMap)
-		for _, v := range rb.Data[accountID] {
+		for _, v := range body.Data[accountID] {
 			shipStats[v.ShipID] = v
 		}
 

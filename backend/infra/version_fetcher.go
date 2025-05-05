@@ -1,7 +1,6 @@
 package infra
 
 import (
-	"encoding/json"
 	"wfs/backend/domain/model"
 
 	"github.com/Masterminds/semver/v3"
@@ -29,26 +28,25 @@ func (f *VersionFetcher) Fetch() (model.LatestRelease, error) {
 		return latestRelease, failure.Wrap(err)
 	}
 
+	//nolint:godox
 	// TODO: https://docs.github.com/rest/overview/resources-in-the-rest-api#rate-limiting
-	resp, err := f.githubClient.R().Get("/repos/tona0516/wows-fast-stats/releases/latest")
+	var body GHLatestRelease
+	_, err = f.githubClient.R().
+		SetSuccessResult(&body).
+		Get("/repos/tona0516/wows-fast-stats/releases/latest")
 	if err != nil {
 		return latestRelease, failure.Wrap(err)
 	}
 
-	var ghLatestRelease GHLatestRelease
-	if err := json.Unmarshal(resp.Bytes(), &ghLatestRelease); err != nil {
-		return latestRelease, failure.Wrap(err)
-	}
-
-	latest, err := semver.NewVersion(ghLatestRelease.TagName)
+	latest, err := semver.NewVersion(body.TagName)
 	if err != nil {
 		return latestRelease, failure.Wrap(err)
 	}
 
 	updatable, _ := constant.Validate(latest)
 	latestRelease = model.LatestRelease{
-		Semver:    ghLatestRelease.TagName,
-		URL:       ghLatestRelease.HTMLURL,
+		Semver:    body.TagName,
+		URL:       body.HTMLURL,
 		Updatable: updatable,
 	}
 

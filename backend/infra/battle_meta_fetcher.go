@@ -1,7 +1,6 @@
 package infra
 
 import (
-	"encoding/json"
 	"errors"
 	"wfs/backend/apperr"
 	"wfs/backend/domain/model"
@@ -62,7 +61,9 @@ func (f *BattleMetaFetcher) fetchBattleArenas(channel chan model.Result[WGBattle
 		channel <- result
 	}()
 
-	resp, err := f.wargamingClient.R().
+	var body WGBattleArenasResponse
+	_, err := f.wargamingClient.R().
+		SetSuccessResult(&body).
 		AddQueryParam("fields", WGBattleArenasResponse{}.Field()).
 		AddQueryParam("language", "ja").
 		Get("/wows/encyclopedia/battlearenas/")
@@ -71,13 +72,7 @@ func (f *BattleMetaFetcher) fetchBattleArenas(channel chan model.Result[WGBattle
 		return
 	}
 
-	var ba WGBattleArenasResponse
-	if err := json.Unmarshal(resp.Bytes(), &ba); err != nil {
-		result.Error = failure.Wrap(err)
-		return
-	}
-
-	result.Value = ba.Data
+	result.Value = body.Data
 }
 
 func (f *BattleMetaFetcher) fetchBattleTypes(channel chan model.Result[WGBattleTypes]) {
@@ -86,7 +81,9 @@ func (f *BattleMetaFetcher) fetchBattleTypes(channel chan model.Result[WGBattleT
 		channel <- result
 	}()
 
-	resp, err := f.wargamingClient.R().
+	var body WGBattleTypesResponse
+	_, err := f.wargamingClient.R().
+		SetSuccessResult(&body).
 		AddQueryParam("fields", WGBattleTypesResponse{}.Field()).
 		AddQueryParam("language", "ja").
 		Get("/wows/encyclopedia/battletypes/")
@@ -95,11 +92,5 @@ func (f *BattleMetaFetcher) fetchBattleTypes(channel chan model.Result[WGBattleT
 		return
 	}
 
-	var bt WGBattleTypesResponse
-	if err := json.Unmarshal(resp.Bytes(), &bt); err != nil {
-		result.Error = failure.Wrap(err)
-		return
-	}
-
-	result.Value = bt.Data
+	result.Value = body.Data
 }

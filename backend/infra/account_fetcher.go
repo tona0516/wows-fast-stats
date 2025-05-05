@@ -1,7 +1,6 @@
 package infra
 
 import (
-	"encoding/json"
 	"strings"
 	"wfs/backend/domain/model"
 
@@ -20,8 +19,9 @@ func NewAccountFetcher(
 }
 
 func (f *AccountFetcher) Search(prefix string) (model.Accounts, error) {
-	var rb WGAccountListResponse
-	resp, err := f.wargamingClient.R().
+	var body WGAccountListResponse
+	_, err := f.wargamingClient.R().
+		SetSuccessResult(&body).
 		AddQueryParam("search", prefix).
 		AddQueryParam("fields", WGAccountListResponse{}.Field()).
 		AddQueryParam("limit", "10").
@@ -30,12 +30,8 @@ func (f *AccountFetcher) Search(prefix string) (model.Accounts, error) {
 		return nil, failure.Wrap(err)
 	}
 
-	if err := json.Unmarshal(resp.Bytes(), &rb); err != nil {
-		return nil, failure.Wrap(err)
-	}
-
 	result := make(model.Accounts)
-	for _, v := range rb.Data {
+	for _, v := range body.Data {
 		result[v.NickName] = v.AccountID
 	}
 
@@ -43,8 +39,9 @@ func (f *AccountFetcher) Search(prefix string) (model.Accounts, error) {
 }
 
 func (f *AccountFetcher) Fetch(playerNames []string) (model.Accounts, error) {
-	var rb WGAccountListResponse
-	resp, err := f.wargamingClient.R().
+	var body WGAccountListResponse
+	_, err := f.wargamingClient.R().
+		SetSuccessResult(&body).
 		AddQueryParam("search", strings.Join(playerNames, ",")).
 		AddQueryParam("fields", WGAccountListResponse{}.Field()).
 		AddQueryParam("type", "exact").
@@ -53,12 +50,8 @@ func (f *AccountFetcher) Fetch(playerNames []string) (model.Accounts, error) {
 		return nil, failure.Wrap(err)
 	}
 
-	if err := json.Unmarshal(resp.Bytes(), &rb); err != nil {
-		return nil, failure.Wrap(err)
-	}
-
 	result := make(model.Accounts)
-	for _, v := range rb.Data {
+	for _, v := range body.Data {
 		result[v.NickName] = v.AccountID
 	}
 

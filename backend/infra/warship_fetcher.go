@@ -1,7 +1,6 @@
 package infra
 
 import (
-	"encoding/json"
 	"errors"
 	"strconv"
 	"sync"
@@ -137,19 +136,16 @@ func (f *WarshipFetcher) expectedStats(channel chan model.Result[NumbersExpected
 		channel <- result
 	}()
 
-	resp, err := f.numbersClient.R().Get("/personal/rating/expected/json/")
+	var body NumbersExpectedStats
+	_, err := f.numbersClient.R().
+		SetSuccessResult(&body).
+		Get("/personal/rating/expected/json/")
 	if err != nil {
 		result.Error = failure.Wrap(err)
 		return
 	}
 
-	var stats NumbersExpectedStats
-	if err := json.Unmarshal(resp.Bytes(), &stats); err != nil {
-		result.Error = failure.Wrap(err)
-		return
-	}
-
-	result.Value = stats
+	result.Value = body
 }
 
 func (f *WarshipFetcher) readCache() (warshipsCache, error) {
@@ -175,36 +171,31 @@ func (f *WarshipFetcher) toError(cache warshipsCache, errCache error, err error)
 }
 
 func (f *WarshipFetcher) fetchGameVersion() (string, error) {
-	resp, err := f.wargamingClient.R().
+	var body WGEncycInfo
+
+	_, err := f.wargamingClient.R().
+		SetSuccessResult(&body).
 		AddQueryParam("fields", "game_version").
 		Get("/wows/encyclopedia/info/")
 	if err != nil {
 		return "", failure.Wrap(err)
 	}
 
-	var result WGEncycInfo
-	if err := json.Unmarshal(resp.Bytes(), &result); err != nil {
-		return "", failure.Wrap(err)
-	}
-
-	return result.Data.GameVersion, nil
+	return body.Data.GameVersion, nil
 }
 
 func (f *WarshipFetcher) fetchEncycShips(pageNo int) (WGEncycShips, error) {
-	var result WGEncycShips
+	var body WGEncycShips
 
-	resp, err := f.wargamingClient.R().
+	_, err := f.wargamingClient.R().
+		SetSuccessResult(&body).
 		AddQueryParam("fields", WGEncycShips{}.Field()).
 		AddQueryParam("language", "ja").
 		AddQueryParam("page_no", strconv.Itoa(pageNo)).
 		Get("/wows/encyclopedia/ships/")
 	if err != nil {
-		return result, failure.Wrap(err)
+		return body, failure.Wrap(err)
 	}
 
-	if err := json.Unmarshal(resp.Bytes(), &result); err != nil {
-		return result, failure.Wrap(err)
-	}
-
-	return result, nil
+	return body, nil
 }

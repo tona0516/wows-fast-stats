@@ -1,7 +1,6 @@
 package infra
 
 import (
-	"encoding/json"
 	"regexp"
 	"slices"
 	"strconv"
@@ -120,20 +119,18 @@ func (f *ClanFetcher) hexColor(tags []string) (map[string]string, error) {
 
 	var mu sync.Mutex
 	err := doParallel(tags, func(tag string) error {
-		resp, err := f.unofficialWargamingClient.R().SetQueryParams(map[string]string{
-			"search": tag,
-			"type":   "clans",
-		}).Get("/api/search/autocomplete/")
+		var body UWGClansAutocomplete
+		_, err := f.unofficialWargamingClient.R().
+			SetSuccessResult(&body).
+			SetQueryParams(map[string]string{
+				"search": tag,
+				"type":   "clans",
+			}).Get("/api/search/autocomplete/")
 		if err != nil {
 			return failure.Wrap(err)
 		}
 
-		var autocomplete UWGClansAutocomplete
-		if err := json.Unmarshal(resp.Bytes(), &autocomplete); err != nil {
-			return failure.Wrap(err)
-		}
-
-		hexColor := autocomplete.HexColor(tag)
+		hexColor := body.HexColor(tag)
 		if hexColor != "" {
 			mu.Lock()
 			result[tag] = hexColor
@@ -173,8 +170,9 @@ func (f *ClanFetcher) fetchClansAccountInfo(accountIDs []int) (WGClansAccountInf
 		strAccountIDs[i] = strconv.Itoa(v)
 	}
 
-	var result WGClansAccountInfoResponse
-	resp, err := f.wargamingClient.R().
+	var body WGClansAccountInfoResponse
+	_, err := f.wargamingClient.R().
+		SetSuccessResult(&body).
 		AddQueryParam("account_id", strings.Join(strAccountIDs, ",")).
 		AddQueryParam("fields", WGClansAccountInfoResponse{}.Field()).
 		Get("/wows/clans/accountinfo/")
@@ -182,11 +180,7 @@ func (f *ClanFetcher) fetchClansAccountInfo(accountIDs []int) (WGClansAccountInf
 		return nil, failure.Wrap(err)
 	}
 
-	if err := json.Unmarshal(resp.Bytes(), &result); err != nil {
-		return nil, failure.Wrap(err)
-	}
-
-	return result.Data, nil
+	return body.Data, nil
 }
 
 func (f *ClanFetcher) fetchClansInfo(clanIDs []int) (WGClansInfo, error) {
@@ -199,8 +193,9 @@ func (f *ClanFetcher) fetchClansInfo(clanIDs []int) (WGClansInfo, error) {
 		return WGClansInfo{}, nil
 	}
 
-	var result WGClansInfoResponse
-	resp, err := f.wargamingClient.R().
+	var body WGClansInfoResponse
+	_, err := f.wargamingClient.R().
+		SetSuccessResult(&body).
 		AddQueryParam("clan_id", strings.Join(strClanIDs, ",")).
 		AddQueryParam("fields", WGClansInfoResponse{}.Field()).
 		Get("/wows/clans/info/")
@@ -208,9 +203,5 @@ func (f *ClanFetcher) fetchClansInfo(clanIDs []int) (WGClansInfo, error) {
 		return nil, failure.Wrap(err)
 	}
 
-	if err := json.Unmarshal(resp.Bytes(), &result); err != nil {
-		return nil, failure.Wrap(err)
-	}
-
-	return result.Data, nil
+	return body.Data, nil
 }
