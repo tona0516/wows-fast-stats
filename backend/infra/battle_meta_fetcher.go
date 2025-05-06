@@ -33,13 +33,13 @@ func (f *BattleMetaFetcher) Fetch() (model.BattleMeta, error) {
 	go f.fetchBattleArenas(arenaResultChan)
 	go f.fetchBattleTypes(typeResultChan)
 
-	var err error
-
 	arenaResult := <-arenaResultChan
-	err = errors.Join(err, arenaResult.Error)
 	typeResult := <-typeResultChan
 
+	var err error
+	err = errors.Join(err, arenaResult.Error)
 	err = errors.Join(err, typeResult.Error)
+
 	if err != nil {
 		return model.BattleMeta{}, failure.Translate(err, apperr.FetchBattleMetaError)
 	}
@@ -50,8 +50,8 @@ func (f *BattleMetaFetcher) Fetch() (model.BattleMeta, error) {
 	}
 
 	types := map[string]string{}
-	for _type, info := range typeResult.Value {
-		types[_type] = info.Name
+	for battleType, info := range typeResult.Value {
+		types[battleType] = info.Name
 	}
 
 	return *model.NewBattleMeta(arenas, types), nil
