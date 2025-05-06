@@ -41,16 +41,16 @@ func (m *MockVersionFetcher) EXPECT() *MockVersionFetcherMockRecorder {
 }
 
 // Fetch mocks base method.
-func (m *MockVersionFetcher) Fetch(currentSemver string) (model.LatestRelease, error) {
+func (m *MockVersionFetcher) Fetch() (model.LatestRelease, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Fetch", currentSemver)
+	ret := m.ctrl.Call(m, "Fetch")
 	ret0, _ := ret[0].(model.LatestRelease)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Fetch indicates an expected call of Fetch.
-func (mr *MockVersionFetcherMockRecorder) Fetch(currentSemver any) *gomock.Call {
+func (mr *MockVersionFetcherMockRecorder) Fetch() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Fetch", reflect.TypeOf((*MockVersionFetcher)(nil).Fetch), currentSemver)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Fetch", reflect.TypeOf((*MockVersionFetcher)(nil).Fetch))
 }

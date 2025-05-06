@@ -59,7 +59,7 @@ func TestBattle_Get_正常系(t *testing.T) {
 	mockBattleMetaFetcher.EXPECT().Fetch().Return(model.BattleMeta{}, nil)
 
 	mockAccountFetcher := repository.NewMockAccountFetcher(ctrl)
-	mockAccountFetcher.EXPECT().Fetch(gomock.Any()).Return(model.Accounts{
+	mockAccountFetcher.EXPECT().FetchByNames(gomock.Any()).Return(model.Accounts{
 		"player_1": 1,
 		"player_2": 2,
 	}, nil)

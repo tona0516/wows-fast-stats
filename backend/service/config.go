@@ -149,7 +149,7 @@ func (c *Config) RemoveAlertPlayer(accountID int) ([]model.AlertPlayer, error) {
 }
 
 func (c *Config) SearchPlayer(prefix string) model.Accounts {
-	result, _ := c.accountFetcher.Search(prefix)
+	result, _ := c.accountFetcher.FetchByPrefix(prefix)
 
 	return result
 }

@@ -40,32 +40,32 @@ func (m *MockAccountFetcher) EXPECT() *MockAccountFetcherMockRecorder {
 	return m.recorder
 }
 
-// Fetch mocks base method.
-func (m *MockAccountFetcher) Fetch(playerNames []string) (model.Accounts, error) {
+// FetchByNames mocks base method.
+func (m *MockAccountFetcher) FetchByNames(names []string) (model.Accounts, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Fetch", playerNames)
+	ret := m.ctrl.Call(m, "FetchByNames", names)
 	ret0, _ := ret[0].(model.Accounts)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// Fetch indicates an expected call of Fetch.
-func (mr *MockAccountFetcherMockRecorder) Fetch(playerNames any) *gomock.Call {
+// FetchByNames indicates an expected call of FetchByNames.
+func (mr *MockAccountFetcherMockRecorder) FetchByNames(names any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Fetch", reflect.TypeOf((*MockAccountFetcher)(nil).Fetch), playerNames)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FetchByNames", reflect.TypeOf((*MockAccountFetcher)(nil).FetchByNames), names)
 }
 
-// Search mocks base method.
-func (m *MockAccountFetcher) Search(prefix string) (model.Accounts, error) {
+// FetchByPrefix mocks base method.
+func (m *MockAccountFetcher) FetchByPrefix(prefix string) (model.Accounts, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Search", prefix)
+	ret := m.ctrl.Call(m, "FetchByPrefix", prefix)
 	ret0, _ := ret[0].(model.Accounts)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// Search indicates an expected call of Search.
-func (mr *MockAccountFetcherMockRecorder) Search(prefix any) *gomock.Call {
+// FetchByPrefix indicates an expected call of FetchByPrefix.
+func (mr *MockAccountFetcherMockRecorder) FetchByPrefix(prefix any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Search", reflect.TypeOf((*MockAccountFetcher)(nil).Search), prefix)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FetchByPrefix", reflect.TypeOf((*MockAccountFetcher)(nil).FetchByPrefix), prefix)
 }

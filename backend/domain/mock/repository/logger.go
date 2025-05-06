@@ -10,7 +10,6 @@
 package repository
 
 import (
-	context "context"
 	reflect "reflect"
 
 	gomock "go.uber.org/mock/gomock"
@@ -64,18 +63,6 @@ func (mr *MockLoggerMockRecorder) Error(err, contexts any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Error", reflect.TypeOf((*MockLogger)(nil).Error), err, contexts)
 }
 
-// Fatal mocks base method.
-func (m *MockLogger) Fatal(err error, contexts map[string]string) {
-	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "Fatal", err, contexts)
-}
-
-// Fatal indicates an expected call of Fatal.
-func (mr *MockLoggerMockRecorder) Fatal(err, contexts any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Fatal", reflect.TypeOf((*MockLogger)(nil).Fatal), err, contexts)
-}
-
 // Info mocks base method.
 func (m *MockLogger) Info(message string, contexts map[string]string) {
 	m.ctrl.T.Helper()
@@ -86,18 +73,6 @@ func (m *MockLogger) Info(message string, contexts map[string]string) {
 func (mr *MockLoggerMockRecorder) Info(message, contexts any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Info", reflect.TypeOf((*MockLogger)(nil).Info), message, contexts)
-}
-
-// Init mocks base method.
-func (m *MockLogger) Init(appCtx context.Context) {
-	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "Init", appCtx)
-}
-
-// Init indicates an expected call of Init.
-func (mr *MockLoggerMockRecorder) Init(appCtx any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Init", reflect.TypeOf((*MockLogger)(nil).Init), appCtx)
 }
 
 // SetOwnIGN mocks base method.

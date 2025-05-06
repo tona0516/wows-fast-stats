@@ -6,6 +6,6 @@ import (
 
 //go:generate mockgen -source=$GOFILE -destination ../mock/$GOPACKAGE/$GOFILE -package $GOPACKAGE
 type AccountFetcher interface {
-	Search(prefix string) (model.Accounts, error)
-	Fetch(playerNames []string) (model.Accounts, error)
+	FetchByPrefix(prefix string) (model.Accounts, error)
+	FetchByNames(names []string) (model.Accounts, error)
 }

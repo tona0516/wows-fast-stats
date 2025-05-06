@@ -59,7 +59,7 @@ func (b *Battle) Get(appCtx context.Context, userConfig model.UserConfigV2) (mod
 	go b.fetchBattleMeta(battleMetaResult)
 
 	// Get Account ID list
-	accountList, err := b.accountFetcher.Fetch(tempArenaInfo.AccountNames())
+	accountList, err := b.accountFetcher.FetchByNames(tempArenaInfo.AccountNames())
 	if err != nil {
 		return result, err
 	}
