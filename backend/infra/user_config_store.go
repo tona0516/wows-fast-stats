@@ -26,11 +26,13 @@ func NewUserConfigStore(db *badger.DB) *UserConfigStore {
 
 func (s *UserConfigStore) IsExistV0() bool {
 	_, err := os.Stat(s.v0Path)
+
 	return err == nil
 }
 
 func (s *UserConfigStore) IsExistV1() bool {
 	_, err := read[model.UserConfig](s.db, s.keyName)
+
 	return !isErrKeyNotFound(err)
 }
 

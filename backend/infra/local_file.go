@@ -29,11 +29,13 @@ func (l *LocalFile) SaveScreenshot(path string, base64Data string) error {
 	}
 
 	err = writeData(path, decoded)
+
 	return failure.Wrap(err)
 }
 
 func (l *LocalFile) SaveTempArenaInfo(path string, tempArenaInfo model.TempArenaInfo) error {
 	err := writeJSON(path, tempArenaInfo)
+
 	return failure.Wrap(err)
 }
 
@@ -46,6 +48,7 @@ func (l *LocalFile) ReadTempArenaInfo(installPath string) (model.TempArenaInfo, 
 	}
 
 	paths := make([]string, 0)
+
 	err := filepath.WalkDir(root, func(path string, info fs.DirEntry, err error) error {
 		if err != nil {
 			return failure.Wrap(err)
@@ -60,6 +63,7 @@ func (l *LocalFile) ReadTempArenaInfo(installPath string) (model.TempArenaInfo, 
 		}
 
 		paths = append(paths, path)
+
 		return nil
 	})
 	if err != nil {
@@ -71,6 +75,7 @@ func (l *LocalFile) ReadTempArenaInfo(installPath string) (model.TempArenaInfo, 
 
 func (l *LocalFile) decide(paths []string) (model.TempArenaInfo, error) {
 	var result model.TempArenaInfo
+
 	size := len(paths)
 
 	if size == 0 {
@@ -82,6 +87,7 @@ func (l *LocalFile) decide(paths []string) (model.TempArenaInfo, error) {
 	}
 
 	var latest model.TempArenaInfo
+
 	for _, path := range paths {
 		tempArenaInfo, err := readJSON(path, model.TempArenaInfo{})
 		if err != nil {

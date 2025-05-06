@@ -63,6 +63,7 @@ func (b *Battle) Get(appCtx context.Context, userConfig model.UserConfigV2) (mod
 	if err != nil {
 		return result, err
 	}
+
 	accountIDs := make([]int, 0, len(accountList))
 	for _, id := range accountList {
 		accountIDs = append(accountIDs, id)
@@ -71,6 +72,7 @@ func (b *Battle) Get(appCtx context.Context, userConfig model.UserConfigV2) (mod
 	// Fetch each stats
 	rawStatsResult := make(chan model.Result[model.RawStats])
 	clanResult := make(chan model.Result[model.Clans])
+
 	go b.fetchRawStats(accountIDs, rawStatsResult)
 	go b.fetchClans(accountIDs, clanResult)
 
@@ -157,6 +159,7 @@ func (b *Battle) compose(
 ) model.Battle {
 	friends := make(model.Players, 0)
 	enemies := make(model.Players, 0)
+
 	var ownShip string
 
 	for _, vehicle := range tempArenaInfo.Vehicles {
@@ -173,6 +176,7 @@ func (b *Battle) compose(
 				Type: model.ShipTypeNONE,
 			}
 		}
+
 		if nickname == tempArenaInfo.PlayerName {
 			ownShip = warship.Name
 		}

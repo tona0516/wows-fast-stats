@@ -34,6 +34,7 @@ func (n *NumbersExpectedStats) UnmarshalJSON(b []byte) error {
 	}
 
 	es := make(ExpectedStatsData)
+
 	for key, value := range data {
 		shipID, err := strconv.Atoi(key)
 		if err != nil {

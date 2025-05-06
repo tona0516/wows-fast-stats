@@ -112,6 +112,7 @@ func (m *ConfigMigrator) toV2() error {
 	// バージョンが存在しないかつバグが発生していない場合
 	if v2.Version == 0 && v2.Display != (model.UCDisplay{}) {
 		v2.Version = 2
+
 		return update(v2)
 	}
 
@@ -120,6 +121,7 @@ func (m *ConfigMigrator) toV2() error {
 	if err != nil {
 		return err
 	}
+
 	v2 = model.FromUserConfigV1(v1)
 
 	return update(v2)

@@ -1,0 +1,35 @@
+version: "2"
+linters:
+  default: all
+  disable:
+    - depguard
+    - exhaustruct
+    - gosmopolitan
+    - revive
+    - testifylint
+    - testpackage
+    - tagliatelle
+    - varnamelen
+  settings:
+    funlen:
+      # Checks the number of lines in a function.
+      # If lower than 0, disable the check.
+      # Default: 60
+      lines: 40
+    mnd:
+      # List of file patterns to exclude from analysis.
+      # Values always ignored: `.+_test.go`.
+      # Default: []
+      ignored-files:
+        - stats.go
+        - pr.go
+        - threat_level.go
+        - user_config.go
+        - user_config_v2.go
+  exclusions:
+    rules:
+      # Exclude some linters from running on tests files.
+      - path: _test\.go
+        linters:
+          - funlen
+          - asciicheck

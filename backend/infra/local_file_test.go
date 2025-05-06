@@ -13,17 +13,12 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-const testInstallPath = "testdata"
-
 func TestLocalFile_SaveScreenshot(t *testing.T) {
 	t.Run("正常系", func(t *testing.T) {
 		// テストデータの作成
 		rawData := "Hello, world!"
 		base64Data := "SGVsbG8sIHdvcmxkIQ=="
-		path := "screenshot_test/screenshot.png"
-
-		// テストで生成したディレクトリを削除
-		defer os.RemoveAll(filepath.Dir(path))
+		path := filepath.Join(t.TempDir(), "screenshot.png")
 
 		// テスト
 		instance := LocalFile{}
@@ -52,25 +47,22 @@ func TestLocalFile_ReadTempArenaInfo(t *testing.T) {
 			PlayerName: "player_1",
 		}
 
-		paths := [][]string{
-			{testInstallPath, replaysDir, tempArenaInfoFile},
-			{testInstallPath, replaysDir, "12.4.0", tempArenaInfoFile},
-			{"ほげほげ", replaysDir, tempArenaInfoFile},
+		testInstallPath := t.TempDir()
+		paths := []string{
+			filepath.Join(testInstallPath, replaysDir, tempArenaInfoFile),
+			filepath.Join(testInstallPath, replaysDir, "12.4.0", tempArenaInfoFile),
 		}
 
 		for _, path := range paths {
-			func(path []string) {
-				defer os.RemoveAll(path[0])
+			_ = os.RemoveAll(path)
 
-				filePath := filepath.Join(path...)
-				err := writeJSON(filePath, expected)
-				assert.NoError(t, err)
+			err := writeJSON(path, expected)
+			assert.NoError(t, err)
 
-				fetcher := NewLocalFile()
-				actual, err := fetcher.ReadTempArenaInfo(path[0])
-				assert.NoError(t, err)
-				assert.Equal(t, expected, actual)
-			}(path)
+			fetcher := NewLocalFile()
+			actual, err := fetcher.ReadTempArenaInfo(testInstallPath)
+			assert.NoError(t, err)
+			assert.Equal(t, expected, actual)
 		}
 	})
 
@@ -99,8 +91,7 @@ func TestLocalFile_ReadTempArenaInfo(t *testing.T) {
 			PlayerName: "player_1",
 		}
 
-		defer os.RemoveAll(testInstallPath)
-
+		testInstallPath := t.TempDir()
 		err := writeJSON(filepath.Join(testInstallPath, replaysDir, tempArenaInfoFile), older)
 		require.NoError(t, err)
 		err = writeJSON(filepath.Join(testInstallPath, replaysDir, "12.4.0", tempArenaInfoFile), expected)
@@ -114,32 +105,26 @@ func TestLocalFile_ReadTempArenaInfo(t *testing.T) {
 	})
 
 	t.Run("異常系_該当ファイルなし", func(t *testing.T) {
+		testInstallPath := t.TempDir()
+
 		paths := []string{
 			filepath.Join(testInstallPath, replaysDir, "hoge.wowsreplay"),
 			filepath.Join(testInstallPath, replaysDir, "12.4.0", "hoge.wowsreplay"),
 		}
 
 		for _, path := range paths {
-			func(path string) {
-				defer os.RemoveAll(testInstallPath)
+			err := writeJSON(path, model.TempArenaInfo{})
+			require.NoError(t, err)
 
-				err := writeJSON(path, model.TempArenaInfo{})
-				require.NoError(t, err)
+			fetcher := NewLocalFile()
+			_, err = fetcher.ReadTempArenaInfo(testInstallPath)
 
-				fetcher := NewLocalFile()
-				_, err = fetcher.ReadTempArenaInfo(testInstallPath)
-
-				assert.True(t, failure.Is(err, apperr.FileNotExist))
-			}(path)
+			assert.True(t, failure.Is(err, apperr.FileNotExist))
 		}
 	})
 	t.Run("異常系_replayフォルダなし", func(t *testing.T) {
-		err := os.Mkdir(testInstallPath, os.ModePerm)
-		require.NoError(t, err)
-		defer os.RemoveAll(testInstallPath)
-
 		fetcher := NewLocalFile()
-		_, err = fetcher.ReadTempArenaInfo(testInstallPath)
+		_, err := fetcher.ReadTempArenaInfo(t.TempDir())
 
 		assert.True(t, failure.Is(err, apperr.ReplayDirNotFoundError))
 	})

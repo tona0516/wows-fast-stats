@@ -36,6 +36,7 @@ func shipTypePriorities() []ShipType {
 
 func NewShipType(raw string) ShipType {
 	shipTypeNames := shipTypeNames()
+
 	shipType, ok := shipTypeNames[raw]
 	if !ok {
 		return ShipTypeNONE

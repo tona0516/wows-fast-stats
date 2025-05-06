@@ -46,6 +46,7 @@ func (f *ClanFetcher) Fetch(accountIDs []int) (model.Clans, error) {
 		if slices.Contains(tags, clan.Tag) {
 			continue
 		}
+
 		tags = append(tags, clan.Tag)
 	}
 
@@ -79,6 +80,7 @@ func (f *ClanFetcher) clansAccountInfo(accountIDs []int) (map[int]int, error) {
 		if clan.ClanID == 0 {
 			continue
 		}
+
 		result[accountID] = clan.ClanID
 	}
 
@@ -118,8 +120,10 @@ func (f *ClanFetcher) hexColor(tags []string) (map[string]string, error) {
 	result := make(map[string]string)
 
 	var mu sync.Mutex
+
 	err := doParallel(tags, func(tag string) error {
 		var body UWGClansAutocomplete
+
 		_, err := f.unofficialWargamingClient.R().
 			SetSuccessResult(&body).
 			SetQueryParams(map[string]string{
@@ -171,6 +175,7 @@ func (f *ClanFetcher) fetchClansAccountInfo(accountIDs []int) (WGClansAccountInf
 	}
 
 	var body WGClansAccountInfoResponse
+
 	_, err := f.wargamingClient.R().
 		SetSuccessResult(&body).
 		AddQueryParam("account_id", strings.Join(strAccountIDs, ",")).
@@ -194,6 +199,7 @@ func (f *ClanFetcher) fetchClansInfo(clanIDs []int) (WGClansInfo, error) {
 	}
 
 	var body WGClansInfoResponse
+
 	_, err := f.wargamingClient.R().
 		SetSuccessResult(&body).
 		AddQueryParam("clan_id", strings.Join(strClanIDs, ",")).

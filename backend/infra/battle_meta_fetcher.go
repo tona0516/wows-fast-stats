@@ -34,9 +34,11 @@ func (f *BattleMetaFetcher) Fetch() (model.BattleMeta, error) {
 	go f.fetchBattleTypes(typeResultChan)
 
 	var err error
+
 	arenaResult := <-arenaResultChan
 	err = errors.Join(err, arenaResult.Error)
 	typeResult := <-typeResultChan
+
 	err = errors.Join(err, typeResult.Error)
 	if err != nil {
 		return model.BattleMeta{}, failure.Translate(err, apperr.FetchBattleMetaError)
@@ -62,6 +64,7 @@ func (f *BattleMetaFetcher) fetchBattleArenas(channel chan model.Result[WGBattle
 	}()
 
 	var body WGBattleArenasResponse
+
 	_, err := f.wargamingClient.R().
 		SetSuccessResult(&body).
 		AddQueryParam("fields", WGBattleArenasResponse{}.Field()).
@@ -69,6 +72,7 @@ func (f *BattleMetaFetcher) fetchBattleArenas(channel chan model.Result[WGBattle
 		Get("/wows/encyclopedia/battlearenas/")
 	if err != nil {
 		result.Error = failure.Wrap(err)
+
 		return
 	}
 
@@ -82,6 +86,7 @@ func (f *BattleMetaFetcher) fetchBattleTypes(channel chan model.Result[WGBattleT
 	}()
 
 	var body WGBattleTypesResponse
+
 	_, err := f.wargamingClient.R().
 		SetSuccessResult(&body).
 		AddQueryParam("fields", WGBattleTypesResponse{}.Field()).
@@ -89,6 +94,7 @@ func (f *BattleMetaFetcher) fetchBattleTypes(channel chan model.Result[WGBattleT
 		Get("/wows/encyclopedia/battletypes/")
 	if err != nil {
 		result.Error = failure.Wrap(err)
+
 		return
 	}
 

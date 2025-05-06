@@ -34,6 +34,7 @@ func TestWatcher_Start(t *testing.T) {
 		mockLocalFile.EXPECT().ReadTempArenaInfo(config.InstallPath).Return(model.TempArenaInfo{}, nil).AnyTimes()
 
 		var events []string
+
 		emitFunc := func(ctx context.Context, eventName string, optionalData ...interface{}) {
 			events = append(events, eventName)
 		}
@@ -44,6 +45,7 @@ func TestWatcher_Start(t *testing.T) {
 		// テスト
 		watcher := NewWatcher(10*time.Millisecond, mockLocalFile, mockUserConfig, nil, emitFunc)
 		err := watcher.Prepare()
+
 		go watcher.Start(ctx, ctx)
 
 		// アサーション
@@ -79,6 +81,7 @@ func TestWatcher_Start(t *testing.T) {
 			).AnyTimes()
 
 			var events []string
+
 			emitFunc := func(ctx context.Context, eventName string, optionalData ...interface{}) {
 				events = append(events, eventName)
 			}
@@ -95,6 +98,7 @@ func TestWatcher_Start(t *testing.T) {
 			assert.NoError(t, err)
 
 			events = nil
+
 			time.Sleep(100 * time.Millisecond)
 			assert.Contains(t, events, EventEnd)
 		}
@@ -113,6 +117,7 @@ func TestWatcher_Start(t *testing.T) {
 		mockUserConfig.EXPECT().GetV2().Return(config, nil)
 
 		var events []string
+
 		emitFunc := func(ctx context.Context, eventName string, optionalData ...interface{}) {
 			events = append(events, eventName)
 		}
@@ -121,6 +126,7 @@ func TestWatcher_Start(t *testing.T) {
 		// テスト
 		watcher := NewWatcher(10*time.Millisecond, nil, mockUserConfig, nil, emitFunc)
 		err := watcher.Prepare()
+
 		go watcher.Start(ctx, ctx)
 		cancel()
 
@@ -153,6 +159,7 @@ func TestWatcher_Start(t *testing.T) {
 		mockLogger.EXPECT().Error(gomock.Any(), gomock.Any())
 
 		var events []string
+
 		emitFunc := func(ctx context.Context, eventName string, optionalData ...interface{}) {
 			events = append(events, eventName)
 		}
@@ -163,6 +170,7 @@ func TestWatcher_Start(t *testing.T) {
 		// テスト
 		watcher := NewWatcher(10*time.Millisecond, mockLocalFile, mockUserConfig, mockLogger, emitFunc)
 		err := watcher.Prepare()
+
 		go watcher.Start(ctx, ctx)
 
 		// アサーション

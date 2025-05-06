@@ -35,6 +35,7 @@ func (s *Screenshot) SaveWithDialog(ctx context.Context, filename string, base64
 	if err != nil {
 		return false, failure.Translate(err, apperr.WailsError)
 	}
+
 	if path == "" {
 		return false, nil
 	}

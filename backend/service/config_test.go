@@ -15,16 +15,14 @@ import (
 	"go.uber.org/mock/gomock"
 )
 
-const validInstallPath = "install_path_test"
-
 //nolint:paralleltest
 func TestConfig_UpdateInstallPath(t *testing.T) {
 	ctrl := gomock.NewController(t)
 
 	// 準備
-	err := createGameClientPath()
+	installPath := t.TempDir()
+	err := createGameClientPath(installPath)
 	assert.NoError(t, err)
-	defer os.RemoveAll(validInstallPath)
 
 	t.Run("正常系", func(t *testing.T) {
 		mockUserConfig := repository.NewMockUserConfigStore(ctrl)
@@ -33,11 +31,11 @@ func TestConfig_UpdateInstallPath(t *testing.T) {
 
 		// テスト
 		c := NewConfig(nil, mockUserConfig, nil)
-		actual, err := c.UpdateInstallPath(validInstallPath)
+		actual, err := c.UpdateInstallPath(installPath)
 
 		// アサーション
 		assert.NoError(t, err)
-		assert.Equal(t, validInstallPath, actual.InstallPath)
+		assert.Equal(t, installPath, actual.InstallPath)
 	})
 
 	t.Run("異常系", func(t *testing.T) {
@@ -61,13 +59,8 @@ func TestConfig_UpdateInstallPath(t *testing.T) {
 func TestConfig_UpdateOptional(t *testing.T) {
 	ctrl := gomock.NewController(t)
 
-	// 準備
-	err := createGameClientPath()
-	assert.NoError(t, err)
-	defer os.RemoveAll(validInstallPath)
-
 	t.Run("正常系", func(t *testing.T) {
-		config := createInputConfig()
+		config := model.DefaultUserConfigV2()
 		config.FontSize = "small"
 		// Note: requiredな値を与えてもこれらの値はWriteUserConfigでは含まれない
 		actualWritten := model.DefaultUserConfigV2()
@@ -79,7 +72,7 @@ func TestConfig_UpdateOptional(t *testing.T) {
 
 		// テスト実行
 		c := NewConfig(nil, mockUserConfig, nil)
-		err = c.UpdateOptional(config)
+		err := c.UpdateOptional(config)
 
 		// アサーション
 		assert.NoError(t, err)
@@ -219,19 +212,8 @@ func TestConfig_RemoveAlertPlayer(t *testing.T) {
 	})
 }
 
-func createInputConfig() model.UserConfigV2 {
-	config := model.DefaultUserConfigV2()
-	config.InstallPath = validInstallPath
-
-	return config
-}
-
-func createGameClientPath() error {
-	if err := os.MkdirAll(validInstallPath, fs.ModePerm); err != nil {
-		return err
-	}
-
-	gameExePath := filepath.Join(validInstallPath, GameExeName)
+func createGameClientPath(installPath string) error {
+	gameExePath := filepath.Join(installPath, GameExeName)
 
 	return os.WriteFile(gameExePath, []byte{}, fs.ModePerm)
 }

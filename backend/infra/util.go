@@ -24,11 +24,14 @@ func readJSON[T any](path string, defaulValue T) (T, error) {
 		if errors.Is(err, os.ErrNotExist) {
 			return defaulValue, failure.New(apperr.FileNotExist, errCtx)
 		}
+
 		return defaulValue, failure.Wrap(err, errCtx)
 	}
+
 	errCtx["target"] = string(f)
 
 	err = json.Unmarshal(f, &defaulValue)
+
 	return defaulValue, failure.Wrap(err, errCtx)
 }
 
@@ -38,15 +41,19 @@ func writeJSON[T any](path string, target T) error {
 	errCtx := failure.Context{"path": path, "target": string(marshaled)}
 
 	_ = os.MkdirAll(filepath.Dir(path), 0o755)
+
 	f, err := os.Create(path)
 	if err != nil {
 		return failure.Wrap(err, errCtx)
 	}
+
+	//nolint: errcheck
 	defer f.Close()
 
 	encoder := json.NewEncoder(f)
 	encoder.SetIndent("", "  ")
 	err = encoder.Encode(target)
+
 	return failure.Wrap(err, errCtx)
 }
 
@@ -55,6 +62,7 @@ func prettyJSON(str string) string {
 	if err := json.Indent(&buf, []byte(str), "", "    "); err != nil {
 		return str
 	}
+
 	return buf.String()
 }
 
@@ -65,20 +73,22 @@ func writeData(path string, target []byte) error {
 	if err != nil {
 		return failure.Wrap(err)
 	}
+	//nolint: errcheck
 	defer f.Close()
 
 	_, err = f.Write(target)
+
 	return failure.Wrap(err)
 }
 
-func makeRange(min, max int) []int {
-	if min > max {
+func makeRange(start, end int) []int {
+	if start > end {
 		return []int{}
 	}
 
-	a := make([]int, max-min)
+	a := make([]int, end-start)
 	for i := range a {
-		a[i] = min + i
+		a[i] = start + i
 	}
 
 	return a
@@ -130,12 +140,14 @@ func toSnakeCase(s string) string {
 	for i, r := range runes {
 		if !unicode.IsUpper(r) {
 			result = append(result, r)
+
 			continue
 		}
 
 		if i > 0 && unicode.IsLower(runes[i-1]) {
 			result = append(result, '_')
 		}
+
 		result = append(result, unicode.ToLower(r))
 	}
 

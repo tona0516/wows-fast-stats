@@ -26,6 +26,7 @@ func NewLogger(
 ) *Logger {
 	zerolog.TimeFieldFormat = time.DateTime
 	level, err := zerolog.ParseLevel(logLevel)
+
 	if err != nil {
 		zerolog.SetGlobalLevel(zerolog.InfoLevel)
 	} else {
@@ -42,11 +43,7 @@ func NewLogger(
 
 	var logFile *os.File
 	if len(appName) > 0 {
-		logFile, _ = os.OpenFile(
-			appName+".log",
-			os.O_APPEND|os.O_CREATE|os.O_WRONLY,
-			0o664,
-		)
+		logFile, _ = os.Open(appName + ".log")
 	}
 
 	multi := zerolog.MultiLevelWriter(consoleWriter, &reportWriter, logFile)

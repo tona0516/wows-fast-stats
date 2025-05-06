@@ -68,6 +68,7 @@ func (c *Config) UpdateInstallPath(path string) (model.UserConfigV2, error) {
 	if err != nil {
 		return config, err
 	}
+
 	config.InstallPath = path
 
 	// write
@@ -80,15 +81,18 @@ func (c *Config) UpdateOptional(config model.UserConfigV2) error {
 	if err != nil {
 		return err
 	}
+
 	config.InstallPath = saved.InstallPath
 
 	// write
 	err = c.userConfig.SaveV2(config)
+
 	return err
 }
 
 func (c *Config) AlertPlayers() ([]model.AlertPlayer, error) {
 	players, err := c.alertPlayer.GetV1()
+
 	return players, err
 }
 
@@ -101,10 +105,12 @@ func (c *Config) UpdateAlertPlayer(player model.AlertPlayer) ([]model.AlertPlaye
 	}
 
 	var isMatched bool
+
 	for i, v := range players {
 		if player.AccountID == v.AccountID {
 			players[i] = player
 			isMatched = true
+
 			break
 		}
 	}
@@ -125,10 +131,12 @@ func (c *Config) RemoveAlertPlayer(accountID int) ([]model.AlertPlayer, error) {
 	}
 
 	var isMatched bool
+
 	for i, v := range players {
 		if accountID == v.AccountID {
 			players = players[:i+copy(players[i:], players[i+1:])]
 			isMatched = true
+
 			break
 		}
 	}
@@ -142,6 +150,7 @@ func (c *Config) RemoveAlertPlayer(accountID int) ([]model.AlertPlayer, error) {
 
 func (c *Config) SearchPlayer(prefix string) model.Accounts {
 	result, _ := c.accountFetcher.Search(prefix)
+
 	return result
 }
 

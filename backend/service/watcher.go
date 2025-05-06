@@ -54,6 +54,7 @@ func (w *Watcher) Prepare() error {
 	}
 
 	w.config = config
+
 	return nil
 }
 
@@ -71,11 +72,13 @@ func (w *Watcher) Start(appCtx context.Context, cancelCtx context.Context) {
 			if err != nil {
 				if failure.Is(err, apperr.FileNotExist) || failure.Is(err, apperr.ReplayDirNotFoundError) {
 					w.eventsEmitFunc(appCtx, EventEnd)
+
 					continue
 				}
 
 				w.logger.Error(err, nil)
 				w.eventsEmitFunc(appCtx, EventErr, apperr.Unwrap(err))
+
 				return
 			}
 
@@ -86,6 +89,7 @@ func (w *Watcher) Start(appCtx context.Context, cancelCtx context.Context) {
 			}
 
 			latestHash = hash
+
 			w.eventsEmitFunc(appCtx, EventStart)
 		}
 	}

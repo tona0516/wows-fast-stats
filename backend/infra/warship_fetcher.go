@@ -54,6 +54,7 @@ func (f *WarshipFetcher) Fetch() (model.Warships, error) {
 	err = errors.Join(err, ships.Error)
 
 	expectedStats := <-expectedStatsChan
+
 	err = errors.Join(err, expectedStats.Error)
 	if err != nil {
 		return f.toError(cache, errCache, err)
@@ -88,6 +89,7 @@ func (f *WarshipFetcher) encycShips(channel chan model.Result[model.Warships]) {
 	warships := make(model.Warships)
 
 	var mu sync.Mutex
+
 	fetch := func(page int) (int, error) {
 		res, err := f.fetchEncycShips(page)
 		if err != nil {
@@ -106,21 +108,25 @@ func (f *WarshipFetcher) encycShips(channel chan model.Result[model.Warships]) {
 			}
 			mu.Unlock()
 		}
+
 		return res.Meta.PageTotal, nil
 	}
 
 	first := 1
+
 	pageTotal, err := fetch(first)
 	if err != nil {
 		channel <- model.Result[model.Warships]{
 			Error: err,
 		}
+
 		return
 	}
 
 	pages := makeRange(first+1, pageTotal+1)
 	err = doParallel(pages, func(page int) error {
 		_, err := fetch(page)
+
 		return err
 	})
 
@@ -137,11 +143,13 @@ func (f *WarshipFetcher) expectedStats(channel chan model.Result[NumbersExpected
 	}()
 
 	var body NumbersExpectedStats
+
 	_, err := f.numbersClient.R().
 		SetSuccessResult(&body).
 		Get("/personal/rating/expected/json/")
 	if err != nil {
 		result.Error = failure.Wrap(err)
+
 		return
 	}
 
@@ -150,6 +158,7 @@ func (f *WarshipFetcher) expectedStats(channel chan model.Result[NumbersExpected
 
 func (f *WarshipFetcher) readCache() (warshipsCache, error) {
 	cache, err := read[warshipsCache](f.db, f.localDataKeyName)
+
 	return cache, failure.Translate(err, apperr.FetchShipError)
 }
 
@@ -158,12 +167,14 @@ func (f *WarshipFetcher) saveCache(warships model.Warships, gameVersion string) 
 		warships:    warships,
 		gameVersion: gameVersion,
 	}
+
 	return write(f.db, f.localDataKeyName, cache)
 }
 
 func (f *WarshipFetcher) toError(cache warshipsCache, errCache error, err error) (model.Warships, error) {
 	if errCache != nil {
 		err = errors.Join(errCache, failure.Translate(err, apperr.FetchShipError))
+
 		return cache.warships, err
 	}
 

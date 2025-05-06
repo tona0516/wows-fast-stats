@@ -37,16 +37,19 @@ func (f *RawStatFetcher) Fetch(accountIDs []int) (model.RawStats, error) {
 	go f.shipStats(accountIDs, shipStatsChan)
 
 	var err error
+
 	accountInfoResult := <-accountInfoChan
 	err = errors.Join(err, accountInfoResult.Error)
 
 	shipStatsResult := <-shipStatsChan
+
 	err = errors.Join(err, shipStatsResult.Error)
 	if err != nil {
 		return nil, failure.Translate(err, apperr.FetchRawStatError)
 	}
 
 	rawStats := make(model.RawStats)
+
 	for accountID, info := range accountInfoResult.Value {
 		rawStat := model.RawStat{
 			Ship: map[int]model.ShipStat{},
@@ -89,6 +92,7 @@ func (f *RawStatFetcher) accountInfo(accountIDs []int, channel chan model.Result
 	}()
 
 	var body WGAccountInfoResponse
+
 	_, err := f.wargamingClient.R().
 		SetSuccessResult(&body).
 		AddQueryParam("account_id", strings.Join(strAccountIDs, ",")).
@@ -102,6 +106,7 @@ func (f *RawStatFetcher) accountInfo(accountIDs []int, channel chan model.Result
 		Get("/wows/account/info/")
 	if err != nil {
 		result.Error = failure.Wrap(err)
+
 		return
 	}
 
@@ -113,10 +118,12 @@ func (f *RawStatFetcher) shipStats(
 	channel chan model.Result[shipStatsAccountsMap],
 ) {
 	shipStatsAccounts := make(shipStatsAccountsMap)
+
 	var mu sync.Mutex
 
 	err := doParallel(accountIDs, func(accountID int) error {
 		var body WGShipsStatsResponse
+
 		_, err := f.wargamingClient.R().
 			SetSuccessResult(&body).
 			AddQueryParam("account_id", strconv.Itoa(accountID)).

@@ -47,18 +47,10 @@ func NewApp(config Config) *App {
 	}
 }
 
-func (a *App) onStartup(ctx context.Context) {
-	a.ctx = ctx
-	runtime.LogSetLogLevel(ctx, logger.INFO)
-
-	if err := a.inject(a.config); err != nil {
-		log.Fatalln(err)
-	}
-}
-
 func (a *App) MigrateIfNeeded() error {
 	if err := a.configMigratorService.ExecuteIfNeeded(); err != nil {
 		a.logger.Error(err, nil)
+
 		return apperr.Unwrap(err)
 	}
 
@@ -68,6 +60,7 @@ func (a *App) MigrateIfNeeded() error {
 func (a *App) StartWatching() error {
 	if err := a.watcherService.Prepare(); err != nil {
 		a.logger.Error(err, nil)
+
 		return apperr.Unwrap(err)
 	}
 
@@ -89,12 +82,14 @@ func (a *App) Battle() (model.Battle, error) {
 	userConfig, err := a.configService.User()
 	if err != nil {
 		a.logger.Error(err, nil)
+
 		return result, apperr.Unwrap(err)
 	}
 
 	result, err = a.battleService.Get(a.ctx, userConfig)
 	if err != nil {
 		a.logger.Error(err, nil)
+
 		return result, apperr.Unwrap(err)
 	}
 
@@ -172,6 +167,7 @@ func (a *App) ManualScreenshot(filename string, base64Data string) (bool, error)
 	if err != nil {
 		a.logger.Error(err, nil)
 	}
+
 	return saved, apperr.Unwrap(err)
 }
 
@@ -180,6 +176,7 @@ func (a *App) AutoScreenshot(filename string, base64Data string) error {
 	if err != nil {
 		a.logger.Error(err, nil)
 	}
+
 	return apperr.Unwrap(err)
 }
 
@@ -237,7 +234,17 @@ func (a *App) LogInfo(message string, contexts map[string]string) {
 
 func (a *App) LatestRelease() (model.LatestRelease, error) {
 	latestRelease, err := a.versionFetcher.Fetch()
+
 	return latestRelease, apperr.Unwrap(err)
+}
+
+func (a *App) onStartup(ctx context.Context) {
+	a.ctx = ctx
+	runtime.LogSetLogLevel(ctx, logger.INFO)
+
+	if err := a.inject(a.config); err != nil {
+		log.Fatalln(err)
+	}
 }
 
 func (a *App) inject(config Config) error {
@@ -271,6 +278,7 @@ func (a *App) inject(config Config) error {
 		SetTimeout(time.Duration(a.config.Wargaming.TimeoutSec) * time.Second).
 		OnBeforeRequest(func(client *req.Client, req *req.Request) error {
 			rateLimiter.Take()
+
 			return nil
 		}).
 		AddCommonRetryCondition(func(resp *req.Response, err error) bool {

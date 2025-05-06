@@ -84,6 +84,7 @@ func TestScreenshot_SaveWithDialog(t *testing.T) {
 
 		// アサーション
 		assert.False(t, saved)
+
 		code, ok := failure.CodeOf(err)
 		assert.True(t, ok)
 		assert.Equal(t, apperr.WailsError, code)

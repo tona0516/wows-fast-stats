@@ -31,6 +31,7 @@ func (f *VersionFetcher) Fetch() (model.LatestRelease, error) {
 	//nolint:godox
 	// TODO: https://docs.github.com/rest/overview/resources-in-the-rest-api#rate-limiting
 	var body GHLatestRelease
+
 	_, err = f.githubClient.R().
 		SetSuccessResult(&body).
 		Get("/repos/tona0516/wows-fast-stats/releases/latest")

@@ -192,6 +192,7 @@ func matchInfo(
 				bottomTier = 1
 			}
 		}
+
 		if bottomTier > tier {
 			bottomTier = tier
 			if bottomTier > 8 {
@@ -300,6 +301,7 @@ func playerShipScore(
 	if !ok {
 		return 0.75
 	}
+
 	shipType := warship.Type
 	shipTier := float64(warship.Tier)
 
@@ -374,6 +376,7 @@ func playerShipScore(
 		} else {
 			shipAAScore = floorU4(shipAAScore - 1)
 		}
+
 		shipAAScore = limitedValue(shipAAScore, 0.2, -0.3)
 	}
 
@@ -384,6 +387,7 @@ func playerShipScore(
 	if shipType == ShipTypeCV {
 		shipWinRateScore *= 1.3
 	}
+
 	shipWinRateScore = floorU4(shipWinRateScore * std.influence * 1.5)
 
 	return floorU4(shipDamageScore + shipServiveScore + shipAAScore + shipWinRateScore)
@@ -394,6 +398,7 @@ func antiAirCoefficient(
 	shipAvgPlanesKilled float64,
 ) float64 {
 	specialAAShips := specialAAShips()
+
 	specialAAShip, ok := specialAAShips[shipID]
 	if !ok {
 		return 1.0
@@ -403,6 +408,7 @@ func antiAirCoefficient(
 	if planesKilledRatio > 1 {
 		planesKilledRatio = floorU4((planesKilledRatio-1)/4) + 1
 	}
+
 	limitedPlanesKilledRatio := limitedValue(planesKilledRatio, 1.2, 1)
 
 	return limitedPlanesKilledRatio + specialAAShip.coef
@@ -419,10 +425,12 @@ func shipClassScore(
 	if !ok {
 		return result
 	}
+
 	shipTier := warship.Tier
 
 	// 特別補正艦はベースをその値にする
 	specialShipScores := specialShipScores()
+
 	score, ok := specialShipScores[shipID]
 	if ok {
 		result = score
@@ -454,11 +462,13 @@ func correctBasedOnMatch(
 	if !ok {
 		return result
 	}
+
 	shipTier := warship.Tier
 
 	if shipTier == topTier {
 		result *= 1.1
 	}
+
 	if shipTier == bottomTier {
 		result *= 0.9
 	}
@@ -466,27 +476,32 @@ func correctBasedOnMatch(
 	return result
 }
 
-func limitedValue(value float64, max float64, min float64) float64 {
-	if value > max {
-		return max
+func limitedValue(value float64, upperLimit float64, lowerLimit float64) float64 {
+	if value > upperLimit {
+		return upperLimit
 	}
-	if value < min {
-		return min
+
+	if value < lowerLimit {
+		return lowerLimit
 	}
+
 	return value
 }
 
 func floorU4(value float64) float64 {
 	pow := math.Pow(10, 4)
+
 	return floor(value*pow) / pow
 }
 
 func floor(value float64) float64 {
 	result, _ := decimal.NewFromFloat(value).Floor().Float64()
+
 	return result
 }
 
 func round(value float64, digits uint16) float64 {
 	result, _ := decimal.NewFromFloat(value).Round(int32(digits)).Float64()
+
 	return result
 }

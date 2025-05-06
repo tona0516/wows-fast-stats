@@ -15,6 +15,7 @@ type TempArenaInfo struct {
 
 func (t *TempArenaInfo) AccountNames() []string {
 	accountNames := make([]string, 0)
+
 	for _, v := range t.Vehicles {
 		// Note: Bot name in corp or ramdom battle.
 		if strings.HasPrefix(v.Name, ":") && strings.HasSuffix(v.Name, ":") {

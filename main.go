@@ -22,6 +22,7 @@ var Base64ConfigYml string
 func main() {
 	if isAlreadyRunning() {
 		os.Exit(0)
+
 		return
 	}
 
@@ -51,6 +52,7 @@ func main() {
 
 func isAlreadyRunning() bool {
 	ownPid := os.Getpid()
+
 	ownPidInfo, err := ps.FindProcess(ownPid)
 	if err != nil {
 		// Note: 可用性のためfalseを返す
@@ -64,9 +66,11 @@ func isAlreadyRunning() bool {
 	}
 
 	isRunning := false
+
 	for _, p := range processes {
 		if p.Pid() != ownPid && p.Executable() == ownPidInfo.Executable() {
 			isRunning = true
+
 			break
 		}
 	}

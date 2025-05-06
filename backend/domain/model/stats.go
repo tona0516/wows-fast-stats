@@ -13,9 +13,11 @@ func NewStats(
 	warships Warships,
 ) *Stats {
 	var useShipStats ShipStat
+
 	for shipID, v := range rawStat.Ship {
 		if shipID == useShipID {
 			useShipStats = v
+
 			break
 		}
 	}
@@ -32,12 +34,14 @@ func (s *Stats) PR(category StatsCategory, pattern StatsPattern) float64 {
 	switch category {
 	case StatsCategoryShip:
 		values, _ := s.statsValues(pattern)
+
 		battles := values.Battles
 		if battles == 0 {
 			return -1
 		}
 
 		warship := s.warships[s.useShipID]
+
 		pr, err := NewPR(
 			avgDamage(values.DamageDealt, battles),
 			avgKill(values.Frags, battles),
@@ -81,6 +85,7 @@ func (s *Stats) PR(category StatsCategory, pattern StatsPattern) float64 {
 
 			allBattles += battles
 		}
+
 		if allBattles == 0 {
 			return -1
 		}
@@ -105,6 +110,7 @@ func (s *Stats) PR(category StatsCategory, pattern StatsPattern) float64 {
 
 func (s *Stats) Battles(category StatsCategory, pattern StatsPattern) uint {
 	ship, player := s.statsValues(pattern)
+
 	switch category {
 	case StatsCategoryShip:
 		return ship.Battles
@@ -117,6 +123,7 @@ func (s *Stats) Battles(category StatsCategory, pattern StatsPattern) uint {
 
 func (s *Stats) AvgDamage(category StatsCategory, pattern StatsPattern) float64 {
 	ship, player := s.statsValues(pattern)
+
 	switch category {
 	case StatsCategoryShip:
 		return avgDamage(ship.DamageDealt, ship.Battles)
@@ -129,6 +136,7 @@ func (s *Stats) AvgDamage(category StatsCategory, pattern StatsPattern) float64 
 
 func (s *Stats) MaxDamage(category StatsCategory, pattern StatsPattern) MaxDamage {
 	ship, player := s.statsValues(pattern)
+
 	switch category {
 	case StatsCategoryShip:
 		return MaxDamage{
@@ -137,6 +145,7 @@ func (s *Stats) MaxDamage(category StatsCategory, pattern StatsPattern) MaxDamag
 	case StatsCategoryOverall:
 		shipID := player.MaxDamageDealtShipID
 		warship := s.warships[shipID]
+
 		return MaxDamage{
 			ShipID:   shipID,
 			ShipName: warship.Name,
@@ -156,6 +165,7 @@ func (s *Stats) KdRate(category StatsCategory, pattern StatsPattern) float64 {
 	)
 
 	ship, player := s.statsValues(pattern)
+
 	switch category {
 	case StatsCategoryShip:
 		survivedBattles = ship.SurvivedBattles
@@ -177,6 +187,7 @@ func (s *Stats) KdRate(category StatsCategory, pattern StatsPattern) float64 {
 
 func (s *Stats) AvgKill(category StatsCategory, pattern StatsPattern) float64 {
 	ship, player := s.statsValues(pattern)
+
 	switch category {
 	case StatsCategoryShip:
 		return avgKill(ship.Frags, ship.Battles)
@@ -189,6 +200,7 @@ func (s *Stats) AvgKill(category StatsCategory, pattern StatsPattern) float64 {
 
 func (s *Stats) AvgExp(category StatsCategory, pattern StatsPattern) float64 {
 	ship, player := s.statsValues(pattern)
+
 	switch category {
 	case StatsCategoryShip:
 		return div(ship.Xp, ship.Battles)
@@ -201,6 +213,7 @@ func (s *Stats) AvgExp(category StatsCategory, pattern StatsPattern) float64 {
 
 func (s *Stats) WinRate(category StatsCategory, pattern StatsPattern) float64 {
 	ship, player := s.statsValues(pattern)
+
 	switch category {
 	case StatsCategoryShip:
 		return winRate(ship.Wins, ship.Battles)
@@ -213,6 +226,7 @@ func (s *Stats) WinRate(category StatsCategory, pattern StatsPattern) float64 {
 
 func (s *Stats) SurvivedRate(category StatsCategory, pattern StatsPattern) float64 {
 	ship, player := s.statsValues(pattern)
+
 	switch category {
 	case StatsCategoryShip:
 		return percentage(ship.SurvivedBattles, ship.Battles)
@@ -225,6 +239,7 @@ func (s *Stats) SurvivedRate(category StatsCategory, pattern StatsPattern) float
 
 func (s *Stats) WinSurvivedRate(category StatsCategory, pattern StatsPattern) float64 {
 	ship, player := s.statsValues(pattern)
+
 	switch category {
 	case StatsCategoryShip:
 		return percentage(ship.SurvivedWins, ship.Wins)
@@ -244,6 +259,7 @@ func (s *Stats) LoseSurvivedRate(category StatsCategory, pattern StatsPattern) f
 	)
 
 	ship, player := s.statsValues(pattern)
+
 	switch category {
 	case StatsCategoryShip:
 		battles = ship.Battles
@@ -258,21 +274,25 @@ func (s *Stats) LoseSurvivedRate(category StatsCategory, pattern StatsPattern) f
 	}
 
 	loses := battles - wins
+
 	return percentage(survivedBattles-survivedWins, loses)
 }
 
 func (s *Stats) MainBatteryHitRate(pattern StatsPattern) float64 {
 	ship, _ := s.statsValues(pattern)
+
 	return percentage(ship.MainBattery.Hits, ship.MainBattery.Shots)
 }
 
 func (s *Stats) TorpedoesHitRate(pattern StatsPattern) float64 {
 	ship, _ := s.statsValues(pattern)
+
 	return percentage(ship.Torpedoes.Hits, ship.Torpedoes.Shots)
 }
 
 func (s *Stats) PlanesKilled(pattern StatsPattern) float64 {
 	ship, _ := s.statsValues(pattern)
+
 	return div(ship.PlanesKilled, ship.Battles)
 }
 
@@ -311,7 +331,9 @@ func (s *Stats) UsingTierRate(
 
 		values := s.statsValuesForm(v, pattern)
 		tier := warship.Tier
+
 		battles := values.Battles
+
 		switch {
 		case tier >= 1 && tier <= 4:
 			tierGroupMap["low"] += battles
@@ -369,6 +391,7 @@ func (s *Stats) PlatoonRate(
 	switch category {
 	case StatsCategoryShip:
 		stats := s.useShipStats
+
 		return platoonRate(
 			stats.Pvp.Battles,
 			stats.PvpSolo.Battles,
@@ -377,6 +400,7 @@ func (s *Stats) PlatoonRate(
 		)
 	case StatsCategoryOverall:
 		stats := s.rawStat.Overall
+
 		return platoonRate(
 			stats.Pvp.Battles,
 			stats.PvpSolo.Battles,
@@ -430,6 +454,7 @@ func platoonRate(allBattles uint, soloBattles uint, div2Battles uint, div3Battle
 	soloRate := div(soloBattles, allBattles) * 1
 	div2Rate := div(div2Battles, allBattles) * 2
 	div3Rate := div(div3Battles, allBattles) * 3
+
 	return soloRate + div2Rate + div3Rate
 }
 

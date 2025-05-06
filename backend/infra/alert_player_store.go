@@ -26,11 +26,13 @@ func NewAlertPlayerStore(db *badger.DB) *AlertPlayerStore {
 
 func (s *AlertPlayerStore) IsExistV0() bool {
 	_, err := os.Stat(s.v0Path)
+
 	return err == nil
 }
 
 func (s *AlertPlayerStore) IsExistV1() bool {
 	_, err := read[[]model.AlertPlayer](s.db, s.keyName)
+
 	return !isErrKeyNotFound(err)
 }
 
@@ -54,8 +56,9 @@ func (s *AlertPlayerStore) GetV1() ([]model.AlertPlayer, error) {
 
 func (s *AlertPlayerStore) SaveV1(players []model.AlertPlayer) error {
 	if len(players) == 0 {
-		return delete(s.db, s.keyName)
+		return remove(s.db, s.keyName)
 	}
+
 	return write(s.db, s.keyName, players)
 }
 

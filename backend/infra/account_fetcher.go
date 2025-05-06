@@ -20,6 +20,7 @@ func NewAccountFetcher(
 
 func (f *AccountFetcher) Search(prefix string) (model.Accounts, error) {
 	var body WGAccountListResponse
+
 	_, err := f.wargamingClient.R().
 		SetSuccessResult(&body).
 		AddQueryParam("search", prefix).
@@ -40,6 +41,7 @@ func (f *AccountFetcher) Search(prefix string) (model.Accounts, error) {
 
 func (f *AccountFetcher) Fetch(playerNames []string) (model.Accounts, error) {
 	var body WGAccountListResponse
+
 	_, err := f.wargamingClient.R().
 		SetSuccessResult(&body).
 		AddQueryParam("search", strings.Join(playerNames, ",")).
