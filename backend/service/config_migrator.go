@@ -97,6 +97,7 @@ func (m *ConfigMigrator) toV2() error {
 			return err
 		}
 
+		//nolint: mnd
 		if err := m.storage.WriteDataVersion(2); err != nil {
 			return err
 		}

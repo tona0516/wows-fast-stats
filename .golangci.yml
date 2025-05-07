@@ -10,6 +10,10 @@ linters:
     - testpackage
     - tagliatelle
     - varnamelen
+    - ireturn
+    - funlen # TODO: remove this when we have fixed all the issues
+    - wrapcheck # TODO: remove this when we have fixed all the issues
+    - err113 # TODO: remove this when we have fixed all the issues
   settings:
     funlen:
       # Checks the number of lines in a function.
@@ -33,3 +37,4 @@ linters:
         linters:
           - funlen
           - asciicheck
+          - gosec

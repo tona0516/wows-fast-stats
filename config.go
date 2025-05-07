@@ -4,6 +4,8 @@ type Config struct {
 	App struct {
 		Name   string `yaml:"name"`
 		Semver string `yaml:"semver"`
+		Width  int    `yaml:"width"`
+		Height int    `yaml:"height"`
 	} `yaml:"app"`
 	Wargaming struct {
 		URL          string `yaml:"url"`

@@ -1,5 +1,7 @@
 package model
 
+import "math"
+
 type Nation string
 
 func nations() []string {
@@ -28,5 +30,5 @@ func (n Nation) Priority() int {
 		}
 	}
 
-	return 999
+	return math.MaxInt
 }

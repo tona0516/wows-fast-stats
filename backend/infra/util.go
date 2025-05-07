@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"os"
+	"path"
 	"path/filepath"
 	"reflect"
 	"strings"
@@ -16,10 +17,12 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-func readJSON[T any](path string, defaulValue T) (T, error) {
-	errCtx := failure.Context{"path": path}
+const dirPerm = os.FileMode(0o755)
 
-	f, err := os.ReadFile(path)
+func readJSON[T any](name string, defaulValue T) (T, error) {
+	errCtx := failure.Context{"path": name}
+
+	f, err := os.ReadFile(path.Clean(name))
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
 			return defaulValue, failure.New(apperr.FileNotExist, errCtx)
@@ -35,14 +38,14 @@ func readJSON[T any](path string, defaulValue T) (T, error) {
 	return defaulValue, failure.Wrap(err, errCtx)
 }
 
-func writeJSON[T any](path string, target T) error {
+func writeJSON[T any](name string, target T) error {
 	//nolint:errchkjson
 	marshaled, _ := json.Marshal(target)
-	errCtx := failure.Context{"path": path, "target": string(marshaled)}
+	errCtx := failure.Context{"path": name, "target": string(marshaled)}
 
-	_ = os.MkdirAll(filepath.Dir(path), 0o755)
+	_ = os.MkdirAll(filepath.Dir(name), dirPerm)
 
-	f, err := os.Create(path)
+	f, err := os.Create(path.Clean(name))
 	if err != nil {
 		return failure.Wrap(err, errCtx)
 	}
@@ -66,10 +69,10 @@ func prettyJSON(str string) string {
 	return buf.String()
 }
 
-func writeData(path string, target []byte) error {
-	_ = os.MkdirAll(filepath.Dir(path), 0o755)
+func writeData(name string, target []byte) error {
+	_ = os.MkdirAll(filepath.Dir(name), dirPerm)
 
-	f, err := os.Create(path)
+	f, err := os.Create(path.Clean(name))
 	if err != nil {
 		return failure.Wrap(err)
 	}

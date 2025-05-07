@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path"
 	"time"
 
 	"github.com/imroc/req/v3"
@@ -43,7 +44,7 @@ func NewLogger(
 
 	var logFile *os.File
 	if len(appName) > 0 {
-		logFile, _ = os.Open(appName + ".log")
+		logFile, _ = os.Open(path.Clean(appName + ".log"))
 	}
 
 	multi := zerolog.MultiLevelWriter(consoleWriter, &reportWriter, logFile)

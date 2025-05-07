@@ -1,5 +1,7 @@
 package model
 
+import "math"
+
 type ShipType string
 
 const (
@@ -53,5 +55,5 @@ func (s ShipType) Priority() int {
 		}
 	}
 
-	return 999
+	return math.MaxInt
 }

@@ -28,7 +28,7 @@ func TestPlayers_Sorter(t *testing.T) {
 	for i := range 100 {
 		actual := make(Players, len(expected))
 		copy(actual, expected)
-		//nolint:gosec
+
 		rand.New(rand.NewSource(int64(i)))
 		rand.Shuffle(len(actual), func(i, j int) { actual[i], actual[j] = actual[j], actual[i] })
 

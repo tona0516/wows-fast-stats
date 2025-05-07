@@ -1,6 +1,8 @@
 app:
   name: wows-fast-stats
   semver: 0.18.0
+  width: 1280
+  height: 720
 wargaming:
   url: https://api.worldofwarships.asia
   max_retry: 2

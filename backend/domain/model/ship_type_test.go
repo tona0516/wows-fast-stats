@@ -1,6 +1,7 @@
 package model
 
 import (
+	"math"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -25,5 +26,5 @@ func TestShipType_Priority(t *testing.T) {
 	assert.Equal(t, 3, ShipTypeDD.Priority())
 	assert.Equal(t, 4, ShipTypeSS.Priority())
 	assert.Equal(t, 5, ShipTypeAUX.Priority())
-	assert.Equal(t, 999, ShipTypeNONE.Priority())
+	assert.Equal(t, math.MaxInt, ShipTypeNONE.Priority())
 }

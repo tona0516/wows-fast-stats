@@ -6,14 +6,14 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-func makeRange(min, max int) []int {
-	if min > max {
+func makeRange(start, end int) []int {
+	if start > end {
 		return []int{}
 	}
 
-	a := make([]int, max-min)
+	a := make([]int, end-start)
 	for i := range a {
-		a[i] = min + i
+		a[i] = start + i
 	}
 
 	return a
