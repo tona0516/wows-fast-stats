@@ -22,12 +22,11 @@ const (
 func TestScreenshot_SaveForAuto(t *testing.T) {
 	t.Parallel()
 
-	ctrl := gomock.NewController(t)
-
 	t.Run("正常系", func(t *testing.T) {
 		t.Parallel()
 
 		// 準備
+		ctrl := gomock.NewController(t)
 		screenshotPath := filepath.Join("screenshot", filename)
 		mockLocalFile := repository.NewMockLocalFile(ctrl)
 		mockLocalFile.EXPECT().SaveScreenshot(screenshotPath, base64Data).Return(nil).AnyTimes()
@@ -48,12 +47,11 @@ func TestScreenshot_SaveForAuto(t *testing.T) {
 func TestScreenshot_SaveWithDialog(t *testing.T) {
 	t.Parallel()
 
-	ctrl := gomock.NewController(t)
-
 	t.Run("正常系", func(t *testing.T) {
 		t.Parallel()
 
 		// 準備
+		ctrl := gomock.NewController(t)
 		screenshotPath := filepath.Join("directory", filename)
 		mockLocalFile := repository.NewMockLocalFile(ctrl)
 		mockLocalFile.EXPECT().SaveScreenshot(screenshotPath, base64Data).Return(nil).AnyTimes()
@@ -73,6 +71,7 @@ func TestScreenshot_SaveWithDialog(t *testing.T) {
 
 	t.Run("異常系", func(t *testing.T) {
 		t.Parallel()
+
 		// 準備
 		s := NewScreenshot(nil)
 		s.SaveFileDialog = func(ctx context.Context, dialogOptions runtime.SaveDialogOptions) (string, error) {

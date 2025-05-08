@@ -11,7 +11,6 @@ import (
 
 func TestConfigMigrator_Migrate(t *testing.T) {
 	t.Parallel()
-	ctrl := gomock.NewController(t)
 
 	t.Run("正常系", func(t *testing.T) {
 		t.Parallel()
@@ -34,6 +33,7 @@ func TestConfigMigrator_Migrate(t *testing.T) {
 			},
 		}
 
+		ctrl := gomock.NewController(t)
 		mockUserConfig := repository.NewMockUserConfigStore(ctrl)
 		mockAlertPlayer := repository.NewMockAlertPlayerStore(ctrl)
 		mockStorage := repository.NewMockStorage(ctrl)
@@ -73,12 +73,11 @@ func TestConfigMigrator_Migrate(t *testing.T) {
 func TestConfigMigrator_toV1(t *testing.T) {
 	t.Parallel()
 
-	ctrl := gomock.NewController(t)
-
 	t.Run("正常系_マイグレ不要_バージョン1以上", func(t *testing.T) {
 		t.Parallel()
 
 		// 準備
+		ctrl := gomock.NewController(t)
 		mockStorage := repository.NewMockStorage(ctrl)
 		mockStorage.EXPECT().DataVersion().Return(uint(1), nil)
 
@@ -94,6 +93,7 @@ func TestConfigMigrator_toV1(t *testing.T) {
 		t.Parallel()
 
 		// 準備
+		ctrl := gomock.NewController(t)
 		mockUserConfig := repository.NewMockUserConfigStore(ctrl)
 		mockAlertPlayer := repository.NewMockAlertPlayerStore(ctrl)
 		mockStorage := repository.NewMockStorage(ctrl)
@@ -135,6 +135,7 @@ func TestConfigMigrator_toV1(t *testing.T) {
 			},
 		}
 
+		ctrl := gomock.NewController(t)
 		mockUserConfig := repository.NewMockUserConfigStore(ctrl)
 		mockAlertPlayer := repository.NewMockAlertPlayerStore(ctrl)
 		mockStorage := repository.NewMockStorage(ctrl)
@@ -167,12 +168,11 @@ func TestConfigMigrator_toV1(t *testing.T) {
 func TestConfigMigrator_toV2(t *testing.T) {
 	t.Parallel()
 
-	ctrl := gomock.NewController(t)
-
 	t.Run("正常系_マイグレ不要_バージョン2以上", func(t *testing.T) {
 		t.Parallel()
 
 		// 準備
+		ctrl := gomock.NewController(t)
 		mockStorage := repository.NewMockStorage(ctrl)
 		mockStorage.EXPECT().DataVersion().Return(uint(2), nil)
 
@@ -206,6 +206,7 @@ func TestConfigMigrator_toV2(t *testing.T) {
 			},
 		}
 
+		ctrl := gomock.NewController(t)
 		mockUserConfig := repository.NewMockUserConfigStore(ctrl)
 		mockStorage := repository.NewMockStorage(ctrl)
 
@@ -280,6 +281,7 @@ func TestConfigMigrator_toV2(t *testing.T) {
 
 		expected := model.FromUserConfigV1(v1)
 
+		ctrl := gomock.NewController(t)
 		mockUserConfig := repository.NewMockUserConfigStore(ctrl)
 		mockStorage := repository.NewMockStorage(ctrl)
 

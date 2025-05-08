@@ -40,7 +40,8 @@ tasks:
     desc: unit testing
     cmds:
       - arch-go
-      - go test -cover ./... -count=1
+      - go clean -testcache
+      - go test -cover ./...
       - "{{.NPM}} run test"
   dev:
     desc: run app in development mode
