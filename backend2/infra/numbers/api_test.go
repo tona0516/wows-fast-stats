@@ -42,6 +42,7 @@ func TestAPI_Fetch(t *testing.T) {
 	actual, err := api.Fetch()
 
 	assert.NoError(t, err)
+
 	expected := Expected{
 		Data: map[int]ExpectedValues{
 			1234: {

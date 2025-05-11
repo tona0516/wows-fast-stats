@@ -32,6 +32,7 @@ func (e *Expected) UnmarshalJSON(b []byte) error {
 	}
 
 	es := make(map[int]ExpectedValues)
+
 	for key, value := range data {
 		shipID, err := strconv.Atoi(key)
 		if err != nil {

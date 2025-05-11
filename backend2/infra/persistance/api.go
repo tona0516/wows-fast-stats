@@ -16,9 +16,7 @@ const (
 
 type API interface {
 	GetUserSetting() (UserSetting, error)
-	GetAlertPlayers() (AlertPlayers, error)
 	SaveUserSetting(us UserSetting) error
-	SaveAlertPlayers(ap AlertPlayers) error
 }
 
 type GetConfigDirFunc func() (string, error)
@@ -36,16 +34,8 @@ func (a *api) GetUserSetting() (UserSetting, error) {
 	if err != nil {
 		return UserSetting{}, failure.Wrap(err)
 	}
+
 	return readJSON[UserSetting](path)
-}
-
-func (a *api) GetAlertPlayers() (AlertPlayers, error) {
-	path, err := a.getPath(alertPlayersFileName)
-	if err != nil {
-		return AlertPlayers{}, failure.Wrap(err)
-	}
-
-	return readJSON[AlertPlayers](path)
 }
 
 func (a *api) SaveUserSetting(us UserSetting) error {
@@ -53,15 +43,8 @@ func (a *api) SaveUserSetting(us UserSetting) error {
 	if err != nil {
 		return failure.Wrap(err)
 	}
-	return writeJSON(path, us)
-}
 
-func (a *api) SaveAlertPlayers(ap AlertPlayers) error {
-	path, err := a.getPath(alertPlayersFileName)
-	if err != nil {
-		return failure.Wrap(err)
-	}
-	return writeJSON(path, ap)
+	return writeJSON(path, us)
 }
 
 func (a *api) getPath(name string) (string, error) {
@@ -76,6 +59,7 @@ func (a *api) getPath(name string) (string, error) {
 func readJSON[T any](path string) (T, error) {
 	var result T
 
+	//nolint:gosec
 	f, err := os.ReadFile(path)
 	if err != nil {
 		return result, failure.Wrap(err)
@@ -89,18 +73,22 @@ func readJSON[T any](path string) (T, error) {
 }
 
 func writeJSON[T any](path string, data T) error {
+	//nolint:gosec
 	if err := os.MkdirAll(filepath.Dir(path), os.ModePerm); err != nil {
 		return failure.Wrap(err)
 	}
 
+	//nolint:gosec
 	f, err := os.Create(path)
 	if err != nil {
 		return failure.Wrap(err)
 	}
+	//nolint:errcheck
 	defer f.Close()
 
 	encoder := json.NewEncoder(f)
 	encoder.SetIndent("", "  ")
+
 	if err = encoder.Encode(data); err != nil {
 		return failure.Wrap(err)
 	}
