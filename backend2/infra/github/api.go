@@ -6,6 +6,7 @@ import (
 
 	"github.com/imroc/req/v3"
 	"github.com/morikuni/failure"
+	"github.com/samber/do"
 )
 
 //go:generate mockgen -source=$GOFILE -destination ../mock/$GOPACKAGE/$GOFILE -package $GOPACKAGE
@@ -17,8 +18,8 @@ type api struct {
 	client *req.Client
 }
 
-func NewGithub(client *req.Client) API {
-	return &api{client: client}
+func NewGithub(i *do.Injector) API {
+	return &api{client: do.MustInvokeNamed[*req.Client](i, "GithubAPIClient")}
 }
 
 func (a *api) FetchLatestRelease() (LatestRelease, error) {
