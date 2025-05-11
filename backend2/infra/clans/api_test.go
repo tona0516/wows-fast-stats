@@ -4,15 +4,15 @@ import (
 	"net/http"
 	"testing"
 	"wfs/backend/apperr"
+	"wfs/backend2/testutil"
 
 	"github.com/imroc/req/v3"
-	"github.com/jarcoal/httpmock"
 	"github.com/morikuni/failure"
 	"github.com/samber/do"
 	"github.com/stretchr/testify/assert"
 )
 
-const baseURL = "https://test.com"
+const provideName = "ClansAPIClient"
 
 func TestClansWargaming_FetchAutoComplete(t *testing.T) {
 	t.Parallel()
@@ -20,30 +20,26 @@ func TestClansWargaming_FetchAutoComplete(t *testing.T) {
 	t.Run("正常系", func(t *testing.T) {
 		t.Parallel()
 
-		client := req.C().SetBaseURL(baseURL)
-		httpmock.ActivateNonDefault(client.GetClient())
-		httpmock.RegisterResponder(
-			http.MethodGet,
-			baseURL+"/api/search/autocomplete/?search=-K2-&type=clans",
-			func(request *http.Request) (*http.Response, error) {
-				return httpmock.NewJsonResponse(http.StatusOK, map[string]interface{}{
-					"search_autocomplete_result": []interface{}{
-						map[string]interface{}{
-							"tag":       "-K2-",
-							"name":      "神風-s",
-							"id":        2000036632,
-							"hex_color": "#cc9966",
-						},
+		injector := do.New()
+		do.ProvideNamed(injector, provideName, func(i *do.Injector) (*req.Client, error) {
+			server := testutil.NewStubServer(t, http.StatusOK, map[string]interface{}{
+				"search_autocomplete_result": []interface{}{
+					map[string]interface{}{
+						"tag":       "-K2-",
+						"name":      "神風-s",
+						"id":        2000036632,
+						"hex_color": "#cc9966",
 					},
-					"_meta_": map[string]interface{}{
-						"collection":  "search_autocomplete_result",
-						"total_clans": 1,
-					},
-				})
+				},
+				"_meta_": map[string]interface{}{
+					"collection":  "search_autocomplete_result",
+					"total_clans": 1,
+				},
 			})
 
-		injector := do.New()
-		do.ProvideNamed(injector, "ClansAPIClient", func(i *do.Injector) (*req.Client, error) {
+			client := req.C()
+			client.SetBaseURL(server.URL)
+
 			return client, nil
 		})
 
@@ -60,24 +56,20 @@ func TestClansWargaming_FetchAutoComplete(t *testing.T) {
 	t.Run("異常系", func(t *testing.T) {
 		t.Parallel()
 
-		client := req.C().SetBaseURL(baseURL)
-		httpmock.ActivateNonDefault(client.GetClient())
-		httpmock.RegisterResponder(
-			http.MethodGet,
-			baseURL+"/api/search/autocomplete/?search=a&type=clans",
-			func(request *http.Request) (*http.Response, error) {
-				return httpmock.NewJsonResponse(http.StatusConflict, map[string]interface{}{
-					"status": "error",
-					"data": map[string]interface{}{
-						"search": []interface{}{
-							"Length must be between 2 and 70.",
-						},
+		injector := do.New()
+		do.ProvideNamed(injector, provideName, func(i *do.Injector) (*req.Client, error) {
+			server := testutil.NewStubServer(t, http.StatusConflict, map[string]interface{}{
+				"status": "error",
+				"data": map[string]interface{}{
+					"search": []interface{}{
+						"Length must be between 2 and 70.",
 					},
-				})
+				},
 			})
 
-		injector := do.New()
-		do.ProvideNamed(injector, "ClansAPIClient", func(i *do.Injector) (*req.Client, error) {
+			client := req.C()
+			client.SetBaseURL(server.URL)
+
 			return client, nil
 		})
 
