@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/imroc/req/v3"
+	"github.com/samber/do"
 )
 
 //go:generate mockgen -source=$GOFILE -destination ../mock/$GOPACKAGE/$GOFILE -package $GOPACKAGE
@@ -15,7 +16,7 @@ type API interface {
 	ClansAccountInfo(accountIDs []int) (ClansAccountInfo, error)
 	ClansInfo(clanIDs []int) (ClansInfo, error)
 	ShipsStats(accountID int) (ShipsStats, error)
-	EncycShips(pageNo int) (EncycShips, int, error)
+	EncycShips(pageNo int) (EncycShips, error)
 	BattleArenas() (BattleArenas, error)
 	BattleTypes() (BattleTypes, error)
 	GameVersion() (string, error)
@@ -26,10 +27,10 @@ type api struct {
 	appID  string
 }
 
-func NewAPI(client *req.Client, appID string) API {
+func NewAPI(i *do.Injector) API {
 	return &api{
-		client: client,
-		appID:  appID,
+		client: do.MustInvokeNamed[*req.Client](i, "WargamingAPIClient"),
+		appID:  do.MustInvokeNamed[string](i, "WargamingAppID"),
 	}
 }
 
@@ -155,7 +156,7 @@ func (w *api) ShipsStats(accountID int) (ShipsStats, error) {
 	return result.Data, err
 }
 
-func (w *api) EncycShips(pageNo int) (EncycShips, int, error) {
+func (w *api) EncycShips(pageNo int) (EncycShips, error) {
 	result := EncycShips{}
 
 	params := map[string]string{
@@ -170,7 +171,7 @@ func (w *api) EncycShips(pageNo int) (EncycShips, int, error) {
 		SetSuccessResult(&result).
 		Get("/wows/encyclopedia/ships/")
 
-	return result, result.Meta.PageTotal, err
+	return result, err
 }
 
 func (w *api) BattleArenas() (BattleArenas, error) {
