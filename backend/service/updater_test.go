@@ -25,8 +25,7 @@ func TestUpdater_IsUpdatable(t *testing.T) {
 		response := data.GHLatestRelease{TagName: "2.0.0", HTMLURL: "https://hoge.com"}
 		mockGithub.EXPECT().LatestRelease().Return(response, nil)
 
-		env := data.Env{Semver: "1.0.0"}
-		updater := NewUpdater(env, mockGithub, nil)
+		updater := NewUpdater("1.0.0", mockGithub, nil)
 
 		// テスト
 		actual, err := updater.IsUpdatable()
@@ -46,8 +45,7 @@ func TestUpdater_IsUpdatable(t *testing.T) {
 		response := data.GHLatestRelease{TagName: "1.0.0", HTMLURL: "https://hoge.com"}
 		mockGithub.EXPECT().LatestRelease().Return(response, nil)
 
-		env := data.Env{Semver: "1.0.0"}
-		updater := NewUpdater(env, mockGithub, nil)
+		updater := NewUpdater("1.0.0", mockGithub, nil)
 
 		// テスト
 		actual, err := updater.IsUpdatable()
@@ -67,8 +65,7 @@ func TestUpdater_IsUpdatable(t *testing.T) {
 		expected := failure.New(apperr.HTTPRequestError)
 		mockGithub.EXPECT().LatestRelease().Return(data.GHLatestRelease{}, expected)
 
-		env := data.Env{Semver: "1.0.0"}
-		updater := NewUpdater(env, mockGithub, nil)
+		updater := NewUpdater("1.0.0", mockGithub, nil)
 
 		// テスト
 		_, err := updater.IsUpdatable()

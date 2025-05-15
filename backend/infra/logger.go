@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"os"
 	"time"
-	"wfs/backend/data"
 	"wfs/backend/repository"
 
 	"github.com/rs/zerolog"
@@ -15,21 +14,27 @@ import (
 )
 
 type Logger struct {
-	zlog         zerolog.Logger
-	env          data.Env
+	appName      string
+	semver       string
+	logLevel     string
 	alertDiscord repository.DiscordInterface
 	infoDiscord  repository.DiscordInterface
 
+	zlog   zerolog.Logger
 	ownIGN string
 }
 
 func NewLogger(
-	env data.Env,
+	appName string,
+	semver string,
+	logLevel string,
 	alertDiscord repository.DiscordInterface,
 	infoDiscord repository.DiscordInterface,
 ) *Logger {
 	return &Logger{
-		env:          env,
+		appName:      appName,
+		semver:       semver,
+		logLevel:     logLevel,
 		alertDiscord: alertDiscord,
 		infoDiscord:  infoDiscord,
 	}
@@ -42,10 +47,11 @@ func (l *Logger) SetOwnIGN(ownIGN string) {
 func (l *Logger) Init(appCtx context.Context) {
 	zerolog.TimeFieldFormat = time.DateTime
 
-	if l.env.IsDev {
-		zerolog.SetGlobalLevel(zerolog.DebugLevel)
-	} else {
+	level, err := zerolog.ParseLevel(l.logLevel)
+	if err != nil {
 		zerolog.SetGlobalLevel(zerolog.InfoLevel)
+	} else {
+		zerolog.SetGlobalLevel(level)
 	}
 
 	consoleWriter := zerolog.ConsoleWriter{
@@ -60,7 +66,7 @@ func (l *Logger) Init(appCtx context.Context) {
 		infoDiscord:  l.infoDiscord,
 	}
 	logFile, _ := os.OpenFile(
-		l.env.AppName+".log",
+		l.appName+".log",
 		os.O_APPEND|os.O_CREATE|os.O_WRONLY,
 		0o664,
 	)
@@ -70,7 +76,7 @@ func (l *Logger) Init(appCtx context.Context) {
 	l.zlog = zerolog.New(multi).
 		With().
 		Timestamp().
-		Str("semver", l.env.Semver).
+		Str("semver", l.semver).
 		Logger()
 }
 

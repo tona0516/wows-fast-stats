@@ -1,0 +1,86 @@
+# https://taskfile.dev
+
+version: "3"
+
+vars:
+  NPM: npm --prefix ./frontend
+  CONFIG_PROD: config.prod.yml
+  CONFIG_DEV: config.dev.yml
+
+tasks:
+  setup:
+    desc: setup project
+    cmds:
+      - for:
+          - github.com/wailsapp/wails/v2/cmd/wails@v2.9.3
+          - github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest
+          - go.uber.org/mock/mockgen@latest
+          - github.com/arch-go/arch-go@latest
+          - github.com/mikefarah/yq/v4@latest
+        cmd: go install {{.ITEM}}
+  gen-mock:
+    desc: generate mocks
+    cmds:
+      - rm -rf backend/domain/mock
+      - rm -rf backend/infra/mock
+      - go generate ./...
+  lint:
+    desc: lint
+    cmds:
+      - golangci-lint run
+      - "{{.NPM}} run check"
+      - "{{.NPM}} run lint"
+  fmt:
+    desc: format
+    cmds:
+      - golangci-lint run --fix
+      - go fmt
+      - "{{.NPM}} run fmt"
+  test:
+    desc: unit testing
+    cmds:
+      - arch-go
+      - go clean -testcache
+      - go test -cover ./...
+      - "{{.NPM}} run test"
+  dev:
+    desc: run app in development mode
+    vars:
+      BASE64_CONFIG:
+        sh: yq -n 'load("{{.CONFIG_PROD}}") * load("{{.CONFIG_DEV}}")' | base64
+    cmds:
+      - wails dev -ldflags="-X main.Base64ConfigYml={{.BASE64_CONFIG}}"
+  build:
+    desc: build
+    deps: [test]
+    vars:
+      BASE64_CONFIG:
+        sh: cat {{.CONFIG_PROD}} | base64
+      CONFIG_JSON:
+        sh: yq {{.CONFIG_PROD}} | yq -o=json
+      CONFIG_MAP:
+        ref: "fromJson .CONFIG_JSON" # https://github.com/go-task/task/issues/2217
+    cmds:
+      - wails build -ldflags="-X main.Base64ConfigYml={{.BASE64_CONFIG}}" -platform windows/amd64 -o {{.CONFIG_MAP.app.name}}-{{.CONFIG_MAP.app.semver}}.exe -trimpath -webview2 embed
+  chbtl:
+    desc: change battle
+    vars:
+      TEST_REPLAY_PATH: ./test_install_dir/replays
+      TEMP_ARENA_INFO: tempArenaInfo.json
+    cmds:
+      - cp {{.TEST_REPLAY_PATH}}/$(ls {{.TEST_REPLAY_PATH}} | grep -v {{.TEMP_ARENA_INFO}} | fzf) {{.TEST_REPLAY_PATH}}/{{.TEMP_ARENA_INFO}}
+  clean:
+    desc: clean project
+    cmds:
+      - for:
+          - config/
+          - cache/
+          - temp_arena_info/
+          - screenshot/
+          - persistent_data/
+        cmd: rm -rf {{.ITEM}}
+  update:
+    desc: update dependencies
+    cmds:
+      - go get
+      - "{{.NPM}} update"

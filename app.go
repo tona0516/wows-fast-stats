@@ -30,7 +30,7 @@ func newVolatileData() volatileData {
 //nolint:containedctx
 type App struct {
 	ctx            context.Context
-	env            data.Env
+	semver         string
 	logger         repository.LoggerInterface
 	config         service.Config
 	screenshot     service.Screenshot
@@ -42,7 +42,7 @@ type App struct {
 }
 
 func NewApp(
-	env data.Env,
+	semver string,
 	logger repository.LoggerInterface,
 	config service.Config,
 	screenshot service.Screenshot,
@@ -52,7 +52,7 @@ func NewApp(
 	configMigrator service.ConfigMigrator,
 ) *App {
 	return &App{
-		env:            env,
+		semver:         semver,
 		logger:         logger,
 		config:         config,
 		screenshot:     screenshot,
@@ -197,7 +197,7 @@ func (a *App) AutoScreenshot(filename string, base64Data string) error {
 }
 
 func (a *App) Semver() string {
-	return a.env.Semver
+	return a.semver
 }
 
 func (a *App) AlertPlayers() ([]data.AlertPlayer, error) {

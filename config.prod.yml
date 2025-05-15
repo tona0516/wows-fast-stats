@@ -1,0 +1,32 @@
+app:
+  name: wows-fast-stats
+  semver: 0.17.0
+  width: 1280
+  height: 720
+wargaming:
+  url: https://api.worldofwarships.asia
+  max_retry: 2
+  timeout_sec: 10
+  rate_limit_rps: 10
+  app_id: e25e1a2af190880c9e33d3be7cc5313d
+unofficial_wargaming:
+  url: https://clans.worldofwarships.asia
+  max_retry: 2
+  timeout_sec: 10
+numbers:
+  url: https://api.wows-numbers.com
+  max_retry: 2
+  timeout_sec: 10
+github:
+  url: https://api.github.com
+  max_retry: 2
+  timeout_sec: 10
+discord:
+  alert_url: https://discord.com/api/webhooks/1206175524372873236/ADQt8o5Expg3Kkh45eFdXve99JMIqv39j4vwcxB77SdseOtItONrDYbhosmW_3N2nRG1
+  info_url: https://discord.com/api/webhooks/1206175770838442024/_c997qrc_7qsXnKlak60ow_Pmuw7kL2hSn0fK0MnarT6414On6r2ZrR4J4TTa38JrxoU
+  max_retry: 2
+  timeout_sec: 10
+local:
+  storage_path: ./persistent_data
+logger:
+  zerolog_log_level: info

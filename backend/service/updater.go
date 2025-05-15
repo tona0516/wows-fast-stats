@@ -9,18 +9,18 @@ import (
 )
 
 type Updater struct {
-	env    data.Env
+	semver string
 	github repository.GithubInterface
 	logger repository.LoggerInterface
 }
 
 func NewUpdater(
-	env data.Env,
+	semver string,
 	github repository.GithubInterface,
 	logger repository.LoggerInterface,
 ) *Updater {
 	return &Updater{
-		env:    env,
+		semver: semver,
 		github: github,
 		logger: logger,
 	}
@@ -29,7 +29,7 @@ func NewUpdater(
 func (u *Updater) IsUpdatable() (data.GHLatestRelease, error) {
 	var latestRelease data.GHLatestRelease
 
-	c, err := semver.NewConstraint("> " + u.env.Semver)
+	c, err := semver.NewConstraint("> " + u.semver)
 	if err != nil {
 		return latestRelease, failure.Wrap(err)
 	}

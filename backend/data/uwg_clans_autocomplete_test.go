@@ -21,5 +21,5 @@ func TestUWGClansAutocomplete_HexColor(t *testing.T) {
 	}
 
 	assert.Equal(t, "#000000", instance.HexColor("TEST"))
-	assert.Equal(t, "", instance.HexColor("INVALID"))
+	assert.Empty(t, instance.HexColor("INVALID"))
 }

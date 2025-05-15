@@ -1,8 +1,9 @@
+version: "2"
+
 # https://golangci-lint.run/usage/linters/
 linters:
-  enable-all: true
+  default: all
   disable:
-    - exportloopref # deprecated
     - wrapcheck
     - forbidigo
     - funlen
@@ -13,8 +14,6 @@ linters:
     - varnamelen
     - noctx
     - nlreturn
-    - gci # Conflict goimports
-    - goimports # Conflict goimports
     - testpackage
     - asciicheck
     - interfacebloat
