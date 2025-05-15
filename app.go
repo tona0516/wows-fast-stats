@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 	"slices"
 	"time"
@@ -11,10 +12,13 @@ import (
 	"wfs/backend/domain/repository"
 	"wfs/backend/infra"
 	"wfs/backend/service"
+	"wfs/backend2/infra/persistence"
+	"wfs/backend2/usecase"
 
 	"github.com/dgraph-io/badger/v4"
 	"github.com/imroc/req/v3"
 	"github.com/morikuni/failure"
+	"github.com/samber/do"
 	"github.com/wailsapp/wails/v2/pkg/logger"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 	"go.uber.org/ratelimit"
@@ -39,11 +43,14 @@ type App struct {
 	configMigratorService *service.ConfigMigrator
 
 	cancelWacthFunc context.CancelFunc
+
+	getBattleUsecase *usecase.GetBattle
 }
 
-func NewApp(config Config) *App {
+func NewApp(config Config, injector *do.Injector) *App {
 	return &App{
-		config: config,
+		config:           config,
+		getBattleUsecase: do.MustInvoke[*usecase.GetBattle](injector),
 	}
 }
 
@@ -91,6 +98,16 @@ func (a *App) Battle() (model.Battle, error) {
 		a.logger.Error(err, nil)
 
 		return result, apperr.Unwrap(err)
+	}
+
+	persistence := persistence.NewAPI(func() (string, error) {
+		return "", nil
+	})
+	info, err := persistence.GetTempArenaInfo(userConfig.InstallPath)
+	fmt.Println(info)
+
+	if err == nil {
+		_, _ = a.getBattleUsecase.Invoke(info)
 	}
 
 	return result, nil

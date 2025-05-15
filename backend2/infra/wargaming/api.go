@@ -27,11 +27,11 @@ type api struct {
 	appID  string
 }
 
-func NewAPI(i *do.Injector) API {
+func NewAPI(i *do.Injector) (API, error) {
 	return &api{
 		client: do.MustInvokeNamed[*req.Client](i, "WargamingAPIClient"),
 		appID:  do.MustInvokeNamed[string](i, "WargamingAppID"),
-	}
+	}, nil
 }
 
 func (w *api) AccountInfo(accountIDs []int) (AccountInfo, error) {

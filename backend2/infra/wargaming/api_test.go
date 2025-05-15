@@ -49,7 +49,7 @@ func TestAPI_AccountInfo(t *testing.T) {
 		},
 	})
 
-	api := NewAPI(injector)
+	api, _ := NewAPI(injector)
 
 	accountID := 2010342809
 	result, err := api.AccountInfo([]int{accountID})
@@ -74,7 +74,7 @@ func TestAPI_AccountList(t *testing.T) {
 		},
 	})
 
-	api := NewAPI(injector)
+	api, _ := NewAPI(injector)
 	nickName := "tonango"
 	result, err := api.AccountList([]string{nickName})
 
@@ -99,7 +99,7 @@ func TestAPI_AccountListForSearch(t *testing.T) {
 		},
 	})
 
-	api := NewAPI(injector)
+	api, _ := NewAPI(injector)
 	nickName := "tonango"
 	result, err := api.AccountListForSearch(nickName)
 
@@ -123,7 +123,7 @@ func TestAPI_ClansAccountInfo(t *testing.T) {
 		},
 	})
 
-	api := NewAPI(injector)
+	api, _ := NewAPI(injector)
 	accountID := 2010342809
 	result, err := api.ClansAccountInfo([]int{accountID})
 
@@ -146,7 +146,7 @@ func TestAPI_ClansInfo(t *testing.T) {
 		},
 	})
 
-	api := NewAPI(injector)
+	api, _ := NewAPI(injector)
 	clanID := 2000036632
 	result, err := api.ClansInfo([]int{clanID})
 
@@ -175,7 +175,7 @@ func TestAPI_ShipsStats(t *testing.T) {
 		},
 	})
 
-	api := NewAPI(injector)
+	api, _ := NewAPI(injector)
 	accountID := 2010342809
 	result, err := api.ShipsStats(accountID)
 
@@ -205,7 +205,7 @@ func TestAPI_EncycShips(t *testing.T) {
 		},
 	})
 
-	api := NewAPI(injector)
+	api, _ := NewAPI(injector)
 	result, err := api.EncycShips(2)
 
 	assert.NoError(t, err)
@@ -241,7 +241,7 @@ func TestAPI_BattleArenas(t *testing.T) {
 		},
 	})
 
-	api := NewAPI(injector)
+	api, _ := NewAPI(injector)
 	result, err := api.BattleArenas()
 
 	assert.NoError(t, err)
@@ -271,7 +271,7 @@ func TestAPI_BattleTypes(t *testing.T) {
 		},
 	})
 
-	api := NewAPI(injector)
+	api, _ := NewAPI(injector)
 	result, err := api.BattleTypes()
 
 	assert.NoError(t, err)
@@ -293,7 +293,7 @@ func TestAPI_GameVersion(t *testing.T) {
 		},
 	})
 
-	api := NewAPI(injector)
+	api, _ := NewAPI(injector)
 	result, err := api.GameVersion()
 
 	assert.NoError(t, err)

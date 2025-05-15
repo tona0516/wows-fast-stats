@@ -43,8 +43,8 @@ func TestClansWargaming_FetchAutoComplete(t *testing.T) {
 			return client, nil
 		})
 
-		clansWargaming := NewAPI(injector)
-		result, err := clansWargaming.FetchAutoComplete("-K2-")
+		api, _ := NewAPI(injector)
+		result, err := api.FetchAutoComplete("-K2-")
 
 		assert.NoError(t, err)
 		assert.Equal(t, 1, len(result.SearchAutocompleteResult))
@@ -73,8 +73,8 @@ func TestClansWargaming_FetchAutoComplete(t *testing.T) {
 			return client, nil
 		})
 
-		clansWargaming := NewAPI(injector)
-		_, err := clansWargaming.FetchAutoComplete("a")
+		api, _ := NewAPI(injector)
+		_, err := api.FetchAutoComplete("a")
 
 		assert.Error(t, err)
 		assert.True(t, failure.Is(err, apperr.UWGAPIError))

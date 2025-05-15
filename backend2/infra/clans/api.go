@@ -18,8 +18,8 @@ type api struct {
 	client *req.Client
 }
 
-func NewAPI(i *do.Injector) API {
-	return &api{client: do.MustInvokeNamed[*req.Client](i, "ClansAPIClient")}
+func NewAPI(i *do.Injector) (API, error) {
+	return &api{client: do.MustInvokeNamed[*req.Client](i, "ClansAPIClient")}, nil
 }
 
 func (a *api) FetchAutoComplete(search string) (Autocomplete, error) {

@@ -40,7 +40,7 @@ func TestAPI_Fetch(t *testing.T) {
 		return client, nil
 	})
 
-	api := NewAPI(injector)
+	api, _ := NewAPI(injector)
 	actual, err := api.Fetch()
 
 	assert.NoError(t, err)

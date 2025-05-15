@@ -14,8 +14,8 @@ type api struct {
 	client *req.Client
 }
 
-func NewAPI(i *do.Injector) API {
-	return &api{client: do.MustInvokeNamed[*req.Client](i, "NumbersAPIClient")}
+func NewAPI(i *do.Injector) (API, error) {
+	return &api{client: do.MustInvokeNamed[*req.Client](i, "NumbersAPIClient")}, nil
 }
 
 func (a *api) Fetch() (Expected, error) {
