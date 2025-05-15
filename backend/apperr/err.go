@@ -38,6 +38,6 @@ func Unwrap(err error) error {
 		return err
 	}
 
-	//nolint:goerr113
+	//nolint:err113
 	return errors.New(code.ErrorCode())
 }

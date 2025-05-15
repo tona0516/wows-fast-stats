@@ -64,12 +64,6 @@ func NewApp(
 	}
 }
 
-func (a *App) onStartup(ctx context.Context) {
-	a.ctx = ctx
-	runtime.LogSetLogLevel(ctx, logger.INFO)
-	a.logger.Init(ctx)
-}
-
 func (a *App) MigrateIfNeeded() error {
 	if err := a.configMigrator.ExecuteIfNeeded(); err != nil {
 		a.logger.Error(err, nil)
@@ -251,4 +245,10 @@ func (a *App) LogInfo(message string, contexts map[string]string) {
 func (a *App) LatestRelease() (data.GHLatestRelease, error) {
 	latestRelease, err := a.updater.IsUpdatable()
 	return latestRelease, apperr.Unwrap(err)
+}
+
+func (a *App) onStartup(ctx context.Context) {
+	a.ctx = ctx
+	runtime.LogSetLogLevel(ctx, logger.INFO)
+	a.logger.Init(ctx)
 }

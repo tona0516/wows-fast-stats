@@ -78,11 +78,11 @@ func WithIsInsecure(isInsecure bool) ClientOption {
 	}
 }
 
-func (rb Client) GET() (http.Response, []byte, error) {
+func (rb Client) GET() (*http.Response, []byte, error) {
 	return do(rb, makeGetRequest)
 }
 
-func (rb Client) POST() (http.Response, []byte, error) {
+func (rb Client) POST() (*http.Response, []byte, error) {
 	return do(rb, makePostRequest)
 }
 
@@ -155,15 +155,14 @@ func makePostRequest(rb Client) (*http.Request, error) {
 	return req, nil
 }
 
-func do(rb Client, makeReqFunc func(rb Client) (*http.Request, error)) (http.Response, []byte, error) {
-	var res http.Response
+func do(rb Client, makeReqFunc func(rb Client) (*http.Request, error)) (*http.Response, []byte, error) {
 	var body []byte
 	errCtx := make(failure.Context)
 
 	client := makeClient(rb)
 	req, err := makeReqFunc(rb)
 	if err != nil {
-		return res, body, failure.Wrap(err)
+		return nil, body, failure.Wrap(err)
 	}
 
 	url := req.URL.Scheme + "://" + req.URL.Host
@@ -176,12 +175,12 @@ func do(rb Client, makeReqFunc func(rb Client) (*http.Request, error)) (http.Res
 
 	errCtx["url"] = url
 
-	_res, err := client.Do(req)
+	res, err := client.Do(req)
 	if err != nil {
 		return res, body, failure.Wrap(err, errCtx)
 	}
-	defer _res.Body.Close()
-	res = *_res
+	//nolint:errcheck
+	defer res.Body.Close()
 
 	errCtx["status_code"] = strconv.Itoa(res.StatusCode)
 
@@ -199,7 +198,7 @@ func do(rb Client, makeReqFunc func(rb Client) (*http.Request, error)) (http.Res
 	return res, body, failure.Wrap(err, errCtx)
 }
 
-func isError(res http.Response) bool {
+func isError(res *http.Response) bool {
 	code := res.StatusCode
 	return code > 399 && code < 600
 }

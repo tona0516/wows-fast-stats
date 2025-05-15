@@ -36,6 +36,7 @@ func writeJSON[T any](path string, target T) error {
 	if err != nil {
 		return failure.Wrap(err, errCtx)
 	}
+	//nolint:errcheck
 	defer f.Close()
 
 	encoder := json.NewEncoder(f)

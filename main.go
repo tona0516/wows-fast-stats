@@ -101,12 +101,12 @@ func getConfig() (Config, error) {
 func initApp(config Config) *App {
 	alertDiscord := infra.NewDiscord(infra.RequestConfig{
 		URL:     config.Discord.AlertURL,
-		Retry:   uint64(config.Discord.MaxRetry),
+		Retry:   config.Discord.MaxRetry,
 		Timeout: time.Duration(config.Discord.TimeoutSec) * time.Second,
 	})
 	infoDiscord := infra.NewDiscord(infra.RequestConfig{
 		URL:     config.Discord.InfoURL,
-		Retry:   uint64(config.Discord.MaxRetry),
+		Retry:   config.Discord.MaxRetry,
 		Timeout: time.Duration(config.Discord.TimeoutSec) * time.Second,
 	})
 
@@ -136,7 +136,7 @@ func initApp(config Config) *App {
 	wargaming := infra.NewWargaming(
 		infra.RequestConfig{
 			URL:     config.Wargaming.URL,
-			Retry:   uint64(config.Wargaming.MaxRetry),
+			Retry:   config.Wargaming.MaxRetry,
 			Timeout: time.Duration(config.Wargaming.TimeoutSec) * time.Second,
 		},
 		ratelimit.New(10), // TODO: onStartupで初期化するようにする
@@ -144,12 +144,12 @@ func initApp(config Config) *App {
 	)
 	uwargaming := infra.NewUnofficialWargaming(infra.RequestConfig{
 		URL:     config.UnofficialWargaming.URL,
-		Retry:   uint64(config.UnofficialWargaming.MaxRetry),
+		Retry:   config.UnofficialWargaming.MaxRetry,
 		Timeout: time.Duration(config.UnofficialWargaming.TimeoutSec) * time.Second,
 	})
 	numbers := infra.NewNumbers(infra.RequestConfig{
 		URL:     config.Numbers.URL,
-		Retry:   uint64(config.Numbers.MaxRetry),
+		Retry:   config.Numbers.MaxRetry,
 		Timeout: time.Duration(config.Numbers.TimeoutSec) * time.Second,
 	})
 	localFile := infra.NewLocalFile()
@@ -157,7 +157,7 @@ func initApp(config Config) *App {
 	unregistered := infra.NewUnregistered()
 	github := infra.NewGithub(infra.RequestConfig{
 		URL:     config.Github.URL,
-		Retry:   uint64(config.Github.MaxRetry),
+		Retry:   config.Github.MaxRetry,
 		Timeout: time.Duration(config.Github.TimeoutSec) * time.Second,
 	})
 

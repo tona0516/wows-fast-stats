@@ -46,6 +46,7 @@ func (l *LocalFile) SaveScreenshot(path string, base64Data string) error {
 	if err != nil {
 		return failure.Wrap(err)
 	}
+	//nolint:errcheck
 	defer f.Close()
 
 	_, err = f.Write(data)

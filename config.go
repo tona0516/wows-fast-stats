@@ -9,30 +9,30 @@ type Config struct {
 	} `yaml:"app"`
 	Wargaming struct {
 		URL          string `yaml:"url"`
-		MaxRetry     int    `yaml:"max_retry"`
+		MaxRetry     uint64 `yaml:"max_retry"`
 		TimeoutSec   int    `yaml:"timeout_sec"`
 		RateLimitRPS int    `yaml:"rate_limit_rps"`
 		AppID        string `yaml:"app_id"`
 	} `yaml:"wargaming"`
 	UnofficialWargaming struct {
 		URL        string `yaml:"url"`
-		MaxRetry   int    `yaml:"max_retry"`
+		MaxRetry   uint64 `yaml:"max_retry"`
 		TimeoutSec int    `yaml:"timeout_sec"`
 	} `yaml:"unofficial_wargaming"`
 	Numbers struct {
 		URL        string `yaml:"url"`
-		MaxRetry   int    `yaml:"max_retry"`
+		MaxRetry   uint64 `yaml:"max_retry"`
 		TimeoutSec int    `yaml:"timeout_sec"`
 	} `yaml:"numbers"`
 	Github struct {
 		URL        string `yaml:"url"`
-		MaxRetry   int    `yaml:"max_retry"`
+		MaxRetry   uint64 `yaml:"max_retry"`
 		TimeoutSec int    `yaml:"timeout_sec"`
 	} `yaml:"github"`
 	Discord struct {
 		AlertURL   string `yaml:"alert_url"`
 		InfoURL    string `yaml:"info_url"`
-		MaxRetry   int    `yaml:"max_retry"`
+		MaxRetry   uint64 `yaml:"max_retry"`
 		TimeoutSec int    `yaml:"timeout_sec"`
 	} `yaml:"discord"`
 	Local struct {

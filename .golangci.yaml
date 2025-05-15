@@ -22,3 +22,14 @@ linters:
     - revive
     - predeclared
     - mnd
+    - bodyclose
+    - godox
+  exclusions:
+    paths:
+      - _test\.go
+  settings:
+    gosec:
+      excludes:
+        - G301
+        - G302
+        - G304
