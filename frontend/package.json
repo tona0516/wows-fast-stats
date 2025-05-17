@@ -8,11 +8,12 @@
     "build": "vite build",
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.json",
-    "lint": "echo 'not implemented'",
-    "fmt": "echo 'not implemented'",
+    "lint": "biome lint ./src",
+    "fmt": "biome check --write ./src",
     "test": "jest --coverage=false"
   },
   "devDependencies": {
+    "@biomejs/biome": "1.9.4",
     "@sveltejs/vite-plugin-svelte": "^1.4.0",
     "@tsconfig/svelte": "^5.0.2",
     "@types/clone": "^2.1.2",

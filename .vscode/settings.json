@@ -1,16 +1,18 @@
 {
+    "editor.formatOnSave": true,
+    "typescript.tsdk": "./frontend/node_modules/typescript/lib",
+    "biome.lspBin": "frontend/node_modules/@biomejs/biome/bin/biome",
     "[svelte]": {
-        "javascript.preferences.importModuleSpecifier": "non-relative",
-        "typescript.preferences.importModuleSpecifier": "non-relative"
+        "editor.defaultFormatter": "biomejs.biome",
     },
     "[typescript]": {
-        "javascript.preferences.importModuleSpecifier": "non-relative",
-        "typescript.preferences.importModuleSpecifier": "non-relative"
+        "editor.defaultFormatter": "biomejs.biome",
     },
     "[javascript]": {
-        "javascript.preferences.importModuleSpecifier": "non-relative",
-        "typescript.preferences.importModuleSpecifier": "non-relative"
+        "editor.defaultFormatter": "biomejs.biome",
     },
-    "typescript.tsdk": "./frontend/node_modules/typescript/lib",
-    "makefile.configureOnOpen": false
+    "editor.codeActionsOnSave": {
+        "quickfix.biome": "always",
+        "source.organizeImports.biome": "always"
+    }
 }
