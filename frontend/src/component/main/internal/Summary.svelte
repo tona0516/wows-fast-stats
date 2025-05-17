@@ -1,9 +1,9 @@
 <script lang="ts">
-  import UkTable from "src/component/common/uikit/UkTable.svelte";
-  import { DispName } from "src/lib/DispName";
-  import type { Summary } from "src/lib/Summary";
+import UkTable from "src/component/common/uikit/UkTable.svelte";
+import { DispName } from "src/lib/DispName";
+import type { Summary } from "src/lib/Summary";
 
-  export let summary: Summary;
+export let summary: Summary;
 </script>
 
 <div class="uk-padding-small">

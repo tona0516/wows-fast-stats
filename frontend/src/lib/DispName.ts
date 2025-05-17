@@ -2,11 +2,11 @@ import { ArrayMap } from "src/lib/ArrayMap";
 import { FontSize } from "src/lib/FontSize";
 import type { RatingLevel } from "src/lib/RatingLevel";
 import type { SummaryShipType } from "src/lib/Summary";
-import {
-  type ColumnCategory,
-  type ShipType,
-  type StatsExtra,
-  type TierGroup,
+import type {
+  ColumnCategory,
+  ShipType,
+  StatsExtra,
+  TierGroup,
 } from "src/lib/types";
 
 enum PlayerNameColor {

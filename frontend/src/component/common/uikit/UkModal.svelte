@@ -1,6 +1,6 @@
 <script lang="ts">
-  // @ts-nocheck
-  export let id: string;
+// @ts-nocheck
+export let id: string;
 </script>
 
 <div {id} class="uk-flex-top uk-modal">

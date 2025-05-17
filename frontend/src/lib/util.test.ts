@@ -6,9 +6,8 @@ import {
   tierString,
 } from "src/lib/util";
 
-test("tierString", () => {
-  [
-    "",
+test("tierString - 正常系", () => {
+  const values = [
     "I",
     "II",
     "III",
@@ -20,55 +19,71 @@ test("tierString", () => {
     "IX",
     "X",
     "★",
-  ].forEach((expected, i) => {
-    expect(tierString(i)).toBe(expected);
-  });
+  ];
+
+  for (let i = 0; i < values.length; i++) {
+    const expected = values[i];
+    expect(tierString(i + 1)).toBe(expected);
+  }
+});
+
+test("tierString - 異常系", () => {
+  expect(tierString(0)).toBe(undefined);
+  expect(tierString(12)).toBe(undefined);
 });
 
 test("isShipType - 正常系", () => {
-  ["cv", "bb", "cl", "dd", "ss"].forEach((type) => {
-    if (!isShipType(type)) fail();
-  });
+  const values = ["cv", "bb", "cl", "dd", "ss"];
+  for (const value of values) {
+    if (!isShipType(value)) fail();
+  }
 });
 
 test("isShipType - 異常系", () => {
-  ["", "aux"].forEach((type) => {
-    if (isShipType(type)) fail();
-  });
+  const values = ["", "aux"];
+  for (const value of values) {
+    if (isShipType(value)) fail();
+  }
 });
 
 test("isDigitKey - 正常系", () => {
-  ["battles", "hit_rate", "avg_tier"].forEach((key) => {
-    if (!isDigitKey(key)) fail();
-  });
+  const values = ["battles", "hit_rate", "avg_tier"];
+  for (const value of values) {
+    if (!isDigitKey(value)) fail();
+  }
 });
 
 test("isDigitKey - 異常系", () => {
-  ["", "invalid"].forEach((key) => {
-    if (isDigitKey(key)) fail();
-  });
+  const values = ["", "invalid"];
+  for (const value of values) {
+    if (isDigitKey(value)) fail();
+  }
 });
 
 test("isShipKey - 正常系", () => {
-  ["battles", "hit_rate"].forEach((key) => {
-    if (!isShipKey(key)) fail();
-  });
+  const values = ["battles", "hit_rate"];
+  for (const value of values) {
+    if (!isShipKey(value)) fail();
+  }
 });
 
 test("isShipKey - 異常系", () => {
-  ["", "avg_tier"].forEach((key) => {
-    if (isShipKey(key)) fail();
-  });
+  const values = ["", "avg_tier"];
+  for (const value of values) {
+    if (isShipKey(value)) fail();
+  }
 });
 
 test("isOverallKey - 正常系", () => {
-  ["battles", "avg_tier"].forEach((key) => {
-    if (!isOverallKey(key)) fail();
-  });
+  const values = ["battles", "avg_tier"];
+  for (const value of values) {
+    if (!isOverallKey(value)) fail();
+  }
 });
 
 test("isOverallKey - 異常系", () => {
-  ["", "hit_rate"].forEach((key) => {
-    if (isOverallKey(key)) fail();
-  });
+  const values = ["", "hit_rate"];
+  for (const value of values) {
+    if (isOverallKey(value)) fail();
+  }
 });

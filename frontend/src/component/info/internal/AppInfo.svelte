@@ -1,26 +1,26 @@
 <script lang="ts">
-  import { Semver } from "wailsjs/go/main/App";
-  import iconApp from "src/assets/images/appicon.png";
-  import ExternalLink from "src/component/common/ExternalLink.svelte";
-  import UkIcon from "src/component/common/uikit/UkIcon.svelte";
+import iconApp from "src/assets/images/appicon.png";
+import ExternalLink from "src/component/common/ExternalLink.svelte";
+import UkIcon from "src/component/common/uikit/UkIcon.svelte";
+import { Semver } from "wailsjs/go/main/App";
 
-  const links = [
-    {
-      icon: "question",
-      url: "https://github.com/tona0516/wows-fast-stats/wiki/FAQ",
-      text: "FAQ",
-    },
-    {
-      icon: "twitter",
-      url: "https://twitter.com/tonango_0516",
-      text: "@tonango_0516",
-    },
-    {
-      icon: "github",
-      url: "https://github.com/tona0516/wows-fast-stats",
-      text: "tona0516/wows-fast-stats",
-    },
-  ];
+const links = [
+  {
+    icon: "question",
+    url: "https://github.com/tona0516/wows-fast-stats/wiki/FAQ",
+    text: "FAQ",
+  },
+  {
+    icon: "twitter",
+    url: "https://twitter.com/tonango_0516",
+    text: "@tonango_0516",
+  },
+  {
+    icon: "github",
+    url: "https://github.com/tona0516/wows-fast-stats",
+    text: "tona0516/wows-fast-stats",
+  },
+];
 </script>
 
 <div class="uk-padding-small">

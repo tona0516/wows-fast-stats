@@ -1,27 +1,27 @@
 <script lang="ts">
-  import UkIcon from "src/component/common/uikit/UkIcon.svelte";
-  import { Notifier } from "src/lib/Notifier";
-  import { storedConfig } from "src/stores";
-  import { OpenDirectory, UpdateUserConfig } from "wailsjs/go/main/App";
+import UkIcon from "src/component/common/uikit/UkIcon.svelte";
+import { Notifier } from "src/lib/Notifier";
+import { storedConfig } from "src/stores";
+import { OpenDirectory, UpdateUserConfig } from "wailsjs/go/main/App";
 
-  $: inputConfig = $storedConfig;
+$: inputConfig = $storedConfig;
 
-  const openDirectory = async (path: string) => {
-    try {
-      await OpenDirectory(path);
-    } catch (error) {
-      Notifier.failure(error);
-    }
-  };
+const openDirectory = async (path: string) => {
+  try {
+    await OpenDirectory(path);
+  } catch (error) {
+    Notifier.failure(error);
+  }
+};
 
-  const change = async () => {
-    try {
-      await UpdateUserConfig(inputConfig);
-    } catch (error) {
-      inputConfig = $storedConfig;
-      Notifier.failure(error);
-    }
-  };
+const change = async () => {
+  try {
+    await UpdateUserConfig(inputConfig);
+  } catch (error) {
+    inputConfig = $storedConfig;
+    Notifier.failure(error);
+  }
+};
 </script>
 
 <div class="uk-padding-small">

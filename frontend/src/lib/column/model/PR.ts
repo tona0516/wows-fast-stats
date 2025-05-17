@@ -3,7 +3,7 @@ import { CssClass } from "src/lib/CssClass";
 import { RatingInfo } from "src/lib/RatingLevel";
 import { AbstractStatsColumn } from "src/lib/column/intetface/AbstractStatsColumn";
 import type { ISummaryColumn } from "src/lib/column/intetface/ISummaryColumn";
-import { type StatsCategory } from "src/lib/types";
+import type { StatsCategory } from "src/lib/types";
 import type { data } from "wailsjs/go/models";
 
 export class PR extends AbstractStatsColumn<string> implements ISummaryColumn {

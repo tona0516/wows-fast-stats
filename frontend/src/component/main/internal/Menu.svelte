@@ -1,29 +1,29 @@
 <script lang="ts">
-  import UkIcon from "src/component/common/uikit/UkIcon.svelte";
-  import UkSpinner from "src/component/common/uikit/UkSpinner.svelte";
-  import { DispName } from "src/lib/DispName";
-  import { Notifier } from "src/lib/Notifier";
-  import { storedBattle, storedConfig } from "src/stores";
-  import { createEventDispatcher } from "svelte";
-  import { UpdateUserConfig } from "wailsjs/go/main/App";
-  import { WindowReloadApp } from "wailsjs/runtime/runtime";
+import UkIcon from "src/component/common/uikit/UkIcon.svelte";
+import UkSpinner from "src/component/common/uikit/UkSpinner.svelte";
+import { DispName } from "src/lib/DispName";
+import { Notifier } from "src/lib/Notifier";
+import { storedBattle, storedConfig } from "src/stores";
+import { createEventDispatcher } from "svelte";
+import { UpdateUserConfig } from "wailsjs/go/main/App";
+import { WindowReloadApp } from "wailsjs/runtime/runtime";
 
-  export let isScreenshotting: boolean;
+export let isScreenshotting: boolean;
 
-  $: inputConfig = $storedConfig;
-  $: disableScreenshot = isScreenshotting || $storedBattle?.meta === undefined;
+$: inputConfig = $storedConfig;
+$: disableScreenshot = isScreenshotting || $storedBattle?.meta === undefined;
 
-  const dispatch = createEventDispatcher();
+const dispatch = createEventDispatcher();
 
-  const onStatsPatternChanged = async () => {
-    try {
-      await UpdateUserConfig(inputConfig);
-    } catch (error) {
-      inputConfig.stats_pattern = $storedConfig.stats_pattern;
-      Notifier.failure(error);
-      return;
-    }
-  };
+const onStatsPatternChanged = async () => {
+  try {
+    await UpdateUserConfig(inputConfig);
+  } catch (error) {
+    inputConfig.stats_pattern = $storedConfig.stats_pattern;
+    Notifier.failure(error);
+    return;
+  }
+};
 </script>
 
 <select

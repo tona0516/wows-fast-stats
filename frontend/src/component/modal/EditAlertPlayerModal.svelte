@@ -1,32 +1,34 @@
 <script lang="ts">
-  import { AlertPatterns, UpdateAlertPlayer } from "wailsjs/go/main/App";
-  import type { data } from "wailsjs/go/models";
-  import UkModal from "src/component/common/uikit/UkModal.svelte";
-  import UIkit from "uikit";
-  import { ModalElementID } from "./ModalElementID";
-  import clone from "clone";
-  import { Notifier } from "src/lib/Notifier";
+import clone from "clone";
+import UkModal from "src/component/common/uikit/UkModal.svelte";
+import { Notifier } from "src/lib/Notifier";
+import UIkit from "uikit";
+import { AlertPatterns, UpdateAlertPlayer } from "wailsjs/go/main/App";
+import type { data } from "wailsjs/go/models";
+import { ModalElementID } from "./ModalElementID";
 
-  export let defaultAlertPlayer: data.AlertPlayer;
-  export let maxMemoLength: number;
+export let defaultAlertPlayer: data.AlertPlayer;
+export let maxMemoLength: number;
 
-  let target: data.AlertPlayer = clone(defaultAlertPlayer);
-  $: disableUpdateButton =
-    target.account_id === 0 || target.name === "" || target.pattern === "";
+let target: data.AlertPlayer = clone(defaultAlertPlayer);
+$: disableUpdateButton =
+  target.account_id === 0 || target.name === "" || target.pattern === "";
 
-  export const show = (_target: data.AlertPlayer) => {
-    target = _target;
-    const elem = document.getElementById(ModalElementID.EDIT_ALERT_PLAYER);
-    UIkit.modal(elem!).show();
-  };
+export const show = (_target: data.AlertPlayer) => {
+  target = _target;
+  const elem = document.getElementById(ModalElementID.EDIT_ALERT_PLAYER);
+  if (elem) {
+    UIkit.modal(elem).show();
+  }
+};
 
-  const update = async () => {
-    try {
-      await UpdateAlertPlayer(target);
-    } catch (error) {
-      Notifier.failure(error);
-    }
-  };
+const update = async () => {
+  try {
+    await UpdateAlertPlayer(target);
+  } catch (error) {
+    Notifier.failure(error);
+  }
+};
 </script>
 
 <UkModal id={ModalElementID.EDIT_ALERT_PLAYER}>

@@ -1,24 +1,24 @@
 <script lang="ts">
-  import { format, fromUnixTime } from "date-fns";
-  import UkIcon from "src/component/common/uikit/UkIcon.svelte";
-  import type { data } from "wailsjs/go/models";
+import { format, fromUnixTime } from "date-fns";
+import UkIcon from "src/component/common/uikit/UkIcon.svelte";
+import type { data } from "wailsjs/go/models";
 
-  export let meta: data.Meta;
+export let meta: data.Meta;
 
-  $: battleMetas = [
-    {
-      icon: "clock",
-      text: format(fromUnixTime(meta.unixtime), "yyyy/MM/dd HH:mm:ss"),
-    },
-    {
-      icon: "tag",
-      text: meta.type,
-    },
-    {
-      icon: "location",
-      text: meta.arena,
-    },
-  ];
+$: battleMetas = [
+  {
+    icon: "clock",
+    text: format(fromUnixTime(meta.unixtime), "yyyy/MM/dd HH:mm:ss"),
+  },
+  {
+    icon: "tag",
+    text: meta.type,
+  },
+  {
+    icon: "location",
+    text: meta.arena,
+  },
+];
 </script>
 
 <div class="uk-flex uk-flex-center">

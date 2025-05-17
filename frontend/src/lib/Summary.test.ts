@@ -47,10 +47,10 @@ test("calculate - invalid battle", () => {
     })(), // teamが1つ
   ];
 
-  battles.forEach((it) => {
+  for (const it of battles) {
     const actual = Summary.calculate(it, new Set(), new data.UserConfigV2());
     expect(actual).toBeUndefined();
-  });
+  }
 });
 
 test("calculate - all types, ship, pvp_all, excluded player", () => {
@@ -145,10 +145,10 @@ test("calculate - all types, ship, pvp_all, excluded player", () => {
 test("calculate - each ship type, overall, pvp_solo", () => {
   const extra: StatsExtra = "pvp_solo";
   const shipTypes = [...DispName.SHIP_TYPES.keys()];
-  const battles = 100,
-    pr = 1000,
-    damage = 10000,
-    winRate = 50;
+  const battles = 100;
+  const pr = 1000;
+  const damage = 10000;
+  const winRate = 50;
 
   const friends = shipTypes.map((it) => {
     const friend = makePlayer();
@@ -191,7 +191,7 @@ test("calculate - each ship type, overall, pvp_solo", () => {
 
   const summary = Summary.calculate(battle, new Set(), config);
 
-  shipTypes.forEach((shipType) => {
+  for (const shipType of shipTypes) {
     expect(summary?.values.get(shipType)?.friends).toEqual([
       "-",
       "-",
@@ -200,9 +200,9 @@ test("calculate - each ship type, overall, pvp_solo", () => {
       damage.toFixed(config.digit.damage),
       winRate.toFixed(config.digit.win_rate),
     ]);
-  });
+  }
 
-  shipTypes.forEach((shipType) => {
+  for (const shipType of shipTypes) {
     expect(summary?.values.get(shipType)?.diffs).toEqual([
       { colorCode: "", diff: "-" },
       { colorCode: "", diff: "-" },
@@ -211,5 +211,5 @@ test("calculate - each ship type, overall, pvp_solo", () => {
       { colorCode: "", diff: "-" },
       { colorCode: "", diff: "-" },
     ]);
-  });
+  }
 });

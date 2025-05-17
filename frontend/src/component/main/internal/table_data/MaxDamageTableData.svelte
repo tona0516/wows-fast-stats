@@ -1,13 +1,13 @@
 <script lang="ts">
-  import ExternalLink from "src/component/common/ExternalLink.svelte";
-  import type { data } from "wailsjs/go/models";
-  import { CssClass } from "src/lib/CssClass";
-  import type { MaxDamage } from "src/lib/column/model/MaxDamage";
+import ExternalLink from "src/component/common/ExternalLink.svelte";
+import { CssClass } from "src/lib/CssClass";
+import type { MaxDamage } from "src/lib/column/model/MaxDamage";
+import type { data } from "wailsjs/go/models";
 
-  export let column: MaxDamage;
-  export let player: data.Player;
+export let column: MaxDamage;
+export let player: data.Player;
 
-  $: param = column.displayValue(player);
+$: param = column.displayValue(player);
 </script>
 
 <td class={CssClass.TD_NUM}>

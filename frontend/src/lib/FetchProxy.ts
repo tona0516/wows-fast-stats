@@ -1,6 +1,6 @@
 import { storedBattle } from "src/stores";
 import { Battle } from "wailsjs/go/main/App";
-import { data } from "wailsjs/go/models";
+import type { data } from "wailsjs/go/models";
 
 export namespace FetchProxy {
   export const getBattle = async (): Promise<data.Battle> => {

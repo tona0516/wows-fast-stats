@@ -1,30 +1,32 @@
 <script lang="ts">
-  import { RemoveAlertPlayer } from "wailsjs/go/main/App";
-  import type { data } from "wailsjs/go/models";
-  import UkModal from "src/component/common/uikit/UkModal.svelte";
-  import UIkit from "uikit";
-  import { ModalElementID } from "./ModalElementID";
-  import clone from "clone";
-  import { Notifier } from "src/lib/Notifier";
+import clone from "clone";
+import UkModal from "src/component/common/uikit/UkModal.svelte";
+import { Notifier } from "src/lib/Notifier";
+import UIkit from "uikit";
+import { RemoveAlertPlayer } from "wailsjs/go/main/App";
+import type { data } from "wailsjs/go/models";
+import { ModalElementID } from "./ModalElementID";
 
-  export let defaultAlertPlayer: data.AlertPlayer;
+export let defaultAlertPlayer: data.AlertPlayer;
 
-  export const show = (_target: data.AlertPlayer) => {
-    target = _target;
+export const show = (_target: data.AlertPlayer) => {
+  target = _target;
 
-    const elem = document.getElementById(ModalElementID.REMOVE_ALERT_PLAYER);
-    UIkit.modal(elem!).show();
-  };
+  const elem = document.getElementById(ModalElementID.REMOVE_ALERT_PLAYER);
+  if (elem) {
+    UIkit.modal(elem).show();
+  }
+};
 
-  const remove = async () => {
-    try {
-      await RemoveAlertPlayer(target.account_id);
-    } catch (error) {
-      Notifier.failure(error);
-    }
-  };
+const remove = async () => {
+  try {
+    await RemoveAlertPlayer(target.account_id);
+  } catch (error) {
+    Notifier.failure(error);
+  }
+};
 
-  let target: data.AlertPlayer = clone(defaultAlertPlayer);
+let target: data.AlertPlayer = clone(defaultAlertPlayer);
 </script>
 
 <UkModal id={ModalElementID.REMOVE_ALERT_PLAYER}>

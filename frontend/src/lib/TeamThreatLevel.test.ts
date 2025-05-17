@@ -37,6 +37,7 @@ test("fromBattle - 正常系", () => {
     meta: new data.Meta(),
   };
 
+  // biome-ignore lint/style/noNonNullAssertion: <explanation>
   const actual = TeamThreatLevel.fromBattle(battle, new Set(), "pvp_all")![0];
   const expected = new TeamThreatLevel(12599, 59, 75);
 

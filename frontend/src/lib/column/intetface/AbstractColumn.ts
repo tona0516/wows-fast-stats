@@ -5,7 +5,7 @@ export abstract class AbstractColumn {
     readonly innerColumnCount: number,
   ) {}
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   abstract svelteComponent(): any;
   abstract shouldShow(): boolean;
 }

@@ -1,4 +1,4 @@
-import { data } from "wailsjs/go/models";
+import type { data } from "wailsjs/go/models";
 
 export type RatingLevel = Readonly<keyof data.UCSkillColorCode>;
 

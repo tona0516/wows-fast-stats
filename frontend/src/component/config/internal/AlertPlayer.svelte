@@ -1,11 +1,11 @@
 <script lang="ts">
-  import UkDowndown from "src/component/common/uikit/UkDowndown.svelte";
-  import UkIcon from "src/component/common/uikit/UkIcon.svelte";
-  import UkTable from "src/component/common/uikit/UkTable.svelte";
-  import { storedAlertPlayers } from "src/stores";
-  import { createEventDispatcher } from "svelte";
+import UkDowndown from "src/component/common/uikit/UkDowndown.svelte";
+import UkIcon from "src/component/common/uikit/UkIcon.svelte";
+import UkTable from "src/component/common/uikit/UkTable.svelte";
+import { storedAlertPlayers } from "src/stores";
+import { createEventDispatcher } from "svelte";
 
-  const dispatch = createEventDispatcher();
+const dispatch = createEventDispatcher();
 </script>
 
 <div class="uk-padding-small">

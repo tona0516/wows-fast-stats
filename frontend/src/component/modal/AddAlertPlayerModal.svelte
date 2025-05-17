@@ -1,82 +1,86 @@
 <script lang="ts">
-  import {
-    SearchPlayer,
-    AlertPatterns,
-    UpdateAlertPlayer,
-  } from "wailsjs/go/main/App";
-  import type { data } from "wailsjs/go/models";
-  import clone from "clone";
-  import UIkit from "uikit";
-  import UkModal from "src/component/common/uikit/UkModal.svelte";
-  import UkIcon from "src/component/common/uikit/UkIcon.svelte";
-  import { ModalElementID } from "./ModalElementID";
-  import { Notifier } from "src/lib/Notifier";
+import clone from "clone";
+import UkIcon from "src/component/common/uikit/UkIcon.svelte";
+import UkModal from "src/component/common/uikit/UkModal.svelte";
+import { Notifier } from "src/lib/Notifier";
+import UIkit from "uikit";
+import {
+  AlertPatterns,
+  SearchPlayer,
+  UpdateAlertPlayer,
+} from "wailsjs/go/main/App";
+import type { data } from "wailsjs/go/models";
+import { ModalElementID } from "./ModalElementID";
 
-  export let defaultAlertPlayer: data.AlertPlayer;
-  export let maxMemoLength: number;
+export let defaultAlertPlayer: data.AlertPlayer;
+export let maxMemoLength: number;
 
-  export const show = () => {
-    clean();
-    const elem = document.getElementById(ModalElementID.ADD_ALERT_PLAYER);
-    UIkit.modal(elem!).show();
-  };
+export const show = () => {
+  clean();
+  const elem = document.getElementById(ModalElementID.ADD_ALERT_PLAYER);
+  if (elem) {
+    UIkit.modal(elem).show();
+  }
+};
 
-  const clean = () => {
-    target = clone(defaultAlertPlayer);
-    isSearching = false;
-    searchInput = "";
-    searchPlayers = [];
-    searchResult = undefined;
-  };
+const clean = () => {
+  target = clone(defaultAlertPlayer);
+  isSearching = false;
+  searchInput = "";
+  searchPlayers = [];
+  searchResult = undefined;
+};
 
-  const add = async (player: data.AlertPlayer) => {
+const add = async (player: data.AlertPlayer) => {
+  if (searchResult) {
+    player.account_id = searchResult.account_id;
+    player.name = searchResult.nickname;
+
     try {
-      player.account_id = searchResult!.account_id;
-      player.name = searchResult!.nickname;
-
       await UpdateAlertPlayer(player);
     } catch (error) {
       Notifier.failure(error);
     }
-  };
+  }
+};
 
-  const searchPlayer = async (input: string) => {
-    if (isSearching) {
-      return;
-    }
+const searchPlayer = async (input: string) => {
+  if (isSearching) {
+    return;
+  }
 
-    if (input.length < 3) {
-      searchPlayers = [];
-      return;
-    }
+  if (input.length < 3) {
+    searchPlayers = [];
+    return;
+  }
 
-    if (input === "") {
-      searchPlayers = [];
-      return;
-    }
+  if (input === "") {
+    searchPlayers = [];
+    return;
+  }
 
-    try {
-      isSearching = true;
-      searchPlayers = await SearchPlayer(input);
-    } catch (error) {
-      searchPlayers = [];
-      return;
-    } finally {
-      isSearching = false;
-    }
-  };
+  try {
+    isSearching = true;
+    searchPlayers = await SearchPlayer(input);
+  } catch (error) {
+    searchPlayers = [];
+    return;
+  } finally {
+    isSearching = false;
+  }
+};
 
-  let target: data.AlertPlayer = clone(defaultAlertPlayer);
-  let isSearching: boolean = false;
-  let searchInput: string = "";
-  let searchPlayers: data.WGAccountListData[] = [];
-  let searchResult: data.WGAccountListData | undefined = undefined;
+let target: data.AlertPlayer = clone(defaultAlertPlayer);
+let isSearching = false;
+let searchInput = "";
+let searchPlayers: data.WGAccountListData[] = [];
+let searchResult: data.WGAccountListData | undefined = undefined;
 
-  $: disableAddButton =
-    searchResult === undefined ||
-    searchResult.account_id === 0 ||
-    searchResult.nickname === "" ||
-    target.pattern === "";
+$: disableAddButton =
+  searchResult === undefined ||
+  searchResult.account_id === 0 ||
+  searchResult.nickname === "" ||
+  target.pattern === "";
 </script>
 
 <UkModal id={ModalElementID.ADD_ALERT_PLAYER}>

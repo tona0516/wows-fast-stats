@@ -1,42 +1,42 @@
 <script lang="ts">
-  import { DispName } from "src/lib/DispName";
-  import ConfirmModal from "src/component/modal/ConfirmModal.svelte";
-  import { storedConfig } from "src/stores";
-  import UIkit from "uikit";
-  import { DefaultUserConfig, UpdateUserConfig } from "wailsjs/go/main/App";
-  import { ModalElementID } from "src/component/modal/ModalElementID";
-  import { Notifier } from "src/lib/Notifier";
-  import { deriveColumnSettings } from "src/lib/util";
+import ConfirmModal from "src/component/modal/ConfirmModal.svelte";
+import { ModalElementID } from "src/component/modal/ModalElementID";
+import { DispName } from "src/lib/DispName";
+import { Notifier } from "src/lib/Notifier";
+import { deriveColumnSettings } from "src/lib/util";
+import { storedConfig } from "src/stores";
+import UIkit from "uikit";
+import { DefaultUserConfig, UpdateUserConfig } from "wailsjs/go/main/App";
 
-  $: inputConfig = $storedConfig;
+$: inputConfig = $storedConfig;
 
-  const reset = async () => {
-    try {
-      const defaultConfig = await DefaultUserConfig();
+const reset = async () => {
+  try {
+    const defaultConfig = await DefaultUserConfig();
 
-      inputConfig.font_size = defaultConfig.font_size;
-      inputConfig.display = defaultConfig.display;
-      inputConfig.color = defaultConfig.color;
-      inputConfig.digit = defaultConfig.digit;
+    inputConfig.font_size = defaultConfig.font_size;
+    inputConfig.display = defaultConfig.display;
+    inputConfig.color = defaultConfig.color;
+    inputConfig.digit = defaultConfig.digit;
 
-      await UpdateUserConfig(inputConfig);
-      Notifier.success("設定を更新しました");
-    } catch (error) {
-      inputConfig = $storedConfig;
-      Notifier.failure(error);
-    }
-  };
+    await UpdateUserConfig(inputConfig);
+    Notifier.success("設定を更新しました");
+  } catch (error) {
+    inputConfig = $storedConfig;
+    Notifier.failure(error);
+  }
+};
 
-  const change = async () => {
-    try {
-      await UpdateUserConfig(inputConfig);
-    } catch (error) {
-      inputConfig = $storedConfig;
-      Notifier.failure(error);
-    }
-  };
+const change = async () => {
+  try {
+    await UpdateUserConfig(inputConfig);
+  } catch (error) {
+    inputConfig = $storedConfig;
+    Notifier.failure(error);
+  }
+};
 
-  $: columnSettings = deriveColumnSettings(inputConfig);
+$: columnSettings = deriveColumnSettings(inputConfig);
 </script>
 
 <ConfirmModal message="表示設定をリセットしますか？" on:Confirmed={reset} />

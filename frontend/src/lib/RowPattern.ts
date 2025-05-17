@@ -2,11 +2,11 @@ import { toPlayerStats } from "src/lib/util";
 import type { data } from "wailsjs/go/models";
 
 export enum RowPattern {
-  NO_COLUMN,
-  PRIVATE,
-  NO_STATS,
-  NO_SHIP_STATS,
-  FULL,
+  NO_COLUMN = 0,
+  PRIVATE = 1,
+  NO_STATS = 2,
+  NO_SHIP_STATS = 3,
+  FULL = 4,
 }
 
 export namespace RowPattern {

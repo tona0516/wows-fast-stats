@@ -24,12 +24,12 @@ import ShipCV from "src/assets/images/ship_cv.png";
 import ShipPremiumCV from "src/assets/images/ship_cv_premium.png";
 import ShipDD from "src/assets/images/ship_dd.png";
 import ShipPremiumDD from "src/assets/images/ship_dd_premium.png";
+import ShipNone from "src/assets/images/ship_none.png";
 import ShipSS from "src/assets/images/ship_ss.png";
 import ShipPremiumSS from "src/assets/images/ship_ss_premium.png";
-import ShipNone from "src/assets/images/ship_none.png";
 
-import { isShipType, tierString } from "src/lib/util";
 import ShipInfoTableData from "src/component/main/internal/table_data/ShipInfoTableData.svelte";
+import { isShipType, tierString } from "src/lib/util";
 
 const FLAGS: { [key: string]: string } = {
   japan: FlagJapan,

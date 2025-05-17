@@ -1,20 +1,20 @@
 import { ArrayMap } from "src/lib/ArrayMap";
 import { DispName } from "src/lib/DispName";
 import type { AbstractStatsColumn } from "src/lib/column/intetface/AbstractStatsColumn";
-import { type ISummaryColumn } from "src/lib/column/intetface/ISummaryColumn";
+import type { ISummaryColumn } from "src/lib/column/intetface/ISummaryColumn";
 import { Damage } from "src/lib/column/model/Damage";
 import { PR } from "src/lib/column/model/PR";
 import { WinRate } from "src/lib/column/model/WinRate";
-import {
-  type OptionalBattle,
-  type OptionalSummary,
-  type ShipType,
-  type StatsCategory,
+import type {
+  OptionalBattle,
+  OptionalSummary,
+  ShipType,
+  StatsCategory,
 } from "src/lib/types";
 import { toPlayerStats } from "src/lib/util";
-import { data } from "wailsjs/go/models";
+import type { data } from "wailsjs/go/models";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 type SummaryColumn = AbstractStatsColumn<any> & ISummaryColumn;
 type Mean = { value: number; len: number };
 export type SummaryShipType = ShipType | "all";
@@ -68,7 +68,7 @@ export namespace Summary {
       ]),
     };
 
-    columns.forEach((column) => {
+    for (const column of columns) {
       result.meta.columnNames.push(column.header);
 
       const filtered = battle.teams.map((team) => {
@@ -79,7 +79,7 @@ export namespace Summary {
         );
       });
 
-      [...result.values.keys()].forEach((shipType) => {
+      for (const shipType of [...result.values.keys()]) {
         let origin: data.Player[][];
         if (shipType.toString() === "all") {
           origin = filtered;
@@ -103,11 +103,11 @@ export namespace Summary {
           enemyMean.len !== 0 ? enemyMean.value.toFixed(digit) : "-";
         const fixedDiff = deriveDiff(friendMean, enemyMean, digit);
 
-        result.values.get(shipType)!.friends.push(fixedFriendMean);
-        result.values.get(shipType)!.enemies.push(fixedEnemyMean);
-        result.values.get(shipType)!.diffs.push(fixedDiff);
-      });
-    });
+        result.values.get(shipType)?.friends.push(fixedFriendMean);
+        result.values.get(shipType)?.enemies.push(fixedEnemyMean);
+        result.values.get(shipType)?.diffs.push(fixedDiff);
+      }
+    }
 
     return result;
   };
@@ -146,11 +146,11 @@ const deriveColumns = (
   const columns = shipCols.concat(overallCols);
   const headers = [
     {
-      title: DispName.COLUMN_CATEGORIES.get("ship")!,
+      title: DispName.COLUMN_CATEGORIES.get("ship") ?? "",
       colspan: shipCols.length,
     },
     {
-      title: DispName.COLUMN_CATEGORIES.get("overall")!,
+      title: DispName.COLUMN_CATEGORIES.get("overall") ?? "",
       colspan: overallCols.length,
     },
   ];

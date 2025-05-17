@@ -51,5 +51,5 @@ const calcGeometricMean = (values: number[]): number => {
 
   const productScore = values.reduce((a, b) => a * b, 1);
 
-  return Math.pow(productScore, 1 / values.length);
+  return productScore ** (1 / values.length);
 };

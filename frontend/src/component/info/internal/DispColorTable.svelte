@@ -1,9 +1,9 @@
 <script lang="ts">
-  import UkTable from "src/component/common/uikit/UkTable.svelte";
-  import type { DispColorTableInfo } from "./DispColorTableInfo";
+import UkTable from "src/component/common/uikit/UkTable.svelte";
+import type { DispColorTableInfo } from "./DispColorTableInfo";
 
-  export let caption: string;
-  export let tableInfo: DispColorTableInfo;
+export let caption: string;
+export let tableInfo: DispColorTableInfo;
 </script>
 
 <UkTable>

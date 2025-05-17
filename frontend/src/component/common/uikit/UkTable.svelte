@@ -1,5 +1,5 @@
 <script lang="ts">
-  // @ts-nocheck
+// @ts-nocheck
 </script>
 
 <div class="uk-overflow-auto">

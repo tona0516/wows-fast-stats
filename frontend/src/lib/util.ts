@@ -2,13 +2,18 @@ import type { ColumnSetting } from "src/lib/ColumnSetting";
 import type { DigitKey, OverallKey, ShipKey, ShipType } from "src/lib/types";
 import { data } from "wailsjs/go/models";
 
-const ROMAN_NUMERALS: { decimal: number; numeral: string }[] = [
-  { decimal: 10, numeral: "X" },
-  { decimal: 9, numeral: "IX" },
-  { decimal: 5, numeral: "V" },
-  { decimal: 4, numeral: "IV" },
-  { decimal: 1, numeral: "I" },
-];
+const ROMAN_NUMERALS: { [key: number]: string } = {
+  1: "I",
+  2: "II",
+  3: "III",
+  4: "IV",
+  5: "V",
+  6: "VI",
+  7: "VII",
+  8: "VIII",
+  9: "IX",
+  10: "X",
+};
 
 export const toPlayerStats = (
   player: data.Player,
@@ -28,16 +33,7 @@ export const toPlayerStats = (
 
 export const tierString = (value: number): string => {
   if (value === 11) return "★";
-
-  let romanized = "";
-  for (const { decimal, numeral } of ROMAN_NUMERALS) {
-    while (decimal <= value) {
-      romanized += numeral;
-      value -= decimal;
-    }
-  }
-
-  return romanized;
+  return ROMAN_NUMERALS[value];
 };
 
 export const isShipType = (type: string): type is ShipType => {

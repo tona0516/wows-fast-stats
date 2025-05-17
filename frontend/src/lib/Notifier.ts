@@ -3,12 +3,12 @@ import UIkit from "uikit";
 const POSITION = "top-right";
 
 export namespace Notifier {
-  export const success = (message: string, durationMs: number = 3000) => {
+  export const success = (message: string, durationMs = 3000) => {
     notify(message, "check", durationMs);
   };
 
-  export const failure = (error: unknown, durationMs: number = 0) => {
-    let message: string = "";
+  export const failure = (error: unknown, durationMs = 0) => {
+    let message = "";
     if (error instanceof Error) {
       message = `${error.name}: ${error.message}`;
     } else if (typeof error === "string") {

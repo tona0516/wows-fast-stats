@@ -1,14 +1,14 @@
 <script lang="ts">
-  import { storedInstallPathError } from "src/stores";
-  import Required from "./internal/Required.svelte";
-  import Other from "./internal/Other.svelte";
-  import TeamSummary from "./internal/TeamSummary.svelte";
-  import Display from "./internal/Display.svelte";
-  import AlertPlayer from "./internal/AlertPlayer.svelte";
-  import UkIcon from "src/component/common/uikit/UkIcon.svelte";
-  import UkTab from "src/component/common/uikit/UkTab.svelte";
+import UkIcon from "src/component/common/uikit/UkIcon.svelte";
+import UkTab from "src/component/common/uikit/UkTab.svelte";
+import { storedInstallPathError } from "src/stores";
+import AlertPlayer from "./internal/AlertPlayer.svelte";
+import Display from "./internal/Display.svelte";
+import Other from "./internal/Other.svelte";
+import Required from "./internal/Required.svelte";
+import TeamSummary from "./internal/TeamSummary.svelte";
 
-  const CONFIG_MENU_ID = "config-menu-id";
+const CONFIG_MENU_ID = "config-menu-id";
 </script>
 
 <div class="uk-padding-small uk-grid">

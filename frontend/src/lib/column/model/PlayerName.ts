@@ -1,7 +1,7 @@
 import PlayerNameTableData from "src/component/main/internal/table_data/PlayerNameTableData.svelte";
 import { RatingInfo } from "src/lib/RatingLevel";
 import { AbstractColumn } from "src/lib/column/intetface/AbstractColumn";
-import { type StatsCategory } from "src/lib/types";
+import type { StatsCategory } from "src/lib/types";
 import { toPlayerStats } from "src/lib/util";
 import type { data } from "wailsjs/go/models";
 

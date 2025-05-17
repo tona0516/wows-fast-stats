@@ -1,41 +1,41 @@
 <script lang="ts">
-  import UkIcon from "src/component/common/uikit/UkIcon.svelte";
-  import UkSpinner from "src/component/common/uikit/UkSpinner.svelte";
-  import { Notifier } from "src/lib/Notifier";
-  import { storedConfig, storedInstallPathError } from "src/stores";
-  import {
-    SelectDirectory,
-    StartWatching,
-    UpdateInstallPath,
-  } from "wailsjs/go/main/App";
+import UkIcon from "src/component/common/uikit/UkIcon.svelte";
+import UkSpinner from "src/component/common/uikit/UkSpinner.svelte";
+import { Notifier } from "src/lib/Notifier";
+import { storedConfig, storedInstallPathError } from "src/stores";
+import {
+  SelectDirectory,
+  StartWatching,
+  UpdateInstallPath,
+} from "wailsjs/go/main/App";
 
-  let isLoading = false;
+let isLoading = false;
 
-  $: inputConfig = $storedConfig;
+$: inputConfig = $storedConfig;
 
-  const clickSelectDirectory = async () => {
-    try {
-      const path = await SelectDirectory();
-      if (!path) return;
-      inputConfig.install_path = path;
-    } catch (error) {
-      Notifier.failure(error);
-    }
-  };
+const clickSelectDirectory = async () => {
+  try {
+    const path = await SelectDirectory();
+    if (!path) return;
+    inputConfig.install_path = path;
+  } catch (error) {
+    Notifier.failure(error);
+  }
+};
 
-  const clickApply = async () => {
-    try {
-      isLoading = true;
-      await UpdateInstallPath(inputConfig.install_path);
-      storedInstallPathError.set("");
-      Notifier.success("設定を更新しました");
-      StartWatching();
-    } catch (error) {
-      storedInstallPathError.set(error as string);
-    } finally {
-      isLoading = false;
-    }
-  };
+const clickApply = async () => {
+  try {
+    isLoading = true;
+    await UpdateInstallPath(inputConfig.install_path);
+    storedInstallPathError.set("");
+    Notifier.success("設定を更新しました");
+    StartWatching();
+  } catch (error) {
+    storedInstallPathError.set(error as string);
+  } finally {
+    isLoading = false;
+  }
+};
 </script>
 
 <div class="uk-padding-small">

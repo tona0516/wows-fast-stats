@@ -18,21 +18,19 @@ import { ThreatLevel } from "src/lib/column/model/ThreatLevel";
 import { UsingShipTypeRate } from "src/lib/column/model/UsingShipTypeRate";
 import { UsingTierRate } from "src/lib/column/model/UsingTierRate";
 import { WinRate } from "src/lib/column/model/WinRate";
-import { type ColumnCategory } from "src/lib/types";
-import { data } from "wailsjs/go/models";
+import type { ColumnCategory } from "src/lib/types";
+import type { data } from "wailsjs/go/models";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 class ColumnArray extends Array<AbstractColumn> {
   constructor(
     private category: ColumnCategory,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private columns: AbstractColumn[],
   ) {
     super(...columns);
   }
 
   dispName(): string {
-    return DispName.COLUMN_CATEGORIES.get(this.category)!;
+    return DispName.COLUMN_CATEGORIES.get(this.category) ?? this.category;
   }
 
   columnCount(): number {

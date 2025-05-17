@@ -27,15 +27,10 @@
 			"recommended": true
 		}
 	},
-	"javascript": {
-		"formatter": {
-			"quoteStyle": "double"
-		}
-	},
 	"overrides": [
 		{
 			"include": [
-				"*.svelte"
+				"**/*.svelte"
 			],
 			"linter": {
 				"rules": {
@@ -46,5 +41,10 @@
 				}
 			}
 		}
-	]
+	],
+	"javascript": {
+		"formatter": {
+			"quoteStyle": "double"
+		}
+	}
 }

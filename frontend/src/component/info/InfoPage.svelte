@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { storedConfig } from "src/stores";
-  import AppInfo from "./internal/AppInfo.svelte";
-  import Logging from "./internal/Logging.svelte";
-  import UkTab from "src/component/common/uikit/UkTab.svelte";
-  import ColorDescription from "./internal/DispColor.svelte";
+import UkTab from "src/component/common/uikit/UkTab.svelte";
+import { storedConfig } from "src/stores";
+import AppInfo from "./internal/AppInfo.svelte";
+import ColorDescription from "./internal/DispColor.svelte";
+import Logging from "./internal/Logging.svelte";
 
-  const INFO_MENU_ID = "info-menu-id";
+const INFO_MENU_ID = "info-menu-id";
 </script>
 
 <div class="uk-padding-small uk-grid">

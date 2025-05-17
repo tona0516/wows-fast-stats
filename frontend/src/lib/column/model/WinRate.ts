@@ -2,7 +2,7 @@ import SingleTableData from "src/component/main/internal/table_data/SingleTableD
 import { RatingInfo } from "src/lib/RatingLevel";
 import { AbstractStatsColumn } from "src/lib/column/intetface/AbstractStatsColumn";
 import type { ISummaryColumn } from "src/lib/column/intetface/ISummaryColumn";
-import { type StatsCategory } from "src/lib/types";
+import type { StatsCategory } from "src/lib/types";
 import type { data } from "wailsjs/go/models";
 
 export class WinRate
@@ -14,7 +14,7 @@ export class WinRate
   }
 
   displayValue(player: data.Player): string {
-    return this.value(player).toFixed(this.digit()) + "%";
+    return `${this.value(player).toFixed(this.digit())}%`;
   }
 
   svelteComponent() {

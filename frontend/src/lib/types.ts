@@ -1,6 +1,6 @@
 import type { Summary } from "src/lib/Summary";
 import type { TeamThreatLevel } from "src/lib/TeamThreatLevel";
-import { data } from "wailsjs/go/models";
+import type { data } from "wailsjs/go/models";
 
 export const BasicKey = {
   player_info: "player_info",

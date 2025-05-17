@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { BrowserOpenURL } from "wailsjs/runtime/runtime";
+import { BrowserOpenURL } from "wailsjs/runtime/runtime";
 </script>
 
 <div class="uk-flex uk-flex-center">

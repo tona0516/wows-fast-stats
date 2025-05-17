@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { BrowserOpenURL } from "wailsjs/runtime/runtime";
+import { BrowserOpenURL } from "wailsjs/runtime/runtime";
 
-  export let url: string;
+export let url: string;
 </script>
 
 <!-- svelte-ignore a11y-invalid-attribute -->

@@ -1,36 +1,36 @@
 <script lang="ts">
-  import UkSpinner from "src/component/common/uikit/UkSpinner.svelte";
-  import { Notifier } from "src/lib/Notifier";
-  import { storedConfig } from "src/stores";
-  import { UpdateUserConfig } from "wailsjs/go/main/App";
+import UkSpinner from "src/component/common/uikit/UkSpinner.svelte";
+import { Notifier } from "src/lib/Notifier";
+import { storedConfig } from "src/stores";
+import { UpdateUserConfig } from "wailsjs/go/main/App";
 
-  let isLoading = false;
+let isLoading = false;
 
-  $: inputConfig = $storedConfig;
-  $: isValidMinShipBattles =
-    inputConfig.team_summary.min_ship_battles > 0 &&
-    Number.isSafeInteger(inputConfig.team_summary.min_ship_battles);
-  $: isValidMinOverallBattles =
-    inputConfig.team_summary.min_overall_battles > 0 &&
-    Number.isSafeInteger(inputConfig.team_summary.min_overall_battles);
-  $: isValidAll = isValidMinShipBattles && isValidMinOverallBattles;
+$: inputConfig = $storedConfig;
+$: isValidMinShipBattles =
+  inputConfig.team_summary.min_ship_battles > 0 &&
+  Number.isSafeInteger(inputConfig.team_summary.min_ship_battles);
+$: isValidMinOverallBattles =
+  inputConfig.team_summary.min_overall_battles > 0 &&
+  Number.isSafeInteger(inputConfig.team_summary.min_overall_battles);
+$: isValidAll = isValidMinShipBattles && isValidMinOverallBattles;
 
-  const clickApply = async () => {
-    if (!isValidAll) {
-      return;
-    }
+const clickApply = async () => {
+  if (!isValidAll) {
+    return;
+  }
 
-    try {
-      isLoading = true;
-      await UpdateUserConfig(inputConfig);
-      Notifier.success("設定を更新しました");
-    } catch (error) {
-      inputConfig.team_summary = $storedConfig.team_summary;
-      Notifier.failure(error);
-    } finally {
-      isLoading = false;
-    }
-  };
+  try {
+    isLoading = true;
+    await UpdateUserConfig(inputConfig);
+    Notifier.success("設定を更新しました");
+  } catch (error) {
+    inputConfig.team_summary = $storedConfig.team_summary;
+    Notifier.failure(error);
+  } finally {
+    isLoading = false;
+  }
+};
 </script>
 
 <div class="uk-padding-small">

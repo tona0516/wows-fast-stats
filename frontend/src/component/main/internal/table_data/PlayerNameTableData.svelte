@@ -1,47 +1,45 @@
 <script lang="ts">
-  import ExternalLink from "src/component/common/ExternalLink.svelte";
-  import UkDowndown from "src/component/common/uikit/UkDowndown.svelte";
-  import UkTooltip from "src/component/common/uikit/UkTooltip.svelte";
-  import { NumbersURL } from "src/lib/NumbersURL";
-  import { CssClass } from "src/lib/CssClass";
-  import { storedAlertPlayers, storedExcludedPlayers } from "src/stores";
-  import { createEventDispatcher } from "svelte";
-  import type { data } from "wailsjs/go/models";
-  import type { PlayerName } from "src/lib/column/model/PlayerName";
-  import { ClipboardSetText } from "wailsjs/runtime/runtime";
-  import { Notifier } from "src/lib/Notifier";
-  import "/node_modules/flag-icons/css/flag-icons.min.css";
-  import { ExcludedPlayers } from "src/lib/ExcludedPlayers";
+import ExternalLink from "src/component/common/ExternalLink.svelte";
+import UkDowndown from "src/component/common/uikit/UkDowndown.svelte";
+import UkTooltip from "src/component/common/uikit/UkTooltip.svelte";
+import { CssClass } from "src/lib/CssClass";
+import { Notifier } from "src/lib/Notifier";
+import { NumbersURL } from "src/lib/NumbersURL";
+import type { PlayerName } from "src/lib/column/model/PlayerName";
+import { storedAlertPlayers, storedExcludedPlayers } from "src/stores";
+import { createEventDispatcher } from "svelte";
+import type { data } from "wailsjs/go/models";
+import { ClipboardSetText } from "wailsjs/runtime/runtime";
+import "/node_modules/flag-icons/css/flag-icons.min.css";
+import { ExcludedPlayers } from "src/lib/ExcludedPlayers";
 
-  export let column: PlayerName;
-  export let player: data.Player;
+export let column: PlayerName;
+export let player: data.Player;
 
-  $: accountID = player.player_info.id;
-  $: isChecked = !$storedExcludedPlayers.has(accountID);
-  $: alertPlayer = $storedAlertPlayers.find(
-    (it) => it.account_id === accountID,
-  );
-  $: clanTag = column.clanTag(player);
-  $: isNPC = column.isNPC(player);
+$: accountID = player.player_info.id;
+$: isChecked = !$storedExcludedPlayers.has(accountID);
+$: alertPlayer = $storedAlertPlayers.find((it) => it.account_id === accountID);
+$: clanTag = column.clanTag(player);
+$: isNPC = column.isNPC(player);
 
-  const dispatch = createEventDispatcher();
+const dispatch = createEventDispatcher();
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const onCheck = async (e: any) => {
-    if (e.target.checked) {
-      ExcludedPlayers.remove(accountID);
-    } else {
-      ExcludedPlayers.add(accountID);
-    }
-  };
+// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+const onCheck = async (e: any) => {
+  if (e.target.checked) {
+    ExcludedPlayers.remove(accountID);
+  } else {
+    ExcludedPlayers.add(accountID);
+  }
+};
 
-  const setPlayerNameToClipboard = async () => {
-    const isSuccess = await ClipboardSetText(player.player_info.name);
+const setPlayerNameToClipboard = async () => {
+  const isSuccess = await ClipboardSetText(player.player_info.name);
 
-    isSuccess
-      ? Notifier.success("コピーしました！")
-      : Notifier.failure("コピーに失敗しました");
-  };
+  isSuccess
+    ? Notifier.success("コピーしました！")
+    : Notifier.failure("コピーに失敗しました");
+};
 </script>
 
 <td>
