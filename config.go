@@ -7,6 +7,9 @@ type Config struct {
 		Width  int    `yaml:"width"`
 		Height int    `yaml:"height"`
 	} `yaml:"app"`
+	Watcher struct {
+		IntervalSec int `yaml:"interval_sec"`
+	} `yaml:"Watcher"`
 	Wargaming struct {
 		URL          string `yaml:"url"`
 		MaxRetry     uint64 `yaml:"max_retry"`

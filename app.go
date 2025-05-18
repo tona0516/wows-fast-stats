@@ -2,11 +2,11 @@ package main
 
 import (
 	"context"
+	"os"
 	"wfs/backend/apperr"
 	"wfs/backend/data"
-	"wfs/backend/repository"
-	"wfs/backend/service"
 
+	"github.com/mitchellh/go-ps"
 	"github.com/morikuni/failure"
 	"github.com/wailsapp/wails/v2/pkg/logger"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
@@ -17,56 +17,23 @@ const (
 	eventUpdateAlertPlayers = "ALERT_PLAYERS_UPDATE"
 )
 
-type volatileData struct {
+//nolint:containedctx
+type App struct {
+	config        Config
+	ctx           context.Context
+	container     *DependencyContainer
 	cancelWatcher context.CancelFunc
 }
 
-func newVolatileData() volatileData {
-	return volatileData{
-		cancelWatcher: nil,
-	}
-}
-
-//nolint:containedctx
-type App struct {
-	ctx            context.Context
-	semver         string
-	logger         repository.LoggerInterface
-	config         service.Config
-	screenshot     service.Screenshot
-	watcher        service.Watcher
-	battle         service.Battle
-	updater        service.Updater
-	configMigrator service.ConfigMigrator
-	volatileData   volatileData
-}
-
-func NewApp(
-	semver string,
-	logger repository.LoggerInterface,
-	config service.Config,
-	screenshot service.Screenshot,
-	watcher service.Watcher,
-	battle service.Battle,
-	updater service.Updater,
-	configMigrator service.ConfigMigrator,
-) *App {
+func NewApp(config Config) *App {
 	return &App{
-		semver:         semver,
-		logger:         logger,
-		config:         config,
-		screenshot:     screenshot,
-		watcher:        watcher,
-		battle:         battle,
-		updater:        updater,
-		configMigrator: configMigrator,
-		volatileData:   newVolatileData(),
+		config: config,
 	}
 }
 
 func (a *App) MigrateIfNeeded() error {
-	if err := a.configMigrator.ExecuteIfNeeded(); err != nil {
-		a.logger.Error(err, nil)
+	if err := a.container.configMigratorService.ExecuteIfNeeded(); err != nil {
+		a.container.logger.Error(err, nil)
 		return apperr.Unwrap(err)
 	}
 
@@ -74,18 +41,19 @@ func (a *App) MigrateIfNeeded() error {
 }
 
 func (a *App) StartWatching() error {
-	if err := a.watcher.Prepare(); err != nil {
-		a.logger.Error(err, nil)
+	if err := a.container.watcherService.Prepare(); err != nil {
+		a.container.logger.Error(err, nil)
 		return apperr.Unwrap(err)
 	}
 
-	if a.volatileData.cancelWatcher != nil {
-		a.volatileData.cancelWatcher()
+	if a.cancelWatcher != nil {
+		a.cancelWatcher()
 	}
-	cancelCtx, cancel := context.WithCancel(context.Background())
-	a.volatileData.cancelWatcher = cancel
 
-	go a.watcher.Start(a.ctx, cancelCtx)
+	cancelCtx, cancel := context.WithCancel(context.Background())
+	a.cancelWatcher = cancel
+
+	go a.container.watcherService.Start(a.ctx, cancelCtx)
 
 	return nil
 }
@@ -93,15 +61,15 @@ func (a *App) StartWatching() error {
 func (a *App) Battle() (data.Battle, error) {
 	result := data.Battle{}
 
-	userConfig, err := a.config.User()
+	userConfig, err := a.container.configService.User()
 	if err != nil {
-		a.logger.Error(err, nil)
+		a.container.logger.Error(err, nil)
 		return result, apperr.Unwrap(err)
 	}
 
-	result, err = a.battle.Get(a.ctx, userConfig)
+	result, err = a.container.battleService.Get(a.ctx, userConfig)
 	if err != nil {
-		a.logger.Error(err, nil)
+		a.container.logger.Error(err, nil)
 		return result, apperr.Unwrap(err)
 	}
 
@@ -109,18 +77,18 @@ func (a *App) Battle() (data.Battle, error) {
 }
 
 func (a *App) SelectDirectory() (string, error) {
-	path, err := a.config.SelectDirectory(a.ctx)
+	path, err := a.container.configService.SelectDirectory(a.ctx)
 	if err != nil {
-		a.logger.Error(err, nil)
+		a.container.logger.Error(err, nil)
 	}
 
 	return path, apperr.Unwrap(err)
 }
 
 func (a *App) OpenDirectory(path string) error {
-	err := a.config.OpenDirectory(path)
+	err := a.container.configService.OpenDirectory(path)
 	if err != nil {
-		a.logger.Warn(err, nil)
+		a.container.logger.Warn(err, nil)
 	}
 
 	return apperr.Unwrap(err)
@@ -131,18 +99,18 @@ func (a *App) DefaultUserConfig() data.UserConfigV2 {
 }
 
 func (a *App) UserConfig() (data.UserConfigV2, error) {
-	config, err := a.config.User()
+	config, err := a.container.configService.User()
 	if err != nil {
-		a.logger.Error(err, nil)
+		a.container.logger.Error(err, nil)
 	}
 
 	return config, apperr.Unwrap(err)
 }
 
 func (a *App) UpdateUserConfig(config data.UserConfigV2) error {
-	err := a.config.UpdateOptional(config)
+	err := a.container.configService.UpdateOptional(config)
 	if err != nil {
-		a.logger.Error(err, nil)
+		a.container.logger.Error(err, nil)
 	} else {
 		runtime.EventsEmit(a.ctx, eventUpdateConfig, config)
 	}
@@ -151,9 +119,9 @@ func (a *App) UpdateUserConfig(config data.UserConfigV2) error {
 }
 
 func (a *App) ValidateInstallPath(path string) string {
-	err := a.config.ValidateInstallPath(path)
+	err := a.container.configService.ValidateInstallPath(path)
 	if err != nil {
-		a.logger.Error(err, nil)
+		a.container.logger.Error(err, nil)
 	}
 
 	if err := apperr.Unwrap(err); err != nil {
@@ -164,9 +132,9 @@ func (a *App) ValidateInstallPath(path string) string {
 }
 
 func (a *App) UpdateInstallPath(path string) error {
-	config, err := a.config.UpdateInstallPath(path)
+	config, err := a.container.configService.UpdateInstallPath(path)
 	if err != nil {
-		a.logger.Error(err, nil)
+		a.container.logger.Error(err, nil)
 	} else {
 		runtime.EventsEmit(a.ctx, eventUpdateConfig, config)
 	}
@@ -175,38 +143,38 @@ func (a *App) UpdateInstallPath(path string) error {
 }
 
 func (a *App) ManualScreenshot(filename string, base64Data string) (bool, error) {
-	saved, err := a.screenshot.SaveWithDialog(a.ctx, filename, base64Data)
+	saved, err := a.container.screenshotService.SaveWithDialog(a.ctx, filename, base64Data)
 	if err != nil {
-		a.logger.Error(err, nil)
+		a.container.logger.Error(err, nil)
 	}
 	return saved, apperr.Unwrap(err)
 }
 
 func (a *App) AutoScreenshot(filename string, base64Data string) error {
-	err := a.screenshot.SaveForAuto(filename, base64Data)
+	err := a.container.screenshotService.SaveForAuto(filename, base64Data)
 	if err != nil {
-		a.logger.Error(err, nil)
+		a.container.logger.Error(err, nil)
 	}
 	return apperr.Unwrap(err)
 }
 
 func (a *App) Semver() string {
-	return a.semver
+	return a.config.App.Semver
 }
 
 func (a *App) AlertPlayers() ([]data.AlertPlayer, error) {
-	players, err := a.config.AlertPlayers()
+	players, err := a.container.configService.AlertPlayers()
 	if err != nil {
-		a.logger.Error(err, nil)
+		a.container.logger.Error(err, nil)
 	}
 
 	return players, apperr.Unwrap(err)
 }
 
 func (a *App) UpdateAlertPlayer(player data.AlertPlayer) error {
-	players, err := a.config.UpdateAlertPlayer(player)
+	players, err := a.container.configService.UpdateAlertPlayer(player)
 	if err != nil {
-		a.logger.Error(err, nil)
+		a.container.logger.Error(err, nil)
 	} else {
 		runtime.EventsEmit(a.ctx, eventUpdateAlertPlayers, players)
 	}
@@ -215,9 +183,9 @@ func (a *App) UpdateAlertPlayer(player data.AlertPlayer) error {
 }
 
 func (a *App) RemoveAlertPlayer(accountID int) error {
-	players, err := a.config.RemoveAlertPlayer(accountID)
+	players, err := a.container.configService.RemoveAlertPlayer(accountID)
 	if err != nil {
-		a.logger.Error(err, nil)
+		a.container.logger.Error(err, nil)
 	} else {
 		runtime.EventsEmit(a.ctx, eventUpdateAlertPlayers, players)
 	}
@@ -226,7 +194,7 @@ func (a *App) RemoveAlertPlayer(accountID int) error {
 }
 
 func (a *App) SearchPlayer(prefix string) data.WGAccountList {
-	return a.config.SearchPlayer(prefix)
+	return a.container.configService.SearchPlayer(prefix)
 }
 
 func (a *App) AlertPatterns() []string {
@@ -235,20 +203,65 @@ func (a *App) AlertPatterns() []string {
 
 func (a *App) LogError(errString string, contexts map[string]string) {
 	err := failure.New(apperr.FrontendError, failure.Messagef("%s", errString))
-	a.logger.Error(err, contexts)
+	a.container.logger.Error(err, contexts)
 }
 
 func (a *App) LogInfo(message string, contexts map[string]string) {
-	a.logger.Info(message, contexts)
+	a.container.logger.Info(message, contexts)
 }
 
 func (a *App) LatestRelease() (data.GHLatestRelease, error) {
-	latestRelease, err := a.updater.IsUpdatable()
+	latestRelease, err := a.container.updaterService.IsUpdatable()
 	return latestRelease, apperr.Unwrap(err)
 }
 
 func (a *App) onStartup(ctx context.Context) {
-	a.ctx = ctx
 	runtime.LogSetLogLevel(ctx, logger.INFO)
-	a.logger.Init(ctx)
+
+	if isAlreadyRunning() {
+		a.showExistDialog("すでに起動しています。", 1)
+	}
+
+	container, err := NewDependencyContainer(a.config)
+	if err != nil {
+		a.showExistDialog("意図しないエラーが発生しました。\n"+err.Error(), 1)
+	}
+
+	a.container = container
+	a.container.logger.Init(ctx)
+
+	a.ctx = ctx
+}
+
+func isAlreadyRunning() bool {
+	ownPid := os.Getpid()
+	ownPidInfo, err := ps.FindProcess(ownPid)
+	if err != nil {
+		// Note: 可用性のためfalseを返す
+		return false
+	}
+
+	processes, err := ps.Processes()
+	if err != nil {
+		// Note: 可用性のためfalseを返す
+		return false
+	}
+
+	isRunning := false
+	for _, p := range processes {
+		if p.Pid() != ownPid && p.Executable() == ownPidInfo.Executable() {
+			isRunning = true
+			break
+		}
+	}
+
+	return isRunning
+}
+
+func (a *App) showExistDialog(message string, code int) {
+	_, _ = runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
+		Title:   a.config.App.Name,
+		Message: message,
+	})
+	os.Exit(code)
 }

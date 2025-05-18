@@ -3,6 +3,8 @@ app:
   semver: 0.17.0
   width: 1280
   height: 720
+warcher:
+  interval_sec: 1
 wargaming:
   url: https://api.worldofwarships.asia
   max_retry: 2
