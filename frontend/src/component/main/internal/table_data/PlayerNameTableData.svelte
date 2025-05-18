@@ -3,6 +3,7 @@ import ExternalLink from "src/component/common/ExternalLink.svelte";
 import UkDowndown from "src/component/common/uikit/UkDowndown.svelte";
 import UkTooltip from "src/component/common/uikit/UkTooltip.svelte";
 import { CssClass } from "src/lib/CssClass";
+import { ExcludedPlayers } from "src/lib/ExcludedPlayers";
 import { Notifier } from "src/lib/Notifier";
 import { NumbersURL } from "src/lib/NumbersURL";
 import type { PlayerName } from "src/lib/column/model/PlayerName";
@@ -10,8 +11,6 @@ import { storedAlertPlayers, storedExcludedPlayers } from "src/stores";
 import { createEventDispatcher } from "svelte";
 import type { data } from "wailsjs/go/models";
 import { ClipboardSetText } from "wailsjs/runtime/runtime";
-import "/node_modules/flag-icons/css/flag-icons.min.css";
-import { ExcludedPlayers } from "src/lib/ExcludedPlayers";
 
 export let column: PlayerName;
 export let player: data.Player;
