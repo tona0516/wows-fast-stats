@@ -100,13 +100,13 @@ func TestClient_Timeout(t *testing.T) {
 
 	// モックサーバーの作成
 	mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		time.Sleep(2 * time.Second)
+		time.Sleep(10 * time.Millisecond)
 		w.WriteHeader(http.StatusOK)
 	}))
 	defer mockServer.Close()
 
 	// クライアントの作成
-	client := NewClient(mockServer.URL, WithTimeout(1*time.Second))
+	client := NewClient(mockServer.URL, WithTimeout(5*time.Millisecond))
 
 	// GETリクエストの実行
 	_, _, err := client.GET()
