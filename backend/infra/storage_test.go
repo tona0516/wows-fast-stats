@@ -1,8 +1,6 @@
 package infra
 
 import (
-	"os"
-	"path"
 	"testing"
 	"wfs/backend/data"
 
@@ -11,27 +9,13 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-const dbPrefix = "storage_test"
-
 func openDB(t *testing.T) *badger.DB {
 	t.Helper()
 
-	storagePath := path.Join(dbPrefix, t.Name())
-	db, err := badger.Open(badger.DefaultOptions(storagePath))
-	require.NoError(t, err)
-
-	err = db.DropAll()
+	db, err := badger.Open(badger.DefaultOptions("").WithInMemory(true))
 	require.NoError(t, err)
 
 	return db
-}
-
-func cleanDB(t *testing.T, db *badger.DB) {
-	t.Helper()
-
-	_ = db.DropAll()
-	_ = db.Close()
-	_ = os.RemoveAll(path.Join(dbPrefix, t.Name()))
 }
 
 func TestStorage_DataVersion(t *testing.T) {
@@ -54,8 +38,6 @@ func TestStorage_DataVersion(t *testing.T) {
 	actual, err = storage.DataVersion()
 	require.NoError(t, err)
 	assert.Equal(t, expected, actual)
-
-	cleanDB(t, db)
 }
 
 func TestStorage_UserConfig(t *testing.T) {
@@ -89,8 +71,6 @@ func TestStorage_UserConfig(t *testing.T) {
 	actual, err = storage.UserConfig()
 	require.NoError(t, err)
 	assert.Equal(t, expected, actual)
-
-	cleanDB(t, db)
 }
 
 func TestStorage_UserConfigV2(t *testing.T) {
@@ -122,8 +102,6 @@ func TestStorage_UserConfigV2(t *testing.T) {
 	actual, err = storage.UserConfigV2()
 	require.NoError(t, err)
 	assert.Equal(t, expected, actual)
-
-	cleanDB(t, db)
 }
 
 func TestStorage_AlertPlayers(t *testing.T) {
@@ -170,8 +148,6 @@ func TestStorage_AlertPlayers(t *testing.T) {
 	actual, err := storage.AlertPlayers()
 	require.NoError(t, err)
 	assert.Equal(t, expected, actual)
-
-	cleanDB(t, db)
 }
 
 func TestStorage_ExpectedStats(t *testing.T) {
@@ -201,8 +177,6 @@ func TestStorage_ExpectedStats(t *testing.T) {
 	actual, err := storage.ExpectedStats()
 	require.NoError(t, err)
 	assert.Equal(t, expected, actual)
-
-	cleanDB(t, db)
 }
 
 func TestStorage_OwnIGN(t *testing.T) {
@@ -220,6 +194,4 @@ func TestStorage_OwnIGN(t *testing.T) {
 	actual, err := storage.OwnIGN()
 	require.NoError(t, err)
 	assert.Equal(t, expected, actual)
-
-	cleanDB(t, db)
 }

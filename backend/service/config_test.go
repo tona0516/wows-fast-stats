@@ -116,15 +116,15 @@ func TestConfig_AlertPlayers(t *testing.T) {
 func TestConfig_UpdateAlertPlayer(t *testing.T) {
 	t.Parallel()
 
-	ctrl := gomock.NewController(t)
-
-	existingPlayers := []data.AlertPlayer{
-		{AccountID: 1, Name: "Player1"},
-		{AccountID: 2, Name: "Player2"},
-	}
-
 	t.Run("正常系_追加", func(t *testing.T) {
 		t.Parallel()
+
+		ctrl := gomock.NewController(t)
+
+		existingPlayers := []data.AlertPlayer{
+			{AccountID: 1, Name: "Player1"},
+			{AccountID: 2, Name: "Player2"},
+		}
 
 		// 準備
 		newPlayer := data.AlertPlayer{AccountID: 3, Name: "Player3"}
@@ -147,6 +147,13 @@ func TestConfig_UpdateAlertPlayer(t *testing.T) {
 
 	t.Run("正常系_更新", func(t *testing.T) {
 		t.Parallel()
+
+		ctrl := gomock.NewController(t)
+
+		existingPlayers := []data.AlertPlayer{
+			{AccountID: 1, Name: "Player1"},
+			{AccountID: 2, Name: "Player2"},
+		}
 
 		expected := []data.AlertPlayer{
 			{AccountID: 1, Name: "UpdatedPlayer"},
