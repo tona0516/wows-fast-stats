@@ -26,9 +26,7 @@ type App struct {
 }
 
 func NewApp(config Config) *App {
-	return &App{
-		config: config,
-	}
+	return &App{config: config}
 }
 
 func (a *App) MigrateIfNeeded() error {
@@ -219,18 +217,16 @@ func (a *App) onStartup(ctx context.Context) {
 	runtime.LogSetLogLevel(ctx, logger.INFO)
 
 	if isAlreadyRunning() {
-		a.showExistDialog("すでに起動しています。", 1)
+		a.showExistDialog(ctx, "すでに起動しています。", 1)
 	}
 
-	container, err := NewDependencyContainer(a.config)
+	container, err := NewDependencyContainer(ctx, a.config)
 	if err != nil {
-		a.showExistDialog("意図しないエラーが発生しました。\n"+err.Error(), 1)
+		a.showExistDialog(ctx, "意図しないエラーが発生しました。\n"+err.Error(), 1)
 	}
-
-	a.container = container
-	a.container.logger.Init(ctx)
 
 	a.ctx = ctx
+	a.container = container
 }
 
 func isAlreadyRunning() bool {
@@ -258,8 +254,8 @@ func isAlreadyRunning() bool {
 	return isRunning
 }
 
-func (a *App) showExistDialog(message string, code int) {
-	_, _ = runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
+func (a *App) showExistDialog(ctx context.Context, message string, code int) {
+	_, _ = runtime.MessageDialog(ctx, runtime.MessageDialogOptions{
 		Title:   a.config.App.Name,
 		Message: message,
 	})

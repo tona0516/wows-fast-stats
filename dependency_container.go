@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"time"
 	"wfs/backend/infra"
 	"wfs/backend/repository"
@@ -25,7 +26,7 @@ type DependencyContainer struct {
 	logger                repository.LoggerInterface
 }
 
-func NewDependencyContainer(config Config) (*DependencyContainer, error) {
+func NewDependencyContainer(ctx context.Context, config Config) (*DependencyContainer, error) {
 	alertDiscord := infra.NewDiscord(infra.RequestConfig{
 		URL:     config.Discord.AlertURL,
 		Retry:   config.Discord.MaxRetry,
@@ -54,6 +55,7 @@ func NewDependencyContainer(config Config) (*DependencyContainer, error) {
 		infoDiscord,
 	)
 	logger.SetOwnIGN(ownIGN)
+	logger.Init(ctx)
 
 	wargaming := infra.NewWargaming(
 		infra.RequestConfig{
