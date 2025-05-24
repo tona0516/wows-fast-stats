@@ -3,7 +3,6 @@ module wfs
 go 1.24.2
 
 require (
-	github.com/cenkalti/backoff/v4 v4.3.0
 	github.com/mitchellh/go-ps v1.0.0
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/stretchr/testify v1.10.0
@@ -17,6 +16,7 @@ require (
 	github.com/abadojack/whatlanggo v1.0.1
 	github.com/dgraph-io/badger/v4 v4.7.0
 	github.com/goccy/go-yaml v1.17.1
+	github.com/imroc/req/v3 v3.52.1
 	github.com/morikuni/failure v1.1.2
 	github.com/shopspring/decimal v1.4.0
 	go.uber.org/mock v0.5.1
@@ -34,14 +34,11 @@ require (
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
 	github.com/godbus/dbus/v5 v5.1.0 // indirect
-	github.com/golang/groupcache v0.0.0-20241129210726-2c02b8208cf8 // indirect
 	github.com/google/flatbuffers v25.2.10+incompatible // indirect
-	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/google/pprof v0.0.0-20250423184734-337e5dd93bb4 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/icholy/digest v1.1.0 // indirect
-	github.com/imroc/req/v3 v3.52.1 // indirect
 	github.com/klauspost/compress v1.18.0 // indirect
 	github.com/leaanthony/u v1.1.1 // indirect
 	github.com/onsi/ginkgo/v2 v2.23.4 // indirect
@@ -49,7 +46,6 @@ require (
 	github.com/quic-go/quic-go v0.51.0 // indirect
 	github.com/refraction-networking/utls v1.6.7 // indirect
 	github.com/wailsapp/go-webview2 v1.0.18 // indirect
-	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
 	go.opentelemetry.io/otel v1.35.0 // indirect
 	go.opentelemetry.io/otel/metric v1.35.0 // indirect

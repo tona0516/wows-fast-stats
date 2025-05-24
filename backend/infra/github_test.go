@@ -22,9 +22,7 @@ func TestGithub_LatestRelease(t *testing.T) {
 		server := simpleMockServer(200, expected)
 		defer server.Close()
 
-		github := NewGithub(RequestConfig{
-			URL: server.URL,
-		})
+		github := NewGithub(server.URL, 0, 0)
 
 		actual, err := github.LatestRelease()
 		require.NoError(t, err)
@@ -37,9 +35,7 @@ func TestGithub_LatestRelease(t *testing.T) {
 		server := simpleMockServer(400, "{}")
 		defer server.Close()
 
-		github := NewGithub(RequestConfig{
-			URL: server.URL,
-		})
+		github := NewGithub(server.URL, 0, 0)
 
 		_, err := github.LatestRelease()
 		require.EqualError(t, apperr.Unwrap(err), apperr.GithubAPICheckUpdateError.ErrorCode())

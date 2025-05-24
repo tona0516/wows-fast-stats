@@ -9,6 +9,7 @@ wargaming:
   url: https://api.worldofwarships.asia
   max_retry: 2
   timeout_sec: 10
+  retry_interval_ms: 500
   rate_limit_rps: 10
   app_id: e25e1a2af190880c9e33d3be7cc5313d
 unofficial_wargaming:

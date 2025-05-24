@@ -13,7 +13,6 @@ import (
 	"github.com/morikuni/failure"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.uber.org/ratelimit"
 )
 
 func TestWargaming_AccountInfo(t *testing.T) {
@@ -30,11 +29,9 @@ func TestWargaming_AccountInfo(t *testing.T) {
 		})
 		defer server.Close()
 
-		wargaming := NewWargaming(RequestConfig{
-			URL: server.URL,
-		}, ratelimit.New(10), "")
-
+		wargaming := NewWargaming(server.URL, 0, 0, 0, 1, "")
 		result, err := wargaming.AccountInfo([]int{123, 456})
+
 		require.NoError(t, err)
 		assert.Equal(t, data.WGAccountInfo{}, result)
 	})
@@ -60,11 +57,9 @@ func TestWargaming_AccountInfo(t *testing.T) {
 		}))
 		defer server.Close()
 
-		wargaming := NewWargaming(RequestConfig{
-			URL: server.URL,
-		}, ratelimit.New(10), "")
-
+		wargaming := NewWargaming(server.URL, 0, 0, 0, 1, "")
 		_, err := wargaming.AccountInfo([]int{123, 456})
+
 		code, ok := failure.CodeOf(err)
 		assert.True(t, ok)
 		assert.Equal(t, apperr.WGAPIError, code)
@@ -89,8 +84,8 @@ func TestWargaming_AccountInfo(t *testing.T) {
                 }
             }`, message)
 
-			var retry uint64 = 1
-			var calls uint64
+			var retry int = 1
+			var calls int
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				calls++
 
@@ -107,8 +102,7 @@ func TestWargaming_AccountInfo(t *testing.T) {
 			}))
 			defer server.Close()
 
-			wargaming := NewWargaming(RequestConfig{URL: server.URL, Retry: retry}, ratelimit.New(10), "")
-
+			wargaming := NewWargaming(server.URL, retry, 0, 0, 1, "")
 			_, err := wargaming.AccountInfo([]int{123, 456})
 
 			require.NoError(t, err)
@@ -134,8 +128,8 @@ func TestWargaming_AccountInfo(t *testing.T) {
                 }
             }`, message)
 
-			var retry uint64 = 1
-			var calls uint64
+			var retry int = 1
+			var calls int
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				calls++
 				w.Header().Set("Content-Type", "application/json")
@@ -144,8 +138,7 @@ func TestWargaming_AccountInfo(t *testing.T) {
 			}))
 			defer server.Close()
 
-			wargaming := NewWargaming(RequestConfig{URL: server.URL, Retry: retry}, ratelimit.New(10), "")
-
+			wargaming := NewWargaming(server.URL, retry, 0, 0, 1, "")
 			_, err := wargaming.AccountInfo([]int{123, 456})
 
 			code, ok := failure.CodeOf(err)
@@ -168,10 +161,7 @@ func TestWargaming_AccountListForSearch(t *testing.T) {
 	})
 	defer server.Close()
 
-	wargaming := NewWargaming(RequestConfig{
-		URL: server.URL,
-	}, ratelimit.New(10), "")
-
+	wargaming := NewWargaming(server.URL, 0, 0, 0, 1, "")
 	result, err := wargaming.AccountListForSearch("player")
 
 	require.NoError(t, err)
@@ -190,10 +180,7 @@ func TestWargaming_ClansAccountInfo(t *testing.T) {
 	})
 	defer server.Close()
 
-	wargaming := NewWargaming(RequestConfig{
-		URL: server.URL,
-	}, ratelimit.New(10), "")
-
+	wargaming := NewWargaming(server.URL, 0, 0, 0, 1, "")
 	result, err := wargaming.ClansAccountInfo([]int{123, 456})
 
 	require.NoError(t, err)
@@ -212,10 +199,7 @@ func TestWargaming_ClansInfo(t *testing.T) {
 	})
 	defer server.Close()
 
-	wargaming := NewWargaming(RequestConfig{
-		URL: server.URL,
-	}, ratelimit.New(10), "")
-
+	wargaming := NewWargaming(server.URL, 0, 0, 0, 1, "")
 	result, err := wargaming.ClansInfo([]int{123, 456})
 
 	require.NoError(t, err)
@@ -234,10 +218,7 @@ func TestWargaming_ShipsStats(t *testing.T) {
 	})
 	defer server.Close()
 
-	wargaming := NewWargaming(RequestConfig{
-		URL: server.URL,
-	}, ratelimit.New(10), "")
-
+	wargaming := NewWargaming(server.URL, 0, 0, 0, 1, "")
 	result, err := wargaming.ShipsStats(123)
 
 	require.NoError(t, err)
@@ -261,10 +242,7 @@ func TestWargaming_EncycShips(t *testing.T) {
 	})
 	defer server.Close()
 
-	wargaming := NewWargaming(RequestConfig{
-		URL: server.URL,
-	}, ratelimit.New(10), "")
-
+	wargaming := NewWargaming(server.URL, 0, 0, 0, 1, "")
 	result, pageTotal, err := wargaming.EncycShips(1)
 
 	require.NoError(t, err)
@@ -278,10 +256,7 @@ func TestWargaming_EncycInfo(t *testing.T) {
 	server := simpleMockServer(200, response.WGEncycInfo{})
 	defer server.Close()
 
-	wargaming := NewWargaming(RequestConfig{
-		URL: server.URL,
-	}, ratelimit.New(10), "")
-
+	wargaming := NewWargaming(server.URL, 0, 0, 0, 1, "")
 	result, err := wargaming.EncycInfo()
 
 	require.NoError(t, err)
@@ -300,10 +275,7 @@ func TestWargaming_BattleArena(t *testing.T) {
 	})
 	defer server.Close()
 
-	wargaming := NewWargaming(RequestConfig{
-		URL: server.URL,
-	}, ratelimit.New(10), "")
-
+	wargaming := NewWargaming(server.URL, 0, 0, 0, 1, "")
 	result, err := wargaming.BattleArenas()
 
 	require.NoError(t, err)
@@ -322,9 +294,7 @@ func TestWargaming_BattleTypes(t *testing.T) {
 	})
 	defer server.Close()
 
-	wargaming := NewWargaming(RequestConfig{
-		URL: server.URL,
-	}, ratelimit.New(10), "")
+	wargaming := NewWargaming(server.URL, 0, 0, 0, 1, "")
 	result, err := wargaming.BattleTypes()
 
 	require.NoError(t, err)

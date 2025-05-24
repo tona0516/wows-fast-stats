@@ -5,27 +5,40 @@ import (
 	"slices"
 	"strconv"
 	"strings"
+	"time"
 	"wfs/backend/apperr"
 	"wfs/backend/data"
 	"wfs/backend/infra/response"
-	"wfs/backend/infra/webapi"
 
-	"github.com/cenkalti/backoff/v4"
+	"github.com/imroc/req/v3"
 	"github.com/morikuni/failure"
 	"go.uber.org/ratelimit"
 )
 
 type Wargaming struct {
-	config RequestConfig
-	rl     ratelimit.Limiter
-	appID  string
+	url           string
+	maxRetry      int
+	timeoutSec    int
+	retryInterval int
+	limier        ratelimit.Limiter
+	appID         string
 }
 
-func NewWargaming(config RequestConfig, rl ratelimit.Limiter, appID string) *Wargaming {
+func NewWargaming(
+	url string,
+	maxRetry int,
+	timeoutSec int,
+	retryInterval int,
+	rateLimitRPS int,
+	appID string,
+) *Wargaming {
 	return &Wargaming{
-		config: config,
-		rl:     rl,
-		appID:  appID,
+		url:           url,
+		maxRetry:      maxRetry,
+		timeoutSec:    timeoutSec,
+		retryInterval: retryInterval,
+		limier:        ratelimit.New(rateLimitRPS),
+		appID:         appID,
 	}
 }
 
@@ -207,39 +220,61 @@ func request[T response.WGResponse](
 	path string,
 	queries map[string]string,
 ) (T, error) {
-	b := backoff.WithMaxRetries(backoff.NewExponentialBackOff(), w.config.Retry)
-	operation := func() (T, error) {
-		w.rl.Take()
-		var result T
-
-		_, body, err := webapi.NewClient(w.config.URL,
-			webapi.WithPath(path),
-			webapi.WithQuery(queries),
-			webapi.WithTimeout(w.config.Timeout),
-		).GET()
-		if err != nil {
-			return result, failure.Translate(err, apperr.WGAPIError)
-		}
-
-		if err := json.Unmarshal(body, &result); err != nil {
-			return result, failure.Translate(err, apperr.WGAPIError)
-		}
-
-		if result.GetStatus() == "error" {
-			// Note:
-			// https://developers.wargaming.net/documentation/guide/getting-started/#common-errors
-			message := result.GetError().Message
-			if slices.Contains([]string{"REQUEST_LIMIT_EXCEEDED", "SOURCE_NOT_AVAILABLE"}, message) {
-				return result, failure.New(apperr.WGAPITemporaryUnavaillalble)
+	c := req.C().
+		SetBaseURL(w.url).
+		SetTimeout(time.Duration(w.timeoutSec) * time.Second).
+		SetCommonRetryCount(w.maxRetry).
+		SetCommonRetryFixedInterval(time.Duration(w.retryInterval) * time.Millisecond).
+		SetCommonRetryCondition(func(resp *req.Response, err error) bool {
+			if err != nil {
+				return true
 			}
 
-			return result, backoff.Permanent(failure.New(apperr.WGAPIError))
-		}
+			var body response.WGResponseCommon[any]
+			if err := json.Unmarshal(resp.Bytes(), &body); err == nil {
+				err := convertError(body.Status, body.Error.Message)
+				if failure.Is(err, apperr.WGAPITemporaryUnavaillalble) {
+					return true
+				}
+			}
 
-		return result, nil
+			return false
+		}).
+		OnBeforeRequest(func(client *req.Client, req *req.Request) error {
+			w.limier.Take()
+			return nil
+		}).
+		SetCommonRetryHook(func(resp *req.Response, err error) {
+			w.limier.Take()
+		})
+
+	var result T
+	_, err := c.R().
+		SetSuccessResult(&result).
+		SetQueryParams(queries).
+		Get(path)
+
+	if err != nil {
+		return result, failure.Translate(err, apperr.WGAPIError)
 	}
 
-	res, err := backoff.RetryWithData(operation, b)
+	if err := convertError(result.GetStatus(), result.GetError().Message); err != nil {
+		return result, failure.Wrap(err)
+	}
 
-	return res, failure.Wrap(err)
+	return result, nil
+}
+
+func convertError(status string, message string) error {
+	if status == "error" {
+		// Note:
+		// https://developers.wargaming.net/documentation/guide/getting-started/#common-errors
+		if slices.Contains([]string{"REQUEST_LIMIT_EXCEEDED", "SOURCE_NOT_AVAILABLE"}, message) {
+			return failure.New(apperr.WGAPITemporaryUnavaillalble)
+		}
+
+		return failure.New(apperr.WGAPIError)
+	}
+
+	return nil
 }

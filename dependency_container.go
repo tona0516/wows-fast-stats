@@ -9,7 +9,6 @@ import (
 
 	"github.com/dgraph-io/badger/v4"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
-	"go.uber.org/ratelimit"
 )
 
 type DependencyContainer struct {
@@ -27,16 +26,16 @@ type DependencyContainer struct {
 }
 
 func NewDependencyContainer(ctx context.Context, config Config) (*DependencyContainer, error) {
-	alertDiscord := infra.NewDiscord(infra.RequestConfig{
-		URL:     config.Discord.AlertURL,
-		Retry:   config.Discord.MaxRetry,
-		Timeout: time.Duration(config.Discord.TimeoutSec) * time.Second,
-	})
-	infoDiscord := infra.NewDiscord(infra.RequestConfig{
-		URL:     config.Discord.InfoURL,
-		Retry:   config.Discord.MaxRetry,
-		Timeout: time.Duration(config.Discord.TimeoutSec) * time.Second,
-	})
+	alertDiscord := infra.NewDiscord(
+		config.Discord.AlertURL,
+		config.Discord.MaxRetry,
+		config.Discord.TimeoutSec,
+	)
+	infoDiscord := infra.NewDiscord(
+		config.Discord.InfoURL,
+		config.Discord.MaxRetry,
+		config.Discord.TimeoutSec,
+	)
 
 	options := badger.DefaultOptions(config.Local.StoragePath)
 	db, err := badger.Open(options)
@@ -58,32 +57,31 @@ func NewDependencyContainer(ctx context.Context, config Config) (*DependencyCont
 	logger.Init(ctx)
 
 	wargaming := infra.NewWargaming(
-		infra.RequestConfig{
-			URL:     config.Wargaming.URL,
-			Retry:   config.Wargaming.MaxRetry,
-			Timeout: time.Duration(config.Wargaming.TimeoutSec) * time.Second,
-		},
-		ratelimit.New(config.Wargaming.RateLimitRPS),
+		config.Wargaming.URL,
+		config.Wargaming.MaxRetry,
+		config.Wargaming.TimeoutSec,
+		config.Wargaming.RetryIntervalMs,
+		config.Wargaming.RateLimitRPS,
 		config.Wargaming.AppID,
 	)
-	uwargaming := infra.NewUnofficialWargaming(infra.RequestConfig{
-		URL:     config.UnofficialWargaming.URL,
-		Retry:   config.UnofficialWargaming.MaxRetry,
-		Timeout: time.Duration(config.UnofficialWargaming.TimeoutSec) * time.Second,
-	})
-	numbers := infra.NewNumbers(infra.RequestConfig{
-		URL:     config.Numbers.URL,
-		Retry:   config.Numbers.MaxRetry,
-		Timeout: time.Duration(config.Numbers.TimeoutSec) * time.Second,
-	})
+	uwargaming := infra.NewUnofficialWargaming(
+		config.UnofficialWargaming.URL,
+		config.UnofficialWargaming.MaxRetry,
+		config.UnofficialWargaming.TimeoutSec,
+	)
+	numbers := infra.NewNumbers(
+		config.Numbers.URL,
+		config.Numbers.MaxRetry,
+		config.Numbers.TimeoutSec,
+	)
 	localFile := infra.NewLocalFile()
 	configV0 := infra.NewConfigV0()
 	unregistered := infra.NewUnregistered()
-	github := infra.NewGithub(infra.RequestConfig{
-		URL:     config.Github.URL,
-		Retry:   config.Github.MaxRetry,
-		Timeout: time.Duration(config.Github.TimeoutSec) * time.Second,
-	})
+	github := infra.NewGithub(
+		config.Github.URL,
+		config.Github.MaxRetry,
+		config.Github.TimeoutSec,
+	)
 
 	// services
 	configService := service.NewConfig(localFile, wargaming, storage, logger)
