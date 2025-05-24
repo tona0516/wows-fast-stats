@@ -157,7 +157,7 @@ func (a *App) AutoScreenshot(filename string, base64Data string) error {
 }
 
 func (a *App) Semver() string {
-	return a.config.App.Semver
+	return *a.config.App.Semver
 }
 
 func (a *App) AlertPlayers() ([]data.AlertPlayer, error) {
@@ -256,7 +256,7 @@ func isAlreadyRunning() bool {
 
 func (a *App) showExistDialog(ctx context.Context, message string, code int) {
 	_, _ = runtime.MessageDialog(ctx, runtime.MessageDialogOptions{
-		Title:   a.config.App.Name,
+		Title:   *a.config.App.Name,
 		Message: message,
 	})
 	os.Exit(code)

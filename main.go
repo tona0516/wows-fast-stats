@@ -23,12 +23,25 @@ func main() {
 		log.Fatalln(err.Error())
 	}
 
-	app := NewApp(config)
+	app := NewApp(*config)
+
+	var title string
+	if config.App.Name != nil {
+		title = *config.App.Name
+	}
+	var width int
+	if config.App.Width != nil {
+		width = *config.App.Width
+	}
+	var height int
+	if config.App.Height != nil {
+		height = *config.App.Height
+	}
 
 	err = wails.Run(&options.App{
-		Title:  config.App.Name,
-		Width:  config.App.Width,
-		Height: config.App.Height,
+		Title:  title,
+		Width:  width,
+		Height: height,
 		AssetServer: &assetserver.Options{
 			Assets: assets,
 		},
@@ -42,16 +55,16 @@ func main() {
 	}
 }
 
-func getConfig() (Config, error) {
+func getConfig() (*Config, error) {
 	configYml, err := base64.StdEncoding.DecodeString(Base64ConfigYml)
 	if err != nil {
-		return Config{}, err
+		return nil, err
 	}
 
 	config := Config{}
 	if err := yaml.Unmarshal(configYml, &config); err != nil {
-		return Config{}, err
+		return nil, err
 	}
 
-	return config, nil
+	return &config, nil
 }
