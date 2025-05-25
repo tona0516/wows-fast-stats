@@ -1,5 +1,6 @@
 <script lang="ts">
 import ExternalLink from "src/component/common/ExternalLink.svelte";
+import UkTooltip from "src/component/common/uikit/UkTooltip.svelte";
 import { CssClass } from "src/lib/CssClass";
 import { NumbersURL } from "src/lib/NumbersURL";
 import type { ShipInfo } from "src/lib/column/model/ShipInfo";
@@ -26,11 +27,13 @@ export let player: data.Player;
 </td>
 
 <td class={CssClass.TD_STR}>
-  <ExternalLink url={NumbersURL.ship(player.ship_info.id)}
-    ><div class="uk-text-truncate">
-      {column.displayValue(player)}
-    </div></ExternalLink
-  >
+  <UkTooltip tooltip={column.tooltipText(player)}>
+    <ExternalLink url={NumbersURL.ship(player.ship_info.id)}
+      ><div class="uk-text-truncate">
+        {column.displayValue(player)}
+      </div></ExternalLink
+    >
+  </UkTooltip>
 </td>
 
 <style>

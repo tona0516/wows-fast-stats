@@ -3,6 +3,10 @@
 export let tooltip: string | undefined;
 </script>
 
-<div uk-tooltip={tooltip}>
+{#if tooltip}
+  <div uk-tooltip="title: {tooltip}; pos: top">
+    <slot />
+  </div>
+{:else}
   <slot />
-</div>
+{/if}

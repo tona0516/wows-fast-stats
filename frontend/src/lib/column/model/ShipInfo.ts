@@ -98,4 +98,16 @@ export class ShipInfo extends AbstractColumn {
   nationIconPath(player: data.Player): string {
     return FLAGS[player.ship_info.nation] ?? FlagNone;
   }
+
+  tooltipText(player: data.Player): string {
+    const lines = [];
+
+    if (player.ship_info.avg_damage > 0) {
+      lines.push(
+        `平均DMG: ${player.ship_info.avg_damage.toFixed(this.config.digit.damage)}`,
+      );
+    }
+
+    return lines.join("<br />");
+  }
 }
