@@ -118,9 +118,6 @@ func (a *App) UpdateUserConfig(config data.UserConfigV2) error {
 
 func (a *App) ValidateInstallPath(path string) string {
 	err := a.container.configService.ValidateInstallPath(path)
-	if err != nil {
-		a.container.logger.Error(err, nil)
-	}
 
 	if err := apperr.Unwrap(err); err != nil {
 		return err.Error()
