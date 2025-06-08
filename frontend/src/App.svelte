@@ -135,7 +135,7 @@ main();
   <AlertModals bind:this={modals} />
 
   {#if updatableRelease}
-    <div class="uk-flex uk-flex-center uk-background-secondary">
+    <div>
       新しいバージョンがあります:
       <ExternalLink url={updatableRelease.html_url}>
         {updatableRelease.tag_name}

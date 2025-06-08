@@ -102,7 +102,7 @@ const deriveFileName = (meta: data.Meta): string => {
 <!-- Note: Use the same color as that of body.  -->
 <div
   id={MAIN_PAGE_ID}
-  class="uk-padding-small uk-light uk-background-secondary"
+  class="uk-padding-small"
 >
   <div class="uk-margin-small uk-flex uk-flex-center">
     <Menu
