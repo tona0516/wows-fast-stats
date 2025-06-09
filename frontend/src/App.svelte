@@ -7,9 +7,7 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 import "charts.css";
 
 import ExternalLink from "src/component/common/ExternalLink.svelte";
-import UkIcon from "src/component/common/uikit/UkIcon.svelte";
 import UkSpinner from "src/component/common/uikit/UkSpinner.svelte";
-import UkTab from "src/component/common/uikit/UkTab.svelte";
 import AlertModals from "src/component/modal/AlertModals.svelte";
 import { FontSize } from "src/lib/FontSize";
 import {
@@ -145,46 +143,39 @@ main();
 
   {#if initialized}
     {@const tabID = "page-tab"}
-    <UkTab clazz="uk-margin-remove" id={tabID}>
-      <li>
-        <!-- svelte-ignore a11y-invalid-attribute -->
-        <a href="#"><UkIcon name="home" /></a>
-      </li>
-      <li>
-        <!-- svelte-ignore a11y-invalid-attribute -->
-        <a href="#">
-          <UkIcon name="cog" />
-          {#if $storedInstallPathError}
-            <span class="uk-text-warning uk-text-small">
-              <UkIcon name="warning" />
-            </span>
-          {/if}
-        </a>
-      </li>
-      <li>
-        <!-- svelte-ignore a11y-invalid-attribute -->
-        <a href="#"><UkIcon name="info" /></a>
-      </li>
-    </UkTab>
-    <ul id={tabID} class="uk-switcher">
-      <li>
+    <div class="tabs tabs-border">
+      <label class="tab">
+        <input type="radio" name={tabID} checked={true} />
+        ホーム
+      </label>
+      <div class="tab-content">
         <MainPage
           bind:this={mainPage}
           on:EditAlertPlayer={(e) => modals.showEdit(e.detail.target)}
           on:RemoveAlertPlayer={(e) => modals.showRemove(e.detail.target)}
         />
-      </li>
-      <li>
+      </div>
+
+      <label class="tab">
+        <input type="radio" name={tabID} />
+        設定
+      </label>
+      <div class="tab-content">
         <ConfigPage
           on:AddAlertPlayer={() => modals.showAdd()}
           on:EditAlertPlayer={(e) => modals.showEdit(e.detail.target)}
           on:RemoveAlertPlayer={(e) => modals.showRemove(e.detail.target)}
         />
-      </li>
-      <li>
+      </div>
+
+      <label class="tab">
+        <input type="radio" name={tabID} />
+        アプリについて
+      </label>
+      <div class="tab-content">
         <InfoPage />
-      </li>
-    </ul>
+      </div>
+    </div>
   {:else}
     <div class="uk-overlay-default">
       <div class="uk-position-center">
