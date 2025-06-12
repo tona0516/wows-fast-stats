@@ -38,7 +38,7 @@ const clickApply = async () => {
 };
 </script>
 
-<div class="uk-padding-small">
+<div>
   <div class="uk-flex">
     <input
       class="uk-input"
@@ -61,7 +61,7 @@ const clickApply = async () => {
   {/if}
 </div>
 
-<div class="uk-padding-small">
+<div>
   <div class="uk-flex">
     <button
       class="uk-button uk-button-primary uk-text-nowrap"

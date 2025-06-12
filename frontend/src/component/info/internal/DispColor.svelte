@@ -112,18 +112,18 @@ const prTableInfo = getPRTableInfo(RATING_DEFS, config.color.skill.text);
 const tlTableInfo = getTLTableInfo(THREAT_LEVEL_DEFS);
 </script>
 
-<div class="uk-padding-small">
+<div>
   <DispColorTable
     caption="Personal Rating (by WoWS Numbers)"
     tableInfo={prTableInfo}
   />
 </div>
 
-<div class="uk-padding-small">
+<div>
   <DispColorTable caption="戦力評価 (by 178usagi氏)" tableInfo={tlTableInfo} />
 </div>
 
-<div class="uk-padding-small">
+<div>
   <ul>
     {#each LINKS as link}
       <li>

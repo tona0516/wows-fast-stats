@@ -33,7 +33,7 @@ const update = async () => {
 
 <UkModal id={ModalElementID.EDIT_ALERT_PLAYER}>
   <div slot="body">
-    <div class="uk-margin-small">
+    <div>
       <input
         class="uk-input"
         type="text"
@@ -43,7 +43,7 @@ const update = async () => {
       />
     </div>
 
-    <div class="uk-margin-small">
+    <div>
       <div>アイコン</div>
       {#await AlertPatterns() then alertPatterns}
         <div class="uk-grid-small uk-child-width-auto uk-grid">
@@ -61,7 +61,7 @@ const update = async () => {
       {/await}
     </div>
 
-    <div class="uk-margin-small">
+    <div>
       <textarea
         class="uk-textarea"
         placeholder="メモ(任意)"

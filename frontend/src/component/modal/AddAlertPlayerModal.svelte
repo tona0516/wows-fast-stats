@@ -85,7 +85,7 @@ $: disableAddButton =
 
 <UkModal id={ModalElementID.ADD_ALERT_PLAYER}>
   <div slot="body">
-    <div class="uk-margin-small">
+    <div>
       <form class="uk-search uk-search-default">
         <input
           class="uk-search-input"
@@ -97,7 +97,7 @@ $: disableAddButton =
       </form>
 
       {#if searchResult}
-        <span class="uk-margin-small">
+        <span>
           <UkIcon name="check" />
           {searchResult.nickname}
         </span>
@@ -123,7 +123,7 @@ $: disableAddButton =
       {/if}
     </div>
 
-    <div class="uk-margin-small">
+    <div>
       <div>アイコン</div>
       {#await AlertPatterns() then alertPatterns}
         <div class="uk-grid-small uk-child-width-auto uk-grid">
@@ -141,7 +141,7 @@ $: disableAddButton =
       {/await}
     </div>
 
-    <div class="uk-margin-small">
+    <div>
       <textarea
         class="uk-textarea"
         placeholder="メモ(任意)"

@@ -4,7 +4,7 @@
 
 <div class="uk-overflow-auto">
   <table
-    class="uk-table uk-table-shrink uk-table-divider uk-table-small uk-table-middle uk-text-nowrap uk-margin-bottom-small"
+    class="uk-table uk-table-shrink uk-table-divider uk-table-small uk-table-middle uk-text-nowrap"
   >
     <slot />
   </table>

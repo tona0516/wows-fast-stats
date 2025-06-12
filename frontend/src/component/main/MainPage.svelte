@@ -102,9 +102,8 @@ const deriveFileName = (meta: data.Meta): string => {
 <!-- Note: Use the same color as that of body.  -->
 <div
   id={MAIN_PAGE_ID}
-  class="uk-padding-small"
 >
-  <div class="uk-margin-small uk-flex uk-flex-center">
+  <div class="uk-flex uk-flex-center">
     <Menu
       bind:this={menu}
       {isScreenshotting}
@@ -112,7 +111,7 @@ const deriveFileName = (meta: data.Meta): string => {
     />
   </div>
 
-  <div class="uk-margin-small">
+  <div>
     {#if $storedBattle}
       {@const teams = $storedBattle.teams}
       {@const meta = $storedBattle.meta}
@@ -148,7 +147,7 @@ const deriveFileName = (meta: data.Meta): string => {
     {/if}
   </div>
 
-  <div class="uk-margin-small">
+  <div>
     <Ofuse />
   </div>
 

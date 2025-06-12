@@ -24,8 +24,8 @@ const change = async () => {
 };
 </script>
 
-<div class="uk-padding-small">
-  <div class="uk-margin-small-bottom">
+<div>
+  <div>
     <label
       ><input
         class="uk-checkbox"
@@ -43,7 +43,7 @@ const change = async () => {
     </div>
   </div>
 
-  <div class="uk-margin-small-bottom">
+  <div>
     <label
       ><input
         class="uk-checkbox"
@@ -61,7 +61,7 @@ const change = async () => {
     </div>
   </div>
 
-  <div class="uk-margin-small-bottom">
+  <div>
     <label
       ><input
         class="uk-checkbox"
@@ -81,7 +81,7 @@ const change = async () => {
     </div>
   </div>
 
-  <div class="uk-margin-small-bottom">
+  <div>
     <label
       ><input
         class="uk-checkbox"

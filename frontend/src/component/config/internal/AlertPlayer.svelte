@@ -8,7 +8,7 @@ import { createEventDispatcher } from "svelte";
 const dispatch = createEventDispatcher();
 </script>
 
-<div class="uk-padding-small">
+<div>
   <h5>プレイヤー検出機能</h5>
   <ul class="uk-list uk-list-disc uk-list-collapse">
     <li>戦闘情報のテーブル内のプレイヤーにアイコンを表示</li>
@@ -18,7 +18,7 @@ const dispatch = createEventDispatcher();
 </div>
 
 {#if $storedAlertPlayers.length !== 0}
-  <div class="uk-padding-small">
+  <div>
     <UkTable>
       <thead>
         <tr>
@@ -69,7 +69,7 @@ const dispatch = createEventDispatcher();
   </div>
 {/if}
 
-<div class="uk-padding-small">
+<div>
   <button
     class="uk-button uk-button-primary uk-text-nowrap"
     on:click={() => {

@@ -41,7 +41,7 @@ $: columnSettings = deriveColumnSettings(inputConfig);
 
 <ConfirmModal message="表示設定をリセットしますか？" on:Confirmed={reset} />
 
-<div class="uk-padding-small">
+<div>
   <div>UIサイズ</div>
   <select
     class="uk-select uk-form-width-small"
@@ -56,7 +56,7 @@ $: columnSettings = deriveColumnSettings(inputConfig);
   </select>
 </div>
 
-<div class="uk-padding-small">
+<div>
   <div>表示項目</div>
   <table
     class="uk-table uk-width-medium uk-table-divider uk-table-middle uk-text-nowrap"
@@ -125,7 +125,7 @@ $: columnSettings = deriveColumnSettings(inputConfig);
   </table>
 </div>
 
-<div class="uk-padding-small">
+<div>
   <div>各種カラー</div>
   <table
     class="uk-table uk-width-medium uk-table-divider uk-table-middle uk-text-nowrap"
@@ -227,7 +227,7 @@ $: columnSettings = deriveColumnSettings(inputConfig);
   </table>
 </div>
 
-<div class="uk-padding-small">
+<div>
   <div>プレイヤー名の背景色</div>
   <select
     class="uk-select uk-form-width-medium"
@@ -243,7 +243,7 @@ $: columnSettings = deriveColumnSettings(inputConfig);
   </select>
 </div>
 
-<div class="uk-padding-small">
+<div>
   <div>その他</div>
   <input
     class="uk-checkbox"
@@ -253,7 +253,7 @@ $: columnSettings = deriveColumnSettings(inputConfig);
   /> クラン国籍を表示する（クラン説明から言語検出）
 </div>
 
-<div class="uk-padding-small">
+<div>
   <button
     class="uk-button uk-button-danger uk-text-nowrap"
     on:click={() => {

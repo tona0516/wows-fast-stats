@@ -23,8 +23,8 @@ const links = [
 ];
 </script>
 
-<div class="uk-padding-small">
-  <div class="uk-margin-small">
+<div>
+  <div>
     <div class="uk-flex uk-flex-center">
       <img src={iconApp} alt="" width="128px" height="128px" />
     </div>
@@ -37,7 +37,7 @@ const links = [
     </div>
   </div>
 
-  <div class="uk-margin-small">
+  <div>
     {#each links as link}
       <div class="uk-flex uk-flex-center">
         <ExternalLink url={link.url}>
@@ -48,7 +48,7 @@ const links = [
     {/each}
   </div>
 
-  <div class="uk-margin-small uk-flex uk-flex-center">
+  <div class="uk-flex uk-flex-center">
     Copyright © 2023 tona0516 All Rights Reserved.
   </div>
 </div>

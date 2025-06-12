@@ -6,7 +6,6 @@ import MainPage from "src/component/main/MainPage.svelte";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "charts.css";
 
-import ExternalLink from "src/component/common/ExternalLink.svelte";
 import UkSpinner from "src/component/common/uikit/UkSpinner.svelte";
 import AlertModals from "src/component/modal/AlertModals.svelte";
 import { FontSize } from "src/lib/FontSize";
@@ -27,12 +26,16 @@ import {
 } from "wailsjs/go/main/App";
 import { data } from "wailsjs/go/models";
 import { EventsOn } from "wailsjs/runtime/runtime";
+import ExternalLink from "./component/common/ExternalLink.svelte";
 import { Notifier } from "./lib/Notifier";
 
 let modals: AlertModals;
 let mainPage: MainPage | undefined;
 let initialized = false;
 let updatableRelease: data.GHLatestRelease;
+
+type Page = "main" | "config" | "info";
+let page: Page = "main";
 
 $: {
   // @ts-ignore
@@ -104,17 +107,19 @@ const initialize = async (): Promise<data.UserConfigV2 | undefined> => {
 };
 
 const notifyUpdate = async (config: data.UserConfigV2) => {
-  if (!config.notify_updatable) return;
+  return;
 
-  try {
-    const latestRelease = await LatestRelease();
-    if (latestRelease.updatable) {
-      updatableRelease = latestRelease;
-    }
-  } catch (error) {
-    Notifier.failure(error);
-    return;
-  }
+  // if (!config.notify_updatable) return;
+
+  // try {
+  //   const latestRelease = await LatestRelease();
+  //   if (latestRelease.updatable) {
+  //     updatableRelease = latestRelease;
+  //   }
+  // } catch (error) {
+  //   Notifier.failure(error);
+  //   return;
+  // }
 };
 
 const main = async () => {
@@ -132,55 +137,60 @@ main();
 <main>
   <AlertModals bind:this={modals} />
 
-  {#if updatableRelease}
-    <div>
-      新しいバージョンがあります:
-      <ExternalLink url={updatableRelease.html_url}>
-        {updatableRelease.tag_name}
-      </ExternalLink>
+  <div class="flex">
+    <div class="flex-none">
+      <ul class="menu bg-base-200 rounded-box">
+        <li>
+          <a on:click={() => (page = "main")}>
+            <i class="bi bi-house"></i>
+          </a>
+        </li>
+        <li>
+          <a on:click={() => (page = "config")}>
+            <i class="bi bi-gear"></i>
+          </a>
+        </li>
+        <li>
+          <a on:click={() => (page = "info")}
+            ><i class="bi bi-info-circle"></i></a
+          >
+        </li>
+      </ul>
     </div>
-  {/if}
 
-  {#if initialized}
-    {@const tabID = "page-tab"}
-    <div class="tabs tabs-border">
-      <label class="tab">
-        <input type="radio" name={tabID} checked={true} />
-        ホーム
-      </label>
-      <div class="tab-content">
-        <MainPage
-          bind:this={mainPage}
-          on:EditAlertPlayer={(e) => modals.showEdit(e.detail.target)}
-          on:RemoveAlertPlayer={(e) => modals.showRemove(e.detail.target)}
-        />
-      </div>
+    <div class="flex-1">
+      {#if updatableRelease}
+        <div>
+          新しいバージョンがあります:
+          <ExternalLink url={updatableRelease.html_url}>
+            {updatableRelease.tag_name}
+          </ExternalLink>
+        </div>
+      {/if}
 
-      <label class="tab">
-        <input type="radio" name={tabID} />
-        設定
-      </label>
-      <div class="tab-content">
-        <ConfigPage
-          on:AddAlertPlayer={() => modals.showAdd()}
-          on:EditAlertPlayer={(e) => modals.showEdit(e.detail.target)}
-          on:RemoveAlertPlayer={(e) => modals.showRemove(e.detail.target)}
-        />
-      </div>
-
-      <label class="tab">
-        <input type="radio" name={tabID} />
-        アプリについて
-      </label>
-      <div class="tab-content">
-        <InfoPage />
-      </div>
+      {#if initialized}
+        {#if page === "main"}
+          <MainPage
+            bind:this={mainPage}
+            on:EditAlertPlayer={(e) => modals.showEdit(e.detail.target)}
+            on:RemoveAlertPlayer={(e) => modals.showRemove(e.detail.target)}
+          />
+        {:else if page === "config"}
+          <ConfigPage
+            on:AddAlertPlayer={() => modals.showAdd()}
+            on:EditAlertPlayer={(e) => modals.showEdit(e.detail.target)}
+            on:RemoveAlertPlayer={(e) => modals.showRemove(e.detail.target)}
+          />
+        {:else if page === "info"}
+          <InfoPage />
+        {/if}
+      {:else}
+        <div class="uk-overlay-default">
+          <div class="uk-position-center">
+            <UkSpinner />
+          </div>
+        </div>
+      {/if}
     </div>
-  {:else}
-    <div class="uk-overlay-default">
-      <div class="uk-position-center">
-        <UkSpinner />
-      </div>
-    </div>
-  {/if}
+  </div>
 </main>

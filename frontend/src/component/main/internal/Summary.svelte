@@ -6,14 +6,14 @@ import type { Summary } from "src/lib/Summary";
 export let summary: Summary;
 </script>
 
-<div class="uk-padding-small">
+<div>
   <div>
     <div class="uk-text-bold uk-text-center">艦種別平均値</div>
   </div>
 
   <div class="uk-grid uk-grid-small uk-flex-center">
     {#each summary.values.toArray() as item}
-      <div class="uk-margin-remove">
+      <div>
         <div class="uk-text-small uk-text-bold uk-text-center">
           {DispName.SHIP_TYPE_FOR_SUMMARY.get(item.key)}
         </div>

@@ -1,33 +1,31 @@
 <script lang="ts">
-import UkTab from "src/component/common/uikit/UkTab.svelte";
 import { storedConfig } from "src/stores";
 import AppInfo from "./internal/AppInfo.svelte";
 import ColorDescription from "./internal/DispColor.svelte";
 import Logging from "./internal/Logging.svelte";
 
-const INFO_MENU_ID = "info-menu-id";
+const tabName = "tab_info";
 </script>
 
-<div class="uk-padding-small uk-grid">
-  <div class="uk-width-auto@m">
-    <UkTab clazz="uk-tab-left" id={INFO_MENU_ID}>
-      {#each ["表示色について", "ログ", "アプリ情報"] as menu}
-        <!-- svelte-ignore a11y-invalid-attribute -->
-        <li><a href="#">{menu}</a></li>
-      {/each}
-    </UkTab>
+<div class="tabs tabs-lift">
+  <input
+    type="radio"
+    name={tabName}
+    class="tab"
+    aria-label="表示色について"
+    checked={true}
+  />
+  <div class="tab-content bg-base-100 border-base-300 p-6">
+    <ColorDescription config={$storedConfig} />
   </div>
-  <div class="uk-width-expand@m">
-    <ul id={INFO_MENU_ID} class="uk-switcher">
-      <li>
-        <ColorDescription config={$storedConfig} />
-      </li>
-      <li>
-        <Logging />
-      </li>
-      <li>
-        <AppInfo />
-      </li>
-    </ul>
+
+  <input type="radio" name={tabName} class="tab" aria-label="ログ" />
+  <div class="tab-content bg-base-100 border-base-300 p-6">
+    <Logging />
+  </div>
+
+  <input type="radio" name={tabName} class="tab" aria-label="アプリ情報" />
+  <div class="tab-content bg-base-100 border-base-300 p-6">
+    <AppInfo />
   </div>
 </div>

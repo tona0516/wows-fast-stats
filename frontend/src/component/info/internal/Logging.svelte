@@ -14,9 +14,9 @@ storedLogs.subscribe(() => {
 });
 </script>
 
-<div class="uk-padding-small">
+<div>
   <div
-    class="overflow-scroll uk-text-emphasis uk-tile-secondary"
+    class="overflow-scroll uk-text-emphasis"
     id={elementID}
   >
     {#each $storedLogs as log}

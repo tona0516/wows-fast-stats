@@ -33,9 +33,9 @@ const clickApply = async () => {
 };
 </script>
 
-<div class="uk-padding-small">
+<div>
   <h5>チーム平均に含める最小戦闘数</h5>
-  <div class="uk-margin-small-bottom">
+  <div>
     <div>艦戦闘数</div>
     <input
       class="uk-input uk-form-width-small"
@@ -47,7 +47,7 @@ const clickApply = async () => {
     {/if}
   </div>
 
-  <div class="uk-margin-small-bottom">
+  <div>
     <div>総合戦闘数</div>
     <input
       class="uk-input uk-form-width-small"
@@ -60,7 +60,7 @@ const clickApply = async () => {
   </div>
 </div>
 
-<div class="uk-padding-small">
+<div>
   <div class="uk-flex">
     <button
       class="uk-button uk-button-primary uk-text-nowrap"

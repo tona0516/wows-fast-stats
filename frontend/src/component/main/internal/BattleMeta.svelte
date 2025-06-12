@@ -23,7 +23,7 @@ $: battleMetas = [
 
 <div class="uk-flex uk-flex-center">
   {#each battleMetas as meta}
-    <div class="uk-margin-small-right uk-text-nowrap">
+    <div class="uk-text-nowrap">
       <UkIcon name={meta.icon} />
       <span class="uk-text-middle">{meta.text}</span>
     </div>
