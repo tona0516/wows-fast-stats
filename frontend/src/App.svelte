@@ -7,7 +7,6 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 import "charts.css";
 
 import UkSpinner from "src/component/common/uikit/UkSpinner.svelte";
-import AlertModals from "src/component/modal/AlertModals.svelte";
 import { FontSize } from "src/lib/FontSize";
 import {
   storedAlertPlayers,
@@ -29,7 +28,6 @@ import { EventsOn } from "wailsjs/runtime/runtime";
 import ExternalLink from "./component/common/ExternalLink.svelte";
 import { Notifier } from "./lib/Notifier";
 
-let modals: AlertModals;
 let mainPage: MainPage | undefined;
 let initialized = false;
 let updatableRelease: data.GHLatestRelease;
@@ -135,8 +133,6 @@ main();
 </script>
 
 <main>
-  <AlertModals bind:this={modals} />
-
   <div class="flex">
     <div class="flex-none">
       <ul class="menu bg-base-200 rounded-box">
@@ -170,17 +166,9 @@ main();
 
       {#if initialized}
         {#if page === "main"}
-          <MainPage
-            bind:this={mainPage}
-            on:EditAlertPlayer={(e) => modals.showEdit(e.detail.target)}
-            on:RemoveAlertPlayer={(e) => modals.showRemove(e.detail.target)}
-          />
+          <MainPage bind:this={mainPage} />
         {:else if page === "config"}
-          <ConfigPage
-            on:AddAlertPlayer={() => modals.showAdd()}
-            on:EditAlertPlayer={(e) => modals.showEdit(e.detail.target)}
-            on:RemoveAlertPlayer={(e) => modals.showRemove(e.detail.target)}
-          />
+          <ConfigPage />
         {:else if page === "info"}
           <InfoPage />
         {/if}

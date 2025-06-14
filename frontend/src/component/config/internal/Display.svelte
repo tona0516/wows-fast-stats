@@ -1,11 +1,8 @@
 <script lang="ts">
-import ConfirmModal from "src/component/modal/ConfirmModal.svelte";
-import { ModalElementID } from "src/component/modal/ModalElementID";
 import { DispName } from "src/lib/DispName";
 import { Notifier } from "src/lib/Notifier";
 import { deriveColumnSettings } from "src/lib/util";
 import { storedConfig } from "src/stores";
-import UIkit from "uikit";
 import { DefaultUserConfig, UpdateUserConfig } from "wailsjs/go/main/App";
 
 $: inputConfig = $storedConfig;
@@ -38,8 +35,6 @@ const change = async () => {
 
 $: columnSettings = deriveColumnSettings(inputConfig);
 </script>
-
-<ConfirmModal message="表示設定をリセットしますか？" on:Confirmed={reset} />
 
 <div>
   <div>UIサイズ</div>
@@ -251,16 +246,4 @@ $: columnSettings = deriveColumnSettings(inputConfig);
     bind:checked={inputConfig.show_language_frag}
     on:change={change}
   /> クラン国籍を表示する（クラン説明から言語検出）
-</div>
-
-<div>
-  <button
-    class="uk-button uk-button-danger uk-text-nowrap"
-    on:click={() => {
-      const elem = document.getElementById(ModalElementID.CONFIRM);
-      if (elem) {
-        UIkit.modal(elem).show();
-      }
-    }}>リセット</button
-  >
 </div>
