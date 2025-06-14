@@ -1,5 +1,4 @@
 import SingleTableData from "src/component/main/internal/table_data/SingleTableData.svelte";
-import { CssClass } from "src/lib/CssClass";
 import { AbstractStatsColumn } from "src/lib/column/intetface/AbstractStatsColumn";
 import type { data } from "wailsjs/go/models";
 
@@ -17,9 +16,5 @@ export class HitRate extends AbstractStatsColumn<string> {
 
   svelteComponent() {
     return SingleTableData;
-  }
-
-  getTdClass(_: data.Player): string {
-    return CssClass.TD_MULTI;
   }
 }

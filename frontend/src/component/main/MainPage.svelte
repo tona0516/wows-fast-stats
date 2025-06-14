@@ -13,7 +13,6 @@ import {
 } from "src/stores";
 import { LogInfo } from "wailsjs/go/main/App";
 import type { data } from "wailsjs/go/models";
-import UkSpinner from "../common/uikit/UkSpinner.svelte";
 import Menu from "./internal/Menu.svelte";
 import Ofuse from "./internal/Ofuse.svelte";
 import Summary from "./internal/Summary.svelte";
@@ -100,10 +99,8 @@ const deriveFileName = (meta: data.Meta): string => {
 </script>
 
 <!-- Note: Use the same color as that of body.  -->
-<div
-  id={MAIN_PAGE_ID}
->
-  <div class="uk-flex uk-flex-center">
+<div id={MAIN_PAGE_ID}>
+  <div class="flex">
     <Menu
       bind:this={menu}
       {isScreenshotting}
@@ -117,7 +114,7 @@ const deriveFileName = (meta: data.Meta): string => {
       {@const meta = $storedBattle.meta}
       {@const config = $storedConfig}
 
-      <div class="uk-flex uk-flex-center">
+      <div class="flex">
         <StatisticsTable
           {teams}
           {config}
@@ -126,18 +123,18 @@ const deriveFileName = (meta: data.Meta): string => {
         />
       </div>
 
-      <div class="uk-flex uk-flex-center">
+      <div class="flex">
         <BattleMeta {meta} />
       </div>
 
       {#if $storedSummary}
         {@const summary = $storedSummary}
-        <div class="uk-flex uk-flex-center">
+        <div class="flex">
           <Summary {summary} />
         </div>
       {/if}
     {:else}
-      <p class="uk-text-center">
+      <p>
         {#if $storedInstallPathError}
           設定画面から初期設定を行ってください。
         {:else}
@@ -152,10 +149,8 @@ const deriveFileName = (meta: data.Meta): string => {
   </div>
 
   {#if isLoading}
-    <div class="uk-overlay-default">
-      <div class="uk-position-center">
-        <UkSpinner />
-      </div>
+    <div class="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-20">
+      <span class="loading loading-spinner"></span>
     </div>
   {/if}
 </div>

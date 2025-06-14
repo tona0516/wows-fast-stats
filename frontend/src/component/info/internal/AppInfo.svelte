@@ -1,7 +1,6 @@
 <script lang="ts">
 import iconApp from "src/assets/images/appicon.png";
 import ExternalLink from "src/component/common/ExternalLink.svelte";
-import UkIcon from "src/component/common/uikit/UkIcon.svelte";
 import { Semver } from "wailsjs/go/main/App";
 
 const links = [
@@ -25,12 +24,12 @@ const links = [
 
 <div>
   <div>
-    <div class="uk-flex uk-flex-center">
+    <div class="flex">
       <img src={iconApp} alt="" width="128px" height="128px" />
     </div>
 
-    <div class="uk-flex uk-flex-center">
-      <div class="uk-flex uk-text-emphasis">
+    <div class="flex">
+      <div class="flex">
         wows-fast-stats
         {#await Semver() then semver} {semver} {/await}
       </div>
@@ -39,16 +38,13 @@ const links = [
 
   <div>
     {#each links as link}
-      <div class="uk-flex uk-flex-center">
+      <div class="flex">
         <ExternalLink url={link.url}>
-          <UkIcon name={link.icon} />
-          <span class="uk-text-middle">{link.text}</span>
+          <i class="bi bi-{link.icon}">{link.text}</i>
         </ExternalLink>
       </div>
     {/each}
   </div>
 
-  <div class="uk-flex uk-flex-center">
-    Copyright © 2023 tona0516 All Rights Reserved.
-  </div>
+  <div class="flex">Copyright © 2023 tona0516 All Rights Reserved.</div>
 </div>

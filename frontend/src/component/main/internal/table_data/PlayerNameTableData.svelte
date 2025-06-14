@@ -1,8 +1,5 @@
 <script lang="ts">
 import ExternalLink from "src/component/common/ExternalLink.svelte";
-import UkDowndown from "src/component/common/uikit/UkDowndown.svelte";
-import UkTooltip from "src/component/common/uikit/UkTooltip.svelte";
-import { CssClass } from "src/lib/CssClass";
 import { ExcludedPlayers } from "src/lib/ExcludedPlayers";
 import { Notifier } from "src/lib/Notifier";
 import { NumbersURL } from "src/lib/NumbersURL";
@@ -44,7 +41,7 @@ const setPlayerNameToClipboard = async () => {
 <td>
   {#if !isNPC}
     <input
-      class="uk-checkbox"
+      class="checkbox"
       type="checkbox"
       on:click={onCheck}
       checked={isChecked}
@@ -52,42 +49,40 @@ const setPlayerNameToClipboard = async () => {
   {/if}
 </td>
 
-<td class={CssClass.TD_STR}>
+<td>
   {#if !isNPC}
-    <UkTooltip tooltip={alertPlayer?.message}>
-      <!-- svelte-ignore a11y-invalid-attribute -->
-      <a href="#">
-        <div class="uk-flex uk-flex-middle">
-          {#if alertPlayer}
-            <i class="bi {alertPlayer.pattern} alert-icon" />
-          {/if}
-          {#if clanTag}
-            {#if column.clanFlagIconClass(player)}
-              <span
-                class="nation-icon uk-preserve-width {column.clanFlagIconClass(
-                  player,
-                )}"
-              ></span>
-            {/if}
-            <span
-              class="clan-tag"
-              style="color: {column.clanColorCode(player)}"
-            >
-              {clanTag}
-            </span>
-          {/if}
-          <div
-            class="uk-text-truncate"
-            style="color: {column.textColorCode(player)}"
-          >
-            {column.playerName(player)}
-          </div>
+    <details class="dropdown">
+      <summary>
+        <div class="tooltip" data-tip={alertPlayer?.message}>
+          <!-- svelte-ignore a11y-invalid-attribute -->
+          <a href="#">
+            <div class="flex">
+              {#if alertPlayer}
+                <i class="bi {alertPlayer.pattern} alert-icon" />
+              {/if}
+              {#if clanTag}
+                {#if column.clanFlagIconClass(player)}
+                  <span class="nation-icon {column.clanFlagIconClass(player)}"
+                  ></span>
+                {/if}
+                <span
+                  class="clan-tag"
+                  style="color: {column.clanColorCode(player)}"
+                >
+                  {clanTag}
+                </span>
+              {/if}
+              <div style="color: {column.textColorCode(player)}">
+                {column.playerName(player)}
+              </div>
+            </div>
+          </a>
         </div>
-      </a>
-    </UkTooltip>
+      </summary>
 
-    <UkDowndown>
-      <ul class="uk-nav uk-dropdown-nav">
+      <ul
+        class="menu dropdown-content bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
+      >
         {#if clanTag}
           <li>
             <ExternalLink url={NumbersURL.clan(player.player_info.clan.id)}
@@ -147,9 +142,9 @@ const setPlayerNameToClipboard = async () => {
           >
         </li>
       </ul>
-    </UkDowndown>
+    </details>
   {:else}
-    <div class="uk-text-truncate">{column.playerName(player)}</div>
+    {column.playerName(player)}
   {/if}
 </td>
 

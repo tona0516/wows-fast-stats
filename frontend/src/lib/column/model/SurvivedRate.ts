@@ -1,5 +1,4 @@
 import SingleTableData from "src/component/main/internal/table_data/SingleTableData.svelte";
-import { CssClass } from "src/lib/CssClass";
 import { AbstractStatsColumn } from "src/lib/column/intetface/AbstractStatsColumn";
 import type { StatsCategory } from "src/lib/types";
 import type { data } from "wailsjs/go/models";
@@ -18,9 +17,5 @@ export class SurvivedRate extends AbstractStatsColumn<string> {
 
   svelteComponent() {
     return SingleTableData;
-  }
-
-  tdClass(_: data.Player): string {
-    return CssClass.TD_MULTI;
   }
 }

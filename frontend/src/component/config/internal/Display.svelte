@@ -38,11 +38,7 @@ $: columnSettings = deriveColumnSettings(inputConfig);
 
 <div>
   <div>UIサイズ</div>
-  <select
-    class="uk-select uk-form-width-small"
-    bind:value={inputConfig.font_size}
-    on:change={change}
-  >
+  <select class="select" bind:value={inputConfig.font_size} on:change={change}>
     {#each DispName.FONT_SIZES.toArray() as fs}
       <option selected={fs.key === $storedConfig.font_size} value={fs.key}
         >{fs.value}</option
@@ -53,13 +49,11 @@ $: columnSettings = deriveColumnSettings(inputConfig);
 
 <div>
   <div>表示項目</div>
-  <table
-    class="uk-table uk-width-medium uk-table-divider uk-table-middle uk-text-nowrap"
-  >
+  <table class="table">
     <thead>
       <tr>
         {#each ["項目", "艦成績", "総合成績", "小数点以下の桁数"] as columns}
-          <th class="uk-text-center">{columns}</th>
+          <th>{columns}</th>
         {/each}
       </tr>
     </thead>
@@ -71,9 +65,9 @@ $: columnSettings = deriveColumnSettings(inputConfig);
           </td>
 
           {#if column.ship.key}
-            <td class="uk-text-center">
+            <td>
               <input
-                class="uk-checkbox"
+                class="checkbox"
                 type="checkbox"
                 bind:checked={inputConfig.display.ship[column.ship.key]}
                 on:change={change}
@@ -84,9 +78,9 @@ $: columnSettings = deriveColumnSettings(inputConfig);
           {/if}
 
           {#if column.overall.key}
-            <td class="uk-text-center">
+            <td>
               <input
-                class="uk-checkbox"
+                class="checkbox"
                 type="checkbox"
                 bind:checked={inputConfig.display.overall[column.overall.key]}
                 on:change={change}
@@ -97,9 +91,9 @@ $: columnSettings = deriveColumnSettings(inputConfig);
           {/if}
 
           {#if column.digit.key}
-            <td class="uk-text-center">
+            <td>
               <select
-                class="uk-select uk-form-small uk-form-width-xsmall"
+                class="select"
                 bind:value={inputConfig.digit[column.digit.key]}
                 on:change={change}
               >
@@ -122,13 +116,11 @@ $: columnSettings = deriveColumnSettings(inputConfig);
 
 <div>
   <div>各種カラー</div>
-  <table
-    class="uk-table uk-width-medium uk-table-divider uk-table-middle uk-text-nowrap"
-  >
+  <table class="table">
     <thead>
       <tr>
         {#each ["スキル", "文字色"] as column}
-          <th class="uk-text-center">{column}</th>
+          <th>{column}</th>
         {/each}
       </tr>
     </thead>
@@ -138,7 +130,7 @@ $: columnSettings = deriveColumnSettings(inputConfig);
           <td>{sl.value}</td>
           <td>
             <input
-              class="uk-input"
+              class="input"
               type="color"
               bind:value={inputConfig.color.skill.text[sl.key]}
               on:input={change}
@@ -149,13 +141,11 @@ $: columnSettings = deriveColumnSettings(inputConfig);
     </tbody>
   </table>
 
-  <table
-    class="uk-table uk-width-medium uk-table-divider uk-table-middle uk-text-nowrap"
-  >
+  <table class="table">
     <thead>
       <tr>
         {#each ["Tier", "使用艦", "非使用艦"] as column}
-          <th class="uk-text-center">{column}</th>
+          <th>{column}</th>
         {/each}
       </tr>
     </thead>
@@ -165,7 +155,7 @@ $: columnSettings = deriveColumnSettings(inputConfig);
           <td>{tg.value}</td>
           <td>
             <input
-              class="uk-input"
+              class="input"
               type="color"
               bind:value={inputConfig.color.tier.own[tg.key]}
               on:input={change}
@@ -174,7 +164,7 @@ $: columnSettings = deriveColumnSettings(inputConfig);
 
           <td>
             <input
-              class="uk-input"
+              class="input"
               type="color"
               bind:value={inputConfig.color.tier.other[tg.key]}
               on:input={change}
@@ -185,13 +175,11 @@ $: columnSettings = deriveColumnSettings(inputConfig);
     </tbody>
   </table>
 
-  <table
-    class="uk-table uk-width-medium uk-table-divider uk-table-middle uk-text-nowrap"
-  >
+  <table class="table">
     <thead>
       <tr>
         {#each ["艦種", "使用艦", "非使用艦"] as column}
-          <th class="uk-text-center">{column}</th>
+          <th>{column}</th>
         {/each}
       </tr>
     </thead>
@@ -201,7 +189,7 @@ $: columnSettings = deriveColumnSettings(inputConfig);
           <td>{st.value}</td>
           <td>
             <input
-              class="uk-input"
+              class="input"
               type="color"
               bind:value={inputConfig.color.ship_type.own[st.key]}
               on:input={change}
@@ -210,7 +198,7 @@ $: columnSettings = deriveColumnSettings(inputConfig);
 
           <td>
             <input
-              class="uk-input"
+              class="input"
               type="color"
               bind:value={inputConfig.color.ship_type.other[st.key]}
               on:input={change}
@@ -225,7 +213,7 @@ $: columnSettings = deriveColumnSettings(inputConfig);
 <div>
   <div>プレイヤー名の背景色</div>
   <select
-    class="uk-select uk-form-width-medium"
+    class="select"
     bind:value={inputConfig.color.player_name}
     on:change={change}
   >
@@ -241,7 +229,7 @@ $: columnSettings = deriveColumnSettings(inputConfig);
 <div>
   <div>その他</div>
   <input
-    class="uk-checkbox"
+    class="checkbox"
     type="checkbox"
     bind:checked={inputConfig.show_language_frag}
     on:change={change}

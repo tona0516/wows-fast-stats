@@ -1,7 +1,5 @@
 <script lang="ts">
 import ExternalLink from "src/component/common/ExternalLink.svelte";
-import UkTooltip from "src/component/common/uikit/UkTooltip.svelte";
-import { CssClass } from "src/lib/CssClass";
 import { NumbersURL } from "src/lib/NumbersURL";
 import type { ShipInfo } from "src/lib/column/model/ShipInfo";
 import type { data } from "wailsjs/go/models";
@@ -11,35 +9,16 @@ export let player: data.Player;
 </script>
 
 <td>
-  <img
-    alt=""
-    src={column.nationIconPath(player)}
-    class="nation-icon uk-preserve-width"
-  />
-</td>
-
-<td style="background-color: {column.bgColorCode(player)}">
-  <img
-    alt=""
-    src={column.shipTypeIconPath(player)}
-    class="ship-icon uk-preserve-width"
-  />
-</td>
-
-<td class={CssClass.TD_STR}>
-  <UkTooltip tooltip={column.tooltipText(player)}>
-    <ExternalLink url={NumbersURL.ship(player.ship_info.id)}
-      ><div class="uk-text-truncate">
-        {column.displayValue(player)}
-      </div></ExternalLink
+  <ExternalLink url={NumbersURL.ship(player.ship_info.id)}>
+    <div
+      class="flex place-items-center tooltip"
+      data-tip={column.tooltipText(player)}
     >
-  </UkTooltip>
+      <img class="w-6" src={column.nationIconPath(player)} alt="" />
+      <img class="w-6" src={column.shipTypeIconPath(player)} alt="" />
+      <div class="truncate">
+        {column.displayValue(player)}
+      </div>
+    </div>
+  </ExternalLink>
 </td>
-
-<style>
-  :global(.ship-icon) {
-    width: 1.25em;
-    display: flex;
-    align-items: center;
-  }
-</style>

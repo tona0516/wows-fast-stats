@@ -1,5 +1,4 @@
 <script lang="ts">
-import UkIcon from "src/component/common/uikit/UkIcon.svelte";
 import { Notifier } from "src/lib/Notifier";
 import { storedConfig } from "src/stores";
 import { OpenDirectory, UpdateUserConfig } from "wailsjs/go/main/App";
@@ -28,7 +27,7 @@ const change = async () => {
   <div>
     <label
       ><input
-        class="uk-checkbox"
+        class="checkbox"
         type="checkbox"
         bind:checked={inputConfig.save_screenshot}
         on:change={change}
@@ -37,8 +36,7 @@ const change = async () => {
     <div>
       <!-- svelte-ignore a11y-invalid-attribute -->
       <a href="#" on:click={() => openDirectory("screenshot")}>
-        <UkIcon name="folder" />
-        <span class="uk-text-middle">保存フォルダを開く</span>
+        <i class="bi bi-folder">保存フォルダを開く</i>
       </a>
     </div>
   </div>
@@ -46,7 +44,7 @@ const change = async () => {
   <div>
     <label
       ><input
-        class="uk-checkbox"
+        class="checkbox"
         type="checkbox"
         bind:checked={inputConfig.save_temp_arena_info}
         on:change={change}
@@ -55,8 +53,7 @@ const change = async () => {
     <div>
       <!-- svelte-ignore a11y-invalid-attribute -->
       <a href="#" on:click={() => openDirectory("temp_arena_info")}>
-        <UkIcon name="folder" />
-        <span class="uk-text-middle">保存フォルダを開く</span>
+        <i class="bi bi-folder">保存フォルダを開く</i>
       </a>
     </div>
   </div>
@@ -64,14 +61,14 @@ const change = async () => {
   <div>
     <label
       ><input
-        class="uk-checkbox"
+        class="checkbox"
         type="checkbox"
         bind:checked={inputConfig.send_report}
         on:change={change}
       /> アプリ改善のためのデータ送信を許可する</label
     >
     <div>
-      <ul class="uk-list uk-list-disc uk-list-collapse">
+      <ul>
         <li>アプリ統計情報</li>
         <li>プレイヤー名</li>
         <li>エラーログ</li>
@@ -84,7 +81,7 @@ const change = async () => {
   <div>
     <label
       ><input
-        class="uk-checkbox"
+        class="checkbox"
         type="checkbox"
         bind:checked={inputConfig.notify_updatable}
         on:change={change}

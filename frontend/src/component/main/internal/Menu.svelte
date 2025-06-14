@@ -1,6 +1,4 @@
 <script lang="ts">
-import UkIcon from "src/component/common/uikit/UkIcon.svelte";
-import UkSpinner from "src/component/common/uikit/UkSpinner.svelte";
 import { DispName } from "src/lib/DispName";
 import { Notifier } from "src/lib/Notifier";
 import { storedBattle, storedConfig } from "src/stores";
@@ -27,7 +25,7 @@ const onStatsPatternChanged = async () => {
 </script>
 
 <select
-  class="uk-select uk-form-width-medium uk-form-small"
+  class="select"
   bind:value={inputConfig.stats_pattern}
   on:change={onStatsPatternChanged}
 >
@@ -38,19 +36,16 @@ const onStatsPatternChanged = async () => {
   {/each}
 </select>
 <button
-  class="uk-button uk-button-primary uk-button-small"
+  class="btn btn-primary"
   disabled={disableScreenshot}
   on:click={() => dispatch("ManualScreenshot")}
 >
   {#if isScreenshotting}
-    <UkSpinner />
+    <span class="loading loading-spinner"></span>
   {:else}
-    <UkIcon name="camera" />
+    <i class="bi bi-camera"></i>
   {/if}
 </button>
-<button
-  class="uk-button uk-button-primary uk-button-small"
-  on:click={() => WindowReloadApp()}
->
-  <UkIcon name="refresh" />
+<button class="btn btn-primary" on:click={() => WindowReloadApp()}>
+  <i class="bi bi-arrow-clockwise"></i>
 </button>

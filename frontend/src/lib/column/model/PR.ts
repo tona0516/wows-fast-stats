@@ -1,5 +1,4 @@
 import SingleTableData from "src/component/main/internal/table_data/SingleTableData.svelte";
-import { CssClass } from "src/lib/CssClass";
 import { RatingInfo } from "src/lib/RatingLevel";
 import { AbstractStatsColumn } from "src/lib/column/intetface/AbstractStatsColumn";
 import type { ISummaryColumn } from "src/lib/column/intetface/ISummaryColumn";
@@ -22,10 +21,6 @@ export class PR extends AbstractStatsColumn<string> implements ISummaryColumn {
 
   svelteComponent() {
     return SingleTableData;
-  }
-
-  tdClass(player: data.Player): string {
-    return this.value(player) === -1 ? CssClass.TD_MULTI : CssClass.TD_NUM;
   }
 
   textColorCode(player: data.Player): string {

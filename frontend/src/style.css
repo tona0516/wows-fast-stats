@@ -27,22 +27,3 @@ body {
     local(""),
     url("assets/fonts/nunito-v16-latin-regular.woff2") format("woff2");
 }
-
-.td-string {
-  text-align: left;
-  max-width: 200px;
-}
-
-.td-number {
-  text-align: right;
-}
-
-.td-multiple {
-  text-align: center;
-}
-
-.nation-icon {
-  width: 1.5em;
-  display: flex;
-  align-items: center;
-}

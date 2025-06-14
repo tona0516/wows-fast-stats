@@ -1,5 +1,4 @@
 <script lang="ts">
-import UkTable from "src/component/common/uikit/UkTable.svelte";
 import { RowPattern } from "src/lib/RowPattern";
 import { ColumnProvider } from "src/lib/column/ColumnProvider";
 import { storedTeamThreatLevels } from "src/stores";
@@ -15,33 +14,25 @@ $: statsColumnCount = shipColumnCount + overallColumns.columnCount();
 $: allColumnCount = basicColumns.columnCount() + statsColumnCount;
 </script>
 
-<UkTable>
+<table class="table text-nowrap">
   {#each teams as team, i}
     {#if team.players.length !== 0}
       <thead>
         {#if config.display.overall.threat_level && $storedTeamThreatLevels && $storedTeamThreatLevels[i]}
           {@const teamThreatLevel = $storedTeamThreatLevels[i]}
           <tr>
-            <th class="uk-text-center" colspan={allColumnCount}>
-              戦力評価値平均 : <span class="uk-text-large uk-text-bold"
-                >{teamThreatLevel.average.toFixed(0)}</span
-              >
-              [確度 :
-              <span class="uk-text-default uk-text-bold"
-                >{teamThreatLevel.accuracy.toFixed(0)}</span
-              >%] [介護指数 :
-              <span class="uk-text-default uk-text-bold"
-                >{teamThreatLevel.dissociationDegree.toFixed(0)}</span
-              >%]
+            <th colspan={allColumnCount}>
+              戦力評価値平均 : {teamThreatLevel.average.toFixed(0)}
+              [確度 : {teamThreatLevel.accuracy.toFixed(0)}%] [介護指数 : {teamThreatLevel.dissociationDegree.toFixed(
+                0,
+              )}%]
             </th>
           </tr>
         {/if}
         <tr>
           {#each categories as category}
             {#if category.columnCount() > 0}
-              <th class="uk-text-center" colspan={category.columnCount()}
-                >{category.dispName()}</th
-              >
+              <th colspan={category.columnCount()}>{category.dispName()}</th>
             {/if}
           {/each}
         </tr>
@@ -49,9 +40,7 @@ $: allColumnCount = basicColumns.columnCount() + statsColumnCount;
           {#each categories as category}
             {#each category as column}
               {#if column.shouldShow()}
-                <th class="uk-text-center" colspan={column.innerColumnCount}
-                  >{column.header}</th
-                >
+                <th colspan={column.innerColumnCount}>{column.header}</th>
               {/if}
             {/each}
           {/each}
@@ -121,7 +110,7 @@ $: allColumnCount = basicColumns.columnCount() + statsColumnCount;
       </tbody>
     {/if}
   {/each}
-</UkTable>
+</table>
 
 <style>
   :global(.no_data) {

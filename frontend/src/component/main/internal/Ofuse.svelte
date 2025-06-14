@@ -2,9 +2,9 @@
 import { BrowserOpenURL } from "wailsjs/runtime/runtime";
 </script>
 
-<div class="uk-flex uk-flex-center">
+<div class="flex">
   <button
-    class="uk-button uk-button-danger"
+    class="btn btn-accent"
     on:click={() => BrowserOpenURL("https://ofuse.me/cc0a3d3f")}
     >開発者にカンパする</button
   >

@@ -7,7 +7,6 @@ export let player: data.Player;
 </script>
 
 <td
-  class={column.tdClass(player)}
   style="color: {column.textColorCode(
     player,
   )}; background-color: {column.bgColorCode(player)}"

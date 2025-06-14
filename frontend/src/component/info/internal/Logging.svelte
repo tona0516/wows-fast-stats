@@ -15,10 +15,7 @@ storedLogs.subscribe(() => {
 </script>
 
 <div>
-  <div
-    class="overflow-scroll uk-text-emphasis"
-    id={elementID}
-  >
+  <div id={elementID}>
     {#each $storedLogs as log}
       {log}
       <br />

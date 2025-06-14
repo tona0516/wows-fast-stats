@@ -1,5 +1,4 @@
 import type { ColumnSetting } from "src/lib/ColumnSetting";
-import { CssClass } from "src/lib/CssClass";
 import { DispName } from "src/lib/DispName";
 import { AbstractColumn } from "src/lib/column/intetface/AbstractColumn";
 import type { StatsCategory } from "src/lib/types";
@@ -27,10 +26,6 @@ export abstract class AbstractStatsColumn<T> extends AbstractColumn {
 
   digit(): number {
     return this.columnSetting.digit.value;
-  }
-
-  tdClass(_: data.Player): string {
-    return CssClass.TD_NUM;
   }
 
   textColorCode(_: data.Player): string {

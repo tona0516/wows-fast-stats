@@ -6,7 +6,6 @@ import MainPage from "src/component/main/MainPage.svelte";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "charts.css";
 
-import UkSpinner from "src/component/common/uikit/UkSpinner.svelte";
 import { FontSize } from "src/lib/FontSize";
 import {
   storedAlertPlayers,
@@ -173,10 +172,10 @@ main();
           <InfoPage />
         {/if}
       {:else}
-        <div class="uk-overlay-default">
-          <div class="uk-position-center">
-            <UkSpinner />
-          </div>
+        <div
+          class="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-20"
+        >
+          <span class="loading loading-spinner"></span>
         </div>
       {/if}
     </div>

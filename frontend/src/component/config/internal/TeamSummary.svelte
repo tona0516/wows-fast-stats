@@ -1,5 +1,4 @@
 <script lang="ts">
-import UkSpinner from "src/component/common/uikit/UkSpinner.svelte";
 import { Notifier } from "src/lib/Notifier";
 import { storedConfig } from "src/stores";
 import { UpdateUserConfig } from "wailsjs/go/main/App";
@@ -38,37 +37,37 @@ const clickApply = async () => {
   <div>
     <div>艦戦闘数</div>
     <input
-      class="uk-input uk-form-width-small"
+      class="input"
       type="number"
       bind:value={inputConfig.team_summary.min_ship_battles}
     />
     {#if !isValidMinShipBattles}
-      <div class="uk-text-danger">1以上の整数を入力してください。</div>
+      <div>1以上の整数を入力してください。</div>
     {/if}
   </div>
 
   <div>
     <div>総合戦闘数</div>
     <input
-      class="uk-input uk-form-width-small"
+      class="input"
       type="number"
       bind:value={inputConfig.team_summary.min_overall_battles}
     />
     {#if !isValidMinOverallBattles}
-      <div class="uk-text-danger">1以上の整数を入力してください。</div>
+      <div>1以上の整数を入力してください。</div>
     {/if}
   </div>
 </div>
 
 <div>
-  <div class="uk-flex">
+  <div class="flex">
     <button
-      class="uk-button uk-button-primary uk-text-nowrap"
+      class="btn btn-primary"
       disabled={isLoading || !isValidAll}
       on:click={clickApply}
     >
       {#if isLoading}
-        <UkSpinner />
+        <span class="loading loading-spinner"></span>
       {:else}
         保存
       {/if}

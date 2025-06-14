@@ -1,6 +1,4 @@
 <script lang="ts">
-import UkIcon from "src/component/common/uikit/UkIcon.svelte";
-import UkSpinner from "src/component/common/uikit/UkSpinner.svelte";
 import { Notifier } from "src/lib/Notifier";
 import { storedConfig, storedInstallPathError } from "src/stores";
 import {
@@ -39,37 +37,31 @@ const clickApply = async () => {
 </script>
 
 <div>
-  <div class="uk-flex">
+  <div class="flex">
     <input
-      class="uk-input"
+      class="input"
       type="text"
       placeholder="World of Warshipsインストールフォルダ"
       bind:value={inputConfig.install_path}
     />
-    <button
-      class="uk-button uk-button-default uk-text-nowrap"
-      on:click={clickSelectDirectory}>フォルダ選択</button
+    <button class="btn btn-neutral" on:click={clickSelectDirectory}
+      >フォルダ選択</button
     >
   </div>
   <span>ゲームクライアントの実行ファイルがあるフォルダを選択してください。</span
   >
   {#if $storedInstallPathError}
-    <div class="uk-text-danger">
-      <UkIcon name="warning" />
-      <span class="uk-text-middle">{$storedInstallPathError}</span>
+    <div>
+      <i class="bi bi-warning">{$storedInstallPathError}</i>
     </div>
   {/if}
 </div>
 
 <div>
-  <div class="uk-flex">
-    <button
-      class="uk-button uk-button-primary uk-text-nowrap"
-      disabled={isLoading}
-      on:click={clickApply}
-    >
+  <div class="flex">
+    <button class="btn btn-primary" disabled={isLoading} on:click={clickApply}>
       {#if isLoading}
-        <UkSpinner />
+        <span class="loading loading-spinner"></span>
       {:else}
         保存
       {/if}

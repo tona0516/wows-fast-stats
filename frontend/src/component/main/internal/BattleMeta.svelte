@@ -1,6 +1,5 @@
 <script lang="ts">
 import { format, fromUnixTime } from "date-fns";
-import UkIcon from "src/component/common/uikit/UkIcon.svelte";
 import type { data } from "wailsjs/go/models";
 
 export let meta: data.Meta;
@@ -21,11 +20,8 @@ $: battleMetas = [
 ];
 </script>
 
-<div class="uk-flex uk-flex-center">
+<div class="flex">
   {#each battleMetas as meta}
-    <div class="uk-text-nowrap">
-      <UkIcon name={meta.icon} />
-      <span class="uk-text-middle">{meta.text}</span>
-    </div>
+    <i class="bi bi-{meta.icon}">{meta.text}</i>
   {/each}
 </div>
