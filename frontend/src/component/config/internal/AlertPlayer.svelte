@@ -33,7 +33,7 @@ const dispatch = createEventDispatcher();
                 <i class="bi bi-chevron-down"></i>
               </summary>
               <ul
-                class="menu dropdown-content bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
+                class="menu dropdown-content rounded-box z-1 w-52 p-2 shadow-sm"
               >
                 <li>
                   <!-- svelte-ignore a11y-invalid-attribute -->

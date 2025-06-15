@@ -9,7 +9,7 @@ export let player: data.Player;
 $: param = column.displayValue(player);
 </script>
 
-<td class="td-graph">
+<td>
   <table class="charts-css bar hide-data stacked">
     <thead>
       {#each param.items as _}
@@ -31,9 +31,3 @@ $: param = column.displayValue(player);
   </table>
 </td>
 
-<style>
-  :global(.td-graph) {
-    min-width: 5em;
-    max-width: 5em;
-  }
-</style>

@@ -7,7 +7,7 @@ import type { data } from "wailsjs/go/models";
 
 export class PR extends AbstractStatsColumn<string> implements ISummaryColumn {
   constructor(config: data.UserConfigV2, category: StatsCategory) {
-    super("pr", 1, config, category);
+    super("pr", config, category);
   }
 
   displayValue(player: data.Player): string {

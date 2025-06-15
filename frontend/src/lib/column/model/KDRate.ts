@@ -5,7 +5,7 @@ import type { data } from "wailsjs/go/models";
 
 export class KDRate extends AbstractStatsColumn<string> {
   constructor(config: data.UserConfigV2, category: StatsCategory) {
-    super("kd_rate", 1, config, category);
+    super("kd_rate", config, category);
   }
 
   displayValue(player: data.Player): string {

@@ -10,7 +10,7 @@ export class WinRate
   implements ISummaryColumn
 {
   constructor(config: data.UserConfigV2, category: StatsCategory) {
-    super("win_rate", 1, config, category);
+    super("win_rate", config, category);
   }
 
   displayValue(player: data.Player): string {

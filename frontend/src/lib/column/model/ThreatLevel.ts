@@ -5,7 +5,7 @@ import type { data } from "wailsjs/go/models";
 
 export class ThreatLevel extends AbstractStatsColumn<string> {
   constructor(config: data.UserConfigV2) {
-    super("threat_level", 1, config, "overall");
+    super("threat_level", config, "overall");
   }
 
   displayValue(player: data.Player): string {

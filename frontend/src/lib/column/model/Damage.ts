@@ -10,7 +10,7 @@ export class Damage
   implements ISummaryColumn
 {
   constructor(config: data.UserConfigV2, category: StatsCategory) {
-    super("damage", 1, config, category);
+    super("damage", config, category);
   }
 
   displayValue(player: data.Player): string {

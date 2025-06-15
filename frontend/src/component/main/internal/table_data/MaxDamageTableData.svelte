@@ -11,10 +11,8 @@ $: param = column.displayValue(player);
 
 <td>
   {param.damage}
+  {#if param.shipInfo}
+    <ExternalLink url={param.shipInfo.url}>{param.shipInfo.name}</ExternalLink>
+{/if}
 </td>
 
-{#if param.shipInfo}
-  <td>
-    <ExternalLink url={param.shipInfo.url}>{param.shipInfo.name}</ExternalLink>
-  </td>
-{/if}

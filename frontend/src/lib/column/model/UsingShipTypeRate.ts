@@ -6,7 +6,7 @@ import type { data } from "wailsjs/go/models";
 
 export class UsingShipTypeRate extends AbstractStatsColumn<StackedBarGraphParam> {
   constructor(config: data.UserConfigV2) {
-    super("using_ship_type_rate", 1, config, "overall");
+    super("using_ship_type_rate", config, "overall");
   }
 
   displayValue(player: data.Player): StackedBarGraphParam {

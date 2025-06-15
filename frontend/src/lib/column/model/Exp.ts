@@ -5,7 +5,7 @@ import type { data } from "wailsjs/go/models";
 
 export class Exp extends AbstractStatsColumn<string> {
   constructor(config: data.UserConfigV2, category: StatsCategory) {
-    super("exp", 1, config, category);
+    super("exp", config, category);
   }
 
   displayValue(player: data.Player): string {

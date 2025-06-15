@@ -7,7 +7,7 @@ import type { data } from "wailsjs/go/models";
 
 export class PlayerName extends AbstractColumn {
   constructor(private config: data.UserConfigV2) {
-    super("player_name", "プレイヤー", 2);
+    super("player_name", "プレイヤー");
   }
 
   svelteComponent() {

@@ -65,7 +65,7 @@ const PREMIUM_SHIP_ICONS: { [key: string]: string } = {
 
 export class ShipInfo extends AbstractColumn {
   constructor(private config: data.UserConfigV2) {
-    super("ship_info", "艦", 1);
+    super("ship_info", "艦");
   }
 
   svelteComponent() {

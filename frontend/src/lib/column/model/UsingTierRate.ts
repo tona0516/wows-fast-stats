@@ -7,7 +7,7 @@ import type { data } from "wailsjs/go/models";
 
 export class UsingTierRate extends AbstractStatsColumn<StackedBarGraphParam> {
   constructor(config: data.UserConfigV2) {
-    super("using_tier_rate", 1, config, "overall");
+    super("using_tier_rate", config, "overall");
   }
 
   displayValue(player: data.Player): StackedBarGraphParam {

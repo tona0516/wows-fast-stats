@@ -10,11 +10,10 @@ export abstract class AbstractStatsColumn<T> extends AbstractColumn {
 
   constructor(
     readonly key: string,
-    readonly innerColumnCount: number,
     readonly config: data.UserConfigV2,
     readonly category: StatsCategory,
   ) {
-    super(key, DispName.MIN_COLUMN_NAMES.get(key) ?? key, innerColumnCount);
+    super(key, DispName.MIN_COLUMN_NAMES.get(key) ?? key);
     this.columnSetting = deriveColumnSetting(config, key);
   }
 

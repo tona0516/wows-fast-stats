@@ -5,7 +5,7 @@ import type { data } from "wailsjs/go/models";
 
 export class SurvivedRate extends AbstractStatsColumn<string> {
   constructor(config: data.UserConfigV2, category: StatsCategory) {
-    super("survived_rate", 1, config, category);
+    super("survived_rate", config, category);
   }
 
   displayValue(player: data.Player): string {

@@ -4,7 +4,7 @@ import type { data } from "wailsjs/go/models";
 
 export class AvgTier extends AbstractStatsColumn<string> {
   constructor(config: data.UserConfigV2) {
-    super("avg_tier", 1, config, "overall");
+    super("avg_tier", config, "overall");
   }
 
   displayValue(player: data.Player): string {

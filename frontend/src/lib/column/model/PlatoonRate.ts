@@ -5,7 +5,7 @@ import type { data } from "wailsjs/go/models";
 
 export class PlatoonRate extends AbstractStatsColumn<string> {
   constructor(config: data.UserConfigV2, category: StatsCategory) {
-    super("platoon_rate", 1, config, category);
+    super("platoon_rate", config, category);
   }
 
   displayValue(player: data.Player): string {
