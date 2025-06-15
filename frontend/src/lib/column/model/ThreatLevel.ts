@@ -24,13 +24,6 @@ export class ThreatLevel extends AbstractStatsColumn<string> {
     );
   }
 
-  bgColorCode(player: data.Player): string {
-    return (
-      ThreatLevelInfo.fromScore(player.pvp_all.overall.threat_level.raw)
-        ?.bgColorCode ?? ""
-    );
-  }
-
   svelteComponent() {
     return SingleTableData;
   }

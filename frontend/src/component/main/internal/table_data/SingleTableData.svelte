@@ -6,10 +6,10 @@ export let column: AbstractStatsColumn<string>;
 export let player: data.Player;
 </script>
 
-<td
-  style="color: {column.textColorCode(
-    player,
-  )}; background-color: {column.bgColorCode(player)}"
->
-  {column.displayValue(player)}
+<td>
+  <div
+    style="color: {column.textColorCode(player)};"
+  >
+    {column.displayValue(player)}
+  </div>
 </td>

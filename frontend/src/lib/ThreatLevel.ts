@@ -14,7 +14,6 @@ export class ThreatLevelInfo {
   constructor(
     readonly level: ThreatLevel,
     readonly textColorCode: string,
-    readonly bgColorCode: string,
   ) {}
 
   static fromScore(score: number): ThreatLevelInfo | undefined {
@@ -30,39 +29,39 @@ export type ThreatLevelDef = {
 };
 export const THREAT_LEVEL_DEFS: ThreatLevelDef[] = [
   {
-    info: new ThreatLevelInfo(ThreatLevel.IR, "#FFFFFF", "#000000"),
+    info: new ThreatLevelInfo(ThreatLevel.IR, "#000000"),
     score: 0,
   },
   {
-    info: new ThreatLevelInfo(ThreatLevel.R, "#FFFFFF", "#FF0000"),
+    info: new ThreatLevelInfo(ThreatLevel.R, "#FF0000"),
     score: 8000 * THREAT_LEVEL_COEF,
   },
   {
-    info: new ThreatLevelInfo(ThreatLevel.O, "#331100", "#FFA500"),
+    info: new ThreatLevelInfo(ThreatLevel.O, "#FFA500"),
     score: 13000 * THREAT_LEVEL_COEF,
   },
   {
-    info: new ThreatLevelInfo(ThreatLevel.Y, "#331100", "#FFFF00"),
+    info: new ThreatLevelInfo(ThreatLevel.Y, "#FFFF00"),
     score: 19000 * THREAT_LEVEL_COEF,
   },
   {
-    info: new ThreatLevelInfo(ThreatLevel.G, "#FFFFFF", "#008000"),
+    info: new ThreatLevelInfo(ThreatLevel.G, "#008000"),
     score: 25000 * THREAT_LEVEL_COEF,
   },
   {
-    info: new ThreatLevelInfo(ThreatLevel.B, "#FFFFFF", "#2255FF"),
+    info: new ThreatLevelInfo(ThreatLevel.B, "#2255FF"),
     score: 32000 * THREAT_LEVEL_COEF,
   },
   {
-    info: new ThreatLevelInfo(ThreatLevel.I, "#FFFFFF", "#234794"),
+    info: new ThreatLevelInfo(ThreatLevel.I, "#234794"),
     score: 35000 * THREAT_LEVEL_COEF,
   },
   {
-    info: new ThreatLevelInfo(ThreatLevel.V, "#FFFFFF", "#705DA8"),
+    info: new ThreatLevelInfo(ThreatLevel.V, "#705DA8"),
     score: 40000 * THREAT_LEVEL_COEF,
   },
   {
-    info: new ThreatLevelInfo(ThreatLevel.UV, "#000000", "#FFFFFF"),
+    info: new ThreatLevelInfo(ThreatLevel.UV, "#65318E"),
     score: 44000 * THREAT_LEVEL_COEF,
   },
 ];
