@@ -3,7 +3,6 @@ import AlertPlayer from "./internal/AlertPlayer.svelte";
 import Display from "./internal/Display.svelte";
 import Other from "./internal/Other.svelte";
 import Required from "./internal/Required.svelte";
-import TeamSummary from "./internal/TeamSummary.svelte";
 
 const tabName = "tab_config";
 </script>
@@ -23,16 +22,6 @@ const tabName = "tab_config";
   <input type="radio" name={tabName} class="tab" aria-label="表示設定" />
   <div class="tab-content border-base-300 p-6">
     <Display />
-  </div>
-
-  <input
-    type="radio"
-    name={tabName}
-    class="tab"
-    aria-label="チームサマリー設定"
-  />
-  <div class="tab-content border-base-300 p-6">
-    <TeamSummary />
   </div>
 
   <input
