@@ -1,39 +1,28 @@
 <script lang="ts">
-import { RowPattern } from "src/lib/RowPattern";
-import { ColumnProvider } from "src/lib/column/ColumnProvider";
-import { storedTeamThreatLevels } from "src/stores";
-import type { data } from "wailsjs/go/models";
+  import { RowPattern } from "src/lib/RowPattern";
+  import { ColumnProvider } from "src/lib/column/ColumnProvider";
+  import type { data } from "wailsjs/go/models";
 
-export let teams: data.Team[];
-export let config: data.UserConfigV2;
+  export let teams: data.Team[];
+  export let config: data.UserConfigV2;
 
-$: categories = ColumnProvider.getAllColumns(config);
-$: [basicColumns, shipColumns, overallColumns] = categories;
-$: shipColumnCount = shipColumns.columnCount();
-$: statsColumnCount = shipColumnCount + overallColumns.columnCount();
-$: allColumnCount = basicColumns.columnCount() + statsColumnCount;
+  $: categories = ColumnProvider.getAllColumns(config);
+  $: [basicColumns, shipColumns, overallColumns] = categories;
+  $: shipColumnCount = shipColumns.columnCount();
+  $: statsColumnCount = shipColumnCount + overallColumns.columnCount();
 </script>
 
-<div class="overflow-x-auto w-screen">
+<div class="overflow-x-auto w-screen py-4">
   <table class="table text-nowrap">
-    {#each teams as team, i}
+    {#each teams as team}
       {#if team.players.length !== 0}
         <thead>
-          {#if config.display.overall.threat_level && $storedTeamThreatLevels && $storedTeamThreatLevels[i]}
-            {@const teamThreatLevel = $storedTeamThreatLevels[i]}
-            <tr>
-              <th colspan={allColumnCount}>
-                戦力評価値平均 : {teamThreatLevel.average.toFixed(0)}
-                [確度 : {teamThreatLevel.accuracy.toFixed(0)}%] [介護指数 : {teamThreatLevel.dissociationDegree.toFixed(
-                  0,
-                )}%]
-              </th>
-            </tr>
-          {/if}
           <tr>
             {#each categories as category}
               {#if category.columnCount() > 0}
-                <th colspan={category.columnCount()}>{category.dispName()}</th>
+                <th class="p-1 text-center" colspan={category.columnCount()}
+                  >{category.dispName()}</th
+                >
               {/if}
             {/each}
           </tr>
@@ -41,7 +30,7 @@ $: allColumnCount = basicColumns.columnCount() + statsColumnCount;
             {#each categories as category}
               {#each category as column}
                 {#if column.shouldShow()}
-                  <th>{column.header}</th>
+                  <th class="p-1 text-center">{column.header}</th>
                 {/if}
               {/each}
             {/each}
@@ -59,50 +48,58 @@ $: allColumnCount = basicColumns.columnCount() + statsColumnCount;
             )}
             <tr>
               {#each basicColumns as column}
-                <svelte:component
-                  this={column.svelteComponent()}
-                  {column}
-                  {player}
-                  on:EditAlertPlayer
-                  on:RemoveAlertPlayer
-                />
+                <td class="p-1">
+                  <svelte:component
+                    this={column.svelteComponent()}
+                    {column}
+                    {player}
+                  />
+                </td>
               {/each}
 
               {#if rowPattern === RowPattern.NO_COLUMN}
-                <td class="text-center" colspan={statsColumnCount}></td>
+                <td class="p-1 bg-base-300 text-center" colspan={statsColumnCount}></td>
               {:else if rowPattern === RowPattern.PRIVATE}
-                <td class="text-center" colspan={statsColumnCount}>PRIVATE</td>
+                <td class="p-1 bg-base-300 text-center" colspan={statsColumnCount}
+                  >PRIVATE</td
+                >
               {:else if rowPattern === RowPattern.NO_STATS}
-                <td class="text-center" colspan={statsColumnCount}>N/A</td>
+                <td class="p-1 bg-base-300 text-center" colspan={statsColumnCount}>N/A</td>
               {:else if rowPattern === RowPattern.NO_SHIP_STATS}
-                <td class="text-center" colspan={shipColumnCount}>N/A</td>
+                <td class="p-1 bg-base-300 text-center" colspan={shipColumnCount}>N/A</td>
                 {#each overallColumns as column}
                   {#if column.shouldShow()}
-                    <svelte:component
-                      this={column.svelteComponent()}
-                      {column}
-                      {player}
-                    />
+                    <td class="py-1">
+                      <svelte:component
+                        this={column.svelteComponent()}
+                        {column}
+                        {player}
+                      />
+                    </td>
                   {/if}
                 {/each}
               {:else}
                 {#each shipColumns as column}
                   {#if column.shouldShow()}
-                    <svelte:component
-                      this={column.svelteComponent()}
-                      {column}
-                      {player}
-                    />
+                    <td class="p-1">
+                      <svelte:component
+                        this={column.svelteComponent()}
+                        {column}
+                        {player}
+                      />
+                    </td>
                   {/if}
                 {/each}
 
                 {#each overallColumns as column}
                   {#if column.shouldShow()}
-                    <svelte:component
-                      this={column.svelteComponent()}
-                      {column}
-                      {player}
-                    />
+                    <td class="p-1">
+                      <svelte:component
+                        this={column.svelteComponent()}
+                        {column}
+                        {player}
+                      />
+                    </td>
                   {/if}
                 {/each}
               {/if}

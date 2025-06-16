@@ -8,7 +8,7 @@ export let column: ShipInfo;
 export let player: data.Player;
 </script>
 
-<td>
+<div>
   <ExternalLink url={NumbersURL.ship(player.ship_info.id)}>
     <div
       class="flex place-items-center tooltip"
@@ -21,4 +21,4 @@ export let player: data.Player;
       </div>
     </div>
   </ExternalLink>
-</td>
+</div>

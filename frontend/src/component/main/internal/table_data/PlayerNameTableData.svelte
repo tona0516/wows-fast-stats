@@ -24,7 +24,7 @@ const setPlayerNameToClipboard = async () => {
 };
 </script>
 
-<td>
+<div>
   {#if isNPC}
     {column.playerName(player)}
   {:else}
@@ -85,4 +85,4 @@ const setPlayerNameToClipboard = async () => {
       </div>
     </div>
   {/if}
-</td>
+</div>
