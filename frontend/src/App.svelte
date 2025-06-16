@@ -8,19 +8,19 @@ import "charts.css";
 
 import { FontSize } from "src/lib/FontSize";
 import {
-  storedAlertPlayers,
-  storedConfig,
-  storedInstallPathError,
-  storedLogs,
+	storedAlertPlayers,
+	storedConfig,
+	storedInstallPathError,
+	storedLogs,
 } from "src/stores";
 import {
-  AlertPlayers,
-  LatestRelease,
-  LogError,
-  MigrateIfNeeded,
-  StartWatching,
-  UserConfig,
-  ValidateInstallPath,
+	AlertPlayers,
+	LatestRelease,
+	LogError,
+	MigrateIfNeeded,
+	StartWatching,
+	UserConfig,
+	ValidateInstallPath,
 } from "wailsjs/go/main/App";
 import { data } from "wailsjs/go/models";
 import { EventsOn } from "wailsjs/runtime/runtime";
@@ -35,97 +35,97 @@ type Page = "main" | "config" | "info";
 let page: Page = "main";
 
 $: {
-  // @ts-ignore
-  document.body.style.zoom = FontSize.getZoomRate($storedConfig);
+	// @ts-ignore
+	document.body.style.zoom = FontSize.getZoomRate($storedConfig);
 }
 
 EventsOn("BATTLE_START", () => mainPage?.fetchBattle());
 EventsOn("BATTLE_ERR", (error: string) => Notifier.failure(error));
 EventsOn("CONFIG_UPDATE", (config: data.UserConfigV2) =>
-  storedConfig.set(config),
+	storedConfig.set(config),
 );
 EventsOn("ALERT_PLAYERS_UPDATE", (players: data.AlertPlayer[]) =>
-  storedAlertPlayers.set(players),
+	storedAlertPlayers.set(players),
 );
 EventsOn("LOG", (log: string) =>
-  storedLogs.update((logs) => {
-    logs.push(log);
-    return logs;
-  }),
+	storedLogs.update((logs) => {
+		logs.push(log);
+		return logs;
+	}),
 );
 
 window.onunhandledrejection = (event) => {
-  const message = "window.onunhandledrejection";
-  const error = event.reason;
-  if (error instanceof Error) {
-    sendFronendError(message, error);
-  } else {
-    LogError(message, { error: JSON.stringify(error) });
-  }
+	const message = "window.onunhandledrejection";
+	const error = event.reason;
+	if (error instanceof Error) {
+		sendFronendError(message, error);
+	} else {
+		LogError(message, { error: JSON.stringify(error) });
+	}
 };
 window.onerror = (_event, _source, _lineno, _colno, error) => {
-  sendFronendError("window.onerror", error);
+	sendFronendError("window.onerror", error);
 };
 
 const sendFronendError = (message: string, error: Error | undefined) => {
-  LogError(message, {
-    "error.name": error?.name ?? "",
-    "error.message": error?.message ?? "",
-    "error.stack": error?.stack ?? "",
-  });
+	LogError(message, {
+		"error.name": error?.name ?? "",
+		"error.message": error?.message ?? "",
+		"error.stack": error?.stack ?? "",
+	});
 };
 
 const initialize = async (): Promise<data.UserConfigV2 | undefined> => {
-  try {
-    await MigrateIfNeeded();
+	try {
+		await MigrateIfNeeded();
 
-    const config = await UserConfig();
-    storedConfig.set(config);
+		const config = await UserConfig();
+		storedConfig.set(config);
 
-    const installPathError = await ValidateInstallPath(config.install_path);
-    if (installPathError) {
-      storedInstallPathError.set(installPathError);
-    }
+		const installPathError = await ValidateInstallPath(config.install_path);
+		if (installPathError) {
+			storedInstallPathError.set(installPathError);
+		}
 
-    const alertPlayers = await AlertPlayers();
-    storedAlertPlayers.set(alertPlayers);
+		const alertPlayers = await AlertPlayers();
+		storedAlertPlayers.set(alertPlayers);
 
-    initialized = true;
+		initialized = true;
 
-    if (!$storedInstallPathError) {
-      StartWatching();
-    }
+		if (!$storedInstallPathError) {
+			StartWatching();
+		}
 
-    return config;
-  } catch (error) {
-    Notifier.failure(error);
-    return undefined;
-  }
+		return config;
+	} catch (error) {
+		Notifier.failure(error);
+		return undefined;
+	}
 };
 
 const notifyUpdate = async (config: data.UserConfigV2) => {
-  return;
+	return;
 
-  // if (!config.notify_updatable) return;
+	// if (!config.notify_updatable) return;
 
-  // try {
-  //   const latestRelease = await LatestRelease();
-  //   if (latestRelease.updatable) {
-  //     updatableRelease = latestRelease;
-  //   }
-  // } catch (error) {
-  //   Notifier.failure(error);
-  //   return;
-  // }
+	// try {
+	//   const latestRelease = await LatestRelease();
+	//   if (latestRelease.updatable) {
+	//     updatableRelease = latestRelease;
+	//   }
+	// } catch (error) {
+	//   Notifier.failure(error);
+	//   return;
+	// }
 };
 
 const main = async () => {
-  const config = await initialize();
-  if (!config) {
-    return;
-  }
+	const config = await initialize();
+	if (!config) {
+		return;
+	}
 
-  await notifyUpdate(config);
+	await notifyUpdate(config);
 };
 
 main();

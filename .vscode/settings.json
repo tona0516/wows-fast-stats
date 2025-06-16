@@ -1,8 +1,8 @@
 {
     "typescript.tsdk": "./frontend/node_modules/typescript/lib",
-    "biome.lspBin": "frontend/node_modules/@biomejs/biome/bin/biome",
+    "biome.lsp.bin": "frontend/node_modules/@biomejs/biome/bin/biome",
     "[svelte]": {
-        "editor.defaultFormatter": "svelte.svelte-vscode",
+        "editor.defaultFormatter": "biomejs.biome",
     },
     "[typescript]": {
         "editor.defaultFormatter": "biomejs.biome",
