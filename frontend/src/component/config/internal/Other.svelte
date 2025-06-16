@@ -29,23 +29,6 @@ const change = async () => {
       ><input
         class="checkbox"
         type="checkbox"
-        bind:checked={inputConfig.save_screenshot}
-        on:change={change}
-      /> 自動でスクリーンショットを保存する</label
-    >
-    <div>
-      <!-- svelte-ignore a11y-invalid-attribute -->
-      <a href="#" on:click={() => openDirectory("screenshot")}>
-        <i class="bi bi-folder">保存フォルダを開く</i>
-      </a>
-    </div>
-  </div>
-
-  <div>
-    <label
-      ><input
-        class="checkbox"
-        type="checkbox"
         bind:checked={inputConfig.save_temp_arena_info}
         on:change={change}
       /> 【開発用】自動で戦闘情報(tempArenaInfo.json)を保存する</label

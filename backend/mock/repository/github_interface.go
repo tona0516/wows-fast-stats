@@ -20,6 +20,7 @@ import (
 type MockGithubInterface struct {
 	ctrl     *gomock.Controller
 	recorder *MockGithubInterfaceMockRecorder
+	isgomock struct{}
 }
 
 // MockGithubInterfaceMockRecorder is the mock recorder for MockGithubInterface.

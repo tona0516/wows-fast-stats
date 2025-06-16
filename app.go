@@ -137,22 +137,6 @@ func (a *App) UpdateInstallPath(path string) error {
 	return apperr.Unwrap(err)
 }
 
-func (a *App) ManualScreenshot(filename string, base64Data string) (bool, error) {
-	saved, err := a.container.screenshotService.SaveWithDialog(a.ctx, filename, base64Data)
-	if err != nil {
-		a.container.logger.Error(err, nil)
-	}
-	return saved, apperr.Unwrap(err)
-}
-
-func (a *App) AutoScreenshot(filename string, base64Data string) error {
-	err := a.container.screenshotService.SaveForAuto(filename, base64Data)
-	if err != nil {
-		a.container.logger.Error(err, nil)
-	}
-	return apperr.Unwrap(err)
-}
-
 func (a *App) Semver() string {
 	return *a.config.App.Semver
 }

@@ -6,8 +6,6 @@ export function AlertPatterns():Promise<Array<string>>;
 
 export function AlertPlayers():Promise<Array<data.AlertPlayer>>;
 
-export function AutoScreenshot(arg1:string,arg2:string):Promise<void>;
-
 export function Battle():Promise<data.Battle>;
 
 export function DefaultUserConfig():Promise<data.UserConfigV2>;
@@ -17,8 +15,6 @@ export function LatestRelease():Promise<data.GHLatestRelease>;
 export function LogError(arg1:string,arg2:{[key: string]: string}):Promise<void>;
 
 export function LogInfo(arg1:string,arg2:{[key: string]: string}):Promise<void>;
-
-export function ManualScreenshot(arg1:string,arg2:string):Promise<boolean>;
 
 export function MigrateIfNeeded():Promise<void>;
 

@@ -20,6 +20,7 @@ import (
 type MockUnregisteredInterface struct {
 	ctrl     *gomock.Controller
 	recorder *MockUnregisteredInterfaceMockRecorder
+	isgomock struct{}
 }
 
 // MockUnregisteredInterfaceMockRecorder is the mock recorder for MockUnregisteredInterface.

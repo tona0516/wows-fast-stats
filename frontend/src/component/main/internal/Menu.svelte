@@ -1,17 +1,11 @@
 <script lang="ts">
 import { DispName } from "src/lib/DispName";
 import { Notifier } from "src/lib/Notifier";
-import { storedBattle, storedConfig } from "src/stores";
-import { createEventDispatcher } from "svelte";
+import { storedConfig } from "src/stores";
 import { UpdateUserConfig } from "wailsjs/go/main/App";
 import { WindowReloadApp } from "wailsjs/runtime/runtime";
 
-export let isScreenshotting: boolean;
-
 $: inputConfig = $storedConfig;
-$: disableScreenshot = isScreenshotting || $storedBattle?.meta === undefined;
-
-const dispatch = createEventDispatcher();
 
 const onStatsPatternChanged = async () => {
   try {
@@ -35,17 +29,7 @@ const onStatsPatternChanged = async () => {
     >
   {/each}
 </select>
-<button
-  class="btn btn-primary"
-  disabled={disableScreenshot}
-  on:click={() => dispatch("ManualScreenshot")}
->
-  {#if isScreenshotting}
-    <span class="loading loading-spinner"></span>
-  {:else}
-    <i class="bi bi-camera"></i>
-  {/if}
-</button>
+
 <button class="btn btn-primary" on:click={() => WindowReloadApp()}>
   <i class="bi bi-arrow-clockwise"></i>
 </button>

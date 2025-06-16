@@ -20,6 +20,7 @@ import (
 type MockWargamingInterface struct {
 	ctrl     *gomock.Controller
 	recorder *MockWargamingInterfaceMockRecorder
+	isgomock struct{}
 }
 
 // MockWargamingInterfaceMockRecorder is the mock recorder for MockWargamingInterface.

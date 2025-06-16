@@ -17,7 +17,6 @@ type DependencyContainer struct {
 
 	// services
 	configService         *service.Config
-	screenshotService     *service.Screenshot
 	watcherService        *service.Watcher
 	battleService         *service.Battle
 	updaterService        *service.Updater
@@ -85,7 +84,6 @@ func NewDependencyContainer(ctx context.Context, config Config) (*DependencyCont
 
 	// services
 	configService := service.NewConfig(localFile, wargaming, storage, logger)
-	screenshotService := service.NewScreenshot(localFile, logger)
 	battleService := service.NewBattle(
 		wargaming,
 		uwargaming,
@@ -109,7 +107,6 @@ func NewDependencyContainer(ctx context.Context, config Config) (*DependencyCont
 	return &DependencyContainer{
 		config:                config,
 		configService:         configService,
-		screenshotService:     screenshotService,
 		watcherService:        watcherService,
 		battleService:         battleService,
 		updaterService:        updaterService,

@@ -20,6 +20,7 @@ import (
 type MockLocalFileInterface struct {
 	ctrl     *gomock.Controller
 	recorder *MockLocalFileInterfaceMockRecorder
+	isgomock struct{}
 }
 
 // MockLocalFileInterfaceMockRecorder is the mock recorder for MockLocalFileInterface.
@@ -37,20 +38,6 @@ func NewMockLocalFileInterface(ctrl *gomock.Controller) *MockLocalFileInterface 
 // EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockLocalFileInterface) EXPECT() *MockLocalFileInterfaceMockRecorder {
 	return m.recorder
-}
-
-// SaveScreenshot mocks base method.
-func (m *MockLocalFileInterface) SaveScreenshot(path, base64Data string) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SaveScreenshot", path, base64Data)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// SaveScreenshot indicates an expected call of SaveScreenshot.
-func (mr *MockLocalFileInterfaceMockRecorder) SaveScreenshot(path, base64Data any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveScreenshot", reflect.TypeOf((*MockLocalFileInterface)(nil).SaveScreenshot), path, base64Data)
 }
 
 // SaveTempArenaInfo mocks base method.
