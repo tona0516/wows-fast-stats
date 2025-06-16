@@ -132,52 +132,54 @@ main();
 </script>
 
 <main>
-  <div class="flex">
-    <div class="flex-none">
-      <ul class="menu sticky top-0 rounded-box">
-        <li>
-          <a on:click={() => (page = "main")}>
-            <i class="bi bi-house"></i>
-          </a>
-        </li>
-        <li>
-          <a on:click={() => (page = "config")}>
-            <i class="bi bi-gear"></i>
-          </a>
-        </li>
-        <li>
-          <a on:click={() => (page = "info")}
-            ><i class="bi bi-info-circle"></i></a
-          >
-        </li>
-      </ul>
-    </div>
+  <div>
+    <div class="flex">
+      <div class="flex-none">
+        <ul class="menu rounded-box sticky top-0">
+          <li>
+            <a on:click={() => (page = "main")}>
+              <i class="bi bi-house"></i>
+            </a>
+          </li>
+          <li>
+            <a on:click={() => (page = "config")}>
+              <i class="bi bi-gear"></i>
+            </a>
+          </li>
+          <li>
+            <a on:click={() => (page = "info")}
+              ><i class="bi bi-info-circle"></i></a
+            >
+          </li>
+        </ul>
+      </div>
 
-    <div class="flex-1">
-      {#if updatableRelease}
-        <div>
-          新しいバージョンがあります:
-          <ExternalLink url={updatableRelease.html_url}>
-            {updatableRelease.tag_name}
-          </ExternalLink>
-        </div>
-      {/if}
-
-      {#if initialized}
-        {#if page === "main"}
-          <MainPage bind:this={mainPage} />
-        {:else if page === "config"}
-          <ConfigPage />
-        {:else if page === "info"}
-          <InfoPage />
+      <div class="flex-1 min-w-[1px]">
+        {#if updatableRelease}
+          <div>
+            新しいバージョンがあります:
+            <ExternalLink url={updatableRelease.html_url}>
+              {updatableRelease.tag_name}
+            </ExternalLink>
+          </div>
         {/if}
-      {:else}
-        <div
-          class="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-20"
-        >
-          <span class="loading loading-spinner"></span>
-        </div>
-      {/if}
+
+        {#if initialized}
+          {#if page === "main"}
+            <MainPage bind:this={mainPage} />
+          {:else if page === "config"}
+            <ConfigPage />
+          {:else if page === "info"}
+            <InfoPage />
+          {/if}
+        {:else}
+          <div
+            class="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-20"
+          >
+            <span class="loading loading-spinner"></span>
+          </div>
+        {/if}
+      </div>
     </div>
   </div>
 </main>

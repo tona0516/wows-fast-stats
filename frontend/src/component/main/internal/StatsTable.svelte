@@ -12,7 +12,7 @@ $: shipColumnCount = shipColumns.columnCount();
 $: statsColumnCount = shipColumnCount + overallColumns.columnCount();
 </script>
 
-<div class="overflow-x-auto w-screen py-4">
+<div class="overflow-x-auto py-4">
   <table class="table text-nowrap">
     {#each teams as team}
       {#if team.players.length !== 0}
@@ -48,7 +48,7 @@ $: statsColumnCount = shipColumnCount + overallColumns.columnCount();
             )}
             <tr>
               {#each basicColumns as column}
-                <td class="p-1">
+                <td class="max-w-64 p-1">
                   <svelte:component
                     this={column.svelteComponent()}
                     {column}
@@ -58,18 +58,18 @@ $: statsColumnCount = shipColumnCount + overallColumns.columnCount();
               {/each}
 
               {#if rowPattern === RowPattern.NO_COLUMN}
-                <td class="p-1 bg-base-300 text-center" colspan={statsColumnCount}></td>
+                <td class="max-w-64 p-1 bg-base-300 text-center" colspan={statsColumnCount}></td>
               {:else if rowPattern === RowPattern.PRIVATE}
-                <td class="p-1 bg-base-300 text-center" colspan={statsColumnCount}
+                <td class="max-w-64 p-1 bg-base-300 text-center" colspan={statsColumnCount}
                   >PRIVATE</td
                 >
               {:else if rowPattern === RowPattern.NO_STATS}
-                <td class="p-1 bg-base-300 text-center" colspan={statsColumnCount}>N/A</td>
+                <td class="max-w-64 p-1 bg-base-300 text-center" colspan={statsColumnCount}>N/A</td>
               {:else if rowPattern === RowPattern.NO_SHIP_STATS}
-                <td class="p-1 bg-base-300 text-center" colspan={shipColumnCount}>N/A</td>
+                <td class="max-w-64 p-1 bg-base-300 text-center" colspan={shipColumnCount}>N/A</td>
                 {#each overallColumns as column}
                   {#if column.shouldShow()}
-                    <td class="py-1">
+                    <td class="max-w-64 p-1">
                       <svelte:component
                         this={column.svelteComponent()}
                         {column}
@@ -81,7 +81,7 @@ $: statsColumnCount = shipColumnCount + overallColumns.columnCount();
               {:else}
                 {#each shipColumns as column}
                   {#if column.shouldShow()}
-                    <td class="p-1">
+                    <td class="max-w-64 p-1">
                       <svelte:component
                         this={column.svelteComponent()}
                         {column}
@@ -93,7 +93,7 @@ $: statsColumnCount = shipColumnCount + overallColumns.columnCount();
 
                 {#each overallColumns as column}
                   {#if column.shouldShow()}
-                    <td class="p-1">
+                    <td class="max-w-64 p-1">
                       <svelte:component
                         this={column.svelteComponent()}
                         {column}

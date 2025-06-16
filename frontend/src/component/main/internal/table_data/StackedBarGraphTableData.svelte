@@ -9,7 +9,7 @@ export let player: data.Player;
 $: param = column.displayValue(player);
 </script>
 
-<div>
+<div class="w-24">
   <table class="charts-css bar hide-data stacked">
     <thead>
       {#each param.items as _}
