@@ -1,10 +1,9 @@
 <script lang="ts">
 import ExternalLink from "src/component/common/ExternalLink.svelte";
-import { ExcludedPlayers } from "src/lib/ExcludedPlayers";
 import { Notifier } from "src/lib/Notifier";
 import { NumbersURL } from "src/lib/NumbersURL";
 import type { PlayerName } from "src/lib/column/model/PlayerName";
-import { storedAlertPlayers, storedExcludedPlayers } from "src/stores";
+import { storedAlertPlayers } from "src/stores";
 import type { data } from "wailsjs/go/models";
 import { ClipboardSetText } from "wailsjs/runtime/runtime";
 
@@ -12,19 +11,9 @@ export let column: PlayerName;
 export let player: data.Player;
 
 $: accountID = player.player_info.id;
-$: isChecked = !$storedExcludedPlayers.has(accountID);
 $: alertPlayer = $storedAlertPlayers.find((it) => it.account_id === accountID);
 $: clanTag = column.clanTag(player);
 $: isNPC = column.isNPC(player);
-
-// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-const onCheck = async (e: any) => {
-  if (e.target.checked) {
-    ExcludedPlayers.remove(accountID);
-  } else {
-    ExcludedPlayers.add(accountID);
-  }
-};
 
 const setPlayerNameToClipboard = async () => {
   const isSuccess = await ClipboardSetText(player.player_info.name);
@@ -40,13 +29,6 @@ const setPlayerNameToClipboard = async () => {
     {column.playerName(player)}
   {:else}
     <div class="flex items-center">
-      <input
-        class="checkbox"
-        type="checkbox"
-        on:click={onCheck}
-        checked={isChecked}
-      />
-
       <div class="dropdown">
         <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
         <div tabindex="0" class="tooltip" data-tip={alertPlayer?.message}>

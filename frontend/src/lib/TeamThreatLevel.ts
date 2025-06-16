@@ -13,7 +13,6 @@ export class TeamThreatLevel {
 
   static fromBattle = (
     battle: OptionalBattle,
-    excludedPlayers: Set<number>,
     statsExtra: StatsExtra,
   ): OptionalTeamThreatLevels => {
     if (!battle) {
@@ -25,11 +24,7 @@ export class TeamThreatLevel {
       const values = players
         .filter((player) => {
           const id = player.player_info.id;
-          return !(
-            id === 0 ||
-            excludedPlayers.has(id) ||
-            player.player_info.is_hidden
-          );
+          return !(id === 0 || player.player_info.is_hidden);
         })
         .map((player) => player[statsExtra].overall.threat_level.modified);
       const maxScore = Math.max(...values);
