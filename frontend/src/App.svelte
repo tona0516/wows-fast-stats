@@ -13,6 +13,8 @@ import {
   storedInstallPathError,
   storedLogs,
 } from "src/stores";
+import { onMount } from "svelte";
+import { themeChange } from "theme-change";
 import {
   AlertPlayers,
   LatestRelease,
@@ -38,6 +40,10 @@ $: {
   // @ts-ignore
   document.body.style.zoom = FontSize.getZoomRate($storedConfig);
 }
+
+onMount(() => {
+  themeChange(false);
+});
 
 EventsOn("BATTLE_START", () => mainPage?.fetchBattle());
 EventsOn("BATTLE_ERR", (error: string) => Notifier.failure(error));
