@@ -1,4 +1,3 @@
-import type { Summary } from "src/lib/Summary";
 import type { TeamThreatLevel } from "src/lib/TeamThreatLevel";
 import type { data } from "wailsjs/go/models";
 
@@ -25,5 +24,4 @@ export type CommonKey = ShipKey & OverallKey;
 export type DigitKey = Readonly<keyof data.UCDigit>;
 
 export type OptionalBattle = data.Battle | undefined;
-export type OptionalSummary = Summary | undefined;
 export type OptionalTeamThreatLevels = TeamThreatLevel[] | undefined;

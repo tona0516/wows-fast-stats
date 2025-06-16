@@ -17,7 +17,7 @@ export let tableInfo: DispColorTableInfo;
     {#each tableInfo.rows as row}
       <tr>
         {#each row as cell}
-          <td style="color: {cell.textColor}; background-color: {cell.bgColor}"
+          <td style="color: {cell.textColor};"
             >{cell.text}</td
           >
         {/each}

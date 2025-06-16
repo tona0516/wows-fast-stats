@@ -98,7 +98,6 @@ const getTLTableInfo = (defs: ThreatLevelDef[]): DispColorTableInfo => {
       {
         text: range,
         textColor: current.info.textColorCode,
-        bgColor: current.info.bgColorCode,
       },
     ];
 

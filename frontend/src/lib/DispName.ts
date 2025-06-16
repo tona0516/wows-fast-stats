@@ -1,7 +1,6 @@
 import { ArrayMap } from "src/lib/ArrayMap";
 import { FontSize } from "src/lib/FontSize";
 import type { RatingLevel } from "src/lib/RatingLevel";
-import type { SummaryShipType } from "src/lib/Summary";
 import type {
   ColumnCategory,
   ShipType,
@@ -61,11 +60,6 @@ export namespace DispName {
     ["cl", "巡洋艦"],
     ["bb", "戦艦"],
     ["cv", "空母"],
-  ]);
-
-  export const SHIP_TYPE_FOR_SUMMARY = new ArrayMap<SummaryShipType, string>([
-    ...SHIP_TYPES,
-    ["all", "全艦種"],
   ]);
 
   export const TIER_GROUPS = new ArrayMap<TierGroup, string>([

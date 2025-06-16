@@ -5,17 +5,11 @@ import StatisticsTable from "src/component/main/internal/StatsTable.svelte";
 import { FetchProxy } from "src/lib/FetchProxy";
 import { Notifier } from "src/lib/Notifier";
 import { Screenshot } from "src/lib/Screenshot";
-import {
-  storedBattle,
-  storedConfig,
-  storedInstallPathError,
-  storedSummary,
-} from "src/stores";
+import { storedBattle, storedConfig, storedInstallPathError } from "src/stores";
 import { LogInfo } from "wailsjs/go/main/App";
 import type { data } from "wailsjs/go/models";
 import Menu from "./internal/Menu.svelte";
 import Ofuse from "./internal/Ofuse.svelte";
-import Summary from "./internal/Summary.svelte";
 
 const MAIN_PAGE_ID = "mainpage";
 
@@ -126,13 +120,6 @@ const deriveFileName = (meta: data.Meta): string => {
       <div class="flex">
         <BattleMeta {meta} />
       </div>
-
-      {#if $storedSummary}
-        {@const summary = $storedSummary}
-        <div class="flex">
-          <Summary {summary} />
-        </div>
-      {/if}
     {:else}
       <p>
         {#if $storedInstallPathError}
@@ -149,7 +136,9 @@ const deriveFileName = (meta: data.Meta): string => {
   </div>
 
   {#if isLoading}
-    <div class="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-20">
+    <div
+      class="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-20"
+    >
       <span class="loading loading-spinner"></span>
     </div>
   {/if}
