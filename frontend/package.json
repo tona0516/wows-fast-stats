@@ -38,6 +38,7 @@
     "flag-icons": "^7.2.3",
     "html-to-image": "^1.11.11",
     "svelte": "^4.2.20",
+    "theme-change": "^2.5.0",
     "uikit": "3.23.7"
   }
 }

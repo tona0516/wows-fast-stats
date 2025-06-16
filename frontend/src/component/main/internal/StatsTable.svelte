@@ -1,15 +1,15 @@
 <script lang="ts">
-  import { RowPattern } from "src/lib/RowPattern";
-  import { ColumnProvider } from "src/lib/column/ColumnProvider";
-  import type { data } from "wailsjs/go/models";
+import { RowPattern } from "src/lib/RowPattern";
+import { ColumnProvider } from "src/lib/column/ColumnProvider";
+import type { data } from "wailsjs/go/models";
 
-  export let teams: data.Team[];
-  export let config: data.UserConfigV2;
+export let teams: data.Team[];
+export let config: data.UserConfigV2;
 
-  $: categories = ColumnProvider.getAllColumns(config);
-  $: [basicColumns, shipColumns, overallColumns] = categories;
-  $: shipColumnCount = shipColumns.columnCount();
-  $: statsColumnCount = shipColumnCount + overallColumns.columnCount();
+$: categories = ColumnProvider.getAllColumns(config);
+$: [basicColumns, shipColumns, overallColumns] = categories;
+$: shipColumnCount = shipColumns.columnCount();
+$: statsColumnCount = shipColumnCount + overallColumns.columnCount();
 </script>
 
 <div class="overflow-x-auto w-screen py-4">

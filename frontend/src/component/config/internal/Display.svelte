@@ -3,6 +3,8 @@ import { DispName } from "src/lib/DispName";
 import { Notifier } from "src/lib/Notifier";
 import { deriveColumnSettings } from "src/lib/util";
 import { storedConfig } from "src/stores";
+import { onMount } from "svelte";
+import { themeChange } from "theme-change";
 import { DefaultUserConfig, UpdateUserConfig } from "wailsjs/go/main/App";
 
 $: inputConfig = $storedConfig;
@@ -34,7 +36,20 @@ const change = async () => {
 };
 
 $: columnSettings = deriveColumnSettings(inputConfig);
+
+onMount(() => {
+  themeChange(false);
+});
 </script>
+
+<div>
+  <div>テーマ</div>
+  <select class="select" data-choose-theme>
+    {#each ["light", "dark", "retro", "night"] as theme}
+      <option value={theme}>{theme}</option>
+    {/each}
+  </select>
+</div>
 
 <div>
   <div>UIサイズ</div>
