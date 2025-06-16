@@ -134,7 +134,7 @@ main();
 <main>
   <div class="flex">
     <div class="flex-none">
-      <ul class="menu rounded-box">
+      <ul class="menu sticky top-0 rounded-box">
         <li>
           <a on:click={() => (page = "main")}>
             <i class="bi bi-house"></i>
