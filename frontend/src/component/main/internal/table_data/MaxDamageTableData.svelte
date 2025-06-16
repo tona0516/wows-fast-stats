@@ -9,9 +9,9 @@ export let player: data.Player;
 $: param = column.displayValue(player);
 </script>
 
-<div>
+<div class="text-center">
   {param.damage}
   {#if param.shipInfo}
-    <ExternalLink url={param.shipInfo.url}>{param.shipInfo.name}</ExternalLink>
+    <ExternalLink url={param.shipInfo.url}>({param.shipInfo.name})</ExternalLink>
   {/if}
 </div>
