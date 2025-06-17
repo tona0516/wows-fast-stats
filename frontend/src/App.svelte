@@ -11,7 +11,6 @@ import {
   storedAlertPlayers,
   storedConfig,
   storedInstallPathError,
-  storedLogs,
 } from "src/stores";
 import { onMount } from "svelte";
 import { themeChange } from "theme-change";
@@ -52,12 +51,6 @@ EventsOn("CONFIG_UPDATE", (config: data.UserConfigV2) =>
 );
 EventsOn("ALERT_PLAYERS_UPDATE", (players: data.AlertPlayer[]) =>
   storedAlertPlayers.set(players),
-);
-EventsOn("LOG", (log: string) =>
-  storedLogs.update((logs) => {
-    logs.push(log);
-    return logs;
-  }),
 );
 
 window.onunhandledrejection = (event) => {

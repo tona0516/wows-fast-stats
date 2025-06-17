@@ -10,7 +10,6 @@ import (
 	"wfs/backend/repository"
 
 	"github.com/rs/zerolog"
-	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 type Logger struct {
@@ -57,10 +56,6 @@ func (l *Logger) Init(appCtx context.Context) {
 	consoleWriter := zerolog.ConsoleWriter{
 		Out: os.Stdout,
 	}
-	frontendWriter := zerolog.ConsoleWriter{
-		Out:     &frontendWriter{appCtx: appCtx},
-		NoColor: true,
-	}
 	reportWriter := reportWriter{
 		alertDiscord: l.alertDiscord,
 		infoDiscord:  l.infoDiscord,
@@ -71,7 +66,7 @@ func (l *Logger) Init(appCtx context.Context) {
 		0o664,
 	)
 
-	multi := zerolog.MultiLevelWriter(consoleWriter, frontendWriter, &reportWriter, logFile)
+	multi := zerolog.MultiLevelWriter(consoleWriter, &reportWriter, logFile)
 
 	l.zlog = zerolog.New(multi).
 		With().
@@ -133,16 +128,6 @@ func addContext(e *zerolog.Event, contexts map[string]string) {
 	for key, value := range contexts {
 		e = e.Str(key, value)
 	}
-}
-
-//nolint:containedctx
-type frontendWriter struct {
-	appCtx context.Context
-}
-
-func (w *frontendWriter) Write(p []byte) (int, error) {
-	runtime.EventsEmit(w.appCtx, "LOG", string(p))
-	return len(p), nil
 }
 
 type reportWriter struct {
