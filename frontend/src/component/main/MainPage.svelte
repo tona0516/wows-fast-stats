@@ -6,9 +6,6 @@ import { Notifier } from "src/lib/Notifier";
 import { storedBattle, storedConfig, storedInstallPathError } from "src/stores";
 import { LogInfo } from "wailsjs/go/main/App";
 import Menu from "./internal/Menu.svelte";
-import Ofuse from "./internal/Ofuse.svelte";
-
-const MAIN_PAGE_ID = "mainpage";
 
 let menu: Menu | undefined;
 let isLoading = false;
@@ -34,9 +31,7 @@ export const fetchBattle = async () => {
 
 <div>
   <div class="flex">
-    <Menu
-      bind:this={menu}
-    />
+    <Menu bind:this={menu} />
   </div>
 
   <div>
@@ -46,12 +41,7 @@ export const fetchBattle = async () => {
       {@const config = $storedConfig}
 
       <div class="flex">
-        <StatisticsTable
-          {teams}
-          {config}
-          on:EditAlertPlayer
-          on:RemoveAlertPlayer
-        />
+        <StatisticsTable {teams} {config} />
       </div>
 
       <div class="flex">
@@ -66,10 +56,6 @@ export const fetchBattle = async () => {
         {/if}
       </p>
     {/if}
-  </div>
-
-  <div>
-    <Ofuse />
   </div>
 
   {#if isLoading}

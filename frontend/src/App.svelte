@@ -23,7 +23,7 @@ import {
   UserConfig,
   ValidateInstallPath,
 } from "wailsjs/go/main/App";
-import { data } from "wailsjs/go/models";
+import type { data } from "wailsjs/go/models";
 import { EventsOn } from "wailsjs/runtime/runtime";
 import ExternalLink from "./component/common/ExternalLink.svelte";
 import { Notifier } from "./lib/Notifier";
@@ -153,7 +153,7 @@ main();
         </ul>
       </div>
 
-      <div class="flex-1 min-w-[1px]">
+      <div class="flex-1 min-w-[1px] m-4">
         {#if updatableRelease}
           <div>
             新しいバージョンがあります:
