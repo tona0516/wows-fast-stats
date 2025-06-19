@@ -116,7 +116,7 @@ const tlTableInfo = getTLTableInfo(THREAT_LEVEL_DEFS);
 </script>
 
 <div>
-  <div class="p-2">
+  <div class="p-4 flex flex-col items-center">
     <p class="text-xl font-bold">Personal Rating (by WoWS Numbers)</p>
     <DispColorTable tableInfo={prTableInfo} />
     <ExternalLink url={"https://asia.wows-numbers.com/personal/rating"}
@@ -124,7 +124,7 @@ const tlTableInfo = getTLTableInfo(THREAT_LEVEL_DEFS);
     >
   </div>
 
-  <div class="p-2">
+  <div class="p-4 flex flex-col items-center">
     <p class="text-xl font-bold">戦力評価 (by 178usagi氏))</p>
     <DispColorTable tableInfo={tlTableInfo} />
     <ExternalLink url={"https://github.com/tona0516/wows-fast-stats/wiki"}
@@ -132,21 +132,20 @@ const tlTableInfo = getTLTableInfo(THREAT_LEVEL_DEFS);
     >
   </div>
 
-  <div class="p-2">
+  <div class="p-4 flex flex-col items-center">
     <img src={iconApp} alt="" width="128px" height="128px" />
-    <span>
-      wows-fast-stats
-      {#await Semver() then semver} {semver} {/await}
-    </span>
-    <div>
+    <div class="pt-1">
+      wows-fast-stats {#await Semver() then semver} {semver} {/await}
+    </div>
+    <div class="pt-2">
       {#each LINKS as link}
-        <div class="flex">
+        <div class="flex flex-col items-center">
           <ExternalLink url={link.url}>
             <i class="bi bi-{link.icon}">{link.text}</i>
           </ExternalLink>
         </div>
       {/each}
     </div>
-    <span>Copyright © 2023 tona0516 All Rights Reserved.</span>
+    <div class="pt-2">Copyright © 2023 tona0516 All Rights Reserved.</div>
   </div>
 </div>

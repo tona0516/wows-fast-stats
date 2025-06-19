@@ -57,26 +57,24 @@ const onChange = async () => {
 </script>
 
 <div>
-  <div class="p-2">
+  <div class="p-4 flex flex-col items-center">
     <p class="text-xl font-bold">インストールフォルダ設定</p>
-    <p class="text-sm">
+    <p class="text-sm text-nowrap">
       ゲームクライアントの実行ファイルがあるフォルダを選択してください。
     </p>
 
-    <div class="pt-1">
-      <input
-        class="input w-1/2"
-        type="text"
-        placeholder="World of Warshipsインストールフォルダ"
-        bind:value={inputConfig.install_path}
-      />
-    </div>
+    <input
+      class="input w-lg my-2"
+      type="text"
+      placeholder="World of Warshipsインストールフォルダ"
+      bind:value={inputConfig.install_path}
+    />
 
-    <div class="pt-1">
+    <div>
       <button class="btn btn-neutral" on:click={onClickSelectDirectory}
         >フォルダ選択</button
       >
-      <button class="btn btn-primary ml-1" on:click={onClickSaveInstallPath}
+      <button class="btn btn-primary ml-2" on:click={onClickSaveInstallPath}
         >フォルダ設定保存</button
       >
     </div>
@@ -87,19 +85,19 @@ const onChange = async () => {
     {/if}
   </div>
 
-  <div class="p-2">
+  <div class="p-4 flex flex-col items-center">
     <p class="text-xl font-bold">テーマ</p>
-    <select class="select" data-choose-theme>
+    <select class="select my-2" data-choose-theme>
       {#each ["light", "dark", "retro", "night"] as theme}
         <option value={theme}>{theme}</option>
       {/each}
     </select>
   </div>
 
-  <div class="p-2">
+  <div class="p-4 flex flex-col items-center">
     <p class="text-xl font-bold">UIサイズ</p>
     <select
-      class="select"
+      class="select my-2"
       bind:value={inputConfig.font_size}
       on:change={onChange}
     >
@@ -111,20 +109,20 @@ const onChange = async () => {
     </select>
   </div>
 
-  <div class="p-2">
+  <div class="p-4 flex flex-col items-center">
     <p class="text-xl font-bold">表示項目</p>
-    <table class="table max-w-md text-nowrap">
+    <table class="table max-w-md text-nowrap my-2">
       <thead>
         <tr>
           {#each ["項目", "艦成績", "総合成績", "小数点以下の桁数"] as columns}
-            <th>{columns}</th>
+            <th class="text-center">{columns}</th>
           {/each}
         </tr>
       </thead>
       <tbody>
         {#each columnSettings as column}
           <tr>
-            <td>
+            <td class="text-center">
               {DispName.FULL_COLUMN_NAMES.get(column.key) ?? column.key}
             </td>
 
@@ -178,20 +176,20 @@ const onChange = async () => {
     </table>
   </div>
 
-  <div class="p-2">
+  <div class="p-4 flex flex-col items-center">
     <p class="text-xl font-bold">各種カラー</p>
-    <table class="table max-w-xs text-nowrap">
+    <table class="table max-w-xs text-nowrap my-2">
       <thead>
         <tr>
           {#each ["スキル", "文字色"] as column}
-            <th>{column}</th>
+            <th class="text-center">{column}</th>
           {/each}
         </tr>
       </thead>
       <tbody>
         {#each DispName.SKILL_LEVELS.toArray() as sl}
           <tr>
-            <td>{sl.value}</td>
+            <td class="text-center">{sl.value}</td>
             <td>
               <input
                 class="input"
@@ -205,18 +203,18 @@ const onChange = async () => {
       </tbody>
     </table>
 
-    <table class="table max-w-xs text-nowrap">
+    <table class="table max-w-xs text-nowrap my-2">
       <thead>
         <tr>
           {#each ["Tier", "使用艦", "非使用艦"] as column}
-            <th>{column}</th>
+            <th class="text-center">{column}</th>
           {/each}
         </tr>
       </thead>
       <tbody>
         {#each DispName.TIER_GROUPS.toArray() as tg}
           <tr>
-            <td>{tg.value}</td>
+            <td class="text-center">{tg.value}</td>
             <td>
               <input
                 class="input"
@@ -239,18 +237,18 @@ const onChange = async () => {
       </tbody>
     </table>
 
-    <table class="table max-w-xs text-nowrap">
+    <table class="table max-w-xs text-nowrap my-2">
       <thead>
         <tr>
           {#each ["艦種", "使用艦", "非使用艦"] as column}
-            <th>{column}</th>
+            <th class="text-center">{column}</th>
           {/each}
         </tr>
       </thead>
       <tbody>
         {#each DispName.SHIP_TYPES.toArray() as st}
           <tr>
-            <td>{st.value}</td>
+            <td class="text-center">{st.value}</td>
             <td>
               <input
                 class="input"
@@ -274,10 +272,10 @@ const onChange = async () => {
     </table>
   </div>
 
-  <div class="p-2">
+  <div class="p-4 flex flex-col items-center">
     <p class="text-xl font-bold">プレイヤー名の背景色</p>
     <select
-      class="select"
+      class="select my-2"
       bind:value={inputConfig.color.player_name}
       on:change={onChange}
     >
@@ -290,29 +288,27 @@ const onChange = async () => {
     </select>
   </div>
 
-  <div class="p-2">
+  <div class="p-4 flex flex-col items-center">
     <p class="text-xl font-bold">その他</p>
-    <div>
-      <input
-        class="toggle toggle-success"
-        type="checkbox"
-        bind:checked={inputConfig.show_language_frag}
-        on:change={onChange}
-      />
-      クラン国籍を表示する（クラン説明から言語検出）
-    </div>
-
-    <div class="pt-2">
-      <input
-        class="toggle toggle-success"
-        type="checkbox"
-        bind:checked={inputConfig.send_report}
-        on:change={onChange}
-      />アプリ改善のためのデータ送信を許可する
-    </div>
-
-    <div class="pt-2">
-      <div>
+    <ul class="list my-2">
+      <li class="list-row">
+        <input
+          class="toggle toggle-success"
+          type="checkbox"
+          bind:checked={inputConfig.show_language_frag}
+          on:change={onChange}
+        />
+        クラン国籍を表示する（クラン説明から言語検出）
+      </li>
+      <li class="list-row">
+        <input
+          class="toggle toggle-success"
+          type="checkbox"
+          bind:checked={inputConfig.send_report}
+          on:change={onChange}
+        />アプリ改善のためのデータ送信を許可する
+      </li>
+      <li class="list-row">
         <input
           class="toggle toggle-success"
           type="checkbox"
@@ -320,14 +316,12 @@ const onChange = async () => {
           on:change={onChange}
         />
         【開発用】自動で戦闘情報(tempArenaInfo.json)を保存する
-      </div>
 
-      <div>
         <!-- svelte-ignore a11y-invalid-attribute -->
         <a href="#" on:click={() => onClickOpenDirectory("temp_arena_info")}>
           <i class="bi bi-folder">保存フォルダを開く</i>
         </a>
-      </div>
-    </div>
+      </li>
+    </ul>
   </div>
 </div>

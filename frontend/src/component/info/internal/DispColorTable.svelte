@@ -7,7 +7,7 @@ export let tableInfo: DispColorTableInfo;
 <table class="table max-w-md text-nowrap">
   <thead>
     {#each tableInfo.headers as header}
-      <th>{header}</th>
+      <th class="text-center">{header}</th>
     {/each}
   </thead>
 
@@ -15,7 +15,7 @@ export let tableInfo: DispColorTableInfo;
     {#each tableInfo.rows as row}
       <tr>
         {#each row as cell}
-          <td style="color: {cell.textColor};">{cell.text}</td>
+          <td class="text-center" style="color: {cell.textColor};">{cell.text}</td>
         {/each}
       </tr>
     {/each}
