@@ -86,6 +86,21 @@ const onChange = async () => {
   </div>
 
   <div class="p-4 flex flex-col items-center">
+    <p class="text-xl font-bold">統計パターン</p>
+    <select
+      class="select my-2"
+      bind:value={inputConfig.stats_pattern}
+      on:change={onChange}
+    >
+      {#each DispName.STATS_PATTERNS.toArray() as sp}
+        <option selected={sp.key == $storedConfig.stats_pattern} value={sp.key}
+          >{sp.value}</option
+        >
+      {/each}
+    </select>
+  </div>
+
+  <div class="p-4 flex flex-col items-center">
     <p class="text-xl font-bold">テーマ</p>
     <select class="select my-2" data-choose-theme>
       {#each ["light", "dark", "retro", "night"] as theme}
@@ -178,98 +193,104 @@ const onChange = async () => {
 
   <div class="p-4 flex flex-col items-center">
     <p class="text-xl font-bold">各種カラー</p>
-    <table class="table max-w-xs text-nowrap my-2">
-      <thead>
-        <tr>
-          {#each ["スキル", "文字色"] as column}
-            <th class="text-center">{column}</th>
-          {/each}
-        </tr>
-      </thead>
-      <tbody>
-        {#each DispName.SKILL_LEVELS.toArray() as sl}
-          <tr>
-            <td class="text-center">{sl.value}</td>
-            <td>
-              <input
-                class="input"
-                type="color"
-                bind:value={inputConfig.color.skill.text[sl.key]}
-                on:change={onChange}
-              />
-            </td>
-          </tr>
-        {/each}
-      </tbody>
-    </table>
+    <div class="grid xl:grid-cols-3 gap-4">
+      <div>
+        <table class="table max-w-xs text-nowrap my-2">
+          <thead>
+            <tr>
+              {#each ["スキル", "文字色"] as column}
+                <th class="text-center">{column}</th>
+              {/each}
+            </tr>
+          </thead>
+          <tbody>
+            {#each DispName.SKILL_LEVELS.toArray() as sl}
+              <tr>
+                <td class="text-center">{sl.value}</td>
+                <td>
+                  <input
+                    class="input w-[64px]"
+                    type="color"
+                    bind:value={inputConfig.color.skill.text[sl.key]}
+                    on:change={onChange}
+                  />
+                </td>
+              </tr>
+            {/each}
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <table class="table max-w-xs text-nowrap my-2">
+          <thead>
+            <tr>
+              {#each ["Tier", "使用艦", "非使用艦"] as column}
+                <th class="text-center">{column}</th>
+              {/each}
+            </tr>
+          </thead>
+          <tbody>
+            {#each DispName.TIER_GROUPS.toArray() as tg}
+              <tr>
+                <td class="text-center">{tg.value}</td>
+                <td>
+                  <input
+                    class="input w-[64px]"
+                    type="color"
+                    bind:value={inputConfig.color.tier.own[tg.key]}
+                    on:change={onChange}
+                  />
+                </td>
 
-    <table class="table max-w-xs text-nowrap my-2">
-      <thead>
-        <tr>
-          {#each ["Tier", "使用艦", "非使用艦"] as column}
-            <th class="text-center">{column}</th>
-          {/each}
-        </tr>
-      </thead>
-      <tbody>
-        {#each DispName.TIER_GROUPS.toArray() as tg}
-          <tr>
-            <td class="text-center">{tg.value}</td>
-            <td>
-              <input
-                class="input"
-                type="color"
-                bind:value={inputConfig.color.tier.own[tg.key]}
-                on:change={onChange}
-              />
-            </td>
+                <td>
+                  <input
+                    class="input w-[64px]"
+                    type="color"
+                    bind:value={inputConfig.color.tier.other[tg.key]}
+                    on:change={onChange}
+                  />
+                </td>
+              </tr>
+            {/each}
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <table class="table max-w-xs text-nowrap my-2">
+          <thead>
+            <tr>
+              {#each ["艦種", "使用艦", "非使用艦"] as column}
+                <th class="text-center">{column}</th>
+              {/each}
+            </tr>
+          </thead>
+          <tbody>
+            {#each DispName.SHIP_TYPES.toArray() as st}
+              <tr>
+                <td class="text-center">{st.value}</td>
+                <td>
+                  <input
+                    class="input w-[64px]"
+                    type="color"
+                    bind:value={inputConfig.color.ship_type.own[st.key]}
+                    on:change={onChange}
+                  />
+                </td>
 
-            <td>
-              <input
-                class="input"
-                type="color"
-                bind:value={inputConfig.color.tier.other[tg.key]}
-                on:change={onChange}
-              />
-            </td>
-          </tr>
-        {/each}
-      </tbody>
-    </table>
-
-    <table class="table max-w-xs text-nowrap my-2">
-      <thead>
-        <tr>
-          {#each ["艦種", "使用艦", "非使用艦"] as column}
-            <th class="text-center">{column}</th>
-          {/each}
-        </tr>
-      </thead>
-      <tbody>
-        {#each DispName.SHIP_TYPES.toArray() as st}
-          <tr>
-            <td class="text-center">{st.value}</td>
-            <td>
-              <input
-                class="input"
-                type="color"
-                bind:value={inputConfig.color.ship_type.own[st.key]}
-                on:change={onChange}
-              />
-            </td>
-
-            <td>
-              <input
-                class="input"
-                type="color"
-                bind:value={inputConfig.color.ship_type.other[st.key]}
-                on:change={onChange}
-              />
-            </td>
-          </tr>
-        {/each}
-      </tbody>
-    </table>
+                <td>
+                  <input
+                    class="input w-[64px]"
+                    type="color"
+                    bind:value={inputConfig.color.ship_type.other[st.key]}
+                    on:change={onChange}
+                  />
+                </td>
+              </tr>
+            {/each}
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
 
   <div class="p-4 flex flex-col items-center">

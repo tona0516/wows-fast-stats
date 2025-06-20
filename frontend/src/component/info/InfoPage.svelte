@@ -117,19 +117,22 @@ const tlTableInfo = getTLTableInfo(THREAT_LEVEL_DEFS);
 
 <div>
   <div class="p-4 flex flex-col items-center">
-    <p class="text-xl font-bold">Personal Rating (by WoWS Numbers)</p>
-    <DispColorTable tableInfo={prTableInfo} />
-    <ExternalLink url={"https://asia.wows-numbers.com/personal/rating"}
-      >Personal Ratingの算出方法</ExternalLink
-    >
-  </div>
-
-  <div class="p-4 flex flex-col items-center">
-    <p class="text-xl font-bold">戦力評価 (by 178usagi氏))</p>
-    <DispColorTable tableInfo={tlTableInfo} />
-    <ExternalLink url={"https://github.com/tona0516/wows-fast-stats/wiki"}
-      >戦力評価の算出方法</ExternalLink
-    >
+    <div class="grid xl:grid-cols-2 gap-4">
+      <div>
+        <p class="text-xl text-center font-bold">Personal Rating (by WoWS Numbers)</p>
+        <DispColorTable tableInfo={prTableInfo} />
+        <ExternalLink url={"https://asia.wows-numbers.com/personal/rating"}
+          >Personal Ratingの算出方法</ExternalLink
+        >
+      </div>
+      <div>
+        <p class="text-xl text-center font-bold">戦力評価 (by 178usagi氏))</p>
+        <DispColorTable tableInfo={tlTableInfo} />
+        <ExternalLink url={"https://github.com/tona0516/wows-fast-stats/wiki"}
+          >戦力評価の算出方法</ExternalLink
+        >
+      </div>
+    </div>
   </div>
 
   <div class="p-4 flex flex-col items-center">

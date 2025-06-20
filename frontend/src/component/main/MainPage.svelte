@@ -5,9 +5,7 @@ import { FetchProxy } from "src/lib/FetchProxy";
 import { Notifier } from "src/lib/Notifier";
 import { storedBattle, storedConfig, storedInstallPathError } from "src/stores";
 import { LogInfo } from "wailsjs/go/main/App";
-import Menu from "./internal/Menu.svelte";
 
-let menu: Menu | undefined;
 let isLoading = false;
 
 export const fetchBattle = async () => {
@@ -30,10 +28,6 @@ export const fetchBattle = async () => {
 </script>
 
 <div>
-  <div class="flex">
-    <Menu bind:this={menu} />
-  </div>
-
   <div>
     {#if $storedBattle}
       {@const teams = $storedBattle.teams}

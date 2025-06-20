@@ -24,7 +24,7 @@ import {
   ValidateInstallPath,
 } from "wailsjs/go/main/App";
 import type { data } from "wailsjs/go/models";
-import { EventsOn } from "wailsjs/runtime/runtime";
+import { EventsOn, WindowReloadApp } from "wailsjs/runtime/runtime";
 import ExternalLink from "./component/common/ExternalLink.svelte";
 import { Notifier } from "./lib/Notifier";
 
@@ -149,6 +149,11 @@ main();
             <a on:click={() => (page = "info")}
               ><i class="bi bi-info-circle"></i></a
             >
+          </li>
+          <li class="pt-8">
+            <button class="btn btn-sm btn-primary" on:click={() => WindowReloadApp()}>
+              <i class="bi bi-arrow-clockwise"></i>
+            </button>
           </li>
         </ul>
       </div>
