@@ -24,7 +24,7 @@ import {
   ValidateInstallPath,
 } from "wailsjs/go/main/App";
 import type { data } from "wailsjs/go/models";
-import { EventsOn, WindowReloadApp } from "wailsjs/runtime/runtime";
+import { EventsOn } from "wailsjs/runtime/runtime";
 import SideMenu from "./SideMenu.svelte";
 import ExternalLink from "./component/common/ExternalLink.svelte";
 import { Notifier } from "./lib/Notifier";

@@ -15,7 +15,7 @@ const MENU_ITEMS: { page: Page; icon: string; tooltip: string }[] = [
         {#each MENU_ITEMS as item}
             <button
                 class="btn btn-ghost {page === item.page &&
-                    'bg-primary'} tooltip tooltip-right"
+                    'bg-current/[15%]'} tooltip tooltip-right"
                 data-tip={item.tooltip}
                 on:click={() => (page = item.page)}
             >
@@ -26,7 +26,7 @@ const MENU_ITEMS: { page: Page; icon: string; tooltip: string }[] = [
 
     <li class="mt-8">
         <button
-            class="btn btn-secondary tooltip tooltip-right"
+            class="btn btn-primary tooltip tooltip-right"
             data-tip="リロード"
             on:click={() => WindowReloadApp()}
         >
