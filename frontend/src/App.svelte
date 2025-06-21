@@ -25,14 +25,15 @@ import {
 } from "wailsjs/go/main/App";
 import type { data } from "wailsjs/go/models";
 import { EventsOn, WindowReloadApp } from "wailsjs/runtime/runtime";
+import SideMenu from "./SideMenu.svelte";
 import ExternalLink from "./component/common/ExternalLink.svelte";
 import { Notifier } from "./lib/Notifier";
+import type { Page } from "./lib/types";
 
 let mainPage: MainPage | undefined;
 let initialized = false;
 let updatableRelease: data.GHLatestRelease;
 
-type Page = "main" | "config" | "info";
 let page: Page = "main";
 
 $: {
@@ -134,28 +135,7 @@ main();
   <div>
     <div class="flex">
       <div class="flex-none">
-        <ul class="menu rounded-box sticky top-0">
-          <li>
-            <a on:click={() => (page = "main")}>
-              <i class="bi bi-house"></i>
-            </a>
-          </li>
-          <li>
-            <a on:click={() => (page = "config")}>
-              <i class="bi bi-gear"></i>
-            </a>
-          </li>
-          <li>
-            <a on:click={() => (page = "info")}
-              ><i class="bi bi-info-circle"></i></a
-            >
-          </li>
-          <li class="pt-8">
-            <button class="btn btn-sm btn-primary" on:click={() => WindowReloadApp()}>
-              <i class="bi bi-arrow-clockwise"></i>
-            </button>
-          </li>
-        </ul>
+        <SideMenu bind:page />
       </div>
 
       <div class="flex-1 min-w-[1px] m-4">
