@@ -36,6 +36,7 @@ tasks:
       - golangci-lint run --fix
       - go fmt
       - "{{.NPM}} run fmt"
+      - "{{.NPM}} run fmt-svelte"
   test:
     desc: unit testing
     cmds:

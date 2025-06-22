@@ -1,36 +1,40 @@
 <script lang="ts">
-import { FetchProxy } from "src/lib/FetchProxy";
-import { Notifier } from "src/lib/Notifier";
-import { storedBattle, storedConfig, storedInstallPathError } from "src/stores";
-import { LogInfo } from "wailsjs/go/main/App";
+  import { FetchProxy } from "src/lib/FetchProxy";
+  import { Notifier } from "src/lib/Notifier";
+  import {
+    storedBattle,
+    storedConfig,
+    storedInstallPathError,
+  } from "src/stores";
+  import { LogInfo } from "wailsjs/go/main/App";
 
-import { RowPattern } from "src/lib/RowPattern";
-import { ColumnProvider } from "src/lib/column/ColumnProvider";
+  import { RowPattern } from "src/lib/RowPattern";
+  import { ColumnProvider } from "src/lib/column/ColumnProvider";
 
-let isLoading = false;
+  let isLoading = false;
 
-$: categories = ColumnProvider.getAllColumns($storedConfig);
-$: [basicColumns, shipColumns, overallColumns] = categories;
-$: shipColumnCount = shipColumns.columnCount();
-$: statsColumnCount = shipColumnCount + overallColumns.columnCount();
+  $: categories = ColumnProvider.getAllColumns($storedConfig);
+  $: [basicColumns, shipColumns, overallColumns] = categories;
+  $: shipColumnCount = shipColumns.columnCount();
+  $: statsColumnCount = shipColumnCount + overallColumns.columnCount();
 
-export const fetchBattle = async () => {
-  try {
-    isLoading = true;
+  export const fetchBattle = async () => {
+    try {
+      isLoading = true;
 
-    const start = new Date().getTime();
-    await FetchProxy.getBattle();
-    const elapsed = (new Date().getTime() - start) / 1000;
+      const start = new Date().getTime();
+      await FetchProxy.getBattle();
+      const elapsed = (new Date().getTime() - start) / 1000;
 
-    Notifier.success(`データ取得完了: ${elapsed.toFixed(1)}秒`);
+      Notifier.success(`データ取得完了: ${elapsed.toFixed(1)}秒`);
 
-    LogInfo("fetch success", { "duration(s)": elapsed.toFixed(1) });
-  } catch (error) {
-    Notifier.failure(error);
-  } finally {
-    isLoading = false;
-  }
-};
+      LogInfo("fetch success", { "duration(s)": elapsed.toFixed(1) });
+    } catch (error) {
+      Notifier.failure(error);
+    } finally {
+      isLoading = false;
+    }
+  };
 </script>
 
 <div>

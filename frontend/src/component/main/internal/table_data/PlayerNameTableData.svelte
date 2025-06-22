@@ -1,27 +1,29 @@
 <script lang="ts">
-import ExternalLink from "src/component/common/ExternalLink.svelte";
-import { Notifier } from "src/lib/Notifier";
-import { NumbersURL } from "src/lib/NumbersURL";
-import type { PlayerName } from "src/lib/column/model/PlayerName";
-import { storedAlertPlayers } from "src/stores";
-import type { data } from "wailsjs/go/models";
-import { ClipboardSetText } from "wailsjs/runtime/runtime";
+  import ExternalLink from "src/component/common/ExternalLink.svelte";
+  import { Notifier } from "src/lib/Notifier";
+  import { NumbersURL } from "src/lib/NumbersURL";
+  import type { PlayerName } from "src/lib/column/model/PlayerName";
+  import { storedAlertPlayers } from "src/stores";
+  import type { data } from "wailsjs/go/models";
+  import { ClipboardSetText } from "wailsjs/runtime/runtime";
 
-export let column: PlayerName;
-export let player: data.Player;
+  export let column: PlayerName;
+  export let player: data.Player;
 
-$: accountID = player.player_info.id;
-$: alertPlayer = $storedAlertPlayers.find((it) => it.account_id === accountID);
-$: clanTag = column.clanTag(player);
-$: isNPC = column.isNPC(player);
+  $: accountID = player.player_info.id;
+  $: alertPlayer = $storedAlertPlayers.find(
+    (it) => it.account_id === accountID,
+  );
+  $: clanTag = column.clanTag(player);
+  $: isNPC = column.isNPC(player);
 
-const setPlayerNameToClipboard = async () => {
-  const isSuccess = await ClipboardSetText(player.player_info.name);
+  const setPlayerNameToClipboard = async () => {
+    const isSuccess = await ClipboardSetText(player.player_info.name);
 
-  isSuccess
-    ? Notifier.success("コピーしました！")
-    : Notifier.failure("コピーに失敗しました");
-};
+    isSuccess
+      ? Notifier.success("コピーしました！")
+      : Notifier.failure("コピーに失敗しました");
+  };
 </script>
 
 <div>

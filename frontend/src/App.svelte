@@ -1,134 +1,134 @@
 <script lang="ts">
-import ConfigPage from "src/component/config/ConfigPage.svelte";
-import InfoPage from "src/component/info/InfoPage.svelte";
-import MainPage from "src/component/main/MainPage.svelte";
+  import ConfigPage from "src/component/config/ConfigPage.svelte";
+  import InfoPage from "src/component/info/InfoPage.svelte";
+  import MainPage from "src/component/main/MainPage.svelte";
 
-import "bootstrap-icons/font/bootstrap-icons.css";
-import "charts.css";
+  import "bootstrap-icons/font/bootstrap-icons.css";
+  import "charts.css";
 
-import { FontSize } from "src/lib/FontSize";
-import {
-  storedAlertPlayers,
-  storedConfig,
-  storedInstallPathError,
-} from "src/stores";
-import { onMount } from "svelte";
-import { themeChange } from "theme-change";
-import {
-  AlertPlayers,
-  LatestRelease,
-  LogError,
-  MigrateIfNeeded,
-  StartWatching,
-  UserConfig,
-  ValidateInstallPath,
-} from "wailsjs/go/main/App";
-import type { data } from "wailsjs/go/models";
-import { EventsOn } from "wailsjs/runtime/runtime";
-import SideMenu from "./SideMenu.svelte";
-import ExternalLink from "./component/common/ExternalLink.svelte";
-import { Notifier } from "./lib/Notifier";
-import type { Page } from "./lib/types";
+  import { FontSize } from "src/lib/FontSize";
+  import {
+    storedAlertPlayers,
+    storedConfig,
+    storedInstallPathError,
+  } from "src/stores";
+  import { onMount } from "svelte";
+  import { themeChange } from "theme-change";
+  import {
+    AlertPlayers,
+    LatestRelease,
+    LogError,
+    MigrateIfNeeded,
+    StartWatching,
+    UserConfig,
+    ValidateInstallPath,
+  } from "wailsjs/go/main/App";
+  import type { data } from "wailsjs/go/models";
+  import { EventsOn } from "wailsjs/runtime/runtime";
+  import SideMenu from "./SideMenu.svelte";
+  import ExternalLink from "./component/common/ExternalLink.svelte";
+  import { Notifier } from "./lib/Notifier";
+  import type { Page } from "./lib/types";
 
-let mainPage: MainPage | undefined;
-let initialized = false;
-let updatableRelease: data.GHLatestRelease;
+  let mainPage: MainPage | undefined;
+  let initialized = false;
+  let updatableRelease: data.GHLatestRelease;
 
-let page: Page = "main";
+  let page: Page = "main";
 
-$: {
-  // @ts-ignore
-  document.body.style.zoom = FontSize.getZoomRate($storedConfig);
-}
-
-onMount(() => {
-  themeChange(false);
-});
-
-EventsOn("BATTLE_START", () => mainPage?.fetchBattle());
-EventsOn("BATTLE_ERR", (error: string) => Notifier.failure(error));
-EventsOn("CONFIG_UPDATE", (config: data.UserConfigV2) =>
-  storedConfig.set(config),
-);
-EventsOn("ALERT_PLAYERS_UPDATE", (players: data.AlertPlayer[]) =>
-  storedAlertPlayers.set(players),
-);
-
-window.onunhandledrejection = (event) => {
-  const message = "window.onunhandledrejection";
-  const error = event.reason;
-  if (error instanceof Error) {
-    sendFronendError(message, error);
-  } else {
-    LogError(message, { error: JSON.stringify(error) });
+  $: {
+    // @ts-ignore
+    document.body.style.zoom = FontSize.getZoomRate($storedConfig);
   }
-};
-window.onerror = (_event, _source, _lineno, _colno, error) => {
-  sendFronendError("window.onerror", error);
-};
 
-const sendFronendError = (message: string, error: Error | undefined) => {
-  LogError(message, {
-    "error.name": error?.name ?? "",
-    "error.message": error?.message ?? "",
-    "error.stack": error?.stack ?? "",
+  onMount(() => {
+    themeChange(false);
   });
-};
 
-const initialize = async (): Promise<data.UserConfigV2 | undefined> => {
-  try {
-    await MigrateIfNeeded();
+  EventsOn("BATTLE_START", () => mainPage?.fetchBattle());
+  EventsOn("BATTLE_ERR", (error: string) => Notifier.failure(error));
+  EventsOn("CONFIG_UPDATE", (config: data.UserConfigV2) =>
+    storedConfig.set(config),
+  );
+  EventsOn("ALERT_PLAYERS_UPDATE", (players: data.AlertPlayer[]) =>
+    storedAlertPlayers.set(players),
+  );
 
-    const config = await UserConfig();
-    storedConfig.set(config);
-
-    const installPathError = await ValidateInstallPath(config.install_path);
-    if (installPathError) {
-      storedInstallPathError.set(installPathError);
+  window.onunhandledrejection = (event) => {
+    const message = "window.onunhandledrejection";
+    const error = event.reason;
+    if (error instanceof Error) {
+      sendFronendError(message, error);
+    } else {
+      LogError(message, { error: JSON.stringify(error) });
     }
+  };
+  window.onerror = (_event, _source, _lineno, _colno, error) => {
+    sendFronendError("window.onerror", error);
+  };
 
-    const alertPlayers = await AlertPlayers();
-    storedAlertPlayers.set(alertPlayers);
+  const sendFronendError = (message: string, error: Error | undefined) => {
+    LogError(message, {
+      "error.name": error?.name ?? "",
+      "error.message": error?.message ?? "",
+      "error.stack": error?.stack ?? "",
+    });
+  };
 
-    initialized = true;
+  const initialize = async (): Promise<data.UserConfigV2 | undefined> => {
+    try {
+      await MigrateIfNeeded();
 
-    if (!$storedInstallPathError) {
-      StartWatching();
+      const config = await UserConfig();
+      storedConfig.set(config);
+
+      const installPathError = await ValidateInstallPath(config.install_path);
+      if (installPathError) {
+        storedInstallPathError.set(installPathError);
+      }
+
+      const alertPlayers = await AlertPlayers();
+      storedAlertPlayers.set(alertPlayers);
+
+      initialized = true;
+
+      if (!$storedInstallPathError) {
+        StartWatching();
+      }
+
+      return config;
+    } catch (error) {
+      Notifier.failure(error);
+      return undefined;
     }
+  };
 
-    return config;
-  } catch (error) {
-    Notifier.failure(error);
-    return undefined;
-  }
-};
-
-const notifyUpdate = async (config: data.UserConfigV2) => {
-  return;
-
-  // if (!config.notify_updatable) return;
-
-  // try {
-  //   const latestRelease = await LatestRelease();
-  //   if (latestRelease.updatable) {
-  //     updatableRelease = latestRelease;
-  //   }
-  // } catch (error) {
-  //   Notifier.failure(error);
-  //   return;
-  // }
-};
-
-const main = async () => {
-  const config = await initialize();
-  if (!config) {
+  const notifyUpdate = async (config: data.UserConfigV2) => {
     return;
-  }
 
-  await notifyUpdate(config);
-};
+    // if (!config.notify_updatable) return;
 
-main();
+    // try {
+    //   const latestRelease = await LatestRelease();
+    //   if (latestRelease.updatable) {
+    //     updatableRelease = latestRelease;
+    //   }
+    // } catch (error) {
+    //   Notifier.failure(error);
+    //   return;
+    // }
+  };
+
+  const main = async () => {
+    const config = await initialize();
+    if (!config) {
+      return;
+    }
+
+    await notifyUpdate(config);
+  };
+
+  main();
 </script>
 
 <main>

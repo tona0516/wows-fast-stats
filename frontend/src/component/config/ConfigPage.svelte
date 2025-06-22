@@ -1,59 +1,59 @@
 <script lang="ts">
-import { DispName } from "src/lib/DispName";
-import { Notifier } from "src/lib/Notifier";
-import { deriveColumnSettings } from "src/lib/util";
-import { storedConfig, storedInstallPathError } from "src/stores";
-import { onMount } from "svelte";
-import { themeChange } from "theme-change";
-import {
-  OpenDirectory,
-  SelectDirectory,
-  UpdateInstallPath,
-  UpdateUserConfig,
-} from "wailsjs/go/main/App";
+  import { DispName } from "src/lib/DispName";
+  import { Notifier } from "src/lib/Notifier";
+  import { deriveColumnSettings } from "src/lib/util";
+  import { storedConfig, storedInstallPathError } from "src/stores";
+  import { onMount } from "svelte";
+  import { themeChange } from "theme-change";
+  import {
+    OpenDirectory,
+    SelectDirectory,
+    UpdateInstallPath,
+    UpdateUserConfig,
+  } from "wailsjs/go/main/App";
 
-$: inputConfig = $storedConfig;
-$: installPath = $storedConfig.install_path;
-$: columnSettings = deriveColumnSettings(inputConfig);
+  $: inputConfig = $storedConfig;
+  $: installPath = $storedConfig.install_path;
+  $: columnSettings = deriveColumnSettings(inputConfig);
 
-onMount(() => {
-  themeChange(false);
-});
+  onMount(() => {
+    themeChange(false);
+  });
 
-const onClickSelectDirectory = async () => {
-  SelectDirectory().then((path) => {
-    if (!path) {
-      return;
+  const onClickSelectDirectory = async () => {
+    SelectDirectory().then((path) => {
+      if (!path) {
+        return;
+      }
+
+      installPath = path;
+    });
+  };
+
+  const onClickSaveInstallPath = async () => {
+    try {
+      await UpdateInstallPath(installPath);
+      storedInstallPathError.set("");
+      Notifier.success("インストールフォルダを保存しました。");
+    } catch (error) {
+      storedInstallPathError.set(error as string);
     }
+  };
 
-    installPath = path;
-  });
-};
+  const onClickOpenDirectory = async (path: string) => {
+    OpenDirectory(path).catch((error) => {
+      Notifier.failure(error);
+    });
+  };
 
-const onClickSaveInstallPath = async () => {
-  try {
-    await UpdateInstallPath(installPath);
-    storedInstallPathError.set("");
-    Notifier.success("インストールフォルダを保存しました。");
-  } catch (error) {
-    storedInstallPathError.set(error as string);
-  }
-};
-
-const onClickOpenDirectory = async (path: string) => {
-  OpenDirectory(path).catch((error) => {
-    Notifier.failure(error);
-  });
-};
-
-const onChange = async () => {
-  try {
-    await UpdateUserConfig(inputConfig);
-  } catch (error) {
-    inputConfig = $storedConfig;
-    Notifier.failure(error);
-  }
-};
+  const onChange = async () => {
+    try {
+      await UpdateUserConfig(inputConfig);
+    } catch (error) {
+      inputConfig = $storedConfig;
+      Notifier.failure(error);
+    }
+  };
 </script>
 
 <div>
