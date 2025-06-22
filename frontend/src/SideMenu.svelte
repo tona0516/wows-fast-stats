@@ -11,7 +11,7 @@
 </script>
 
 <ul class="menu rounded-box sticky top-0">
-  <li>
+  <li class="gap-1">
     {#each MENU_ITEMS as item}
       <button
         class="btn btn-ghost {page === item.page &&
