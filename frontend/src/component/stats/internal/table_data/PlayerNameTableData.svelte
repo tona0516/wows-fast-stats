@@ -32,8 +32,7 @@
   {:else}
     <div class="flex items-center">
       <div class="dropdown">
-        <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
-        <div tabindex="0" class="tooltip" data-tip={alertPlayer?.message}>
+        <div class="tooltip" data-tip={alertPlayer?.message}>
           <!-- svelte-ignore a11y-invalid-attribute -->
           <a href="#">
             <div class="flex">
@@ -55,9 +54,7 @@
           </a>
         </div>
 
-        <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
         <ul
-          tabindex="0"
           class="dropdown-content menu bg-base-100 rounded-md border-1 border-neutral-500 shadow-lg p-2"
         >
           {#if clanTag}

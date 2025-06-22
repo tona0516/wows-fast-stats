@@ -10,7 +10,7 @@
   ];
 </script>
 
-<ul class="menu rounded-box sticky top-0">
+<ul class="menu rounded-box sticky top-0 h-screen">
   <li class="gap-1">
     {#each MENU_ITEMS as item}
       <button

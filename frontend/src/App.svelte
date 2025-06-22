@@ -134,7 +134,7 @@
 <main>
   <div>
     <div class="flex divide-x-1 divide-neutral-500">
-      <div class="flex-none">
+      <div class="flex-none z-10">
         <SideMenu bind:page />
       </div>
 
