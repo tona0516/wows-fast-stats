@@ -172,8 +172,10 @@ func (a *App) RemoveAlertPlayer(accountID int) error {
 	return apperr.Unwrap(err)
 }
 
-func (a *App) SearchPlayer(prefix string) data.WGAccountList {
-	return a.container.configService.SearchPlayer(prefix)
+func (a *App) SearchPlayer(prefix string) ([]data.WGAccountListData, error) {
+	result, err := a.container.configService.SearchPlayer(prefix)
+
+	return result, apperr.Unwrap(err)
 }
 
 func (a *App) AlertPatterns() []string {

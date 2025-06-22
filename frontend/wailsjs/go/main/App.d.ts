@@ -22,7 +22,7 @@ export function OpenDirectory(arg1:string):Promise<void>;
 
 export function RemoveAlertPlayer(arg1:number):Promise<void>;
 
-export function SearchPlayer(arg1:string):Promise<data.WGAccountList>;
+export function SearchPlayer(arg1:string):Promise<Array<data.WGAccountListData>>;
 
 export function SelectDirectory():Promise<string>;
 

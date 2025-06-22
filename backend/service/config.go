@@ -143,9 +143,8 @@ func (c *Config) RemoveAlertPlayer(accountID int) ([]data.AlertPlayer, error) {
 	return players, c.storage.WriteAlertPlayers(players)
 }
 
-func (c *Config) SearchPlayer(prefix string) data.WGAccountList {
-	result, _ := c.wargaming.AccountListForSearch(prefix)
-	return result
+func (c *Config) SearchPlayer(prefix string) (data.WGAccountList, error) {
+	return c.wargaming.AccountListForSearch(prefix)
 }
 
 func (c *Config) SelectDirectory(appCtx context.Context) (string, error) {

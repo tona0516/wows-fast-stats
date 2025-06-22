@@ -26,4 +26,4 @@ export type DigitKey = Readonly<keyof data.UCDigit>;
 export type OptionalBattle = data.Battle | undefined;
 export type OptionalTeamThreatLevels = TeamThreatLevel[] | undefined;
 
-export type Page = "stats" | "config" | "info";
+export type Page = "stats" | "ap_config" | "config" | "info";

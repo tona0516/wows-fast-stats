@@ -29,6 +29,7 @@
   import ExternalLink from "./component/common/ExternalLink.svelte";
   import { Notifier } from "./lib/Notifier";
   import type { Page } from "./lib/types";
+  import AlertPlayerPage from "./component/alert_player/AlertPlayerPage.svelte";
 
   let statsPage: StatsPage | undefined;
   let initialized = false;
@@ -151,6 +152,8 @@
         {#if initialized}
           {#if page === "stats"}
             <StatsPage bind:this={statsPage} />
+          {:else if page === "ap_config"}
+            <AlertPlayerPage />
           {:else if page === "config"}
             <ConfigPage />
           {:else if page === "info"}
