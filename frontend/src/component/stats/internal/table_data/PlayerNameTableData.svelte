@@ -58,13 +58,14 @@
         <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
         <ul
           tabindex="0"
-          class="dropdown-content menu rounded-box w-52 shadow-sm"
+          class="dropdown-content menu bg-base-100 rounded-md border-1 border-neutral-500 shadow-lg p-2"
         >
           {#if clanTag}
             <li>
-              <ExternalLink url={NumbersURL.clan(player.player_info.clan.id)}
-                >クラン詳細(WoWS Stats & Numbers)</ExternalLink
-              >
+              <ExternalLink url={NumbersURL.clan(player.player_info.clan.id)}>
+                <span class="text-nowrap">クラン詳細(WoWS Stats & Numbers)</span
+                >
+              </ExternalLink>
             </li>
           {/if}
 
@@ -73,15 +74,21 @@
               url={NumbersURL.player(
                 player.player_info.id,
                 player.player_info.name,
-              )}>プレイヤー詳細(WoWS Stats & Numbers)</ExternalLink
+              )}
             >
+              <span class="text-nowrap"
+                >プレイヤー詳細(WoWS Stats & Numbers)</span
+              >
+            </ExternalLink>
           </li>
 
           <li>
             <!-- svelte-ignore a11y-invalid-attribute -->
-            <a href="#" on:click={setPlayerNameToClipboard}
-              >プレイヤー名をクリップボードにコピーする</a
-            >
+            <a href="#" on:click={setPlayerNameToClipboard}>
+              <span class="text-nowrap"
+                >プレイヤー名をクリップボードにコピーする</span
+              >
+            </a>
           </li>
         </ul>
       </div>
