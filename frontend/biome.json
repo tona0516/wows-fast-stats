@@ -7,8 +7,7 @@
 	},
 	"files": {
 		"include": [
-			"**/*.ts",
-			"**/*.svelte"
+			"**/*.ts"
 		],
 		"ignoreUnknown": false,
 		"ignore": []
@@ -27,21 +26,7 @@
 			"recommended": true
 		}
 	},
-	"overrides": [
-		{
-			"include": [
-				"**/*.svelte"
-			],
-			"linter": {
-				"rules": {
-					"style": {
-						"useConst": "off",
-						"useImportType": "off"
-					}
-				}
-			}
-		}
-	],
+	"overrides": [],
 	"javascript": {
 		"formatter": {
 			"quoteStyle": "double"

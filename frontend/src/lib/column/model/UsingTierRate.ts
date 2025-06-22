@@ -1,4 +1,4 @@
-import StackedBarGraphTableData from "src/component/main/internal/table_data/StackedBarGraphTableData.svelte";
+import StackedBarGraphTableData from "src/component/stats/internal/table_data/StackedBarGraphTableData.svelte";
 import { DispName } from "src/lib/DispName";
 import type { StackedBarGraphParam } from "src/lib/column/StackedBarGraphParam";
 import { AbstractStatsColumn } from "src/lib/column/intetface/AbstractStatsColumn";

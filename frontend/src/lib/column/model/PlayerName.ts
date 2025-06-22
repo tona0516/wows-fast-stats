@@ -1,4 +1,4 @@
-import PlayerNameTableData from "src/component/main/internal/table_data/PlayerNameTableData.svelte";
+import PlayerNameTableData from "src/component/stats/internal/table_data/PlayerNameTableData.svelte";
 import { RatingInfo } from "src/lib/RatingLevel";
 import { AbstractColumn } from "src/lib/column/intetface/AbstractColumn";
 import type { StatsCategory } from "src/lib/types";

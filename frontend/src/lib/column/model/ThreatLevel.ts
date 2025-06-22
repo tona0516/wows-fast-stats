@@ -1,4 +1,4 @@
-import SingleTableData from "src/component/main/internal/table_data/SingleTableData.svelte";
+import SingleTableData from "src/component/stats/internal/table_data/SingleTableData.svelte";
 import { ThreatLevelInfo } from "src/lib/ThreatLevel";
 import { AbstractStatsColumn } from "src/lib/column/intetface/AbstractStatsColumn";
 import type { data } from "wailsjs/go/models";

@@ -1,7 +1,7 @@
 <script lang="ts">
   import ConfigPage from "src/component/config/ConfigPage.svelte";
   import InfoPage from "src/component/info/InfoPage.svelte";
-  import MainPage from "src/component/main/MainPage.svelte";
+  import StatsPage from "src/component/stats/StatsPage.svelte";
 
   import "bootstrap-icons/font/bootstrap-icons.css";
   import "charts.css";
@@ -30,11 +30,11 @@
   import { Notifier } from "./lib/Notifier";
   import type { Page } from "./lib/types";
 
-  let mainPage: MainPage | undefined;
+  let statsPage: StatsPage | undefined;
   let initialized = false;
   let updatableRelease: data.GHLatestRelease;
 
-  let page: Page = "main";
+  let page: Page = "stats";
 
   $: {
     // @ts-ignore
@@ -45,7 +45,7 @@
     themeChange(false);
   });
 
-  EventsOn("BATTLE_START", () => mainPage?.fetchBattle());
+  EventsOn("BATTLE_START", () => statsPage?.fetchBattle());
   EventsOn("BATTLE_ERR", (error: string) => Notifier.failure(error));
   EventsOn("CONFIG_UPDATE", (config: data.UserConfigV2) =>
     storedConfig.set(config),
@@ -149,8 +149,8 @@
         {/if}
 
         {#if initialized}
-          {#if page === "main"}
-            <MainPage bind:this={mainPage} />
+          {#if page === "stats"}
+            <StatsPage bind:this={statsPage} />
           {:else if page === "config"}
             <ConfigPage />
           {:else if page === "info"}

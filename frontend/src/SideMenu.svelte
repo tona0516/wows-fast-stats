@@ -4,7 +4,7 @@
   export let page: Page;
 
   const MENU_ITEMS: { page: Page; icon: string; tooltip: string }[] = [
-    { page: "main", icon: "bi-house", tooltip: "ホーム" },
+    { page: "stats", icon: "bi-table", tooltip: "戦闘統計" },
     { page: "config", icon: "bi-gear", tooltip: "設定" },
     { page: "info", icon: "bi-info-circle", tooltip: "アプリ情報" },
   ];

@@ -1,4 +1,4 @@
-import MaxDamageTableData from "src/component/main/internal/table_data/MaxDamageTableData.svelte";
+import MaxDamageTableData from "src/component/stats/internal/table_data/MaxDamageTableData.svelte";
 import { NumbersURL } from "src/lib/NumbersURL";
 import { AbstractStatsColumn } from "src/lib/column/intetface/AbstractStatsColumn";
 import type { StatsCategory } from "src/lib/types";
