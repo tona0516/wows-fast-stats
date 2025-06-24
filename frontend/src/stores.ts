@@ -16,3 +16,60 @@ export const storedTeamThreatLevels = derived(
       storedConfig.stats_pattern as StatsExtra,
     ),
 );
+
+export const storedIsShowUpdateAlertPlayerModal = writable(
+  false,
+) as Writable<boolean>;
+export const storedIsShowDeleteAlertPlayerModal = writable(
+  false,
+) as Writable<boolean>;
+export const storedAlertPlayerForm = writable({
+  account_id: 0,
+  name: "",
+  pattern: "bi-check-circle-fill",
+  message: "",
+}) as Writable<data.AlertPlayer>;
+export const storedIsEditAlertPlayer = writable(false) as Writable<boolean>;
+
+export const showAddAlertPlayerModal = () => {
+  storedIsShowUpdateAlertPlayerModal.set(true);
+  storedIsEditAlertPlayer.set(false);
+};
+
+export const showUpdateAlertPlayerModal = (
+  accountID: number,
+  name: string,
+  pattern?: string,
+  message?: string,
+) => {
+  storedIsShowUpdateAlertPlayerModal.set(true);
+  storedIsEditAlertPlayer.set(true);
+  storedAlertPlayerForm.set({
+    account_id: accountID,
+    name: name,
+    pattern: pattern || "bi-check-circle-fill",
+    message: message || "",
+  });
+};
+
+export const showDeleteAlertPlayerModal = (accountID: number) => {
+  storedIsShowDeleteAlertPlayerModal.set(true);
+  storedAlertPlayerForm.set({
+    account_id: accountID,
+    name: "",
+    pattern: "",
+    message: "",
+  });
+};
+
+export const closeAlertPlayerModal = () => {
+  storedIsShowUpdateAlertPlayerModal.set(false);
+  storedIsShowDeleteAlertPlayerModal.set(false);
+  storedAlertPlayerForm.set({
+    account_id: 0,
+    name: "",
+    pattern: "",
+    message: "",
+  });
+  storedIsEditAlertPlayer.set(false);
+};

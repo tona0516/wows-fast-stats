@@ -29,6 +29,8 @@
   import ExternalLink from "./component/common/ExternalLink.svelte";
   import { Notifier } from "./lib/Notifier";
   import type { Page } from "./lib/types";
+  import UpdateAlertPlayerModal from "./component/common/UpdateAlertPlayerModal.svelte";
+  import DeleteAlertPlayerModal from "./component/common/DeleteAlertPlayerModal.svelte";
   import AlertPlayerPage from "./component/alert_player/AlertPlayerPage.svelte";
 
   let statsPage: StatsPage | undefined;
@@ -134,6 +136,9 @@
 
 <main>
   <div>
+    <UpdateAlertPlayerModal />
+    <DeleteAlertPlayerModal />
+
     <div class="flex divide-x-1 divide-neutral-500">
       <div class="flex-none z-10">
         <SideMenu bind:page />
