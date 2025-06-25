@@ -126,7 +126,7 @@
                         >
                         {#each overallColumns as column}
                           {#if column.shouldShow()}
-                            <td class="py-1">
+                            <td class="p-1">
                               <svelte:component
                                 this={column.svelteComponent()}
                                 {column}
