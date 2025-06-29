@@ -86,3 +86,23 @@ export const deriveColumnSettings = (
 
   return allKeys.map((key) => deriveColumnSetting(config, key));
 };
+
+const G = 1_000_000_000;
+const M = 1_000_000;
+const K = 1_000;
+
+export const formatWithSuffix = (num: number): string => {
+  if (num >= G) {
+    return `${(num / G).toFixed(1).replace(/\.0$/, "")}G`;
+  }
+
+  if (num >= M) {
+    return `${(num / M).toFixed(1).replace(/\.0$/, "")}M`;
+  }
+
+  if (num >= K) {
+    return `${(num / K).toFixed(1).replace(/\.0$/, "")}K`;
+  }
+
+  return num.toFixed(1);
+};

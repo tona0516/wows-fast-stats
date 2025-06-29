@@ -10,6 +10,7 @@
 
   import { RowPattern } from "src/lib/RowPattern";
   import { ColumnProvider } from "src/lib/column/ColumnProvider";
+  import TeamRadarChart from "./TeamRadarChart.svelte";
 
   let isLoading = false;
 
@@ -41,25 +42,6 @@
   <div>
     {#if $storedBattle}
       {@const teams = $storedBattle.teams}
-
-      <div class="flex justify-center">
-        <div class="stats shadow">
-          <div class="stat">
-            <div class="stat-title">マップ</div>
-            <div class="stat-value text-lg">{$storedBattle.meta.arena}</div>
-          </div>
-          <div class="stat">
-            <div class="stat-title">種別</div>
-            <div class="stat-value text-lg">{$storedBattle.meta.type}</div>
-          </div>
-          <div class="stat">
-            <div class="stat-title">取得時刻</div>
-            <div class="stat-value text-lg">
-              {new Date($storedBattle.meta.unixtime * 1000).toLocaleString()}
-            </div>
-          </div>
-        </div>
-      </div>
 
       <div class="flex">
         <div class="overflow-x-auto w-screen pb-4">
@@ -166,6 +148,29 @@
             {/each}
           </table>
         </div>
+      </div>
+
+      <div class="flex justify-center">
+        <div class="stats shadow">
+          <div class="stat">
+            <div class="stat-title">マップ</div>
+            <div class="stat-value text-lg">{$storedBattle.meta.arena}</div>
+          </div>
+          <div class="stat">
+            <div class="stat-title">種別</div>
+            <div class="stat-value text-lg">{$storedBattle.meta.type}</div>
+          </div>
+          <div class="stat">
+            <div class="stat-title">取得時刻</div>
+            <div class="stat-value text-lg">
+              {new Date($storedBattle.meta.unixtime * 1000).toLocaleString()}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <TeamRadarChart battle={$storedBattle} />
       </div>
     {:else}
       <p>
