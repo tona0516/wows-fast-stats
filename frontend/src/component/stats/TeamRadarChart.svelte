@@ -18,81 +18,100 @@
     return values.reduce((a, b) => a + b) / values.length;
   }
 
-  function averagePR(team: data.Team): number {
-    const values = getPlayerStats(team).map((p) => p.overall.pr);
-    return average(values);
+  function standardDeviation(values: number[]): number {
+    if (values.length === 0) {
+      return 0;
+    }
+
+    const mean = average(values);
+
+    const squaredDiffs = values.map((value) => {
+      const diff = value - mean;
+      return diff * diff;
+    });
+
+    const variance = squaredDiffs.reduce((a, b) => a + b, 0) / values.length;
+
+    return Math.sqrt(variance);
   }
 
-  function averageThreatLevel(team: data.Team): number {
-    const values = getPlayerStats(team).map(
-      (p) => p.overall.threat_level.modified,
-    );
-    return average(values);
+  function getPRs(team: data.Team): number[] {
+    return getPlayerStats(team).map((p) => p.overall.pr);
   }
 
-  function averageDamage(team: data.Team): number {
-    const values = getPlayerStats(team).map((p) => p.overall.damage);
-    return average(values);
+  function getThreatLevels(team: data.Team): number[] {
+    return getPlayerStats(team).map((p) => p.overall.threat_level.modified);
   }
 
-  function averageWinRate(team: data.Team): number {
-    const values = getPlayerStats(team).map((p) => p.overall.win_rate);
-    return average(values);
+  function getDamages(team: data.Team): number[] {
+    return getPlayerStats(team).map((p) => p.overall.damage);
   }
 
-  function averageBattle(team: data.Team): number {
-    const values = getPlayerStats(team).map((p) => p.overall.battles);
-    return average(values);
+  function getWinRates(team: data.Team): number[] {
+    return getPlayerStats(team).map((p) => p.overall.win_rate);
   }
 
-  const chartData = [
+  function getBattles(team: data.Team): number[] {
+    return getPlayerStats(team).map((p) => p.overall.battles);
+  }
+
+  function maxTeamValue(
+    teams: data.Team[],
+    func: (team: data.Team) => number[],
+  ): number {
+    return Math.max(...teams.map((team) => average(func(team))));
+  }
+
+  const chartItems = [
     {
       label: "PR",
-      friend: averagePR(battle.teams[0]),
-      enemy: averagePR(battle.teams[1]),
+      func: getPRs,
     },
     {
       label: "戦力評価",
-      friend: averageThreatLevel(battle.teams[0]),
-      enemy: averageThreatLevel(battle.teams[1]),
+      func: getThreatLevels,
     },
     {
       label: "ダメージ",
-      friend: averageDamage(battle.teams[0]),
-      enemy: averageDamage(battle.teams[1]),
+      func: getDamages,
     },
     {
       label: "勝率",
-      friend: averageWinRate(battle.teams[0]),
-      enemy: averageWinRate(battle.teams[1]),
+      func: getWinRates,
     },
     {
       label: "戦闘数",
-      friend: averageBattle(battle.teams[0]),
-      enemy: averageBattle(battle.teams[1]),
+      func: getBattles,
     },
   ];
+
+  // Note: https://iro-color.com/colorchart/tone/bright-tone.html
+  const chartColors = ["#00A95F", "#EA5532", "#187FC4"];
 </script>
 
-<div class="w-2xl">
+<div class="w-3xl">
   <table
     class="charts-css column multiple show-labels data-spacing-10 datasets-spacing-4"
   >
-    <tbody>
-      {#each chartData as item}
-        {@const max = Math.max(item.friend, item.enemy)}
+    <tbody class="h-32">
+      {#each chartItems as item}
+        {@const max = maxTeamValue(battle.teams, item.func)}
         <tr>
           <th scope="row">{item.label}</th>
-          <td style="--size: calc({item.friend}/{max}; --color: #00A95F;"
-            ><span class="text-nowrap text-neutral-100"
-              >{formatWithSuffix(item.friend)}</span
-            ></td
-          >
-          <td style="--size: calc({item.enemy}/{max}); --color: #EA5532;"
-            ><span class="text-nowrap text-neutral-100"
-              >{formatWithSuffix(item.enemy)}</span
-            ></td
-          >
+          {#each battle.teams as team, i}
+            {@const avg = average(item.func(team))}
+            {@const sd = standardDeviation(item.func(team))}
+            <td style="--size: calc({avg}/{max}); --color: {chartColors[i]}">
+              <div class="text-center">
+                <span class="text-nowrap text-neutral-100 font-semibold"
+                  >{formatWithSuffix(avg)}</span
+                >
+                <span class="text-nowrap text-neutral-100"
+                  >(±{formatWithSuffix(sd)})</span
+                >
+              </div>
+            </td>
+          {/each}
         </tr>
       {/each}
     </tbody>
