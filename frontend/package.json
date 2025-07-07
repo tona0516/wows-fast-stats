@@ -42,6 +42,7 @@
     "date-fns": "^3.5.0",
     "flag-icons": "^7.2.3",
     "html-to-image": "^1.11.11",
+    "simple-statistics": "^7.8.8",
     "svelte": "^4.2.20",
     "tailwindcss": "^4.1.10",
     "theme-change": "^2.5.0",

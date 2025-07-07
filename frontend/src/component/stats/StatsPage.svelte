@@ -10,7 +10,7 @@
 
   import { RowPattern } from "src/lib/RowPattern";
   import { ColumnProvider } from "src/lib/column/ColumnProvider";
-  import TeamRadarChart from "./TeamRadarChart.svelte";
+  import TeamCompareBarChart from "./internal/TeamCompareBarChart.svelte";
 
   let isLoading = false;
 
@@ -170,7 +170,7 @@
       </div>
 
       <div>
-        <TeamRadarChart battle={$storedBattle} />
+        <TeamCompareBarChart battle={$storedBattle} />
       </div>
     {:else}
       <p>
