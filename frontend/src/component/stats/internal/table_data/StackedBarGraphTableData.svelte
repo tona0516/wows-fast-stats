@@ -9,7 +9,7 @@
   $: param = column.displayValue(player);
 </script>
 
-<div class="w-24">
+<div class="w-20">
   <table class="charts-css bar hide-data stacked">
     <thead>
       {#each param.items as _}

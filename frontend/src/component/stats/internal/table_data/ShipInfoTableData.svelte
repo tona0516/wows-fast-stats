@@ -8,7 +8,7 @@
   export let player: data.Player;
 </script>
 
-<div>
+<div class="w-40">
   <ExternalLink url={NumbersURL.ship(player.ship_info.id)}>
     <div
       class="flex place-items-center tooltip"

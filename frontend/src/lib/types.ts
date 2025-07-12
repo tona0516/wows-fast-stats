@@ -27,3 +27,5 @@ export type OptionalBattle = data.Battle | undefined;
 export type OptionalTeamThreatLevels = TeamThreatLevel[] | undefined;
 
 export type Page = "stats" | "ap_config" | "config" | "info";
+
+export type GetStatsFunction = (ps: data.PlayerStats) => number;

@@ -31,15 +31,6 @@ export const toPlayerStats = (
   }
 };
 
-export const toPlayerStatsValues = (
-  team: data.Team,
-  statsPattern: string,
-): data.PlayerStats[] => {
-  return team.players
-    .filter((p) => p.player_info.id !== 0 && !p.player_info.is_hidden)
-    .map((p) => toPlayerStats(p, statsPattern));
-};
-
 export const tierString = (value: number): string => {
   if (value === 11) return "★";
   return ROMAN_NUMERALS[value];

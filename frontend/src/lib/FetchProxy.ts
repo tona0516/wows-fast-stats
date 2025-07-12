@@ -9,11 +9,11 @@ export namespace FetchProxy {
     const cache = localStorage.getItem("cache");
 
     // TODO: あとで消す
-    if (cache) {
-      const cachedBattle = JSON.parse(cache) as data.Battle;
-      storedBattle.set(cachedBattle);
-      return cachedBattle;
-    }
+    // if (cache) {
+    //   const cachedBattle = JSON.parse(cache) as data.Battle;
+    //   storedBattle.set(cachedBattle);
+    //   return cachedBattle;
+    // }
 
     const ret = await Battle();
     storedBattle.set(ret);

@@ -30,11 +30,13 @@
   };
 </script>
 
-<div>
+<div class="w-40">
   {#if isNPC}
-    {column.playerName(player)}
+    <div class="truncate">
+      {column.playerName(player)}
+    </div>
   {:else}
-    <div class="flex items-center">
+    <div class="flex items-center truncate">
       <div class="dropdown">
         <div class="tooltip" data-tip={alertPlayer?.message}>
           <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
