@@ -33,7 +33,7 @@ export const toPlayerStats = (
 
 export const tierString = (value: number): string => {
   if (value === 11) return "★";
-  return ROMAN_NUMERALS[value];
+  return ROMAN_NUMERALS[value] ?? "";
 };
 
 export const isShipType = (type: string): type is ShipType => {

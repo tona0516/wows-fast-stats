@@ -421,7 +421,7 @@ func (b *Battle) compose(
 		warship, ok := warships[vehicle.ShipID]
 		if !ok {
 			warship = data.Warship{
-				Name:   "Unknown",
+				Name:   "UNKNOWN",
 				Tier:   0,
 				Type:   data.ShipTypeNONE,
 				Nation: "",
