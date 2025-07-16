@@ -14,9 +14,8 @@
   export let column: PlayerName;
   export let player: data.Player;
 
-  $: accountID = player.player_info.id;
   $: alertPlayer = $storedAlertPlayers.find(
-    (it) => it.account_id === accountID,
+    (it) => it.account_id === player.player_info.id,
   );
   $: clanTag = column.clanTag(player);
   $: isNPC = column.isNPC(player);

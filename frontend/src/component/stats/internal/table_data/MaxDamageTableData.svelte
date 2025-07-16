@@ -1,5 +1,4 @@
 <script lang="ts">
-  import ExternalLink from "src/component/common/ExternalLink.svelte";
   import type { MaxDamage } from "src/lib/column/model/MaxDamage";
   import type { data } from "wailsjs/go/models";
 
@@ -9,10 +8,6 @@
   $: param = column.displayValue(player);
 </script>
 
-<div class="text-center">
+<div class="text-center tooltip" data-tip={param.shipInfo?.name}>
   {param.damage}
-  {#if param.shipInfo}
-    <ExternalLink url={param.shipInfo.url}>({param.shipInfo.name})</ExternalLink
-    >
-  {/if}
 </div>
