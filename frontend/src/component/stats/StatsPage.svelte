@@ -53,9 +53,7 @@
   {/if}
 
   {#if isLoading}
-    <div
-      class="flex h-screen items-center justify-center"
-    >
+    <div class="flex h-screen items-center justify-center">
       <span class="loading loading-ring loading-xl"></span>
     </div>
   {/if}

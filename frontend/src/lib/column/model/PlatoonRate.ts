@@ -10,7 +10,7 @@ export class PlatoonRate extends AbstractStatsColumn<string> {
 
   displayValue(player: data.Player): string {
     const value = this.playerStats(player)[this.category].platoon_rate;
-    return value.toFixed(this.digit());
+    return value.format(this.digit());
   }
 
   svelteComponent() {

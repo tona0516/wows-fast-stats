@@ -10,7 +10,7 @@ export class Damage extends AbstractStatsColumn<string> {
   }
 
   displayValue(player: data.Player): string {
-    return this.playerStats(player)[this.category].damage.toFixed(this.digit());
+    return this.playerStats(player)[this.category].damage.format(this.digit());
   }
 
   svelteComponent() {

@@ -34,4 +34,8 @@ export abstract class AbstractStatsColumn<T> extends AbstractColumn {
   playerStats(player: data.Player): data.PlayerStats {
     return toPlayerStats(player, this.config.stats_pattern);
   }
+
+  isCenterized(): boolean {
+    return false;
+  }
 }

@@ -10,7 +10,7 @@ export class WinRate extends AbstractStatsColumn<string> {
   }
 
   displayValue(player: data.Player): string {
-    return `${this.value(player).toFixed(this.digit())}%`;
+    return `${this.value(player).format(this.digit())}%`;
   }
 
   svelteComponent() {

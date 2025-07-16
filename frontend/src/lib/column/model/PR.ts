@@ -15,7 +15,7 @@ export class PR extends AbstractStatsColumn<string> {
       return "N/A";
     }
 
-    return value.toFixed(this.digit());
+    return value.format(this.digit());
   }
 
   svelteComponent() {

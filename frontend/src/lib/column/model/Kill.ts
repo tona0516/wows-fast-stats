@@ -10,7 +10,7 @@ export class Kill extends AbstractStatsColumn<string> {
 
   displayValue(player: data.Player): string {
     const value = this.playerStats(player)[this.category].kill;
-    return value.toFixed(this.digit());
+    return value.format(this.digit());
   }
 
   svelteComponent() {

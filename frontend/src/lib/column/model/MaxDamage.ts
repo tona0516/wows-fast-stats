@@ -20,7 +20,7 @@ export class MaxDamage extends AbstractStatsColumn<MaxDamageParam> {
 
   displayValue(player: data.Player): MaxDamageParam {
     const maxDamage = this.playerStats(player)[this.category].max_damage;
-    const value = maxDamage.value.toFixed(this.digit());
+    const value = maxDamage.value.format(this.digit());
 
     switch (this.category) {
       case "ship":

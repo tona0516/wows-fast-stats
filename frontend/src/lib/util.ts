@@ -93,16 +93,29 @@ const K = 1_000;
 
 export const formatWithSuffix = (num: number): string => {
   if (num >= G) {
-    return `${(num / G).toFixed(1).replace(/\.0$/, "")}G`;
+    return `${(num / G).format(1).replace(/\.0$/, "")}G`;
   }
 
   if (num >= M) {
-    return `${(num / M).toFixed(1).replace(/\.0$/, "")}M`;
+    return `${(num / M).format(1).replace(/\.0$/, "")}M`;
   }
 
   if (num >= K) {
-    return `${(num / K).toFixed(1).replace(/\.0$/, "")}K`;
+    return `${(num / K).format(1).replace(/\.0$/, "")}K`;
   }
 
-  return num.toFixed(1);
+  return num.format(1);
+};
+
+declare global {
+  interface Number {
+    format(digit: number): string;
+  }
+}
+
+Number.prototype.format = function (digit: number): string {
+  return this.toLocaleString("ja-JP", {
+    minimumFractionDigits: digit,
+    maximumFractionDigits: digit,
+  });
 };

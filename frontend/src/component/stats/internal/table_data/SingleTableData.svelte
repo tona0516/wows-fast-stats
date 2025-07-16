@@ -4,8 +4,10 @@
 
   export let column: AbstractStatsColumn<string>;
   export let player: data.Player;
+
+  const align = column.isCenterized() ? "text-center" : "text-right";
 </script>
 
-<div class="text-right" style="color: {column.textColorCode(player)};">
+<div class={align} style="color: {column.textColorCode(player)};">
   {column.displayValue(player)}
 </div>

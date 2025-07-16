@@ -14,7 +14,7 @@ export class ThreatLevel extends AbstractStatsColumn<string> {
       return "N/A";
     }
 
-    return value.toFixed(this.digit());
+    return value.format(this.digit());
   }
 
   textColorCode(player: data.Player): string {

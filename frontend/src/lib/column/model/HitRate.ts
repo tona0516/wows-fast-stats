@@ -9,9 +9,14 @@ export class HitRate extends AbstractStatsColumn<string> {
 
   displayValue(player: data.Player): string {
     const stats = this.playerStats(player).ship;
-    return `${stats.main_battery_hit_rate.toFixed(
-      this.digit(),
-    )}% | ${stats.torpedoes_hit_rate.toFixed(this.digit())}%`;
+    const main = stats.main_battery_hit_rate.format(this.digit());
+    const torps = stats.torpedoes_hit_rate.format(this.digit());
+
+    return `${main}% | ${torps}%`;
+  }
+
+  isCenterized(): boolean {
+    return true;
   }
 
   svelteComponent() {

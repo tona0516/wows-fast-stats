@@ -10,9 +10,14 @@ export class SurvivedRate extends AbstractStatsColumn<string> {
 
   displayValue(player: data.Player): string {
     const stats = this.playerStats(player)[this.category];
-    return `${stats.win_survived_rate.toFixed(
-      this.digit(),
-    )}% | ${stats.lose_survived_rate.toFixed(this.digit())}%`;
+    const win = stats.win_survived_rate.format(this.digit());
+    const lose = stats.lose_survived_rate.format(this.digit());
+
+    return `${win}% | ${lose}%`;
+  }
+
+  isCenterized(): boolean {
+    return true;
   }
 
   svelteComponent() {
