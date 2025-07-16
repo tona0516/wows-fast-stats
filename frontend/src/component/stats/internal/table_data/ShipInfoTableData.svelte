@@ -14,11 +14,19 @@
       class="flex place-items-center tooltip"
       data-tip={column.tooltipText(player)}
     >
-      <img class="w-6" src={column.nationIconPath(player)} alt="" />
-      <img class="w-6" src={column.shipTypeIconPath(player)} alt="" />
+      <img class="w-icon" src={column.nationIconPath(player)} alt="" />
+      <img class="w-icon" src={column.shipTypeIconPath(player)} alt="" />
       <div class="truncate">
         {column.displayValue(player)}
       </div>
     </div>
   </ExternalLink>
 </div>
+
+<style>
+  .w-icon {
+    width: 1.5rem;
+    padding-left: 2px;
+    padding-right: 2px;
+  }
+</style>
