@@ -1,6 +1,4 @@
 <script lang="ts">
-  import ExternalLink from "src/component/common/ExternalLink.svelte";
-  import { NumbersURL } from "src/lib/NumbersURL";
   import type { ShipInfo } from "src/lib/column/model/ShipInfo";
   import type { data } from "wailsjs/go/models";
 
@@ -8,19 +6,12 @@
   export let player: data.Player;
 </script>
 
-<div class="w-40">
-  <ExternalLink url={NumbersURL.ship(player.ship_info.id)}>
-    <div
-      class="flex place-items-center tooltip"
-      data-tip={column.tooltipText(player)}
-    >
-      <img class="w-icon" src={column.nationIconPath(player)} alt="" />
-      <img class="w-icon" src={column.shipTypeIconPath(player)} alt="" />
-      <div class="truncate">
-        {column.displayValue(player)}
-      </div>
-    </div>
-  </ExternalLink>
+<div class="w-40 flex place-items-center">
+  <img class="w-icon" src={column.nationIconPath(player)} alt="" />
+  <img class="w-icon" src={column.shipTypeIconPath(player)} alt="" />
+  <div class="truncate">
+    {column.displayValue(player)}
+  </div>
 </div>
 
 <style>
