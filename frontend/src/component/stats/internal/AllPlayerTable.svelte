@@ -21,10 +21,7 @@
           <tr>
             {#each categories as category}
               {#if category.columnCount() > 0}
-                <th
-                  class="px-1 py-0 text-center"
-                  colspan={category.columnCount()}
-                >
+                <th class="p-1 text-center" colspan={category.columnCount()}>
                   {category.dispName()}
                 </th>
               {/if}
@@ -34,7 +31,7 @@
             {#each categories as category}
               {#each category as column}
                 {#if column.shouldShow()}
-                  <th class="px-1 py-0 text-center">{column.header}</th>
+                  <th class="p-1 text-center">{column.header}</th>
                 {/if}
               {/each}
             {/each}
@@ -51,7 +48,7 @@
             )}
             <tr>
               {#each basicColumns as column}
-                <td class="px-1 py-0">
+                <td class="p-1">
                   <svelte:component
                     this={column.svelteComponent()}
                     {column}
@@ -61,23 +58,18 @@
               {/each}
 
               {#if rowPattern === RowPattern.NO_COLUMN}
-                <td class="px-1 py-0 text-center" colspan={statsColumnCount}
-                ></td>
+                <td class="p-1 text-center" colspan={statsColumnCount}></td>
               {:else if rowPattern === RowPattern.PRIVATE}
-                <td class="px-1 py-0 text-center" colspan={statsColumnCount}
+                <td class="p-1 text-center" colspan={statsColumnCount}
                   >PRIVATE</td
                 >
               {:else if rowPattern === RowPattern.NO_STATS}
-                <td class="px-1 py-0 text-center" colspan={statsColumnCount}
-                  >N/A</td
-                >
+                <td class="p-1 text-center" colspan={statsColumnCount}>N/A</td>
               {:else if rowPattern === RowPattern.NO_SHIP_STATS}
-                <td class="px-1 py-0 text-center" colspan={shipColumnCount}
-                  >N/A</td
-                >
+                <td class="p-1 text-center" colspan={shipColumnCount}>N/A</td>
                 {#each overallColumns as column}
                   {#if column.shouldShow()}
-                    <td class="px-1 py-0">
+                    <td class="p-1">
                       <svelte:component
                         this={column.svelteComponent()}
                         {column}
@@ -89,7 +81,7 @@
               {:else}
                 {#each shipColumns as column}
                   {#if column.shouldShow()}
-                    <td class="px-1 py-0">
+                    <td class="p-1">
                       <svelte:component
                         this={column.svelteComponent()}
                         {column}
@@ -100,7 +92,7 @@
                 {/each}
                 {#each overallColumns as column}
                   {#if column.shouldShow()}
-                    <td class="px-1 py-0">
+                    <td class="p-1">
                       <svelte:component
                         this={column.svelteComponent()}
                         {column}

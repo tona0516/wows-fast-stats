@@ -196,19 +196,25 @@ func (a *App) LatestRelease() (data.GHLatestRelease, error) {
 	return latestRelease, apperr.Unwrap(err)
 }
 
+func (a *App) ShowMessageDialog(message string) {
+	_, _ = runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
+		Title:   *a.config.App.Name,
+		Message: message,
+	})
+}
+
 func (a *App) onStartup(ctx context.Context) {
+	a.ctx = ctx
 	runtime.LogSetLogLevel(ctx, logger.INFO)
 
 	if isAlreadyRunning() {
-		a.showExistDialog(ctx, "すでに起動しています。", 1)
+		a.showExistDialog("すでに起動しています。", 1)
 	}
 
 	container, err := NewDependencyContainer(ctx, a.config)
 	if err != nil {
-		a.showExistDialog(ctx, "意図しないエラーが発生しました。\n"+err.Error(), 1)
+		a.showExistDialog("意図しないエラーが発生しました。\n"+err.Error(), 1)
 	}
-
-	a.ctx = ctx
 	a.container = container
 }
 
@@ -237,10 +243,7 @@ func isAlreadyRunning() bool {
 	return isRunning
 }
 
-func (a *App) showExistDialog(ctx context.Context, message string, code int) {
-	_, _ = runtime.MessageDialog(ctx, runtime.MessageDialogOptions{
-		Title:   *a.config.App.Name,
-		Message: message,
-	})
+func (a *App) showExistDialog(message string, code int) {
+	a.ShowMessageDialog(message)
 	os.Exit(code)
 }

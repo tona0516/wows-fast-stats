@@ -4,8 +4,8 @@
     AlertPatterns,
     UpdateAlertPlayer,
     SearchPlayer,
+    ShowMessageDialog,
   } from "wailsjs/go/main/App";
-  import { Notifier } from "src/lib/Notifier";
   import {
     closeAlertPlayerModal,
     storedAlertPlayerForm,
@@ -51,8 +51,8 @@
   async function save() {
     try {
       await UpdateAlertPlayer($storedAlertPlayerForm);
-    } catch (e) {
-      Notifier.failure("保存に失敗しました");
+    } catch (error) {
+      ShowMessageDialog("保存に失敗しました");
     }
 
     closeAlertPlayerModal();

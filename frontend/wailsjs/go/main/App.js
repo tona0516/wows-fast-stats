@@ -54,6 +54,10 @@ export function Semver() {
   return window['go']['main']['App']['Semver']();
 }
 
+export function ShowMessageDialog(arg1) {
+  return window['go']['main']['App']['ShowMessageDialog'](arg1);
+}
+
 export function StartWatching() {
   return window['go']['main']['App']['StartWatching']();
 }

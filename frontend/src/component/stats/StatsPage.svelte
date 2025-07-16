@@ -1,8 +1,7 @@
 <script lang="ts">
   import { FetchProxy } from "src/lib/FetchProxy";
-  import { Notifier } from "src/lib/Notifier";
   import { storedBattle, storedInstallPathError } from "src/stores";
-  import { LogInfo } from "wailsjs/go/main/App";
+  import { LogInfo, ShowMessageDialog } from "wailsjs/go/main/App";
 
   import TeamCompareBarChart from "./internal/TeamCompareBarChart.svelte";
   import AllPlayerTable from "./internal/AllPlayerTable.svelte";
@@ -18,11 +17,11 @@
       await FetchProxy.getBattle();
       const elapsed = (new Date().getTime() - start) / 1000;
 
-      Notifier.success(`データ取得完了: ${elapsed.toFixed(1)}秒`);
-
       LogInfo("fetch success", { "duration(s)": elapsed.toFixed(1) });
     } catch (error) {
-      Notifier.failure(error);
+      if (error instanceof Error) {
+        ShowMessageDialog(error.message);
+      }
     } finally {
       isLoading = false;
     }

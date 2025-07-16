@@ -16,8 +16,8 @@
 
 <style>
   .w-icon {
-    width: 1.5rem;
-    padding-left: 2px;
-    padding-right: 2px;
+    width: 1.25rem;
+    margin-left: 1px;
+    margin-right: 1px;
   }
 </style>

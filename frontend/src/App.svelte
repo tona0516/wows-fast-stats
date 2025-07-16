@@ -19,6 +19,7 @@
     LatestRelease,
     LogError,
     MigrateIfNeeded,
+    ShowMessageDialog,
     StartWatching,
     UserConfig,
     ValidateInstallPath,
@@ -27,7 +28,6 @@
   import { EventsOn } from "wailsjs/runtime/runtime";
   import SideMenu from "./SideMenu.svelte";
   import ExternalLink from "./component/common/ExternalLink.svelte";
-  import { Notifier } from "./lib/Notifier";
   import type { Page } from "./lib/types";
   import UpdateAlertPlayerModal from "./component/common/UpdateAlertPlayerModal.svelte";
   import DeleteAlertPlayerModal from "./component/common/DeleteAlertPlayerModal.svelte";
@@ -101,7 +101,7 @@
 
       return config;
     } catch (error) {
-      Notifier.failure(error);
+      ShowMessageDialog("初期化に失敗しました");
       return undefined;
     }
   };

@@ -1,6 +1,5 @@
 <script lang="ts">
   import { DispName } from "src/lib/DispName";
-  import { Notifier } from "src/lib/Notifier";
   import { deriveColumnSettings } from "src/lib/util";
   import { storedConfig, storedInstallPathError } from "src/stores";
   import { onMount } from "svelte";
@@ -8,6 +7,7 @@
   import {
     OpenDirectory,
     SelectDirectory,
+    ShowMessageDialog,
     UpdateInstallPath,
     UpdateUserConfig,
   } from "wailsjs/go/main/App";
@@ -15,6 +15,10 @@
   $: inputConfig = $storedConfig;
   $: installPath = $storedConfig.install_path;
   $: columnSettings = deriveColumnSettings(inputConfig);
+  $: applyInstallPathButton = {
+    label: "フォルダ設定保存",
+    disabled: false,
+  };
 
   onMount(() => {
     themeChange(false);
@@ -27,6 +31,10 @@
       }
 
       installPath = path;
+      applyInstallPathButton = {
+        label: "フォルダ設定保存",
+        disabled: false,
+      };
     });
   };
 
@@ -34,7 +42,10 @@
     try {
       await UpdateInstallPath(installPath);
       storedInstallPathError.set("");
-      Notifier.success("インストールフォルダを保存しました。");
+      applyInstallPathButton = {
+        label: "保存しました！",
+        disabled: true,
+      };
     } catch (error) {
       storedInstallPathError.set(error as string);
     }
@@ -42,7 +53,9 @@
 
   const onClickOpenDirectory = async (path: string) => {
     OpenDirectory(path).catch((error) => {
-      Notifier.failure(error);
+      if (error instanceof Error) {
+        ShowMessageDialog(error.message);
+      }
     });
   };
 
@@ -51,7 +64,9 @@
       await UpdateUserConfig(inputConfig);
     } catch (error) {
       inputConfig = $storedConfig;
-      Notifier.failure(error);
+      if (error instanceof Error) {
+        ShowMessageDialog(error.message);
+      }
     }
   };
 </script>
@@ -60,22 +75,25 @@
   <div class="p-4 flex flex-col items-center">
     <p class="text-xl font-bold">インストールフォルダ設定</p>
     <p class="text-sm text-nowrap">
-      ゲームクライアントの実行ファイルがあるフォルダを選択してください。
+      ゲームクライアントの実行ファイルがあるフォルダを設定してください。
     </p>
 
-    <input
-      class="input w-lg my-2"
-      type="text"
-      placeholder="World of Warshipsインストールフォルダ"
-      bind:value={inputConfig.install_path}
-    />
+    <div class="stats shadow">
+      <div class="stat">
+        <div class="stat-title">現在の入力値（設定値）</div>
+        <div class="stat-value text-lg">{inputConfig.install_path}</div>
+      </div>
+    </div>
 
     <div>
       <button class="btn btn-neutral" on:click={onClickSelectDirectory}
         >フォルダ選択</button
       >
-      <button class="btn btn-primary ml-2" on:click={onClickSaveInstallPath}
-        >フォルダ設定保存</button
+      <button
+        class="btn btn-primary ml-2"
+        on:click={onClickSaveInstallPath}
+        disabled={applyInstallPathButton.disabled}
+        >{applyInstallPathButton.label}</button
       >
     </div>
     {#if $storedInstallPathError}

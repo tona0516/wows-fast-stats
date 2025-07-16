@@ -1,6 +1,5 @@
 <script lang="ts">
-  import { RemoveAlertPlayer } from "wailsjs/go/main/App";
-  import { Notifier } from "src/lib/Notifier";
+  import { RemoveAlertPlayer, ShowMessageDialog } from "wailsjs/go/main/App";
   import {
     closeAlertPlayerModal,
     storedAlertPlayerForm,
@@ -11,8 +10,8 @@
     if ($storedAlertPlayerForm.account_id !== 0) {
       try {
         await RemoveAlertPlayer($storedAlertPlayerForm.account_id);
-      } catch (e) {
-        Notifier.failure("削除に失敗しました");
+      } catch (error) {
+        ShowMessageDialog("削除に失敗しました");
       }
     }
 

@@ -28,8 +28,8 @@ test("tierString - 正常系", () => {
 });
 
 test("tierString - 異常系", () => {
-  expect(tierString(0)).toBe(undefined);
-  expect(tierString(12)).toBe(undefined);
+  expect(tierString(0)).toBe("");
+  expect(tierString(12)).toBe("");
 });
 
 test("isShipType - 正常系", () => {

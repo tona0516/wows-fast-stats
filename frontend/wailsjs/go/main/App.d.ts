@@ -28,6 +28,8 @@ export function SelectDirectory():Promise<string>;
 
 export function Semver():Promise<string>;
 
+export function ShowMessageDialog(arg1:string):Promise<void>;
+
 export function StartWatching():Promise<void>;
 
 export function UpdateAlertPlayer(arg1:data.AlertPlayer):Promise<void>;

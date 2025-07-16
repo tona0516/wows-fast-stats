@@ -22,7 +22,7 @@ export class PlayerName extends AbstractColumn {
     const clanID = player.player_info.clan.id;
     const clanTag = player.player_info.clan.tag;
 
-    return clanID !== 0 ? `[${clanTag}] ` : undefined;
+    return clanID !== 0 ? `[${clanTag}]` : undefined;
   }
 
   clanFlagIconClass(player: data.Player): string | undefined {
