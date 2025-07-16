@@ -54,9 +54,9 @@
 
   {#if isLoading}
     <div
-      class="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-20"
+      class="flex h-screen items-center justify-center"
     >
-      <span class="loading loading-spinner"></span>
+      <span class="loading loading-ring loading-xl"></span>
     </div>
   {/if}
 </div>
