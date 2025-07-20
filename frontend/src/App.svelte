@@ -32,6 +32,7 @@
   import UpdateAlertPlayerModal from "./component/common/UpdateAlertPlayerModal.svelte";
   import DeleteAlertPlayerModal from "./component/common/DeleteAlertPlayerModal.svelte";
   import AlertPlayerPage from "./component/alert_player/AlertPlayerPage.svelte";
+  import PlayerDetailModal from "./component/common/PlayerDetailModal.svelte";
 
   let statsPage: StatsPage | undefined;
   let initialized = false;
@@ -138,6 +139,7 @@
   <div>
     <UpdateAlertPlayerModal />
     <DeleteAlertPlayerModal />
+    <PlayerDetailModal />
 
     <div class="flex divide-x-1 divide-neutral-500">
       <div class="flex-none z-10">

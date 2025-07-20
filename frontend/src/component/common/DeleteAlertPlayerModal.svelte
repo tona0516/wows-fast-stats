@@ -1,7 +1,7 @@
 <script lang="ts">
   import { RemoveAlertPlayer, ShowMessageDialog } from "wailsjs/go/main/App";
   import {
-    closeAlertPlayerModal,
+    closeModal,
     storedAlertPlayerForm,
     storedIsShowDeleteAlertPlayerModal,
   } from "src/stores";
@@ -15,7 +15,7 @@
       }
     }
 
-    closeAlertPlayerModal();
+    closeModal();
   }
 </script>
 
@@ -30,10 +30,8 @@
         >
       </div>
       <div class="modal-action">
-        <button
-          type="button"
-          class="btn"
-          on:click={() => closeAlertPlayerModal()}>キャンセル</button
+        <button type="button" class="btn" on:click={() => closeModal()}
+          >キャンセル</button
         >
         <button type="submit" class="btn btn-error">削除</button>
       </div>

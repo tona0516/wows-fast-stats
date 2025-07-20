@@ -29,3 +29,12 @@ export type OptionalTeamThreatLevels = TeamThreatLevel[] | undefined;
 export type Page = "stats" | "ap_config" | "config" | "info";
 
 export type GetStatsFunction = (ps: data.PlayerStats) => number;
+
+export type PlayerDetail = {
+  id: number;
+  name: string;
+  clan?: {
+    id: number;
+    tag: string;
+  };
+};

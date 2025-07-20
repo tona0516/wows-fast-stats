@@ -1,5 +1,5 @@
 import { TeamThreatLevel } from "src/lib/TeamThreatLevel";
-import type { OptionalBattle, StatsExtra } from "src/lib/types";
+import type { OptionalBattle, PlayerDetail, StatsExtra } from "src/lib/types";
 import { type Writable, derived, writable } from "svelte/store";
 import type { data } from "wailsjs/go/models";
 
@@ -23,12 +23,20 @@ export const storedIsShowUpdateAlertPlayerModal = writable(
 export const storedIsShowDeleteAlertPlayerModal = writable(
   false,
 ) as Writable<boolean>;
+export const storedIsShowPlayerDetailModal = writable(
+  false,
+) as Writable<boolean>;
 export const storedAlertPlayerForm = writable({
   account_id: 0,
   name: "",
   pattern: "bi-check-circle-fill",
   message: "",
 }) as Writable<data.AlertPlayer>;
+export const storedPlayerDetail = writable({
+  id: 0,
+  name: "",
+  clan: undefined,
+}) as Writable<PlayerDetail>;
 export const storedIsEditAlertPlayer = writable(false) as Writable<boolean>;
 
 export const showAddAlertPlayerModal = () => {
@@ -62,14 +70,25 @@ export const showDeleteAlertPlayerModal = (accountID: number) => {
   });
 };
 
-export const closeAlertPlayerModal = () => {
+export const showPlayerDetailModal = (player: PlayerDetail) => {
+  storedIsShowPlayerDetailModal.set(true);
+  storedPlayerDetail.set(player);
+};
+
+export const closeModal = () => {
   storedIsShowUpdateAlertPlayerModal.set(false);
   storedIsShowDeleteAlertPlayerModal.set(false);
+  storedIsShowPlayerDetailModal.set(false);
   storedAlertPlayerForm.set({
     account_id: 0,
     name: "",
     pattern: "",
     message: "",
+  });
+  storedPlayerDetail.set({
+    id: 0,
+    name: "",
+    clan: undefined,
   });
   storedIsEditAlertPlayer.set(false);
 };

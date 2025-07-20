@@ -7,7 +7,7 @@
     ShowMessageDialog,
   } from "wailsjs/go/main/App";
   import {
-    closeAlertPlayerModal,
+    closeModal,
     storedAlertPlayerForm,
     storedIsEditAlertPlayer,
     storedIsShowUpdateAlertPlayerModal,
@@ -55,7 +55,7 @@
       ShowMessageDialog("保存に失敗しました");
     }
 
-    closeAlertPlayerModal();
+    closeModal();
   }
 </script>
 
@@ -152,10 +152,8 @@
         </div>
       </div>
       <div class="modal-action">
-        <button
-          type="button"
-          class="btn"
-          on:click={() => closeAlertPlayerModal()}>キャンセル</button
+        <button type="button" class="btn" on:click={() => closeModal()}
+          >キャンセル</button
         >
         <button
           type="submit"
