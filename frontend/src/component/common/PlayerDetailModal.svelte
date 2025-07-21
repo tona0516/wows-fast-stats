@@ -7,10 +7,12 @@
     storedIsShowPlayerDetailModal,
     storedPlayerDetail,
     closeModal,
+    showToast,
   } from "src/stores";
   import ExternalLink from "./ExternalLink.svelte";
+  import { ClipboardSetText } from "wailsjs/runtime/runtime";
 
-  const isAlertPlayer = $storedAlertPlayers.some(
+  $: isAlertPlayer = $storedAlertPlayers.some(
     (alertPlayer) => alertPlayer.account_id === $storedPlayerDetail.id,
   );
 
@@ -25,6 +27,11 @@
 
   function openDeleteAlertPlayerModal() {
     showDeleteAlertPlayerModal($storedPlayerDetail.id);
+  }
+
+  function setPlayerNameToClipboard() {
+    ClipboardSetText($storedPlayerDetail.name);
+    showToast("コピーしました！");
   }
 </script>
 
@@ -45,17 +52,31 @@
             $storedPlayerDetail.name,
           )}
         >
-          プレイヤーページ<i class="bi bi-box-arrow-in-up-right"></i>
+          プレイヤーページ(wows-numbers.com)<i
+            class="bi bi-box-arrow-in-up-right"
+          ></i>
         </ExternalLink>
       </div>
 
       {#if $storedPlayerDetail.clan}
         <div class="mt-2">
           <ExternalLink url={NumbersURL.clan($storedPlayerDetail.clan.id)}>
-            クランページ<i class="bi bi-box-arrow-in-up-right"></i>
+            クランページ(wows-numbers.com)<i class="bi bi-box-arrow-in-up-right"
+            ></i>
           </ExternalLink>
         </div>
       {/if}
+
+      <div class="mt-2">
+        <!-- svelte-ignore a11y-invalid-attribute -->
+        <a
+          href="#"
+          class="underline"
+          on:click={() => setPlayerNameToClipboard()}
+        >
+          プレイヤー名をクリップボードにコピー
+        </a>
+      </div>
 
       <div class="mt-4">
         <button

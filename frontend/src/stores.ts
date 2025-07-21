@@ -39,6 +39,8 @@ export const storedPlayerDetail = writable({
 }) as Writable<PlayerDetail>;
 export const storedIsEditAlertPlayer = writable(false) as Writable<boolean>;
 
+export const storedToastText = writable("");
+
 export const showAddAlertPlayerModal = () => {
   storedIsShowUpdateAlertPlayerModal.set(true);
   storedIsEditAlertPlayer.set(false);
@@ -92,3 +94,10 @@ export const closeModal = () => {
   });
   storedIsEditAlertPlayer.set(false);
 };
+
+export function showToast(text: string, intervalSeconds = 3) {
+  storedToastText.set(text);
+  setTimeout(() => {
+    storedToastText.set("");
+  }, intervalSeconds * 1000);
+}

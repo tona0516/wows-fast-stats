@@ -33,6 +33,7 @@
   import DeleteAlertPlayerModal from "./component/common/DeleteAlertPlayerModal.svelte";
   import AlertPlayerPage from "./component/alert_player/AlertPlayerPage.svelte";
   import PlayerDetailModal from "./component/common/PlayerDetailModal.svelte";
+  import Toast from "./component/common/Toast.svelte";
 
   let statsPage: StatsPage | undefined;
   let initialized = false;
@@ -137,6 +138,8 @@
 
 <main>
   <div>
+    <Toast />
+
     <UpdateAlertPlayerModal />
     <DeleteAlertPlayerModal />
     <PlayerDetailModal />
