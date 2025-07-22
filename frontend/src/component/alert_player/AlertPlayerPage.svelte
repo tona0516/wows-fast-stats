@@ -1,15 +1,15 @@
 <script lang="ts">
   import {
-    showAddAlertPlayerModal,
-    showDeleteAlertPlayerModal,
-    showUpdateAlertPlayerModal,
+    DeleteAlertPlayerModal,
+    EditAlertPlayerModal,
     storedAlertPlayers,
   } from "src/stores";
 </script>
 
 <div class="mb-4 flex justify-end">
-  <button class="btn btn-primary" on:click={() => showAddAlertPlayerModal()}
-    >追加</button
+  <button
+    class="btn btn-primary"
+    on:click={() => EditAlertPlayerModal.openForCreate()}>追加</button
   >
 </div>
 
@@ -32,18 +32,12 @@
           <div class="flex justify-center">
             <button
               class="btn btn-sm btn-info mx-2"
-              on:click={() =>
-                showUpdateAlertPlayerModal(
-                  player.account_id,
-                  player.name,
-                  player.pattern,
-                  player.message,
-                )}>編集</button
+              on:click={() => EditAlertPlayerModal.openForEdit(player)}
+              >編集</button
             >
             <button
               class="btn btn-sm btn-error mx-2"
-              on:click={() => showDeleteAlertPlayerModal(player.account_id)}
-              >削除</button
+              on:click={() => DeleteAlertPlayerModal.open(player)}>削除</button
             >
           </div>
         </td>

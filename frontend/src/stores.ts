@@ -17,83 +17,91 @@ export const storedTeamThreatLevels = derived(
     ),
 );
 
-export const storedIsShowUpdateAlertPlayerModal = writable(
-  false,
-) as Writable<boolean>;
-export const storedIsShowDeleteAlertPlayerModal = writable(
-  false,
-) as Writable<boolean>;
-export const storedIsShowPlayerDetailModal = writable(
-  false,
-) as Writable<boolean>;
-export const storedAlertPlayerForm = writable({
+const DEFAULT_ALERT_PLAYER = {
   account_id: 0,
   name: "",
   pattern: "bi-check-circle-fill",
   message: "",
-}) as Writable<data.AlertPlayer>;
-export const storedPlayerDetail = writable({
-  id: 0,
-  name: "",
-  clan: undefined,
-}) as Writable<PlayerDetail>;
-export const storedIsEditAlertPlayer = writable(false) as Writable<boolean>;
+} as data.AlertPlayer;
+
+type EditModalMode = "create" | "specify" | "edit";
+
+export const storedEditAlertPlayer = writable(undefined) as Writable<
+  | {
+      mode: EditModalMode;
+      form: data.AlertPlayer;
+    }
+  | undefined
+>;
+
+export class EditAlertPlayerModal {
+  private constructor() {}
+
+  static openForCreate() {
+    storedEditAlertPlayer.set({
+      mode: "create",
+      form: structuredClone(DEFAULT_ALERT_PLAYER),
+    });
+  }
+
+  static openForSpecify(accountID: number, name: string) {
+    const defaultValue = structuredClone(DEFAULT_ALERT_PLAYER);
+    storedEditAlertPlayer.set({
+      mode: "specify",
+      form: {
+        account_id: accountID,
+        name: name,
+        pattern: defaultValue.pattern,
+        message: defaultValue.message,
+      } as data.AlertPlayer,
+    });
+  }
+
+  static openForEdit(ap: data.AlertPlayer) {
+    storedEditAlertPlayer.set({
+      mode: "edit",
+      form: ap,
+    });
+  }
+
+  static close() {
+    storedEditAlertPlayer.set(undefined);
+  }
+}
+
+export const storedDeleteAlertPlayer = writable(undefined) as Writable<
+  data.AlertPlayer | undefined
+>;
+
+export class DeleteAlertPlayerModal {
+  private constructor() {}
+
+  static open(ap: data.AlertPlayer) {
+    storedDeleteAlertPlayer.set(ap);
+  }
+
+  static close() {
+    storedDeleteAlertPlayer.set(undefined);
+  }
+}
+
+export const storedPlayerDetail = writable(undefined) as Writable<
+  PlayerDetail | undefined
+>;
+
+export class PlayerDetailModal {
+  private constructor() {}
+
+  static open(player: PlayerDetail) {
+    storedPlayerDetail.set(player);
+  }
+
+  static close() {
+    storedPlayerDetail.set(undefined);
+  }
+}
 
 export const storedToastText = writable("");
-
-export const showAddAlertPlayerModal = () => {
-  storedIsShowUpdateAlertPlayerModal.set(true);
-  storedIsEditAlertPlayer.set(false);
-};
-
-export const showUpdateAlertPlayerModal = (
-  accountID: number,
-  name: string,
-  pattern?: string,
-  message?: string,
-) => {
-  storedIsShowUpdateAlertPlayerModal.set(true);
-  storedIsEditAlertPlayer.set(true);
-  storedAlertPlayerForm.set({
-    account_id: accountID,
-    name: name,
-    pattern: pattern || "bi-check-circle-fill",
-    message: message || "",
-  });
-};
-
-export const showDeleteAlertPlayerModal = (accountID: number) => {
-  storedIsShowDeleteAlertPlayerModal.set(true);
-  storedAlertPlayerForm.set({
-    account_id: accountID,
-    name: "",
-    pattern: "",
-    message: "",
-  });
-};
-
-export const showPlayerDetailModal = (player: PlayerDetail) => {
-  storedIsShowPlayerDetailModal.set(true);
-  storedPlayerDetail.set(player);
-};
-
-export const closeModal = () => {
-  storedIsShowUpdateAlertPlayerModal.set(false);
-  storedIsShowDeleteAlertPlayerModal.set(false);
-  storedIsShowPlayerDetailModal.set(false);
-  storedAlertPlayerForm.set({
-    account_id: 0,
-    name: "",
-    pattern: "",
-    message: "",
-  });
-  storedPlayerDetail.set({
-    id: 0,
-    name: "",
-    clan: undefined,
-  });
-  storedIsEditAlertPlayer.set(false);
-};
 
 export function showToast(text: string, intervalSeconds = 3) {
   storedToastText.set(text);

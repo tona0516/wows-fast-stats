@@ -29,7 +29,7 @@
   import SideMenu from "./SideMenu.svelte";
   import ExternalLink from "./component/common/ExternalLink.svelte";
   import type { Page } from "./lib/types";
-  import UpdateAlertPlayerModal from "./component/common/UpdateAlertPlayerModal.svelte";
+  import EditAlertPlayerModal from "./component/common/EditAlertPlayerModal.svelte";
   import DeleteAlertPlayerModal from "./component/common/DeleteAlertPlayerModal.svelte";
   import AlertPlayerPage from "./component/alert_player/AlertPlayerPage.svelte";
   import PlayerDetailModal from "./component/common/PlayerDetailModal.svelte";
@@ -140,7 +140,7 @@
   <div>
     <Toast />
 
-    <UpdateAlertPlayerModal />
+    <EditAlertPlayerModal />
     <DeleteAlertPlayerModal />
     <PlayerDetailModal />
 

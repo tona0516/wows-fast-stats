@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { PlayerName } from "src/lib/column/model/PlayerName";
-  import { showPlayerDetailModal, storedAlertPlayers } from "src/stores";
+  import { PlayerDetailModal, storedAlertPlayers } from "src/stores";
   import type { data } from "wailsjs/go/models";
 
   export let column: PlayerName;
@@ -23,7 +23,7 @@
     <button
       class="btn btn-xs"
       on:click={() =>
-        showPlayerDetailModal({
+        PlayerDetailModal.open({
           id: player.player_info.id,
           name: player.player_info.name,
           clan: {

@@ -2,47 +2,38 @@
   import { NumbersURL } from "src/lib/NumbersURL";
   import {
     storedAlertPlayers,
-    showUpdateAlertPlayerModal,
-    showDeleteAlertPlayerModal,
-    storedIsShowPlayerDetailModal,
     storedPlayerDetail,
-    closeModal,
     showToast,
+    EditAlertPlayerModal,
+    DeleteAlertPlayerModal,
+    PlayerDetailModal,
   } from "src/stores";
   import ExternalLink from "./ExternalLink.svelte";
   import { ClipboardSetText } from "wailsjs/runtime/runtime";
 
-  $: isAlertPlayer = $storedAlertPlayers.some(
-    (alertPlayer) => alertPlayer.account_id === $storedPlayerDetail.id,
+  $: alertPlayer = $storedAlertPlayers.find(
+    (ap) => ap.account_id === $storedPlayerDetail?.id,
   );
-
-  function openUpdateAlertPlayerModal() {
-    showUpdateAlertPlayerModal(
-      $storedPlayerDetail.id,
-      $storedPlayerDetail.name,
-      $storedAlertPlayers[$storedPlayerDetail.id].pattern,
-      $storedAlertPlayers[$storedPlayerDetail.id].message,
-    );
-  }
-
-  function openDeleteAlertPlayerModal() {
-    showDeleteAlertPlayerModal($storedPlayerDetail.id);
-  }
-
-  function setPlayerNameToClipboard() {
-    ClipboardSetText($storedPlayerDetail.name);
-    showToast("コピーしました！");
-  }
 </script>
 
-{#if $storedIsShowPlayerDetailModal}
-  <dialog class="modal modal-open">
+{#if $storedPlayerDetail}
+  <dialog class="modal modal-open z-50">
     <form method="dialog" class="modal-box">
       <h2 class="text-lg font-bold">
         {#if $storedPlayerDetail.clan}
           [{$storedPlayerDetail.clan.tag}]
         {/if}
         {$storedPlayerDetail.name}
+        <a
+          href="#"
+          class="mx-2"
+          on:click={() => {
+            ClipboardSetText($storedPlayerDetail.name);
+            showToast("コピーしました！");
+          }}
+        >
+          <i class="bi bi-clipboard"></i>
+        </a>
       </h2>
 
       <div class="mt-4">
@@ -67,31 +58,31 @@
         </div>
       {/if}
 
-      <div class="mt-2">
-        <!-- svelte-ignore a11y-invalid-attribute -->
-        <a
-          href="#"
-          class="underline"
-          on:click={() => setPlayerNameToClipboard()}
-        >
-          プレイヤー名をクリップボードにコピー
-        </a>
-      </div>
-
       <div class="mt-4">
         <button
           class="btn btn-primary"
-          on:click={() => openUpdateAlertPlayerModal()}
+          on:click={() => {
+            if (alertPlayer) {
+              EditAlertPlayerModal.openForEdit(alertPlayer);
+            } else {
+              EditAlertPlayerModal.openForSpecify(
+                $storedPlayerDetail.id,
+                $storedPlayerDetail.name,
+              );
+            }
+          }}
         >
           アラートプレイヤーの編集
         </button>
       </div>
 
-      {#if isAlertPlayer}
+      {#if alertPlayer}
         <div class="mt-2">
           <button
             class="btn btn-error"
-            on:click={() => openDeleteAlertPlayerModal()}
+            on:click={() => {
+              DeleteAlertPlayerModal.open(alertPlayer);
+            }}
           >
             アラートプレイヤーの削除
           </button>
@@ -99,8 +90,10 @@
       {/if}
 
       <div class="modal-action">
-        <button type="button" class="btn" on:click={() => closeModal()}
-          >キャンセル</button
+        <button
+          type="button"
+          class="btn"
+          on:click={() => PlayerDetailModal.close()}>キャンセル</button
         >
       </div>
     </form>
