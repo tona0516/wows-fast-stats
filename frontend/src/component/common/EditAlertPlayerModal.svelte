@@ -18,6 +18,7 @@
     "bi-2-square-fill",
     "bi-3-square-fill",
   ];
+  const Z_VALUE = 51;
 
   let suggestedPlayers: data.WGAccountListData[] = [];
 
@@ -75,7 +76,7 @@
 </script>
 
 {#if $storedEditAlertPlayer}
-  <ModalCommon zValue={51} close={EditAlertPlayerModal.close}>
+  <ModalCommon zValue={Z_VALUE} close={EditAlertPlayerModal.close}>
     <h3 class="font-bold text-lg mb-4">
       アラートプレイヤー{$storedEditAlertPlayer.mode === "edit"
         ? "編集"
@@ -86,17 +87,20 @@
       <fieldset class="fieldset">
         <legend class="fieldset-legend">プレイヤー名</legend>
         <div class="dropdown">
-          <input
-            id="player-search"
-            class="input input-bordered"
-            type="text"
-            bind:value={$storedEditAlertPlayer.form.name}
-            on:input={searchPlayer}
-            autocomplete="off"
-          />
+          <label class="input">
+            <i class="bi bi-search"></i>
+            <input
+              id="player-search"
+              class="grow"
+              type="text"
+              bind:value={$storedEditAlertPlayer.form.name}
+              on:input={searchPlayer}
+              autocomplete="off"
+            />
+          </label>
           {#if suggestedPlayers.length > 0}
             <ul
-              class="dropdown-content menu bg-base-100 rounded-md border-1 border-neutral-300 shadow-lg mt-1 w-full z-50 max-h-60 overflow-y-auto"
+              class="dropdown-content menu bg-base-100 rounded-md border-1 border-neutral-300 shadow-lg mt-1 w-full z-{Z_VALUE} max-h-60 overflow-y-auto"
             >
               {#each suggestedPlayers as player}
                 <li>

@@ -8,8 +8,8 @@
     DeleteAlertPlayerModal,
     PlayerDetailModal,
   } from "src/stores";
-  import ExternalLink from "./ExternalLink.svelte";
-  import { ClipboardSetText } from "wailsjs/runtime/runtime";
+  import { BrowserOpenURL, ClipboardSetText } from "wailsjs/runtime/runtime";
+  import ModalCommon from "./ModalCommon.svelte";
 
   $: alertPlayer = $storedAlertPlayers.find(
     (ap) => ap.account_id === $storedPlayerDetail?.id,
@@ -17,85 +17,78 @@
 </script>
 
 {#if $storedPlayerDetail}
-  <dialog class="modal modal-open z-50">
-    <form method="dialog" class="modal-box">
-      <h2 class="text-lg font-bold">
-        {#if $storedPlayerDetail.clan}
-          [{$storedPlayerDetail.clan.tag}]
+  {@const accountID = $storedPlayerDetail.id}
+  {@const playerName = $storedPlayerDetail.name}
+  {@const clan = $storedPlayerDetail.clan}
+  <ModalCommon zValue={50} close={PlayerDetailModal.close}>
+    <h2 class="text-lg font-bold">
+      <span>
+        {#if clan.tag !== ""}
+          [{clan.tag}]
         {/if}
-        {$storedPlayerDetail.name}
-        <a
-          href="#"
-          class="mx-2"
-          on:click={() => {
-            ClipboardSetText($storedPlayerDetail.name);
-            showToast("コピーしました！");
-          }}
-        >
-          <i class="bi bi-clipboard"></i>
-        </a>
-      </h2>
+        {playerName}
+      </span>
+      <button
+        class="btn btn-circle btn-ghost"
+        on:click={() => {
+          ClipboardSetText(playerName);
+          showToast("クリップボードにコピーしました！");
+        }}
+      >
+        <i class="bi bi-clipboard"></i>
+      </button>
+    </h2>
 
-      <div class="mt-4">
-        <ExternalLink
-          url={NumbersURL.player(
-            $storedPlayerDetail.id,
-            $storedPlayerDetail.name,
-          )}
-        >
-          プレイヤーページ(wows-numbers.com)<i
-            class="bi bi-box-arrow-in-up-right"
-          ></i>
-        </ExternalLink>
-      </div>
+    <div class="grid xl:grid-cols-1 gap-4 mt-2">
+      {#if alertPlayer}
+        {#if alertPlayer.message !== ""}
+          <p>
+            <i class="bi {alertPlayer.pattern}"></i>
+            {alertPlayer.message}
+          </p>
+        {/if}
 
-      {#if $storedPlayerDetail.clan}
-        <div class="mt-2">
-          <ExternalLink url={NumbersURL.clan($storedPlayerDetail.clan.id)}>
-            クランページ(wows-numbers.com)<i class="bi bi-box-arrow-in-up-right"
-            ></i>
-          </ExternalLink>
-        </div>
-      {/if}
-
-      <div class="mt-4">
         <button
           class="btn btn-primary"
+          on:click={() => EditAlertPlayerModal.openForEdit(alertPlayer)}
+          >アラートプレイヤーの編集</button
+        >
+
+        <button
+          class="btn btn-error"
           on:click={() => {
-            if (alertPlayer) {
-              EditAlertPlayerModal.openForEdit(alertPlayer);
-            } else {
-              EditAlertPlayerModal.openForSpecify(
-                $storedPlayerDetail.id,
-                $storedPlayerDetail.name,
-              );
-            }
+            DeleteAlertPlayerModal.open(alertPlayer);
           }}
         >
-          アラートプレイヤーの編集
+          アラートプレイヤーの削除
         </button>
-      </div>
-
-      {#if alertPlayer}
-        <div class="mt-2">
-          <button
-            class="btn btn-error"
-            on:click={() => {
-              DeleteAlertPlayerModal.open(alertPlayer);
-            }}
-          >
-            アラートプレイヤーの削除
-          </button>
-        </div>
+      {:else}
+        <button
+          class="btn btn-primary"
+          on:click={() =>
+            EditAlertPlayerModal.openForSpecify(accountID, playerName)}
+          >アラートプレイヤーの編集</button
+        >
       {/if}
 
-      <div class="modal-action">
+      <button
+        class="btn"
+        on:click={() =>
+          BrowserOpenURL(NumbersURL.player(accountID, playerName))}
+      >
+        プレイヤーページ(wows-numbers.com)<i class="bi bi-box-arrow-in-up-right"
+        ></i>
+      </button>
+
+      {#if clan.id !== 0}
         <button
-          type="button"
           class="btn"
-          on:click={() => PlayerDetailModal.close()}>キャンセル</button
+          on:click={() => BrowserOpenURL(NumbersURL.clan(clan.id))}
         >
-      </div>
-    </form>
-  </dialog>
+          クランページ(wows-numbers.com)<i class="bi bi-box-arrow-in-up-right"
+          ></i>
+        </button>
+      {/if}
+    </div>
+  </ModalCommon>
 {/if}

@@ -1,5 +1,5 @@
 import { TeamThreatLevel } from "src/lib/TeamThreatLevel";
-import type { OptionalBattle, PlayerDetail, StatsExtra } from "src/lib/types";
+import type { OptionalBattle, StatsExtra } from "src/lib/types";
 import { type Writable, derived, writable } from "svelte/store";
 import type { data } from "wailsjs/go/models";
 
@@ -86,13 +86,13 @@ export class DeleteAlertPlayerModal {
 }
 
 export const storedPlayerDetail = writable(undefined) as Writable<
-  PlayerDetail | undefined
+  data.PlayerInfo | undefined
 >;
 
 export class PlayerDetailModal {
   private constructor() {}
 
-  static open(player: PlayerDetail) {
+  static open(player: data.PlayerInfo) {
     storedPlayerDetail.set(player);
   }
 

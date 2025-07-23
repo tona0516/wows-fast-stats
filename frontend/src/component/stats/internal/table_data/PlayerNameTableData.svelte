@@ -22,23 +22,13 @@
   {:else}
     <button
       class="btn btn-xs"
-      on:click={() =>
-        PlayerDetailModal.open({
-          id: player.player_info.id,
-          name: player.player_info.name,
-          clan: {
-            id: player.player_info.clan.id,
-            tag: player.player_info.clan.tag,
-          },
-        })}
+      on:click={() => PlayerDetailModal.open(player.player_info)}
     >
       <i class="bi bi-box-arrow-in-up-right"></i>
     </button>
     <div class="truncate">
       {#if alertPlayer}
-        <div class="tooltip tooltip-right" data-tip={alertPlayer?.message}>
-          <span class="bi {alertPlayer.pattern}"></span>
-        </div>
+        <span class="bi {alertPlayer.pattern}"></span>
       {/if}
       {#if clanTag}
         {#if nationFlagClass}
