@@ -21,7 +21,7 @@
     </div>
   {:else}
     <button
-      class="btn btn-xs"
+      class="btn btn-xs mr-1"
       on:click={() => PlayerDetailModal.open(player.player_info)}
     >
       <i class="bi bi-box-arrow-in-up-right"></i>

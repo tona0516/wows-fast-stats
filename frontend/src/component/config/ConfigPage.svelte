@@ -121,7 +121,7 @@
   <div class="p-4 flex flex-col items-center">
     <p class="text-xl font-bold">テーマ</p>
     <select class="select my-2" data-choose-theme>
-      {#each ["light", "dark", "retro", "night"] as theme}
+      {#each ["garden", "light", "silk", "retro", "dark", "night"] as theme}
         <option value={theme}>{theme}</option>
       {/each}
     </select>
