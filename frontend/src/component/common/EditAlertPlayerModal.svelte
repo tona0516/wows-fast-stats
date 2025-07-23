@@ -5,63 +5,67 @@
     storedAlertPlayers,
     storedEditAlertPlayer,
   } from "src/stores";
-  import { onMount } from "svelte";
-  import {
-    AlertPatterns,
-    UpdateAlertPlayer,
-    SearchPlayer,
-  } from "wailsjs/go/main/App";
+  import { UpdateAlertPlayer, SearchPlayer } from "wailsjs/go/main/App";
+  import ModalCommon from "./ModalCommon.svelte";
+  import type { data } from "wailsjs/go/models";
 
   const MAX_MESSAGE_LENGTH = 100;
+  const ALERT_PATTERNS = [
+    "bi-check-circle-fill",
+    "bi-exclamation-triangle-fill",
+    "bi-patch-question-fill",
+    "bi-1-square-fill",
+    "bi-2-square-fill",
+    "bi-3-square-fill",
+  ];
 
-  let patterns: string[] = [];
+  let suggestedPlayers: data.WGAccountListData[] = [];
 
-  let playerSuggestions: { id: number; name: string }[] = [];
+  function includesAlertPlayers(accountID: number): boolean {
+    for (const alertPlayer of $storedAlertPlayers) {
+      if (alertPlayer.account_id === accountID) {
+        return true;
+      }
+    }
+    return false;
+  }
 
-  onMount(async () => {
-    patterns = await AlertPatterns();
-  });
-
-  async function onPlayerSearchInput(e: Event) {
-    const value = (e.target as HTMLInputElement).value;
-    if (value.length < 2) {
-      playerSuggestions = [];
+  async function searchPlayer(e: Event) {
+    const input = (e.target as HTMLInputElement).value;
+    if (input.length < 2) {
+      suggestedPlayers = [];
       return;
     }
 
-    SearchPlayer(value).then((result) => {
-      if (!result) {
-        playerSuggestions = [];
-        return;
-      }
-
-      const alertPlayerIDs = $storedAlertPlayers.map((ap) => ap.account_id);
-
-      playerSuggestions = result
-        .filter((p) => !alertPlayerIDs.includes(p.account_id))
-        .map((p) => {
-          return { id: p.account_id, name: p.nickname };
-        });
-    });
+    try {
+      const result = await SearchPlayer(input);
+      suggestedPlayers = result.filter(
+        (player) => !includesAlertPlayers(player.account_id),
+      );
+    } catch (error) {
+      suggestedPlayers = [];
+    }
   }
 
-  function selectPlayerSuggestion(s: { id: number; name: string }) {
+  function selectPlayer(player: data.WGAccountListData) {
     if (!$storedEditAlertPlayer) {
       return;
     }
 
-    $storedEditAlertPlayer.form.account_id = s.id;
-    $storedEditAlertPlayer.form.name = s.name;
-    playerSuggestions = [];
+    $storedEditAlertPlayer.form.account_id = player.account_id;
+    $storedEditAlertPlayer.form.name = player.nickname;
+    suggestedPlayers = [];
   }
 
   async function save() {
     if (!$storedEditAlertPlayer) {
+      EditAlertPlayerModal.close();
       return;
     }
 
     try {
       await UpdateAlertPlayer($storedEditAlertPlayer.form);
+      showToast("保存しました");
     } catch (error) {
       showToast("保存に失敗しました");
     }
@@ -71,114 +75,98 @@
 </script>
 
 {#if $storedEditAlertPlayer}
-  <dialog class="modal modal-open z-51">
-    <form method="dialog" class="modal-box" on:submit|preventDefault={save}>
-      <h3 class="font-bold text-lg mb-4">
-        {$storedEditAlertPlayer.mode === "edit" ? "編集" : "追加"}
-      </h3>
+  <ModalCommon zValue={51} close={EditAlertPlayerModal.close}>
+    <h3 class="font-bold text-lg mb-4">
+      アラートプレイヤー{$storedEditAlertPlayer.mode === "edit"
+        ? "編集"
+        : "追加"}
+    </h3>
 
-      {#if $storedEditAlertPlayer.mode === "create"}
-        <div class="form-control mb-2">
-          <label class="label" for="player-search">プレイヤー名</label>
-          <div class="dropdown w-full">
-            <input
-              id="player-search"
-              class="input input-bordered w-full"
-              type="text"
-              bind:value={$storedEditAlertPlayer.form.name}
-              on:input={onPlayerSearchInput}
-              autocomplete="off"
-              required
-            />
-            {#if playerSuggestions.length > 0}
-              <ul
-                class="dropdown-content menu bg-base-100 rounded-md border-1 border-neutral-300 shadow-lg mt-1 w-full z-50 max-h-60 overflow-y-auto"
-              >
-                {#each playerSuggestions as s}
-                  <li>
-                    <button
-                      type="button"
-                      class="w-full text-left"
-                      on:click={() => selectPlayerSuggestion(s)}
-                    >
-                      {s.name}
-                      <span class="text-xs text-gray-400">({s.id})</span>
-                    </button>
-                  </li>
-                {/each}
-              </ul>
-            {/if}
-          </div>
-        </div>
-      {:else}
-        <div class="form-control mb-2">
-          <label class="label" for="account-id">ID</label>
+    {#if $storedEditAlertPlayer.mode === "create"}
+      <fieldset class="fieldset">
+        <legend class="fieldset-legend">プレイヤー名</legend>
+        <div class="dropdown">
           <input
-            id="account-id"
-            class="input input-bordered"
-            type="number"
-            value={$storedEditAlertPlayer.form.account_id}
-            readonly={$storedEditAlertPlayer.mode === "specify"}
-          />
-        </div>
-
-        <div class="form-control mb-2">
-          <label class="label" for="player-name">プレイヤー名</label>
-          <input
-            id="player-name"
+            id="player-search"
             class="input input-bordered"
             type="text"
-            value={$storedEditAlertPlayer.form.name}
-            readonly={$storedEditAlertPlayer.mode === "specify"}
+            bind:value={$storedEditAlertPlayer.form.name}
+            on:input={searchPlayer}
+            autocomplete="off"
           />
+          {#if suggestedPlayers.length > 0}
+            <ul
+              class="dropdown-content menu bg-base-100 rounded-md border-1 border-neutral-300 shadow-lg mt-1 w-full z-50 max-h-60 overflow-y-auto"
+            >
+              {#each suggestedPlayers as player}
+                <li>
+                  <button
+                    type="button"
+                    class="w-full text-left"
+                    on:click={() => selectPlayer(player)}
+                  >
+                    {player.nickname}
+                    <span class="text-xs text-gray-400"
+                      >({player.account_id})</span
+                    >
+                  </button>
+                </li>
+              {/each}
+            </ul>
+          {/if}
         </div>
-      {/if}
-
-      <div class="form-control mb-2">
-        <label class="label" for="pattern">アイコン</label>
-        <div class="flex flex-wrap gap-2">
-          {#each patterns as p}
-            <label class="cursor-pointer flex items-center gap-1">
-              <input
-                type="radio"
-                name="pattern"
-                class="radio radio-primary"
-                value={p}
-                bind:group={$storedEditAlertPlayer.form.pattern}
-              />
-              <i class={`bi ${p}`}></i>
-            </label>
-          {/each}
-        </div>
-      </div>
-
-      <div class="form-control mb-2">
-        <label class="label" for="message">メッセージ</label>
+      </fieldset>
+    {:else}
+      <fieldset class="fieldset">
+        <legend class="fieldset-legend">プレイヤー名</legend>
         <input
-          id="message"
+          id="player-name"
           class="input input-bordered"
           type="text"
-          bind:value={$storedEditAlertPlayer.form.message}
-          maxlength={MAX_MESSAGE_LENGTH}
+          value={$storedEditAlertPlayer.form.name}
+          readonly
         />
-        <div class="text-right text-xs text-gray-500 mt-1">
-          {$storedEditAlertPlayer.form.message.length}/{MAX_MESSAGE_LENGTH}文字
-        </div>
-      </div>
+      </fieldset>
+    {/if}
 
-      <div class="modal-action">
-        <button
-          type="button"
-          class="btn"
-          on:click={() => EditAlertPlayerModal.close()}>キャンセル</button
-        >
-        <button
-          type="submit"
-          class="btn btn-primary"
-          disabled={$storedEditAlertPlayer.form.account_id === 0 ||
-            $storedEditAlertPlayer.form.name.length === 0}>保存</button
-        >
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">アイコン</legend>
+      <div class="flex flex-wrap gap-4">
+        {#each ALERT_PATTERNS as pattern}
+          <label class="flex items-center gap-1">
+            <input
+              type="radio"
+              class="radio"
+              value={pattern}
+              bind:group={$storedEditAlertPlayer.form.pattern}
+            />
+            <i class="{`bi ${pattern}`} text-lg"></i>
+          </label>
+        {/each}
       </div>
-    </form>
-  </dialog>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">メモ(任意)</legend>
+      <input
+        id="message"
+        class="input input-bordered"
+        type="text"
+        bind:value={$storedEditAlertPlayer.form.message}
+        maxlength={MAX_MESSAGE_LENGTH}
+      />
+      <div class="text-xs text-gray-500 mt-1">
+        {$storedEditAlertPlayer.form.message.length}/{MAX_MESSAGE_LENGTH}文字
+      </div>
+    </fieldset>
+
+    <div class="modal-action">
+      <button
+        type="button"
+        class="btn btn-primary"
+        disabled={$storedEditAlertPlayer.form.account_id === 0}
+        on:click={save}>保存</button
+      >
+    </div>
+  </ModalCommon>
 {/if}

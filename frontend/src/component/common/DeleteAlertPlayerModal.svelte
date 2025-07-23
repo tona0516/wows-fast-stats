@@ -5,14 +5,17 @@
     storedDeleteAlertPlayer,
   } from "src/stores";
   import { RemoveAlertPlayer } from "wailsjs/go/main/App";
+  import ModalCommon from "./ModalCommon.svelte";
 
   async function remove() {
     if (!$storedDeleteAlertPlayer) {
+      DeleteAlertPlayerModal.close();
       return;
     }
 
     try {
       await RemoveAlertPlayer($storedDeleteAlertPlayer.account_id);
+      showToast("削除しました");
     } catch (error) {
       showToast("削除に失敗しました");
     } finally {
@@ -22,32 +25,17 @@
 </script>
 
 {#if $storedDeleteAlertPlayer}
-  <dialog class="modal modal-open z-51">
-    <div class="modal-box">
-      <form method="dialog">
-        <button
-          class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
-          on:click={DeleteAlertPlayerModal.close}
-          ><i class="bi bi-x-lg"></i>
-        </button>
-      </form>
-      <h3 class="font-bold text-lg mb-4">本当に削除しますか？</h3>
-      <div class="mb-4 text-center">
-        <span class="font-bold">{$storedDeleteAlertPlayer.name}</span>
-        <span class="ml-2 text-xs text-gray-500"
-          >(ID: {$storedDeleteAlertPlayer.account_id})</span
-        >
-      </div>
-      <form class="modal-action">
-        <button type="button" class="btn btn-error" on:click={remove}
-          >削除</button
-        >
-      </form>
+  <ModalCommon zValue={51} close={DeleteAlertPlayerModal.close}>
+    <h3 class="font-bold text-lg mb-4">本当に削除しますか？</h3>
+    <div class="mb-4 text-center">
+      <span class="font-bold">{$storedDeleteAlertPlayer.name}</span>
+      <span class="ml-2 text-xs text-gray-500"
+        >(ID: {$storedDeleteAlertPlayer.account_id})</span
+      >
     </div>
-    <form method="dialog" class="modal-backdrop">
-      <button type="button" on:click={DeleteAlertPlayerModal.close}
-        >close</button
+    <form class="modal-action">
+      <button type="button" class="btn btn-error" on:click={remove}>削除</button
       >
     </form>
-  </dialog>
+  </ModalCommon>
 {/if}

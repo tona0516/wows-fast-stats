@@ -178,10 +178,6 @@ func (a *App) SearchPlayer(prefix string) ([]data.WGAccountListData, error) {
 	return result, apperr.Unwrap(err)
 }
 
-func (a *App) AlertPatterns() []string {
-	return data.AlertPatterns()
-}
-
 func (a *App) LogError(errString string, contexts map[string]string) {
 	err := failure.New(apperr.FrontendError, failure.Messagef("%s", errString))
 	a.container.logger.Error(err, contexts)
