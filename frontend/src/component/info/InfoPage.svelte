@@ -6,7 +6,6 @@
     Row,
   } from "src/component/info/internal/DispColorTableInfo";
   import { DispName } from "src/lib/DispName";
-  import { RATING_DEFS, type RatingDef, RatingInfo } from "src/lib/RatingLevel";
   import { THREAT_LEVEL_DEFS, type ThreatLevelDef } from "src/lib/ThreatLevel";
   import { storedConfig } from "src/stores";
   import { Semver } from "wailsjs/go/main/App";
@@ -31,95 +30,95 @@
     },
   ];
 
-  const getPRTableInfo = (
-    defs: RatingDef[],
-    skillColorCode: data.UCSkillColorCode,
-  ): DispColorTableInfo => {
-    const rows: Row[] = [];
+  // const getPRTableInfo = (
+  //   defs: RatingDef[],
+  //   skillColorCode: data.UCSkillColorCode,
+  // ): DispColorTableInfo => {
+  //   const rows: Row[] = [];
 
-    for (let i = 0; i < defs.length; i++) {
-      const current = defs[i];
+  //   for (let i = 0; i < defs.length; i++) {
+  //     const current = defs[i];
 
-      let prRange = "";
-      let damageRange = "";
-      let winRateRange = "";
+  //     let prRange = "";
+  //     let damageRange = "";
+  //     let winRateRange = "";
 
-      if (defs[i + 1]) {
-        const next = defs[i + 1];
-        prRange = `${current.pr} ~ ${next.pr}`;
-        damageRange = `${current.damage} ~ ${next.damage}倍`;
-        winRateRange = `${current.winRate} ~ ${next.winRate}%`;
-      } else {
-        prRange = `${current.pr} ~`;
-        damageRange = `${current.damage}倍 ~`;
-        winRateRange = `${current.winRate}% ~`;
-      }
+  //     if (defs[i + 1]) {
+  //       const next = defs[i + 1];
+  //       prRange = `${current.pr} ~ ${next.pr}`;
+  //       damageRange = `${current.damage} ~ ${next.damage}倍`;
+  //       winRateRange = `${current.winRate} ~ ${next.winRate}%`;
+  //     } else {
+  //       prRange = `${current.pr} ~`;
+  //       damageRange = `${current.damage}倍 ~`;
+  //       winRateRange = `${current.winRate}% ~`;
+  //     }
 
-      const row: Row = [
-        {
-          text: DispName.SKILL_LEVELS.get(current.level) ?? "",
-        },
-        {
-          text: prRange,
-          textColor: RatingInfo.fromDamage(current.damage, 1.0, skillColorCode)
-            ?.textColorCode,
-        },
-        {
-          text: damageRange,
-          textColor: RatingInfo.fromWinRate(current.winRate, skillColorCode)
-            ?.textColorCode,
-        },
-        {
-          text: winRateRange,
-          textColor: RatingInfo.fromWinRate(current.winRate, skillColorCode)
-            ?.textColorCode,
-        },
-      ];
+  //     const row: Row = [
+  //       {
+  //         text: DispName.SKILL_LEVELS.get(current.level) ?? "",
+  //       },
+  //       {
+  //         text: prRange,
+  //         textColor: RatingInfo.fromDamage(current.damage, 1.0, skillColorCode)
+  //           ?.textColorCode,
+  //       },
+  //       {
+  //         text: damageRange,
+  //         textColor: RatingInfo.fromWinRate(current.winRate, skillColorCode)
+  //           ?.textColorCode,
+  //       },
+  //       {
+  //         text: winRateRange,
+  //         textColor: RatingInfo.fromWinRate(current.winRate, skillColorCode)
+  //           ?.textColorCode,
+  //       },
+  //     ];
 
-      rows.push(row);
-    }
+  //     rows.push(row);
+  //   }
 
-    return { headers: ["スキル", "PR", "ダメージ(平均比)", "勝率"], rows };
-  };
+  //   return { headers: ["スキル", "PR", "ダメージ(平均比)", "勝率"], rows };
+  // };
 
-  const getTLTableInfo = (defs: ThreatLevelDef[]): DispColorTableInfo => {
-    const rows: Row[] = [];
-    for (let i = 0; i < defs.length; i++) {
-      const current = defs[i];
+  // const getTLTableInfo = (defs: ThreatLevelDef[]): DispColorTableInfo => {
+  //   const rows: Row[] = [];
+  //   for (let i = 0; i < defs.length; i++) {
+  //     const current = defs[i];
 
-      let range = "";
-      if (defs[i + 1]) {
-        const next = defs[i + 1];
-        range = `${current.score} ~ ${next.score}`;
-      } else {
-        range = `${current.score} ~`;
-      }
+  //     let range = "";
+  //     if (defs[i + 1]) {
+  //       const next = defs[i + 1];
+  //       range = `${current.score} ~ ${next.score}`;
+  //     } else {
+  //       range = `${current.score} ~`;
+  //     }
 
-      const row: Row = [
-        {
-          text: current.info.level,
-        },
-        {
-          text: range,
-          textColor: current.info.textColorCode,
-        },
-      ];
+  //     const row: Row = [
+  //       {
+  //         text: current.info.level,
+  //       },
+  //       {
+  //         text: range,
+  //         textColor: current.info.textColorCode,
+  //       },
+  //     ];
 
-      rows.push(row);
-    }
+  //     rows.push(row);
+  //   }
 
-    return { headers: ["スキル", "戦力評価"], rows };
-  };
+  //   return { headers: ["スキル", "戦力評価"], rows };
+  // };
 
-  const prTableInfo = getPRTableInfo(
-    RATING_DEFS,
-    $storedConfig.color.skill.text,
-  );
-  const tlTableInfo = getTLTableInfo(THREAT_LEVEL_DEFS);
+  // const prTableInfo = getPRTableInfo(
+  //   RATING_DEFS,
+  //   $storedConfig.color.skill.text,
+  // );
+  // const tlTableInfo = getTLTableInfo(THREAT_LEVEL_DEFS);
 </script>
 
 <div>
-  <div class="p-4 flex flex-col items-center">
+  <!-- <div class="p-4 flex flex-col items-center">
     <div class="grid xl:grid-cols-2 gap-4">
       <div>
         <p class="text-xl text-center font-bold">
@@ -138,7 +137,7 @@
         >
       </div>
     </div>
-  </div>
+  </div> -->
 
   <div class="p-4 flex flex-col items-center">
     <img src={iconApp} alt="" width="128px" height="128px" />

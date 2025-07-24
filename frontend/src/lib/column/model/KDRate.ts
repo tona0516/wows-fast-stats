@@ -16,4 +16,8 @@ export class KDRate extends AbstractStatsColumn<string> {
   svelteComponent() {
     return SingleTableData;
   }
+
+  getCssClass(): string | undefined {
+    return "text-right";
+  }
 }

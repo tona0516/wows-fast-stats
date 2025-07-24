@@ -15,4 +15,8 @@ export class PlanesKilled extends AbstractStatsColumn<string> {
   svelteComponent() {
     return SingleTableData;
   }
+
+  getCssClass(): string | undefined {
+    return "text-right";
+  }
 }

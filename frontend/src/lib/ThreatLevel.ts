@@ -10,58 +10,74 @@ export enum ThreatLevel {
   UV = "UV",
 }
 
-export class ThreatLevelInfo {
-  constructor(
-    readonly level: ThreatLevel,
-    readonly textColorCode: string,
-  ) {}
+export class ThreatLevelGenerator {
+  private constructor() {}
 
   static fromScore(score: number): ThreatLevelInfo | undefined {
-    const tl = THREAT_LEVEL_DEFS.findLast((it) => score >= it.score);
-    return tl?.info;
+    return THREAT_LEVEL_DEFS.findLast((it) => score >= it.score);
   }
+}
+export interface ThreatLevelInfo {
+  level: ThreatLevel;
+  score: number;
+  textColor: string;
+  bgColor: string;
 }
 
 const THREAT_LEVEL_COEF = 0.5;
-export type ThreatLevelDef = {
-  info: ThreatLevelInfo;
-  score: number;
-};
-export const THREAT_LEVEL_DEFS: ThreatLevelDef[] = [
+export const THREAT_LEVEL_DEFS: ThreatLevelInfo[] = [
   {
-    info: new ThreatLevelInfo(ThreatLevel.IR, "#000000"),
+    level: ThreatLevel.IR,
+    textColor: "#FFFFFF",
+    bgColor: "#000000",
     score: 0,
   },
   {
-    info: new ThreatLevelInfo(ThreatLevel.R, "#FF0000"),
+    level: ThreatLevel.R,
+    textColor: "#FFFFFF",
+    bgColor: "#FF0000",
     score: 8000 * THREAT_LEVEL_COEF,
   },
   {
-    info: new ThreatLevelInfo(ThreatLevel.O, "#FFA500"),
+    level: ThreatLevel.O,
+    textColor: "#331100",
+    bgColor: "#FFA500",
     score: 13000 * THREAT_LEVEL_COEF,
   },
   {
-    info: new ThreatLevelInfo(ThreatLevel.Y, "#FFFF00"),
+    level: ThreatLevel.Y,
+    textColor: "#331100",
+    bgColor: "#FFFF00",
     score: 19000 * THREAT_LEVEL_COEF,
   },
   {
-    info: new ThreatLevelInfo(ThreatLevel.G, "#008000"),
-    score: 25000 * THREAT_LEVEL_COEF,
+    level: ThreatLevel.G,
+    textColor: "#FFFFFF",
+    bgColor: "#2255FF",
+    score: 13000 * THREAT_LEVEL_COEF,
   },
   {
-    info: new ThreatLevelInfo(ThreatLevel.B, "#2255FF"),
+    level: ThreatLevel.B,
+    textColor: "#FFFFFF",
+    bgColor: "#FFA500",
     score: 32000 * THREAT_LEVEL_COEF,
   },
   {
-    info: new ThreatLevelInfo(ThreatLevel.I, "#234794"),
+    level: ThreatLevel.I,
+    textColor: "#FFFFFF",
+    bgColor: "#234794",
     score: 35000 * THREAT_LEVEL_COEF,
   },
   {
-    info: new ThreatLevelInfo(ThreatLevel.V, "#705DA8"),
-    score: 40000 * THREAT_LEVEL_COEF,
+    level: ThreatLevel.V,
+    textColor: "#FFFFFF",
+    bgColor: "#705DA8",
+    score: 35000 * THREAT_LEVEL_COEF,
   },
   {
-    info: new ThreatLevelInfo(ThreatLevel.UV, "#65318E"),
+    level: ThreatLevel.UV,
+    textColor: "#000000",
+    bgColor: "#FFFFFF",
     score: 44000 * THREAT_LEVEL_COEF,
   },
 ];

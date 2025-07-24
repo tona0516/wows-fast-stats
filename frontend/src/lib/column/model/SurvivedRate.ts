@@ -16,11 +16,11 @@ export class SurvivedRate extends AbstractStatsColumn<string> {
     return `${win}% | ${lose}%`;
   }
 
-  isCenterized(): boolean {
-    return true;
-  }
-
   svelteComponent() {
     return SingleTableData;
+  }
+
+  getCssClass(): string | undefined {
+    return "text-center";
   }
 }

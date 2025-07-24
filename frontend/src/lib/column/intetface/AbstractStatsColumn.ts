@@ -35,7 +35,11 @@ export abstract class AbstractStatsColumn<T> extends AbstractColumn {
     return toPlayerStats(player, this.config.stats_pattern);
   }
 
-  isCenterized(): boolean {
-    return false;
+  getBackgroundColorCode(player: data.Player): string | undefined {
+    return undefined;
+  }
+
+  getCssClass(): string | undefined {
+    return;
   }
 }

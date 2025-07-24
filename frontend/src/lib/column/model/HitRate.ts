@@ -15,11 +15,11 @@ export class HitRate extends AbstractStatsColumn<string> {
     return `${main}% | ${torps}%`;
   }
 
-  isCenterized(): boolean {
-    return true;
-  }
-
   svelteComponent() {
     return SingleTableData;
+  }
+
+  getCssClass(): string | undefined {
+    return "text-center";
   }
 }

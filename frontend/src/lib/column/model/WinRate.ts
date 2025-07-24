@@ -1,5 +1,5 @@
 import SingleTableData from "src/component/stats/internal/table_data/SingleTableData.svelte";
-import { RatingInfo } from "src/lib/RatingLevel";
+import { RatingfGenerator } from "src/lib/RatingLevel";
 import { AbstractStatsColumn } from "src/lib/column/intetface/AbstractStatsColumn";
 import type { StatsCategory } from "src/lib/types";
 import type { data } from "wailsjs/go/models";
@@ -18,10 +18,15 @@ export class WinRate extends AbstractStatsColumn<string> {
   }
 
   textColorCode(player: data.Player): string {
-    return (
-      RatingInfo.fromWinRate(this.value(player), this.config.color.skill.text)
-        ?.textColorCode ?? ""
-    );
+    return RatingfGenerator.fromWinRate(this.value(player))?.textColor ?? "";
+  }
+
+  getBackgroundColorCode(player: data.Player): string | undefined {
+    return RatingfGenerator.fromWinRate(this.value(player))?.bgColor;
+  }
+
+  getCssClass(): string | undefined {
+    return "text-right";
   }
 
   private value(player: data.Player): number {

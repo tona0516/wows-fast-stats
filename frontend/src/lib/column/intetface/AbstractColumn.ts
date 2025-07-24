@@ -1,3 +1,5 @@
+import type { data } from "wailsjs/go/models";
+
 export abstract class AbstractColumn {
   constructor(
     readonly key: string,
@@ -7,4 +9,5 @@ export abstract class AbstractColumn {
   // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   abstract svelteComponent(): any;
   abstract shouldShow(): boolean;
+  abstract getBackgroundColorCode(player: data.Player): string | undefined;
 }

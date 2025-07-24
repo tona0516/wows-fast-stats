@@ -1,5 +1,5 @@
 import SingleTableData from "src/component/stats/internal/table_data/SingleTableData.svelte";
-import { ThreatLevelInfo } from "src/lib/ThreatLevel";
+import { ThreatLevelGenerator } from "src/lib/ThreatLevel";
 import { AbstractStatsColumn } from "src/lib/column/intetface/AbstractStatsColumn";
 import type { data } from "wailsjs/go/models";
 
@@ -19,12 +19,22 @@ export class ThreatLevel extends AbstractStatsColumn<string> {
 
   textColorCode(player: data.Player): string {
     return (
-      ThreatLevelInfo.fromScore(player.pvp_all.overall.threat_level.raw)
-        ?.textColorCode ?? ""
+      ThreatLevelGenerator.fromScore(player.pvp_all.overall.threat_level.raw)
+        ?.textColor || ""
     );
+  }
+
+  getBackgroundColorCode(player: data.Player): string | undefined {
+    return ThreatLevelGenerator.fromScore(
+      player.pvp_all.overall.threat_level.raw,
+    )?.bgColor;
   }
 
   svelteComponent() {
     return SingleTableData;
+  }
+
+  getCssClass(): string | undefined {
+    return "text-right";
   }
 }

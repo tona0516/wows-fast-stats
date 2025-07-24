@@ -39,4 +39,8 @@ export class MaxDamage extends AbstractStatsColumn<MaxDamageParam> {
   svelteComponent() {
     return MaxDamageTableData;
   }
+
+  getCssClass(): string | undefined {
+    return "text-right";
+  }
 }

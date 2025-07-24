@@ -69,7 +69,12 @@
                 <td class="p-1 text-center" colspan={shipColumnCount}>N/A</td>
                 {#each overallColumns as column}
                   {#if column.shouldShow()}
-                    <td class="p-1">
+                    <td
+                      class="p-1"
+                      style="background-color: {column.getBackgroundColorCode(
+                        player,
+                      ) ?? ''}"
+                    >
                       <svelte:component
                         this={column.svelteComponent()}
                         {column}
@@ -81,7 +86,12 @@
               {:else}
                 {#each shipColumns as column}
                   {#if column.shouldShow()}
-                    <td class="p-1">
+                    <td
+                      class="p-1"
+                      style="background-color: {column.getBackgroundColorCode(
+                        player,
+                      ) ?? ''}"
+                    >
                       <svelte:component
                         this={column.svelteComponent()}
                         {column}
@@ -92,7 +102,12 @@
                 {/each}
                 {#each overallColumns as column}
                   {#if column.shouldShow()}
-                    <td class="p-1">
+                    <td
+                      class="p-1"
+                      style="background-color: {column.getBackgroundColorCode(
+                        player,
+                      ) ?? ''}"
+                    >
                       <svelte:component
                         this={column.svelteComponent()}
                         {column}

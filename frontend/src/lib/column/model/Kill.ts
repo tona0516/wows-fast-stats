@@ -16,4 +16,8 @@ export class Kill extends AbstractStatsColumn<string> {
   svelteComponent() {
     return SingleTableData;
   }
+
+  getCssClass(): string | undefined {
+    return "text-right";
+  }
 }
