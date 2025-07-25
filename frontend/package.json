@@ -34,10 +34,12 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.10",
+    "@types/chroma-js": "^3.1.1",
     "@types/sprintf-js": "^1.1.4",
     "bootstrap-icons": "^1.10.5",
     "chart.js": "^4.5.0",
     "charts.css": "^1.1.0",
+    "chroma-js": "^3.1.2",
     "clone": "^2.1.2",
     "date-fns": "^3.5.0",
     "flag-icons": "^7.2.3",

@@ -1,5 +1,6 @@
 <script lang="ts">
   import { DispName } from "src/lib/DispName";
+  import { Theme } from "src/lib/Theme";
   import { deriveColumnSettings } from "src/lib/util";
   import { storedConfig, storedInstallPathError } from "src/stores";
   import { onMount } from "svelte";
@@ -121,7 +122,7 @@
   <div class="p-4 flex flex-col items-center">
     <p class="text-xl font-bold">テーマ</p>
     <select class="select my-2" data-choose-theme>
-      {#each ["garden", "light", "silk", "retro", "dark", "night"] as theme}
+      {#each Theme.getAll() as theme}
         <option value={theme}>{theme}</option>
       {/each}
     </select>

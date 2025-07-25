@@ -1,4 +1,6 @@
+import chroma from "chroma-js";
 import PlayerNameTableData from "src/component/stats/internal/table_data/PlayerNameTableData.svelte";
+import { Theme } from "src/lib/Theme";
 import { AbstractColumn } from "src/lib/column/intetface/AbstractColumn";
 import type { data } from "wailsjs/go/models";
 
@@ -56,7 +58,13 @@ export class PlayerName extends AbstractColumn {
   }
 
   clanColorCode(player: data.Player): string {
-    return player.player_info.clan.hex_color;
+    const color = player.player_info.clan.hex_color;
+
+    if (Theme.isLighter()) {
+      return chroma(color).darken(1.25).hex();
+    }
+
+    return color;
   }
 
   getBackgroundColorCode(player: data.Player): string | undefined {
