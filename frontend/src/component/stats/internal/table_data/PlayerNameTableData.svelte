@@ -38,9 +38,7 @@
           {clanTag}
         </span>
       {/if}
-      <span style="color: {column.textColorCode(player)}">
-        {column.playerName(player)}
-      </span>
+      {column.playerName(player)}
     </div>
   {/if}
 </div>

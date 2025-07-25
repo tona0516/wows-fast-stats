@@ -1,8 +1,5 @@
 import PlayerNameTableData from "src/component/stats/internal/table_data/PlayerNameTableData.svelte";
-import { RatingfGenerator } from "src/lib/RatingLevel";
 import { AbstractColumn } from "src/lib/column/intetface/AbstractColumn";
-import type { StatsCategory } from "src/lib/types";
-import { toPlayerStats } from "src/lib/util";
 import type { data } from "wailsjs/go/models";
 
 export class PlayerName extends AbstractColumn {
@@ -60,26 +57,6 @@ export class PlayerName extends AbstractColumn {
 
   clanColorCode(player: data.Player): string {
     return player.player_info.clan.hex_color;
-  }
-
-  textColorCode(player: data.Player): string {
-    let statsCategory: StatsCategory | undefined;
-
-    if (this.config.color.player_name === "ship") {
-      statsCategory = "ship";
-    }
-    if (this.config.color.player_name === "overall") {
-      statsCategory = "overall";
-    }
-
-    if (!statsCategory) {
-      return "";
-    }
-
-    const pr = toPlayerStats(player, this.config.stats_pattern)[statsCategory]
-      .pr;
-
-    return RatingfGenerator.fromPR(pr)?.bgColor ?? "";
   }
 
   getBackgroundColorCode(player: data.Player): string | undefined {
