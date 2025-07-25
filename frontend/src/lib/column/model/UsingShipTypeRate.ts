@@ -1,5 +1,4 @@
 import StackedBarGraphTableData from "src/component/stats/internal/table_data/StackedBarGraphTableData.svelte";
-import { DispName } from "src/lib/DispName";
 import type { StackedBarGraphParam } from "src/lib/column/StackedBarGraphParam";
 import { AbstractStatsColumn } from "src/lib/column/intetface/AbstractStatsColumn";
 import type { data } from "wailsjs/go/models";
@@ -11,18 +10,36 @@ export class UsingShipTypeRate extends AbstractStatsColumn<StackedBarGraphParam>
 
   displayValue(player: data.Player): StackedBarGraphParam {
     const shipTypeGroup = this.playerStats(player).overall.using_ship_type_rate;
-    const ownShipType = player.ship_info.type;
-    const colors = this.config.color.ship_type;
-
-    const items = DispName.SHIP_TYPES.toArray().map((it) => {
-      const colorCode =
-        it.key === ownShipType ? colors.own[it.key] : colors.other[it.key];
-      const rate = shipTypeGroup[it.key];
-
-      return { label: it.value, colorCode: colorCode, value: rate };
-    });
-
-    return { digit: this.digit(), items: items };
+    return {
+      digit: this.digit(),
+      items: [
+        {
+          label: "潜水艦",
+          colorCode: "#233B8B",
+          value: shipTypeGroup.ss,
+        },
+        {
+          label: "駆逐艦",
+          colorCode: "#D9760F",
+          value: shipTypeGroup.dd,
+        },
+        {
+          label: "巡洋艦",
+          colorCode: "#27853F",
+          value: shipTypeGroup.cl,
+        },
+        {
+          label: "戦艦",
+          colorCode: "#CA1028",
+          value: shipTypeGroup.bb,
+        },
+        {
+          label: "空母",
+          colorCode: "#5E2883",
+          value: shipTypeGroup.cv,
+        },
+      ],
+    };
   }
 
   svelteComponent() {
