@@ -46,9 +46,9 @@ export namespace ColumnProvider {
       new ColumnArray("basic", [new PlayerName(config), new ShipInfo(config)]),
       new ColumnArray("ship", [
         new PR(config, "ship"),
+        new WinRate(config, "ship"),
         new Damage(config, "ship"),
         new MaxDamage(config, "ship"),
-        new WinRate(config, "ship"),
         new KDRate(config, "ship"),
         new Kill(config, "ship"),
         new Exp(config, "ship"),
@@ -61,9 +61,9 @@ export namespace ColumnProvider {
       new ColumnArray("overall", [
         new ThreatLevel(config),
         new PR(config, "overall"),
+        new WinRate(config, "overall"),
         new Damage(config, "overall"),
         new MaxDamage(config, "overall"),
-        new WinRate(config, "overall"),
         new KDRate(config, "overall"),
         new Kill(config, "overall"),
         new Exp(config, "overall"),
