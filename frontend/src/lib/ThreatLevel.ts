@@ -54,7 +54,7 @@ export const THREAT_LEVEL_DEFS: ThreatLevelInfo[] = [
     level: ThreatLevel.G,
     textColor: "#FFFFFF",
     bgColor: "#2255FF",
-    score: 13000 * THREAT_LEVEL_COEF,
+    score: 25000 * THREAT_LEVEL_COEF,
   },
   {
     level: ThreatLevel.B,
@@ -72,7 +72,7 @@ export const THREAT_LEVEL_DEFS: ThreatLevelInfo[] = [
     level: ThreatLevel.V,
     textColor: "#FFFFFF",
     bgColor: "#705DA8",
-    score: 35000 * THREAT_LEVEL_COEF,
+    score: 40000 * THREAT_LEVEL_COEF,
   },
   {
     level: ThreatLevel.UV,

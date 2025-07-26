@@ -1,38 +1,33 @@
-import { RatingInfo } from "src/lib/RatingLevel";
 import { data } from "wailsjs/go/models";
+import { RatingfGenerator } from "./RatingLevel";
 
 test("ファクトリメソッド - 異常系", () => {
-  const skillColorCode = new data.UCSkillColorCode();
-
-  const pr = RatingInfo.fromPR(-1, skillColorCode);
+  const pr = RatingfGenerator.fromPR(-1);
   expect(pr).toBeUndefined();
 
-  const damage1 = RatingInfo.fromDamage(16000, 0, skillColorCode);
+  const damage1 = RatingfGenerator.fromDamage(16000, 0);
   expect(damage1).toBeUndefined();
 
-  const damage2 = RatingInfo.fromDamage(-1, 1, skillColorCode);
+  const damage2 = RatingfGenerator.fromDamage(-1, 1);
   expect(damage2).toBeUndefined();
 
-  const winRate = RatingInfo.fromWinRate(-1, skillColorCode);
+  const winRate = RatingfGenerator.fromWinRate(-1);
   expect(winRate).toBeUndefined();
 });
 
 test("ファクトリメソッド - 正常系", () => {
-  const expectedTextColor = "#114514";
-
-  const skillColorCode = new data.UCSkillColorCode({
-    super_unicum: expectedTextColor,
-  });
-
-  const pr = RatingInfo.fromPR(2450, skillColorCode);
+  const pr = RatingfGenerator.fromPR(2450);
   expect(pr?.level).toBe("super_unicum");
-  expect(pr?.textColorCode).toBe(expectedTextColor);
+  expect(pr?.textColor).toBeDefined();
+  expect(pr?.bgColor).toBeDefined();
 
-  const damage = RatingInfo.fromDamage(16000, 10000, skillColorCode);
+  const damage = RatingfGenerator.fromDamage(16000, 10000);
   expect(damage?.level).toBe("super_unicum");
-  expect(damage?.textColorCode).toBe(expectedTextColor);
+  expect(damage?.textColor).toBeDefined();
+  expect(damage?.bgColor).toBeDefined();
 
-  const winRate = RatingInfo.fromWinRate(100, skillColorCode);
+  const winRate = RatingfGenerator.fromWinRate(100);
   expect(winRate?.level).toBe("super_unicum");
-  expect(winRate?.textColorCode).toBe(expectedTextColor);
+  expect(damage?.textColor).toBeDefined();
+  expect(damage?.bgColor).toBeDefined();
 });

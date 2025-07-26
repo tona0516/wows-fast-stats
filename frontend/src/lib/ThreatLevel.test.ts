@@ -1,17 +1,19 @@
 import {
   THREAT_LEVEL_DEFS,
   ThreatLevel,
-  ThreatLevelInfo,
+  ThreatLevelGenerator,
 } from "src/lib/ThreatLevel";
 
 test("fromScore - 異常系", () => {
-  expect(ThreatLevelInfo.fromScore(-1)).toBeUndefined();
+  expect(ThreatLevelGenerator.fromScore(-1)).toBeUndefined();
 });
 
 test("fromScore - 正常系", () => {
-  const instance = ThreatLevelInfo.fromScore(9500);
+  const instance = ThreatLevelGenerator.fromScore(9500);
   expect(instance?.level).toBe(ThreatLevel.Y);
-  expect(instance?.textColorCode).toBeDefined();
+  expect(instance?.score).toBeDefined();
+  expect(instance?.textColor).toBeDefined();
+  expect(instance?.bgColor).toBeDefined();
 });
 
 test("THREAT_LEVEL_DEFSがスコアの昇順で定義されている", () => {
