@@ -138,7 +138,7 @@ func (a *App) ValidateInstallPath(path string) string {
 }
 
 func (a *App) Semver() string {
-	return *a.config.App.Semver
+	return a.config.App.Semver
 }
 
 func (a *App) AlertPlayers() ([]data.AlertPlayer, error) {
@@ -194,7 +194,7 @@ func (a *App) LatestRelease() (data.GHLatestRelease, error) {
 
 func (a *App) ShowMessageDialog(message string) {
 	_, _ = runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
-		Title:   *a.config.App.Name,
+		Title:   a.config.App.Name,
 		Message: message,
 	})
 }

@@ -25,23 +25,12 @@ func main() {
 
 	app := NewApp(*config)
 
-	var title string
-	if config.App.Name != nil {
-		title = *config.App.Name
-	}
-	var width int
-	if config.App.Width != nil {
-		width = *config.App.Width
-	}
-	var height int
-	if config.App.Height != nil {
-		height = *config.App.Height
-	}
-
 	err = wails.Run(&options.App{
-		Title:  title,
-		Width:  width,
-		Height: height,
+		Title:     config.App.Name,
+		Width:     config.App.Width,
+		Height:    config.App.Height,
+		MinWidth:  config.App.MinWidth,
+		MinHeight: config.App.MinHeight,
 		AssetServer: &assetserver.Options{
 			Assets: assets,
 		},
