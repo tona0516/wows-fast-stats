@@ -4,8 +4,8 @@
   import { LogInfo, ShowMessageDialog } from "wailsjs/go/main/App";
 
   import TeamCompareBarChart from "./internal/TeamCompareBarChart.svelte";
-  import AllPlayerTable from "./internal/AllPlayerTable.svelte";
   import BattleMetaInfo from "./internal/BattleMetaInfo.svelte";
+  import MainStatsTable from "./internal/MainStatsTable.svelte";
 
   let isLoading = false;
 
@@ -31,7 +31,7 @@
 <div>
   {#if $storedBattle}
     <div class="flex">
-      <AllPlayerTable teams={$storedBattle.teams} />
+      <MainStatsTable teams={$storedBattle.teams} />
     </div>
 
     <div>
