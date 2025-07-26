@@ -2,51 +2,30 @@
   import { DispName } from "src/lib/DispName";
   import { Theme } from "src/lib/Theme";
   import { deriveColumnSettings } from "src/lib/util";
-  import { storedConfig, storedInstallPathError } from "src/stores";
+  import { showToast, storedConfig, storedInstallPathError } from "src/stores";
   import { onMount } from "svelte";
   import { themeChange } from "theme-change";
   import {
     OpenDirectory,
-    SelectDirectory,
     ShowMessageDialog,
-    UpdateInstallPath,
+    TrySaveInstallPath,
     UpdateUserConfig,
   } from "wailsjs/go/main/App";
 
-  $: inputConfig = $storedConfig;
-  $: installPath = $storedConfig.install_path;
-  $: columnSettings = deriveColumnSettings(inputConfig);
-  $: applyInstallPathButton = {
-    label: "フォルダ設定保存",
-    disabled: false,
-  };
+  $: inputConfig = structuredClone($storedConfig);
+  $: columnSettings = deriveColumnSettings($storedConfig);
 
   onMount(() => {
     themeChange(false);
   });
 
   const onClickSelectDirectory = async () => {
-    SelectDirectory().then((path) => {
-      if (!path) {
-        return;
-      }
-
-      installPath = path;
-      applyInstallPathButton = {
-        label: "フォルダ設定保存",
-        disabled: false,
-      };
-    });
-  };
-
-  const onClickSaveInstallPath = async () => {
     try {
-      await UpdateInstallPath(installPath);
-      storedInstallPathError.set("");
-      applyInstallPathButton = {
-        label: "保存しました！",
-        disabled: true,
-      };
+      const isSuccess = await TrySaveInstallPath();
+      if (isSuccess) {
+        showToast("インストールパスを設定しました");
+        storedInstallPathError.set("");
+      }
     } catch (error) {
       storedInstallPathError.set(error as string);
     }
@@ -64,7 +43,7 @@
     try {
       await UpdateUserConfig(inputConfig);
     } catch (error) {
-      inputConfig = $storedConfig;
+      inputConfig = structuredClone($storedConfig);
       if (error instanceof Error) {
         ShowMessageDialog(error.message);
       }
@@ -74,34 +53,33 @@
 
 <div>
   <div class="p-4 flex flex-col items-center">
-    <p class="text-xl font-bold">インストールフォルダ設定</p>
-    <p class="text-sm text-nowrap">
-      ゲームクライアントの実行ファイルがあるフォルダを設定してください。
-    </p>
+    <div>
+      <p class="text-xl font-bold">
+        ゲームクライアント インストールパス設定(必須)
+      </p>
+      <p class="text-sm text-nowrap">
+        WorldOfWarships.exeが存在するフォルダを選択してください。
+      </p>
+    </div>
 
-    <div class="stats shadow">
-      <div class="stat">
+    <div class="stats shadow w-3/4">
+      <div class="stat {$storedInstallPathError && 'input-error'}">
         <div class="stat-title">現在の入力値（設定値）</div>
         <div class="stat-value text-lg">{inputConfig.install_path}</div>
       </div>
     </div>
 
-    <div class="pt-4">
+    {#if $storedInstallPathError}
+      <div role="alert" class="mt-2 alert alert-error alert-soft">
+        <span>{$storedInstallPathError}</span>
+      </div>
+    {/if}
+
+    <div class="mt-2">
       <button class="btn btn-neutral" on:click={onClickSelectDirectory}
         >フォルダ選択</button
       >
-      <button
-        class="btn btn-primary ml-2"
-        on:click={onClickSaveInstallPath}
-        disabled={applyInstallPathButton.disabled}
-        >{applyInstallPathButton.label}</button
-      >
     </div>
-    {#if $storedInstallPathError}
-      <div>
-        <i class="bi bi-warning">{$storedInstallPathError}</i>
-      </div>
-    {/if}
   </div>
 
   <div class="p-4 flex flex-col items-center">

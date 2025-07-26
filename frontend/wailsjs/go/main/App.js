@@ -42,10 +42,6 @@ export function SearchPlayer(arg1) {
   return window['go']['main']['App']['SearchPlayer'](arg1);
 }
 
-export function SelectDirectory() {
-  return window['go']['main']['App']['SelectDirectory']();
-}
-
 export function Semver() {
   return window['go']['main']['App']['Semver']();
 }
@@ -58,12 +54,12 @@ export function StartWatching() {
   return window['go']['main']['App']['StartWatching']();
 }
 
-export function UpdateAlertPlayer(arg1) {
-  return window['go']['main']['App']['UpdateAlertPlayer'](arg1);
+export function TrySaveInstallPath() {
+  return window['go']['main']['App']['TrySaveInstallPath']();
 }
 
-export function UpdateInstallPath(arg1) {
-  return window['go']['main']['App']['UpdateInstallPath'](arg1);
+export function UpdateAlertPlayer(arg1) {
+  return window['go']['main']['App']['UpdateAlertPlayer'](arg1);
 }
 
 export function UpdateUserConfig(arg1) {

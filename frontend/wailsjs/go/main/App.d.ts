@@ -22,17 +22,15 @@ export function RemoveAlertPlayer(arg1:number):Promise<void>;
 
 export function SearchPlayer(arg1:string):Promise<Array<data.WGAccountListData>>;
 
-export function SelectDirectory():Promise<string>;
-
 export function Semver():Promise<string>;
 
 export function ShowMessageDialog(arg1:string):Promise<void>;
 
 export function StartWatching():Promise<void>;
 
-export function UpdateAlertPlayer(arg1:data.AlertPlayer):Promise<void>;
+export function TrySaveInstallPath():Promise<boolean>;
 
-export function UpdateInstallPath(arg1:string):Promise<void>;
+export function UpdateAlertPlayer(arg1:data.AlertPlayer):Promise<void>;
 
 export function UpdateUserConfig(arg1:data.UserConfigV2):Promise<void>;
 

@@ -74,13 +74,24 @@ func (a *App) Battle() (data.Battle, error) {
 	return result, nil
 }
 
-func (a *App) SelectDirectory() (string, error) {
+func (a *App) TrySaveInstallPath() (bool, error) {
 	path, err := a.container.configService.SelectDirectory(a.ctx)
 	if err != nil {
-		a.container.logger.Error(err, nil)
+		return false, apperr.Unwrap(err)
 	}
 
-	return path, apperr.Unwrap(err)
+	if path == "" {
+		return false, nil
+	}
+
+	config, err := a.container.configService.UpdateInstallPath(path)
+	if err != nil {
+		return false, apperr.Unwrap(err)
+	}
+
+	runtime.EventsEmit(a.ctx, eventUpdateConfig, config)
+
+	return true, nil
 }
 
 func (a *App) OpenDirectory(path string) error {
@@ -124,17 +135,6 @@ func (a *App) ValidateInstallPath(path string) string {
 	}
 
 	return ""
-}
-
-func (a *App) UpdateInstallPath(path string) error {
-	config, err := a.container.configService.UpdateInstallPath(path)
-	if err != nil {
-		a.container.logger.Error(err, nil)
-	} else {
-		runtime.EventsEmit(a.ctx, eventUpdateConfig, config)
-	}
-
-	return apperr.Unwrap(err)
 }
 
 func (a *App) Semver() string {
