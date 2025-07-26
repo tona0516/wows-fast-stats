@@ -86,7 +86,7 @@
       </div>
     </div>
 
-    <div>
+    <div class="pt-4">
       <button class="btn btn-neutral" on:click={onClickSelectDirectory}
         >フォルダ選択</button
       >

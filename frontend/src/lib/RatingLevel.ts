@@ -36,7 +36,7 @@ export const RATING_DEFS: Rating[] = [
   {
     level: "bad",
     textColor: "#ffffff",
-    bgColor: "#fe0c03",
+    bgColor: "#FE0E00",
     pr: 0,
     damage: 0,
     winRate: 0,
@@ -44,7 +44,7 @@ export const RATING_DEFS: Rating[] = [
   {
     level: "below_avg",
     textColor: "#000000",
-    bgColor: "#fe7f17",
+    bgColor: "#FE7903",
     pr: 750,
     damage: 0.6,
     winRate: 47,
@@ -52,7 +52,7 @@ export const RATING_DEFS: Rating[] = [
   {
     level: "avg",
     textColor: "#000000",
-    bgColor: "#fec61f",
+    bgColor: "#FFC71F",
     pr: 1100,
     damage: 0.8,
     winRate: 50,
@@ -60,7 +60,7 @@ export const RATING_DEFS: Rating[] = [
   {
     level: "good",
     textColor: "#ffffff",
-    bgColor: "#42b301",
+    bgColor: "#44B300",
     pr: 1350,
     damage: 1.0,
     winRate: 52,
@@ -68,7 +68,7 @@ export const RATING_DEFS: Rating[] = [
   {
     level: "very_good",
     textColor: "#ffffff",
-    bgColor: "#307f00",
+    bgColor: "#318000",
     pr: 1550,
     damage: 1.2,
     winRate: 54,
@@ -76,7 +76,7 @@ export const RATING_DEFS: Rating[] = [
   {
     level: "great",
     textColor: "#ffffff",
-    bgColor: "#02c8b3",
+    bgColor: "#02C9B3",
     pr: 1750,
     damage: 1.4,
     winRate: 56,
@@ -84,7 +84,7 @@ export const RATING_DEFS: Rating[] = [
   {
     level: "unicum",
     textColor: "#ffffff",
-    bgColor: "#d758f4",
+    bgColor: "#D042F3",
     pr: 2100,
     damage: 1.5,
     winRate: 60,
@@ -92,7 +92,7 @@ export const RATING_DEFS: Rating[] = [
   {
     level: "super_unicum",
     textColor: "#ffffff",
-    bgColor: "#a00dc4",
+    bgColor: "#A00DC5",
     pr: 2450,
     damage: 1.6,
     winRate: 65,
