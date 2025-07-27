@@ -53,21 +53,21 @@
 
 <div>
   <div class="p-4 flex flex-col items-center">
-    <div>
-      <p class="text-xl font-bold">
-        ゲームクライアント インストールパス設定(必須)
-      </p>
-      <p class="text-sm text-nowrap">
-        WorldOfWarships.exeが存在するフォルダを選択してください。
-      </p>
+    <div class="flex items-center">
+      <span class="text-xl font-bold">インストールパス設定</span>
+      <span class="ml-2 badge badge-outline badge-error">必須</span>
     </div>
 
     <div class="stats shadow w-3/4">
       <div class="stat {$storedInstallPathError && 'input-error'}">
-        <div class="stat-title">現在の入力値（設定値）</div>
+        <div class="stat-title">ゲームクライアント インストールパス</div>
         <div class="stat-value text-lg">{inputConfig.install_path}</div>
       </div>
     </div>
+
+    <p class="text-sm text-nowrap">
+      WorldOfWarships.exeが存在するフォルダを選択してください
+    </p>
 
     {#if $storedInstallPathError}
       <div role="alert" class="mt-2 alert alert-error alert-soft">
