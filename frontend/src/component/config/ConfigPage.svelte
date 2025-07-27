@@ -12,7 +12,6 @@
     UpdateUserConfig,
   } from "wailsjs/go/main/App";
 
-  $: inputConfig = structuredClone($storedConfig);
   $: columnSettings = deriveColumnSettings($storedConfig);
 
   onMount(() => {
@@ -33,20 +32,18 @@
 
   const onClickOpenDirectory = async (path: string) => {
     OpenDirectory(path).catch((error) => {
-      if (error instanceof Error) {
-        ShowMessageDialog(error.message);
-      }
+      ShowMessageDialog(error as string);
     });
   };
 
   const onChange = async () => {
+    const beforeConfig = structuredClone($storedConfig);
+
     try {
-      await UpdateUserConfig(inputConfig);
+      await UpdateUserConfig($storedConfig);
     } catch (error) {
-      inputConfig = structuredClone($storedConfig);
-      if (error instanceof Error) {
-        ShowMessageDialog(error.message);
-      }
+      storedConfig.set(beforeConfig);
+      ShowMessageDialog(error as string);
     }
   };
 </script>
@@ -61,7 +58,7 @@
     <div class="stats shadow w-3/4">
       <div class="stat {$storedInstallPathError && 'input-error'}">
         <div class="stat-title">ゲームクライアント インストールパス</div>
-        <div class="stat-value text-lg">{inputConfig.install_path}</div>
+        <div class="stat-value text-lg">{$storedConfig.install_path}</div>
       </div>
     </div>
 
@@ -86,7 +83,7 @@
     <p class="text-xl font-bold">統計パターン</p>
     <select
       class="select my-2"
-      bind:value={inputConfig.stats_pattern}
+      bind:value={$storedConfig.stats_pattern}
       on:change={onChange}
     >
       {#each DispName.STATS_PATTERNS.toArray() as sp}
@@ -110,7 +107,7 @@
     <p class="text-xl font-bold">UIサイズ</p>
     <select
       class="select my-2"
-      bind:value={inputConfig.font_size}
+      bind:value={$storedConfig.font_size}
       on:change={onChange}
     >
       {#each DispName.FONT_SIZES.toArray() as fs}
@@ -143,7 +140,7 @@
                 <input
                   class="toggle toggle-success"
                   type="checkbox"
-                  bind:checked={inputConfig.display.ship[column.ship.key]}
+                  bind:checked={$storedConfig.display.ship[column.ship.key]}
                   on:change={onChange}
                 />
               </td>
@@ -156,7 +153,9 @@
                 <input
                   class="toggle toggle-success"
                   type="checkbox"
-                  bind:checked={inputConfig.display.overall[column.overall.key]}
+                  bind:checked={
+                    $storedConfig.display.overall[column.overall.key]
+                  }
                   on:change={onChange}
                 />
               </td>
@@ -168,12 +167,12 @@
               <td>
                 <select
                   class="select select-sm"
-                  bind:value={inputConfig.digit[column.digit.key]}
+                  bind:value={$storedConfig.digit[column.digit.key]}
                   on:change={onChange}
                 >
                   {#each [0, 1, 2] as digit}
                     <option
-                      selected={digit === inputConfig.digit[column.digit.key]}
+                      selected={digit === $storedConfig.digit[column.digit.key]}
                       value={digit}>{digit}</option
                     >
                   {/each}
@@ -192,7 +191,7 @@
     <p class="text-xl font-bold">プレイヤー名の背景色</p>
     <select
       class="select my-2"
-      bind:value={inputConfig.color.player_name}
+      bind:value={$storedConfig.color.player_name}
       on:change={onChange}
     >
       {#each DispName.PLAYER_NAME_COLORS.toArray() as pnc}
@@ -211,7 +210,7 @@
         <input
           class="toggle toggle-success"
           type="checkbox"
-          bind:checked={inputConfig.show_language_frag}
+          bind:checked={$storedConfig.show_language_frag}
           on:change={onChange}
         />
         クラン国籍を表示する（クラン説明から言語検出）
@@ -220,7 +219,7 @@
         <input
           class="toggle toggle-success"
           type="checkbox"
-          bind:checked={inputConfig.send_report}
+          bind:checked={$storedConfig.send_report}
           on:change={onChange}
         />アプリ改善のためのデータ送信を許可する
       </li>
@@ -228,7 +227,7 @@
         <input
           class="toggle toggle-success"
           type="checkbox"
-          bind:checked={inputConfig.save_temp_arena_info}
+          bind:checked={$storedConfig.save_temp_arena_info}
           on:change={onChange}
         />
         【開発用】自動で戦闘情報(tempArenaInfo.json)を保存する
