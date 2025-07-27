@@ -1,4 +1,5 @@
 import type { data } from "wailsjs/go/models";
+import { Color } from "./Color";
 
 export type RatingLevel = Readonly<keyof data.UCSkillColorCode>;
 
@@ -25,8 +26,7 @@ export class RatingfGenerator {
 
 export interface Rating {
   level: RatingLevel;
-  textColor: string;
-  bgColor: string;
+  color: string;
   pr: number;
   damage: number;
   winRate: number;
@@ -35,64 +35,56 @@ export interface Rating {
 export const RATING_DEFS: Rating[] = [
   {
     level: "bad",
-    textColor: "#ffffff",
-    bgColor: "#FE0E00",
+    color: Color.Rating.getDefault("bad"),
     pr: 0,
     damage: 0,
     winRate: 0,
   },
   {
     level: "below_avg",
-    textColor: "#000000",
-    bgColor: "#FE7903",
+    color: Color.Rating.getDefault("below_avg"),
     pr: 750,
     damage: 0.6,
     winRate: 47,
   },
   {
     level: "avg",
-    textColor: "#000000",
-    bgColor: "#FFC71F",
+    color: Color.Rating.getDefault("avg"),
     pr: 1100,
     damage: 0.8,
     winRate: 50,
   },
   {
     level: "good",
-    textColor: "#ffffff",
-    bgColor: "#44B300",
+    color: Color.Rating.getDefault("good"),
     pr: 1350,
     damage: 1.0,
     winRate: 52,
   },
   {
     level: "very_good",
-    textColor: "#ffffff",
-    bgColor: "#318000",
+    color: Color.Rating.getDefault("very_good"),
     pr: 1550,
     damage: 1.2,
     winRate: 54,
   },
   {
     level: "great",
-    textColor: "#ffffff",
-    bgColor: "#02C9B3",
+    color: Color.Rating.getDefault("great"),
     pr: 1750,
     damage: 1.4,
     winRate: 56,
   },
   {
     level: "unicum",
-    textColor: "#ffffff",
-    bgColor: "#D042F3",
+    color: Color.Rating.getDefault("unicum"),
     pr: 2100,
     damage: 1.5,
     winRate: 60,
   },
   {
     level: "super_unicum",
-    textColor: "#ffffff",
-    bgColor: "#A00DC5",
+    color: Color.Rating.getDefault("super_unicum"),
     pr: 2450,
     damage: 1.6,
     winRate: 65,

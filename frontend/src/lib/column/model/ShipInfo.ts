@@ -29,6 +29,7 @@ import ShipSS from "src/assets/images/ship_ss.png";
 import ShipPremiumSS from "src/assets/images/ship_ss_premium.png";
 
 import ShipInfoTableData from "src/component/stats/internal/table_data/ShipInfoTableData.svelte";
+import { Color } from "src/lib/Color";
 import { isShipType, tierString } from "src/lib/util";
 
 const FLAGS: { [key: string]: string } = {
@@ -97,5 +98,14 @@ export class ShipInfo extends AbstractColumn {
 
   nationIconPath(player: data.Player): string {
     return FLAGS[player.ship_info.nation] ?? FlagNone;
+  }
+
+  getBackgroundColorCode(player: data.Player): string | undefined {
+    const type = player.ship_info.type;
+    if (isShipType(type)) {
+      return Color.ShipType.getFixed(type);
+    }
+
+    return undefined;
   }
 }

@@ -48,7 +48,12 @@
             )}
             <tr>
               {#each basicColumns as column}
-                <td class="p-1">
+                <td
+                  class="p-1"
+                  style="background-color: {column.getBackgroundColorCode(
+                    player,
+                  )};"
+                >
                   <svelte:component
                     this={column.svelteComponent()}
                     {column}

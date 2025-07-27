@@ -1,14 +1,6 @@
-export enum ThreatLevel {
-  IR = "IR",
-  R = "R",
-  O = "O",
-  Y = "Y",
-  G = "G",
-  B = "B",
-  I = "I",
-  V = "V",
-  UV = "UV",
-}
+import { Color, type ColorPair } from "./Color";
+
+export type ThreatLevel = "ir" | "r" | "o" | "y" | "g" | "b" | "i" | "v" | "uv";
 
 export class ThreatLevelGenerator {
   private constructor() {}
@@ -20,64 +12,54 @@ export class ThreatLevelGenerator {
 export interface ThreatLevelInfo {
   level: ThreatLevel;
   score: number;
-  textColor: string;
-  bgColor: string;
+  color: ColorPair;
 }
 
 const THREAT_LEVEL_COEF = 0.5;
 export const THREAT_LEVEL_DEFS: ThreatLevelInfo[] = [
   {
-    level: ThreatLevel.IR,
-    textColor: "#FFFFFF",
-    bgColor: "#000000",
+    level: "ir",
     score: 0,
+    color: Color.ThreatLevel.getDefault("ir"),
   },
   {
-    level: ThreatLevel.R,
-    textColor: "#FFFFFF",
-    bgColor: "#FF0000",
+    level: "r",
     score: 8000 * THREAT_LEVEL_COEF,
+    color: Color.ThreatLevel.getDefault("r"),
   },
   {
-    level: ThreatLevel.O,
-    textColor: "#331100",
-    bgColor: "#FFA500",
+    level: "o",
     score: 13000 * THREAT_LEVEL_COEF,
+    color: Color.ThreatLevel.getDefault("o"),
   },
   {
-    level: ThreatLevel.Y,
-    textColor: "#331100",
-    bgColor: "#FFFF00",
+    level: "y",
     score: 19000 * THREAT_LEVEL_COEF,
+    color: Color.ThreatLevel.getDefault("y"),
   },
   {
-    level: ThreatLevel.G,
-    textColor: "#FFFFFF",
-    bgColor: "#2255FF",
+    level: "g",
     score: 25000 * THREAT_LEVEL_COEF,
+    color: Color.ThreatLevel.getDefault("g"),
   },
   {
-    level: ThreatLevel.B,
-    textColor: "#FFFFFF",
-    bgColor: "#FFA500",
+    level: "b",
     score: 32000 * THREAT_LEVEL_COEF,
+    color: Color.ThreatLevel.getDefault("b"),
   },
   {
-    level: ThreatLevel.I,
-    textColor: "#FFFFFF",
-    bgColor: "#234794",
+    level: "i",
     score: 35000 * THREAT_LEVEL_COEF,
+    color: Color.ThreatLevel.getDefault("i"),
   },
   {
-    level: ThreatLevel.V,
-    textColor: "#FFFFFF",
-    bgColor: "#705DA8",
+    level: "v",
     score: 40000 * THREAT_LEVEL_COEF,
+    color: Color.ThreatLevel.getDefault("v"),
   },
   {
-    level: ThreatLevel.UV,
-    textColor: "#000000",
-    bgColor: "#FFFFFF",
+    level: "uv",
     score: 44000 * THREAT_LEVEL_COEF,
+    color: Color.ThreatLevel.getDefault("uv"),
   },
 ];

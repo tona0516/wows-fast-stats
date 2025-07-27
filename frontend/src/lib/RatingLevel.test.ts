@@ -1,4 +1,3 @@
-import { data } from "wailsjs/go/models";
 import { RatingfGenerator } from "./RatingLevel";
 
 test("ファクトリメソッド - 異常系", () => {
@@ -18,16 +17,13 @@ test("ファクトリメソッド - 異常系", () => {
 test("ファクトリメソッド - 正常系", () => {
   const pr = RatingfGenerator.fromPR(2450);
   expect(pr?.level).toBe("super_unicum");
-  expect(pr?.textColor).toBeDefined();
-  expect(pr?.bgColor).toBeDefined();
+  expect(pr?.color).toBeDefined();
 
   const damage = RatingfGenerator.fromDamage(16000, 10000);
   expect(damage?.level).toBe("super_unicum");
-  expect(damage?.textColor).toBeDefined();
-  expect(damage?.bgColor).toBeDefined();
+  expect(damage?.color).toBeDefined();
 
   const winRate = RatingfGenerator.fromWinRate(100);
   expect(winRate?.level).toBe("super_unicum");
-  expect(damage?.textColor).toBeDefined();
-  expect(damage?.bgColor).toBeDefined();
+  expect(damage?.color).toBeDefined();
 });

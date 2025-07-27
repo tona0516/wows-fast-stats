@@ -1,4 +1,5 @@
 import SingleTableData from "src/component/stats/internal/table_data/SingleTableData.svelte";
+import { Color } from "src/lib/Color";
 import { type Rating, RatingfGenerator } from "src/lib/RatingLevel";
 import { AbstractStatsColumn } from "src/lib/column/intetface/AbstractStatsColumn";
 import type { StatsCategory } from "src/lib/types";
@@ -18,22 +19,22 @@ export class Damage extends AbstractStatsColumn<string> {
   }
 
   textColorCode(player: data.Player): string {
-    return this.getRating(player)?.textColor ?? "";
-  }
+    if (this.category !== "ship") "";
+    const value = this.playerStats(player).ship.damage;
 
-  getBackgroundColorCode(player: data.Player): string | undefined {
-    return this.getRating(player)?.bgColor;
+    const rating = RatingfGenerator.fromDamage(
+      value,
+      player.ship_info.avg_damage,
+    );
+    if (!rating) {
+      return "";
+    }
+
+    return Color.Rating.getFixed(rating.level);
   }
 
   getCssClass(): string | undefined {
     if (this.category !== "ship") return "text-right";
     return "text-right";
-  }
-
-  private getRating(player: data.Player): Rating | undefined {
-    if (this.category !== "ship") return undefined;
-    const value = this.playerStats(player).ship.damage;
-
-    return RatingfGenerator.fromDamage(value, player.ship_info.avg_damage);
   }
 }
