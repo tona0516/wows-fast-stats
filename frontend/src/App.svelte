@@ -34,6 +34,7 @@
   import AlertPlayerPage from "./component/alert_player/AlertPlayerPage.svelte";
   import PlayerDetailModal from "./component/common/PlayerDetailModal.svelte";
   import Toast from "./component/common/Toast.svelte";
+  import ShipDetailModal from "./component/common/ShipDetailModal.svelte";
 
   let statsPage: StatsPage | undefined;
   let initialized = false;
@@ -143,6 +144,7 @@
     <EditAlertPlayerModal />
     <DeleteAlertPlayerModal />
     <PlayerDetailModal />
+    <ShipDetailModal />
 
     <div class="flex divide-x-1 divide-neutral-500">
       <div class="flex-none z-10">

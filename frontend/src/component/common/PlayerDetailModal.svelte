@@ -12,14 +12,14 @@
   import ModalCommon from "./ModalCommon.svelte";
 
   $: alertPlayer = $storedAlertPlayers.find(
-    (ap) => ap.account_id === $storedPlayerDetail?.id,
+    (ap) => ap.account_id === $storedPlayerDetail?.player_info.id,
   );
 </script>
 
 {#if $storedPlayerDetail}
-  {@const accountID = $storedPlayerDetail.id}
-  {@const playerName = $storedPlayerDetail.name}
-  {@const clan = $storedPlayerDetail.clan}
+  {@const accountID = $storedPlayerDetail.player_info.id}
+  {@const playerName = $storedPlayerDetail.player_info.name}
+  {@const clan = $storedPlayerDetail.player_info.clan}
   <ModalCommon zValue={50} close={PlayerDetailModal.close}>
     <h2 class="text-lg font-bold">
       <span>

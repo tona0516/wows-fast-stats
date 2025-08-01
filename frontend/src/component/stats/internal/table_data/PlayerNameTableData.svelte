@@ -21,11 +21,9 @@
     </div>
   {:else}
     <button
-      class="btn btn-xs mr-1"
-      on:click={() => PlayerDetailModal.open(player.player_info)}
-    >
-      <i class="bi bi-box-arrow-in-up-right"></i>
-    </button>
+      class="btn btn-xs mr-1 bi bi-box-arrow-in-up-right"
+      on:click={() => PlayerDetailModal.open(player)}
+    />
     <div class="truncate">
       {#if alertPlayer}
         <span class="bi {alertPlayer.pattern}"></span>

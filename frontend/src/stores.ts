@@ -23,9 +23,7 @@ const DEFAULT_ALERT_PLAYER = {
   pattern: "bi-check-circle-fill",
   message: "",
 } as data.AlertPlayer;
-
 type EditModalMode = "create" | "specify" | "edit";
-
 export const storedEditAlertPlayer = writable(undefined) as Writable<
   | {
       mode: EditModalMode;
@@ -33,7 +31,6 @@ export const storedEditAlertPlayer = writable(undefined) as Writable<
     }
   | undefined
 >;
-
 export class EditAlertPlayerModal {
   private constructor() {}
 
@@ -72,7 +69,6 @@ export class EditAlertPlayerModal {
 export const storedDeleteAlertPlayer = writable(undefined) as Writable<
   data.AlertPlayer | undefined
 >;
-
 export class DeleteAlertPlayerModal {
   private constructor() {}
 
@@ -86,13 +82,12 @@ export class DeleteAlertPlayerModal {
 }
 
 export const storedPlayerDetail = writable(undefined) as Writable<
-  data.PlayerInfo | undefined
+  data.Player | undefined
 >;
-
 export class PlayerDetailModal {
   private constructor() {}
 
-  static open(player: data.PlayerInfo) {
+  static open(player: data.Player) {
     storedPlayerDetail.set(player);
   }
 
@@ -101,8 +96,22 @@ export class PlayerDetailModal {
   }
 }
 
-export const storedToastText = writable("");
+export const storedPlayerDetailForShip = writable(undefined) as Writable<
+  data.Player | undefined
+>;
+export class ShipDetailModal {
+  private constructor() {}
 
+  static open(player: data.Player) {
+    storedPlayerDetailForShip.set(player);
+  }
+
+  static close() {
+    storedPlayerDetailForShip.set(undefined);
+  }
+}
+
+export const storedToastText = writable("");
 export function showToast(text: string, intervalSeconds = 3) {
   storedToastText.set(text);
   setTimeout(() => {

@@ -27,7 +27,7 @@ export namespace DispName {
     ["overall", "総合成績"],
   ]);
 
-  export const SKILL_LEVELS = new ArrayMap<RatingLevel, string>([
+  export const SKILL_LEVELS = new Map<RatingLevel, string>([
     ["bad", "Bad"],
     ["below_avg", "Below Average"],
     ["avg", "Average"],
