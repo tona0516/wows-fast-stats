@@ -12,6 +12,8 @@
     return true;
   };
 
+  $: teams = filterPlayers(battle.teams);
+
   // Note: https://iro-color.com/colorchart/tone/bright-tone.html
   const CHART_COLORS = ["#00A95F", "#EA5532"];
   const CHART_INFO: { label: string; func: GetStatsFunction }[] = [
@@ -89,45 +91,45 @@
   }
 </script>
 
-<div class="w-3xl">
+<div class="w-2xl">
   <table
     class="charts-css column multiple show-labels data-spacing-4 datasets-spacing-4 show-heading"
   >
-    <caption>{caption}</caption>
-    <tbody class="h-32">
-      {#each CHART_INFO as item}
-        {@const teams = filterPlayers(battle.teams)}
-        {@const max = getMaxValueInAllPlayers(teams, item.func)}
-        <tr>
-          <th scope="row">{item.label}</th>
-          {#each teams as team, i}
-            {@const values = getValuesInTeam(team, item.func)}
-            {@const mn = calculateMean(values)}
-            {@const sd = calculateStandardDeviation(values)}
+    <caption class="text-sm">{caption}</caption>
+    {#if teams.every((team) => team.players.length > 0)}
+      <tbody class="h-32">
+        {#each CHART_INFO as item}
+          {@const max = getMaxValueInAllPlayers(teams, item.func)}
+          <tr>
+            <th scope="row" class="text-sm">{item.label}</th>
+            {#each teams as team, i}
+              {@const values = getValuesInTeam(team, item.func)}
+              {@const mn = calculateMean(values)}
+              {@const sd = calculateStandardDeviation(values)}
 
-            <td style="--size: calc({mn}/{max}); --color: {CHART_COLORS[i]}">
-              <div
-                class="text-center {mn / max <= 0 &&
-                  'absolute -translate-y-full'}"
-              >
-                <span class="text-nowrap text-neutral-100 font-semibold">
-                  {formatWithSuffix(mn)}
-                </span>
-                <span class="text-nowrap text-neutral-100">
-                  (±{formatWithSuffix(sd)})
-                </span>
-              </div>
-            </td>
-          {/each}
-        </tr>
-      {/each}
-    </tbody>
+              <td style="--size: calc({mn}/{max}); --color: {CHART_COLORS[i]}">
+                <div
+                  class="text-center {mn / max <= 0 &&
+                    'absolute -translate-y-full'}"
+                >
+                  <span
+                    class="text-sm text-nowrap text-neutral-100 font-semibold"
+                  >
+                    {formatWithSuffix(mn)}
+                  </span>
+                  <span class="text-sm text-nowrap text-neutral-100">
+                    (±{formatWithSuffix(sd)})
+                  </span>
+                </div>
+              </td>
+            {/each}
+          </tr>
+        {/each}
+      </tbody>
+    {:else}
+      <div role="alert" class="alert alert-warning alert-dash flex flex-col">
+        <span class="items-center">対象艦種なし</span>
+      </div>
+    {/if}
   </table>
 </div>
-
-<style>
-  .text-above-bar {
-    position: absolute;
-    transform: translateY(-100%);
-  }
-</style>
