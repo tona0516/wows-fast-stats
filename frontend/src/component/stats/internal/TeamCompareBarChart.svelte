@@ -18,27 +18,27 @@
   const CHART_COLORS = ["#00A95F", "#EA5532"];
   const CHART_INFO: { label: string; func: GetStatsFunction }[] = [
     {
-      label: "PR",
+      label: "PR(艦)",
       func: (ps: data.PlayerStats): number => {
         return ps.overall.pr;
+      },
+    },
+    {
+      label: "ダメージ(艦)",
+      func: (ps: data.PlayerStats): number => {
+        return ps.overall.damage;
+      },
+    },
+    {
+      label: "勝率(艦)",
+      func: (ps: data.PlayerStats): number => {
+        return ps.overall.win_rate;
       },
     },
     {
       label: "戦力評価",
       func: (ps: data.PlayerStats): number => {
         return ps.overall.threat_level.modified;
-      },
-    },
-    {
-      label: "ダメージ",
-      func: (ps: data.PlayerStats): number => {
-        return ps.overall.damage;
-      },
-    },
-    {
-      label: "勝率",
-      func: (ps: data.PlayerStats): number => {
-        return ps.overall.win_rate;
       },
     },
     {
@@ -95,9 +95,9 @@
   <table
     class="charts-css column multiple show-labels data-spacing-4 datasets-spacing-4 show-heading"
   >
-    <caption class="text-sm">{caption}</caption>
+    <caption>{caption}</caption>
     {#if teams.every((team) => team.players.length > 0)}
-      <tbody class="h-32">
+      <tbody class="h-24">
         {#each CHART_INFO as item}
           {@const max = getMaxValueInAllPlayers(teams, item.func)}
           <tr>
@@ -106,18 +106,25 @@
               {@const values = getValuesInTeam(team, item.func)}
               {@const mn = calculateMean(values)}
               {@const sd = calculateStandardDeviation(values)}
+              {@const isTranslateText = mn / max <= 0.5}
+              {@const textColorClass = isTranslateText
+                ? ""
+                : "text-neutral-100"}
 
               <td style="--size: calc({mn}/{max}); --color: {CHART_COLORS[i]}">
                 <div
-                  class="text-center {mn / max <= 0 &&
-                    'absolute -translate-y-full'}"
+                  class="py-1 text-center leading-none {isTranslateText
+                    ? 'absolute -translate-y-full'
+                    : ''}"
                 >
                   <span
-                    class="text-sm text-nowrap text-neutral-100 font-semibold"
+                    class="leading-none text-sm text-nowrap {textColorClass} font-semibold"
                   >
                     {formatWithSuffix(mn)}
                   </span>
-                  <span class="text-sm text-nowrap text-neutral-100">
+                  <span
+                    class="leading-none text-sm text-nowrap {textColorClass}"
+                  >
                     (±{formatWithSuffix(sd)})
                   </span>
                 </div>
@@ -127,8 +134,10 @@
         {/each}
       </tbody>
     {:else}
-      <div role="alert" class="alert alert-warning alert-dash flex flex-col">
-        <span class="items-center">対象艦種なし</span>
+      <div class="inline-block align-middle">
+        <div role="alert" class="alert alert-warning alert-dash flex flex-col">
+          <span class="items-center">対象艦種なし</span>
+        </div>
       </div>
     {/if}
   </table>

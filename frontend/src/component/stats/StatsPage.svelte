@@ -47,23 +47,23 @@
       <MainStatsTable teams={$storedBattle.teams} />
     </div>
 
-    <div>
+    <div class="pt-2 flex flex-col items-center">
       <BattleMetaInfo meta={$storedBattle.meta} />
     </div>
 
-    <div>
-      <TeamCompareBarChart battle={$storedBattle} />
-    </div>
+    <div class="pt-2 flex flex-col items-center overflow-x-auto">
+      <div class="grid 2xl:grid-cols-2 place-content-center gap-4">
+        <TeamCompareBarChart battle={$storedBattle} />
 
-    {#each shipTypes as { type, caption }}
-      <div>
-        <TeamCompareBarChart
-          battle={$storedBattle}
-          {caption}
-          filterFunc={filterByShipType(type)}
-        />
+        {#each shipTypes as { type, caption }}
+          <TeamCompareBarChart
+            battle={$storedBattle}
+            {caption}
+            filterFunc={filterByShipType(type)}
+          />
+        {/each}
       </div>
-    {/each}
+    </div>
   {:else}
     <p>
       {#if $storedInstallPathError}

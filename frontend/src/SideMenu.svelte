@@ -15,12 +15,12 @@
   ];
 </script>
 
-<ul class="menu rounded-box sticky top-0 h-screen">
+<ul class="menu menu-sm rounded-box sticky top-0 h-screen">
   <li class="gap-1">
     {#each MENU_ITEMS as item}
       <button
-        class="btn btn-ghost {page === item.page &&
-          'bg-current/[15%]'} tooltip tooltip-right"
+        class="btn btn-sm btn-ghost tooltip tooltip-right {page === item.page &&
+          'bg-current/[15%]'} "
         data-tip={item.tooltip}
         on:click={() => (page = item.page)}
       >
@@ -31,9 +31,9 @@
 
   <li class="mt-8">
     <button
-      class="btn btn-primary tooltip tooltip-right"
+      class="btn btn-sm btn-ghost tooltip tooltip-right btn-primary"
       data-tip="リロード"
-      on:click={() => WindowReloadApp()}
+      on:click={WindowReloadApp}
     >
       <i class="bi bi-arrow-clockwise"></i>
     </button>

@@ -21,9 +21,9 @@
 
 <div class="stats shadow">
   {#each metaData as md}
-    <div class="stat">
+    <div class="stat px-4 py-2">
       <div class="stat-title">{md.title}</div>
-      <div class="stat-value text-lg">{md.text}</div>
+      <div class="stat-value text-sm">{md.text}</div>
     </div>
   {/each}
 </div>
