@@ -1,11 +1,16 @@
 <script lang="ts">
-  import { max, mean, standardDeviation } from "simple-statistics";
+  import { mean, standardDeviation } from "simple-statistics";
   import type { GetStatsFunction } from "src/lib/types";
   import { formatWithSuffix, toPlayerStats } from "src/lib/util";
   import { storedConfig } from "src/stores";
   import type { data } from "wailsjs/go/models";
 
   export let battle: data.Battle;
+
+  export let caption = "全艦艇";
+  export let filterFunc = (player: data.Player) => {
+    return true;
+  };
 
   // Note: https://iro-color.com/colorchart/tone/bright-tone.html
   const CHART_COLORS = ["#00A95F", "#EA5532"];
@@ -41,6 +46,14 @@
       },
     },
   ];
+
+  function filterPlayers(team: data.Team[]): data.Team[] {
+    return team.map((team) => {
+      const updatedTeam = structuredClone(team);
+      updatedTeam.players = team.players.filter(filterFunc);
+      return updatedTeam;
+    });
+  }
 
   function getMaxValueInAllPlayers(
     teams: data.Team[],
@@ -78,14 +91,16 @@
 
 <div class="w-3xl">
   <table
-    class="charts-css column multiple show-labels data-spacing-4 datasets-spacing-4"
+    class="charts-css column multiple show-labels data-spacing-4 datasets-spacing-4 show-heading"
   >
+    <caption>{caption}</caption>
     <tbody class="h-32">
       {#each CHART_INFO as item}
-        {@const max = getMaxValueInAllPlayers(battle.teams, item.func)}
+        {@const teams = filterPlayers(battle.teams)}
+        {@const max = getMaxValueInAllPlayers(teams, item.func)}
         <tr>
           <th scope="row">{item.label}</th>
-          {#each battle.teams as team, i}
+          {#each teams as team, i}
             {@const values = getValuesInTeam(team, item.func)}
             {@const mn = calculateMean(values)}
             {@const sd = calculateStandardDeviation(values)}
