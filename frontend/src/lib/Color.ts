@@ -23,18 +23,20 @@ export namespace Color {
       return TYPES.get(type);
     };
 
-    export const getFixed = (type: ShipType): string | undefined => {
+    export const getFixed = (type: ShipType): ColorPair | undefined => {
       const colorCode = TYPES.get(type);
       if (!colorCode) {
         return undefined;
       }
 
       const chromaColor = chroma(colorCode);
+      const brighten = chromaColor.brighten(2).hex();
+      const darken = chromaColor.darken(1.5).hex();
 
       if (Theme.isLighter()) {
-        return chromaColor.brighten(3).hex();
+        return { text: darken, background: brighten };
       }
-      return chromaColor.darken(2).hex();
+      return { text: brighten, background: darken };
     };
   }
 
@@ -51,8 +53,8 @@ export namespace Color {
       ["uv", { text: "#FFFFFF", background: "#800080" }],
     ]);
 
-    export const getDefault = (level: ThreatLevel): ColorPair => {
-      return TYPES.get(level) || { text: "", background: "" };
+    export const getDefault = (level: ThreatLevel): ColorPair | undefined => {
+      return TYPES.get(level);
     };
   }
 
@@ -68,22 +70,25 @@ export namespace Color {
       ["super_unicum", "#A00DC5"],
     ]);
 
-    export const getDefault = (level: RatingLevel): string => {
-      return TYPES.get(level) || "";
+    export const getDefault = (level: RatingLevel): string | undefined => {
+      return TYPES.get(level);
     };
 
-    export const getFixed = (level: RatingLevel): string => {
+    export const getFixed = (level: RatingLevel): ColorPair | undefined => {
       const colorCode = TYPES.get(level);
       if (!colorCode) {
-        return "";
+        return undefined;
       }
 
       const chromaColor = chroma(colorCode);
 
+      const brighten = chromaColor.brighten(2).hex();
+      const darken = chromaColor.darken(1.5).hex();
+
       if (Theme.isLighter()) {
-        return chromaColor.darken(0.75).hex();
+        return { text: darken, background: brighten };
       }
-      return chromaColor.brighten(0.75).hex();
+      return { text: brighten, background: darken };
     };
   }
 }

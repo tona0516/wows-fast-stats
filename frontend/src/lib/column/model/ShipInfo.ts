@@ -103,7 +103,7 @@ export class ShipInfo extends AbstractColumn {
   getBackgroundColorCode(player: data.Player): string | undefined {
     const type = player.ship_info.type;
     if (isShipType(type)) {
-      return Color.ShipType.getFixed(type);
+      return Color.ShipType.getFixed(type)?.background;
     }
 
     return undefined;

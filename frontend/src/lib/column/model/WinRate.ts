@@ -24,7 +24,7 @@ export class WinRate extends AbstractStatsColumn<string> {
       return "";
     }
 
-    return Color.Rating.getFixed(rating.level);
+    return Color.Rating.getFixed(rating.level)?.text || "";
   }
 
   getCssClass(): string | undefined {

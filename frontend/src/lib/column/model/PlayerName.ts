@@ -1,7 +1,11 @@
 import chroma from "chroma-js";
 import PlayerNameTableData from "src/component/stats/internal/table_data/PlayerNameTableData.svelte";
+import { Color } from "src/lib/Color";
+import { PlayerNameColor } from "src/lib/DispName";
+import { type Rating, RatingfGenerator } from "src/lib/RatingLevel";
 import { Theme } from "src/lib/Theme";
 import { AbstractColumn } from "src/lib/column/intetface/AbstractColumn";
+import { toPlayerStats } from "src/lib/util";
 import type { data } from "wailsjs/go/models";
 
 export class PlayerName extends AbstractColumn {
@@ -68,6 +72,20 @@ export class PlayerName extends AbstractColumn {
   }
 
   getBackgroundColorCode(player: data.Player): string | undefined {
-    return undefined;
+    const playerStats = toPlayerStats(player, this.config.stats_pattern);
+
+    let rating: Rating | undefined;
+    switch (this.config.color.player_name) {
+      case PlayerNameColor.SHIP: {
+        rating = RatingfGenerator.fromPR(playerStats.ship.pr);
+        break;
+      }
+      case PlayerNameColor.OVERALL: {
+        rating = RatingfGenerator.fromPR(playerStats.overall.pr);
+        break;
+      }
+    }
+
+    return rating ? Color.Rating.getFixed(rating.level)?.background : undefined;
   }
 }
