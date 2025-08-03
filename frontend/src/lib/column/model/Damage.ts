@@ -14,7 +14,7 @@ export class Damage extends AbstractStatsColumn<string> {
     return this.playerStats(player)[this.category].damage.format(this.digit());
   }
 
-  svelteComponent() {
+  getTableDataComponent() {
     return SingleTableData;
   }
 

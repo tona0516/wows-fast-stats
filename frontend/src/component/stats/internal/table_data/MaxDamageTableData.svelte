@@ -8,7 +8,7 @@
   const param = column.displayValue(player);
 </script>
 
-{#if column.shouldShow()}
+{#if column.needsShow()}
   <td
     class="p-1"
     style="background-color: {column.getBackgroundColorCode(player) ?? ''}"

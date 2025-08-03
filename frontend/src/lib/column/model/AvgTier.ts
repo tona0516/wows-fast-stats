@@ -12,7 +12,7 @@ export class AvgTier extends AbstractStatsColumn<string> {
     return value.format(this.digit());
   }
 
-  svelteComponent() {
+  getTableDataComponent() {
     return SingleTableData;
   }
 

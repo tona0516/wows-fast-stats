@@ -69,11 +69,11 @@ export class ShipInfo extends AbstractColumn {
     super("ship_info", "艦");
   }
 
-  svelteComponent() {
+  getTableDataComponent() {
     return ShipInfoTableData;
   }
 
-  shouldShow(): boolean {
+  needsShow(): boolean {
     return true;
   }
 

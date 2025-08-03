@@ -15,7 +15,7 @@ export class HitRate extends AbstractStatsColumn<string> {
     return `${main}% | ${torps}%`;
   }
 
-  svelteComponent() {
+  getTableDataComponent() {
     return SingleTableData;
   }
 

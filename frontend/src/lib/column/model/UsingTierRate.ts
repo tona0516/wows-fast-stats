@@ -32,7 +32,7 @@ export class UsingTierRate extends AbstractStatsColumn<StackedBarGraphParam> {
     };
   }
 
-  svelteComponent() {
+  getTableDataComponent() {
     return StackedBarGraphTableData;
   }
 }

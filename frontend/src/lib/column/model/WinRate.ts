@@ -14,7 +14,7 @@ export class WinRate extends AbstractStatsColumn<string> {
     return `${this.value(player).format(this.digit())}%`;
   }
 
-  svelteComponent() {
+  getTableDataComponent() {
     return SingleTableData;
   }
 

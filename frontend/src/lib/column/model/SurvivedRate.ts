@@ -16,7 +16,7 @@ export class SurvivedRate extends AbstractStatsColumn<string> {
     return `${win}% | ${lose}%`;
   }
 
-  svelteComponent() {
+  getTableDataComponent() {
     return SingleTableData;
   }
 

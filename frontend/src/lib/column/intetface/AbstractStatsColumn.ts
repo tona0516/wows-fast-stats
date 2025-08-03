@@ -19,7 +19,7 @@ export abstract class AbstractStatsColumn<T> extends AbstractColumn {
 
   abstract displayValue(player: data.Player): T;
 
-  shouldShow(): boolean {
+  needsShow(): boolean {
     return this.columnSetting[this.category].value;
   }
 

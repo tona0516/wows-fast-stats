@@ -13,7 +13,7 @@ export class Kill extends AbstractStatsColumn<string> {
     return value.format(this.digit());
   }
 
-  svelteComponent() {
+  getTableDataComponent() {
     return SingleTableData;
   }
 

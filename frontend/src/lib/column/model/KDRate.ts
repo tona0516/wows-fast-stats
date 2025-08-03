@@ -13,7 +13,7 @@ export class KDRate extends AbstractStatsColumn<string> {
     return value.format(this.digit());
   }
 
-  svelteComponent() {
+  getTableDataComponent() {
     return SingleTableData;
   }
 

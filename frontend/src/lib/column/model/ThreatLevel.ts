@@ -30,7 +30,7 @@ export class ThreatLevel extends AbstractStatsColumn<string> {
     )?.color.background;
   }
 
-  svelteComponent() {
+  getTableDataComponent() {
     return SingleTableData;
   }
 

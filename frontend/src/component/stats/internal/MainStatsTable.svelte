@@ -31,7 +31,7 @@
           <tr>
             {#each categories as category}
               {#each category as column}
-                {#if column.shouldShow()}
+                {#if column.needsShow()}
                   <th class="p-1 text-center">{column.header}</th>
                 {/if}
               {/each}
@@ -50,7 +50,7 @@
             <tr>
               {#each basicColumns as column}
                 <svelte:component
-                  this={column.svelteComponent()}
+                  this={column.getTableDataComponent()}
                   {column}
                   {player}
                 />
@@ -66,7 +66,7 @@
                 <ColspanTableData colspan={shipColumnCount} text="N/A" />
                 {#each overallColumns as column}
                   <svelte:component
-                    this={column.svelteComponent()}
+                    this={column.getTableDataComponent()}
                     {column}
                     {player}
                   />
@@ -74,14 +74,14 @@
               {:else}
                 {#each shipColumns as column}
                   <svelte:component
-                    this={column.svelteComponent()}
+                    this={column.getTableDataComponent()}
                     {column}
                     {player}
                   />
                 {/each}
                 {#each overallColumns as column}
                   <svelte:component
-                    this={column.svelteComponent()}
+                    this={column.getTableDataComponent()}
                     {column}
                     {player}
                   />

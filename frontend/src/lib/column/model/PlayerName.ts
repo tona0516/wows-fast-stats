@@ -13,11 +13,11 @@ export class PlayerName extends AbstractColumn {
     super("player_name", "プレイヤー");
   }
 
-  svelteComponent() {
+  getTableDataComponent() {
     return PlayerNameTableData;
   }
 
-  shouldShow(): boolean {
+  needsShow(): boolean {
     return true;
   }
 

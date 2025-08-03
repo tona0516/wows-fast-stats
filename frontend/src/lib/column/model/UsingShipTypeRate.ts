@@ -31,7 +31,7 @@ export class UsingShipTypeRate extends AbstractStatsColumn<StackedBarGraphParam>
     };
   }
 
-  svelteComponent() {
+  getTableDataComponent() {
     return StackedBarGraphTableData;
   }
 }

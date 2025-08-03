@@ -34,7 +34,7 @@ class ColumnArray extends Array<AbstractColumn> {
   }
 
   columnCount(): number {
-    return this.columns.filter((it) => it.shouldShow()).length;
+    return this.columns.filter((it) => it.needsShow()).length;
   }
 }
 
