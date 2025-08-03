@@ -4,6 +4,7 @@
   import { RowPattern } from "src/lib/RowPattern";
   import { ColumnProvider } from "src/lib/column/ColumnProvider";
   import type { data } from "wailsjs/go/models";
+  import ColspanTableData from "./table_data/ColspanTableData.svelte";
 
   export let teams: data.Team[];
 
@@ -48,78 +49,42 @@
             )}
             <tr>
               {#each basicColumns as column}
-                <td
-                  class="p-1"
-                  style="background-color: {column.getBackgroundColorCode(
-                    player,
-                  )};"
-                >
+                <svelte:component
+                  this={column.svelteComponent()}
+                  {column}
+                  {player}
+                />
+              {/each}
+
+              {#if rowPattern === RowPattern.NO_COLUMN}
+                <ColspanTableData colspan={statsColumnCount} text="" />
+              {:else if rowPattern === RowPattern.PRIVATE}
+                <ColspanTableData colspan={statsColumnCount} text="PRIVATE" />
+              {:else if rowPattern === RowPattern.NO_STATS}
+                <ColspanTableData colspan={statsColumnCount} text="N/A" />
+              {:else if rowPattern === RowPattern.NO_SHIP_STATS}
+                <ColspanTableData colspan={shipColumnCount} text="N/A" />
+                {#each overallColumns as column}
                   <svelte:component
                     this={column.svelteComponent()}
                     {column}
                     {player}
                   />
-                </td>
-              {/each}
-
-              {#if rowPattern === RowPattern.NO_COLUMN}
-                <td class="p-1 text-center" colspan={statsColumnCount}></td>
-              {:else if rowPattern === RowPattern.PRIVATE}
-                <td class="p-1 text-center" colspan={statsColumnCount}
-                  >PRIVATE</td
-                >
-              {:else if rowPattern === RowPattern.NO_STATS}
-                <td class="p-1 text-center" colspan={statsColumnCount}>N/A</td>
-              {:else if rowPattern === RowPattern.NO_SHIP_STATS}
-                <td class="p-1 text-center" colspan={shipColumnCount}>N/A</td>
-                {#each overallColumns as column}
-                  {#if column.shouldShow()}
-                    <td
-                      class="p-1"
-                      style="background-color: {column.getBackgroundColorCode(
-                        player,
-                      ) ?? ''}"
-                    >
-                      <svelte:component
-                        this={column.svelteComponent()}
-                        {column}
-                        {player}
-                      />
-                    </td>
-                  {/if}
                 {/each}
               {:else}
                 {#each shipColumns as column}
-                  {#if column.shouldShow()}
-                    <td
-                      class="p-1"
-                      style="background-color: {column.getBackgroundColorCode(
-                        player,
-                      ) ?? ''}"
-                    >
-                      <svelte:component
-                        this={column.svelteComponent()}
-                        {column}
-                        {player}
-                      />
-                    </td>
-                  {/if}
+                  <svelte:component
+                    this={column.svelteComponent()}
+                    {column}
+                    {player}
+                  />
                 {/each}
                 {#each overallColumns as column}
-                  {#if column.shouldShow()}
-                    <td
-                      class="p-1"
-                      style="background-color: {column.getBackgroundColorCode(
-                        player,
-                      ) ?? ''}"
-                    >
-                      <svelte:component
-                        this={column.svelteComponent()}
-                        {column}
-                        {player}
-                      />
-                    </td>
-                  {/if}
+                  <svelte:component
+                    this={column.svelteComponent()}
+                    {column}
+                    {player}
+                  />
                 {/each}
               {/if}
             </tr>

@@ -6,9 +6,16 @@
   export let player: data.Player;
 </script>
 
-<div
-  class={column.getCssClass() ?? ""}
-  style="color: {column.textColorCode(player)};"
->
-  {column.displayValue(player)}
-</div>
+{#if column.shouldShow()}
+  <td
+    class="p-1"
+    style="background-color: {column.getBackgroundColorCode(player) ?? ''}"
+  >
+    <div
+      class={column.getCssClass() ?? ""}
+      style="color: {column.textColorCode(player)};"
+    >
+      {column.displayValue(player)}
+    </div>
+  </td>
+{/if}

@@ -8,8 +8,15 @@
   const param = column.displayValue(player);
 </script>
 
-<div class="text-right">
-  <div class="tooltip" data-tip={param.shipInfo?.name}>
-    {param.damage}
-  </div>
-</div>
+{#if column.shouldShow()}
+  <td
+    class="p-1"
+    style="background-color: {column.getBackgroundColorCode(player) ?? ''}"
+  >
+    <div class="text-right">
+      <div class="tooltip" data-tip={param.shipInfo?.name}>
+        {param.damage}
+      </div>
+    </div>
+  </td>
+{/if}

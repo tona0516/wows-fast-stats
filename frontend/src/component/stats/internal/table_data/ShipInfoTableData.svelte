@@ -7,19 +7,24 @@
   export let player: data.Player;
 </script>
 
-<div class="w-40 flex place-items-center">
-  <button
-    class="btn btn-xs mr-1 bi bi-box-arrow-in-up-right"
-    on:click={() => {
-      ShipDetailModal.open(player);
-    }}
-  />
-  <img class="w-icon" src={column.nationIconPath(player)} alt="" />
-  <img class="w-icon" src={column.shipTypeIconPath(player)} alt="" />
-  <div class="truncate">
-    {column.displayValue(player)}
+<td
+  class="p-1"
+  style="background-color: {column.getBackgroundColorCode(player) ?? ''}"
+>
+  <div class="w-40 flex place-items-center">
+    <button
+      class="btn btn-xs mr-1 bi bi-info-square"
+      on:click={() => {
+        ShipDetailModal.open(player);
+      }}
+    />
+    <img class="w-icon" src={column.nationIconPath(player)} alt="" />
+    <img class="w-icon" src={column.shipTypeIconPath(player)} alt="" />
+    <div class="truncate">
+      {column.displayValue(player)}
+    </div>
   </div>
-</div>
+</td>
 
 <style>
   .w-icon {
