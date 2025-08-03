@@ -92,11 +92,11 @@
 </script>
 
 <div class="w-2xl">
-  <table
-    class="charts-css column multiple show-labels data-spacing-4 datasets-spacing-4 show-heading"
-  >
-    <caption>{caption}</caption>
-    {#if teams.every((team) => team.players.length > 0)}
+  <span class="flex flex-col items-center">{caption}</span>
+  {#if teams.every((team) => team.players.length > 0)}
+    <table
+      class="charts-css column multiple show-labels data-spacing-4 datasets-spacing-4 show-heading"
+    >
       <tbody class="h-24">
         {#each CHART_INFO as item}
           {@const max = getMaxValueInAllPlayers(teams, item.func)}
@@ -133,12 +133,10 @@
           </tr>
         {/each}
       </tbody>
-    {:else}
-      <div class="inline-block align-middle">
-        <div role="alert" class="alert alert-warning alert-dash flex flex-col">
-          <span class="items-center">対象艦種なし</span>
-        </div>
-      </div>
-    {/if}
-  </table>
+    </table>
+  {:else}
+    <div role="alert" class="alert alert-warning alert-dash flex flex-col">
+      <span class="items-center">対象艦種なし</span>
+    </div>
+  {/if}
 </div>

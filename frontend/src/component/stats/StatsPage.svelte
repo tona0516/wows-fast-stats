@@ -51,8 +51,8 @@
       <BattleMetaInfo meta={$storedBattle.meta} />
     </div>
 
-    <div class="pt-2 flex flex-col items-center overflow-x-auto">
-      <div class="grid 2xl:grid-cols-2 place-content-center gap-4">
+    <div class="pt-2 flex flex-col items-center">
+      <div class="grid 2xl:grid-cols-2 gap-4">
         <TeamCompareBarChart battle={$storedBattle} />
 
         {#each shipTypes as { type, caption }}
