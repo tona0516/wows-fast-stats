@@ -9,12 +9,12 @@
   import { NumbersURL } from "src/lib/NumbersURL";
   import { RATING_DEFS } from "src/lib/RatingLevel";
   import type { data } from "wailsjs/go/models";
-  import { Color } from "src/lib/Color";
+  import { Color, type ColorPair } from "src/lib/Color";
   import { DispName } from "src/lib/DispName";
 
   interface DamageRating {
     level: string;
-    color: string;
+    color?: ColorPair;
     value: string;
   }
 
@@ -85,7 +85,7 @@
                 <tr>
                   <td
                     class="p-1 text-center font-bold"
-                    style="color: {dr.color}">{dr.level}</td
+                    style="color: {dr.color?.text}">{dr.level}</td
                   >
                   <td class="p-1 text-right">{dr.value}</td>
                 </tr>
