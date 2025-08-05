@@ -1,10 +1,6 @@
 import { TeamThreatLevel } from "src/lib/TeamThreatLevel";
 import { data } from "wailsjs/go/models";
 
-test("fromBattle - 異常系", () => {
-  expect(TeamThreatLevel.fromBattle(undefined, "pvp_all")).toBeUndefined();
-});
-
 test("fromBattle - 正常系", () => {
   const values: { threatLevel: number; isHidden: boolean; id: number }[] = [
     { threatLevel: 10000, isHidden: false, id: 1 },

@@ -12,7 +12,7 @@ export class ThreatLevelGenerator {
 export interface ThreatLevelInfo {
   level: ThreatLevel;
   score: number;
-  color: ColorPair;
+  color?: ColorPair;
 }
 
 const THREAT_LEVEL_COEF = 0.5;

@@ -1,13 +1,20 @@
 <script lang="ts">
   import { FetchProxy } from "src/lib/FetchProxy";
-  import { storedBattle, storedInstallPathError } from "src/stores";
+  import {
+    storedBattle,
+    storedConfig,
+    storedInstallPathError,
+  } from "src/stores";
   import { LogInfo, ShowMessageDialog } from "wailsjs/go/main/App";
 
   import TeamCompareBarChart from "./internal/TeamCompareBarChart.svelte";
   import BattleMetaInfo from "./internal/BattleMetaInfo.svelte";
   import MainStatsTable from "./internal/MainStatsTable.svelte";
+  import CompareTeamThrearLevel from "./internal/CompareTeamThrearLevel.svelte";
 
   let isLoading = false;
+
+  $: statsExtra = $storedConfig.stats_pattern as StatsExtra;
 
   export const fetchBattle = async () => {
     try {
@@ -40,6 +47,10 @@
 
     <div class="pt-2 flex flex-col items-center">
       <TeamCompareBarChart teams={$storedBattle.teams} />
+    </div>
+
+    <div class="pt-2 flex flex-col items-center">
+      <CompareTeamThrearLevel battle={$storedBattle} {statsExtra} />
     </div>
   {:else}
     <p>
