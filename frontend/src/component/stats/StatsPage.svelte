@@ -6,7 +6,6 @@
   import TeamCompareBarChart from "./internal/TeamCompareBarChart.svelte";
   import BattleMetaInfo from "./internal/BattleMetaInfo.svelte";
   import MainStatsTable from "./internal/MainStatsTable.svelte";
-  import type { data } from "wailsjs/go/models";
 
   let isLoading = false;
 
@@ -27,18 +26,6 @@
       isLoading = false;
     }
   };
-
-  // 各艦種のメタ情報をまとめる
-  const shipTypes = [
-    { type: "cv", caption: "空母" },
-    { type: "bb", caption: "戦艦" },
-    { type: "cl", caption: "巡洋艦" },
-    { type: "dd", caption: "駆逐艦" },
-    { type: "ss", caption: "潜水艦" },
-  ];
-
-  const filterByShipType = (type: string) => (player: data.Player) =>
-    player.ship_info.type === type;
 </script>
 
 <div>
@@ -52,17 +39,7 @@
     </div>
 
     <div class="pt-2 flex flex-col items-center">
-      <div class="grid 2xl:grid-cols-2 gap-4">
-        <TeamCompareBarChart battle={$storedBattle} />
-
-        {#each shipTypes as { type, caption }}
-          <TeamCompareBarChart
-            battle={$storedBattle}
-            {caption}
-            filterFunc={filterByShipType(type)}
-          />
-        {/each}
-      </div>
+      <TeamCompareBarChart teams={$storedBattle.teams} />
     </div>
   {:else}
     <p>
