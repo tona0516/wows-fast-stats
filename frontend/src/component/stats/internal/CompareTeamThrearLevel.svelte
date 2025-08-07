@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { max } from "date-fns";
   import { TeamThreatLevel } from "src/lib/TeamThreatLevel";
   import type { StatsExtra } from "src/lib/types";
   import type { data } from "wailsjs/go/models";
@@ -6,27 +7,40 @@
   export let battle: data.Battle;
   export let statsExtra: StatsExtra;
 
-  const teamThreatLevels = TeamThreatLevel.fromBattle(battle, statsExtra);
+  $: teamThreatLevels = TeamThreatLevel.fromBattle(battle, statsExtra);
 </script>
 
-<div>
-  {#each teamThreatLevels as level}
-  <div class="flex flex-col items-center">{level[0]}</div>
-    <div class="stats shadow">
-      <div class="stat">
-        <div class="stat-title">戦力評価</div>
-        <div class="stat-value">{level[1].average.format(0)}</div>
-      </div>
+{#if teamThreatLevels}
+  {@const friendRate =
+    teamThreatLevels[0].average /
+    teamThreatLevels.map((l) => l.average).reduce((a, b) => a + b)}
+  <div>
+    <table class="charts-css bar stacked">
+      <tbody>
+        <tr>
+          <td style="--size: calc({friendRate}); --color: #00A95F;"></td>
+          <td style="--size: calc{1 - friendRate}); --color: #EA5532;"></td>
+        </tr>
+      </tbody>
+    </table>
 
-      <div class="stat">
-        <div class="stat-title">精度</div>
-        <div class="stat-value">{level[1].accuracy.format(0)}%</div>
-      </div>
+    {#each teamThreatLevels as level}
+      <div class="stats shadow">
+        <div class="stat">
+          <div class="stat-title">戦力評価</div>
+          <div class="stat-value">{level.average.format(0)}</div>
+        </div>
 
-      <div class="stat">
-        <div class="stat-title">介護指数</div>
-        <div class="stat-value">{level[1].dissociationDegree.format(0)}%</div>
+        <div class="stat">
+          <div class="stat-title">精度</div>
+          <div class="stat-value">{level.accuracy.format(0)}%</div>
+        </div>
+
+        <div class="stat">
+          <div class="stat-title">介護指数</div>
+          <div class="stat-value">{level.dissociationDegree.format(0)}%</div>
+        </div>
       </div>
-    </div>
-  {/each}
-</div>
+    {/each}
+  </div>
+{/if}

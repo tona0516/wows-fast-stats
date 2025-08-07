@@ -11,6 +11,7 @@
   import BattleMetaInfo from "./internal/BattleMetaInfo.svelte";
   import MainStatsTable from "./internal/MainStatsTable.svelte";
   import CompareTeamThrearLevel from "./internal/CompareTeamThrearLevel.svelte";
+  import type { StatsExtra } from "src/lib/types";
 
   let isLoading = false;
 
@@ -37,12 +38,12 @@
 
 <div>
   {#if $storedBattle}
-    <div class="flex">
-      <MainStatsTable teams={$storedBattle.teams} />
-    </div>
-
     <div class="pt-2 flex flex-col items-center">
       <BattleMetaInfo meta={$storedBattle.meta} />
+    </div>
+
+    <div class="flex">
+      <MainStatsTable teams={$storedBattle.teams} />
     </div>
 
     <div class="pt-2 flex flex-col items-center">
