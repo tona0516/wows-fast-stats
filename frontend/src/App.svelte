@@ -1,6 +1,7 @@
 <script lang="ts">
   import ConfigPage from "src/component/config/ConfigPage.svelte";
   import InfoPage from "src/component/info/InfoPage.svelte";
+  // biome-ignore lint/style/useImportType: <explanation>
   import StatsPage from "src/component/stats/StatsPage.svelte";
 
   import "bootstrap-icons/font/bootstrap-icons.css";
@@ -40,6 +41,7 @@
   let initialized = false;
   let updatableRelease: data.GHLatestRelease;
 
+  // biome-ignore lint/style/useConst: <explanation>
   let page: Page = "stats";
 
   $: {
@@ -52,7 +54,7 @@
   });
 
   EventsOn("BATTLE_START", () => statsPage?.fetchBattle());
-  EventsOn("BATTLE_ERR", (error: string) => Notifier.failure(error));
+  EventsOn("BATTLE_ERR", (error: string) => statsPage?.showError(error));
   EventsOn("CONFIG_UPDATE", (config: data.UserConfigV2) =>
     storedConfig.set(config),
   );
@@ -104,7 +106,7 @@
 
       return config;
     } catch (error) {
-      ShowMessageDialog("初期化に失敗しました");
+      ShowMessageDialog(`初期化に失敗しました: ${error as string}`);
       return undefined;
     }
   };

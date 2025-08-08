@@ -1,19 +1,15 @@
 <script lang="ts">
   import { FetchProxy } from "src/lib/FetchProxy";
-  import {
-    storedBattle,
-    storedConfig,
-    storedInstallPathError,
-  } from "src/stores";
-  import { LogInfo, ShowMessageDialog } from "wailsjs/go/main/App";
+  import { storedBattle, storedInstallPathError } from "src/stores";
+  import { LogInfo } from "wailsjs/go/main/App";
 
   import BattleMetaInfo from "./internal/BattleMetaInfo.svelte";
   import MainStatsTable from "./internal/MainStatsTable.svelte";
-  import type { StatsExtra } from "src/lib/types";
+  import MessagingTonako from "./internal/MessagingTonako.svelte";
+  import { Tonako } from "./internal/Tonako";
 
   let isLoading = false;
-
-  $: statsExtra = $storedConfig.stats_pattern as StatsExtra;
+  let errorText = "";
 
   export const fetchBattle = async () => {
     try {
@@ -25,17 +21,25 @@
 
       LogInfo("fetch success", { "duration(s)": elapsed.toFixed(1) });
     } catch (error) {
-      if (error instanceof Error) {
-        ShowMessageDialog(error.message);
-      }
+      showError(error as string);
     } finally {
       isLoading = false;
     }
   };
+
+  export const showError = (error: string) => {
+    errorText = error;
+  };
 </script>
 
 <div>
-  {#if $storedBattle}
+  {#if errorText.length > 0}
+    <MessagingTonako tonako={Tonako.Sorry} message={errorText} />
+  {:else if isLoading}
+    <div class="flex w-full h-screen items-center justify-center">
+      <span class="loading loading-ring loading-xl"></span>
+    </div>
+  {:else if $storedBattle}
     <div class="pt-2 flex flex-col items-center">
       <BattleMetaInfo meta={$storedBattle.meta} />
     </div>
@@ -43,19 +47,15 @@
     <div class="flex">
       <MainStatsTable teams={$storedBattle.teams} />
     </div>
+  {:else if $storedInstallPathError}
+    <MessagingTonako
+      tonako={Tonako.Pointing}
+      message="設定画面から初期設定をおこなってください"
+    />
   {:else}
-    <p>
-      {#if $storedInstallPathError}
-        設定画面から初期設定を行ってください。
-      {:else}
-        戦闘中ではありません。開始時に自動的にリロードします。
-      {/if}
-    </p>
-  {/if}
-
-  {#if isLoading}
-    <div class="flex h-screen items-center justify-center">
-      <span class="loading loading-ring loading-xl"></span>
-    </div>
+    <MessagingTonako
+      tonako={Tonako.Standby}
+      message="戦闘開始時に自動的にリロードします"
+    />
   {/if}
 </div>

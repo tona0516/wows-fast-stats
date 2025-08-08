@@ -4,7 +4,7 @@ import { Theme } from "./Theme";
 import type { ThreatLevel } from "./ThreatLevel";
 import type { ShipType } from "./types";
 
-const COLOR_RATE = 1.5
+const COLOR_RATE = 1.5;
 
 export interface ColorPair {
   text: string;
