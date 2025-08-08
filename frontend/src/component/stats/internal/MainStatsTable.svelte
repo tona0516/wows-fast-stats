@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { storedConfig } from "src/stores";
+  import { storedConfig, storedTeamThreatLevels } from "src/stores";
 
   import { RowPattern } from "src/lib/RowPattern";
   import { ColumnProvider } from "src/lib/column/ColumnProvider";
@@ -12,13 +12,32 @@
   $: [basicColumns, shipColumns, overallColumns] = categories;
   $: shipColumnCount = shipColumns.columnCount();
   $: statsColumnCount = shipColumnCount + overallColumns.columnCount();
+  $: allColumnCount = basicColumns.columnCount() + statsColumnCount;
 </script>
 
 <div class="overflow-x-auto w-screen pb-4">
   <table class="table text-nowrap">
-    {#each teams as team}
+    {#each teams as team, i}
       {#if team.players.length !== 0}
         <thead>
+          {#if $storedConfig.display.overall.threat_level && $storedTeamThreatLevels && $storedTeamThreatLevels[i]}
+            {@const teamThreatLevel = $storedTeamThreatLevels[i]}
+            <tr>
+              <th colspan={allColumnCount}>
+                戦力評価値平均: <span class="text-lg"
+                  >{teamThreatLevel.average.toFixed(0)}</span
+                >
+                [確度:
+                <span class="text-lg"
+                  >{teamThreatLevel.accuracy.toFixed(0)}</span
+                >%] [介護指数:
+                <span class="text-lg"
+                  >{teamThreatLevel.dissociationDegree.toFixed(0)}</span
+                >%]
+              </th>
+            </tr>
+          {/if}
+
           <tr>
             {#each categories as category}
               {#if category.columnCount() > 0}

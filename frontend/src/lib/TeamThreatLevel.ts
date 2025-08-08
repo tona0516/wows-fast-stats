@@ -9,9 +9,13 @@ export class TeamThreatLevel {
   ) {}
 
   static fromBattle = (
-    battle: data.Battle,
+    battle: data.Battle | undefined,
     statsExtra: StatsExtra,
   ): TeamThreatLevel[] => {
+    if (!battle || !battle.teams) {
+      return [];
+    }
+
     return battle.teams.map((team) => {
       const players = team.players;
       const values = players
