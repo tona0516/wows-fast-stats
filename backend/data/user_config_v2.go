@@ -40,10 +40,6 @@ func DefaultUserConfigV2() UserConfigV2 {
 			PlatoonRate:       1,
 			ThreatLevel:       0,
 		},
-		TeamSummary: UCTeamSummary{
-			MinShipBattles:    1,
-			MinOverallBattles: 10,
-		},
 	}
 }
 
@@ -57,8 +53,6 @@ type UserConfigV2 struct {
 	Color            UCColor   `json:"color"`
 	Digit            UCDigit   `json:"digit"`
 	ShowLanguageFrag bool      `json:"show_language_frag"`
-	// team summary
-	TeamSummary UCTeamSummary `json:"team_summary"`
 	// other
 	SaveScreenshot    bool         `json:"save_screenshot"`
 	SaveTempArenaInfo bool         `json:"save_temp_arena_info"`
@@ -112,7 +106,6 @@ func FromUserConfigV1(v1 UserConfig) UserConfigV2 {
 			PlatoonRate:       v1.CustomDigit.PlatoonRate,
 			ThreatLevel:       0,
 		},
-		TeamSummary:       UCTeamSummary(v1.TeamAverage),
 		SaveScreenshot:    v1.SaveScreenshot,
 		SaveTempArenaInfo: v1.SaveTempArenaInfo,
 		SendReport:        v1.SendReport,
@@ -179,9 +172,4 @@ type UCDigit struct {
 	UsingTierRate     uint `json:"using_tier_rate"`
 	PlatoonRate       uint `json:"platoon_rate"`
 	ThreatLevel       uint `json:"threat_level"`
-}
-
-type UCTeamSummary struct {
-	MinShipBattles    uint `json:"min_ship_battles"`
-	MinOverallBattles uint `json:"min_overall_battles"`
 }

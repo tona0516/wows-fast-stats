@@ -617,20 +617,6 @@ export namespace data {
 	}
 	
 	
-	export class UCTeamSummary {
-	    min_ship_battles: number;
-	    min_overall_battles: number;
-	
-	    static createFrom(source: any = {}) {
-	        return new UCTeamSummary(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.min_ship_battles = source["min_ship_battles"];
-	        this.min_overall_battles = source["min_overall_battles"];
-	    }
-	}
 	export class UserConfigV2 {
 	    version: number;
 	    install_path: string;
@@ -639,7 +625,6 @@ export namespace data {
 	    color: UCColor;
 	    digit: UCDigit;
 	    show_language_frag: boolean;
-	    team_summary: UCTeamSummary;
 	    save_screenshot: boolean;
 	    save_temp_arena_info: boolean;
 	    send_report: boolean;
@@ -659,7 +644,6 @@ export namespace data {
 	        this.color = this.convertValues(source["color"], UCColor);
 	        this.digit = this.convertValues(source["digit"], UCDigit);
 	        this.show_language_frag = source["show_language_frag"];
-	        this.team_summary = this.convertValues(source["team_summary"], UCTeamSummary);
 	        this.save_screenshot = source["save_screenshot"];
 	        this.save_temp_arena_info = source["save_temp_arena_info"];
 	        this.send_report = source["send_report"];
