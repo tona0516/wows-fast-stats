@@ -7,8 +7,8 @@
   import MessagingTonako from "./internal/MessagingTonako.svelte";
   import { Tonako } from "./internal/Tonako";
 
-  let isLoading = false;
-  let errorText = "";
+  $: isLoading = false;
+  $: errorText = "";
 
   export const fetchBattle = async () => {
     try {
@@ -45,9 +45,11 @@
   {#if errorText.length > 0}
     <MessagingTonako tonako={Tonako.Sorry} message={errorText} />
   {:else if isLoading}
-    <div class="flex w-full h-screen items-center justify-center">
-      <span class="loading loading-ring loading-xl"></span>
-    </div>
+    <MessagingTonako
+      tonako={Tonako.Standby}
+      message="戦闘データを読み込み中"
+      showLoading={true}
+    />
   {:else if $storedBattle}
     <div class="pt-2 flex flex-col items-center">
       <BattleMetaInfo meta={$storedBattle.meta} />

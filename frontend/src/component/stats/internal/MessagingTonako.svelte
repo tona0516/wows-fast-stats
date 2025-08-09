@@ -3,6 +3,8 @@
 
   export let tonako: Tonako;
   export let message: string;
+  // biome-ignore lint/style/useConst: <explanation>
+  export let showLoading = false;
 </script>
 
 <div class="flex w-full h-screen items-center justify-center">
@@ -12,6 +14,11 @@
         <img src={tonako.getImgPath()} alt="" />
       </div>
     </div>
-    <p class="p-4">{message}</p>
+    <p class="p-4">
+      {message}
+      {#if showLoading}
+        <span class="mx-1 loading"></span>
+      {/if}
+    </p>
   </div>
 </div>
