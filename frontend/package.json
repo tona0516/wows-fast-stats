@@ -9,12 +9,12 @@
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "lint": "biome lint ./src",
-    "fmt": "biome check --write ./src",
+    "fmt": "biome check --write --unsafe ./src ",
     "fmt-svelte": "prettier --write ./src/**/*.svelte",
     "test": "jest --coverage=false"
   },
   "devDependencies": {
-    "@biomejs/biome": "1.9.4",
+    "@biomejs/biome": "2.1.4",
     "@sveltejs/vite-plugin-svelte": "^3.1.2",
     "@tsconfig/svelte": "^5.0.2",
     "@types/clone": "^2.1.2",
