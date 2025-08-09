@@ -1,6 +1,6 @@
 import { TeamThreatLevel } from "src/lib/TeamThreatLevel";
 import type { OptionalBattle, StatsExtra } from "src/lib/types";
-import { type Writable, derived, writable } from "svelte/store";
+import { derived, type Writable, writable } from "svelte/store";
 import type { data } from "wailsjs/go/models";
 
 export const storedBattle = writable(undefined) as Writable<OptionalBattle>;

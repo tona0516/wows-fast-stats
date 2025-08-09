@@ -1,6 +1,6 @@
 import type { ColumnSetting } from "src/lib/ColumnSetting";
-import { DispName } from "src/lib/DispName";
 import { AbstractColumn } from "src/lib/column/intetface/AbstractColumn";
+import { DispName } from "src/lib/DispName";
 import type { StatsCategory } from "src/lib/types";
 import { deriveColumnSetting, toPlayerStats } from "src/lib/util";
 import type { data } from "wailsjs/go/models";
@@ -35,7 +35,7 @@ export abstract class AbstractStatsColumn<T> extends AbstractColumn {
     return toPlayerStats(player, this.config.stats_pattern);
   }
 
-  getBackgroundColorCode(player: data.Player): string | undefined {
+  getBackgroundColorCode(_player: data.Player): string | undefined {
     return undefined;
   }
 

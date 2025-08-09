@@ -1,10 +1,10 @@
 import chroma from "chroma-js";
 import PlayerNameTableData from "src/component/stats/internal/table_data/PlayerNameTableData.svelte";
 import { Color } from "src/lib/Color";
+import { AbstractColumn } from "src/lib/column/intetface/AbstractColumn";
 import { PlayerNameColor } from "src/lib/DispName";
 import { type Rating, RatingfGenerator } from "src/lib/RatingLevel";
 import { Theme } from "src/lib/Theme";
-import { AbstractColumn } from "src/lib/column/intetface/AbstractColumn";
 import { toPlayerStats } from "src/lib/util";
 import type { data } from "wailsjs/go/models";
 

@@ -1,7 +1,7 @@
 import SingleTableData from "src/component/stats/internal/table_data/SingleTableData.svelte";
 import { Color } from "src/lib/Color";
-import { RatingfGenerator } from "src/lib/RatingLevel";
 import { AbstractStatsColumn } from "src/lib/column/intetface/AbstractStatsColumn";
+import { RatingfGenerator } from "src/lib/RatingLevel";
 import type { StatsCategory } from "src/lib/types";
 import type { data } from "wailsjs/go/models";
 

@@ -1,6 +1,6 @@
 import MaxDamageTableData from "src/component/stats/internal/table_data/MaxDamageTableData.svelte";
-import { NumbersURL } from "src/lib/NumbersURL";
 import { AbstractStatsColumn } from "src/lib/column/intetface/AbstractStatsColumn";
+import { NumbersURL } from "src/lib/NumbersURL";
 import type { StatsCategory } from "src/lib/types";
 import { tierString } from "src/lib/util";
 import type { data } from "wailsjs/go/models";

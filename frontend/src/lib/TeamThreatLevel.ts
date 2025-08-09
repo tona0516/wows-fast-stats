@@ -1,4 +1,4 @@
-import type { OptionalTeamThreatLevels, StatsExtra } from "src/lib/types";
+import type { StatsExtra } from "src/lib/types";
 import type { data } from "wailsjs/go/models";
 
 export class TeamThreatLevel {

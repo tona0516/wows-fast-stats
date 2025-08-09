@@ -1,6 +1,6 @@
 import StackedBarGraphTableData from "src/component/stats/internal/table_data/StackedBarGraphTableData.svelte";
-import type { StackedBarGraphParam } from "src/lib/column/StackedBarGraphParam";
 import { AbstractStatsColumn } from "src/lib/column/intetface/AbstractStatsColumn";
+import type { StackedBarGraphParam } from "src/lib/column/StackedBarGraphParam";
 import type { data } from "wailsjs/go/models";
 
 export class UsingTierRate extends AbstractStatsColumn<StackedBarGraphParam> {

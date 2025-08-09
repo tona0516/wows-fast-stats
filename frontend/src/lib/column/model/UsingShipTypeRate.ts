@@ -1,11 +1,11 @@
 import StackedBarGraphTableData from "src/component/stats/internal/table_data/StackedBarGraphTableData.svelte";
 import { Color } from "src/lib/Color";
-import { DispName } from "src/lib/DispName";
+import { AbstractStatsColumn } from "src/lib/column/intetface/AbstractStatsColumn";
 import type {
   StackedBarGraphItem,
   StackedBarGraphParam,
 } from "src/lib/column/StackedBarGraphParam";
-import { AbstractStatsColumn } from "src/lib/column/intetface/AbstractStatsColumn";
+import { DispName } from "src/lib/DispName";
 import type { data } from "wailsjs/go/models";
 
 export class UsingShipTypeRate extends AbstractStatsColumn<StackedBarGraphParam> {

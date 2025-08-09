@@ -1,4 +1,3 @@
-import { DispName } from "src/lib/DispName";
 import type { AbstractColumn } from "src/lib/column/intetface/AbstractColumn";
 import { AvgTier } from "src/lib/column/model/AvgTier";
 import { Battles } from "src/lib/column/model/Battles";
@@ -8,16 +7,17 @@ import { HitRate } from "src/lib/column/model/HitRate";
 import { KDRate } from "src/lib/column/model/KDRate";
 import { Kill } from "src/lib/column/model/Kill";
 import { MaxDamage } from "src/lib/column/model/MaxDamage";
-import { PR } from "src/lib/column/model/PR";
 import { PlanesKilled } from "src/lib/column/model/PlanesKilled";
 import { PlatoonRate } from "src/lib/column/model/PlatoonRate";
 import { PlayerName } from "src/lib/column/model/PlayerName";
+import { PR } from "src/lib/column/model/PR";
 import { ShipInfo } from "src/lib/column/model/ShipInfo";
 import { SurvivedRate } from "src/lib/column/model/SurvivedRate";
 import { ThreatLevel } from "src/lib/column/model/ThreatLevel";
 import { UsingShipTypeRate } from "src/lib/column/model/UsingShipTypeRate";
 import { UsingTierRate } from "src/lib/column/model/UsingTierRate";
 import { WinRate } from "src/lib/column/model/WinRate";
+import { DispName } from "src/lib/DispName";
 import type { ColumnCategory } from "src/lib/types";
 import type { data } from "wailsjs/go/models";
 

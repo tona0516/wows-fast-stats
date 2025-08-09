@@ -1,6 +1,6 @@
 import SingleTableData from "src/component/stats/internal/table_data/SingleTableData.svelte";
-import { ThreatLevelGenerator } from "src/lib/ThreatLevel";
 import { AbstractStatsColumn } from "src/lib/column/intetface/AbstractStatsColumn";
+import { ThreatLevelGenerator } from "src/lib/ThreatLevel";
 import type { data } from "wailsjs/go/models";
 
 export class ThreatLevel extends AbstractStatsColumn<string> {
