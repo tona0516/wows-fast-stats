@@ -31,7 +31,7 @@
 
   <li class="mt-8">
     <button
-      class="btn btn-sm btn-ghost tooltip tooltip-right btn-primary"
+      class="btn btn-sm btn-primary tooltip tooltip-right"
       data-tip="リロード"
       on:click={WindowReloadApp}
     >
