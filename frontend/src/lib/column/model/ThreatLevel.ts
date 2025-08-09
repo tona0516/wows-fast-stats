@@ -20,14 +20,14 @@ export class ThreatLevel extends AbstractStatsColumn<string> {
   textColorCode(player: data.Player): string {
     return (
       ThreatLevelGenerator.fromScore(player.pvp_all.overall.threat_level.raw)
-        ?.color.text || ""
+        ?.color?.text || ""
     );
   }
 
   getBackgroundColorCode(player: data.Player): string | undefined {
     return ThreatLevelGenerator.fromScore(
       player.pvp_all.overall.threat_level.raw,
-    )?.color.background;
+    )?.color?.background;
   }
 
   getTableDataComponent() {

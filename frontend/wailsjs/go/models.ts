@@ -457,166 +457,7 @@ export namespace data {
 	
 	
 	
-	export class UCShipTypeColorCode {
-	    ss: string;
-	    dd: string;
-	    cl: string;
-	    bb: string;
-	    cv: string;
-	
-	    static createFrom(source: any = {}) {
-	        return new UCShipTypeColorCode(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.ss = source["ss"];
-	        this.dd = source["dd"];
-	        this.cl = source["cl"];
-	        this.bb = source["bb"];
-	        this.cv = source["cv"];
-	    }
-	}
-	export class UCShipTypeColor {
-	    own: UCShipTypeColorCode;
-	    other: UCShipTypeColorCode;
-	
-	    static createFrom(source: any = {}) {
-	        return new UCShipTypeColor(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.own = this.convertValues(source["own"], UCShipTypeColorCode);
-	        this.other = this.convertValues(source["other"], UCShipTypeColorCode);
-	    }
-	
-		convertValues(a: any, classs: any, asMap: boolean = false): any {
-		    if (!a) {
-		        return a;
-		    }
-		    if (a.slice && a.map) {
-		        return (a as any[]).map(elem => this.convertValues(elem, classs));
-		    } else if ("object" === typeof a) {
-		        if (asMap) {
-		            for (const key of Object.keys(a)) {
-		                a[key] = new classs(a[key]);
-		            }
-		            return a;
-		        }
-		        return new classs(a);
-		    }
-		    return a;
-		}
-	}
-	export class UCTierColorCode {
-	    low: string;
-	    middle: string;
-	    high: string;
-	
-	    static createFrom(source: any = {}) {
-	        return new UCTierColorCode(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.low = source["low"];
-	        this.middle = source["middle"];
-	        this.high = source["high"];
-	    }
-	}
-	export class UCTierColor {
-	    own: UCTierColorCode;
-	    other: UCTierColorCode;
-	
-	    static createFrom(source: any = {}) {
-	        return new UCTierColor(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.own = this.convertValues(source["own"], UCTierColorCode);
-	        this.other = this.convertValues(source["other"], UCTierColorCode);
-	    }
-	
-		convertValues(a: any, classs: any, asMap: boolean = false): any {
-		    if (!a) {
-		        return a;
-		    }
-		    if (a.slice && a.map) {
-		        return (a as any[]).map(elem => this.convertValues(elem, classs));
-		    } else if ("object" === typeof a) {
-		        if (asMap) {
-		            for (const key of Object.keys(a)) {
-		                a[key] = new classs(a[key]);
-		            }
-		            return a;
-		        }
-		        return new classs(a);
-		    }
-		    return a;
-		}
-	}
-	export class UCSkillColorCode {
-	    bad: string;
-	    below_avg: string;
-	    avg: string;
-	    good: string;
-	    very_good: string;
-	    great: string;
-	    unicum: string;
-	    super_unicum: string;
-	
-	    static createFrom(source: any = {}) {
-	        return new UCSkillColorCode(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.bad = source["bad"];
-	        this.below_avg = source["below_avg"];
-	        this.avg = source["avg"];
-	        this.good = source["good"];
-	        this.very_good = source["very_good"];
-	        this.great = source["great"];
-	        this.unicum = source["unicum"];
-	        this.super_unicum = source["super_unicum"];
-	    }
-	}
-	export class UCSkillColor {
-	    text: UCSkillColorCode;
-	
-	    static createFrom(source: any = {}) {
-	        return new UCSkillColor(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.text = this.convertValues(source["text"], UCSkillColorCode);
-	    }
-	
-		convertValues(a: any, classs: any, asMap: boolean = false): any {
-		    if (!a) {
-		        return a;
-		    }
-		    if (a.slice && a.map) {
-		        return (a as any[]).map(elem => this.convertValues(elem, classs));
-		    } else if ("object" === typeof a) {
-		        if (asMap) {
-		            for (const key of Object.keys(a)) {
-		                a[key] = new classs(a[key]);
-		            }
-		            return a;
-		        }
-		        return new classs(a);
-		    }
-		    return a;
-		}
-	}
 	export class UCColor {
-	    skill: UCSkillColor;
-	    tier: UCTierColor;
-	    ship_type: UCShipTypeColor;
 	    player_name: string;
 	
 	    static createFrom(source: any = {}) {
@@ -625,29 +466,8 @@ export namespace data {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.skill = this.convertValues(source["skill"], UCSkillColor);
-	        this.tier = this.convertValues(source["tier"], UCTierColor);
-	        this.ship_type = this.convertValues(source["ship_type"], UCShipTypeColor);
 	        this.player_name = source["player_name"];
 	    }
-	
-		convertValues(a: any, classs: any, asMap: boolean = false): any {
-		    if (!a) {
-		        return a;
-		    }
-		    if (a.slice && a.map) {
-		        return (a as any[]).map(elem => this.convertValues(elem, classs));
-		    } else if ("object" === typeof a) {
-		        if (asMap) {
-		            for (const key of Object.keys(a)) {
-		                a[key] = new classs(a[key]);
-		            }
-		            return a;
-		        }
-		        return new classs(a);
-		    }
-		    return a;
-		}
 	}
 	export class UCDigit {
 	    pr: number;
@@ -797,10 +617,6 @@ export namespace data {
 	}
 	
 	
-	
-	
-	
-	
 	export class UCTeamSummary {
 	    min_ship_battles: number;
 	    min_overall_battles: number;
@@ -815,8 +631,6 @@ export namespace data {
 	        this.min_overall_battles = source["min_overall_battles"];
 	    }
 	}
-	
-	
 	export class UserConfigV2 {
 	    version: number;
 	    install_path: string;

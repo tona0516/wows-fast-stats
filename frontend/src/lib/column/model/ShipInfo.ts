@@ -85,7 +85,7 @@ export class ShipInfo extends AbstractColumn {
     const type = player.ship_info.type;
     if (!isShipType(type)) return "";
 
-    return this.config.color.ship_type.own[type];
+    return Color.ShipType.getFixed(type)?.background ?? "";
   }
 
   shipTypeIconPath(player: data.Player): string {

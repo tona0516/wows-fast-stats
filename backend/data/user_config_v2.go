@@ -21,46 +21,6 @@ func DefaultUserConfigV2() UserConfigV2 {
 			},
 		},
 		Color: UCColor{
-			Skill: UCSkillColor{
-				Text: UCSkillColorCode{
-					Bad:         "#ff382d",
-					BelowAvg:    "#fd9234",
-					Avg:         "#ffd351",
-					Good:        "#57e500",
-					VeryGood:    "#44b200",
-					Great:       "#02f7da",
-					Unicum:      "#da6ff5",
-					SuperUnicum: "#bf15ee",
-				},
-			},
-			Tier: UCTierColor{
-				Own: UCTierColorCode{
-					Low:    "#8CA113",
-					Middle: "#205B85",
-					High:   "#990F4F",
-				},
-				Other: UCTierColorCode{
-					Low:    "#E6F5B0",
-					Middle: "#B3D7DD",
-					High:   "#E3ADD5",
-				},
-			},
-			ShipType: UCShipTypeColor{
-				Own: UCShipTypeColorCode{
-					CV: "#5E2883",
-					BB: "#CA1028",
-					CL: "#27853F",
-					DD: "#D9760F",
-					SS: "#233B8B",
-				},
-				Other: UCShipTypeColorCode{
-					CV: "#CAB2D6",
-					BB: "#FBB4C4",
-					CL: "#CCEBC5",
-					DD: "#FEE6AA",
-					SS: "#B3CDE3",
-				},
-			},
 			PlayerName: PlayerNameColorShip,
 		},
 		Digit: UCDigit{
@@ -132,17 +92,6 @@ func FromUserConfigV1(v1 UserConfig) UserConfigV2 {
 			},
 		},
 		Color: UCColor{
-			Skill: UCSkillColor{
-				Text: UCSkillColorCode(v1.CustomColor.Skill.Text),
-			},
-			Tier: UCTierColor{
-				Own:   UCTierColorCode(v1.CustomColor.Tier.Own),
-				Other: UCTierColorCode(v1.CustomColor.Tier.Other),
-			},
-			ShipType: UCShipTypeColor{
-				Own:   UCShipTypeColorCode(v1.CustomColor.ShipType.Own),
-				Other: UCShipTypeColorCode(v1.CustomColor.ShipType.Other),
-			},
 			PlayerName: v1.CustomColor.PlayerName,
 		},
 		Digit: UCDigit{
@@ -210,49 +159,7 @@ type UCDisplayOverall struct {
 }
 
 type UCColor struct {
-	Skill      UCSkillColor    `json:"skill"`
-	Tier       UCTierColor     `json:"tier"`
-	ShipType   UCShipTypeColor `json:"ship_type"`
 	PlayerName PlayerNameColor `json:"player_name"`
-}
-
-type UCTierColor struct {
-	Own   UCTierColorCode `json:"own"`
-	Other UCTierColorCode `json:"other"`
-}
-
-type UCSkillColor struct {
-	Text UCSkillColorCode `json:"text"`
-}
-
-type UCShipTypeColor struct {
-	Own   UCShipTypeColorCode `json:"own"`
-	Other UCShipTypeColorCode `json:"other"`
-}
-
-type UCSkillColorCode struct {
-	Bad         string `json:"bad"`
-	BelowAvg    string `json:"below_avg"`
-	Avg         string `json:"avg"`
-	Good        string `json:"good"`
-	VeryGood    string `json:"very_good"`
-	Great       string `json:"great"`
-	Unicum      string `json:"unicum"`
-	SuperUnicum string `json:"super_unicum"`
-}
-
-type UCTierColorCode struct {
-	Low    string `json:"low"`    // tier 1~4
-	Middle string `json:"middle"` // tier 5~7
-	High   string `json:"high"`   // tier 8~★
-}
-
-type UCShipTypeColorCode struct {
-	SS string `json:"ss"`
-	DD string `json:"dd"`
-	CL string `json:"cl"`
-	BB string `json:"bb"`
-	CV string `json:"cv"`
 }
 
 type UCDigit struct {

@@ -8,8 +8,8 @@ test("fromScore - 正常系", () => {
   const instance = ThreatLevelGenerator.fromScore(9500);
   expect(instance?.level).toBe("y");
   expect(instance?.score).toBeDefined();
-  expect(instance?.color.text).toBeDefined();
-  expect(instance?.color.background).toBeDefined();
+  expect(instance?.color?.text).toBeDefined();
+  expect(instance?.color?.background).toBeDefined();
 });
 
 test("THREAT_LEVEL_DEFSがスコアの昇順で定義されている", () => {

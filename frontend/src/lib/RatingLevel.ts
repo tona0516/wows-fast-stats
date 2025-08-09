@@ -1,7 +1,14 @@
-import type { data } from "wailsjs/go/models";
 import { Color } from "./Color";
 
-export type RatingLevel = Readonly<keyof data.UCSkillColorCode>;
+export type RatingLevel =
+  | "bad"
+  | "below_avg"
+  | "avg"
+  | "good"
+  | "very_good"
+  | "great"
+  | "unicum"
+  | "super_unicum";
 
 export class RatingfGenerator {
   private constructor() {}
