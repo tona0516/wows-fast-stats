@@ -8,6 +8,7 @@
   import {
     OpenDirectory,
     ShowMessageDialog,
+    StartWatching,
     TrySaveInstallPath,
     UpdateUserConfig,
   } from "wailsjs/go/main/App";
@@ -24,6 +25,7 @@
       if (isSuccess) {
         showToast("インストールパスを設定しました");
         storedInstallPathError.set("");
+        StartWatching();
       }
     } catch (error) {
       storedInstallPathError.set(error as string);

@@ -1,7 +1,6 @@
 <script lang="ts">
-  import { FetchProxy } from "src/lib/FetchProxy";
   import { storedBattle, storedInstallPathError } from "src/stores";
-  import { LogInfo } from "wailsjs/go/main/App";
+  import { Battle } from "wailsjs/go/main/App";
 
   import BattleMetaInfo from "./internal/BattleMetaInfo.svelte";
   import MainStatsTable from "./internal/MainStatsTable.svelte";
@@ -15,11 +14,21 @@
     try {
       isLoading = true;
 
-      const start = new Date().getTime();
-      await FetchProxy.getBattle();
-      const elapsed = (new Date().getTime() - start) / 1000;
+      // Note: 過去のデータが影響してか値が0になってしまうためクリーンする
+      storedBattle.set(undefined);
 
-      LogInfo("fetch success", { "duration(s)": elapsed.toFixed(1) });
+      // const cache = localStorage.getItem("cache");
+      // TODO: あとで消す
+      // if (cache) {
+      //   const cachedBattle = JSON.parse(cache) as data.Battle;
+      //   storedBattle.set(cachedBattle);
+      //   return cachedBattle;
+      // }
+
+      const ret = await Battle();
+      storedBattle.set(ret);
+
+      localStorage.setItem("cache", JSON.stringify(ret));
     } catch (error) {
       showError(error as string);
     } finally {

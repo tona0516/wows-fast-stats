@@ -26,7 +26,7 @@
     ValidateInstallPath,
   } from "wailsjs/go/main/App";
   import type { data } from "wailsjs/go/models";
-  import { EventsOn } from "wailsjs/runtime/runtime";
+  import { EventsOn, LogInfo } from "wailsjs/runtime/runtime";
   import SideMenu from "./SideMenu.svelte";
   import ExternalLink from "./component/common/ExternalLink.svelte";
   import type { Page } from "./lib/types";
@@ -53,7 +53,9 @@
     themeChange(false);
   });
 
-  EventsOn("BATTLE_START", () => statsPage?.fetchBattle());
+  EventsOn("BATTLE_START", () => {
+    statsPage?.fetchBattle();
+  });
   EventsOn("BATTLE_ERR", (error: string) => statsPage?.showError(error));
   EventsOn("CONFIG_UPDATE", (config: data.UserConfigV2) =>
     storedConfig.set(config),
