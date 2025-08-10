@@ -54,6 +54,7 @@
   });
 
   EventsOn("BATTLE_START", () => {
+    statsPage?.hideError();
     statsPage?.fetchBattle();
   });
   EventsOn("BATTLE_ERR", (error: string) => statsPage?.showError(error));

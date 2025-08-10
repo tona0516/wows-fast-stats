@@ -39,6 +39,10 @@
   export const showError = (error: string) => {
     errorText = error;
   };
+
+  export const hideError = () => {
+    errorText = "";
+  };
 </script>
 
 <div>
