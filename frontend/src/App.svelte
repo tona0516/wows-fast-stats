@@ -86,6 +86,8 @@
   };
 
   const initialize = async (): Promise<data.UserConfigV2 | undefined> => {
+    // localStorage.clear();
+
     try {
       await MigrateIfNeeded();
 

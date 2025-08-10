@@ -4,8 +4,6 @@ import { Theme } from "./Theme";
 import type { ThreatLevel } from "./ThreatLevel";
 import type { ShipType } from "./types";
 
-const COLOR_RATE = 1.5;
-
 export interface ColorPair {
   text: string;
   background: string;
@@ -90,8 +88,9 @@ export namespace Color {
 
 const getFixedColorPair = (colorCode: string): ColorPair => {
   const chromaColor = chroma(colorCode);
-  const brighten = chromaColor.brighten(COLOR_RATE).hex();
-  const darken = chromaColor.darken(COLOR_RATE).hex();
+  const colorRate = 1.5;
+  const brighten = chromaColor.brighten(colorRate).hex();
+  const darken = chromaColor.darken(colorRate).hex();
 
   if (Theme.isLighter()) {
     return { text: darken, background: brighten };

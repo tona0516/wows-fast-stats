@@ -7,7 +7,11 @@ export namespace Theme {
   };
 
   export const isLighter = (): boolean => {
-    const current = localStorage.getItem("theme") || "light";
+    const current = getCurrent();
     return lighterThemes.includes(current);
+  };
+
+  const getCurrent = (): string => {
+    return localStorage.getItem("theme") || "light";
   };
 }
