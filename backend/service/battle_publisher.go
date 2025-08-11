@@ -76,7 +76,7 @@ func (bp *BattlePublisher) Subcribe(cancelCtx context.Context, channel chan data
 				}
 
 				bp.logger.Error(err, nil)
-				bp.eventsEmitFunc(bp.ctx, EventErr, apperr.Unwrap(err))
+				bp.eventsEmitFunc(bp.ctx, EventErr, apperr.ToStringCode(err))
 				return
 			}
 

@@ -78,7 +78,7 @@ func (b *BattleFetcher) Invoke(tempArenaInfo data.TempArenaInfo) {
 
 	accountList, err := b.wargaming.AccountList(tempArenaInfo.AccountNames())
 	if err != nil {
-		b.eventsEmitFunc(b.ctx, EventErr, err)
+		b.eventsEmitFunc(b.ctx, EventErr, apperr.ToStringCode(err))
 		return
 	}
 	accountIDs := accountList.AccountIDs()
@@ -131,7 +131,7 @@ func (b *BattleFetcher) Invoke(tempArenaInfo data.TempArenaInfo) {
 				continue
 			}
 
-			b.eventsEmitFunc(b.ctx, EventErr, err)
+			b.eventsEmitFunc(b.ctx, EventErr, apperr.ToStringCode(err))
 			return
 		}
 	}

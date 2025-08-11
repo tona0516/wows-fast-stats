@@ -1,9 +1,9 @@
 <script lang="ts">
+  import { storedTonako } from "src/stores";
   import type { Tonako } from "./Tonako";
 
   export let tonako: Tonako;
   export let message: string;
-  // biome-ignore lint/style/useConst: <explanation>
   export let showLoading = false;
 </script>
 

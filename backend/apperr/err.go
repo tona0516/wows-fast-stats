@@ -41,3 +41,16 @@ func Unwrap(err error) error {
 	//nolint:err113
 	return errors.New(code.ErrorCode())
 }
+
+func ToStringCode(err error) string {
+	if err == nil {
+		return ""
+	}
+
+	code, ok := failure.CodeOf(err)
+	if !ok {
+		return err.Error()
+	}
+
+	return code.ErrorCode()
+}

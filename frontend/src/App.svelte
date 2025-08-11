@@ -1,7 +1,6 @@
 <script lang="ts">
   import ConfigPage from "src/component/config/ConfigPage.svelte";
   import InfoPage from "src/component/info/InfoPage.svelte";
-  // biome-ignore lint/style/useImportType: <explanation>
   import StatsPage from "src/component/stats/StatsPage.svelte";
 
   import "bootstrap-icons/font/bootstrap-icons.css";
@@ -44,7 +43,6 @@
   let initialized = false;
   let updatableRelease: data.GHLatestRelease;
 
-  // biome-ignore lint/style/useConst: <explanation>
   let page: Page = "stats";
 
   $: {
@@ -77,9 +75,9 @@
       tonako: Tonako.Standby,
     });
   });
-  EventsOn("BATTLE_ERR", (error: string) => {
+  EventsOn("BATTLE_ERR", (message: string) => {
     storedTonako.set({
-      message: error,
+      message: message,
       isLoading: false,
       tonako: Tonako.Sorry,
     });
