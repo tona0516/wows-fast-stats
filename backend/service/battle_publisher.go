@@ -12,7 +12,6 @@ import (
 	"github.com/morikuni/failure"
 )
 
-//nolint:containedctx
 type BattlePublisher struct {
 	ctx            context.Context
 	interval       time.Duration

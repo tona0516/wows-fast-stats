@@ -15,7 +15,6 @@ import (
 	"github.com/morikuni/failure"
 )
 
-//nolint:containedctx
 type BattleFetcher struct {
 	ctx            context.Context
 	wargaming      repository.WargamingInterface

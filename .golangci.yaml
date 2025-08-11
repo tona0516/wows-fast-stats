@@ -24,6 +24,8 @@ linters:
     - mnd
     - bodyclose
     - godox
+    - containedctx
+    - contextcheck
   exclusions:
     paths:
       - _test\.go

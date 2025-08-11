@@ -13,7 +13,6 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
-//nolint:containedctx
 type App struct {
 	config            Config
 	ctx               context.Context
@@ -178,7 +177,7 @@ func (a *App) ShowMessageDialog(message string) {
 	})
 }
 
-// 構造体のバインド用のメソッド
+// 構造体のバインド用のメソッド.
 func (a *App) EmptyBattle() data.Battle {
 	return data.Battle{}
 }
