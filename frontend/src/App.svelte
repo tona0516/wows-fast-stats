@@ -10,8 +10,10 @@
   import { FontSize } from "src/lib/FontSize";
   import {
     storedAlertPlayers,
+    storedBattle,
     storedConfig,
     storedInstallPathError,
+    storedTonako,
   } from "src/stores";
   import { onMount } from "svelte";
   import { themeChange } from "theme-change";
@@ -21,7 +23,7 @@
     LogError,
     MigrateIfNeeded,
     ShowMessageDialog,
-    StartWatching,
+    SubscribeBattle,
     UserConfig,
     ValidateInstallPath,
   } from "wailsjs/go/main/App";
@@ -36,6 +38,7 @@
   import PlayerDetailModal from "./component/common/PlayerDetailModal.svelte";
   import Toast from "./component/common/Toast.svelte";
   import ShipDetailModal from "./component/common/ShipDetailModal.svelte";
+  import { Tonako } from "./component/stats/internal/Tonako";
 
   let statsPage: StatsPage | undefined;
   let initialized = false;
@@ -53,17 +56,52 @@
     themeChange(false);
   });
 
-  EventsOn("BATTLE_START", () => {
-    statsPage?.hideError();
-    statsPage?.fetchBattle();
-  });
-  EventsOn("BATTLE_ERR", (error: string) => statsPage?.showError(error));
   EventsOn("CONFIG_UPDATE", (config: data.UserConfigV2) =>
     storedConfig.set(config),
   );
   EventsOn("ALERT_PLAYERS_UPDATE", (players: data.AlertPlayer[]) =>
     storedAlertPlayers.set(players),
   );
+  EventsOn("BATTLE_START", () => {
+    storedBattle.set(undefined);
+    storedTonako.set({
+      message: "戦闘データを読み込み中",
+      isLoading: true,
+      tonako: Tonako.Standby,
+    });
+  });
+  EventsOn("BATTLE_END", () => {
+    storedTonako.set({
+      message: "戦闘開始時に自動的にリロードします",
+      isLoading: false,
+      tonako: Tonako.Standby,
+    });
+  });
+  EventsOn("BATTLE_ERR", (error: string) => {
+    storedTonako.set({
+      message: error,
+      isLoading: false,
+      tonako: Tonako.Sorry,
+    });
+  });
+  EventsOn("BATTLE_FETCH_OTHERS", () => {
+    storedTonako.set({
+      message: "艦・マップ情報を取得中",
+      isLoading: true,
+      tonako: Tonako.Standby,
+    });
+  });
+  EventsOn("BATTLE_FETCH_PLAYERS", () => {
+    storedTonako.set({
+      message: "プレイヤー情報を取得中",
+      isLoading: true,
+      tonako: Tonako.Standby,
+    });
+  });
+  EventsOn("BATTLE_FETCH_DONE", (battle: data.Battle) => {
+    storedTonako.set(undefined);
+    storedBattle.set(battle);
+  });
 
   window.onunhandledrejection = (event) => {
     const message = "window.onunhandledrejection";
@@ -106,7 +144,7 @@
       initialized = true;
 
       if (!$storedInstallPathError) {
-        StartWatching();
+        SubscribeBattle();
       }
 
       return config;

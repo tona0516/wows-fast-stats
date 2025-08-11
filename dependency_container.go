@@ -17,8 +17,8 @@ type DependencyContainer struct {
 
 	// services
 	configService         *service.Config
-	watcherService        *service.Watcher
-	battleService         *service.Battle
+	battlePublisher       *service.BattlePublisher
+	battleService         *service.BattleFetcher
 	updaterService        *service.Updater
 	configMigratorService *service.ConfigMigrator
 	logger                repository.LoggerInterface
@@ -84,17 +84,18 @@ func NewDependencyContainer(ctx context.Context, config Config) (*DependencyCont
 
 	// services
 	configService := service.NewConfig(localFile, wargaming, storage, logger)
-	battleService := service.NewBattle(
+	battleFetcher := service.NewBattleFetcher(
+		ctx,
 		wargaming,
 		uwargaming,
-		localFile,
 		numbers,
 		unregistered,
 		storage,
 		logger,
 		runtime.EventsEmit,
 	)
-	watcherService := service.NewWatcher(
+	battlePublisher := service.NewBattlePublisher(
+		ctx,
 		time.Duration(config.Watcher.IntervalSec)*time.Second,
 		localFile,
 		storage,
@@ -107,8 +108,8 @@ func NewDependencyContainer(ctx context.Context, config Config) (*DependencyCont
 	return &DependencyContainer{
 		config:                config,
 		configService:         configService,
-		watcherService:        watcherService,
-		battleService:         battleService,
+		battlePublisher:       battlePublisher,
+		battleService:         battleFetcher,
 		updaterService:        updaterService,
 		configMigratorService: configMigratorService,
 		logger:                logger,

@@ -15,12 +15,13 @@ import (
 	"github.com/morikuni/failure"
 )
 
-type Battle struct {
+//nolint:containedctx
+type BattleFetcher struct {
+	ctx            context.Context
 	wargaming      repository.WargamingInterface
 	uwargaming     repository.UnofficialWargamingInterface
 	numbers        repository.NumbersInterface
 	unregistered   repository.UnregisteredInterface
-	localFile      repository.LocalFileInterface
 	storage        repository.StorageInterface
 	logger         repository.LoggerInterface
 	eventsEmitFunc eventEmitFunc
@@ -33,20 +34,20 @@ type Battle struct {
 	battleTypes                        data.WGBattleTypes
 }
 
-func NewBattle(
+func NewBattleFetcher(
+	ctx context.Context,
 	wargaming repository.WargamingInterface,
 	uwargaming repository.UnofficialWargamingInterface,
-	localFile repository.LocalFileInterface,
 	numbers repository.NumbersInterface,
 	unregistered repository.UnregisteredInterface,
 	storage repository.StorageInterface,
 	logger repository.LoggerInterface,
 	eventsEmitFunc eventEmitFunc,
-) *Battle {
-	return &Battle{
+) *BattleFetcher {
+	return &BattleFetcher{
+		ctx:                                ctx,
 		wargaming:                          wargaming,
 		uwargaming:                         uwargaming,
-		localFile:                          localFile,
 		numbers:                            numbers,
 		unregistered:                       unregistered,
 		storage:                            storage,
@@ -57,7 +58,7 @@ func NewBattle(
 	}
 }
 
-func (b *Battle) Get(appCtx context.Context, userConfig data.UserConfigV2) (data.Battle, error) {
+func (b *BattleFetcher) Invoke(tempArenaInfo data.TempArenaInfo) {
 	var result data.Battle
 
 	// Fetch on-memory stored data
@@ -72,20 +73,14 @@ func (b *Battle) Get(appCtx context.Context, userConfig data.UserConfigV2) (data
 		go b.fetchBattleTypes(battleTypesResult)
 	}
 
-	// Get tempArenaInfo.json
-	tempArenaInfo, err := b.getTempArenaInfo(userConfig)
-	if err != nil {
-		return result, err
-	}
-
 	// persist own ign for reporting
 	_ = b.storage.WriteOwnIGN(tempArenaInfo.PlayerName)
 	b.logger.SetOwnIGN(tempArenaInfo.PlayerName)
 
-	// Get Account ID list
 	accountList, err := b.wargaming.AccountList(tempArenaInfo.AccountNames())
 	if err != nil {
-		return result, err
+		b.eventsEmitFunc(b.ctx, EventErr, err)
+		return
 	}
 	accountIDs := accountList.AccountIDs()
 
@@ -98,8 +93,9 @@ func (b *Battle) Get(appCtx context.Context, userConfig data.UserConfigV2) (data
 	go b.fetchClan(accountIDs, clanResult)
 
 	errs := make([]error, 0)
-
 	if b.isFirstBattle {
+		b.eventsEmitFunc(b.ctx, EventFetchOthers, nil)
+
 		warship := <-warshipResult
 		b.warship = warship.Value
 		errs = append(errs, warship.Error)
@@ -117,6 +113,8 @@ func (b *Battle) Get(appCtx context.Context, userConfig data.UserConfigV2) (data
 		errs = append(errs, battleTypes.Error)
 	}
 
+	b.eventsEmitFunc(b.ctx, EventFetchPlayers, nil)
+
 	accountInfo := <-accountInfoResult
 	errs = append(errs, accountInfo.Error)
 
@@ -129,11 +127,13 @@ func (b *Battle) Get(appCtx context.Context, userConfig data.UserConfigV2) (data
 	for _, err := range errs {
 		if err != nil {
 			if failure.Is(err, apperr.ExpectedStatsUnavaillalble) && !b.isNotifyExpectedStatsUnavaillalble {
-				b.eventsEmitFunc(appCtx, EventErr, apperr.ExpectedStatsUnavaillalble.ErrorCode())
+				b.eventsEmitFunc(b.ctx, EventErr, apperr.ExpectedStatsUnavaillalble.ErrorCode())
 				b.isNotifyExpectedStatsUnavaillalble = true
 				continue
 			}
-			return result, err
+
+			b.eventsEmitFunc(b.ctx, EventErr, err)
+			return
 		}
 	}
 
@@ -150,26 +150,10 @@ func (b *Battle) Get(appCtx context.Context, userConfig data.UserConfigV2) (data
 	)
 
 	b.isFirstBattle = false
-
-	return result, nil
+	b.eventsEmitFunc(b.ctx, EventFetchDone, result)
 }
 
-func (b *Battle) getTempArenaInfo(userConfig data.UserConfigV2) (data.TempArenaInfo, error) {
-	tempArenaInfo, err := b.localFile.TempArenaInfo(userConfig.InstallPath)
-	if err != nil {
-		return tempArenaInfo, err
-	}
-
-	if userConfig.SaveTempArenaInfo {
-		if err := b.localFile.SaveTempArenaInfo(tempArenaInfo); err != nil {
-			return tempArenaInfo, err
-		}
-	}
-
-	return tempArenaInfo, nil
-}
-
-func (b *Battle) fetchWarships(channel chan data.Result[data.Warships]) {
+func (b *BattleFetcher) fetchWarships(channel chan data.Result[data.Warships]) {
 	warships := make(data.Warships)
 	var result data.Result[data.Warships]
 
@@ -230,7 +214,7 @@ func (b *Battle) fetchWarships(channel chan data.Result[data.Warships]) {
 	channel <- result
 }
 
-func (b *Battle) fetchExpectedStats(channel chan data.Result[data.ExpectedStats]) {
+func (b *BattleFetcher) fetchExpectedStats(channel chan data.Result[data.ExpectedStats]) {
 	var result data.Result[data.ExpectedStats]
 
 	// 最新の予測成績を取得
@@ -257,22 +241,22 @@ func (b *Battle) fetchExpectedStats(channel chan data.Result[data.ExpectedStats]
 	channel <- result
 }
 
-func (b *Battle) fetchBattleArenas(channel chan data.Result[data.WGBattleArenas]) {
+func (b *BattleFetcher) fetchBattleArenas(channel chan data.Result[data.WGBattleArenas]) {
 	battleArenas, err := b.wargaming.BattleArenas()
 	channel <- data.Result[data.WGBattleArenas]{Value: battleArenas, Error: err}
 }
 
-func (b *Battle) fetchBattleTypes(channel chan data.Result[data.WGBattleTypes]) {
+func (b *BattleFetcher) fetchBattleTypes(channel chan data.Result[data.WGBattleTypes]) {
 	battleTypes, err := b.wargaming.BattleTypes()
 	channel <- data.Result[data.WGBattleTypes]{Value: battleTypes, Error: err}
 }
 
-func (b *Battle) fetchAccountInfo(accountIDs []int, channel chan data.Result[data.WGAccountInfo]) {
+func (b *BattleFetcher) fetchAccountInfo(accountIDs []int, channel chan data.Result[data.WGAccountInfo]) {
 	accountInfo, err := b.wargaming.AccountInfo(accountIDs)
 	channel <- data.Result[data.WGAccountInfo]{Value: accountInfo, Error: err}
 }
 
-func (b *Battle) fetchAllPlayerShipsStats(
+func (b *BattleFetcher) fetchAllPlayerShipsStats(
 	accountIDs []int,
 	channel chan data.Result[data.AllPlayerShipsStats],
 ) {
@@ -294,7 +278,7 @@ func (b *Battle) fetchAllPlayerShipsStats(
 	channel <- data.Result[data.AllPlayerShipsStats]{Value: shipStatsMap, Error: err}
 }
 
-func (b *Battle) fetchClan(accountIDs []int, channel chan data.Result[data.Clans]) {
+func (b *BattleFetcher) fetchClan(accountIDs []int, channel chan data.Result[data.Clans]) {
 	var result data.Result[data.Clans]
 
 	clansAccountInfo, err := b.wargaming.ClansAccountInfo(accountIDs)
@@ -330,7 +314,7 @@ func (b *Battle) fetchClan(accountIDs []int, channel chan data.Result[data.Clans
 	channel <- result
 }
 
-func (b *Battle) fetchClanColor(clanInfoArray []data.WGClansInfoData) map[string]string {
+func (b *BattleFetcher) fetchClanColor(clanInfoArray []data.WGClansInfoData) map[string]string {
 	result := make(map[string]string)
 
 	var mu sync.Mutex
@@ -356,7 +340,7 @@ func (b *Battle) fetchClanColor(clanInfoArray []data.WGClansInfoData) map[string
 	return result
 }
 
-func (b *Battle) fetchClanLanguage(clanInfoArray []data.WGClansInfoData) map[string]string {
+func (b *BattleFetcher) fetchClanLanguage(clanInfoArray []data.WGClansInfoData) map[string]string {
 	result := make(map[string]string)
 
 	// URLを検出する正規表現パターン
@@ -397,7 +381,7 @@ func (b *Battle) fetchClanLanguage(clanInfoArray []data.WGClansInfoData) map[str
 	return result
 }
 
-func (b *Battle) compose(
+func (b *BattleFetcher) compose(
 	tempArenaInfo data.TempArenaInfo,
 	accountInfo data.WGAccountInfo,
 	accountList data.WGAccountList,

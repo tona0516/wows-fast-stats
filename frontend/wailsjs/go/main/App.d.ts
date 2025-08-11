@@ -4,9 +4,9 @@ import {data} from '../models';
 
 export function AlertPlayers():Promise<Array<data.AlertPlayer>>;
 
-export function Battle():Promise<data.Battle>;
-
 export function DefaultUserConfig():Promise<data.UserConfigV2>;
+
+export function EmptyBattle():Promise<data.Battle>;
 
 export function LatestRelease():Promise<data.GHLatestRelease>;
 
@@ -26,7 +26,7 @@ export function Semver():Promise<string>;
 
 export function ShowMessageDialog(arg1:string):Promise<void>;
 
-export function StartWatching():Promise<void>;
+export function SubscribeBattle():Promise<void>;
 
 export function TrySaveInstallPath():Promise<boolean>;
 

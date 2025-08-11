@@ -2,6 +2,7 @@ import { TeamThreatLevel } from "src/lib/TeamThreatLevel";
 import type { OptionalBattle, StatsExtra } from "src/lib/types";
 import { derived, type Writable, writable } from "svelte/store";
 import type { data } from "wailsjs/go/models";
+import type { Tonako } from "./component/stats/internal/Tonako";
 
 export const storedBattle = writable(undefined) as Writable<OptionalBattle>;
 export const storedConfig = writable({}) as Writable<data.UserConfigV2>;
@@ -16,6 +17,9 @@ export const storedTeamThreatLevels = derived(
       storedConfig.stats_pattern as StatsExtra,
     ),
 );
+export const storedTonako = writable(undefined) as Writable<
+  { message: string; isLoading: boolean; tonako: Tonako } | undefined
+>;
 
 const DEFAULT_ALERT_PLAYER = {
   account_id: 0,

@@ -5,6 +5,7 @@ import (
 	"os"
 	"wfs/backend/apperr"
 	"wfs/backend/data"
+	"wfs/backend/service"
 
 	"github.com/mitchellh/go-ps"
 	"github.com/morikuni/failure"
@@ -12,17 +13,12 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
-const (
-	eventUpdateConfig       = "CONFIG_UPDATE"
-	eventUpdateAlertPlayers = "ALERT_PLAYERS_UPDATE"
-)
-
 //nolint:containedctx
 type App struct {
-	config        Config
-	ctx           context.Context
-	container     *DependencyContainer
-	cancelWatcher context.CancelFunc
+	config            Config
+	ctx               context.Context
+	container         *DependencyContainer
+	unsubscribeBattle context.CancelFunc
 }
 
 func NewApp(config Config) *App {
@@ -38,40 +34,23 @@ func (a *App) MigrateIfNeeded() error {
 	return nil
 }
 
-func (a *App) StartWatching() error {
-	if err := a.container.watcherService.Prepare(); err != nil {
-		a.container.logger.Error(err, nil)
-		return apperr.Unwrap(err)
+func (a *App) SubscribeBattle() {
+	if !a.container.battlePublisher.CanSubcribe() {
+		return
 	}
 
-	if a.cancelWatcher != nil {
-		a.cancelWatcher()
+	if a.unsubscribeBattle != nil {
+		a.unsubscribeBattle()
 	}
 
-	cancelCtx, cancel := context.WithCancel(context.Background())
-	a.cancelWatcher = cancel
+	cancelCtx, unsubscribeBattle := context.WithCancel(context.Background())
+	a.unsubscribeBattle = unsubscribeBattle
+	channel := make(chan data.TempArenaInfo)
 
-	go a.container.watcherService.Start(a.ctx, cancelCtx)
-
-	return nil
-}
-
-func (a *App) Battle() (data.Battle, error) {
-	result := data.Battle{}
-
-	userConfig, err := a.container.configService.User()
-	if err != nil {
-		a.container.logger.Error(err, nil)
-		return result, apperr.Unwrap(err)
+	go a.container.battlePublisher.Subcribe(cancelCtx, channel)
+	for tempArenaInfo := range channel {
+		a.container.battleService.Invoke(tempArenaInfo)
 	}
-
-	result, err = a.container.battleService.Get(a.ctx, userConfig)
-	if err != nil {
-		a.container.logger.Error(err, nil)
-		return result, apperr.Unwrap(err)
-	}
-
-	return result, nil
 }
 
 func (a *App) TrySaveInstallPath() (bool, error) {
@@ -89,7 +68,7 @@ func (a *App) TrySaveInstallPath() (bool, error) {
 		return false, apperr.Unwrap(err)
 	}
 
-	runtime.EventsEmit(a.ctx, eventUpdateConfig, config)
+	runtime.EventsEmit(a.ctx, service.EventUpdateConfig, config)
 
 	return true, nil
 }
@@ -121,7 +100,7 @@ func (a *App) UpdateUserConfig(config data.UserConfigV2) error {
 	if err != nil {
 		a.container.logger.Error(err, nil)
 	} else {
-		runtime.EventsEmit(a.ctx, eventUpdateConfig, config)
+		runtime.EventsEmit(a.ctx, service.EventUpdateConfig, config)
 	}
 
 	return apperr.Unwrap(err)
@@ -155,7 +134,7 @@ func (a *App) UpdateAlertPlayer(player data.AlertPlayer) error {
 	if err != nil {
 		a.container.logger.Error(err, nil)
 	} else {
-		runtime.EventsEmit(a.ctx, eventUpdateAlertPlayers, players)
+		runtime.EventsEmit(a.ctx, service.EventUpdateAlertPlayers, players)
 	}
 
 	return apperr.Unwrap(err)
@@ -166,7 +145,7 @@ func (a *App) RemoveAlertPlayer(accountID int) error {
 	if err != nil {
 		a.container.logger.Error(err, nil)
 	} else {
-		runtime.EventsEmit(a.ctx, eventUpdateAlertPlayers, players)
+		runtime.EventsEmit(a.ctx, service.EventUpdateAlertPlayers, players)
 	}
 
 	return apperr.Unwrap(err)
@@ -197,6 +176,11 @@ func (a *App) ShowMessageDialog(message string) {
 		Title:   a.config.App.Name,
 		Message: message,
 	})
+}
+
+// 構造体のバインド用のメソッド
+func (a *App) EmptyBattle() data.Battle {
+	return data.Battle{}
 }
 
 func (a *App) onStartup(ctx context.Context) {

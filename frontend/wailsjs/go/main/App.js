@@ -6,12 +6,12 @@ export function AlertPlayers() {
   return window['go']['main']['App']['AlertPlayers']();
 }
 
-export function Battle() {
-  return window['go']['main']['App']['Battle']();
-}
-
 export function DefaultUserConfig() {
   return window['go']['main']['App']['DefaultUserConfig']();
+}
+
+export function EmptyBattle() {
+  return window['go']['main']['App']['EmptyBattle']();
 }
 
 export function LatestRelease() {
@@ -50,8 +50,8 @@ export function ShowMessageDialog(arg1) {
   return window['go']['main']['App']['ShowMessageDialog'](arg1);
 }
 
-export function StartWatching() {
-  return window['go']['main']['App']['StartWatching']();
+export function SubscribeBattle() {
+  return window['go']['main']['App']['SubscribeBattle']();
 }
 
 export function TrySaveInstallPath() {
