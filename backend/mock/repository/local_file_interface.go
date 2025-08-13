@@ -40,20 +40,6 @@ func (m *MockLocalFileInterface) EXPECT() *MockLocalFileInterfaceMockRecorder {
 	return m.recorder
 }
 
-// SaveTempArenaInfo mocks base method.
-func (m *MockLocalFileInterface) SaveTempArenaInfo(tempArenaInfo data.TempArenaInfo) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SaveTempArenaInfo", tempArenaInfo)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// SaveTempArenaInfo indicates an expected call of SaveTempArenaInfo.
-func (mr *MockLocalFileInterfaceMockRecorder) SaveTempArenaInfo(tempArenaInfo any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveTempArenaInfo", reflect.TypeOf((*MockLocalFileInterface)(nil).SaveTempArenaInfo), tempArenaInfo)
-}
-
 // TempArenaInfo mocks base method.
 func (m *MockLocalFileInterface) TempArenaInfo(installPath string) (data.TempArenaInfo, error) {
 	m.ctrl.T.Helper()

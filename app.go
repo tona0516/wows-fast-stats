@@ -24,15 +24,6 @@ func NewApp(config Config) *App {
 	return &App{config: config}
 }
 
-func (a *App) MigrateIfNeeded() error {
-	if err := a.container.configMigratorService.ExecuteIfNeeded(); err != nil {
-		a.container.logger.Error(err, nil)
-		return apperr.Unwrap(err)
-	}
-
-	return nil
-}
-
 func (a *App) SubscribeBattle() {
 	if !a.container.battlePublisher.CanSubcribe() {
 		return
@@ -62,12 +53,12 @@ func (a *App) TrySaveInstallPath() (bool, error) {
 		return false, nil
 	}
 
-	config, err := a.container.configService.UpdateInstallPath(path)
+	err = a.container.configService.UpdateInstallPath(path)
 	if err != nil {
 		return false, apperr.Unwrap(err)
 	}
 
-	runtime.EventsEmit(a.ctx, service.EventUpdateConfig, config)
+	runtime.EventsEmit(a.ctx, service.EventUpdateConfig)
 
 	return true, nil
 }
@@ -76,30 +67,6 @@ func (a *App) OpenDirectory(path string) error {
 	err := a.container.configService.OpenDirectory(path)
 	if err != nil {
 		a.container.logger.Warn(err, nil)
-	}
-
-	return apperr.Unwrap(err)
-}
-
-func (a *App) DefaultUserConfig() data.UserConfigV2 {
-	return data.DefaultUserConfigV2()
-}
-
-func (a *App) UserConfig() (data.UserConfigV2, error) {
-	config, err := a.container.configService.User()
-	if err != nil {
-		a.container.logger.Error(err, nil)
-	}
-
-	return config, apperr.Unwrap(err)
-}
-
-func (a *App) UpdateUserConfig(config data.UserConfigV2) error {
-	err := a.container.configService.UpdateOptional(config)
-	if err != nil {
-		a.container.logger.Error(err, nil)
-	} else {
-		runtime.EventsEmit(a.ctx, service.EventUpdateConfig, config)
 	}
 
 	return apperr.Unwrap(err)
@@ -123,31 +90,44 @@ func (a *App) AlertPlayers() ([]data.AlertPlayer, error) {
 	players, err := a.container.configService.AlertPlayers()
 	if err != nil {
 		a.container.logger.Error(err, nil)
+		return nil, apperr.Unwrap(err)
 	}
 
-	return players, apperr.Unwrap(err)
+	return players, nil
 }
 
 func (a *App) UpdateAlertPlayer(player data.AlertPlayer) error {
-	players, err := a.container.configService.UpdateAlertPlayer(player)
-	if err != nil {
+	if err := a.container.configService.UpdateAlertPlayer(player); err != nil {
 		a.container.logger.Error(err, nil)
-	} else {
-		runtime.EventsEmit(a.ctx, service.EventUpdateAlertPlayers, players)
+		return apperr.Unwrap(err)
 	}
 
-	return apperr.Unwrap(err)
+	players, err := a.container.configService.AlertPlayers()
+	if err != nil {
+		a.container.logger.Error(err, nil)
+		return apperr.Unwrap(err)
+	}
+
+	runtime.EventsEmit(a.ctx, service.EventUpdateAlertPlayers, players)
+
+	return nil
 }
 
 func (a *App) RemoveAlertPlayer(accountID int) error {
-	players, err := a.container.configService.RemoveAlertPlayer(accountID)
-	if err != nil {
+	if err := a.container.configService.RemoveAlertPlayer(accountID); err != nil {
 		a.container.logger.Error(err, nil)
-	} else {
-		runtime.EventsEmit(a.ctx, service.EventUpdateAlertPlayers, players)
+		return apperr.Unwrap(err)
 	}
 
-	return apperr.Unwrap(err)
+	players, err := a.container.configService.AlertPlayers()
+	if err != nil {
+		a.container.logger.Error(err, nil)
+		return apperr.Unwrap(err)
+	}
+
+	runtime.EventsEmit(a.ctx, service.EventUpdateAlertPlayers, players)
+
+	return nil
 }
 
 func (a *App) SearchPlayer(prefix string) ([]data.WGAccountListData, error) {
@@ -190,11 +170,7 @@ func (a *App) onStartup(ctx context.Context) {
 		a.showExistDialog("すでに起動しています。", 1)
 	}
 
-	container, err := NewDependencyContainer(ctx, a.config)
-	if err != nil {
-		a.showExistDialog("意図しないエラーが発生しました。\n"+err.Error(), 1)
-	}
-	a.container = container
+	a.container = NewDependencyContainer(ctx, a.config)
 }
 
 func isAlreadyRunning() bool {

@@ -6,10 +6,6 @@ export function AlertPlayers() {
   return window['go']['main']['App']['AlertPlayers']();
 }
 
-export function DefaultUserConfig() {
-  return window['go']['main']['App']['DefaultUserConfig']();
-}
-
 export function EmptyBattle() {
   return window['go']['main']['App']['EmptyBattle']();
 }
@@ -24,10 +20,6 @@ export function LogError(arg1, arg2) {
 
 export function LogInfo(arg1, arg2) {
   return window['go']['main']['App']['LogInfo'](arg1, arg2);
-}
-
-export function MigrateIfNeeded() {
-  return window['go']['main']['App']['MigrateIfNeeded']();
 }
 
 export function OpenDirectory(arg1) {
@@ -60,14 +52,6 @@ export function TrySaveInstallPath() {
 
 export function UpdateAlertPlayer(arg1) {
   return window['go']['main']['App']['UpdateAlertPlayer'](arg1);
-}
-
-export function UpdateUserConfig(arg1) {
-  return window['go']['main']['App']['UpdateUserConfig'](arg1);
-}
-
-export function UserConfig() {
-  return window['go']['main']['App']['UserConfig']();
 }
 
 export function ValidateInstallPath(arg1) {

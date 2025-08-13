@@ -10,7 +10,6 @@
     ShowMessageDialog,
     SubscribeBattle,
     TrySaveInstallPath,
-    UpdateUserConfig,
   } from "wailsjs/go/main/App";
 
   $: columnSettings = deriveColumnSettings($storedConfig);

@@ -2,9 +2,11 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"wfs/backend/apperr"
 	"wfs/backend/data"
 	"wfs/backend/repository"
@@ -18,7 +20,7 @@ const GameExeName = "WorldOfWarships.exe"
 type Config struct {
 	localFile           repository.LocalFileInterface
 	wargaming           repository.WargamingInterface
-	storage             repository.StorageInterface
+	fileStore           repository.FileStoreInterface
 	logger              repository.LoggerInterface
 	OpenDirectoryDialog openDirectoryDialogFunc
 	OpenWithDefaultApp  openWithDefaultAppFunc
@@ -27,23 +29,19 @@ type Config struct {
 func NewConfig(
 	localFile repository.LocalFileInterface,
 	wargaming repository.WargamingInterface,
-	storage repository.StorageInterface,
+	fileStore repository.FileStoreInterface,
 	logger repository.LoggerInterface,
 ) *Config {
 	return &Config{
 		localFile:           localFile,
 		wargaming:           wargaming,
-		storage:             storage,
+		fileStore:           fileStore,
 		logger:              logger,
 		OpenDirectoryDialog: runtime.OpenDirectoryDialog,
 		OpenWithDefaultApp: func(input string) error {
 			return exec.Command("explorer", input).Start()
 		},
 	}
-}
-
-func (c *Config) User() (data.UserConfigV2, error) {
-	return c.storage.UserConfigV2()
 }
 
 func (c *Config) ValidateInstallPath(path string) error {
@@ -58,89 +56,68 @@ func (c *Config) ValidateInstallPath(path string) error {
 	return nil
 }
 
-func (c *Config) UpdateInstallPath(path string) (data.UserConfigV2, error) {
-	var config data.UserConfigV2
-
+func (c *Config) UpdateInstallPath(path string) error {
 	// validate
 	if err := c.ValidateInstallPath(path); err != nil {
-		return config, err
-	}
-
-	// Note: overwrite only required setting
-	config, err := c.storage.UserConfigV2()
-	if err != nil {
-		return config, err
-	}
-	config.InstallPath = path
-
-	// write
-	return config, c.storage.WriteUserConfigV2(config)
-}
-
-func (c *Config) UpdateOptional(config data.UserConfigV2) error {
-	// Note: exclulde required setting
-	saved, err := c.storage.UserConfigV2()
-	if err != nil {
 		return err
 	}
-	config.InstallPath = saved.InstallPath
 
-	// write
-	err = c.storage.WriteUserConfigV2(config)
-	return err
+	return c.fileStore.Put(data.InstallPathKey, path)
+}
+
+func (c *Config) UpdateSendReport() error {
+	return c.fileStore.Put(data.SendReportKey, "1")
 }
 
 func (c *Config) AlertPlayers() ([]data.AlertPlayer, error) {
-	players, err := c.storage.AlertPlayers()
-	return players, err
-}
+	players := make([]data.AlertPlayer, 0)
 
-func (c *Config) UpdateAlertPlayer(player data.AlertPlayer) ([]data.AlertPlayer, error) {
-	var players []data.AlertPlayer
-
-	players, err := c.storage.AlertPlayers()
+	keys, err := c.fileStore.Keys()
 	if err != nil {
-		return players, err
+		return nil, failure.Wrap(err)
 	}
 
-	var isMatched bool
-	for i, v := range players {
-		if player.AccountID == v.AccountID {
-			players[i] = player
-			isMatched = true
-			break
+	for _, v := range keys {
+		if !strings.HasPrefix(v, data.AlertPlayerKeyPrefix.ToString()) {
+			continue
 		}
-	}
 
-	if !isMatched {
+		playerBytes, err := c.fileStore.Get(data.FileStoreKey(v))
+		if err != nil {
+			continue
+		}
+
+		var player data.AlertPlayer
+		if err := json.Unmarshal([]byte(playerBytes), &player); err != nil {
+			continue
+		}
+
 		players = append(players, player)
 	}
 
-	return players, c.storage.WriteAlertPlayers(players)
+	return players, nil
 }
 
-func (c *Config) RemoveAlertPlayer(accountID int) ([]data.AlertPlayer, error) {
-	var players []data.AlertPlayer
-
-	players, err := c.storage.AlertPlayers()
+func (c *Config) UpdateAlertPlayer(player data.AlertPlayer) error {
+	playerBytes, err := json.Marshal(player)
 	if err != nil {
-		return players, err
+		return failure.Wrap(err)
 	}
 
-	var isMatched bool
-	for i, v := range players {
-		if accountID == v.AccountID {
-			players = players[:i+copy(players[i:], players[i+1:])]
-			isMatched = true
-			break
-		}
+	key := data.AlertPlayerKeyPrefix.ToAlertPlayerKey(player.AccountID)
+	if err := c.fileStore.Put(key, string(playerBytes)); err != nil {
+		return failure.Wrap(err)
 	}
 
-	if !isMatched {
-		return players, nil
+	return nil
+}
+
+func (c *Config) RemoveAlertPlayer(accountID int) error {
+	if err := c.fileStore.Remove(data.AlertPlayerKeyPrefix.ToAlertPlayerKey(accountID)); err != nil {
+		return failure.Wrap(err)
 	}
 
-	return players, c.storage.WriteAlertPlayers(players)
+	return nil
 }
 
 func (c *Config) SearchPlayer(prefix string) (data.WGAccountList, error) {

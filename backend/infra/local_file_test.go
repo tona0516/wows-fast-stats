@@ -2,6 +2,7 @@
 package infra
 
 import (
+	"encoding/json"
 	"os"
 	"path/filepath"
 	"testing"
@@ -40,8 +41,7 @@ func TestLocalFile_GetTempArenaInfo(t *testing.T) {
 				defer os.RemoveAll(path[0])
 
 				filePath := filepath.Join(path...)
-				err := writeJSON(filePath, expected)
-				require.NoError(t, err)
+				writeJSON(t, filePath, expected)
 
 				localFile := NewLocalFile()
 				actual, err := localFile.TempArenaInfo(path[0])
@@ -78,10 +78,8 @@ func TestLocalFile_GetTempArenaInfo(t *testing.T) {
 
 		defer os.RemoveAll(testInstallPath)
 
-		err := writeJSON(filepath.Join(testInstallPath, replaysDir, tempArenaInfoFile), older)
-		require.NoError(t, err)
-		err = writeJSON(filepath.Join(testInstallPath, replaysDir, "12.4.0", tempArenaInfoFile), expected)
-		require.NoError(t, err)
+		writeJSON(t, filepath.Join(testInstallPath, replaysDir, tempArenaInfoFile), older)
+		writeJSON(t, filepath.Join(testInstallPath, replaysDir, "12.4.0", tempArenaInfoFile), expected)
 
 		instance := NewLocalFile()
 		actual, err := instance.TempArenaInfo(testInstallPath)
@@ -99,11 +97,10 @@ func TestLocalFile_GetTempArenaInfo(t *testing.T) {
 			func(path string) {
 				defer os.RemoveAll(testInstallPath)
 
-				err := writeJSON(path, data.TempArenaInfo{})
-				require.NoError(t, err)
+				writeJSON(t, path, data.TempArenaInfo{})
 
 				instance := NewLocalFile()
-				_, err = instance.TempArenaInfo(testInstallPath)
+				_, err := instance.TempArenaInfo(testInstallPath)
 				require.Error(t, err)
 			}(path)
 		}
@@ -120,4 +117,22 @@ func TestLocalFile_GetTempArenaInfo(t *testing.T) {
 		assert.True(t, ok)
 		assert.Equal(t, apperr.ReplayDirNotFoundError, code)
 	})
+}
+
+func writeJSON[T any](t *testing.T, path string, target T) {
+	_ = os.MkdirAll(filepath.Dir(path), 0o755)
+	f, err := os.Create(path)
+	if err != nil {
+		t.Fail()
+		return
+	}
+	//nolint:errcheck
+	defer f.Close()
+
+	encoder := json.NewEncoder(f)
+	encoder.SetIndent("", "  ")
+	if err = encoder.Encode(target); err != nil {
+		t.Fail()
+		return
+	}
 }

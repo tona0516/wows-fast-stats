@@ -5,17 +5,13 @@ import type { data } from "wailsjs/go/models";
 import type { Tonako } from "./component/stats/internal/Tonako";
 
 export const storedBattle = writable(undefined) as Writable<OptionalBattle>;
-export const storedConfig = writable({}) as Writable<data.UserConfigV2>;
-
+export const storedStatsExtra = writable({}) as Writable<StatsExtra>;
 export const storedAlertPlayers = writable([]) as Writable<data.AlertPlayer[]>;
 export const storedInstallPathError = writable("") as Writable<string>;
 export const storedTeamThreatLevels = derived(
-  [storedBattle, storedConfig],
-  ([storedBattle, storedConfig]) =>
-    TeamThreatLevel.fromBattle(
-      storedBattle,
-      storedConfig.stats_pattern as StatsExtra,
-    ),
+  [storedBattle, storedStatsExtra],
+  ([storedBattle, storedStatsExtra]) =>
+    TeamThreatLevel.fromBattle(storedBattle, storedStatsExtra),
 );
 export const storedTonako = writable(undefined) as Writable<
   { message: string; isLoading: boolean; tonako: Tonako } | undefined

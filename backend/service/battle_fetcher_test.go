@@ -5,6 +5,7 @@ import (
 	"errors"
 	"testing"
 	"wfs/backend/data"
+	"wfs/backend/infra"
 	"wfs/backend/mock/repository"
 
 	"github.com/stretchr/testify/assert"
@@ -59,10 +60,6 @@ func TestBattle_Get_正常系_初回(t *testing.T) {
 	mockUnregistered := repository.NewMockUnregisteredInterface(ctrl)
 	mockUnregistered.EXPECT().Warship().Return(data.Warships{}, nil)
 
-	mockStorage := repository.NewMockStorageInterface(ctrl)
-	mockStorage.EXPECT().WriteOwnIGN(gomock.Any()).Return(nil)
-	mockStorage.EXPECT().WriteExpectedStats(gomock.Any()).Return(nil)
-
 	mockLogger := repository.NewMockLoggerInterface(ctrl)
 	mockLogger.EXPECT().SetOwnIGN(gomock.Any()).Return()
 
@@ -79,7 +76,7 @@ func TestBattle_Get_正常系_初回(t *testing.T) {
 		mockUnofficialWargaming,
 		mockNumbers,
 		mockUnregistered,
-		mockStorage,
+		infra.NewFileStore(t.TempDir()),
 		mockLogger,
 		emitFunc,
 	)
@@ -130,9 +127,6 @@ func TestBattle_Get_正常系_2回目以降(t *testing.T) {
 
 	mockUnregistered := repository.NewMockUnregisteredInterface(ctrl)
 
-	mockStorage := repository.NewMockStorageInterface(ctrl)
-	mockStorage.EXPECT().WriteOwnIGN(gomock.Any()).Return(nil)
-
 	mockLogger := repository.NewMockLoggerInterface(ctrl)
 	mockLogger.EXPECT().SetOwnIGN(gomock.Any()).Return()
 
@@ -149,7 +143,7 @@ func TestBattle_Get_正常系_2回目以降(t *testing.T) {
 		mockUnofficialWargaming,
 		mockNumbers,
 		mockUnregistered,
-		mockStorage,
+		infra.NewFileStore(t.TempDir()),
 		mockLogger,
 		emitFunc,
 	)
@@ -181,9 +175,6 @@ func TestBattle_Get_異常系_アカウントリスト取得失敗(t *testing.T)
 
 	mockUnregistered := repository.NewMockUnregisteredInterface(ctrl)
 
-	mockStorage := repository.NewMockStorageInterface(ctrl)
-	mockStorage.EXPECT().WriteOwnIGN(gomock.Any()).Return(nil)
-
 	mockLogger := repository.NewMockLoggerInterface(ctrl)
 	mockLogger.EXPECT().SetOwnIGN(gomock.Any()).Return()
 
@@ -200,7 +191,7 @@ func TestBattle_Get_異常系_アカウントリスト取得失敗(t *testing.T)
 		mockUnofficialWargaming,
 		mockNumbers,
 		mockUnregistered,
-		mockStorage,
+		infra.NewFileStore(t.TempDir()),
 		mockLogger,
 		emitFunc,
 	)

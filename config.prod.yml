@@ -32,6 +32,6 @@ discord:
   max_retry: 2
   timeout_sec: 10
 local:
-  storage_path: ./persistent_data
+  storage_path: ./user_data
 logger:
   zerolog_log_level: info

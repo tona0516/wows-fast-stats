@@ -13,8 +13,8 @@ import (
 )
 
 type ExpectedCanSubcribe struct {
-	userConfig data.UserConfigV2
-	expected   bool
+	installPath string
+	expected    bool
 }
 
 func TestBattlePublisher_CanSubcribe(t *testing.T) {
@@ -22,25 +22,26 @@ func TestBattlePublisher_CanSubcribe(t *testing.T) {
 
 	params := []ExpectedCanSubcribe{
 		{
-			userConfig: data.UserConfigV2{InstallPath: "test"},
-			expected:   true,
+			installPath: "test",
+			expected:    true,
 		},
 		{
-			userConfig: data.UserConfigV2{},
-			expected:   false,
+			installPath: "",
+			expected:    false,
 		},
 	}
 
+	ctrl := gomock.NewController(t)
+	mockFileStore := repository.NewMockFileStoreInterface(ctrl)
+
 	for _, v := range params {
-		ctrl := gomock.NewController(t)
-		mockStorage := repository.NewMockStorageInterface(ctrl)
-		mockStorage.EXPECT().UserConfigV2().Return(v.userConfig, nil)
+		mockFileStore.EXPECT().Get(data.InstallPathKey).Return(v.installPath, nil)
 
 		bp := NewBattlePublisher(
 			context.Background(),
 			1,
 			nil,
-			mockStorage,
+			mockFileStore,
 			nil,
 			nil,
 		)
@@ -55,17 +56,11 @@ func TestBattlePublisher_Subcribe(t *testing.T) {
 	ctrl := gomock.NewController(t)
 
 	// モックの作成
-	mockLocalFile := repository.NewMockLocalFileInterface(ctrl)
-	mockStorage := repository.NewMockStorageInterface(ctrl)
-
-	// テスト用データ
-	testConfig := data.UserConfigV2{InstallPath: "test", SaveTempArenaInfo: false}
 	testArena := data.TempArenaInfo{PlayerName: "testPlayer"}
-
-	// UserConfigV2の返却値を設定
-	mockStorage.EXPECT().UserConfigV2().Return(testConfig, nil)
-	// TempArenaInfoの返却値を設定
-	mockLocalFile.EXPECT().TempArenaInfo(testConfig.InstallPath).Return(testArena, nil).AnyTimes()
+	mockLocalFile := repository.NewMockLocalFileInterface(ctrl)
+	mockLocalFile.EXPECT().TempArenaInfo("test").Return(testArena, nil).AnyTimes()
+	mockFileStore := repository.NewMockFileStoreInterface(ctrl)
+	mockFileStore.EXPECT().Get(data.InstallPathKey).Return("test", nil).AnyTimes()
 
 	// イベント発火履歴を記録するモック
 	var events []string
@@ -77,12 +72,12 @@ func TestBattlePublisher_Subcribe(t *testing.T) {
 		context.Background(),
 		0, // intervalを0にして即時実行
 		mockLocalFile,
-		mockStorage,
+		mockFileStore,
 		nil,
 		emitFunc,
 	)
 
-	// CanSubcribeでuserConfigをセット
+	// CanSubcribeでinstallPathをセット
 	assert.True(t, bp.CanSubcribe())
 
 	// channelを用意

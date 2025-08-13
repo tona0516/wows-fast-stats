@@ -4,8 +4,6 @@ import {data} from '../models';
 
 export function AlertPlayers():Promise<Array<data.AlertPlayer>>;
 
-export function DefaultUserConfig():Promise<data.UserConfigV2>;
-
 export function EmptyBattle():Promise<data.Battle>;
 
 export function LatestRelease():Promise<data.GHLatestRelease>;
@@ -13,8 +11,6 @@ export function LatestRelease():Promise<data.GHLatestRelease>;
 export function LogError(arg1:string,arg2:{[key: string]: string}):Promise<void>;
 
 export function LogInfo(arg1:string,arg2:{[key: string]: string}):Promise<void>;
-
-export function MigrateIfNeeded():Promise<void>;
 
 export function OpenDirectory(arg1:string):Promise<void>;
 
@@ -31,9 +27,5 @@ export function SubscribeBattle():Promise<void>;
 export function TrySaveInstallPath():Promise<boolean>;
 
 export function UpdateAlertPlayer(arg1:data.AlertPlayer):Promise<void>;
-
-export function UpdateUserConfig(arg1:data.UserConfigV2):Promise<void>;
-
-export function UserConfig():Promise<data.UserConfigV2>;
 
 export function ValidateInstallPath(arg1:string):Promise<string>;

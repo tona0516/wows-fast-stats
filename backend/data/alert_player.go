@@ -5,4 +5,5 @@ type AlertPlayer struct {
 	Name      string `json:"name"`
 	Pattern   string `json:"pattern"`
 	Message   string `json:"message"`
+	CreatedAt uint64 `json:"created_at"`
 }

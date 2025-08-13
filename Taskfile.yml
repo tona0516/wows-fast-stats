@@ -79,6 +79,7 @@ tasks:
           - temp_arena_info/
           - screenshot/
           - persistent_data/
+          - user_data/
         cmd: rm -rf {{.ITEM}}
   update:
     desc: update dependencies

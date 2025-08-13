@@ -10,7 +10,6 @@
   import {
     storedAlertPlayers,
     storedBattle,
-    storedConfig,
     storedInstallPathError,
     storedTonako,
   } from "src/stores";
@@ -20,10 +19,8 @@
     AlertPlayers,
     LatestRelease,
     LogError,
-    MigrateIfNeeded,
     ShowMessageDialog,
     SubscribeBattle,
-    UserConfig,
     ValidateInstallPath,
   } from "wailsjs/go/main/App";
   import type { data } from "wailsjs/go/models";
@@ -54,9 +51,6 @@
     themeChange(false);
   });
 
-  EventsOn("CONFIG_UPDATE", (config: data.UserConfigV2) =>
-    storedConfig.set(config),
-  );
   EventsOn("ALERT_PLAYERS_UPDATE", (players: data.AlertPlayer[]) =>
     storedAlertPlayers.set(players),
   );
@@ -126,8 +120,6 @@
     // localStorage.clear();
 
     try {
-      await MigrateIfNeeded();
-
       const config = await UserConfig();
       storedConfig.set(config);
 

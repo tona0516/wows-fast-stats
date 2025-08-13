@@ -3,11 +3,11 @@ package main
 import (
 	"context"
 	"time"
+	"wfs/backend/data"
 	"wfs/backend/infra"
 	"wfs/backend/repository"
 	"wfs/backend/service"
 
-	"github.com/dgraph-io/badger/v4"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
@@ -16,15 +16,14 @@ type DependencyContainer struct {
 	config Config
 
 	// services
-	configService         *service.Config
-	battlePublisher       *service.BattlePublisher
-	battleService         *service.BattleFetcher
-	updaterService        *service.Updater
-	configMigratorService *service.ConfigMigrator
-	logger                repository.LoggerInterface
+	configService   *service.Config
+	battlePublisher *service.BattlePublisher
+	battleService   *service.BattleFetcher
+	updaterService  *service.Updater
+	logger          repository.LoggerInterface
 }
 
-func NewDependencyContainer(ctx context.Context, config Config) (*DependencyContainer, error) {
+func NewDependencyContainer(ctx context.Context, config Config) *DependencyContainer {
 	alertDiscord := infra.NewDiscord(
 		config.Discord.AlertURL,
 		config.Discord.MaxRetry,
@@ -36,14 +35,8 @@ func NewDependencyContainer(ctx context.Context, config Config) (*DependencyCont
 		config.Discord.TimeoutSec,
 	)
 
-	options := badger.DefaultOptions(config.Local.StoragePath)
-	db, err := badger.Open(options)
-	if err != nil {
-		return nil, err
-	}
-
-	storage := infra.NewStorage(db)
-	ownIGN, _ := storage.OwnIGN()
+	fileStore := infra.NewFileStore(config.Local.StoragePath)
+	ownIGN, _ := fileStore.Get(data.OwnIGNKey)
 
 	logger := infra.NewLogger(
 		config.App.Name,
@@ -74,7 +67,6 @@ func NewDependencyContainer(ctx context.Context, config Config) (*DependencyCont
 		config.Numbers.TimeoutSec,
 	)
 	localFile := infra.NewLocalFile()
-	configV0 := infra.NewConfigV0()
 	unregistered := infra.NewUnregistered()
 	github := infra.NewGithub(
 		config.Github.URL,
@@ -83,14 +75,14 @@ func NewDependencyContainer(ctx context.Context, config Config) (*DependencyCont
 	)
 
 	// services
-	configService := service.NewConfig(localFile, wargaming, storage, logger)
+	configService := service.NewConfig(localFile, wargaming, fileStore, logger)
 	battleFetcher := service.NewBattleFetcher(
 		ctx,
 		wargaming,
 		uwargaming,
 		numbers,
 		unregistered,
-		storage,
+		fileStore,
 		logger,
 		runtime.EventsEmit,
 	)
@@ -98,20 +90,18 @@ func NewDependencyContainer(ctx context.Context, config Config) (*DependencyCont
 		ctx,
 		time.Duration(config.Watcher.IntervalSec)*time.Second,
 		localFile,
-		storage,
+		fileStore,
 		logger,
 		runtime.EventsEmit,
 	)
 	updaterService := service.NewUpdater(config.App.Semver, github, logger)
-	configMigratorService := service.NewConfigMigrator(configV0, storage, logger)
 
 	return &DependencyContainer{
-		config:                config,
-		configService:         configService,
-		battlePublisher:       battlePublisher,
-		battleService:         battleFetcher,
-		updaterService:        updaterService,
-		configMigratorService: configMigratorService,
-		logger:                logger,
-	}, nil
+		config:          config,
+		configService:   configService,
+		battlePublisher: battlePublisher,
+		battleService:   battleFetcher,
+		updaterService:  updaterService,
+		logger:          logger,
+	}
 }

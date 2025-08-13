@@ -16,18 +16,18 @@ type BattlePublisher struct {
 	ctx            context.Context
 	interval       time.Duration
 	localFile      repository.LocalFileInterface
-	storage        repository.StorageInterface
+	fileStore      repository.FileStoreInterface
 	logger         repository.LoggerInterface
 	eventsEmitFunc eventEmitFunc
 
-	userConfig *data.UserConfigV2
+	installPath string
 }
 
 func NewBattlePublisher(
 	ctx context.Context,
 	interval time.Duration,
 	localFile repository.LocalFileInterface,
-	storage repository.StorageInterface,
+	fileStore repository.FileStoreInterface,
 	logger repository.LoggerInterface,
 	eventsEmitFunc eventEmitFunc,
 ) *BattlePublisher {
@@ -35,23 +35,23 @@ func NewBattlePublisher(
 		ctx:            ctx,
 		interval:       interval,
 		localFile:      localFile,
-		storage:        storage,
+		fileStore:      fileStore,
 		logger:         logger,
 		eventsEmitFunc: eventsEmitFunc,
 	}
 }
 
 func (bp *BattlePublisher) CanSubcribe() bool {
-	userConfig, err := bp.storage.UserConfigV2()
+	installPath, err := bp.fileStore.Get(data.InstallPathKey)
 	if err != nil {
 		return false
 	}
 
-	if userConfig.InstallPath == "" {
+	if installPath == "" {
 		return false
 	}
 
-	bp.userConfig = &userConfig
+	bp.installPath = installPath
 	return true
 }
 
@@ -68,7 +68,7 @@ func (bp *BattlePublisher) Subcribe(cancelCtx context.Context, channel chan data
 
 			// tempArenaInfo.jsonを取得
 			// 取得できない場合は、イベントを発行して次のループ
-			tempArenaInfo, err := bp.localFile.TempArenaInfo(bp.userConfig.InstallPath)
+			tempArenaInfo, err := bp.localFile.TempArenaInfo(bp.installPath)
 			if err != nil {
 				if failure.Is(err, apperr.FileNotExist) || failure.Is(err, apperr.ReplayDirNotFoundError) {
 					bp.eventsEmitFunc(bp.ctx, EventEnd)
@@ -84,13 +84,6 @@ func (bp *BattlePublisher) Subcribe(cancelCtx context.Context, channel chan data
 			hash := fmt.Sprintf("%x", sha256.Sum256([]byte(fmt.Sprintf("%x", tempArenaInfo))))
 			if hash == latestHash {
 				continue
-			}
-
-			// 必要に応じて保存
-			if bp.userConfig.SaveTempArenaInfo {
-				if err := bp.localFile.SaveTempArenaInfo(tempArenaInfo); err != nil {
-					bp.logger.Warn(err, nil)
-				}
 			}
 
 			// 新規戦闘開始を通知

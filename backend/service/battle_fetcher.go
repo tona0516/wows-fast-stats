@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"regexp"
 	"sort"
 	"strings"
@@ -21,7 +22,7 @@ type BattleFetcher struct {
 	uwargaming     repository.UnofficialWargamingInterface
 	numbers        repository.NumbersInterface
 	unregistered   repository.UnregisteredInterface
-	storage        repository.StorageInterface
+	fileStore      repository.FileStoreInterface
 	logger         repository.LoggerInterface
 	eventsEmitFunc eventEmitFunc
 
@@ -39,7 +40,7 @@ func NewBattleFetcher(
 	uwargaming repository.UnofficialWargamingInterface,
 	numbers repository.NumbersInterface,
 	unregistered repository.UnregisteredInterface,
-	storage repository.StorageInterface,
+	fileStore repository.FileStoreInterface,
 	logger repository.LoggerInterface,
 	eventsEmitFunc eventEmitFunc,
 ) *BattleFetcher {
@@ -49,7 +50,7 @@ func NewBattleFetcher(
 		uwargaming:                         uwargaming,
 		numbers:                            numbers,
 		unregistered:                       unregistered,
-		storage:                            storage,
+		fileStore:                          fileStore,
 		logger:                             logger,
 		eventsEmitFunc:                     eventsEmitFunc,
 		isFirstBattle:                      true,
@@ -73,7 +74,7 @@ func (b *BattleFetcher) Invoke(tempArenaInfo data.TempArenaInfo) {
 	}
 
 	// persist own ign for reporting
-	_ = b.storage.WriteOwnIGN(tempArenaInfo.PlayerName)
+	_ = b.fileStore.Put(data.OwnIGNKey, tempArenaInfo.PlayerName)
 	b.logger.SetOwnIGN(tempArenaInfo.PlayerName)
 
 	accountList, err := b.wargaming.AccountList(tempArenaInfo.AccountNames())
@@ -219,18 +220,25 @@ func (b *BattleFetcher) fetchExpectedStats(channel chan data.Result[data.Expecte
 	// 最新の予測成績を取得
 	expectedStats, errFetch := b.numbers.ExpectedStats()
 	if errFetch == nil {
-		_ = b.storage.WriteExpectedStats(expectedStats)
+		// キャッシュに保存
+		expectedStatsBytes, err := json.Marshal(expectedStats)
+		if err == nil {
+			_ = b.fileStore.Put(data.ExpectedStatsKey, string(expectedStatsBytes))
+		}
+
 		result.Value = expectedStats
 		channel <- result
 		return
 	}
 
 	// 取得できない場合、キャッシュを利用する
-	expectedStats, errCache := b.storage.ExpectedStats()
+	expectedStatsBytes, errCache := b.fileStore.Get(data.ExpectedStatsKey)
 	if errCache == nil {
-		result.Value = expectedStats
-		channel <- result
-		return
+		if err := json.Unmarshal([]byte(expectedStatsBytes), &expectedStats); err == nil {
+			result.Value = expectedStats
+			channel <- result
+			return
+		}
 	}
 
 	result.Error = failure.New(apperr.ExpectedStatsUnavaillalble, failure.Context{
