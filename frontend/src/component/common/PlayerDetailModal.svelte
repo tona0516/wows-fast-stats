@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { NumbersURL } from "src/lib/NumbersURL";
   import {
     storedAlertPlayers,
     storedPlayerDetail,
@@ -10,6 +9,7 @@
   } from "src/stores";
   import { BrowserOpenURL, ClipboardSetText } from "wailsjs/runtime/runtime";
   import ModalCommon from "./ModalCommon.svelte";
+  import { AppFunc } from "src/lib/AppFunc";
 
   $: alertPlayer = $storedAlertPlayers.find(
     (ap) => ap.account_id === $storedPlayerDetail?.player_info.id,
@@ -74,7 +74,7 @@
       <button
         class="btn"
         on:click={() =>
-          BrowserOpenURL(NumbersURL.player(accountID, playerName))}
+          BrowserOpenURL(AppFunc.playerNumbersURL(accountID, playerName))}
       >
         プレイヤーページ(wows-numbers.com)<i class="bi bi-box-arrow-in-up-right"
         ></i>
@@ -83,7 +83,7 @@
       {#if clan.id !== 0}
         <button
           class="btn"
-          on:click={() => BrowserOpenURL(NumbersURL.clan(clan.id))}
+          on:click={() => BrowserOpenURL(AppFunc.clanNumbersURL(clan.id))}
         >
           クランページ(wows-numbers.com)<i class="bi bi-box-arrow-in-up-right"
           ></i>

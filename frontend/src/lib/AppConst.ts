@@ -96,4 +96,6 @@ export namespace AppConst {
     ["middle", "5~7"],
     ["high", "8~★"],
   ]);
+
+  export const NUMBERS_URL = "https://asia.wows-numbers.com/";
 }

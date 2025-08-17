@@ -6,11 +6,11 @@
   } from "src/stores";
   import { BrowserOpenURL, ClipboardSetText } from "wailsjs/runtime/runtime";
   import ModalCommon from "./ModalCommon.svelte";
-  import { NumbersURL } from "src/lib/NumbersURL";
   import { RATING_DEFS } from "src/lib/RatingLevel";
   import type { data } from "wailsjs/go/models";
   import { Color, type ColorPair } from "src/lib/Color";
   import { AppConst } from "src/lib/AppConst";
+    import { AppFunc } from "src/lib/AppFunc";
 
   interface DamageRating {
     level: string;
@@ -67,7 +67,7 @@
     <div class="grid xl:grid-cols-1 gap-4 mt-2">
       <button
         class="btn"
-        on:click={() => BrowserOpenURL(NumbersURL.ship(shipID))}
+        on:click={() => BrowserOpenURL(AppFunc.shipNumbersURL(shipID))}
       >
         艦艇ページ(wows-numbers.com)<i class="bi bi-box-arrow-in-up-right"></i>
       </button>
