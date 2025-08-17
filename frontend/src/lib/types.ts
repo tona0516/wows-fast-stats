@@ -18,10 +18,10 @@ export type StatsExtra = Exclude<
   keyof data.Player,
   keyof typeof BasicKey | CommonMethod
 >;
-export type ShipKey = Readonly<keyof data.UCDisplayShip>;
-export type OverallKey = Readonly<keyof data.UCDisplayOverall>;
-export type CommonKey = ShipKey & OverallKey;
-export type DigitKey = Readonly<keyof data.UCDigit>;
+
+export type ShipStatsKey = Exclude<keyof data.ShipStats, CommonMethod>;
+export type OverallStatsKey = Exclude<keyof data.OverallStats, CommonMethod>;
+export type StatsKey = ShipStatsKey | OverallStatsKey;
 
 export type OptionalBattle = data.Battle | undefined;
 export type OptionalTeamThreatLevels = TeamThreatLevel[] | undefined;
@@ -29,3 +29,7 @@ export type OptionalTeamThreatLevels = TeamThreatLevel[] | undefined;
 export type Page = "stats" | "ap_config" | "config" | "info";
 
 export type GetStatsFunction = (ps: data.PlayerStats) => number;
+
+export type ColumnSetting = { ship: boolean; overall: boolean; digit: number };
+
+export type ColumnSettingPattern = "ship" | "overall" | "both";

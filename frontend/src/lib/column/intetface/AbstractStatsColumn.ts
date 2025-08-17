@@ -1,30 +1,32 @@
-import type { ColumnSetting } from "src/lib/ColumnSetting";
+import { AppConstants } from "src/lib/AppConstants";
 import { AbstractColumn } from "src/lib/column/intetface/AbstractColumn";
-import { DispName } from "src/lib/DispName";
-import type { StatsCategory } from "src/lib/types";
-import { deriveColumnSetting, toPlayerStats } from "src/lib/util";
+import type { StatsCategory, StatsKey } from "src/lib/types";
+import { storedColumnmSettings, storedStatsExtra } from "src/stores";
+import { get } from "svelte/store";
 import type { data } from "wailsjs/go/models";
 
 export abstract class AbstractStatsColumn<T> extends AbstractColumn {
-  columnSetting: ColumnSetting;
-
   constructor(
-    readonly key: string,
-    readonly config: data.UserConfigV2,
+    readonly key: StatsKey,
     readonly category: StatsCategory,
   ) {
-    super(key, DispName.MIN_COLUMN_NAMES.get(key) ?? key);
-    this.columnSetting = deriveColumnSetting(config, key);
+    super(key, AppConstants.STATS_COLUMN_INFO[key].min ?? key);
   }
 
   abstract displayValue(player: data.Player): T;
 
   needsShow(): boolean {
-    return this.columnSetting[this.category].value;
+    const cs = get(storedColumnmSettings)[this.key];
+    switch (this.category) {
+      case "ship":
+        return cs.ship;
+      case "overall":
+        return cs.overall;
+    }
   }
 
   digit(): number {
-    return this.columnSetting.digit.value;
+    return get(storedColumnmSettings)[this.key].digit;
   }
 
   textColorCode(_: data.Player): string {
@@ -32,7 +34,7 @@ export abstract class AbstractStatsColumn<T> extends AbstractColumn {
   }
 
   playerStats(player: data.Player): data.PlayerStats {
-    return toPlayerStats(player, this.config.stats_pattern);
+    return player[get(storedStatsExtra)];
   }
 
   getBackgroundColorCode(_player: data.Player): string | undefined {

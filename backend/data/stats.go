@@ -202,64 +202,32 @@ func (s *Stats) WinRate(category StatsCategory, pattern StatsPattern) float64 {
 	return 0
 }
 
-func (s *Stats) SurvivedRate(category StatsCategory, pattern StatsPattern) float64 {
+func (s *Stats) SurvivedRate(category StatsCategory, pattern StatsPattern) SurvivedRate {
 	ship, player := s.statsValues(pattern)
 	switch category {
 	case StatsCategoryShip:
-		return percentage(ship.SurvivedBattles, ship.Battles)
+		return SurvivedRate{
+			All:  percentage(ship.SurvivedBattles, ship.Battles),
+			Win:  percentage(ship.SurvivedWins, ship.Wins),
+			Lose: percentage(ship.SurvivedBattles-ship.SurvivedWins, ship.Battles-ship.Wins),
+		}
 	case StatsCategoryOverall:
-		return percentage(player.SurvivedBattles, player.Battles)
+		return SurvivedRate{
+			All:  percentage(player.SurvivedBattles, player.Battles),
+			Win:  percentage(player.SurvivedWins, player.Wins),
+			Lose: percentage(player.SurvivedBattles-player.SurvivedWins, player.Battles-player.Wins),
+		}
 	}
 
-	return 0
+	return SurvivedRate{}
 }
 
-func (s *Stats) WinSurvivedRate(category StatsCategory, pattern StatsPattern) float64 {
-	ship, player := s.statsValues(pattern)
-	switch category {
-	case StatsCategoryShip:
-		return percentage(ship.SurvivedWins, ship.Wins)
-	case StatsCategoryOverall:
-		return percentage(player.SurvivedWins, player.Wins)
-	}
-
-	return 0
-}
-
-func (s *Stats) LoseSurvivedRate(category StatsCategory, pattern StatsPattern) float64 {
-	var (
-		battles         uint
-		wins            uint
-		survivedBattles uint
-		survivedWins    uint
-	)
-
-	ship, player := s.statsValues(pattern)
-	switch category {
-	case StatsCategoryShip:
-		battles = ship.Battles
-		wins = ship.Wins
-		survivedBattles = ship.SurvivedBattles
-		survivedWins = ship.SurvivedWins
-	case StatsCategoryOverall:
-		battles = player.Battles
-		wins = player.Wins
-		survivedBattles = player.SurvivedBattles
-		survivedWins = player.SurvivedWins
-	}
-
-	loses := battles - wins
-	return percentage(survivedBattles-survivedWins, loses)
-}
-
-func (s *Stats) MainBatteryHitRate(pattern StatsPattern) float64 {
+func (s *Stats) HitRate(pattern StatsPattern) HitRate {
 	ship, _ := s.statsValues(pattern)
-	return percentage(ship.MainBattery.Hits, ship.MainBattery.Shots)
-}
-
-func (s *Stats) TorpedoesHitRate(pattern StatsPattern) float64 {
-	ship, _ := s.statsValues(pattern)
-	return percentage(ship.Torpedoes.Hits, ship.Torpedoes.Shots)
+	return HitRate{
+		MainBattery: percentage(ship.MainBattery.Hits, ship.MainBattery.Shots),
+		Torpedoes:   percentage(ship.Torpedoes.Hits, ship.Torpedoes.Shots),
+	}
 }
 
 func (s *Stats) PlanesKilled(pattern StatsPattern) float64 {

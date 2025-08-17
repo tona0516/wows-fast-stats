@@ -4,8 +4,8 @@ import { ThreatLevelGenerator } from "src/lib/ThreatLevel";
 import type { data } from "wailsjs/go/models";
 
 export class ThreatLevel extends AbstractStatsColumn<string> {
-  constructor(config: data.UserConfigV2) {
-    super("threat_level", config, "overall");
+  constructor() {
+    super("threat_level", "overall");
   }
 
   displayValue(player: data.Player): string {

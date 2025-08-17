@@ -56,6 +56,15 @@ func (c *Config) ValidateInstallPath(path string) error {
 	return nil
 }
 
+func (c *Config) InstallPath() string {
+	installPath, err := c.fileStore.Get(data.InstallPathKey)
+	if err != nil {
+		return ""
+	}
+
+	return installPath
+}
+
 func (c *Config) UpdateInstallPath(path string) error {
 	// validate
 	if err := c.ValidateInstallPath(path); err != nil {
@@ -65,8 +74,28 @@ func (c *Config) UpdateInstallPath(path string) error {
 	return c.fileStore.Put(data.InstallPathKey, path)
 }
 
-func (c *Config) UpdateSendReport() error {
-	return c.fileStore.Put(data.SendReportKey, "1")
+func (c *Config) SendReport() bool {
+	value, err := c.fileStore.Get(data.SendReportKey)
+	if err != nil {
+		return false
+	}
+
+	if value == "" {
+		return false
+	}
+
+	return value == "1"
+}
+
+func (c *Config) UpdateSendReport(sendReport bool) error {
+	var value string
+	if sendReport {
+		value = "1"
+	} else {
+		value = "0"
+	}
+
+	return c.fileStore.Put(data.SendReportKey, value)
 }
 
 func (c *Config) AlertPlayers() ([]data.AlertPlayer, error) {

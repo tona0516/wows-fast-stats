@@ -1,5 +1,5 @@
-import { toPlayerStats } from "src/lib/util";
 import type { data } from "wailsjs/go/models";
+import type { StatsExtra } from "./types";
 
 export enum RowPattern {
   NO_COLUMN = 0,
@@ -12,11 +12,11 @@ export enum RowPattern {
 export namespace RowPattern {
   export const derive = (
     player: data.Player,
-    statsPattern: string,
-    allColumnCount: number,
+    statsExtra: StatsExtra,
     shipColumnCount: number,
+    overallColumnCount: number,
   ): RowPattern => {
-    if (allColumnCount === 0) {
+    if (shipColumnCount + overallColumnCount === 0) {
       return RowPattern.NO_COLUMN;
     }
 
@@ -24,7 +24,7 @@ export namespace RowPattern {
       return RowPattern.PRIVATE;
     }
 
-    const stats = toPlayerStats(player, statsPattern);
+    const stats = player[statsExtra];
     if (player.player_info.id === 0 || stats.overall.battles === 0) {
       return RowPattern.NO_STATS;
     }
@@ -34,5 +34,20 @@ export namespace RowPattern {
     }
 
     return RowPattern.FULL;
+  };
+
+  export const getColumnText = (pattern: RowPattern): string => {
+    switch (pattern) {
+      case RowPattern.NO_COLUMN:
+        return "";
+      case RowPattern.PRIVATE:
+        return "PRIVAYE";
+      case RowPattern.NO_STATS:
+        return "N/A";
+      case RowPattern.NO_SHIP_STATS:
+        return "N/A";
+      case RowPattern.FULL:
+        return "";
+    }
   };
 }

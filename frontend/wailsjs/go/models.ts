@@ -75,8 +75,7 @@ export namespace data {
 	    damage: number;
 	    max_damage: MaxDamage;
 	    win_rate: number;
-	    win_survived_rate: number;
-	    lose_survived_rate: number;
+	    survived_rate: SurvivedRate;
 	    kd_rate: number;
 	    kill: number;
 	    exp: number;
@@ -97,8 +96,7 @@ export namespace data {
 	        this.damage = source["damage"];
 	        this.max_damage = this.convertValues(source["max_damage"], MaxDamage);
 	        this.win_rate = source["win_rate"];
-	        this.win_survived_rate = source["win_survived_rate"];
-	        this.lose_survived_rate = source["lose_survived_rate"];
+	        this.survived_rate = this.convertValues(source["survived_rate"], SurvivedRate);
 	        this.kd_rate = source["kd_rate"];
 	        this.kill = source["kill"];
 	        this.exp = source["exp"];
@@ -128,6 +126,36 @@ export namespace data {
 		    return a;
 		}
 	}
+	export class HitRate {
+	    main_battery: number;
+	    torpedoes: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new HitRate(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.main_battery = source["main_battery"];
+	        this.torpedoes = source["torpedoes"];
+	    }
+	}
+	export class SurvivedRate {
+	    all: number;
+	    win: number;
+	    lose: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new SurvivedRate(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.all = source["all"];
+	        this.win = source["win"];
+	        this.lose = source["lose"];
+	    }
+	}
 	export class MaxDamage {
 	    ship_id: number;
 	    ship_name: string;
@@ -151,14 +179,12 @@ export namespace data {
 	    damage: number;
 	    max_damage: MaxDamage;
 	    win_rate: number;
-	    win_survived_rate: number;
-	    lose_survived_rate: number;
+	    survived_rate: SurvivedRate;
 	    kd_rate: number;
 	    kill: number;
 	    exp: number;
 	    pr: number;
-	    main_battery_hit_rate: number;
-	    torpedoes_hit_rate: number;
+	    hit_rate: HitRate;
 	    planes_killed: number;
 	    platoon_rate: number;
 	
@@ -172,14 +198,12 @@ export namespace data {
 	        this.damage = source["damage"];
 	        this.max_damage = this.convertValues(source["max_damage"], MaxDamage);
 	        this.win_rate = source["win_rate"];
-	        this.win_survived_rate = source["win_survived_rate"];
-	        this.lose_survived_rate = source["lose_survived_rate"];
+	        this.survived_rate = this.convertValues(source["survived_rate"], SurvivedRate);
 	        this.kd_rate = source["kd_rate"];
 	        this.kill = source["kill"];
 	        this.exp = source["exp"];
 	        this.pr = source["pr"];
-	        this.main_battery_hit_rate = source["main_battery_hit_rate"];
-	        this.torpedoes_hit_rate = source["torpedoes_hit_rate"];
+	        this.hit_rate = this.convertValues(source["hit_rate"], HitRate);
 	        this.planes_killed = source["planes_killed"];
 	        this.platoon_rate = source["platoon_rate"];
 	    }
@@ -447,6 +471,8 @@ export namespace data {
 	        this.updatable = source["updatable"];
 	    }
 	}
+	
+	
 	
 	
 	

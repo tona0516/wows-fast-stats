@@ -3,16 +3,17 @@ import { AbstractStatsColumn } from "src/lib/column/intetface/AbstractStatsColum
 import type { data } from "wailsjs/go/models";
 
 export class HitRate extends AbstractStatsColumn<string> {
-  constructor(config: data.UserConfigV2) {
-    super("hit_rate", config, "ship");
+  constructor() {
+    super("hit_rate", "ship");
   }
 
   displayValue(player: data.Player): string {
-    const stats = this.playerStats(player).ship;
-    const main = stats.main_battery_hit_rate.format(this.digit());
-    const torps = stats.torpedoes_hit_rate.format(this.digit());
+    const hitRate = this.playerStats(player).ship.hit_rate;
 
-    return `${main}% | ${torps}%`;
+    const main = hitRate.main_battery.format(this.digit());
+    const torps = hitRate.torpedoes.format(this.digit());
+
+    return `${main}|${torps}`;
   }
 
   getTableDataComponent() {

@@ -1,17 +1,58 @@
 import { TeamThreatLevel } from "src/lib/TeamThreatLevel";
-import type { OptionalBattle, StatsExtra } from "src/lib/types";
+import type { ColumnSetting, OptionalBattle, StatsKey } from "src/lib/types";
 import { derived, type Writable, writable } from "svelte/store";
 import type { data } from "wailsjs/go/models";
 import type { Tonako } from "./component/stats/internal/Tonako";
+import { AppConstants } from "./lib/AppConstants";
+import { LocalStorage } from "./lib/LocalStorage";
+
+export const storedZoomRate = writable(LocalStorage.instance.getZoomRate());
+storedZoomRate.subscribe((zoomRate) => {
+  LocalStorage.instance.setZoomRate(zoomRate);
+});
+
+export const storedStatsExtra = writable(LocalStorage.instance.getStatsExtra());
+storedStatsExtra.subscribe((statsExtra) => {
+  LocalStorage.instance.setStatsExtra(statsExtra);
+});
+
+export const storedPlayerNameColor = writable(
+  LocalStorage.instance.getPlayerNameColor(),
+);
+storedPlayerNameColor.subscribe((color) => {
+  LocalStorage.instance.setPlayerNameColor(color);
+});
+
+export const storedShowClanNation = writable(
+  LocalStorage.instance.getShowClanNation(),
+);
+storedShowClanNation.subscribe((showClanNation) => {
+  LocalStorage.instance.setShowClanNation(showClanNation);
+});
+
+export const storedColumnmSettings = writable(
+  AppConstants.STATS_KEYS.reduce(
+    (acc, key) => {
+      acc[key] = LocalStorage.instance.getColumnSetting(key);
+      return acc;
+    },
+    {} as { [key in StatsKey]: ColumnSetting },
+  ),
+);
+storedColumnmSettings.subscribe((settings) => {
+  Object.entries(settings).forEach(([key, value]) => {
+    LocalStorage.instance.setColumnSetting(key as StatsKey, value);
+  });
+});
 
 export const storedBattle = writable(undefined) as Writable<OptionalBattle>;
-export const storedStatsExtra = writable({}) as Writable<StatsExtra>;
 export const storedAlertPlayers = writable([]) as Writable<data.AlertPlayer[]>;
 export const storedInstallPathError = writable("") as Writable<string>;
 export const storedTeamThreatLevels = derived(
   [storedBattle, storedStatsExtra],
-  ([storedBattle, storedStatsExtra]) =>
-    TeamThreatLevel.fromBattle(storedBattle, storedStatsExtra),
+  ([battle, statsExtra]) => {
+    return TeamThreatLevel.fromBattle(battle, statsExtra);
+  },
 );
 export const storedTonako = writable(undefined) as Writable<
   { message: string; isLoading: boolean; tonako: Tonako } | undefined

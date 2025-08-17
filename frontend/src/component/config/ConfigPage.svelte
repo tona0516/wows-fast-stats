@@ -1,50 +1,45 @@
 <script lang="ts">
-  import { DispName } from "src/lib/DispName";
-  import { Theme } from "src/lib/Theme";
-  import { deriveColumnSettings } from "src/lib/util";
-  import { showToast, storedConfig, storedInstallPathError } from "src/stores";
+  import { AppConstants } from "src/lib/AppConstants";
+  import {
+    showToast,
+    storedColumnmSettings,
+    storedInstallPathError,
+    storedPlayerNameColor,
+    storedShowClanNation,
+    storedStatsExtra,
+    storedZoomRate,
+  } from "src/stores";
   import { onMount } from "svelte";
   import { themeChange } from "theme-change";
   import {
-    OpenDirectory,
-    ShowMessageDialog,
+    InstallPath,
+    SendReport,
     SubscribeBattle,
     TrySaveInstallPath,
+    UpdateSendReport,
   } from "wailsjs/go/main/App";
 
-  $: columnSettings = deriveColumnSettings($storedConfig);
+  let installPath: string = "";
+  let sendReport: boolean = false;
 
-  onMount(() => {
+  onMount(async () => {
     themeChange(false);
+    sendReport = await SendReport();
+    installPath = await InstallPath();
   });
 
   const onClickSelectDirectory = async () => {
     try {
       const isSuccess = await TrySaveInstallPath();
       if (isSuccess) {
-        showToast("インストールパスを設定しました");
+        installPath = await InstallPath();
         storedInstallPathError.set("");
+
+        showToast("インストールパスを設定しました");
         SubscribeBattle();
       }
     } catch (error) {
       storedInstallPathError.set(error as string);
-    }
-  };
-
-  const onClickOpenDirectory = async (path: string) => {
-    OpenDirectory(path).catch((error) => {
-      ShowMessageDialog(error as string);
-    });
-  };
-
-  const onChange = async () => {
-    const beforeConfig = structuredClone($storedConfig);
-
-    try {
-      await UpdateUserConfig($storedConfig);
-    } catch (error) {
-      storedConfig.set(beforeConfig);
-      ShowMessageDialog(error as string);
     }
   };
 </script>
@@ -59,7 +54,7 @@
     <div class="stats shadow w-3/4">
       <div class="stat {$storedInstallPathError && 'input-error'}">
         <div class="stat-title">ゲームクライアント インストールパス</div>
-        <div class="stat-value text-lg">{$storedConfig.install_path}</div>
+        <div class="stat-value text-lg">{installPath}</div>
       </div>
     </div>
 
@@ -82,14 +77,10 @@
 
   <div class="p-4 flex flex-col items-center">
     <p class="text-xl font-bold">統計パターン</p>
-    <select
-      class="select my-2"
-      bind:value={$storedConfig.stats_pattern}
-      on:change={onChange}
-    >
-      {#each DispName.STATS_PATTERNS.toArray() as sp}
-        <option selected={sp.key == $storedConfig.stats_pattern} value={sp.key}
-          >{sp.value}</option
+    <select class="select my-2" bind:value={$storedStatsExtra}>
+      {#each AppConstants.STATS_EXTRAS as se}
+        <option selected={se[0] === $storedStatsExtra} value={se[0]}
+          >{se[1]}</option
         >
       {/each}
     </select>
@@ -98,7 +89,7 @@
   <div class="p-4 flex flex-col items-center">
     <p class="text-xl font-bold">テーマ</p>
     <select class="select my-2" data-choose-theme>
-      {#each Theme.getAll() as theme}
+      {#each AppConstants.THEMES as theme}
         <option value={theme}>{theme}</option>
       {/each}
     </select>
@@ -106,15 +97,9 @@
 
   <div class="p-4 flex flex-col items-center">
     <p class="text-xl font-bold">UIサイズ</p>
-    <select
-      class="select my-2"
-      bind:value={$storedConfig.font_size}
-      on:change={onChange}
-    >
-      {#each DispName.FONT_SIZES.toArray() as fs}
-        <option selected={fs.key === $storedConfig.font_size} value={fs.key}
-          >{fs.value}</option
-        >
+    <select class="select my-2" bind:value={$storedZoomRate}>
+      {#each AppConstants.ZOOM_RATES as zr}
+        <option selected={zr === $storedZoomRate} value={zr}>{zr}%</option>
       {/each}
     </select>
   </div>
@@ -130,58 +115,50 @@
         </tr>
       </thead>
       <tbody>
-        {#each columnSettings as column}
+        {#each AppConstants.STATS_KEYS as statsKey}
+          {@const info = AppConstants.STATS_COLUMN_INFO[statsKey]}
           <tr>
             <td class="text-center">
-              {DispName.FULL_COLUMN_NAMES.get(column.key) ?? column.key}
+              {info.full ?? statsKey}
             </td>
 
-            {#if column.ship.key}
+            {#if ["both", "ship"].includes(info.pattern)}
               <td>
                 <input
                   class="toggle toggle-success"
                   type="checkbox"
-                  bind:checked={$storedConfig.display.ship[column.ship.key]}
-                  on:change={onChange}
+                  bind:checked={$storedColumnmSettings[statsKey].ship}
                 />
               </td>
             {:else}
               <td></td>
             {/if}
 
-            {#if column.overall.key}
+            {#if ["both", "overall"].includes(info.pattern)}
               <td>
                 <input
                   class="toggle toggle-success"
                   type="checkbox"
-                  bind:checked={
-                    $storedConfig.display.overall[column.overall.key]
-                  }
-                  on:change={onChange}
+                  bind:checked={$storedColumnmSettings[statsKey].overall}
                 />
               </td>
             {:else}
               <td></td>
             {/if}
 
-            {#if column.digit.key}
-              <td>
-                <select
-                  class="select select-sm"
-                  bind:value={$storedConfig.digit[column.digit.key]}
-                  on:change={onChange}
-                >
-                  {#each [0, 1, 2] as digit}
-                    <option
-                      selected={digit === $storedConfig.digit[column.digit.key]}
-                      value={digit}>{digit}</option
-                    >
-                  {/each}
-                </select>
-              </td>
-            {:else}
-              <td></td>
-            {/if}
+            <td>
+              <select
+                class="select select-sm"
+                bind:value={$storedColumnmSettings[statsKey].digit}
+              >
+                {#each [0, 1, 2] as digit}
+                  <option
+                    selected={digit === $storedColumnmSettings[statsKey].digit}
+                    value={digit}>{digit}</option
+                  >
+                {/each}
+              </select>
+            </td>
           </tr>
         {/each}
       </tbody>
@@ -190,15 +167,10 @@
 
   <div class="p-4 flex flex-col items-center">
     <p class="text-xl font-bold">プレイヤー名の背景色</p>
-    <select
-      class="select my-2"
-      bind:value={$storedConfig.color.player_name}
-      on:change={onChange}
-    >
-      {#each DispName.PLAYER_NAME_COLORS.toArray() as pnc}
-        <option
-          selected={pnc.key === $storedConfig.color.player_name}
-          value={pnc.key}>{pnc.value}</option
+    <select class="select my-2" bind:value={$storedPlayerNameColor}>
+      {#each AppConstants.PLAYER_NAME_COLORS as pnc}
+        <option selected={pnc[0] === $storedPlayerNameColor} value={pnc[0]}
+          >{pnc[1]}</option
         >
       {/each}
     </select>
@@ -211,32 +183,18 @@
         <input
           class="toggle toggle-success"
           type="checkbox"
-          bind:checked={$storedConfig.show_language_frag}
-          on:change={onChange}
+          bind:checked={$storedShowClanNation}
         />
         クラン国籍を表示する（クラン説明から言語検出）
       </li>
-      <li class="list-row">
-        <input
-          class="toggle toggle-success"
-          type="checkbox"
-          bind:checked={$storedConfig.send_report}
-          on:change={onChange}
-        />アプリ改善のためのデータ送信を許可する
-      </li>
-      <li class="list-row">
-        <input
-          class="toggle toggle-success"
-          type="checkbox"
-          bind:checked={$storedConfig.save_temp_arena_info}
-          on:change={onChange}
-        />
-        【開発用】自動で戦闘情報(tempArenaInfo.json)を保存する
 
-        <!-- svelte-ignore a11y-invalid-attribute -->
-        <a href="#" on:click={() => onClickOpenDirectory("temp_arena_info")}>
-          <i class="bi bi-folder">保存フォルダを開く</i>
-        </a>
+      <li class="list-row">
+        <input
+          class="toggle toggle-success"
+          type="checkbox"
+          bind:checked={sendReport}
+          on:change={() => UpdateSendReport(sendReport)}
+        />アプリ改善のためのデータ送信を許可する
       </li>
     </ul>
   </div>

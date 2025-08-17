@@ -10,6 +10,10 @@ export function EmptyBattle() {
   return window['go']['main']['App']['EmptyBattle']();
 }
 
+export function InstallPath() {
+  return window['go']['main']['App']['InstallPath']();
+}
+
 export function LatestRelease() {
   return window['go']['main']['App']['LatestRelease']();
 }
@@ -38,6 +42,10 @@ export function Semver() {
   return window['go']['main']['App']['Semver']();
 }
 
+export function SendReport() {
+  return window['go']['main']['App']['SendReport']();
+}
+
 export function ShowMessageDialog(arg1) {
   return window['go']['main']['App']['ShowMessageDialog'](arg1);
 }
@@ -52,6 +60,10 @@ export function TrySaveInstallPath() {
 
 export function UpdateAlertPlayer(arg1) {
   return window['go']['main']['App']['UpdateAlertPlayer'](arg1);
+}
+
+export function UpdateSendReport(arg1) {
+  return window['go']['main']['App']['UpdateSendReport'](arg1);
 }
 
 export function ValidateInstallPath(arg1) {

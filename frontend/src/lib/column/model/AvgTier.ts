@@ -3,8 +3,8 @@ import { AbstractStatsColumn } from "src/lib/column/intetface/AbstractStatsColum
 import type { data } from "wailsjs/go/models";
 
 export class AvgTier extends AbstractStatsColumn<string> {
-  constructor(config: data.UserConfigV2) {
-    super("avg_tier", config, "overall");
+  constructor() {
+    super("avg_tier", "overall");
   }
 
   displayValue(player: data.Player): string {

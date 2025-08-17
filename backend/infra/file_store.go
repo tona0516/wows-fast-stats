@@ -33,6 +33,8 @@ func (fs FileStore) Put(key data.FileStoreKey, value string) error {
 }
 
 func (fs FileStore) Get(key data.FileStoreKey) (string, error) {
+	_ = os.MkdirAll(fs.path, 0o755)
+
 	p := createFilePath(fs.path, key)
 
 	if _, err := os.Stat(p); os.IsNotExist(err) {

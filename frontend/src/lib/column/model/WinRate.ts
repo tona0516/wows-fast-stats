@@ -6,8 +6,8 @@ import type { StatsCategory } from "src/lib/types";
 import type { data } from "wailsjs/go/models";
 
 export class WinRate extends AbstractStatsColumn<string> {
-  constructor(config: data.UserConfigV2, category: StatsCategory) {
-    super("win_rate", config, category);
+  constructor(category: StatsCategory) {
+    super("win_rate", category);
   }
 
   displayValue(player: data.Player): string {

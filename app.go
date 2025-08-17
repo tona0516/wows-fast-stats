@@ -162,6 +162,23 @@ func (a *App) EmptyBattle() data.Battle {
 	return data.Battle{}
 }
 
+func (a *App) InstallPath() string {
+	return a.container.configService.InstallPath()
+}
+
+func (a *App) SendReport() bool {
+	return a.container.configService.SendReport()
+}
+
+func (a *App) UpdateSendReport(sendReport bool) error {
+	if err := a.container.configService.UpdateSendReport(sendReport); err != nil {
+		a.container.logger.Error(err, nil)
+		return failure.Wrap(err)
+	}
+
+	return nil
+}
+
 func (a *App) onStartup(ctx context.Context) {
 	a.ctx = ctx
 	runtime.LogSetLogLevel(ctx, logger.INFO)

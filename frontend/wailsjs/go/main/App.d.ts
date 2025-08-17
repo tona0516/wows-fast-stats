@@ -6,6 +6,8 @@ export function AlertPlayers():Promise<Array<data.AlertPlayer>>;
 
 export function EmptyBattle():Promise<data.Battle>;
 
+export function InstallPath():Promise<string>;
+
 export function LatestRelease():Promise<data.GHLatestRelease>;
 
 export function LogError(arg1:string,arg2:{[key: string]: string}):Promise<void>;
@@ -20,6 +22,8 @@ export function SearchPlayer(arg1:string):Promise<Array<data.WGAccountListData>>
 
 export function Semver():Promise<string>;
 
+export function SendReport():Promise<boolean>;
+
 export function ShowMessageDialog(arg1:string):Promise<void>;
 
 export function SubscribeBattle():Promise<void>;
@@ -27,5 +31,7 @@ export function SubscribeBattle():Promise<void>;
 export function TrySaveInstallPath():Promise<boolean>;
 
 export function UpdateAlertPlayer(arg1:data.AlertPlayer):Promise<void>;
+
+export function UpdateSendReport(arg1:boolean):Promise<void>;
 
 export function ValidateInstallPath(arg1:string):Promise<string>;

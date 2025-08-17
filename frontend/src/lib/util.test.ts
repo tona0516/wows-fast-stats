@@ -1,10 +1,4 @@
-import {
-  isDigitKey,
-  isOverallKey,
-  isShipKey,
-  isShipType,
-  tierString,
-} from "src/lib/util";
+import { isShipType, tierString } from "src/lib/util";
 
 test("tierString - 正常系", () => {
   const values = [
@@ -43,47 +37,5 @@ test("isShipType - 異常系", () => {
   const values = ["", "aux"];
   for (const value of values) {
     if (isShipType(value)) fail();
-  }
-});
-
-test("isDigitKey - 正常系", () => {
-  const values = ["battles", "hit_rate", "avg_tier"];
-  for (const value of values) {
-    if (!isDigitKey(value)) fail();
-  }
-});
-
-test("isDigitKey - 異常系", () => {
-  const values = ["", "invalid"];
-  for (const value of values) {
-    if (isDigitKey(value)) fail();
-  }
-});
-
-test("isShipKey - 正常系", () => {
-  const values = ["battles", "hit_rate"];
-  for (const value of values) {
-    if (!isShipKey(value)) fail();
-  }
-});
-
-test("isShipKey - 異常系", () => {
-  const values = ["", "avg_tier"];
-  for (const value of values) {
-    if (isShipKey(value)) fail();
-  }
-});
-
-test("isOverallKey - 正常系", () => {
-  const values = ["battles", "avg_tier"];
-  for (const value of values) {
-    if (!isOverallKey(value)) fail();
-  }
-});
-
-test("isOverallKey - 異常系", () => {
-  const values = ["", "hit_rate"];
-  for (const value of values) {
-    if (isOverallKey(value)) fail();
   }
 });

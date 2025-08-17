@@ -6,17 +6,18 @@
   import "bootstrap-icons/font/bootstrap-icons.css";
   import "charts.css";
 
-  import { FontSize } from "src/lib/FontSize";
   import {
     storedAlertPlayers,
     storedBattle,
     storedInstallPathError,
     storedTonako,
+    storedZoomRate,
   } from "src/stores";
   import { onMount } from "svelte";
   import { themeChange } from "theme-change";
   import {
     AlertPlayers,
+    InstallPath,
     LatestRelease,
     LogError,
     ShowMessageDialog,
@@ -24,7 +25,7 @@
     ValidateInstallPath,
   } from "wailsjs/go/main/App";
   import type { data } from "wailsjs/go/models";
-  import { EventsOn, LogInfo } from "wailsjs/runtime/runtime";
+  import { EventsOn } from "wailsjs/runtime/runtime";
   import SideMenu from "./SideMenu.svelte";
   import ExternalLink from "./component/common/ExternalLink.svelte";
   import type { Page } from "./lib/types";
@@ -35,6 +36,7 @@
   import Toast from "./component/common/Toast.svelte";
   import ShipDetailModal from "./component/common/ShipDetailModal.svelte";
   import { Tonako } from "./component/stats/internal/Tonako";
+  import { LocalStorage } from "./lib/LocalStorage";
 
   let statsPage: StatsPage | undefined;
   let initialized = false;
@@ -44,7 +46,7 @@
 
   $: {
     // @ts-ignore
-    document.body.style.zoom = FontSize.getZoomRate($storedConfig);
+    document.body.style.zoom = $storedZoomRate / 100;
   }
 
   onMount(() => {
@@ -116,14 +118,12 @@
     });
   };
 
-  const initialize = async (): Promise<data.UserConfigV2 | undefined> => {
+  const initialize = async (): Promise<void> => {
     // localStorage.clear();
 
     try {
-      const config = await UserConfig();
-      storedConfig.set(config);
-
-      const installPathError = await ValidateInstallPath(config.install_path);
+      const installPath = await InstallPath();
+      const installPathError = await ValidateInstallPath(installPath);
       if (installPathError) {
         storedInstallPathError.set(installPathError);
       }
@@ -136,37 +136,30 @@
       if (!$storedInstallPathError) {
         SubscribeBattle();
       }
-
-      return config;
     } catch (error) {
       ShowMessageDialog(`初期化に失敗しました: ${error as string}`);
-      return undefined;
     }
   };
 
-  const notifyUpdate = async (config: data.UserConfigV2) => {
-    return;
+  // const notifyUpdate = async (config: data.UserConfigV2) => {
+  //   return;
 
-    // if (!config.notify_updatable) return;
+  //   if (!config.notify_updatable) return;
 
-    // try {
-    //   const latestRelease = await LatestRelease();
-    //   if (latestRelease.updatable) {
-    //     updatableRelease = latestRelease;
-    //   }
-    // } catch (error) {
-    //   Notifier.failure(error);
-    //   return;
-    // }
-  };
+  //   try {
+  //     const latestRelease = await LatestRelease();
+  //     if (latestRelease.updatable) {
+  //       updatableRelease = latestRelease;
+  //     }
+  //   } catch (error) {
+  //     Notifier.failure(error);
+  //     return;
+  //   }
+  // };
 
   const main = async () => {
-    const config = await initialize();
-    if (!config) {
-      return;
-    }
-
-    await notifyUpdate(config);
+    await initialize();
+    // await notifyUpdate(config);
   };
 
   main();

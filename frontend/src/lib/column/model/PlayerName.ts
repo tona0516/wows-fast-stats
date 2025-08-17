@@ -1,15 +1,20 @@
 import chroma from "chroma-js";
 import PlayerNameTableData from "src/component/stats/internal/table_data/PlayerNameTableData.svelte";
+import { AppFunctions } from "src/lib/AppFunctions";
 import { Color } from "src/lib/Color";
 import { AbstractColumn } from "src/lib/column/intetface/AbstractColumn";
-import { PlayerNameColor } from "src/lib/DispName";
+import { PlayerNameColor } from "src/lib/enums";
 import { type Rating, RatingfGenerator } from "src/lib/RatingLevel";
-import { Theme } from "src/lib/Theme";
-import { toPlayerStats } from "src/lib/util";
+import {
+  storedPlayerNameColor,
+  storedShowClanNation,
+  storedStatsExtra,
+} from "src/stores";
+import { get } from "svelte/store";
 import type { data } from "wailsjs/go/models";
 
 export class PlayerName extends AbstractColumn {
-  constructor(private config: data.UserConfigV2) {
+  constructor() {
     super("player_name", "プレイヤー");
   }
 
@@ -29,7 +34,7 @@ export class PlayerName extends AbstractColumn {
   }
 
   clanFlagIconClass(player: data.Player): string | undefined {
-    if (!this.config.show_language_frag) {
+    if (!get(storedShowClanNation)) {
       return undefined;
     }
 
@@ -64,7 +69,7 @@ export class PlayerName extends AbstractColumn {
   clanColorCode(player: data.Player): string {
     const color = player.player_info.clan.hex_color;
 
-    if (Theme.isLighter()) {
+    if (AppFunctions.isLighter()) {
       return chroma(color).darken(1.25).hex();
     }
 
@@ -72,16 +77,16 @@ export class PlayerName extends AbstractColumn {
   }
 
   getBackgroundColorCode(player: data.Player): string | undefined {
-    const playerStats = toPlayerStats(player, this.config.stats_pattern);
+    const statsExtra = get(storedStatsExtra);
 
     let rating: Rating | undefined;
-    switch (this.config.color.player_name) {
+    switch (get(storedPlayerNameColor)) {
       case PlayerNameColor.SHIP: {
-        rating = RatingfGenerator.fromPR(playerStats.ship.pr);
+        rating = RatingfGenerator.fromPR(player[statsExtra].ship.pr);
         break;
       }
       case PlayerNameColor.OVERALL: {
-        rating = RatingfGenerator.fromPR(playerStats.overall.pr);
+        rating = RatingfGenerator.fromPR(player[statsExtra].overall.pr);
         break;
       }
     }

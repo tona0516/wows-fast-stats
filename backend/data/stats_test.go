@@ -494,35 +494,7 @@ func TestStats_WinRate(t *testing.T) {
 	assert.InDelta(t, 60, stats.WinRate(StatsCategoryOverall, StatsPatternPvPAll), allowableDelta)
 }
 
-func TestStats_WinSurvivedRate(t *testing.T) {
-	t.Parallel()
-
-	stats := NewStats(
-		0,
-		WGAccountInfoData{
-			Statistics: struct {
-				Pvp      WGPlayerStatsValues `json:"pvp"`
-				PvpSolo  WGPlayerStatsValues `json:"pvp_solo"`
-				PvpDiv2  WGPlayerStatsValues `json:"pvp_div2"`
-				PvpDiv3  WGPlayerStatsValues `json:"pvp_div3"`
-				RankSolo WGPlayerStatsValues `json:"rank_solo"`
-			}{
-				Pvp: WGPlayerStatsValues{
-					Wins:         100,
-					SurvivedWins: 20,
-				},
-			},
-		},
-		emptyShipsStats,
-		emptyExpectedStats,
-		emptyWarships,
-		emptyTempArenaInfo,
-	)
-
-	assert.InDelta(t, 20, stats.WinSurvivedRate(StatsCategoryOverall, StatsPatternPvPAll), allowableDelta)
-}
-
-func TestStats_LoseSurvivedRate(t *testing.T) {
+func TestStats_SurvivedRate(t *testing.T) {
 	t.Parallel()
 
 	stats := NewStats(
@@ -549,10 +521,13 @@ func TestStats_LoseSurvivedRate(t *testing.T) {
 		emptyTempArenaInfo,
 	)
 
-	assert.InDelta(t, 50, stats.LoseSurvivedRate(StatsCategoryOverall, StatsPatternPvPAll), allowableDelta)
+	actual := stats.SurvivedRate(StatsCategoryOverall, StatsPatternPvPAll)
+	assert.InDelta(t, 40, actual.All, allowableDelta)
+	assert.InDelta(t, 33.33, actual.Win, allowableDelta)
+	assert.InDelta(t, 50, actual.Lose, allowableDelta)
 }
 
-func TestStats_MainBatteryHitRate(t *testing.T) {
+func TestStats_HitRate(t *testing.T) {
 	t.Parallel()
 
 	useShipID := 0
@@ -569,28 +544,6 @@ func TestStats_MainBatteryHitRate(t *testing.T) {
 						Hits:  100,
 						Shots: 200,
 					},
-				},
-				ShipID: useShipID,
-			},
-		},
-		emptyExpectedStats,
-		emptyWarships,
-		emptyTempArenaInfo,
-	)
-
-	assert.InDelta(t, 50, stats.MainBatteryHitRate(StatsPatternPvPAll), allowableDelta)
-}
-
-func TestStats_TorpedoesHitRate(t *testing.T) {
-	t.Parallel()
-
-	useShipID := 0
-	stats := NewStats(
-		useShipID,
-		emptyAccountInfo,
-		[]WGShipsStatsData{
-			{
-				Pvp: WGShipStatsValues{
 					Torpedoes: struct {
 						Hits  uint `json:"hits"`
 						Shots uint `json:"shots"`
@@ -607,7 +560,9 @@ func TestStats_TorpedoesHitRate(t *testing.T) {
 		emptyTempArenaInfo,
 	)
 
-	assert.InDelta(t, 25, stats.TorpedoesHitRate(StatsPatternPvPAll), allowableDelta)
+	actual := stats.HitRate(StatsPatternPvPAll)
+	assert.InDelta(t, 50, actual.MainBattery, allowableDelta)
+	assert.InDelta(t, 25, actual.Torpedoes, allowableDelta)
 }
 
 func TestStats_PlanesKilled(t *testing.T) {

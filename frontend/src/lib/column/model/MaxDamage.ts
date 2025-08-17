@@ -14,8 +14,8 @@ export interface MaxDamageParam {
 }
 
 export class MaxDamage extends AbstractStatsColumn<MaxDamageParam> {
-  constructor(config: data.UserConfigV2, category: StatsCategory) {
-    super("max_damage", config, category);
+  constructor(category: StatsCategory) {
+    super("max_damage", category);
   }
 
   displayValue(player: data.Player): MaxDamageParam {
