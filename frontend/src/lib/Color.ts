@@ -1,5 +1,5 @@
 import chroma from "chroma-js";
-import { AppFunctions } from "./AppFunctions";
+import { AppFunc } from "./AppFunc";
 import type { RatingLevel } from "./RatingLevel";
 import type { ThreatLevel } from "./ThreatLevel";
 import type { ShipType } from "./types";
@@ -92,7 +92,7 @@ const getFixedColorPair = (colorCode: string): ColorPair => {
   const brighten = chromaColor.brighten(colorRate).hex();
   const darken = chromaColor.darken(colorRate).hex();
 
-  if (AppFunctions.isLighter()) {
+  if (AppFunc.isLighter()) {
     return { text: darken, background: brighten };
   }
   return { text: brighten, background: darken };

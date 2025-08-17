@@ -1,4 +1,4 @@
-import { AppConstants } from "src/lib/AppConstants";
+import { AppConst } from "src/lib/AppConst";
 import { AbstractColumn } from "src/lib/column/intetface/AbstractColumn";
 import type { StatsCategory, StatsKey } from "src/lib/types";
 import { storedColumnmSettings, storedStatsExtra } from "src/stores";
@@ -10,7 +10,7 @@ export abstract class AbstractStatsColumn<T> extends AbstractColumn {
     readonly key: StatsKey,
     readonly category: StatsCategory,
   ) {
-    super(key, AppConstants.STATS_COLUMN_INFO[key].min ?? key);
+    super(key, AppConst.STATS_COLUMN_INFO[key].min ?? key);
   }
 
   abstract displayValue(player: data.Player): T;

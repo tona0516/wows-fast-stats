@@ -1,5 +1,5 @@
 import StackedBarGraphTableData from "src/component/stats/internal/table_data/StackedBarGraphTableData.svelte";
-import { AppConstants } from "src/lib/AppConstants";
+import { AppConst } from "src/lib/AppConst";
 import { Color } from "src/lib/Color";
 import { AbstractStatsColumn } from "src/lib/column/intetface/AbstractStatsColumn";
 import type {
@@ -17,9 +17,9 @@ export class UsingShipTypeRate extends AbstractStatsColumn<StackedBarGraphParam>
     const shipTypeGroup = this.playerStats(player).overall.using_ship_type_rate;
 
     const items: StackedBarGraphItem[] = [];
-    for (const type of AppConstants.SHIP_TYPES.keys()) {
+    for (const type of AppConst.SHIP_TYPES.keys()) {
       items.push({
-        label: AppConstants.SHIP_TYPES.get(type) || "",
+        label: AppConst.SHIP_TYPES.get(type) || "",
         colorCode: Color.ShipType.getDefault(type) || "",
         value: shipTypeGroup[type] || 0,
       });

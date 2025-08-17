@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { AppConstants } from "src/lib/AppConstants";
+  import { AppConst } from "src/lib/AppConst";
   import {
     showToast,
     storedColumnmSettings,
@@ -78,7 +78,7 @@
   <div class="p-4 flex flex-col items-center">
     <p class="text-xl font-bold">統計パターン</p>
     <select class="select my-2" bind:value={$storedStatsExtra}>
-      {#each AppConstants.STATS_EXTRAS as se}
+      {#each AppConst.STATS_EXTRAS as se}
         <option selected={se[0] === $storedStatsExtra} value={se[0]}
           >{se[1]}</option
         >
@@ -89,7 +89,7 @@
   <div class="p-4 flex flex-col items-center">
     <p class="text-xl font-bold">テーマ</p>
     <select class="select my-2" data-choose-theme>
-      {#each AppConstants.THEMES as theme}
+      {#each AppConst.THEMES as theme}
         <option value={theme}>{theme}</option>
       {/each}
     </select>
@@ -98,7 +98,7 @@
   <div class="p-4 flex flex-col items-center">
     <p class="text-xl font-bold">UIサイズ</p>
     <select class="select my-2" bind:value={$storedZoomRate}>
-      {#each AppConstants.ZOOM_RATES as zr}
+      {#each AppConst.ZOOM_RATES as zr}
         <option selected={zr === $storedZoomRate} value={zr}>{zr}%</option>
       {/each}
     </select>
@@ -115,8 +115,8 @@
         </tr>
       </thead>
       <tbody>
-        {#each AppConstants.STATS_KEYS as statsKey}
-          {@const info = AppConstants.STATS_COLUMN_INFO[statsKey]}
+        {#each AppConst.STATS_KEYS as statsKey}
+          {@const info = AppConst.STATS_COLUMN_INFO[statsKey]}
           <tr>
             <td class="text-center">
               {info.full ?? statsKey}
@@ -168,7 +168,7 @@
   <div class="p-4 flex flex-col items-center">
     <p class="text-xl font-bold">プレイヤー名の背景色</p>
     <select class="select my-2" bind:value={$storedPlayerNameColor}>
-      {#each AppConstants.PLAYER_NAME_COLORS as pnc}
+      {#each AppConst.PLAYER_NAME_COLORS as pnc}
         <option selected={pnc[0] === $storedPlayerNameColor} value={pnc[0]}
           >{pnc[1]}</option
         >

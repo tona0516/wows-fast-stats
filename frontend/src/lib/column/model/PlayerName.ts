@@ -1,6 +1,6 @@
 import chroma from "chroma-js";
 import PlayerNameTableData from "src/component/stats/internal/table_data/PlayerNameTableData.svelte";
-import { AppFunctions } from "src/lib/AppFunctions";
+import { AppFunc } from "src/lib/AppFunc";
 import { Color } from "src/lib/Color";
 import { AbstractColumn } from "src/lib/column/intetface/AbstractColumn";
 import { PlayerNameColor } from "src/lib/enums";
@@ -69,7 +69,7 @@ export class PlayerName extends AbstractColumn {
   clanColorCode(player: data.Player): string {
     const color = player.player_info.clan.hex_color;
 
-    if (AppFunctions.isLighter()) {
+    if (AppFunc.isLighter()) {
       return chroma(color).darken(1.25).hex();
     }
 

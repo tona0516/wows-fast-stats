@@ -3,7 +3,7 @@ import type { ColumnSetting, OptionalBattle, StatsKey } from "src/lib/types";
 import { derived, type Writable, writable } from "svelte/store";
 import type { data } from "wailsjs/go/models";
 import type { Tonako } from "./component/stats/internal/Tonako";
-import { AppConstants } from "./lib/AppConstants";
+import { AppConst } from "./lib/AppConst";
 import { LocalStorage } from "./lib/LocalStorage";
 
 export const storedZoomRate = writable(LocalStorage.instance.getZoomRate());
@@ -31,7 +31,7 @@ storedShowClanNation.subscribe((showClanNation) => {
 });
 
 export const storedColumnmSettings = writable(
-  AppConstants.STATS_KEYS.reduce(
+  AppConst.STATS_KEYS.reduce(
     (acc, key) => {
       acc[key] = LocalStorage.instance.getColumnSetting(key);
       return acc;

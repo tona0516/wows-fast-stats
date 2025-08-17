@@ -28,7 +28,7 @@
   import { ShipInfo } from "src/lib/column/model/ShipInfo";
   import type { ColumnCategory } from "src/lib/types";
   import type { AbstractColumn } from "src/lib/column/intetface/AbstractColumn";
-  import { AppConstants } from "src/lib/AppConstants";
+  import { AppConst } from "src/lib/AppConst";
 
   export let teams: data.Team[];
 
@@ -39,7 +39,7 @@
     ) {}
 
     header(): string {
-      return AppConstants.CATEGORY_NAMES.get(this.value) ?? this.value;
+      return AppConst.CATEGORY_NAMES.get(this.value) ?? this.value;
     }
 
     showCount(): number {

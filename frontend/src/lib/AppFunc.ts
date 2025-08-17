@@ -1,9 +1,9 @@
-import { AppConstants } from "./AppConstants";
+import { AppConst } from "./AppConst";
 import { LocalStorage } from "./LocalStorage";
 
-export namespace AppFunctions {
+export namespace AppFunc {
   export const isLighter = (): boolean => {
     const current = LocalStorage.instance.getTheme();
-    return AppConstants.LIGHTER_THEMES.includes(current);
+    return AppConst.LIGHTER_THEMES.includes(current);
   };
 }
