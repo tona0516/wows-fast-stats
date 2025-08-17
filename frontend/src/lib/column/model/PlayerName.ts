@@ -3,7 +3,6 @@ import PlayerNameTableData from "src/component/stats/internal/table_data/PlayerN
 import { AppFunc } from "src/lib/AppFunc";
 import { Color } from "src/lib/Color";
 import { AbstractColumn } from "src/lib/column/intetface/AbstractColumn";
-import { PlayerNameColor } from "src/lib/enums";
 import { type Rating, RatingfGenerator } from "src/lib/RatingLevel";
 import {
   storedPlayerNameColor,
@@ -81,11 +80,11 @@ export class PlayerName extends AbstractColumn {
 
     let rating: Rating | undefined;
     switch (get(storedPlayerNameColor)) {
-      case PlayerNameColor.SHIP: {
+      case "ship": {
         rating = RatingfGenerator.fromPR(player[statsExtra].ship.pr);
         break;
       }
-      case PlayerNameColor.OVERALL: {
+      case "overall": {
         rating = RatingfGenerator.fromPR(player[statsExtra].overall.pr);
         break;
       }

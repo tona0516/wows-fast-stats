@@ -1,8 +1,8 @@
-import { PlayerNameColor } from "./enums";
 import type { RatingLevel } from "./RatingLevel";
 import type {
   ColumnCategory,
   ColumnSettingPattern,
+  PlayerNameColor,
   ShipType,
   StatsExtra,
   StatsKey,
@@ -26,9 +26,9 @@ export namespace AppConst {
   export const THEMES = [...LIGHTER_THEMES, ...DARKER_THEMES];
 
   export const PLAYER_NAME_COLORS = new Map<PlayerNameColor, string>([
-    [PlayerNameColor.SHIP, "艦成績のPR"],
-    [PlayerNameColor.OVERALL, "総合成績のPR"],
-    [PlayerNameColor.NONE, "なし"],
+    ["ship", "艦成績のPR"],
+    ["overall", "総合成績のPR"],
+    ["none", "なし"],
   ]);
 
   class ColumnInfo {

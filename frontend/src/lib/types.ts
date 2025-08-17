@@ -33,3 +33,5 @@ export type GetStatsFunction = (ps: data.PlayerStats) => number;
 export type ColumnSetting = { ship: boolean; overall: boolean; digit: number };
 
 export type ColumnSettingPattern = "ship" | "overall" | "both";
+
+export type PlayerNameColor = "ship" | "overall" | "none";

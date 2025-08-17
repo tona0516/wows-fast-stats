@@ -1,5 +1,9 @@
-import { PlayerNameColor } from "./enums";
-import type { ColumnSetting, StatsExtra, StatsKey } from "./types";
+import type {
+  ColumnSetting,
+  PlayerNameColor,
+  StatsExtra,
+  StatsKey,
+} from "./types";
 
 const KEY_ZOOM_RATE = "zoom_rate";
 const KEY_STATS_EXTRA = "stats_extra";
@@ -45,7 +49,7 @@ export class LocalStorage {
   getPlayerNameColor(): PlayerNameColor {
     const playerNameColor = localStorage.getItem(KEY_PLAYER_NAME_COLOR);
     if (!playerNameColor) {
-      return PlayerNameColor.NONE;
+      return "none";
     }
     return playerNameColor as PlayerNameColor;
   }
