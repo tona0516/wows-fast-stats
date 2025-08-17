@@ -1,9 +1,12 @@
 import { PlayerNameColor } from "./enums";
+import type { RatingLevel } from "./RatingLevel";
 import type {
   ColumnCategory,
   ColumnSettingPattern,
+  ShipType,
   StatsExtra,
   StatsKey,
+  TierGroup,
 } from "./types";
 
 export namespace AppConstants {
@@ -39,11 +42,6 @@ export namespace AppConstants {
   export const STATS_COLUMN_INFO: {
     [key in StatsKey]: ColumnInfo;
   } = {
-    threat_level: new ColumnInfo(
-      "戦力評価",
-      "戦力評価(闇深XVM算出ロジック)",
-      "overall",
-    ),
     pr: new ColumnInfo("PR", "Personal Rating", "both"),
     win_rate: new ColumnInfo("勝率", "勝率", "both"),
     damage: new ColumnInfo("Dmg", "与ダメージ", "both"),
@@ -52,11 +50,16 @@ export namespace AppConstants {
     kill: new ColumnInfo("撃沈", "撃沈", "both"),
     exp: new ColumnInfo("Exp", "経験値(プレミアム補正含む)", "both"),
     battles: new ColumnInfo("戦闘数", "戦闘数", "both"),
+    platoon_rate: new ColumnInfo("分艦隊比", "分艦隊比率", "both"),
+    avg_tier: new ColumnInfo("平均T", "平均Tier", "both"),
     planes_killed: new ColumnInfo("撃墜", "撃墜", "ship"),
     survived_rate: new ColumnInfo("生存率", "生存率(勝利|敗北)", "ship"),
     hit_rate: new ColumnInfo("命中率", "命中率(主砲|魚雷)", "ship"),
-    platoon_rate: new ColumnInfo("分艦隊比", "分艦隊比率", "overall"),
-    avg_tier: new ColumnInfo("平均T", "平均Tier", "ship"),
+    threat_level: new ColumnInfo(
+      "戦力評価",
+      "戦力評価(闇深XVM算出ロジック)",
+      "overall",
+    ),
     using_ship_type_rate: new ColumnInfo("艦種割合", "使用艦種割合", "overall"),
     using_tier_rate: new ColumnInfo("T割合", "プレイTier割合", "overall"),
   };
@@ -67,5 +70,30 @@ export namespace AppConstants {
     ["basic", "基本情報"],
     ["ship", "艦成績"],
     ["overall", "総合成績"],
+  ]);
+
+  export const SKILL_LEVELS = new Map<RatingLevel, string>([
+    ["bad", "Bad"],
+    ["below_avg", "Below Average"],
+    ["avg", "Average"],
+    ["good", "Good"],
+    ["very_good", "Very Good"],
+    ["great", "Great"],
+    ["unicum", "Unicum"],
+    ["super_unicum", "Super Unicum"],
+  ]);
+
+  export const SHIP_TYPES = new Map<ShipType, string>([
+    ["ss", "潜水艦"],
+    ["dd", "駆逐艦"],
+    ["cl", "巡洋艦"],
+    ["bb", "戦艦"],
+    ["cv", "空母"],
+  ]);
+
+  export const TIER_GROUPS = new Map<TierGroup, string>([
+    ["low", "1~4"],
+    ["middle", "5~7"],
+    ["high", "8~★"],
   ]);
 }

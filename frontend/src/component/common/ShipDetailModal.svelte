@@ -10,7 +10,7 @@
   import { RATING_DEFS } from "src/lib/RatingLevel";
   import type { data } from "wailsjs/go/models";
   import { Color, type ColorPair } from "src/lib/Color";
-  import { DispName } from "src/lib/DispName";
+  import { AppConstants } from "src/lib/AppConstants";
 
   interface DamageRating {
     level: string;
@@ -36,7 +36,7 @@
       const value = serverAvdgDamage * rating.damage;
 
       return {
-        level: DispName.SKILL_LEVELS.get(rating.level) ?? "",
+        level: AppConstants.SKILL_LEVELS.get(rating.level) ?? "",
         color: Color.Rating.getFixed(rating.level),
         value: `${Math.floor(value).format(0)}~`,
       };
