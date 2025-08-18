@@ -1,9 +1,9 @@
-import { TeamThreatLevel } from "src/lib/TeamThreatLevel";
 import type { ColumnSetting, OptionalBattle, StatsKey } from "src/lib/types";
 import { derived, type Writable, writable } from "svelte/store";
 import type { data } from "wailsjs/go/models";
 import type { Tonako } from "./component/stats/internal/Tonako";
 import { AppConst } from "./lib/AppConst";
+import { AppFunc } from "./lib/AppFunc";
 import { LocalStorage } from "./lib/LocalStorage";
 
 export const storedZoomRate = writable(LocalStorage.instance.getZoomRate());
@@ -51,7 +51,7 @@ export const storedInstallPathError = writable("") as Writable<string>;
 export const storedTeamThreatLevels = derived(
   [storedBattle, storedStatsExtra],
   ([battle, statsExtra]) => {
-    return TeamThreatLevel.fromBattle(battle, statsExtra);
+    return AppFunc.getTeamThreatLevels(battle, statsExtra);
   },
 );
 export const storedTonako = writable(undefined) as Writable<

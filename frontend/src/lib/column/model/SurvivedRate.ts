@@ -11,9 +11,9 @@ export class SurvivedRate extends AbstractStatsColumn<string> {
   displayValue(player: data.Player): string {
     const sv = this.playerStats(player)[this.category].survived_rate;
 
-    const all = sv.all.format(this.digit());
-    const win = sv.all.format(this.digit());
-    const lose = sv.all.format(this.digit());
+    const all = sv.all.toFixed(this.digit());
+    const win = sv.all.toFixed(this.digit());
+    const lose = sv.all.toFixed(this.digit());
 
     return `${all}|${win}|${lose}`;
   }

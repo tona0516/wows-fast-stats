@@ -24,7 +24,7 @@
         <tbody>
           <tr>
             {#each param.items as item}
-              {@const value = item.value.format(param.digit)}
+              {@const value = item.value.toFixed(param.digit)}
               <td style="--size: calc({value}/100); --color: {item.colorCode};"
                 ><span class="data">{value}</span><span class="tooltip"
                   >{item.label}<br />{value}%</span

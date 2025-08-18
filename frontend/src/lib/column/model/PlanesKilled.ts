@@ -9,7 +9,7 @@ export class PlanesKilled extends AbstractStatsColumn<string> {
 
   displayValue(player: data.Player): string {
     const value = this.playerStats(player).ship.planes_killed;
-    return value.format(this.digit());
+    return value.toFixed(this.digit());
   }
 
   getTableDataComponent() {

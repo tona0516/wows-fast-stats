@@ -24,9 +24,9 @@ import ShipNone from "src/assets/images/ship_none.png";
 import ShipSS from "src/assets/images/ship_ss.png";
 import ShipPremiumSS from "src/assets/images/ship_ss_premium.png";
 import ShipInfoTableData from "src/component/stats/internal/table_data/ShipInfoTableData.svelte";
-import { Color } from "src/lib/Color";
+import { AppConst } from "src/lib/AppConst";
+import { AppFunc } from "src/lib/AppFunc";
 import { AbstractColumn } from "src/lib/column/intetface/AbstractColumn";
-import { isShipType, tierString } from "src/lib/util";
 import type { data } from "wailsjs/go/models";
 
 const FLAGS: { [key: string]: string } = {
@@ -75,20 +75,13 @@ export class ShipInfo extends AbstractColumn {
   }
 
   displayValue(player: data.Player): string {
-    return `${tierString(player.ship_info.tier)} ${player.ship_info.name}`;
-  }
-
-  bgColorCode(player: data.Player): string {
-    const type = player.ship_info.type;
-    if (!isShipType(type)) return "";
-
-    return Color.ShipType.getFixed(type)?.background ?? "";
+    return `${AppFunc.toTierString(player.ship_info.tier)} ${player.ship_info.name}`;
   }
 
   shipTypeIconPath(player: data.Player): string {
     const shipInfo = player.ship_info;
     const type = shipInfo.type;
-    if (!isShipType(type)) return ShipNone;
+    if (!AppFunc.toShipType(type)) return ShipNone;
 
     return shipInfo.is_premium ? PREMIUM_SHIP_ICONS[type] : SHIP_ICONS[type];
   }
@@ -99,10 +92,11 @@ export class ShipInfo extends AbstractColumn {
 
   getBackgroundColorCode(player: data.Player): string | undefined {
     const type = player.ship_info.type;
-    if (isShipType(type)) {
-      return Color.ShipType.getFixed(type)?.background;
-    }
+    if (!AppFunc.toShipType(type)) return "";
 
-    return undefined;
+    const defaultColor = AppConst.SHIP_TYPE_COLORS.get(type);
+    if (!defaultColor) return "";
+
+    return AppFunc.getFixedColorPair(defaultColor).background;
   }
 }

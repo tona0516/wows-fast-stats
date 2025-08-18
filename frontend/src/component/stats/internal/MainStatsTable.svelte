@@ -5,7 +5,6 @@
     storedTeamThreatLevels,
   } from "src/stores";
 
-  import { RowPattern } from "src/lib/RowPattern";
   import type { data } from "wailsjs/go/models";
   import ColspanTableData from "./table_data/ColspanTableData.svelte";
   import { ThreatLevel } from "src/lib/column/model/ThreatLevel";
@@ -29,6 +28,7 @@
   import type { ColumnCategory } from "src/lib/types";
   import type { AbstractColumn } from "src/lib/column/intetface/AbstractColumn";
   import { AppConst } from "src/lib/AppConst";
+  import { AppFunc } from "src/lib/AppFunc";
 
   export let teams: data.Team[];
 
@@ -136,7 +136,7 @@
         </thead>
         <tbody>
           {#each team.players as player}
-            {@const rowPattern = RowPattern.derive(
+            {@const rowPattern = AppFunc.getRowPattern(
               player,
               $storedStatsExtra,
               shipCategory.showCount(),
@@ -151,15 +151,15 @@
                 />
               {/each}
 
-              {#if [RowPattern.NO_COLUMN, RowPattern.PRIVATE, RowPattern.NO_STATS].includes(rowPattern)}
+              {#if ["no_column", "private", "no_stats"].includes(rowPattern)}
                 <ColspanTableData
                   colspan={allColumnCount}
-                  text={RowPattern.getColumnText(rowPattern)}
+                  text={AppFunc.getColumnText(rowPattern)}
                 />
-              {:else if rowPattern === RowPattern.NO_SHIP_STATS}
+              {:else if rowPattern === "no_ship_stats"}
                 <ColspanTableData
                   colspan={shipCategory.showCount()}
-                  text={RowPattern.getColumnText(rowPattern)}
+                  text={AppFunc.getColumnText(rowPattern)}
                 />
                 {#each shipCategory.columns as column}
                   <svelte:component

@@ -9,7 +9,7 @@ export class AvgTier extends AbstractStatsColumn<string> {
 
   displayValue(player: data.Player): string {
     const value = this.playerStats(player).overall.avg_tier;
-    return value.format(this.digit());
+    return value.toFixed(this.digit());
   }
 
   getTableDataComponent() {

@@ -1,6 +1,7 @@
 import SingleTableData from "src/component/stats/internal/table_data/SingleTableData.svelte";
+import { AppConst } from "src/lib/AppConst";
+import { AppFunc } from "src/lib/AppFunc";
 import { AbstractStatsColumn } from "src/lib/column/intetface/AbstractStatsColumn";
-import { ThreatLevelGenerator } from "src/lib/ThreatLevel";
 import type { data } from "wailsjs/go/models";
 
 export class ThreatLevel extends AbstractStatsColumn<string> {
@@ -14,20 +15,29 @@ export class ThreatLevel extends AbstractStatsColumn<string> {
       return "N/A";
     }
 
-    return value.format(this.digit());
+    return value.toFixed(this.digit());
   }
 
   textColorCode(player: data.Player): string {
-    return (
-      ThreatLevelGenerator.fromScore(player.pvp_all.overall.threat_level.raw)
-        ?.color?.text || ""
+    const threatLevelInfo = AppFunc.getThreatLevel(
+      player.pvp_all.overall.threat_level.raw,
     );
+    if (!threatLevelInfo) {
+      return "";
+    }
+    return AppConst.THREAT_LEVEL_COLORS.get(threatLevelInfo.level)?.text || "";
   }
 
   getBackgroundColorCode(player: data.Player): string | undefined {
-    return ThreatLevelGenerator.fromScore(
+    const threatLevelInfo = AppFunc.getThreatLevel(
       player.pvp_all.overall.threat_level.raw,
-    )?.color?.background;
+    );
+    if (!threatLevelInfo) {
+      return "";
+    }
+    return (
+      AppConst.THREAT_LEVEL_COLORS.get(threatLevelInfo.level)?.background || ""
+    );
   }
 
   getTableDataComponent() {

@@ -6,15 +6,13 @@
   } from "src/stores";
   import { BrowserOpenURL, ClipboardSetText } from "wailsjs/runtime/runtime";
   import ModalCommon from "./ModalCommon.svelte";
-  import { RATING_DEFS } from "src/lib/RatingLevel";
   import type { data } from "wailsjs/go/models";
-  import { Color, type ColorPair } from "src/lib/Color";
   import { AppConst } from "src/lib/AppConst";
-    import { AppFunc } from "src/lib/AppFunc";
+  import { AppFunc } from "src/lib/AppFunc";
 
   interface DamageRating {
     level: string;
-    color?: ColorPair;
+    color?: string;
     value: string;
   }
 
@@ -32,13 +30,18 @@
       return undefined;
     }
 
-    return RATING_DEFS.map((rating) => {
-      const value = serverAvdgDamage * rating.damage;
+    return AppConst.RATING_INFO.map((info) => {
+      const value = serverAvdgDamage * info.damageThreshold;
+      let fixedColor = "";
+      const color = AppConst.RATING_COLORS.get(info.rating);
+      if (color) {
+        fixedColor = AppFunc.getFixedColorPair(color).text;
+      }
 
       return {
-        level: AppConst.SKILL_LEVELS.get(rating.level) ?? "",
-        color: Color.Rating.getFixed(rating.level),
-        value: `${Math.floor(value).format(0)}~`,
+        level: info.rating,
+        color: fixedColor,
+        value: `${value.toFixed()}~`,
       };
     });
   }
@@ -85,7 +88,7 @@
                 <tr>
                   <td
                     class="p-1 text-center font-bold"
-                    style="color: {dr.color?.text}">{dr.level}</td
+                    style="color: {dr.color}">{dr.level}</td
                   >
                   <td class="p-1 text-right">{dr.value}</td>
                 </tr>

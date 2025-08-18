@@ -1,7 +1,7 @@
 import SingleTableData from "src/component/stats/internal/table_data/SingleTableData.svelte";
-import { Color } from "src/lib/Color";
+import { AppConst } from "src/lib/AppConst";
+import { AppFunc } from "src/lib/AppFunc";
 import { AbstractStatsColumn } from "src/lib/column/intetface/AbstractStatsColumn";
-import { RatingfGenerator } from "src/lib/RatingLevel";
 import type { StatsCategory } from "src/lib/types";
 import type { data } from "wailsjs/go/models";
 
@@ -11,7 +11,7 @@ export class Damage extends AbstractStatsColumn<string> {
   }
 
   displayValue(player: data.Player): string {
-    return this.playerStats(player)[this.category].damage.format(this.digit());
+    return this.playerStats(player)[this.category].damage.toFixed(this.digit());
   }
 
   getTableDataComponent() {
@@ -22,15 +22,25 @@ export class Damage extends AbstractStatsColumn<string> {
     if (this.category !== "ship") "";
     const value = this.playerStats(player).ship.damage;
 
-    const rating = RatingfGenerator.fromDamage(
+    const ratingInfo = AppFunc.getRatingfromDamage(
       value,
       player.ship_info.avg_damage,
     );
-    if (!rating) {
+    if (!ratingInfo) {
       return "";
     }
 
-    return Color.Rating.getFixed(rating.level)?.text || "";
+    let fixedColor = "";
+    const color = AppConst.RATING_COLORS.get(ratingInfo.rating);
+    if (color) {
+      fixedColor = AppFunc.getFixedColorPair(color).text;
+    }
+
+    return fixedColor;
+  }
+
+  value(_player: data.Player): number {
+    throw new Error("Method not implemented.");
   }
 
   getCssClass(): string | undefined {

@@ -10,8 +10,8 @@ export class HitRate extends AbstractStatsColumn<string> {
   displayValue(player: data.Player): string {
     const hitRate = this.playerStats(player).ship.hit_rate;
 
-    const main = hitRate.main_battery.format(this.digit());
-    const torps = hitRate.torpedoes.format(this.digit());
+    const main = hitRate.main_battery.toFixed(this.digit());
+    const torps = hitRate.torpedoes.toFixed(this.digit());
 
     return `${main}|${torps}`;
   }

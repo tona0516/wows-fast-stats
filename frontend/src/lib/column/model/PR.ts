@@ -1,7 +1,7 @@
 import SingleTableData from "src/component/stats/internal/table_data/SingleTableData.svelte";
-import { Color } from "src/lib/Color";
+import { AppConst } from "src/lib/AppConst";
+import { AppFunc } from "src/lib/AppFunc";
 import { AbstractStatsColumn } from "src/lib/column/intetface/AbstractStatsColumn";
-import { RatingfGenerator } from "src/lib/RatingLevel";
 import type { StatsCategory } from "src/lib/types";
 import type { data } from "wailsjs/go/models";
 
@@ -16,7 +16,7 @@ export class PR extends AbstractStatsColumn<string> {
       return "N/A";
     }
 
-    return value.format(this.digit());
+    return value.toFixed(this.digit());
   }
 
   getTableDataComponent() {
@@ -24,12 +24,18 @@ export class PR extends AbstractStatsColumn<string> {
   }
 
   textColorCode(player: data.Player): string {
-    const rating = RatingfGenerator.fromPR(this.value(player));
-    if (!rating) {
+    const ratingInfo = AppFunc.getRatingfromPR(this.value(player));
+    if (!ratingInfo) {
       return "";
     }
 
-    return Color.Rating.getFixed(rating.level)?.text || "";
+    let fixedColor = "";
+    const color = AppConst.RATING_COLORS.get(ratingInfo.rating);
+    if (color) {
+      fixedColor = AppFunc.getFixedColorPair(color).text;
+    }
+
+    return fixedColor;
   }
 
   getCssClass(): string | undefined {

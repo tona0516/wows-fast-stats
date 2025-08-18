@@ -1,9 +1,9 @@
 import chroma from "chroma-js";
 import PlayerNameTableData from "src/component/stats/internal/table_data/PlayerNameTableData.svelte";
+import { AppConst } from "src/lib/AppConst";
 import { AppFunc } from "src/lib/AppFunc";
-import { Color } from "src/lib/Color";
 import { AbstractColumn } from "src/lib/column/intetface/AbstractColumn";
-import { type Rating, RatingfGenerator } from "src/lib/RatingLevel";
+import type { RatingInfo } from "src/lib/types";
 import {
   storedPlayerNameColor,
   storedShowClanNation,
@@ -78,18 +78,28 @@ export class PlayerName extends AbstractColumn {
   getBackgroundColorCode(player: data.Player): string | undefined {
     const statsExtra = get(storedStatsExtra);
 
-    let rating: Rating | undefined;
+    let ratingInfo: RatingInfo | undefined;
     switch (get(storedPlayerNameColor)) {
       case "ship": {
-        rating = RatingfGenerator.fromPR(player[statsExtra].ship.pr);
+        ratingInfo = AppFunc.getRatingfromPR(player[statsExtra].ship.pr);
         break;
       }
       case "overall": {
-        rating = RatingfGenerator.fromPR(player[statsExtra].overall.pr);
+        ratingInfo = AppFunc.getRatingfromPR(player[statsExtra].overall.pr);
         break;
       }
     }
 
-    return rating ? Color.Rating.getFixed(rating.level)?.background : undefined;
+    if (!ratingInfo) {
+      return undefined;
+    }
+
+    let fixedColor = "";
+    const color = AppConst.RATING_COLORS.get(ratingInfo.rating);
+    if (color) {
+      fixedColor = AppFunc.getFixedColorPair(color).background;
+    }
+
+    return fixedColor;
   }
 }
