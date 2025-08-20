@@ -1,0 +1,26 @@
+import SingleTableData from "@components/tabledata/SingleTableData.svelte";
+import type { data } from "@wails/go/models";
+import { AbstractStatsColumn } from "./AbstractStatsColumn";
+
+export class HitRateColumn extends AbstractStatsColumn<string> {
+  constructor() {
+    super("hit_rate", "ship");
+  }
+
+  override getTableDataComponent() {
+    return SingleTableData;
+  }
+
+  override getDisplayValue(player: data.Player): string {
+    const hitRate = this.getPlayerStats(player).ship.hit_rate;
+
+    const main = hitRate.main_battery.toFixed(this.getDigit());
+    const torps = hitRate.torpedoes.toFixed(this.getDigit());
+
+    return `${main}|${torps}`;
+  }
+
+  override getCssClass(): string {
+    return "text-center";
+  }
+}

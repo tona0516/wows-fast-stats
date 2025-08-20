@@ -1,42 +1,37 @@
 <script lang="ts">
-  import ConfigPage from "src/component/config/ConfigPage.svelte";
-  import InfoPage from "src/component/info/InfoPage.svelte";
-  import StatsPage from "src/component/stats/StatsPage.svelte";
-
   import "bootstrap-icons/font/bootstrap-icons.css";
   import "charts.css";
-
+  import EditAlertPlayerModal from "@components/modals/EditAlertPlayerModal.svelte";
+  import ExternalLink from "@components/ExternalLink.svelte";
+  import SideMenu from "@components/SideMenu.svelte";
+  import Toast from "@components/Toast.svelte";
   import {
     storedAlertPlayers,
     storedBattle,
     storedInstallPathError,
-    storedTonako,
     storedZoomRate,
-  } from "src/stores";
+  } from "@libs/stores";
+  import type { Page } from "@libs/types";
+  import AlertPlayerPage from "@pages/AlertPlayerPage.svelte";
+  import ConfigPage from "@pages/ConfigPage.svelte";
+  import InfoPage from "@pages/InfoPage.svelte";
+  import StatsPage from "@pages/StatsPage.svelte";
+  import {
+    InstallPath,
+    ValidateInstallPath,
+    AlertPlayers,
+    SubscribeBattle,
+    ShowMessageDialog,
+    LogError,
+  } from "@wails/go/main/App";
+  import type { data } from "@wails/go/models";
+  import { EventsOn } from "@wails/runtime/runtime";
   import { onMount } from "svelte";
   import { themeChange } from "theme-change";
-  import {
-    AlertPlayers,
-    InstallPath,
-    LatestRelease,
-    LogError,
-    ShowMessageDialog,
-    SubscribeBattle,
-    ValidateInstallPath,
-  } from "wailsjs/go/main/App";
-  import type { data } from "wailsjs/go/models";
-  import { EventsOn } from "wailsjs/runtime/runtime";
-  import SideMenu from "./SideMenu.svelte";
-  import ExternalLink from "./component/common/ExternalLink.svelte";
-  import type { Page } from "./lib/types";
-  import EditAlertPlayerModal from "./component/common/EditAlertPlayerModal.svelte";
-  import DeleteAlertPlayerModal from "./component/common/DeleteAlertPlayerModal.svelte";
-  import AlertPlayerPage from "./component/alert_player/AlertPlayerPage.svelte";
-  import PlayerDetailModal from "./component/common/PlayerDetailModal.svelte";
-  import Toast from "./component/common/Toast.svelte";
-  import ShipDetailModal from "./component/common/ShipDetailModal.svelte";
-  import { Tonako } from "./component/stats/internal/Tonako";
-  import { LocalStorage } from "./lib/LocalStorage";
+  import { TonakoManager } from "@libs/TonakoManager";
+  import PlayerDetailModal from "@components/modals/PlayerDetailModal.svelte";
+  import RemoveAlertPlayerModal from "@components/modals/RemoveAlertPlayerModal.svelte";
+  import ShipDetailModal from "@components/modals/ShipDetailModal.svelte";
 
   let statsPage: StatsPage | undefined;
   let initialized = false;
@@ -57,43 +52,22 @@
     storedAlertPlayers.set(players),
   );
   EventsOn("BATTLE_START", () => {
-    storedBattle.set(undefined);
-    storedTonako.set({
-      message: "戦闘データを読み込み中",
-      isLoading: true,
-      tonako: Tonako.Standby,
-    });
+    TonakoManager.instance.setStartBattleState();
   });
   EventsOn("BATTLE_END", () => {
-    storedTonako.set({
-      message: "戦闘開始時に自動的にリロードします",
-      isLoading: false,
-      tonako: Tonako.Standby,
-    });
+    TonakoManager.instance.setEndBattleState();
   });
   EventsOn("BATTLE_ERR", (message: string) => {
-    storedTonako.set({
-      message: message,
-      isLoading: false,
-      tonako: Tonako.Sorry,
-    });
+    TonakoManager.instance.setBattleErrorState(message);
   });
   EventsOn("BATTLE_FETCH_OTHERS", () => {
-    storedTonako.set({
-      message: "艦・マップ情報を取得中",
-      isLoading: true,
-      tonako: Tonako.Standby,
-    });
+    TonakoManager.instance.setFetchOtherDataState();
   });
   EventsOn("BATTLE_FETCH_PLAYERS", () => {
-    storedTonako.set({
-      message: "プレイヤー情報を取得中",
-      isLoading: true,
-      tonako: Tonako.Standby,
-    });
+    TonakoManager.instance.setFetchPlayerDataState();
   });
   EventsOn("BATTLE_FETCH_DONE", (battle: data.Battle) => {
-    storedTonako.set(undefined);
+    TonakoManager.instance.setHidden();
     storedBattle.set(battle);
   });
 
@@ -170,7 +144,7 @@
     <Toast />
 
     <EditAlertPlayerModal />
-    <DeleteAlertPlayerModal />
+    <RemoveAlertPlayerModal />
     <PlayerDetailModal />
     <ShipDetailModal />
 
