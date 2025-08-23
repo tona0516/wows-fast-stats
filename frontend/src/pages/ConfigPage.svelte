@@ -58,16 +58,18 @@
       <span class="ml-2 badge badge-outline badge-error">必須</span>
     </div>
 
-    <div class="stats shadow w-3/4">
-      <div class="stat {$storedInstallPathError && 'input-error'}">
-        <div class="stat-title">ゲームクライアント インストールパス</div>
-        <div class="stat-value text-lg">{installPath}</div>
-      </div>
-    </div>
-
     <p class="text-sm text-nowrap">
       WorldOfWarships.exeが存在するフォルダを選択してください
     </p>
+
+    {#if installPath}
+      <div class="stats shadow w-3/4">
+        <div class="stat">
+          <div class="stat-title">ゲームクライアント インストールパス</div>
+          <div class="stat-value text-lg">{installPath}</div>
+        </div>
+      </div>
+    {/if}
 
     {#if $storedInstallPathError}
       <div role="alert" class="mt-2 alert alert-error alert-soft">
