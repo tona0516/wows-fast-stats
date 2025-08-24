@@ -1,6 +1,7 @@
 import MaxDamageTableData from "@components/tabledata/MaxDamageTableData.svelte";
+import { NumbersURL } from "@libs/NumbersURL";
 import type { StatsCategory } from "@libs/types";
-import { shipNumbersURL, toTierString } from "@libs/utils";
+import { toTierString } from "@libs/utils";
 import type { data } from "@wails/go/models";
 import { AbstractStatsColumn } from "./AbstractStatsColumn";
 
@@ -29,7 +30,7 @@ export class MaxDamageColumn extends AbstractStatsColumn<MaxDamageParam> {
       case "ship":
         return { damage: value };
       case "overall": {
-        const url = shipNumbersURL(maxDamage.ship_id);
+        const url = NumbersURL.getShip(maxDamage.ship_id);
         const name = `${toTierString(maxDamage.ship_tier)} ${maxDamage.ship_name}`;
         return {
           damage: value,

@@ -1,23 +1,12 @@
 import { data } from "@wails/go/models";
 import { geometricMean } from "simple-statistics";
-import { NUMBERS_URL, ROMAN_NUMERALS } from "./constants";
+import { ROMAN_NUMERALS } from "./constants";
 import type {
   RowPattern,
   ShipType,
   StatsExtra,
   TeamThreatLevel,
 } from "./types";
-
-export const clanNumbersURL = (clanID: number): string =>
-  `${NUMBERS_URL}clan/${clanID},/`;
-
-export const playerNumbersURL = (
-  accountID: number,
-  accountName: string,
-): string => `${NUMBERS_URL}player/${accountID},${accountName}/`;
-
-export const shipNumbersURL = (shipID: number): string =>
-  `${NUMBERS_URL}ship/${shipID},/`;
 
 export const getTeamThreatLevels = (
   battle: data.Battle | undefined,

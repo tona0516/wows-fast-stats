@@ -3,10 +3,10 @@
   import type { data } from "@wails/go/models";
   import { ClipboardSetText, BrowserOpenURL } from "@wails/runtime/runtime";
   import ModalCommon from "./ModalCommon.svelte";
-  import { shipNumbersURL } from "@libs/utils";
   import { ModalManager } from "@libs/ModalManager";
   import type { ColorCode } from "@libs/ColorCode";
   import { Rating } from "@libs/Rating";
+  import { NumbersURL } from "@libs/NumbersURL";
 
   interface DamageRating {
     displayName: string;
@@ -64,7 +64,7 @@
     <div class="grid xl:grid-cols-1 gap-4 mt-2">
       <button
         class="btn"
-        on:click={() => BrowserOpenURL(shipNumbersURL(shipID))}
+        on:click={() => BrowserOpenURL(NumbersURL.getShip(shipID))}
       >
         艦艇ページ(wows-numbers.com)<i class="bi bi-box-arrow-in-up-right"></i>
       </button>

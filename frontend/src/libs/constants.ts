@@ -99,8 +99,6 @@ export const TIER_GROUPS: Readonly<Map<TierGroup, string>> = new Map<
   ["high", "8~★"],
 ]);
 
-export const NUMBERS_URL = "https://asia.wows-numbers.com/";
-
 export const SHIP_TYPE_COLORS: Readonly<Map<ShipType, ColorCode>> = new Map<
   ShipType,
   ColorCode

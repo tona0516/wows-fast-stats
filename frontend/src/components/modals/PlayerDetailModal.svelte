@@ -6,8 +6,8 @@
   } from "@libs/stores";
   import { ClipboardSetText, BrowserOpenURL } from "@wails/runtime/runtime";
   import ModalCommon from "./ModalCommon.svelte";
-  import { clanNumbersURL, playerNumbersURL } from "@libs/utils";
   import { ModalManager } from "@libs/ModalManager";
+  import { NumbersURL } from "@libs/NumbersURL";
 
   $: alertPlayer = $storedAlertPlayers.find(
     (ap) => ap.account_id === $storedPlayerDetail?.player_info.id,
@@ -71,7 +71,8 @@
 
       <button
         class="btn"
-        on:click={() => BrowserOpenURL(playerNumbersURL(accountID, playerName))}
+        on:click={() =>
+          BrowserOpenURL(NumbersURL.getPlayer(accountID, playerName))}
       >
         プレイヤーページ(wows-numbers.com)<i class="bi bi-box-arrow-in-up-right"
         ></i>
@@ -80,7 +81,7 @@
       {#if clan.id !== 0}
         <button
           class="btn"
-          on:click={() => BrowserOpenURL(clanNumbersURL(clan.id))}
+          on:click={() => BrowserOpenURL(NumbersURL.getClan(clan.id))}
         >
           クランページ(wows-numbers.com)<i class="bi bi-box-arrow-in-up-right"
           ></i>
