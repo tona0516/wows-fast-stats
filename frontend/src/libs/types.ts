@@ -65,3 +65,5 @@ export type TonakoParam = {
   isLoading: boolean;
   tonako: Tonako;
 };
+
+export type ColumnSettings = { [key in StatsKey]: ColumnSetting };

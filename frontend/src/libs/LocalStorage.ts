@@ -1,15 +1,11 @@
-import type {
-  ColumnSetting,
-  PlayerNameColor,
-  StatsExtra,
-  StatsKey,
-} from "./types";
+import { DEFAULT_COLUMN_SETTINGS } from "./constants";
+import type { ColumnSettings, PlayerNameColor, StatsExtra } from "./types";
 
 const KEY_ZOOM_RATE = "zoom_rate";
 const KEY_STATS_EXTRA = "stats_extra";
 const KEY_PLAYER_NAME_COLOR = "player_name_color";
 const KEY_SHOW_CLAN_NATION = "show_clan_nation";
-const KEYPREFIX_COLUMN_SETTING = "column_setting_";
+const KEY_COLUMN_SETTINGS = "column_settings";
 
 export class LocalStorage {
   private static _instance: LocalStorage;
@@ -63,23 +59,15 @@ export class LocalStorage {
     localStorage.setItem(KEY_SHOW_CLAN_NATION, showClanNation ? "1" : "0");
   }
 
-  getColumnSetting(key: StatsKey): ColumnSetting {
-    const columnSetting = localStorage.getItem(KEYPREFIX_COLUMN_SETTING + key);
-    if (!columnSetting) {
-      return { ship: false, overall: false, digit: 0 };
+  getColumnSettings(): ColumnSettings {
+    const columnSettings = localStorage.getItem(KEY_COLUMN_SETTINGS);
+    if (!columnSettings) {
+      return DEFAULT_COLUMN_SETTINGS;
     }
-    return JSON.parse(columnSetting) as ColumnSetting;
+    return JSON.parse(columnSettings) as ColumnSettings;
   }
 
-  setColumnSetting(key: StatsKey, columnSetting: Partial<ColumnSetting>) {
-    const currentSetting = this.getColumnSetting(key);
-    const newSetting: ColumnSetting = {
-      ...currentSetting,
-      ...columnSetting,
-    };
-    localStorage.setItem(
-      KEYPREFIX_COLUMN_SETTING + key,
-      JSON.stringify(newSetting),
-    );
+  setColumnSettings(settings: ColumnSettings) {
+    localStorage.setItem(KEY_COLUMN_SETTINGS, JSON.stringify(settings));
   }
 }

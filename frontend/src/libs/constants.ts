@@ -3,6 +3,7 @@ import { ColorCode } from "./ColorCode";
 import type {
   ColumnCategory,
   ColumnInfo,
+  ColumnSettings,
   PlayerNameColor,
   ShipType,
   StatsExtra,
@@ -119,3 +120,86 @@ export const DEFAULT_ALERT_PLAYER = {
   pattern: "bi-check-circle-fill",
   message: "",
 } as data.AlertPlayer;
+
+export const DEFAULT_COLUMN_SETTINGS: ColumnSettings = {
+  pr: {
+    ship: true,
+    overall: false,
+    digit: 0,
+  },
+  win_rate: {
+    ship: true,
+    overall: true,
+    digit: 1,
+  },
+  damage: {
+    ship: true,
+    overall: false,
+    digit: 0,
+  },
+  max_damage: {
+    ship: false,
+    overall: false,
+    digit: 0,
+  },
+  kd_rate: {
+    ship: true,
+    overall: false,
+    digit: 1,
+  },
+  kill: {
+    ship: false,
+    overall: false,
+    digit: 1,
+  },
+  exp: {
+    ship: false,
+    overall: false,
+    digit: 0,
+  },
+  battles: {
+    ship: true,
+    overall: true,
+    digit: 0,
+  },
+  avg_tier: {
+    ship: false,
+    overall: false,
+    digit: 1,
+  },
+  platoon_rate: {
+    ship: false,
+    overall: false,
+    digit: 1,
+  },
+  planes_killed: {
+    ship: false,
+    overall: false,
+    digit: 1,
+  },
+  survived_rate: {
+    ship: false,
+    overall: false,
+    digit: 1,
+  },
+  hit_rate: {
+    ship: false,
+    overall: false,
+    digit: 1,
+  },
+  threat_level: {
+    ship: false,
+    overall: false,
+    digit: 0,
+  },
+  using_ship_type_rate: {
+    ship: false,
+    overall: false,
+    digit: 1,
+  },
+  using_tier_rate: {
+    ship: false,
+    overall: false,
+    digit: 1,
+  },
+} as const;

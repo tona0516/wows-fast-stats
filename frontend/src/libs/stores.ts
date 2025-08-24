@@ -1,14 +1,7 @@
 import type { data } from "@wails/go/models";
 import { derived, type Writable, writable } from "svelte/store";
-import { STATS_KEYS } from "./constants";
 import { LocalStorage } from "./LocalStorage";
-import type {
-  ColumnSetting,
-  EditModalParam,
-  Optional,
-  StatsKey,
-  TonakoParam,
-} from "./types";
+import type { EditModalParam, Optional, TonakoParam } from "./types";
 import { getTeamThreatLevels } from "./utils";
 
 export const storedZoomRate = writable(LocalStorage.instance.getZoomRate());
@@ -36,18 +29,10 @@ storedShowClanNation.subscribe((showClanNation) => {
 });
 
 export const storedColumnmSettings = writable(
-  STATS_KEYS.reduce(
-    (acc, key) => {
-      acc[key] = LocalStorage.instance.getColumnSetting(key);
-      return acc;
-    },
-    {} as { [key in StatsKey]: ColumnSetting },
-  ),
+  LocalStorage.instance.getColumnSettings(),
 );
 storedColumnmSettings.subscribe((settings) => {
-  Object.entries(settings).forEach(([key, value]) => {
-    LocalStorage.instance.setColumnSetting(key as StatsKey, value);
-  });
+  LocalStorage.instance.setColumnSettings(settings);
 });
 
 export const storedBattle = writable(undefined) as Writable<
