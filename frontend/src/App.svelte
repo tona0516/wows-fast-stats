@@ -93,7 +93,7 @@
   };
 
   const initialize = async (): Promise<void> => {
-    // localStorage.clear();
+    localStorage.clear();
 
     try {
       const installPath = await InstallPath();

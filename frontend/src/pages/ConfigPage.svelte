@@ -155,19 +155,24 @@
               <td></td>
             {/if}
 
-            <td>
-              <select
-                class="select select-sm"
-                bind:value={$storedColumnmSettings[statsKey].digit}
-              >
-                {#each [0, 1, 2] as digit}
-                  <option
-                    selected={digit === $storedColumnmSettings[statsKey].digit}
-                    value={digit}>{digit}</option
-                  >
-                {/each}
-              </select>
-            </td>
+            {#if statsKey !== "ship_badge"}
+              <td>
+                <select
+                  class="select select-sm"
+                  bind:value={$storedColumnmSettings[statsKey].digit}
+                >
+                  {#each [0, 1, 2] as digit}
+                    <option
+                      selected={digit ===
+                        $storedColumnmSettings[statsKey].digit}
+                      value={digit}>{digit}</option
+                    >
+                  {/each}
+                </select>
+              </td>
+            {:else}
+              <td></td>
+            {/if}
           </tr>
         {/each}
       </tbody>

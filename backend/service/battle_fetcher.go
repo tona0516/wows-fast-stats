@@ -88,8 +88,10 @@ func (b *BattleFetcher) Invoke(tempArenaInfo data.TempArenaInfo) {
 	accountInfoResult := make(chan data.Result[data.WGAccountInfo])
 	shipStatsResult := make(chan data.Result[data.AllPlayerShipsStats])
 	clanResult := make(chan data.Result[data.Clans])
+	shipsBadgesResult := make(chan data.Result[data.AllPlayerShipsBadges])
 	go b.fetchAccountInfo(accountIDs, accountInfoResult)
 	go b.fetchAllPlayerShipsStats(accountIDs, shipStatsResult)
+	go b.fetchAllPlayerShipsBadges(accountIDs, shipsBadgesResult)
 	go b.fetchClan(accountIDs, clanResult)
 
 	errs := make([]error, 0)
@@ -121,6 +123,9 @@ func (b *BattleFetcher) Invoke(tempArenaInfo data.TempArenaInfo) {
 	shipStats := <-shipStatsResult
 	errs = append(errs, shipStats.Error)
 
+	shipsBadges := <-shipsBadgesResult
+	errs = append(errs, shipsBadges.Error)
+
 	clan := <-clanResult
 	errs = append(errs, clan.Error)
 
@@ -143,6 +148,7 @@ func (b *BattleFetcher) Invoke(tempArenaInfo data.TempArenaInfo) {
 		accountList,
 		clan.Value,
 		shipStats.Value,
+		shipsBadges.Value,
 		b.warship,
 		b.allExpectedStats,
 		b.battleArenas,
@@ -388,12 +394,35 @@ func (b *BattleFetcher) fetchClanLanguage(clanInfoArray []data.WGClansInfoData) 
 	return result
 }
 
+func (b *BattleFetcher) fetchAllPlayerShipsBadges(
+	accountIDs []int,
+	channel chan data.Result[data.AllPlayerShipsBadges],
+) {
+	shipBadgesMap := make(data.AllPlayerShipsBadges)
+	var mu sync.Mutex
+	err := doParallel(accountIDs, func(accountID int) error {
+		shipBadges, err := b.wargaming.ShipsBadges(accountID)
+		if err != nil {
+			return err
+		}
+
+		mu.Lock()
+		shipBadgesMap[accountID] = shipBadges[accountID]
+		mu.Unlock()
+
+		return nil
+	})
+
+	channel <- data.Result[data.AllPlayerShipsBadges]{Value: shipBadgesMap, Error: err}
+}
+
 func (b *BattleFetcher) compose(
 	tempArenaInfo data.TempArenaInfo,
 	accountInfo data.WGAccountInfo,
 	accountList data.WGAccountList,
 	clans data.Clans,
 	allPlayerShipsStats data.AllPlayerShipsStats,
+	allPlayerShipsBadges data.AllPlayerShipsBadges,
 	warships data.Warships,
 	allExpectedStats data.ExpectedStats,
 	battleArenas data.WGBattleArenas,
@@ -426,6 +455,7 @@ func (b *BattleFetcher) compose(
 			vehicle.ShipID,
 			accountInfo[accountID],
 			allPlayerShipsStats.Player(accountID),
+			allPlayerShipsBadges[accountID],
 			allExpectedStats,
 			warships,
 			tempArenaInfo,
@@ -519,6 +549,7 @@ func playerStats(
 			HitRate:      stats.HitRate(statsPattern),
 			PlanesKilled: stats.PlanesKilled(statsPattern),
 			PlatoonRate:  stats.PlatoonRate(data.StatsCategoryShip),
+			ShipBadge:    stats.ShipBadge(),
 		},
 		OverallStats: data.OverallStats{
 			Battles:           stats.Battles(data.StatsCategoryOverall, statsPattern),
@@ -534,6 +565,7 @@ func playerStats(
 			UsingShipTypeRate: stats.UsingShipTypeRate(statsPattern),
 			UsingTierRate:     stats.UsingTierRate(statsPattern),
 			PlatoonRate:       stats.PlatoonRate(data.StatsCategoryOverall),
+			ShipBadge:         stats.ShipBadges(),
 			ThreatLevel:       threatLevel,
 		},
 	}

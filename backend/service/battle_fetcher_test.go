@@ -36,6 +36,7 @@ func TestBattle_Get_正常系_初回(t *testing.T) {
 	mockWargaming.EXPECT().BattleTypes().Return(data.WGBattleTypes{}, nil)
 	mockWargaming.EXPECT().AccountInfo(gomock.Any()).Return(data.WGAccountInfo{}, nil)
 	mockWargaming.EXPECT().ShipsStats(gomock.Any()).Return(data.WGShipsStats{}, nil).AnyTimes()
+	mockWargaming.EXPECT().ShipsBadges(gomock.Any()).Return(data.WGShipsBadges{}, nil).AnyTimes()
 	mockWargaming.EXPECT().ClansAccountInfo(gomock.Any()).Return(data.WGClansAccountInfo{}, nil)
 	mockWargaming.EXPECT().ClansInfo(gomock.Any()).Return(data.WGClansInfo{}, nil)
 
@@ -105,6 +106,7 @@ func TestBattle_Get_正常系_2回目以降(t *testing.T) {
 	}, nil)
 	mockWargaming.EXPECT().AccountInfo(gomock.Any()).Return(data.WGAccountInfo{}, nil)
 	mockWargaming.EXPECT().ShipsStats(gomock.Any()).Return(data.WGShipsStats{}, nil).AnyTimes()
+	mockWargaming.EXPECT().ShipsBadges(gomock.Any()).Return(data.WGShipsBadges{}, nil).AnyTimes()
 	mockWargaming.EXPECT().ClansAccountInfo(gomock.Any()).Return(data.WGClansAccountInfo{}, nil)
 	mockWargaming.EXPECT().ClansInfo(gomock.Any()).Return(data.WGClansInfo{}, nil)
 

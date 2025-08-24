@@ -161,6 +161,21 @@ func (mr *MockWargamingInterfaceMockRecorder) EncycShips(pageNo any) *gomock.Cal
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EncycShips", reflect.TypeOf((*MockWargamingInterface)(nil).EncycShips), pageNo)
 }
 
+// ShipsBadges mocks base method.
+func (m *MockWargamingInterface) ShipsBadges(accountID int) (data.WGShipsBadges, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ShipsBadges", accountID)
+	ret0, _ := ret[0].(data.WGShipsBadges)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ShipsBadges indicates an expected call of ShipsBadges.
+func (mr *MockWargamingInterfaceMockRecorder) ShipsBadges(accountID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ShipsBadges", reflect.TypeOf((*MockWargamingInterface)(nil).ShipsBadges), accountID)
+}
+
 // ShipsStats mocks base method.
 func (m *MockWargamingInterface) ShipsStats(accountID int) (data.WGShipsStats, error) {
 	m.ctrl.T.Helper()

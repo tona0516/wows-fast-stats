@@ -215,6 +215,20 @@ func (w *Wargaming) BattleTypes() (data.WGBattleTypes, error) {
 	return res.Data, err
 }
 
+func (w *Wargaming) ShipsBadges(accountID int) (data.WGShipsBadges, error) {
+	res, err := request[response.WGShipsBadges](
+		w,
+		"/wows/ships/badges/",
+		map[string]string{
+			"application_id": w.appID,
+			"account_id":     strconv.Itoa(accountID),
+			"fields":         response.WGShipsBadges{}.Field(),
+		},
+	)
+
+	return res.Data, err
+}
+
 func request[T response.WGResponse](
 	w *Wargaming,
 	path string,

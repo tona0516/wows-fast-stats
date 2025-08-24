@@ -66,6 +66,7 @@ export const STATS_COLUMN_INFO: {
     full: "プレイTier割合",
     pattern: "overall",
   },
+  ship_badge: { min: "艦バッジ", full: "艦バッジ", pattern: "both" },
 } as const;
 
 export const STATS_KEYS = Object.keys(STATS_COLUMN_INFO) as readonly StatsKey[];
@@ -201,5 +202,10 @@ export const DEFAULT_COLUMN_SETTINGS: ColumnSettings = {
     ship: false,
     overall: false,
     digit: 1,
+  },
+  ship_badge: {
+    ship: false,
+    overall: false,
+    digit: 0,
   },
 } as const;

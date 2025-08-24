@@ -29,6 +29,7 @@
   import { ThreatLevelColumn } from "@libs/columns/ThreatLevelColumn";
   import { TierRateColumn } from "@libs/columns/TierRateColumn";
   import { WinRateColumn } from "@libs/columns/WinRateColumn";
+  import { ShipBadgeColumn } from "@libs/columns/ShipBadgeColumn";
 
   export let teams: data.Team[];
 
@@ -63,6 +64,7 @@
     new BattlesColumn("ship"),
     new SurvivedRateColumn("ship"),
     new PlatoonRateColumn("ship"),
+    new ShipBadgeColumn("ship"),
     new PlanesKilledColumn(),
     new HitRateColumn(),
   ]);
@@ -78,6 +80,7 @@
     new BattlesColumn("overall"),
     new SurvivedRateColumn("overall"),
     new PlatoonRateColumn("overall"),
+    new ShipBadgeColumn("overall"),
     new ThreatLevelColumn(),
     new AvgTierColumn(),
     new TierRateColumn(),

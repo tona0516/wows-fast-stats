@@ -9,6 +9,7 @@ type Stats struct {
 	accountInfo      WGAccountInfoData
 	useShipStats     WGShipsStatsData
 	allShipsStats    []WGShipsStatsData
+	shipsBadges      []WGShipsBadgesData
 	allExpectedStats ExpectedStats
 	warships         Warships
 	tempArenaInfo    TempArenaInfo
@@ -18,6 +19,7 @@ func NewStats(
 	useShipID int,
 	accountInfo WGAccountInfoData,
 	allShipsStats []WGShipsStatsData,
+	shipsBadges []WGShipsBadgesData,
 	expectedStats ExpectedStats,
 	warships Warships,
 	tempArenaInfo TempArenaInfo,
@@ -35,6 +37,7 @@ func NewStats(
 		accountInfo:      accountInfo,
 		useShipStats:     useShipStats,
 		allShipsStats:    allShipsStats,
+		shipsBadges:      shipsBadges,
 		allExpectedStats: expectedStats,
 		warships:         warships,
 		tempArenaInfo:    tempArenaInfo,
@@ -345,6 +348,50 @@ func (s *Stats) PlatoonRate(
 	}
 
 	return 0
+}
+
+func (s *Stats) ShipBadge() ShipBadge {
+	for _, b := range s.shipsBadges {
+		if b.ShipID == s.useShipID {
+			return s.toShipBadge(b.TopGradeClass)
+		}
+	}
+
+	return ShipBadgeNone
+}
+
+func (s *Stats) ShipBadges() ShipBadgeGroup {
+	var badges ShipBadgeGroup
+
+	for _, b := range s.shipsBadges {
+		switch s.toShipBadge(b.TopGradeClass) {
+		case ShipBadgeExpert:
+			badges.Expert++
+		case ShipBadgeFirst:
+			badges.First++
+		case ShipBadgeSecond:
+			badges.Second++
+		case ShipBadgeThird:
+			badges.Third++
+		}
+	}
+
+	return badges
+}
+
+func (s *Stats) toShipBadge(value int) ShipBadge {
+	switch value {
+	case 1:
+		return ShipBadgeExpert
+	case 2:
+		return ShipBadgeFirst
+	case 3:
+		return ShipBadgeSecond
+	case 4:
+		return ShipBadgeThird
+	default:
+		return ShipBadgeNone
+	}
 }
 
 func (s *Stats) statsValues(pattern StatsPattern) (WGShipStatsValues, WGPlayerStatsValues) {

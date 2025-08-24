@@ -300,3 +300,22 @@ func TestWargaming_BattleTypes(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, data.WGBattleTypes{}, result)
 }
+
+func TestWargaming_ShipsBadges(t *testing.T) {
+	t.Parallel()
+
+	server := simpleMockServer(200, response.WGShipsBadges{
+		WGResponseCommon: response.WGResponseCommon[data.WGShipsBadges]{
+			Status: "",
+			Error:  response.WGError{},
+			Data:   map[int][]data.WGShipsBadgesData{},
+		},
+	})
+	defer server.Close()
+
+	wargaming := NewWargaming(server.URL, 0, 0, 0, 1, "")
+	result, err := wargaming.ShipsBadges(123)
+
+	require.NoError(t, err)
+	assert.Equal(t, data.WGShipsBadges{}, result)
+}

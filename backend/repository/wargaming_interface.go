@@ -13,4 +13,5 @@ type WargamingInterface interface {
 	ShipsStats(accountID int) (data.WGShipsStats, error)
 	BattleArenas() (data.WGBattleArenas, error)
 	BattleTypes() (data.WGBattleTypes, error)
+	ShipsBadges(accountID int) (data.WGShipsBadges, error)
 }

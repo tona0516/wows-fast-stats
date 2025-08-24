@@ -20,6 +20,24 @@ export namespace data {
 	        this.created_at = source["created_at"];
 	    }
 	}
+	export class ShipBadgeGroup {
+	    expert: number;
+	    first: number;
+	    second: number;
+	    third: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new ShipBadgeGroup(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.expert = source["expert"];
+	        this.first = source["first"];
+	        this.second = source["second"];
+	        this.third = source["third"];
+	    }
+	}
 	export class TierGroup {
 	    low: number;
 	    middle: number;
@@ -85,6 +103,7 @@ export namespace data {
 	    using_ship_type_rate: ShipTypeGroup;
 	    using_tier_rate: TierGroup;
 	    platoon_rate: number;
+	    ship_badge: ShipBadgeGroup;
 	
 	    static createFrom(source: any = {}) {
 	        return new OverallStats(source);
@@ -106,6 +125,7 @@ export namespace data {
 	        this.using_ship_type_rate = this.convertValues(source["using_ship_type_rate"], ShipTypeGroup);
 	        this.using_tier_rate = this.convertValues(source["using_tier_rate"], TierGroup);
 	        this.platoon_rate = source["platoon_rate"];
+	        this.ship_badge = this.convertValues(source["ship_badge"], ShipBadgeGroup);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -187,6 +207,7 @@ export namespace data {
 	    hit_rate: HitRate;
 	    planes_killed: number;
 	    platoon_rate: number;
+	    ship_badge: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new ShipStats(source);
@@ -206,6 +227,7 @@ export namespace data {
 	        this.hit_rate = this.convertValues(source["hit_rate"], HitRate);
 	        this.planes_killed = source["planes_killed"];
 	        this.platoon_rate = source["platoon_rate"];
+	        this.ship_badge = source["ship_badge"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -471,6 +493,7 @@ export namespace data {
 	        this.updatable = source["updatable"];
 	    }
 	}
+	
 	
 	
 	
