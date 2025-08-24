@@ -9,7 +9,6 @@ export type StatsCategory = Exclude<keyof data.PlayerStats, CommonMethod>;
 export type ColumnCategory = Readonly<"basic" | StatsCategory>;
 
 export type ShipType = Readonly<keyof data.ShipTypeGroup>;
-export type TierGroup = Readonly<keyof data.TierGroup>;
 export type StatsExtra = Exclude<keyof data.Player, BasicKey | CommonMethod>;
 
 export type ShipStatsKey = Exclude<keyof data.ShipStats, CommonMethod>;

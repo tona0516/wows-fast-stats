@@ -1,8 +1,22 @@
 import StackedBarGraphTableData from "@components/tabledata/StackedBarGraphTableData.svelte";
-import { TIER_GROUP_COLORS, TIER_GROUPS } from "@libs/constants";
+import { ColorCode } from "@libs/ColorCode";
 import type { StackedBarChartParam } from "@libs/types";
 import type { data } from "@wails/go/models";
 import { AbstractStatsColumn } from "./AbstractStatsColumn";
+
+type TierGroup = Readonly<keyof data.TierGroup>;
+
+const DISPLAY_NAMES: { [tierGroup in TierGroup]: string } = {
+  low: "1~4",
+  middle: "5~7",
+  high: "8~★",
+} as const;
+
+const COLORS: { [tierGroup in TierGroup]: ColorCode } = {
+  low: new ColorCode("#8CA113"),
+  middle: new ColorCode("#205B85"),
+  high: new ColorCode("#990F4F"),
+} as const;
 
 export class TierRateColumn extends AbstractStatsColumn<
   StackedBarChartParam[]
@@ -19,16 +33,17 @@ export class TierRateColumn extends AbstractStatsColumn<
     const tierRateGroup = this.getPlayerStats(player).overall.using_tier_rate;
 
     const params: StackedBarChartParam[] = [];
-    TIER_GROUPS.forEach((label, tierGroup) => {
-      const color = TIER_GROUP_COLORS.get(tierGroup);
+    Object.keys(DISPLAY_NAMES).forEach((key) => {
+      const tierGroup = key as TierGroup;
 
+      const label = DISPLAY_NAMES[tierGroup];
+      const color = COLORS[tierGroup];
       params.push({
         label: label,
-        colorCode: color?.getFixedBgColor(),
+        colorCode: color.getFixedBgColor(),
         value: tierRateGroup[tierGroup],
       });
     });
-
     return params;
   }
 }

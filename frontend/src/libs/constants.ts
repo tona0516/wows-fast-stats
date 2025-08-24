@@ -7,7 +7,6 @@ import type {
   ShipType,
   StatsExtra,
   StatsKey,
-  TierGroup,
 } from "./types";
 
 export const ZOOM_RATES = [
@@ -90,15 +89,6 @@ export const SHIP_TYPES: Readonly<Map<ShipType, string>> = new Map<
   ["cv", "空母"],
 ]);
 
-export const TIER_GROUPS: Readonly<Map<TierGroup, string>> = new Map<
-  TierGroup,
-  string
->([
-  ["low", "1~4"],
-  ["middle", "5~7"],
-  ["high", "8~★"],
-]);
-
 export const SHIP_TYPE_COLORS: Readonly<Map<ShipType, ColorCode>> = new Map<
   ShipType,
   ColorCode
@@ -108,15 +98,6 @@ export const SHIP_TYPE_COLORS: Readonly<Map<ShipType, ColorCode>> = new Map<
   ["cl", new ColorCode("#27853F")],
   ["bb", new ColorCode("#CA1028")],
   ["cv", new ColorCode("#5E2883")],
-]);
-
-export const TIER_GROUP_COLORS: Readonly<Map<TierGroup, ColorCode>> = new Map<
-  TierGroup,
-  ColorCode
->([
-  ["low", new ColorCode("#8CA113")],
-  ["middle", new ColorCode("#205B85")],
-  ["high", new ColorCode("#990F4F")],
 ]);
 
 export const ROMAN_NUMERALS: { [key: number]: string } = {
