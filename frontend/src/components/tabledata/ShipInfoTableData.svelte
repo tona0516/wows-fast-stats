@@ -8,7 +8,7 @@
 </script>
 
 <td class="p-1" style="background-color: {column.getBgColorCode(player)?.raw}">
-  <div class="w-40 flex place-items-center">
+  <div class="w-48 flex place-items-center">
     <button
       class="btn btn-xs mr-1 bi bi-info-square"
       on:click={() => ModalManager.instance.openForShipDetail(player)}
