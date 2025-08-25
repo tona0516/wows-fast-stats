@@ -47,7 +47,7 @@ export const STATS_COLUMN_INFO: {
   planes_killed: { min: "撃墜", full: "撃墜", pattern: "ship" },
   survived_rate: {
     min: "生存率",
-    full: "生存率(勝利|敗北)",
+    full: "生存率(全戦|勝利|敗北)",
     pattern: "ship",
   },
   hit_rate: { min: "命中率", full: "命中率(主砲|魚雷)", pattern: "ship" },
