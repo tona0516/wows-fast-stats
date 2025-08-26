@@ -33,7 +33,7 @@ export class ShipBadgeColumn extends AbstractStatsColumn<string> {
             (entry) =>
               `${SHIP_BADGES[entry[0] as keyof ShipBadge]}:${entry[1]}`,
           )
-          .join("|");
+          .join(" | ");
     }
   }
 
