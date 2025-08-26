@@ -26,18 +26,19 @@
         class="btn btn-xs mr-1 bi bi-info-square"
         on:click={() => ModalManager.instance.openForPlayerDetail(player)}
       />
+      {#if alertPlayer}
+        <span class="bi {alertPlayer.pattern}"></span>
+      {/if}
+
+      {#if clanTag}
+        {#if nationFlagClass}
+          <span class={nationFlagClass}></span>
+        {/if}
+        <span style="color: {column.getClanColorCode(player)?.raw}">
+          {clanTag}
+        </span>
+      {/if}
       <div class="truncate">
-        {#if alertPlayer}
-          <span class="bi {alertPlayer.pattern}"></span>
-        {/if}
-        {#if clanTag}
-          {#if nationFlagClass}
-            <span class={nationFlagClass}></span>
-          {/if}
-          <span style="color: {column.getClanColorCode(player)?.raw}">
-            {clanTag}
-          </span>
-        {/if}
         {column.getPlayerName(player)}
       </div>
     {/if}
