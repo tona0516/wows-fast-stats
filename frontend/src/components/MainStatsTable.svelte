@@ -164,7 +164,7 @@
                   colspan={shipCategory.showCount()}
                   text={getColumnText(rowPattern)}
                 />
-                {#each shipCategory.columns as column}
+                {#each overallCategory.columns as column}
                   <svelte:component
                     this={column.getTableDataComponent()}
                     {column}
