@@ -10,7 +10,7 @@
 <td class="p-1" style="background-color: {column.getBgColorCode(player)?.raw}">
   <div class="w-48 flex place-items-center">
     <button
-      class="btn btn-xs mr-1 bi bi-info-square"
+      class="btn btn-xs bi bi-info-square p-1 mr-1"
       on:click={() => ModalManager.instance.openForShipDetail(player)}
     />
     <img class="w-icon" src={column.getNationIconPath(player)} alt="" />

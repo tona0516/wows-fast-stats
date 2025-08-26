@@ -23,7 +23,7 @@
       </div>
     {:else}
       <button
-        class="btn btn-xs mr-1 bi bi-info-square"
+        class="btn btn-xs bi bi-info-square p-1 mr-1"
         on:click={() => ModalManager.instance.openForPlayerDetail(player)}
       />
       {#if alertPlayer}
