@@ -19,7 +19,7 @@ export class SurvivedRateColumn extends AbstractStatsColumn<string> {
     const win = sv.win.toFixed(this.getDigit());
     const lose = sv.lose.toFixed(this.getDigit());
 
-    return `${all} | ${win} | ${lose}`;
+    return `${all}% | ${win}% | ${lose}%`;
   }
 
   override getCssClass(): string {
