@@ -24,8 +24,16 @@ export const getTeamThreatLevels = (
         return !(id === 0 || player.player_info.is_hidden);
       })
       .map((player) => player[statsExtra].overall.threat_level.modified);
-    const maxScore = Math.max(...values);
 
+    if (values.length === 0) {
+      return {
+        average: Number.NaN,
+        dissociationDegree: Number.NaN,
+        accuracy: Number.NaN,
+      };
+    }
+
+    const maxScore = Math.max(...values);
     const average = geometricMean(values);
 
     return {
