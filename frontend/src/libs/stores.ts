@@ -14,18 +14,18 @@ storedStatsExtra.subscribe((statsExtra) => {
   LocalStorage.instance.setStatsExtra(statsExtra);
 });
 
-export const storedPlayerNameColor = writable(
-  LocalStorage.instance.getPlayerNameColor(),
+export const storedPlayerNameColumnSettings = writable(
+  LocalStorage.instance.getPlayerNameColumnSettings(),
 );
-storedPlayerNameColor.subscribe((color) => {
-  LocalStorage.instance.setPlayerNameColor(color);
+storedPlayerNameColumnSettings.subscribe((settings) => {
+  LocalStorage.instance.setPlayerNameColumnSettings(settings);
 });
 
-export const storedShowClanNation = writable(
-  LocalStorage.instance.getShowClanNation(),
+export const storedShipInfoColumnSettings = writable(
+  LocalStorage.instance.getShipInfoColumnSettings(),
 );
-storedShowClanNation.subscribe((showClanNation) => {
-  LocalStorage.instance.setShowClanNation(showClanNation);
+storedShipInfoColumnSettings.subscribe((settings) => {
+  LocalStorage.instance.setShipInfoColumnSettings(settings);
 });
 
 export const storedColumnmSettings = writable(

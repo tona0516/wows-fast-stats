@@ -21,7 +21,11 @@ export type Page = "stats" | "ap_config" | "config" | "info";
 
 export type ColumnSettingPattern = "ship" | "overall" | "both";
 
-export type PlayerNameColor = "ship" | "overall" | "none";
+export type PlayerNameColorPattern =
+  | "pr_ship"
+  | "pr_overall"
+  | "threat_level"
+  | "none";
 
 export type RowPattern =
   | "no_column"
@@ -67,3 +71,13 @@ export type TonakoParam = {
 };
 
 export type ColumnSettings = { [key in StatsKey]: ColumnSetting };
+
+export type PlayerNameColumnSetting = {
+  enableNationFlag: boolean;
+  colorPattern: PlayerNameColorPattern;
+};
+
+export type ShipInfoColumnSetting = {
+  enableNationFlag: boolean;
+  enableColorized: boolean;
+};

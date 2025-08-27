@@ -12,8 +12,6 @@
     storedStatsExtra,
     storedZoomRate,
     storedColumnmSettings,
-    storedPlayerNameColor,
-    storedShowClanNation,
   } from "@libs/stores";
   import { Theme } from "@libs/Theme";
   import {
@@ -180,28 +178,8 @@
   </div>
 
   <div class="p-4 flex flex-col items-center">
-    <p class="text-xl font-bold">プレイヤー名の背景色</p>
-    <select class="select my-2" bind:value={$storedPlayerNameColor}>
-      {#each PLAYER_NAME_COLORS as pnc}
-        <option selected={pnc[0] === $storedPlayerNameColor} value={pnc[0]}
-          >{pnc[1]}</option
-        >
-      {/each}
-    </select>
-  </div>
-
-  <div class="p-4 flex flex-col items-center">
     <p class="text-xl font-bold">その他</p>
     <ul class="list my-2">
-      <li class="list-row">
-        <input
-          class="toggle toggle-success"
-          type="checkbox"
-          bind:checked={$storedShowClanNation}
-        />
-        クラン国籍を表示する（クラン説明から言語検出）
-      </li>
-
       <li class="list-row">
         <input
           class="toggle toggle-success"

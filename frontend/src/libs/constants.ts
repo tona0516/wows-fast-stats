@@ -4,7 +4,9 @@ import type {
   ColumnCategory,
   ColumnInfo,
   ColumnSettings,
-  PlayerNameColor,
+  PlayerNameColorPattern,
+  PlayerNameColumnSetting,
+  ShipInfoColumnSetting,
   ShipType,
   StatsExtra,
   StatsKey,
@@ -24,10 +26,11 @@ export const STATS_EXTRAS: Readonly<Map<StatsExtra, string>> = new Map<
   ["rank_solo", "ランク戦"],
 ]);
 
-export const PLAYER_NAME_COLORS: Readonly<Map<PlayerNameColor, string>> =
-  new Map<PlayerNameColor, string>([
-    ["ship", "艦成績のPR"],
-    ["overall", "総合成績のPR"],
+export const PLAYER_NAME_COLORS: Readonly<Map<PlayerNameColorPattern, string>> =
+  new Map<PlayerNameColorPattern, string>([
+    ["pr_ship", "艦成績のPR"],
+    ["pr_overall", "総合成績のPR"],
+    ["threat_level", "戦力評価"],
     ["none", "なし"],
   ]);
 
@@ -209,3 +212,13 @@ export const DEFAULT_COLUMN_SETTINGS: ColumnSettings = {
     digit: 0,
   },
 } as const;
+
+export const DEFAULT_PLAYER_NAME_COLUMN_SETTING = {
+  enableNationFlag: false,
+  colorPattern: "none",
+} as PlayerNameColumnSetting;
+
+export const DEFAULT_SHIP_INFO_COLUMN_SETTING = {
+  enableNationFlag: true,
+  enableColorized: false,
+} as ShipInfoColumnSetting;

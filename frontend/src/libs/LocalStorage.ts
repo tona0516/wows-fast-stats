@@ -1,10 +1,19 @@
-import { DEFAULT_COLUMN_SETTINGS } from "./constants";
-import type { ColumnSettings, PlayerNameColor, StatsExtra } from "./types";
+import {
+  DEFAULT_COLUMN_SETTINGS,
+  DEFAULT_PLAYER_NAME_COLUMN_SETTING,
+  DEFAULT_SHIP_INFO_COLUMN_SETTING,
+} from "./constants";
+import type {
+  ColumnSettings,
+  PlayerNameColumnSetting,
+  ShipInfoColumnSetting,
+  StatsExtra,
+} from "./types";
 
 const KEY_ZOOM_RATE = "zoom_rate";
 const KEY_STATS_EXTRA = "stats_extra";
-const KEY_PLAYER_NAME_COLOR = "player_name_color";
-const KEY_SHOW_CLAN_NATION = "show_clan_nation";
+const KEY_PLAYER_NAME_COLUMN_SETTING = "player_name_column_setting";
+const KEY_SHIP_INFO_COLUMN_SETTING = "ship_info_column_setting";
 const KEY_COLUMN_SETTINGS = "column_settings";
 
 export class LocalStorage {
@@ -38,25 +47,33 @@ export class LocalStorage {
     localStorage.setItem(KEY_STATS_EXTRA, statsExtra);
   }
 
-  getPlayerNameColor(): PlayerNameColor {
-    const playerNameColor = localStorage.getItem(KEY_PLAYER_NAME_COLOR);
-    if (!playerNameColor) {
-      return "none";
+  getPlayerNameColumnSettings(): PlayerNameColumnSetting {
+    const setting = localStorage.getItem(KEY_PLAYER_NAME_COLUMN_SETTING);
+    if (!setting) {
+      return DEFAULT_PLAYER_NAME_COLUMN_SETTING;
     }
-    return playerNameColor as PlayerNameColor;
+
+    return JSON.parse(setting) as PlayerNameColumnSetting;
   }
 
-  setPlayerNameColor(playerNameColor: PlayerNameColor) {
-    localStorage.setItem(KEY_PLAYER_NAME_COLOR, playerNameColor);
+  setPlayerNameColumnSettings(setting: PlayerNameColumnSetting) {
+    localStorage.setItem(
+      KEY_PLAYER_NAME_COLUMN_SETTING,
+      JSON.stringify(setting),
+    );
   }
 
-  getShowClanNation(): boolean {
-    const showClanNation = localStorage.getItem(KEY_SHOW_CLAN_NATION);
-    return showClanNation === "1";
+  getShipInfoColumnSettings(): ShipInfoColumnSetting {
+    const setting = localStorage.getItem(KEY_SHIP_INFO_COLUMN_SETTING);
+    if (!setting) {
+      return DEFAULT_SHIP_INFO_COLUMN_SETTING;
+    }
+
+    return JSON.parse(setting) as ShipInfoColumnSetting;
   }
 
-  setShowClanNation(showClanNation: boolean): void {
-    localStorage.setItem(KEY_SHOW_CLAN_NATION, showClanNation ? "1" : "0");
+  setShipInfoColumnSettings(setting: ShipInfoColumnSetting) {
+    localStorage.setItem(KEY_SHIP_INFO_COLUMN_SETTING, JSON.stringify(setting));
   }
 
   getColumnSettings(): ColumnSettings {

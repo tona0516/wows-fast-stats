@@ -6,6 +6,8 @@
 
   export let column: ShipInfoColumn;
   export let player: data.Player;
+
+  const nationIconPath = column.getNationIconPath(player);
 </script>
 
 <td class="p-1" style="background-color: {column.getBgColorCode(player)?.raw}">
@@ -14,12 +16,14 @@
       class="btn btn-xs bi bi-info-square p-1 mr-1"
       on:click={() => ModalManager.instance.openForShipDetail(player)}
     />
-    <img
-      class="w-icon"
-      style="width: {(1.25 * $storedZoomRate) / 100}rem"
-      src={column.getNationIconPath(player)}
-      alt=""
-    />
+    {#if nationIconPath}
+      <img
+        class="w-icon"
+        style="width: {(1.25 * $storedZoomRate) / 100}rem"
+        src={nationIconPath}
+        alt=""
+      />
+    {/if}
     <img
       class="w-icon"
       style="width: {(1.25 * $storedZoomRate) / 100}rem"
