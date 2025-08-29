@@ -20,14 +20,14 @@ export namespace data {
 	        this.created_at = source["created_at"];
 	    }
 	}
-	export class ShipBadgeGroup {
+	export class EfficiencyBadgeGroup {
 	    expert: number;
 	    first: number;
 	    second: number;
 	    third: number;
 	
 	    static createFrom(source: any = {}) {
-	        return new ShipBadgeGroup(source);
+	        return new EfficiencyBadgeGroup(source);
 	    }
 	
 	    constructor(source: any = {}) {
@@ -103,7 +103,7 @@ export namespace data {
 	    using_ship_type_rate: ShipTypeGroup;
 	    using_tier_rate: TierGroup;
 	    platoon_rate: number;
-	    ship_badge: ShipBadgeGroup;
+	    efficiency_badge: EfficiencyBadgeGroup;
 	
 	    static createFrom(source: any = {}) {
 	        return new OverallStats(source);
@@ -125,7 +125,7 @@ export namespace data {
 	        this.using_ship_type_rate = this.convertValues(source["using_ship_type_rate"], ShipTypeGroup);
 	        this.using_tier_rate = this.convertValues(source["using_tier_rate"], TierGroup);
 	        this.platoon_rate = source["platoon_rate"];
-	        this.ship_badge = this.convertValues(source["ship_badge"], ShipBadgeGroup);
+	        this.efficiency_badge = this.convertValues(source["efficiency_badge"], EfficiencyBadgeGroup);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -207,7 +207,7 @@ export namespace data {
 	    hit_rate: HitRate;
 	    planes_killed: number;
 	    platoon_rate: number;
-	    ship_badge: string;
+	    efficiency_badge: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new ShipStats(source);
@@ -227,7 +227,7 @@ export namespace data {
 	        this.hit_rate = this.convertValues(source["hit_rate"], HitRate);
 	        this.planes_killed = source["planes_killed"];
 	        this.platoon_rate = source["platoon_rate"];
-	        this.ship_badge = source["ship_badge"];
+	        this.efficiency_badge = source["efficiency_badge"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -477,6 +477,7 @@ export namespace data {
 		}
 	}
 	
+	
 	export class GHLatestRelease {
 	    tag_name: string;
 	    html_url: string;
@@ -493,7 +494,6 @@ export namespace data {
 	        this.updatable = source["updatable"];
 	    }
 	}
-	
 	
 	
 	

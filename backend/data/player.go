@@ -23,37 +23,37 @@ type PlayerStats struct {
 }
 
 type ShipStats struct {
-	Battles      uint         `json:"battles"`
-	Damage       float64      `json:"damage"`
-	MaxDamage    MaxDamage    `json:"max_damage"`
-	WinRate      float64      `json:"win_rate"`
-	SurvivedRate SurvivedRate `json:"survived_rate"`
-	KdRate       float64      `json:"kd_rate"`
-	Kill         float64      `json:"kill"`
-	Exp          float64      `json:"exp"`
-	PR           float64      `json:"pr"`
-	HitRate      HitRate      `json:"hit_rate"`
-	PlanesKilled float64      `json:"planes_killed"`
-	PlatoonRate  float64      `json:"platoon_rate"`
-	ShipBadge    ShipBadge    `json:"ship_badge"`
+	Battles         uint            `json:"battles"`
+	Damage          float64         `json:"damage"`
+	MaxDamage       MaxDamage       `json:"max_damage"`
+	WinRate         float64         `json:"win_rate"`
+	SurvivedRate    SurvivedRate    `json:"survived_rate"`
+	KdRate          float64         `json:"kd_rate"`
+	Kill            float64         `json:"kill"`
+	Exp             float64         `json:"exp"`
+	PR              float64         `json:"pr"`
+	HitRate         HitRate         `json:"hit_rate"`
+	PlanesKilled    float64         `json:"planes_killed"`
+	PlatoonRate     float64         `json:"platoon_rate"`
+	EfficiencyBadge EfficiencyBadge `json:"efficiency_badge"`
 }
 
 type OverallStats struct {
-	Battles           uint           `json:"battles"`
-	Damage            float64        `json:"damage"`
-	MaxDamage         MaxDamage      `json:"max_damage"`
-	WinRate           float64        `json:"win_rate"`
-	SurvivedRate      SurvivedRate   `json:"survived_rate"`
-	KdRate            float64        `json:"kd_rate"`
-	Kill              float64        `json:"kill"`
-	Exp               float64        `json:"exp"`
-	PR                float64        `json:"pr"`
-	ThreatLevel       ThreatLevel    `json:"threat_level"`
-	AvgTier           float64        `json:"avg_tier"`
-	UsingShipTypeRate ShipTypeGroup  `json:"using_ship_type_rate"`
-	UsingTierRate     TierGroup      `json:"using_tier_rate"`
-	PlatoonRate       float64        `json:"platoon_rate"`
-	ShipBadge         ShipBadgeGroup `json:"ship_badge"`
+	Battles           uint                 `json:"battles"`
+	Damage            float64              `json:"damage"`
+	MaxDamage         MaxDamage            `json:"max_damage"`
+	WinRate           float64              `json:"win_rate"`
+	SurvivedRate      SurvivedRate         `json:"survived_rate"`
+	KdRate            float64              `json:"kd_rate"`
+	Kill              float64              `json:"kill"`
+	Exp               float64              `json:"exp"`
+	PR                float64              `json:"pr"`
+	ThreatLevel       ThreatLevel          `json:"threat_level"`
+	AvgTier           float64              `json:"avg_tier"`
+	UsingShipTypeRate ShipTypeGroup        `json:"using_ship_type_rate"`
+	UsingTierRate     TierGroup            `json:"using_tier_rate"`
+	PlatoonRate       float64              `json:"platoon_rate"`
+	EfficiencyBadge   EfficiencyBadgeGroup `json:"efficiency_badge"`
 }
 
 type Player struct {

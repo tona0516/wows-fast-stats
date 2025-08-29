@@ -69,7 +69,7 @@ export const STATS_COLUMN_INFO: {
     full: "プレイTier割合",
     pattern: "overall",
   },
-  ship_badge: { min: "技能バッジ", full: "技能バッジ", pattern: "both" },
+  efficiency_badge: { min: "技能バッジ", full: "技能バッジ", pattern: "both" },
 } as const;
 
 export const STATS_KEYS = Object.keys(STATS_COLUMN_INFO) as readonly StatsKey[];
@@ -206,7 +206,7 @@ export const DEFAULT_COLUMN_SETTINGS: ColumnSettings = {
     overall: false,
     digit: 1,
   },
-  ship_badge: {
+  efficiency_badge: {
     ship: false,
     overall: false,
     digit: 0,

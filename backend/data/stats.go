@@ -350,28 +350,28 @@ func (s *Stats) PlatoonRate(
 	return 0
 }
 
-func (s *Stats) ShipBadge() ShipBadge {
+func (s *Stats) EfficiencyBadge() EfficiencyBadge {
 	for _, b := range s.shipsBadges {
 		if b.ShipID == s.useShipID {
-			return s.toShipBadge(b.TopGradeClass)
+			return s.toEfficiencyBadge(b.TopGradeClass)
 		}
 	}
 
-	return ShipBadgeNone
+	return EfficiencyBadgeNone
 }
 
-func (s *Stats) ShipBadges() ShipBadgeGroup {
-	var badges ShipBadgeGroup
+func (s *Stats) EfficiencyBadges() EfficiencyBadgeGroup {
+	var badges EfficiencyBadgeGroup
 
 	for _, b := range s.shipsBadges {
-		switch s.toShipBadge(b.TopGradeClass) {
-		case ShipBadgeExpert:
+		switch s.toEfficiencyBadge(b.TopGradeClass) {
+		case EfficiencyBadgeExpert:
 			badges.Expert++
-		case ShipBadgeFirst:
+		case EfficiencyBadgeFirst:
 			badges.First++
-		case ShipBadgeSecond:
+		case EfficiencyBadgeSecond:
 			badges.Second++
-		case ShipBadgeThird:
+		case EfficiencyBadgeThird:
 			badges.Third++
 		}
 	}
@@ -379,18 +379,18 @@ func (s *Stats) ShipBadges() ShipBadgeGroup {
 	return badges
 }
 
-func (s *Stats) toShipBadge(value int) ShipBadge {
+func (s *Stats) toEfficiencyBadge(value int) EfficiencyBadge {
 	switch value {
 	case 1:
-		return ShipBadgeExpert
+		return EfficiencyBadgeExpert
 	case 2:
-		return ShipBadgeFirst
+		return EfficiencyBadgeFirst
 	case 3:
-		return ShipBadgeSecond
+		return EfficiencyBadgeSecond
 	case 4:
-		return ShipBadgeThird
+		return EfficiencyBadgeThird
 	default:
-		return ShipBadgeNone
+		return EfficiencyBadgeNone
 	}
 }
 

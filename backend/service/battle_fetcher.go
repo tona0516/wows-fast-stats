@@ -398,22 +398,22 @@ func (b *BattleFetcher) fetchAllPlayerShipsBadges(
 	accountIDs []int,
 	channel chan data.Result[data.AllPlayerShipsBadges],
 ) {
-	shipBadgesMap := make(data.AllPlayerShipsBadges)
+	shipsBadgesMap := make(data.AllPlayerShipsBadges)
 	var mu sync.Mutex
 	err := doParallel(accountIDs, func(accountID int) error {
-		shipBadges, err := b.wargaming.ShipsBadges(accountID)
+		shipsBadges, err := b.wargaming.ShipsBadges(accountID)
 		if err != nil {
 			return err
 		}
 
 		mu.Lock()
-		shipBadgesMap[accountID] = shipBadges[accountID]
+		shipsBadgesMap[accountID] = shipsBadges[accountID]
 		mu.Unlock()
 
 		return nil
 	})
 
-	channel <- data.Result[data.AllPlayerShipsBadges]{Value: shipBadgesMap, Error: err}
+	channel <- data.Result[data.AllPlayerShipsBadges]{Value: shipsBadgesMap, Error: err}
 }
 
 func (b *BattleFetcher) compose(
@@ -537,19 +537,19 @@ func playerStats(
 
 	return data.PlayerStats{
 		ShipStats: data.ShipStats{
-			Battles:      stats.Battles(data.StatsCategoryShip, statsPattern),
-			Damage:       stats.AvgDamage(data.StatsCategoryShip, statsPattern),
-			MaxDamage:    stats.MaxDamage(data.StatsCategoryShip, statsPattern),
-			WinRate:      stats.WinRate(data.StatsCategoryShip, statsPattern),
-			SurvivedRate: stats.SurvivedRate(data.StatsCategoryShip, statsPattern),
-			KdRate:       stats.KdRate(data.StatsCategoryShip, statsPattern),
-			Kill:         stats.AvgKill(data.StatsCategoryShip, statsPattern),
-			Exp:          stats.AvgExp(data.StatsCategoryShip, statsPattern),
-			PR:           stats.PR(data.StatsCategoryShip, statsPattern),
-			HitRate:      stats.HitRate(statsPattern),
-			PlanesKilled: stats.PlanesKilled(statsPattern),
-			PlatoonRate:  stats.PlatoonRate(data.StatsCategoryShip),
-			ShipBadge:    stats.ShipBadge(),
+			Battles:         stats.Battles(data.StatsCategoryShip, statsPattern),
+			Damage:          stats.AvgDamage(data.StatsCategoryShip, statsPattern),
+			MaxDamage:       stats.MaxDamage(data.StatsCategoryShip, statsPattern),
+			WinRate:         stats.WinRate(data.StatsCategoryShip, statsPattern),
+			SurvivedRate:    stats.SurvivedRate(data.StatsCategoryShip, statsPattern),
+			KdRate:          stats.KdRate(data.StatsCategoryShip, statsPattern),
+			Kill:            stats.AvgKill(data.StatsCategoryShip, statsPattern),
+			Exp:             stats.AvgExp(data.StatsCategoryShip, statsPattern),
+			PR:              stats.PR(data.StatsCategoryShip, statsPattern),
+			HitRate:         stats.HitRate(statsPattern),
+			PlanesKilled:    stats.PlanesKilled(statsPattern),
+			PlatoonRate:     stats.PlatoonRate(data.StatsCategoryShip),
+			EfficiencyBadge: stats.EfficiencyBadge(),
 		},
 		OverallStats: data.OverallStats{
 			Battles:           stats.Battles(data.StatsCategoryOverall, statsPattern),
@@ -565,7 +565,7 @@ func playerStats(
 			UsingShipTypeRate: stats.UsingShipTypeRate(statsPattern),
 			UsingTierRate:     stats.UsingTierRate(statsPattern),
 			PlatoonRate:       stats.PlatoonRate(data.StatsCategoryOverall),
-			ShipBadge:         stats.ShipBadges(),
+			EfficiencyBadge:   stats.EfficiencyBadges(),
 			ThreatLevel:       threatLevel,
 		},
 	}

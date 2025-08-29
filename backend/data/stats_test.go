@@ -752,7 +752,7 @@ func TestStats_PlatoonRate(t *testing.T) {
 	assert.InDelta(t, 2.4, stats.PlatoonRate(StatsCategoryOverall), allowableDelta)
 }
 
-func TestStats_ShipBadge(t *testing.T) {
+func TestStats_EfficiencyBadge(t *testing.T) {
 	t.Parallel()
 
 	useShipID := 0
@@ -778,10 +778,10 @@ func TestStats_ShipBadge(t *testing.T) {
 		emptyTempArenaInfo,
 	)
 
-	assert.Equal(t, ShipBadge("E"), stats.ShipBadge())
+	assert.Equal(t, EfficiencyBadge("E"), stats.EfficiencyBadge())
 }
 
-func TestStats_ShipBadges(t *testing.T) {
+func TestStats_EfficiencyBadges(t *testing.T) {
 	t.Parallel()
 
 	stats := NewStats(
@@ -815,7 +815,7 @@ func TestStats_ShipBadges(t *testing.T) {
 		emptyTempArenaInfo,
 	)
 
-	badges := stats.ShipBadges()
+	badges := stats.EfficiencyBadges()
 	assert.Equal(t, 1, badges.Expert)
 	assert.Equal(t, 2, badges.First)
 	assert.Equal(t, 1, badges.Second)

@@ -231,7 +231,7 @@
               <td></td>
             {/if}
 
-            {#if statsKey !== "ship_badge"}
+            {#if statsKey !== "efficiency_badge"}
               <td>
                 <select
                   class="select select-sm"

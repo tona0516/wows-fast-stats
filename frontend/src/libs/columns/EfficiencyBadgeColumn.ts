@@ -3,18 +3,18 @@ import type { StatsCategory } from "@libs/types";
 import type { data } from "@wails/go/models";
 import { AbstractStatsColumn } from "./AbstractStatsColumn";
 
-type ShipBadge = Readonly<data.ShipBadgeGroup>;
+type EfficiencyBadge = Readonly<data.EfficiencyBadgeGroup>;
 
-const SHIP_BADGES: { [key in keyof ShipBadge]: string } = {
+const EFFICIENCY_BADGES: { [key in keyof EfficiencyBadge]: string } = {
   expert: "E",
   first: "1st",
   second: "2nd",
   third: "3rd",
 };
 
-export class ShipBadgeColumn extends AbstractStatsColumn<string> {
+export class EfficiencyBadgeColumn extends AbstractStatsColumn<string> {
   constructor(category: StatsCategory) {
-    super("ship_badge", category);
+    super("efficiency_badge", category);
   }
 
   override getTableDataComponent() {
@@ -26,12 +26,12 @@ export class ShipBadgeColumn extends AbstractStatsColumn<string> {
 
     switch (this.category) {
       case "ship":
-        return playerStats.ship.ship_badge;
+        return playerStats.ship.efficiency_badge;
       case "overall":
-        return Object.entries(playerStats.overall.ship_badge)
+        return Object.entries(playerStats.overall.efficiency_badge)
           .map(
             (entry) =>
-              `${SHIP_BADGES[entry[0] as keyof ShipBadge]}:${entry[1]}`,
+              `${EFFICIENCY_BADGES[entry[0] as keyof EfficiencyBadge]}:${entry[1]}`,
           )
           .join(" | ");
     }
