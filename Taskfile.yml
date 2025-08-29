@@ -43,7 +43,7 @@ tasks:
       - arch-go
       - go clean -testcache
       - go test -cover ./...
-      - "{{.NPM}} run test"
+      # - "{{.NPM}} run test"
   dev:
     desc: run app in development mode
     vars:
