@@ -27,7 +27,7 @@
       <BattleMetaInfo meta={$storedBattle.meta} />
     </div>
 
-    <div class="flex">
+    <div class="flex justify-center">
       <MainStatsTable teams={$storedBattle.teams} />
     </div>
   {/if}

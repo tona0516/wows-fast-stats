@@ -95,7 +95,7 @@
   const showThreatLevel = $storedColumnmSettings["threat_level"].overall;
 </script>
 
-<div class="overflow-x-auto w-screen pb-4">
+<div class="overflow-x-auto pb-4">
   <table class="table text-nowrap">
     {#each teams as team, i}
       {#if team.players.length !== 0}
