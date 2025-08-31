@@ -95,43 +95,60 @@
   const showThreatLevel = $storedColumnmSettings["threat_level"].overall;
 </script>
 
-<div class="overflow-x-auto pb-4">
-  <table class="table text-nowrap">
+<div class="overflow-x-auto rounded-xl border border-base-300 bg-base-200">
+  <table class="table table-zebra text-nowrap w-full">
     {#each teams as team, i}
       {#if team.players.length !== 0}
         <thead>
           {#if showThreatLevel && $storedTeamThreatLevels && $storedTeamThreatLevels[i]}
             {@const teamThreatLevel = $storedTeamThreatLevels[i]}
-            <tr>
-              <th colspan={allColumnCount}>
-                戦力評価値平均: <span class="text-lg"
-                  >{teamThreatLevel.average.toFixed(0)}</span
-                >
-                [確度:
-                <span class="text-lg"
-                  >{teamThreatLevel.accuracy.toFixed(0)}</span
-                >%] [介護指数:
-                <span class="text-lg"
-                  >{teamThreatLevel.dissociationDegree.toFixed(0)}</span
-                >%]
+            <tr class="bg-base-300/80">
+              <th colspan={allColumnCount} class="p-2">
+                <div class="flex flex-wrap items-center gap-3 text-sm">
+                  <div class="badge badge-info badge-outline gap-1">
+                    <span class="opacity-70">戦力</span>
+                    <span class="font-mono"
+                      >{teamThreatLevel.average.toFixed(0)}</span
+                    >
+                  </div>
+                  <div class="badge badge-success badge-outline gap-1">
+                    <span class="opacity-70">確度</span>
+                    <span class="font-mono"
+                      >{teamThreatLevel.accuracy.toFixed(0)}%</span
+                    >
+                  </div>
+                  <div class="badge badge-warning badge-outline gap-1">
+                    <span class="opacity-70">介護指数</span>
+                    <span class="font-mono"
+                      >{teamThreatLevel.dissociationDegree.toFixed(0)}%</span
+                    >
+                  </div>
+                </div>
               </th>
             </tr>
           {/if}
 
-          <tr>
+          <tr class="bg-base-300 text-xs">
             {#each categories as category}
               {#if category.showCount() > 0}
-                <th class="p-1 text-center" colspan={category.showCount()}>
+                <th
+                  class="p-2 text-center font-bold tracking-wide"
+                  colspan={category.showCount()}
+                  scope="colgroup"
+                >
                   {category.header()}
                 </th>
               {/if}
             {/each}
           </tr>
-          <tr>
+          <tr class="bg-base-200 text-[11px]">
             {#each categories as category}
               {#each category.columns as column}
                 {#if column.needsShow()}
-                  <th class="p-1 text-center">{column.header}</th>
+                  <th
+                    class="px-2 py-1 text-center font-medium whitespace-pre-line"
+                    scope="col">{column.header}</th
+                  >
                 {/if}
               {/each}
             {/each}
@@ -145,7 +162,7 @@
               shipCategory.showCount(),
               overallCategory.showCount(),
             )}
-            <tr>
+            <tr class="hover:bg-base-100/70">
               {#each basicCategory.columns as column}
                 <svelte:component
                   this={column.getTableDataComponent()}
@@ -193,4 +210,10 @@
       {/if}
     {/each}
   </table>
+
+  {#if teams.every((t) => t.players.length === 0)}
+    <div class="alert alert-info">
+      <span>表示可能なプレイヤーデータがありません。</span>
+    </div>
+  {/if}
 </div>
