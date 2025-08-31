@@ -4,7 +4,7 @@ import (
 	"math"
 )
 
-type Stats struct {
+type PersonalStats struct {
 	useShipID        int
 	accountInfo      WGAccountInfoData
 	useShipStats     WGShipsStatsData
@@ -15,7 +15,7 @@ type Stats struct {
 	tempArenaInfo    TempArenaInfo
 }
 
-func NewStats(
+func NewPersonalStats(
 	useShipID int,
 	accountInfo WGAccountInfoData,
 	allShipsStats []WGShipsStatsData,
@@ -23,7 +23,7 @@ func NewStats(
 	expectedStats ExpectedStats,
 	warships Warships,
 	tempArenaInfo TempArenaInfo,
-) *Stats {
+) *PersonalStats {
 	var useShipStats WGShipsStatsData
 	for _, v := range allShipsStats {
 		if v.ShipID == useShipID {
@@ -32,7 +32,7 @@ func NewStats(
 		}
 	}
 
-	return &Stats{
+	return &PersonalStats{
 		useShipID:        useShipID,
 		accountInfo:      accountInfo,
 		useShipStats:     useShipStats,
@@ -44,7 +44,7 @@ func NewStats(
 	}
 }
 
-func (s *Stats) PR(category StatsCategory, pattern StatsPattern) float64 {
+func (s *PersonalStats) PR(category StatsCategory, pattern StatsPattern) float64 {
 	switch category {
 	case StatsCategoryShip:
 		values, _ := s.statsValues(pattern)
@@ -97,7 +97,7 @@ func (s *Stats) PR(category StatsCategory, pattern StatsPattern) float64 {
 	return -1
 }
 
-func (s *Stats) Battles(category StatsCategory, pattern StatsPattern) uint {
+func (s *PersonalStats) Battles(category StatsCategory, pattern StatsPattern) uint {
 	ship, player := s.statsValues(pattern)
 	switch category {
 	case StatsCategoryShip:
@@ -109,7 +109,7 @@ func (s *Stats) Battles(category StatsCategory, pattern StatsPattern) uint {
 	return 0
 }
 
-func (s *Stats) AvgDamage(category StatsCategory, pattern StatsPattern) float64 {
+func (s *PersonalStats) AvgDamage(category StatsCategory, pattern StatsPattern) float64 {
 	ship, player := s.statsValues(pattern)
 	switch category {
 	case StatsCategoryShip:
@@ -121,7 +121,7 @@ func (s *Stats) AvgDamage(category StatsCategory, pattern StatsPattern) float64 
 	return 0
 }
 
-func (s *Stats) MaxDamage(category StatsCategory, pattern StatsPattern) MaxDamage {
+func (s *PersonalStats) MaxDamage(category StatsCategory, pattern StatsPattern) MaxDamage {
 	ship, player := s.statsValues(pattern)
 	switch category {
 	case StatsCategoryShip:
@@ -142,7 +142,7 @@ func (s *Stats) MaxDamage(category StatsCategory, pattern StatsPattern) MaxDamag
 	return MaxDamage{}
 }
 
-func (s *Stats) KdRate(category StatsCategory, pattern StatsPattern) float64 {
+func (s *PersonalStats) KdRate(category StatsCategory, pattern StatsPattern) float64 {
 	var (
 		survivedBattles uint
 		frags           uint
@@ -169,7 +169,7 @@ func (s *Stats) KdRate(category StatsCategory, pattern StatsPattern) float64 {
 	return float64(frags) / float64(death)
 }
 
-func (s *Stats) AvgKill(category StatsCategory, pattern StatsPattern) float64 {
+func (s *PersonalStats) AvgKill(category StatsCategory, pattern StatsPattern) float64 {
 	ship, player := s.statsValues(pattern)
 	switch category {
 	case StatsCategoryShip:
@@ -181,7 +181,7 @@ func (s *Stats) AvgKill(category StatsCategory, pattern StatsPattern) float64 {
 	return 0
 }
 
-func (s *Stats) AvgExp(category StatsCategory, pattern StatsPattern) float64 {
+func (s *PersonalStats) AvgExp(category StatsCategory, pattern StatsPattern) float64 {
 	ship, player := s.statsValues(pattern)
 	switch category {
 	case StatsCategoryShip:
@@ -193,7 +193,7 @@ func (s *Stats) AvgExp(category StatsCategory, pattern StatsPattern) float64 {
 	return 0
 }
 
-func (s *Stats) WinRate(category StatsCategory, pattern StatsPattern) float64 {
+func (s *PersonalStats) WinRate(category StatsCategory, pattern StatsPattern) float64 {
 	ship, player := s.statsValues(pattern)
 	switch category {
 	case StatsCategoryShip:
@@ -205,7 +205,7 @@ func (s *Stats) WinRate(category StatsCategory, pattern StatsPattern) float64 {
 	return 0
 }
 
-func (s *Stats) SurvivedRate(category StatsCategory, pattern StatsPattern) SurvivedRate {
+func (s *PersonalStats) SurvivedRate(category StatsCategory, pattern StatsPattern) SurvivedRate {
 	ship, player := s.statsValues(pattern)
 	switch category {
 	case StatsCategoryShip:
@@ -225,7 +225,7 @@ func (s *Stats) SurvivedRate(category StatsCategory, pattern StatsPattern) Survi
 	return SurvivedRate{}
 }
 
-func (s *Stats) HitRate(pattern StatsPattern) HitRate {
+func (s *PersonalStats) HitRate(pattern StatsPattern) HitRate {
 	ship, _ := s.statsValues(pattern)
 	return HitRate{
 		MainBattery: percentage(ship.MainBattery.Hits, ship.MainBattery.Shots),
@@ -233,12 +233,12 @@ func (s *Stats) HitRate(pattern StatsPattern) HitRate {
 	}
 }
 
-func (s *Stats) PlanesKilled(pattern StatsPattern) float64 {
+func (s *PersonalStats) PlanesKilled(pattern StatsPattern) float64 {
 	ship, _ := s.statsValues(pattern)
 	return div(ship.PlanesKilled, ship.Battles)
 }
 
-func (s *Stats) AvgTier(
+func (s *PersonalStats) AvgTier(
 	pattern StatsPattern,
 ) float64 {
 	var (
@@ -260,7 +260,7 @@ func (s *Stats) AvgTier(
 	return div(sum, allBattles)
 }
 
-func (s *Stats) UsingTierRate(
+func (s *PersonalStats) UsingTierRate(
 	pattern StatsPattern,
 ) TierGroup {
 	tierGroupMap := make(map[string]uint)
@@ -296,7 +296,7 @@ func (s *Stats) UsingTierRate(
 	}
 }
 
-func (s *Stats) UsingShipTypeRate(
+func (s *PersonalStats) UsingShipTypeRate(
 	pattern StatsPattern,
 ) ShipTypeGroup {
 	shipTypeMap := make(map[ShipType]uint)
@@ -325,7 +325,7 @@ func (s *Stats) UsingShipTypeRate(
 	}
 }
 
-func (s *Stats) PlatoonRate(
+func (s *PersonalStats) PlatoonRate(
 	category StatsCategory,
 ) float64 {
 	switch category {
@@ -350,7 +350,7 @@ func (s *Stats) PlatoonRate(
 	return 0
 }
 
-func (s *Stats) EfficiencyBadge() EfficiencyBadge {
+func (s *PersonalStats) EfficiencyBadge() EfficiencyBadge {
 	for _, b := range s.shipsBadges {
 		if b.ShipID == s.useShipID {
 			return s.toEfficiencyBadge(b.TopGradeClass)
@@ -360,7 +360,7 @@ func (s *Stats) EfficiencyBadge() EfficiencyBadge {
 	return EfficiencyBadgeNone
 }
 
-func (s *Stats) EfficiencyBadges() EfficiencyBadgeGroup {
+func (s *PersonalStats) EfficiencyBadges() EfficiencyBadgeGroup {
 	var badges EfficiencyBadgeGroup
 
 	for _, b := range s.shipsBadges {
@@ -379,7 +379,7 @@ func (s *Stats) EfficiencyBadges() EfficiencyBadgeGroup {
 	return badges
 }
 
-func (s *Stats) toEfficiencyBadge(value int) EfficiencyBadge {
+func (s *PersonalStats) toEfficiencyBadge(value int) EfficiencyBadge {
 	switch value {
 	case 1:
 		return EfficiencyBadgeExpert
@@ -394,7 +394,7 @@ func (s *Stats) toEfficiencyBadge(value int) EfficiencyBadge {
 	}
 }
 
-func (s *Stats) statsValues(pattern StatsPattern) (WGShipStatsValues, WGPlayerStatsValues) {
+func (s *PersonalStats) statsValues(pattern StatsPattern) (WGShipStatsValues, WGPlayerStatsValues) {
 	switch pattern {
 	case StatsPatternPvPAll:
 		return s.useShipStats.Pvp, s.accountInfo.Statistics.Pvp
@@ -407,7 +407,7 @@ func (s *Stats) statsValues(pattern StatsPattern) (WGShipStatsValues, WGPlayerSt
 	return WGShipStatsValues{}, WGPlayerStatsValues{}
 }
 
-func (s *Stats) statsValuesForm(statsData WGShipsStatsData, pattern StatsPattern) WGShipStatsValues {
+func (s *PersonalStats) statsValuesForm(statsData WGShipsStatsData, pattern StatsPattern) WGShipStatsValues {
 	switch pattern {
 	case StatsPatternPvPAll:
 		return statsData.Pvp
@@ -420,7 +420,7 @@ func (s *Stats) statsValuesForm(statsData WGShipsStatsData, pattern StatsPattern
 	return WGShipStatsValues{}
 }
 
-func (s *Stats) pr(
+func (s *PersonalStats) pr(
 	actual PRFactor,
 	expected PRFactor,
 	battles uint,

@@ -21,7 +21,7 @@ var (
 )
 
 // ref: https://asia.wows-numbers.com/personal/rating
-func TestStats_PR_Ship(t *testing.T) {
+func TestPersonalStats_PR_Ship(t *testing.T) {
 	t.Parallel()
 
 	params := []struct {
@@ -34,7 +34,7 @@ func TestStats_PR_Ship(t *testing.T) {
 
 	useShipID := 0
 	for _, p := range params {
-		stats := NewStats(
+		stats := NewPersonalStats(
 			useShipID,
 			emptyAccountInfo,
 			[]WGShipsStatsData{
@@ -65,11 +65,11 @@ func TestStats_PR_Ship(t *testing.T) {
 }
 
 // ref: https://asia.wows-numbers.com/personal/rating
-func TestStats_PR_Overall(t *testing.T) {
+func TestPersonalStats_PR_Overall(t *testing.T) {
 	t.Parallel()
 
 	useShipID := 0
-	stats := NewStats(
+	stats := NewPersonalStats(
 		useShipID,
 		emptyAccountInfo,
 		[]WGShipsStatsData{
@@ -140,10 +140,10 @@ func TestStats_PR_Overall(t *testing.T) {
 	assert.InDelta(t, 2215.0243612353, stats.PR(StatsCategoryOverall, StatsPatternPvPAll), allowableDelta)
 }
 
-func TestStats_AvgDamage_Overall(t *testing.T) {
+func TestPersonalStats_AvgDamage_Overall(t *testing.T) {
 	t.Parallel()
 
-	stats := NewStats(
+	stats := NewPersonalStats(
 		0,
 		WGAccountInfoData{
 			Statistics: struct {
@@ -169,10 +169,10 @@ func TestStats_AvgDamage_Overall(t *testing.T) {
 	assert.InDelta(t, 10000, stats.AvgDamage(StatsCategoryOverall, StatsPatternPvPAll), allowableDelta)
 }
 
-func TestStats_AvgDamage_Overall_Solo(t *testing.T) {
+func TestPersonalStats_AvgDamage_Overall_Solo(t *testing.T) {
 	t.Parallel()
 
-	stats := NewStats(
+	stats := NewPersonalStats(
 		0,
 		WGAccountInfoData{
 			Statistics: struct {
@@ -198,10 +198,10 @@ func TestStats_AvgDamage_Overall_Solo(t *testing.T) {
 	assert.InDelta(t, 10000, stats.AvgDamage(StatsCategoryOverall, StatsPatternPvPSolo), allowableDelta)
 }
 
-func TestStats_AvgDamage_Overall_Rank(t *testing.T) {
+func TestPersonalStats_AvgDamage_Overall_Rank(t *testing.T) {
 	t.Parallel()
 
-	stats := NewStats(
+	stats := NewPersonalStats(
 		0,
 		WGAccountInfoData{
 			Statistics: struct {
@@ -227,10 +227,10 @@ func TestStats_AvgDamage_Overall_Rank(t *testing.T) {
 	assert.InDelta(t, 10000, stats.AvgDamage(StatsCategoryOverall, StatsPatternRankSolo), allowableDelta)
 }
 
-func TestStats_AvgDamage_Ship(t *testing.T) {
+func TestPersonalStats_AvgDamage_Ship(t *testing.T) {
 	t.Parallel()
 
-	stats := NewStats(
+	stats := NewPersonalStats(
 		0,
 		emptyAccountInfo,
 		[]WGShipsStatsData{
@@ -250,10 +250,10 @@ func TestStats_AvgDamage_Ship(t *testing.T) {
 	assert.InDelta(t, 10000, stats.AvgDamage(StatsCategoryShip, StatsPatternPvPAll), allowableDelta)
 }
 
-func TestStats_AvgDamage_Ship_Solo(t *testing.T) {
+func TestPersonalStats_AvgDamage_Ship_Solo(t *testing.T) {
 	t.Parallel()
 
-	stats := NewStats(
+	stats := NewPersonalStats(
 		0,
 		emptyAccountInfo,
 		[]WGShipsStatsData{
@@ -273,10 +273,10 @@ func TestStats_AvgDamage_Ship_Solo(t *testing.T) {
 	assert.InDelta(t, 10000, stats.AvgDamage(StatsCategoryShip, StatsPatternPvPSolo), allowableDelta)
 }
 
-func TestStats_AvgDamage_Ship_Rank(t *testing.T) {
+func TestPersonalStats_AvgDamage_Ship_Rank(t *testing.T) {
 	t.Parallel()
 
-	stats := NewStats(
+	stats := NewPersonalStats(
 		0,
 		emptyAccountInfo,
 		[]WGShipsStatsData{
@@ -296,7 +296,7 @@ func TestStats_AvgDamage_Ship_Rank(t *testing.T) {
 	assert.InDelta(t, 10000, stats.AvgDamage(StatsCategoryShip, StatsPatternRankSolo), allowableDelta)
 }
 
-func TestStats_MaxDamage_Ship(t *testing.T) {
+func TestPersonalStats_MaxDamage_Ship(t *testing.T) {
 	t.Parallel()
 
 	expected := MaxDamage{
@@ -304,7 +304,7 @@ func TestStats_MaxDamage_Ship(t *testing.T) {
 	}
 
 	useShipID := 100
-	stats := NewStats(
+	stats := NewPersonalStats(
 		useShipID,
 		emptyAccountInfo,
 		[]WGShipsStatsData{
@@ -324,7 +324,7 @@ func TestStats_MaxDamage_Ship(t *testing.T) {
 	assert.Equal(t, expected, stats.MaxDamage(StatsCategoryShip, StatsPatternPvPAll))
 }
 
-func TestStats_MaxDamage_Overall(t *testing.T) {
+func TestPersonalStats_MaxDamage_Overall(t *testing.T) {
 	t.Parallel()
 
 	expected := MaxDamage{
@@ -334,7 +334,7 @@ func TestStats_MaxDamage_Overall(t *testing.T) {
 		Value:    200000,
 	}
 
-	stats := NewStats(
+	stats := NewPersonalStats(
 		0,
 		WGAccountInfoData{
 			Statistics: struct {
@@ -365,10 +365,10 @@ func TestStats_MaxDamage_Overall(t *testing.T) {
 	assert.Equal(t, expected, stats.MaxDamage(StatsCategoryOverall, StatsPatternPvPAll))
 }
 
-func TestStats_Battles(t *testing.T) {
+func TestPersonalStats_Battles(t *testing.T) {
 	t.Parallel()
 
-	stats := NewStats(
+	stats := NewPersonalStats(
 		0,
 		WGAccountInfoData{
 			Statistics: struct {
@@ -393,10 +393,10 @@ func TestStats_Battles(t *testing.T) {
 	assert.InDelta(t, 100, stats.Battles(StatsCategoryOverall, StatsPatternPvPAll), allowableDelta)
 }
 
-func TestStats_KdRate(t *testing.T) {
+func TestPersonalStats_KdRate(t *testing.T) {
 	t.Parallel()
 
-	stats := NewStats(
+	stats := NewPersonalStats(
 		0,
 		WGAccountInfoData{
 			Statistics: struct {
@@ -423,10 +423,10 @@ func TestStats_KdRate(t *testing.T) {
 	assert.InDelta(t, 0.5, stats.KdRate(StatsCategoryOverall, StatsPatternPvPAll), allowableDelta)
 }
 
-func TestStats_AvgKill(t *testing.T) {
+func TestPersonalStats_AvgKill(t *testing.T) {
 	t.Parallel()
 
-	stats := NewStats(
+	stats := NewPersonalStats(
 		0,
 		WGAccountInfoData{
 			Statistics: struct {
@@ -452,10 +452,10 @@ func TestStats_AvgKill(t *testing.T) {
 	assert.InDelta(t, 0.3, stats.AvgKill(StatsCategoryOverall, StatsPatternPvPAll), allowableDelta)
 }
 
-func TestStats_AvgExp(t *testing.T) {
+func TestPersonalStats_AvgExp(t *testing.T) {
 	t.Parallel()
 
-	stats := NewStats(
+	stats := NewPersonalStats(
 		0,
 		WGAccountInfoData{
 			Statistics: struct {
@@ -481,10 +481,10 @@ func TestStats_AvgExp(t *testing.T) {
 	assert.InDelta(t, 1500, stats.AvgExp(StatsCategoryOverall, StatsPatternPvPAll), allowableDelta)
 }
 
-func TestStats_WinRate(t *testing.T) {
+func TestPersonalStats_WinRate(t *testing.T) {
 	t.Parallel()
 
-	stats := NewStats(
+	stats := NewPersonalStats(
 		0,
 		WGAccountInfoData{
 			Statistics: struct {
@@ -510,10 +510,10 @@ func TestStats_WinRate(t *testing.T) {
 	assert.InDelta(t, 60, stats.WinRate(StatsCategoryOverall, StatsPatternPvPAll), allowableDelta)
 }
 
-func TestStats_SurvivedRate(t *testing.T) {
+func TestPersonalStats_SurvivedRate(t *testing.T) {
 	t.Parallel()
 
-	stats := NewStats(
+	stats := NewPersonalStats(
 		0,
 		WGAccountInfoData{
 			Statistics: struct {
@@ -544,11 +544,11 @@ func TestStats_SurvivedRate(t *testing.T) {
 	assert.InDelta(t, 50, actual.Lose, allowableDelta)
 }
 
-func TestStats_HitRate(t *testing.T) {
+func TestPersonalStats_HitRate(t *testing.T) {
 	t.Parallel()
 
 	useShipID := 0
-	stats := NewStats(
+	stats := NewPersonalStats(
 		useShipID,
 		emptyAccountInfo,
 		[]WGShipsStatsData{
@@ -583,11 +583,11 @@ func TestStats_HitRate(t *testing.T) {
 	assert.InDelta(t, 25, actual.Torpedoes, allowableDelta)
 }
 
-func TestStats_PlanesKilled(t *testing.T) {
+func TestPersonalStats_PlanesKilled(t *testing.T) {
 	t.Parallel()
 
 	useShipID := 0
-	stats := NewStats(
+	stats := NewPersonalStats(
 		useShipID,
 		emptyAccountInfo,
 		[]WGShipsStatsData{
@@ -608,10 +608,10 @@ func TestStats_PlanesKilled(t *testing.T) {
 	assert.InDelta(t, 33.4, stats.PlanesKilled(StatsPatternPvPAll), allowableDelta)
 }
 
-func TestStats_AvgTier(t *testing.T) {
+func TestPersonalStats_AvgTier(t *testing.T) {
 	t.Parallel()
 
-	stats := NewStats(
+	stats := NewPersonalStats(
 		0,
 		emptyAccountInfo,
 		[]WGShipsStatsData{
@@ -636,10 +636,10 @@ func TestStats_AvgTier(t *testing.T) {
 	assert.InDelta(t, 7.14, stats.AvgTier(StatsPatternPvPAll), allowableDelta)
 }
 
-func TestStats_UsingTierRate(t *testing.T) {
+func TestPersonalStats_UsingTierRate(t *testing.T) {
 	t.Parallel()
 
-	stats := NewStats(
+	stats := NewPersonalStats(
 		0,
 		emptyAccountInfo,
 		[]WGShipsStatsData{
@@ -672,10 +672,10 @@ func TestStats_UsingTierRate(t *testing.T) {
 	assert.InDelta(t, 50, tierGroup.High, allowableDelta)
 }
 
-func TestStats_UsingShipTypeRate(t *testing.T) {
+func TestPersonalStats_UsingShipTypeRate(t *testing.T) {
 	t.Parallel()
 
-	stats := NewStats(
+	stats := NewPersonalStats(
 		0,
 		emptyAccountInfo,
 		[]WGShipsStatsData{
@@ -715,10 +715,10 @@ func TestStats_UsingShipTypeRate(t *testing.T) {
 	assert.InDelta(t, 50, shipTypeGroup.CV, allowableDelta)
 }
 
-func TestStats_PlatoonRate(t *testing.T) {
+func TestPersonalStats_PlatoonRate(t *testing.T) {
 	t.Parallel()
 
-	stats := NewStats(
+	stats := NewPersonalStats(
 		0,
 		WGAccountInfoData{
 			Statistics: struct {
@@ -752,11 +752,11 @@ func TestStats_PlatoonRate(t *testing.T) {
 	assert.InDelta(t, 2.4, stats.PlatoonRate(StatsCategoryOverall), allowableDelta)
 }
 
-func TestStats_EfficiencyBadge(t *testing.T) {
+func TestPersonalStats_EfficiencyBadge(t *testing.T) {
 	t.Parallel()
 
 	useShipID := 0
-	stats := NewStats(
+	stats := NewPersonalStats(
 		useShipID,
 		emptyAccountInfo,
 		[]WGShipsStatsData{
@@ -781,10 +781,10 @@ func TestStats_EfficiencyBadge(t *testing.T) {
 	assert.Equal(t, EfficiencyBadge("E"), stats.EfficiencyBadge())
 }
 
-func TestStats_EfficiencyBadges(t *testing.T) {
+func TestPersonalStats_EfficiencyBadges(t *testing.T) {
 	t.Parallel()
 
-	stats := NewStats(
+	stats := NewPersonalStats(
 		0,
 		emptyAccountInfo,
 		emptyShipsStats,

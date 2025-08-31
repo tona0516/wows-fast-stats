@@ -451,7 +451,7 @@ func (b *BattleFetcher) compose(
 			ownShip = warship.Name
 		}
 
-		stats := data.NewStats(
+		stats := data.NewPersonalStats(
 			vehicle.ShipID,
 			accountInfo[accountID],
 			allPlayerShipsStats.Player(accountID),
@@ -512,7 +512,7 @@ func (b *BattleFetcher) compose(
 
 func playerStats(
 	statsPattern data.StatsPattern,
-	stats *data.Stats,
+	stats *data.PersonalStats,
 	accountID int,
 	shipID int,
 	tempArenaInfo data.TempArenaInfo,
