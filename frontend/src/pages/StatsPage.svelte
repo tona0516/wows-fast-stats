@@ -1,5 +1,5 @@
 <script lang="ts">
-  import BattleMetaInfo from "@components/BattleMetaInfo.svelte";
+  import BattleMetadata from "@components/BattleMetadata.svelte";
   import MainStatsTable from "@components/MainStatsTable.svelte";
   import MessagingTonako from "@components/MessagingTonako.svelte";
   import {
@@ -24,7 +24,7 @@
     />
   {:else if $storedBattle}
     <div class="pt-2 flex flex-col items-center">
-      <BattleMetaInfo meta={$storedBattle.meta} />
+      <BattleMetadata metadata={$storedBattle.metadata} />
     </div>
 
     <div class="flex justify-center">

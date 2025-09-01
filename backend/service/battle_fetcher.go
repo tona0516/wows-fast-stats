@@ -431,8 +431,6 @@ func (b *BattleFetcher) compose(
 	friends := make(data.Players, 0)
 	enemies := make(data.Players, 0)
 
-	var ownShip string
-
 	for _, vehicle := range tempArenaInfo.Vehicles {
 		nickname := vehicle.Name
 		accountID := accountList.AccountID(nickname)
@@ -446,9 +444,6 @@ func (b *BattleFetcher) compose(
 				Type:   data.ShipTypeNONE,
 				Nation: "",
 			}
-		}
-		if nickname == tempArenaInfo.PlayerName {
-			ownShip = warship.Name
 		}
 
 		stats := data.NewPersonalStats(
@@ -498,11 +493,10 @@ func (b *BattleFetcher) compose(
 	}
 
 	battle := data.Battle{
-		Meta: data.Meta{
+		Meta: data.BattleMetaData{
 			Unixtime: tempArenaInfo.Unixtime(),
 			Arena:    tempArenaInfo.BattleArena(battleArenas),
 			Type:     tempArenaInfo.BattleType(battleTypes),
-			OwnShip:  ownShip,
 		},
 		Teams: teams,
 	}

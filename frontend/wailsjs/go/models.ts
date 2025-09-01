@@ -426,14 +426,13 @@ export namespace data {
 		    return a;
 		}
 	}
-	export class Meta {
+	export class BattleMetaData {
 	    unixtime: number;
 	    arena: string;
 	    type: string;
-	    own_ship: string;
 	
 	    static createFrom(source: any = {}) {
-	        return new Meta(source);
+	        return new BattleMetaData(source);
 	    }
 	
 	    constructor(source: any = {}) {
@@ -441,11 +440,10 @@ export namespace data {
 	        this.unixtime = source["unixtime"];
 	        this.arena = source["arena"];
 	        this.type = source["type"];
-	        this.own_ship = source["own_ship"];
 	    }
 	}
 	export class Battle {
-	    meta: Meta;
+	    metadata: BattleMetaData;
 	    teams: Team[];
 	
 	    static createFrom(source: any = {}) {
@@ -454,7 +452,7 @@ export namespace data {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.meta = this.convertValues(source["meta"], Meta);
+	        this.metadata = this.convertValues(source["metadata"], BattleMetaData);
 	        this.teams = this.convertValues(source["teams"], Team);
 	    }
 	
@@ -478,6 +476,7 @@ export namespace data {
 	}
 	
 	
+	
 	export class GHLatestRelease {
 	    tag_name: string;
 	    html_url: string;
@@ -494,7 +493,6 @@ export namespace data {
 	        this.updatable = source["updatable"];
 	    }
 	}
-	
 	
 	
 	

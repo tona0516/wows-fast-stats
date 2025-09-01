@@ -1,20 +1,20 @@
 <script lang="ts">
   import { data } from "@wails/go/models";
 
-  export let meta: data.Meta;
+  export let metadata: data.BattleMetaData;
 
   const metaTexts = [
     {
       title: "マップ",
-      text: meta.arena,
+      text: metadata.arena,
     },
     {
       title: "種別",
-      text: meta.type,
+      text: metadata.type,
     },
     {
       title: "取得時刻",
-      text: new Date(meta.unixtime * 1000).toLocaleString(),
+      text: new Date(metadata.unixtime * 1000).toLocaleString(),
     },
   ];
 </script>
