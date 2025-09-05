@@ -40,6 +40,20 @@ func (m *MockFileStoreInterface) EXPECT() *MockFileStoreInterfaceMockRecorder {
 	return m.recorder
 }
 
+// Delete mocks base method.
+func (m *MockFileStoreInterface) Delete(key data.FileStoreKey) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Delete", key)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Delete indicates an expected call of Delete.
+func (mr *MockFileStoreInterfaceMockRecorder) Delete(key any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockFileStoreInterface)(nil).Delete), key)
+}
+
 // Get mocks base method.
 func (m *MockFileStoreInterface) Get(key data.FileStoreKey) (string, error) {
 	m.ctrl.T.Helper()
@@ -82,18 +96,4 @@ func (m *MockFileStoreInterface) Put(key data.FileStoreKey, value string) error 
 func (mr *MockFileStoreInterfaceMockRecorder) Put(key, value any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Put", reflect.TypeOf((*MockFileStoreInterface)(nil).Put), key, value)
-}
-
-// Remove mocks base method.
-func (m *MockFileStoreInterface) Remove(key data.FileStoreKey) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Remove", key)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// Remove indicates an expected call of Remove.
-func (mr *MockFileStoreInterfaceMockRecorder) Remove(key any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Remove", reflect.TypeOf((*MockFileStoreInterface)(nil).Remove), key)
 }

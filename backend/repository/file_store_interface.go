@@ -6,6 +6,6 @@ import "wfs/backend/data"
 type FileStoreInterface interface {
 	Put(key data.FileStoreKey, value string) error
 	Get(key data.FileStoreKey) (string, error)
-	Remove(key data.FileStoreKey) error
+	Delete(key data.FileStoreKey) error
 	Keys() ([]string, error)
 }

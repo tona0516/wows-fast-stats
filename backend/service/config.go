@@ -142,7 +142,7 @@ func (c *Config) UpdateAlertPlayer(player data.AlertPlayer) error {
 }
 
 func (c *Config) RemoveAlertPlayer(accountID int) error {
-	if err := c.fileStore.Remove(data.AlertPlayerKeyPrefix.ToAlertPlayerKey(accountID)); err != nil {
+	if err := c.fileStore.Delete(data.AlertPlayerKeyPrefix.ToAlertPlayerKey(accountID)); err != nil {
 		return failure.Wrap(err)
 	}
 

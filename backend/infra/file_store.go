@@ -49,7 +49,7 @@ func (fs FileStore) Get(key data.FileStoreKey) (string, error) {
 	return string(data), nil
 }
 
-func (fs FileStore) Remove(key data.FileStoreKey) error {
+func (fs FileStore) Delete(key data.FileStoreKey) error {
 	return os.Remove(createFilePath(fs.path, key))
 }
 
