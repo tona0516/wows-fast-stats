@@ -2,25 +2,24 @@ package infra
 
 import (
 	"os"
-	"wfs/backend/apperr"
 	"wfs/backend/data"
 
 	"github.com/morikuni/failure"
 )
 
 type FileStore struct {
-	path string
+	basePath string
 }
 
 func NewFileStore(path string) *FileStore {
-	return &FileStore{path: path}
+	return &FileStore{basePath: path}
 }
 
-func (fs FileStore) Put(key data.FileStoreKey, value string) error {
-	_ = os.MkdirAll(fs.path, 0o755)
+func (fs FileStore) Put(path data.FileStorePath, value string) error {
+	_ = os.MkdirAll(fs.basePath, os.ModePerm)
 
-	file, err := os.OpenFile(createFilePath(fs.path, key),
-		os.O_WRONLY|os.O_CREATE, 0o755)
+	file, err := os.OpenFile(createFilePath(fs.basePath, path),
+		os.O_WRONLY|os.O_CREATE, os.ModePerm)
 	if err != nil {
 		return failure.Wrap(err)
 	}
@@ -32,14 +31,8 @@ func (fs FileStore) Put(key data.FileStoreKey, value string) error {
 	return failure.Wrap(err)
 }
 
-func (fs FileStore) Get(key data.FileStoreKey) (string, error) {
-	_ = os.MkdirAll(fs.path, 0o755)
-
-	p := createFilePath(fs.path, key)
-
-	if _, err := os.Stat(p); os.IsNotExist(err) {
-		return "", failure.New(apperr.FileNotExist)
-	}
+func (fs FileStore) Get(path data.FileStorePath) (string, error) {
+	p := createFilePath(fs.basePath, path)
 
 	data, err := os.ReadFile(p)
 	if err != nil {
@@ -49,12 +42,12 @@ func (fs FileStore) Get(key data.FileStoreKey) (string, error) {
 	return string(data), nil
 }
 
-func (fs FileStore) Delete(key data.FileStoreKey) error {
-	return os.Remove(createFilePath(fs.path, key))
+func (fs FileStore) Delete(path data.FileStorePath) error {
+	return os.Remove(createFilePath(fs.basePath, path))
 }
 
 func (fs FileStore) Keys() ([]string, error) {
-	files, err := os.ReadDir(fs.path)
+	files, err := os.ReadDir(fs.basePath)
 	if err != nil {
 		return nil, failure.Wrap(err)
 	}
@@ -68,6 +61,6 @@ func (fs FileStore) Keys() ([]string, error) {
 	return keys, nil
 }
 
-func createFilePath(basePath string, key data.FileStoreKey) string {
-	return basePath + "/" + key.ToString()
+func createFilePath(basePath string, filePath data.FileStorePath) string {
+	return basePath + "/" + filePath.ToString()
 }

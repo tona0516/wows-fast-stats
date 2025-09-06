@@ -41,7 +41,7 @@ func (m *MockFileStoreInterface) EXPECT() *MockFileStoreInterfaceMockRecorder {
 }
 
 // Delete mocks base method.
-func (m *MockFileStoreInterface) Delete(key data.FileStoreKey) error {
+func (m *MockFileStoreInterface) Delete(key data.FileStorePath) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Delete", key)
 	ret0, _ := ret[0].(error)
@@ -55,7 +55,7 @@ func (mr *MockFileStoreInterfaceMockRecorder) Delete(key any) *gomock.Call {
 }
 
 // Get mocks base method.
-func (m *MockFileStoreInterface) Get(key data.FileStoreKey) (string, error) {
+func (m *MockFileStoreInterface) Get(key data.FileStorePath) (string, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Get", key)
 	ret0, _ := ret[0].(string)
@@ -85,7 +85,7 @@ func (mr *MockFileStoreInterfaceMockRecorder) Keys() *gomock.Call {
 }
 
 // Put mocks base method.
-func (m *MockFileStoreInterface) Put(key data.FileStoreKey, value string) error {
+func (m *MockFileStoreInterface) Put(key data.FileStorePath, value string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Put", key, value)
 	ret0, _ := ret[0].(error)

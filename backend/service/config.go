@@ -111,7 +111,7 @@ func (c *Config) AlertPlayers() ([]data.AlertPlayer, error) {
 			continue
 		}
 
-		playerBytes, err := c.fileStore.Get(data.FileStoreKey(v))
+		playerBytes, err := c.fileStore.Get(data.FileStorePath(v))
 		if err != nil {
 			continue
 		}
@@ -133,7 +133,7 @@ func (c *Config) UpdateAlertPlayer(player data.AlertPlayer) error {
 		return failure.Wrap(err)
 	}
 
-	key := data.AlertPlayerKeyPrefix.ToAlertPlayerKey(player.AccountID)
+	key := data.AlertPlayerKeyPrefix.ToAlertPlayerPath(player.AccountID)
 	if err := c.fileStore.Put(key, string(playerBytes)); err != nil {
 		return failure.Wrap(err)
 	}
@@ -142,7 +142,7 @@ func (c *Config) UpdateAlertPlayer(player data.AlertPlayer) error {
 }
 
 func (c *Config) RemoveAlertPlayer(accountID int) error {
-	if err := c.fileStore.Delete(data.AlertPlayerKeyPrefix.ToAlertPlayerKey(accountID)); err != nil {
+	if err := c.fileStore.Delete(data.AlertPlayerKeyPrefix.ToAlertPlayerPath(accountID)); err != nil {
 		return failure.Wrap(err)
 	}
 
