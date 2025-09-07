@@ -7,5 +7,5 @@ type FileStoreInterface interface {
 	Put(key data.FileStorePath, value string) error
 	Get(key data.FileStorePath) (string, error)
 	Delete(key data.FileStorePath) error
-	Keys() ([]string, error)
+	Files(childPath string) ([]string, error)
 }

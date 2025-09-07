@@ -74,7 +74,7 @@ func (b *BattleFetcher) Invoke(tempArenaInfo data.TempArenaInfo) {
 	}
 
 	// persist own ign for reporting
-	_ = b.fileStore.Put(data.OwnIGNKey, tempArenaInfo.PlayerName)
+	_ = b.fileStore.Put(data.FileNameOwnIGN, tempArenaInfo.PlayerName)
 	b.logger.SetOwnIGN(tempArenaInfo.PlayerName)
 
 	accountList, err := b.wargaming.AccountList(tempArenaInfo.AccountNames())
@@ -229,7 +229,7 @@ func (b *BattleFetcher) fetchExpectedStats(channel chan data.Result[data.Expecte
 		// キャッシュに保存
 		expectedStatsBytes, err := json.Marshal(expectedStats)
 		if err == nil {
-			_ = b.fileStore.Put(data.ExpectedStatsKey, string(expectedStatsBytes))
+			_ = b.fileStore.Put(data.FileNameExpectedStats, string(expectedStatsBytes))
 		}
 
 		result.Value = expectedStats
@@ -238,7 +238,7 @@ func (b *BattleFetcher) fetchExpectedStats(channel chan data.Result[data.Expecte
 	}
 
 	// 取得できない場合、キャッシュを利用する
-	expectedStatsBytes, errCache := b.fileStore.Get(data.ExpectedStatsKey)
+	expectedStatsBytes, errCache := b.fileStore.Get(data.FileNameExpectedStats)
 	if errCache == nil {
 		if err := json.Unmarshal([]byte(expectedStatsBytes), &expectedStats); err == nil {
 			result.Value = expectedStats
@@ -464,13 +464,14 @@ func (b *BattleFetcher) compose(
 				IsHidden: accountInfo[accountID].HiddenProfile,
 			},
 			ShipInfo: data.ShipInfo{
-				ID:        vehicle.ShipID,
-				Name:      warship.Name,
-				Nation:    warship.Nation,
-				Tier:      warship.Tier,
-				Type:      warship.Type,
-				IsPremium: warship.IsPremium,
-				AvgDamage: allExpectedStats[vehicle.ShipID].AverageDamageDealt,
+				ID:            vehicle.ShipID,
+				Name:          warship.Name,
+				Nation:        warship.Nation,
+				Tier:          warship.Tier,
+				Type:          warship.Type,
+				IsPremium:     warship.IsPremium,
+				AvgDamage:     allExpectedStats[vehicle.ShipID].AverageDamageDealt,
+				DamageRatings: data.NewDamageRatings(allExpectedStats[vehicle.ShipID].AverageDamageDealt),
 			},
 			PvPSolo:  playerStats(data.StatsPatternPvPSolo, stats, accountID, vehicle.ShipID, tempArenaInfo, warships),
 			PvPAll:   playerStats(data.StatsPatternPvPAll, stats, accountID, vehicle.ShipID, tempArenaInfo, warships),
@@ -518,13 +519,13 @@ func playerStats(
 		warships,
 		shipID,
 		stats.Battles(data.StatsCategoryShip, statsPattern),
-		stats.AvgDamage(data.StatsCategoryShip, statsPattern),
-		stats.WinRate(data.StatsCategoryShip, statsPattern),
+		stats.AvgDamage(data.StatsCategoryShip, statsPattern).Value,
+		stats.WinRate(data.StatsCategoryShip, statsPattern).Value,
 		stats.SurvivedRate(data.StatsCategoryShip, statsPattern).All,
 		stats.PlanesKilled(data.StatsCategoryShip),
 		stats.Battles(data.StatsCategoryOverall, statsPattern),
-		stats.AvgDamage(data.StatsCategoryOverall, statsPattern),
-		stats.WinRate(data.StatsCategoryOverall, statsPattern),
+		stats.AvgDamage(data.StatsCategoryOverall, statsPattern).Value,
+		stats.WinRate(data.StatsCategoryOverall, statsPattern).Value,
 		stats.AvgKill(data.StatsCategoryOverall, statsPattern),
 		stats.KdRate(data.StatsCategoryOverall, statsPattern),
 	))

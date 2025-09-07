@@ -54,6 +54,21 @@ func (mr *MockFileStoreInterfaceMockRecorder) Delete(key any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockFileStoreInterface)(nil).Delete), key)
 }
 
+// Files mocks base method.
+func (m *MockFileStoreInterface) Files(childPath string) ([]string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Files", childPath)
+	ret0, _ := ret[0].([]string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Files indicates an expected call of Files.
+func (mr *MockFileStoreInterfaceMockRecorder) Files(childPath any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Files", reflect.TypeOf((*MockFileStoreInterface)(nil).Files), childPath)
+}
+
 // Get mocks base method.
 func (m *MockFileStoreInterface) Get(key data.FileStorePath) (string, error) {
 	m.ctrl.T.Helper()
@@ -67,21 +82,6 @@ func (m *MockFileStoreInterface) Get(key data.FileStorePath) (string, error) {
 func (mr *MockFileStoreInterfaceMockRecorder) Get(key any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockFileStoreInterface)(nil).Get), key)
-}
-
-// Keys mocks base method.
-func (m *MockFileStoreInterface) Keys() ([]string, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Keys")
-	ret0, _ := ret[0].([]string)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// Keys indicates an expected call of Keys.
-func (mr *MockFileStoreInterfaceMockRecorder) Keys() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Keys", reflect.TypeOf((*MockFileStoreInterface)(nil).Keys))
 }
 
 // Put mocks base method.

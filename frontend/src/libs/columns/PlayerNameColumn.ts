@@ -1,13 +1,9 @@
 import PlayerNameTableData from "@components/tabledata/PlayerNameTableData.svelte";
 import { ColorCode } from "@libs/ColorCode";
-import { Rating } from "@libs/Rating";
-import {
-  storedPlayerNameColumnSettings,
-  storedShipInfoColumnSettings,
-  storedStatsExtra,
-} from "@libs/stores";
+import { RATING_COLORS } from "@libs/constants";
+import { storedBasicColumnSetting, storedOptionalSetting } from "@libs/stores";
 import { ThreatLevel } from "@libs/ThreatLevel";
-import type { Optional } from "@libs/types";
+import type { Optional, StatsExtra } from "@libs/types";
 import type { data } from "@wails/go/models";
 import { get } from "svelte/store";
 import { AbstractColumn } from "./AbstractColumn";
@@ -22,19 +18,17 @@ export class PlayerNameColumn extends AbstractColumn {
   }
 
   override getTextColorCode(player: data.Player): Optional<ColorCode> {
-    const statsExtra = get(storedStatsExtra);
-    const colorPattern = get(storedPlayerNameColumnSettings).colorPattern;
+    const statsExtra = get(storedOptionalSetting).stats_extra as StatsExtra;
+    const colorPattern = get(storedBasicColumnSetting).player.color_pattern;
 
     switch (colorPattern) {
       case "pr_ship": {
-        const value = player[statsExtra].ship.pr;
-        const rating = Rating.fromPR(value);
-        return rating?.getColor().getFixedTextColor();
+        const value = player[statsExtra].ship.pr.rating;
+        return RATING_COLORS[value].getFixedTextColor();
       }
       case "pr_overall": {
-        const value = player[statsExtra].overall.pr;
-        const rating = Rating.fromPR(value);
-        return rating?.getColor().getFixedTextColor();
+        const value = player[statsExtra].overall.pr.rating;
+        return RATING_COLORS[value].getFixedTextColor();
       }
       case "threat_level": {
         const value = player[statsExtra].overall.threat_level;
@@ -49,19 +43,17 @@ export class PlayerNameColumn extends AbstractColumn {
   }
 
   override getBgColorCode(player: data.Player): Optional<ColorCode> {
-    const statsExtra = get(storedStatsExtra);
-    const colorPattern = get(storedPlayerNameColumnSettings).colorPattern;
+    const statsExtra = get(storedOptionalSetting).stats_extra as StatsExtra;
+    const colorPattern = get(storedBasicColumnSetting).player.color_pattern;
 
     switch (colorPattern) {
       case "pr_ship": {
-        const value = player[statsExtra].ship.pr;
-        const rating = Rating.fromPR(value);
-        return rating?.getColor().getFixedBgColor();
+        const value = player[statsExtra].ship.pr.rating;
+        return RATING_COLORS[value].getFixedBgColor();
       }
       case "pr_overall": {
-        const value = player[statsExtra].overall.pr;
-        const rating = Rating.fromPR(value);
-        return rating?.getColor().getFixedBgColor();
+        const value = player[statsExtra].overall.pr.rating;
+        return RATING_COLORS[value].getFixedBgColor();
       }
       case "threat_level": {
         const value = player[statsExtra].overall.threat_level;
@@ -87,7 +79,7 @@ export class PlayerNameColumn extends AbstractColumn {
   }
 
   getNationFlagClass(player: data.Player): string {
-    if (!get(storedShipInfoColumnSettings).enableNationFlag) {
+    if (!get(storedBasicColumnSetting).player.enable_nation_flag) {
       return "";
     }
 

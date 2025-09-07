@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"crypto/sha256"
+	"encoding/json"
 	"fmt"
 	"time"
 	"wfs/backend/apperr"
@@ -42,16 +43,21 @@ func NewBattlePublisher(
 }
 
 func (bp *BattlePublisher) CanSubcribe() bool {
-	installPath, err := bp.fileStore.Get(data.InstallPathKey)
+	text, err := bp.fileStore.Get(data.FileNameRequiredSetting)
 	if err != nil {
 		return false
 	}
 
-	if installPath == "" {
+	var required data.RequiredSetting
+	if err := json.Unmarshal([]byte(text), &required); err != nil {
 		return false
 	}
 
-	bp.installPath = installPath
+	if required.InstallPath == "" {
+		return false
+	}
+
+	bp.installPath = required.InstallPath
 	return true
 }
 

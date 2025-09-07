@@ -4,8 +4,8 @@ import "strconv"
 
 type FileStorePath string
 
-func (p FileStorePath) ToAlertPlayerPath(accountID int) FileStorePath {
-	return AlertPlayerKeyPrefix + FileStorePath(strconv.Itoa(accountID))
+func (p FileStorePath) ToAlertPlayerFileName(accountID int) FileStorePath {
+	return FilePathAlertPlayer + FileStorePath(strconv.Itoa(accountID)) + ".json"
 }
 
 func (p FileStorePath) ToString() string {
@@ -13,9 +13,14 @@ func (p FileStorePath) ToString() string {
 }
 
 const (
-	InstallPathKey       FileStorePath = "install_path"
-	SendReportKey        FileStorePath = "send_report"
-	ExpectedStatsKey     FileStorePath = "expected_stats"
-	OwnIGNKey            FileStorePath = "own_ign"
-	AlertPlayerKeyPrefix FileStorePath = "alert_player_"
+	// user_data.
+	FileNameRequiredSetting    FileStorePath = "required_setting.json"
+	FileNameOptionalSetting    FileStorePath = "optional_setting.json"
+	FileNameBasicColumnSetting FileStorePath = "basic_column.json"
+	FileNameStatsColumnSetting FileStorePath = "stats_column.json"
+	// cache.
+	FileNameExpectedStats FileStorePath = "expected_stats.json"
+	FileNameOwnIGN        FileStorePath = "own_ign.txt"
+
+	FilePathAlertPlayer FileStorePath = "alert_player/"
 )

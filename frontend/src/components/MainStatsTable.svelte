@@ -4,9 +4,9 @@
   import { getColumnText, getRowPattern } from "@libs/utils";
 
   import {
-    storedColumnmSettings,
+    storedOptionalSetting,
+    storedStatsColumnSettings,
     storedTeamThreatLevels,
-    storedStatsExtra,
   } from "@libs/stores";
   import type { ColumnCategory } from "@libs/types";
   import type { data } from "@wails/go/models";
@@ -92,7 +92,8 @@
     basicCategory.showCount() +
     shipCategory.showCount() +
     overallCategory.showCount();
-  const showThreatLevel = $storedColumnmSettings["threat_level"].overall;
+  const showThreatLevel =
+    $storedStatsColumnSettings.threat_level.is_show_overall;
 </script>
 
 <div class="overflow-x-auto rounded-xl border border-base-300 bg-base-200">
@@ -158,7 +159,7 @@
           {#each team.players as player}
             {@const rowPattern = getRowPattern(
               player,
-              $storedStatsExtra,
+              $storedOptionalSetting.stats_extra,
               shipCategory.showCount(),
               overallCategory.showCount(),
             )}

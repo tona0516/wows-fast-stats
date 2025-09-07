@@ -3,12 +3,8 @@ import { ColorCode } from "./ColorCode";
 import type {
   ColumnCategory,
   ColumnInfo,
-  ColumnSettings,
   PlayerNameColorPattern,
-  PlayerNameColumnSetting,
-  ShipInfoColumnSetting,
   ShipType,
-  StatsExtra,
   StatsKey,
 } from "./types";
 
@@ -17,8 +13,8 @@ export const ZOOM_RATES = [
   300, 400, 500,
 ] as const;
 
-export const STATS_EXTRAS: Readonly<Map<StatsExtra, string>> = new Map<
-  StatsExtra,
+export const STATS_EXTRAS: Readonly<Map<string, string>> = new Map<
+  string,
   string
 >([
   ["pvp_all", "ランダム戦"],
@@ -125,100 +121,24 @@ export const DEFAULT_ALERT_PLAYER = {
   message: "",
 } as data.AlertPlayer;
 
-export const DEFAULT_COLUMN_SETTINGS: ColumnSettings = {
-  pr: {
-    ship: true,
-    overall: false,
-    digit: 0,
-  },
-  win_rate: {
-    ship: true,
-    overall: true,
-    digit: 1,
-  },
-  damage: {
-    ship: true,
-    overall: false,
-    digit: 0,
-  },
-  max_damage: {
-    ship: false,
-    overall: false,
-    digit: 0,
-  },
-  kd_rate: {
-    ship: true,
-    overall: false,
-    digit: 1,
-  },
-  kill: {
-    ship: false,
-    overall: false,
-    digit: 1,
-  },
-  exp: {
-    ship: false,
-    overall: false,
-    digit: 0,
-  },
-  battles: {
-    ship: true,
-    overall: true,
-    digit: 0,
-  },
-  avg_tier: {
-    ship: false,
-    overall: false,
-    digit: 1,
-  },
-  platoon_rate: {
-    ship: false,
-    overall: false,
-    digit: 1,
-  },
-  planes_killed: {
-    ship: false,
-    overall: false,
-    digit: 1,
-  },
-  survived_rate: {
-    ship: false,
-    overall: false,
-    digit: 1,
-  },
-  hit_rate: {
-    ship: false,
-    overall: false,
-    digit: 1,
-  },
-  threat_level: {
-    ship: false,
-    overall: false,
-    digit: 0,
-  },
-  using_ship_type_rate: {
-    ship: false,
-    overall: false,
-    digit: 1,
-  },
-  using_tier_rate: {
-    ship: false,
-    overall: false,
-    digit: 1,
-  },
-  efficiency_badge: {
-    ship: false,
-    overall: false,
-    digit: 0,
-  },
+export const RATING_COLORS: { [key: string]: ColorCode } = {
+  bad: new ColorCode("#FE0E00"),
+  below_avg: new ColorCode("#FE7903"),
+  avg: new ColorCode("#FFC71F"),
+  good: new ColorCode("#44B300"),
+  very_good: new ColorCode("#318000"),
+  great: new ColorCode("#02C9B3"),
+  unicum: new ColorCode("#D042F3"),
+  super_unicum: new ColorCode("#A00DC5"),
 } as const;
 
-export const DEFAULT_PLAYER_NAME_COLUMN_SETTING = {
-  enableNationFlag: false,
-  colorPattern: "none",
-} as PlayerNameColumnSetting;
-
-export const DEFAULT_SHIP_INFO_COLUMN_SETTING = {
-  enableNationFlag: true,
-  enableColorized: false,
-} as ShipInfoColumnSetting;
+export const RATING_NAMES: { [key: string]: string } = {
+  bad: "Bad",
+  below_avg: "Below Average",
+  avg: "Average",
+  good: "Good",
+  very_good: "Very Good",
+  great: "Great",
+  unicum: "Unicum",
+  super_unicum: "Super Unicum",
+} as const;

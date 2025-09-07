@@ -7,9 +7,12 @@
   import Toast from "@components/Toast.svelte";
   import {
     storedAlertPlayers,
+    storedBasicColumnSetting,
     storedBattle,
     storedInstallPathError,
-    storedZoomRate,
+    storedOptionalSetting,
+    storedRequiredSetting,
+    storedStatsColumnSettings,
   } from "@libs/stores";
   import type { Page } from "@libs/types";
   import AlertPlayerPage from "@pages/AlertPlayerPage.svelte";
@@ -17,12 +20,15 @@
   import InfoPage from "@pages/InfoPage.svelte";
   import StatsPage from "@pages/StatsPage.svelte";
   import {
-    InstallPath,
     ValidateInstallPath,
     AlertPlayers,
     SubscribeBattle,
     ShowMessageDialog,
     LogError,
+    OptionalSetting,
+    BasicColumnSetting,
+    StatsColumnSettings,
+    RequiredSetting,
   } from "@wails/go/main/App";
   import type { data } from "@wails/go/models";
   import { EventsOn } from "@wails/runtime/runtime";
@@ -38,11 +44,6 @@
   let updatableRelease: data.GHLatestRelease;
 
   let page: Page = "stats";
-
-  $: {
-    // @ts-ignore
-    document.body.style.zoom = $storedZoomRate / 100;
-  }
 
   onMount(() => {
     themeChange(false);
@@ -93,17 +94,21 @@
   };
 
   const initialize = async (): Promise<void> => {
-    localStorage.clear();
-
     try {
-      const installPath = await InstallPath();
-      const installPathError = await ValidateInstallPath(installPath);
+      const requiredSetting = await RequiredSetting();
+      storedRequiredSetting.set(requiredSetting);
+
+      storedOptionalSetting.set(await OptionalSetting());
+      storedBasicColumnSetting.set(await BasicColumnSetting());
+      storedStatsColumnSettings.set(await StatsColumnSettings());
+      storedAlertPlayers.set(await AlertPlayers());
+
+      const installPathError = await ValidateInstallPath(
+        requiredSetting.install_path,
+      );
       if (installPathError) {
         storedInstallPathError.set(installPathError);
       }
-
-      const alertPlayers = await AlertPlayers();
-      storedAlertPlayers.set(alertPlayers);
 
       initialized = true;
 

@@ -9,37 +9,24 @@
   import {
     storedInstallPathError,
     showToast,
-    storedStatsExtra,
-    storedZoomRate,
-    storedColumnmSettings,
-    storedPlayerNameColumnSettings,
-    storedShipInfoColumnSettings,
+    storedRequiredSetting,
+    storedOptionalSetting,
+    storedBasicColumnSetting,
+    storedStatsColumnSettings,
   } from "@libs/stores";
   import { Theme } from "@libs/Theme";
-  import {
-    SendReport,
-    InstallPath,
-    TrySaveInstallPath,
-    SubscribeBattle,
-    UpdateSendReport,
-  } from "@wails/go/main/App";
+  import { TrySaveInstallPath, SubscribeBattle } from "@wails/go/main/App";
   import { onMount } from "svelte";
   import { themeChange } from "theme-change";
 
-  let installPath: string = "";
-  let sendReport: boolean = false;
-
   onMount(async () => {
     themeChange(false);
-    sendReport = await SendReport();
-    installPath = await InstallPath();
   });
 
   const onClickSelectDirectory = async () => {
     try {
       const isSuccess = await TrySaveInstallPath();
       if (isSuccess) {
-        installPath = await InstallPath();
         storedInstallPathError.set("");
 
         showToast("インストールパスを設定しました");
@@ -61,11 +48,13 @@
     <p class="text-sm text-gray-500 mb-2">
       WorldOfWarships.exeが存在するフォルダを選択してください
     </p>
-    {#if installPath}
+    {#if $storedRequiredSetting.install_path}
       <div class="stats shadow w-full mb-2">
         <div class="stat">
           <div class="stat-title">ゲームクライアント インストールパス</div>
-          <div class="stat-value text-lg break-all">{installPath}</div>
+          <div class="stat-value text-lg break-all">
+            {$storedRequiredSetting.install_path}
+          </div>
         </div>
       </div>
     {/if}
@@ -96,10 +85,12 @@
       <label class="label font-bold">UIサイズ</label>
       <select
         class="select select-bordered w-full"
-        bind:value={$storedZoomRate}
+        bind:value={$storedOptionalSetting.zoom_rate}
       >
         {#each ZOOM_RATES as zr}
-          <option selected={zr === $storedZoomRate} value={zr}>{zr}%</option>
+          <option selected={zr === $storedOptionalSetting.zoom_rate} value={zr}
+            >{zr}%</option
+          >
         {/each}
       </select>
     </div>
@@ -108,11 +99,12 @@
       <label class="label font-bold">統計パターン</label>
       <select
         class="select select-bordered w-full my-2"
-        bind:value={$storedStatsExtra}
+        bind:value={$storedOptionalSetting.stats_extra}
       >
         {#each STATS_EXTRAS as se}
-          <option selected={se[0] === $storedStatsExtra} value={se[0]}
-            >{se[1]}</option
+          <option
+            selected={se[0] === $storedOptionalSetting.stats_extra}
+            value={se[0]}>{se[1]}</option
           >
         {/each}
       </select>
@@ -143,7 +135,7 @@
                     class="toggle toggle-success"
                     type="checkbox"
                     bind:checked={
-                      $storedPlayerNameColumnSettings.enableNationFlag
+                      $storedBasicColumnSetting.player.enable_nation_flag
                     }
                   />
                   <span
@@ -154,12 +146,12 @@
                   <span>成績に基づく背景色</span>
                   <select
                     class="select select-sm select-bordered"
-                    bind:value={$storedPlayerNameColumnSettings.colorPattern}
+                    bind:value={$storedBasicColumnSetting.player.color_pattern}
                   >
                     {#each PLAYER_NAME_COLORS as color}
                       <option
                         selected={color[0] ===
-                          $storedPlayerNameColumnSettings.colorPattern}
+                          $storedBasicColumnSetting.player.color_pattern}
                         value={color[0]}>{color[1]}</option
                       >
                     {/each}
@@ -177,7 +169,7 @@
                     class="toggle toggle-success"
                     type="checkbox"
                     bind:checked={
-                      $storedShipInfoColumnSettings.enableNationFlag
+                      $storedBasicColumnSetting.ship.enable_nation_flag
                     }
                   />
                   <span>国旗を表示する</span>
@@ -186,7 +178,7 @@
                   <input
                     class="toggle toggle-success"
                     type="checkbox"
-                    bind:checked={$storedShipInfoColumnSettings.enableColorized}
+                    bind:checked={$storedBasicColumnSetting.ship.is_colored}
                   />
                   <span>艦種に基づく背景色にする</span>
                 </label>
@@ -217,7 +209,9 @@
                   <input
                     class="toggle toggle-success"
                     type="checkbox"
-                    bind:checked={$storedColumnmSettings[statsKey].ship}
+                    bind:checked={
+                      $storedStatsColumnSettings[statsKey].is_show_ship
+                    }
                   />
                 </td>
               {:else}
@@ -228,7 +222,9 @@
                   <input
                     class="toggle toggle-success"
                     type="checkbox"
-                    bind:checked={$storedColumnmSettings[statsKey].overall}
+                    bind:checked={
+                      $storedStatsColumnSettings[statsKey].is_show_overall
+                    }
                   />
                 </td>
               {:else}
@@ -238,12 +234,12 @@
                 <td class="text-center px-4 py-2">
                   <select
                     class="select select-sm select-bordered"
-                    bind:value={$storedColumnmSettings[statsKey].digit}
+                    bind:value={$storedStatsColumnSettings[statsKey].digit}
                   >
                     {#each [0, 1, 2] as digit}
                       <option
                         selected={digit ===
-                          $storedColumnmSettings[statsKey].digit}
+                          $storedStatsColumnSettings[statsKey].digit}
                         value={digit}>{digit}</option
                       >
                     {/each}
@@ -267,8 +263,10 @@
         <input
           class="toggle toggle-success"
           type="checkbox"
-          bind:checked={sendReport}
-          on:change={() => UpdateSendReport(sendReport)}
+          bind:checked={$storedOptionalSetting.is_send_report}
+          on:change={() =>
+            ($storedOptionalSetting.is_send_report =
+              !$storedOptionalSetting.is_send_report)}
         />
         <span>アプリ改善のためのデータ送信を許可する</span>
       </li>

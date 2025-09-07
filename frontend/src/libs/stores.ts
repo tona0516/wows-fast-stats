@@ -1,38 +1,46 @@
+import {
+  UpdateBasicColumnSetting,
+  UpdateOptionalSetting,
+  UpdateRequiredSetting,
+  UpdateStatsColumnSettings,
+} from "@wails/go/main/App";
 import type { data } from "@wails/go/models";
 import { derived, type Writable, writable } from "svelte/store";
-import { LocalStorage } from "./LocalStorage";
-import type { EditModalParam, Optional, TonakoParam } from "./types";
+import type {
+  EditModalParam,
+  Optional,
+  StatsExtra,
+  TonakoParam,
+} from "./types";
 import { getTeamThreatLevels } from "./utils";
 
-export const storedZoomRate = writable(LocalStorage.instance.getZoomRate());
-storedZoomRate.subscribe((zoomRate) => {
-  LocalStorage.instance.setZoomRate(zoomRate);
+export const storedRequiredSetting =
+  writable() as Writable<data.RequiredSetting>;
+storedRequiredSetting.subscribe(async (value) => {
+  if (!value) return;
+  await UpdateRequiredSetting(value);
 });
 
-export const storedStatsExtra = writable(LocalStorage.instance.getStatsExtra());
-storedStatsExtra.subscribe((statsExtra) => {
-  LocalStorage.instance.setStatsExtra(statsExtra);
+export const storedOptionalSetting =
+  writable() as Writable<data.OptionalSetting>;
+storedOptionalSetting.subscribe(async (value) => {
+  if (!value) return;
+  document.body.style.zoom = `${value.zoom_rate}%`;
+  await UpdateOptionalSetting(value);
 });
 
-export const storedPlayerNameColumnSettings = writable(
-  LocalStorage.instance.getPlayerNameColumnSettings(),
-);
-storedPlayerNameColumnSettings.subscribe((settings) => {
-  LocalStorage.instance.setPlayerNameColumnSettings(settings);
+export const storedBasicColumnSetting =
+  writable() as Writable<data.BasicColumnSetting>;
+storedBasicColumnSetting.subscribe(async (value) => {
+  if (!value) return;
+  await UpdateBasicColumnSetting(value);
 });
 
-export const storedShipInfoColumnSettings = writable(
-  LocalStorage.instance.getShipInfoColumnSettings(),
-);
-storedShipInfoColumnSettings.subscribe((settings) => {
-  LocalStorage.instance.setShipInfoColumnSettings(settings);
-});
-
-export const storedColumnmSettings = writable(
-  LocalStorage.instance.getColumnSettings(),
-);
-storedColumnmSettings.subscribe((settings) => {
-  LocalStorage.instance.setColumnSettings(settings);
+export const storedStatsColumnSettings =
+  writable() as Writable<data.StatsColumnSettings>;
+storedStatsColumnSettings.subscribe(async (value) => {
+  if (!value) return;
+  await UpdateStatsColumnSettings(value);
 });
 
 export const storedBattle = writable(undefined) as Writable<
@@ -41,9 +49,12 @@ export const storedBattle = writable(undefined) as Writable<
 export const storedAlertPlayers = writable([]) as Writable<data.AlertPlayer[]>;
 export const storedInstallPathError = writable("") as Writable<string>;
 export const storedTeamThreatLevels = derived(
-  [storedBattle, storedStatsExtra],
-  ([battle, statsExtra]) => {
-    return getTeamThreatLevels(battle, statsExtra);
+  [storedBattle, storedOptionalSetting],
+  ([battle, optionalSetting]) => {
+    return getTeamThreatLevels(
+      battle,
+      optionalSetting.stats_extra as StatsExtra,
+    );
   },
 );
 export const storedEditAlertPlayer = writable(undefined) as Writable<

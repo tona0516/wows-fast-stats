@@ -44,7 +44,7 @@ func NewPersonalStats(
 	}
 }
 
-func (s *PersonalStats) PR(category StatsCategory, pattern StatsPattern) float64 {
+func (s *PersonalStats) PR(category StatsCategory, pattern StatsPattern) RatingValue {
 	switch category {
 	case StatsCategoryShip:
 		values, _ := s.statsValues(pattern)
@@ -94,7 +94,7 @@ func (s *PersonalStats) PR(category StatsCategory, pattern StatsPattern) float64
 		return s.pr(actual, expected, allBattles)
 	}
 
-	return -1
+	return NewRatingValueNone()
 }
 
 func (s *PersonalStats) Battles(category StatsCategory, pattern StatsPattern) uint {
@@ -109,16 +109,19 @@ func (s *PersonalStats) Battles(category StatsCategory, pattern StatsPattern) ui
 	return 0
 }
 
-func (s *PersonalStats) AvgDamage(category StatsCategory, pattern StatsPattern) float64 {
+func (s *PersonalStats) AvgDamage(category StatsCategory, pattern StatsPattern) RatingValue {
 	ship, player := s.statsValues(pattern)
 	switch category {
 	case StatsCategoryShip:
-		return avgDamage(ship.DamageDealt, ship.Battles)
+		value := avgDamage(ship.DamageDealt, ship.Battles)
+		rating := NewRatingFromShipDamage(value, s.allExpectedStats[s.useShipID].AverageDamageDealt)
+		return NewRatingValue(value, rating)
 	case StatsCategoryOverall:
-		return avgDamage(player.DamageDealt, player.Battles)
+		value := avgDamage(player.DamageDealt, player.Battles)
+		return NewRatingValue(value, RatingNone)
 	}
 
-	return 0
+	return NewRatingValueNone()
 }
 
 func (s *PersonalStats) MaxDamage(category StatsCategory, pattern StatsPattern) MaxDamage {
@@ -193,16 +196,19 @@ func (s *PersonalStats) AvgExp(category StatsCategory, pattern StatsPattern) flo
 	return 0
 }
 
-func (s *PersonalStats) WinRate(category StatsCategory, pattern StatsPattern) float64 {
+func (s *PersonalStats) WinRate(category StatsCategory, pattern StatsPattern) RatingValue {
 	ship, player := s.statsValues(pattern)
+
+	var value float64
 	switch category {
 	case StatsCategoryShip:
-		return winRate(ship.Wins, ship.Battles)
+		value = winRate(ship.Wins, ship.Battles)
 	case StatsCategoryOverall:
-		return winRate(player.Wins, player.Battles)
+		value = winRate(player.Wins, player.Battles)
 	}
 
-	return 0
+	rating := NewRatingFromWinRate(value)
+	return NewRatingValue(value, rating)
 }
 
 func (s *PersonalStats) SurvivedRate(category StatsCategory, pattern StatsPattern) SurvivedRate {
@@ -424,9 +430,9 @@ func (s *PersonalStats) pr(
 	actual PRFactor,
 	expected PRFactor,
 	battles uint,
-) float64 {
+) RatingValue {
 	if battles < 1 {
-		return -1
+		return NewRatingValueNone()
 	}
 
 	ratio := PRFactor{
@@ -436,7 +442,7 @@ func (s *PersonalStats) pr(
 	}
 
 	if !ratio.Valid() {
-		return -1
+		return NewRatingValueNone()
 	}
 
 	norm := PRFactor{
@@ -445,7 +451,10 @@ func (s *PersonalStats) pr(
 		wins:   math.Max(0, (ratio.wins-0.7)/(1-0.7)),
 	}
 
-	return 700*norm.damage + 300*norm.frags + 150*norm.wins
+	value := 700*norm.damage + 300*norm.frags + 150*norm.wins
+	rating := NewRatingFromPR(value)
+
+	return NewRatingValue(value, rating)
 }
 
 func avgDamage(damageDealt uint, battles uint) float64 {

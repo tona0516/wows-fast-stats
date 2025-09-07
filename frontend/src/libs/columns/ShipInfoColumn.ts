@@ -1,7 +1,7 @@
 import ShipInfoTableData from "@components/tabledata/ShipInfoTableData.svelte";
 import { ColorCode } from "@libs/ColorCode";
 import { SHIP_TYPE_COLORS } from "@libs/constants";
-import { storedShipInfoColumnSettings } from "@libs/stores";
+import { storedBasicColumnSetting } from "@libs/stores";
 import type { Optional } from "@libs/types";
 import { toShipType, toTierString } from "@libs/utils";
 import type { data } from "@wails/go/models";
@@ -79,7 +79,7 @@ export class ShipInfoColumn extends AbstractColumn {
   }
 
   override getBgColorCode(player: data.Player): Optional<ColorCode> {
-    if (!get(storedShipInfoColumnSettings).enableColorized) {
+    if (!get(storedBasicColumnSetting).ship.is_colored) {
       return undefined;
     }
 
@@ -107,7 +107,7 @@ export class ShipInfoColumn extends AbstractColumn {
   }
 
   getNationIconPath(player: data.Player): string {
-    if (!get(storedShipInfoColumnSettings).enableNationFlag) {
+    if (!get(storedBasicColumnSetting).ship.enable_nation_flag) {
       return "";
     }
     return FLAGS[player.ship_info.nation] ?? FlagNone;

@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"testing"
 	"time"
 
@@ -35,7 +36,11 @@ func TestBattlePublisher_CanSubcribe(t *testing.T) {
 	mockFileStore := repository.NewMockFileStoreInterface(ctrl)
 
 	for _, v := range params {
-		mockFileStore.EXPECT().Get(data.InstallPathKey).Return(v.installPath, nil)
+		settingByte, _ := json.Marshal(data.RequiredSetting{
+			Version:     1,
+			InstallPath: v.installPath,
+		})
+		mockFileStore.EXPECT().Get(data.FileNameRequiredSetting).Return(string(settingByte), nil)
 
 		bp := NewBattlePublisher(
 			context.Background(),
@@ -59,8 +64,13 @@ func TestBattlePublisher_Subcribe(t *testing.T) {
 	testArena := data.TempArenaInfo{PlayerName: "testPlayer"}
 	mockLocalFile := repository.NewMockLocalFileInterface(ctrl)
 	mockLocalFile.EXPECT().TempArenaInfo("test").Return(testArena, nil).AnyTimes()
+
+	settingByte, _ := json.Marshal(data.RequiredSetting{
+		Version:     1,
+		InstallPath: "test",
+	})
 	mockFileStore := repository.NewMockFileStoreInterface(ctrl)
-	mockFileStore.EXPECT().Get(data.InstallPathKey).Return("test", nil).AnyTimes()
+	mockFileStore.EXPECT().Get(data.FileNameRequiredSetting).Return(string(settingByte), nil).AnyTimes()
 
 	// イベント発火履歴を記録するモック
 	var events []string

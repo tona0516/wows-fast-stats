@@ -8,13 +8,14 @@ type PlayerInfo struct {
 }
 
 type ShipInfo struct {
-	ID        int      `json:"id"`
-	Name      string   `json:"name"`
-	Nation    Nation   `json:"nation"`
-	Tier      uint     `json:"tier"`
-	Type      ShipType `json:"type"`
-	IsPremium bool     `json:"is_premium"`
-	AvgDamage float64  `json:"avg_damage"`
+	ID            int           `json:"id"`
+	Name          string        `json:"name"`
+	Nation        Nation        `json:"nation"`
+	Tier          uint          `json:"tier"`
+	Type          ShipType      `json:"type"`
+	IsPremium     bool          `json:"is_premium"`
+	AvgDamage     float64       `json:"avg_damage"`
+	DamageRatings []RatingValue `json:"damage_ratings"`
 }
 
 type PlayerStats struct {
@@ -24,14 +25,14 @@ type PlayerStats struct {
 
 type ShipStats struct {
 	Battles         uint            `json:"battles"`
-	Damage          float64         `json:"damage"`
+	Damage          RatingValue     `json:"damage"`
 	MaxDamage       MaxDamage       `json:"max_damage"`
-	WinRate         float64         `json:"win_rate"`
+	WinRate         RatingValue     `json:"win_rate"`
 	SurvivedRate    SurvivedRate    `json:"survived_rate"`
 	KdRate          float64         `json:"kd_rate"`
 	Kill            float64         `json:"kill"`
 	Exp             float64         `json:"exp"`
-	PR              float64         `json:"pr"`
+	PR              RatingValue     `json:"pr"`
 	HitRate         HitRate         `json:"hit_rate"`
 	PlanesKilled    float64         `json:"planes_killed"`
 	PlatoonRate     float64         `json:"platoon_rate"`
@@ -40,14 +41,14 @@ type ShipStats struct {
 
 type OverallStats struct {
 	Battles           uint                 `json:"battles"`
-	Damage            float64              `json:"damage"`
+	Damage            RatingValue          `json:"damage"`
 	MaxDamage         MaxDamage            `json:"max_damage"`
-	WinRate           float64              `json:"win_rate"`
+	WinRate           RatingValue          `json:"win_rate"`
 	SurvivedRate      SurvivedRate         `json:"survived_rate"`
 	KdRate            float64              `json:"kd_rate"`
 	Kill              float64              `json:"kill"`
 	Exp               float64              `json:"exp"`
-	PR                float64              `json:"pr"`
+	PR                RatingValue          `json:"pr"`
 	ThreatLevel       ThreatLevel          `json:"threat_level"`
 	AvgTier           float64              `json:"avg_tier"`
 	UsingShipTypeRate ShipTypeGroup        `json:"using_ship_type_rate"`

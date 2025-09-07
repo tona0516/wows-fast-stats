@@ -6,12 +6,12 @@ export function AlertPlayers() {
   return window['go']['main']['App']['AlertPlayers']();
 }
 
-export function EmptyBattle() {
-  return window['go']['main']['App']['EmptyBattle']();
+export function BasicColumnSetting() {
+  return window['go']['main']['App']['BasicColumnSetting']();
 }
 
-export function InstallPath() {
-  return window['go']['main']['App']['InstallPath']();
+export function EmptyBattle() {
+  return window['go']['main']['App']['EmptyBattle']();
 }
 
 export function LatestRelease() {
@@ -30,8 +30,16 @@ export function OpenDirectory(arg1) {
   return window['go']['main']['App']['OpenDirectory'](arg1);
 }
 
+export function OptionalSetting() {
+  return window['go']['main']['App']['OptionalSetting']();
+}
+
 export function RemoveAlertPlayer(arg1) {
   return window['go']['main']['App']['RemoveAlertPlayer'](arg1);
+}
+
+export function RequiredSetting() {
+  return window['go']['main']['App']['RequiredSetting']();
 }
 
 export function SearchPlayer(arg1) {
@@ -42,12 +50,12 @@ export function Semver() {
   return window['go']['main']['App']['Semver']();
 }
 
-export function SendReport() {
-  return window['go']['main']['App']['SendReport']();
-}
-
 export function ShowMessageDialog(arg1) {
   return window['go']['main']['App']['ShowMessageDialog'](arg1);
+}
+
+export function StatsColumnSettings() {
+  return window['go']['main']['App']['StatsColumnSettings']();
 }
 
 export function SubscribeBattle() {
@@ -62,8 +70,20 @@ export function UpdateAlertPlayer(arg1) {
   return window['go']['main']['App']['UpdateAlertPlayer'](arg1);
 }
 
-export function UpdateSendReport(arg1) {
-  return window['go']['main']['App']['UpdateSendReport'](arg1);
+export function UpdateBasicColumnSetting(arg1) {
+  return window['go']['main']['App']['UpdateBasicColumnSetting'](arg1);
+}
+
+export function UpdateOptionalSetting(arg1) {
+  return window['go']['main']['App']['UpdateOptionalSetting'](arg1);
+}
+
+export function UpdateRequiredSetting(arg1) {
+  return window['go']['main']['App']['UpdateRequiredSetting'](arg1);
+}
+
+export function UpdateStatsColumnSettings(arg1) {
+  return window['go']['main']['App']['UpdateStatsColumnSettings'](arg1);
 }
 
 export function ValidateInstallPath(arg1) {

@@ -16,7 +16,7 @@ type DependencyContainer struct {
 	config Config
 
 	// services
-	configService   *service.Config
+	configService   *service.Setting
 	battlePublisher *service.BattlePublisher
 	battleService   *service.BattleFetcher
 	updaterService  *service.Updater
@@ -36,7 +36,7 @@ func NewDependencyContainer(ctx context.Context, config Config) *DependencyConta
 	)
 
 	fileStore := infra.NewFileStore(config.Local.StoragePath)
-	ownIGN, _ := fileStore.Get(data.OwnIGNKey)
+	ownIGN, _ := fileStore.Get(data.FileNameOwnIGN)
 
 	logger := infra.NewLogger(
 		config.App.Name,
@@ -75,7 +75,7 @@ func NewDependencyContainer(ctx context.Context, config Config) *DependencyConta
 	)
 
 	// services
-	configService := service.NewConfig(localFile, wargaming, fileStore, logger)
+	configService := service.NewSetting(localFile, wargaming, fileStore, logger)
 	battleFetcher := service.NewBattleFetcher(
 		ctx,
 		wargaming,

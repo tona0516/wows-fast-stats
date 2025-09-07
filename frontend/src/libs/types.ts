@@ -34,12 +34,6 @@ export type RowPattern =
   | "no_ship_stats"
   | "full";
 
-export type ColumnSetting = {
-  readonly ship: boolean;
-  readonly overall: boolean;
-  readonly digit: number;
-};
-
 export type TeamThreatLevel = {
   readonly average: number;
   readonly dissociationDegree: number;
@@ -68,16 +62,4 @@ export type TonakoParam = {
   message: string;
   isLoading: boolean;
   tonako: Tonako;
-};
-
-export type ColumnSettings = { [key in StatsKey]: ColumnSetting };
-
-export type PlayerNameColumnSetting = {
-  enableNationFlag: boolean;
-  colorPattern: PlayerNameColorPattern;
-};
-
-export type ShipInfoColumnSetting = {
-  enableNationFlag: boolean;
-  enableColorized: boolean;
 };

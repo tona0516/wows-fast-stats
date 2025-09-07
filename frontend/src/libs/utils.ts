@@ -82,7 +82,7 @@ export const formatWithSuffix = (num: number): string => {
 
 export const getRowPattern = (
   player: data.Player,
-  statsExtra: StatsExtra,
+  statsExtra: string,
   shipColumnCount: number,
   overallColumnCount: number,
 ): RowPattern => {
@@ -94,7 +94,7 @@ export const getRowPattern = (
     return "private";
   }
 
-  const stats = player[statsExtra];
+  const stats = player[statsExtra as StatsExtra];
   if (player.player_info.id === 0 || stats.overall.battles === 0) {
     return "no_stats";
   }

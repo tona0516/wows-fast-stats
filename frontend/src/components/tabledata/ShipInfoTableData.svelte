@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { ShipInfoColumn } from "@libs/columns/ShipInfoColumn";
   import { ModalManager } from "@libs/ModalManager";
-  import { storedZoomRate } from "@libs/stores";
+  import { storedOptionalSetting } from "@libs/stores";
   import type { data } from "@wails/go/models";
 
   export let column: ShipInfoColumn;
@@ -19,14 +19,14 @@
     {#if nationIconPath}
       <img
         class="w-icon"
-        style="width: {(1.25 * $storedZoomRate) / 100}rem"
+        style="width: {(1.25 * $storedOptionalSetting.zoom_rate) / 100}rem"
         src={nationIconPath}
         alt=""
       />
     {/if}
     <img
       class="w-icon"
-      style="width: {(1.25 * $storedZoomRate) / 100}rem"
+      style="width: {(1.25 * $storedOptionalSetting.zoom_rate) / 100}rem"
       src={column.getShipIconPath(player)}
       alt=""
     />

@@ -43,6 +43,27 @@ func (a *App) SubscribeBattle() {
 	}
 }
 
+func (a *App) RequiredSetting() (data.RequiredSetting, error) {
+	setting, err := a.container.configService.RequiredSetting()
+	if err != nil {
+		a.container.logger.Error(err, nil)
+		return data.RequiredSetting{}, apperr.Unwrap(err)
+	}
+
+	return setting, nil
+}
+
+func (a *App) UpdateRequiredSetting(setting data.RequiredSetting) error {
+	if err := a.container.configService.UpdateRequiredSetting(setting); err != nil {
+		a.container.logger.Error(err, nil)
+		return apperr.Unwrap(err)
+	}
+
+	runtime.EventsEmit(a.ctx, service.EventUpdateConfig)
+
+	return nil
+}
+
 func (a *App) TrySaveInstallPath() (bool, error) {
 	path, err := a.container.configService.SelectDirectory(a.ctx)
 	if err != nil {
@@ -53,7 +74,14 @@ func (a *App) TrySaveInstallPath() (bool, error) {
 		return false, nil
 	}
 
-	err = a.container.configService.UpdateInstallPath(path)
+	required, err := a.container.configService.RequiredSetting()
+	if err != nil {
+		return false, apperr.Unwrap(err)
+	}
+
+	required.InstallPath = path
+
+	err = a.container.configService.UpdateRequiredSetting(required)
 	if err != nil {
 		return false, apperr.Unwrap(err)
 	}
@@ -61,6 +89,69 @@ func (a *App) TrySaveInstallPath() (bool, error) {
 	runtime.EventsEmit(a.ctx, service.EventUpdateConfig)
 
 	return true, nil
+}
+
+func (a *App) OptionalSetting() (data.OptionalSetting, error) {
+	setting, err := a.container.configService.OptionalSetting()
+	if err != nil {
+		a.container.logger.Error(err, nil)
+		return data.OptionalSetting{}, apperr.Unwrap(err)
+	}
+
+	return setting, nil
+}
+
+func (a *App) UpdateOptionalSetting(setting data.OptionalSetting) error {
+	if err := a.container.configService.UpdateOptionalSetting(setting); err != nil {
+		a.container.logger.Error(err, nil)
+		return apperr.Unwrap(err)
+	}
+
+	runtime.EventsEmit(a.ctx, service.EventUpdateConfig)
+
+	return nil
+}
+
+func (a *App) BasicColumnSetting() (data.BasicColumnSetting, error) {
+	setting, err := a.container.configService.BasicColumnSetting()
+	if err != nil {
+		a.container.logger.Error(err, nil)
+		return data.BasicColumnSetting{}, apperr.Unwrap(err)
+	}
+
+	return setting, nil
+}
+
+func (a *App) UpdateBasicColumnSetting(setting data.BasicColumnSetting) error {
+	if err := a.container.configService.UpdateBasicColumnSetting(setting); err != nil {
+		a.container.logger.Error(err, nil)
+		return apperr.Unwrap(err)
+	}
+
+	runtime.EventsEmit(a.ctx, service.EventUpdateConfig)
+
+	return nil
+}
+
+func (a *App) StatsColumnSettings() (data.StatsColumnSettings, error) {
+	setting, err := a.container.configService.StatsColumnSettings()
+	if err != nil {
+		a.container.logger.Error(err, nil)
+		return data.StatsColumnSettings{}, apperr.Unwrap(err)
+	}
+
+	return setting, nil
+}
+
+func (a *App) UpdateStatsColumnSettings(setting data.StatsColumnSettings) error {
+	if err := a.container.configService.UpdateStatsColumnSettings(setting); err != nil {
+		a.container.logger.Error(err, nil)
+		return apperr.Unwrap(err)
+	}
+
+	runtime.EventsEmit(a.ctx, service.EventUpdateConfig)
+
+	return nil
 }
 
 func (a *App) OpenDirectory(path string) error {
@@ -160,23 +251,6 @@ func (a *App) ShowMessageDialog(message string) {
 // 構造体のバインド用のメソッド.
 func (a *App) EmptyBattle() data.Battle {
 	return data.Battle{}
-}
-
-func (a *App) InstallPath() string {
-	return a.container.configService.InstallPath()
-}
-
-func (a *App) SendReport() bool {
-	return a.container.configService.SendReport()
-}
-
-func (a *App) UpdateSendReport(sendReport bool) error {
-	if err := a.container.configService.UpdateSendReport(sendReport); err != nil {
-		a.container.logger.Error(err, nil)
-		return failure.Wrap(err)
-	}
-
-	return nil
 }
 
 func (a *App) onStartup(ctx context.Context) {

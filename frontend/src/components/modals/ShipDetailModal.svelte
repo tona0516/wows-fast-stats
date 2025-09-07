@@ -5,8 +5,8 @@
   import ModalCommon from "./ModalCommon.svelte";
   import { ModalManager } from "@libs/ModalManager";
   import type { ColorCode } from "@libs/ColorCode";
-  import { Rating } from "@libs/Rating";
   import { NumbersURL } from "@libs/NumbersURL";
+  import { RATING_COLORS, RATING_NAMES } from "@libs/constants";
 
   interface DamageRating {
     displayName: string;
@@ -23,19 +23,11 @@
       return undefined;
     }
 
-    const serverAvdgDamage = player.ship_info.avg_damage;
-    if (serverAvdgDamage === 0) {
-      return undefined;
-    }
-
-    return Rating.getThresholds().map((threshold) => {
-      const rating = new Rating(threshold.raw);
-      const value = serverAvdgDamage * threshold.shipDamageRatio;
-
+    return player.ship_info.damage_ratings.map((dr) => {
       return {
-        displayName: rating.getDisplayName(),
-        colorCode: rating.getColor().getFixedTextColor(),
-        value: `${value.toFixed()}~`,
+        displayName: RATING_NAMES[dr.rating],
+        colorCode: RATING_COLORS[dr.rating].getFixedTextColor(),
+        value: `${dr.value.toFixed()}~`,
       };
     });
   }

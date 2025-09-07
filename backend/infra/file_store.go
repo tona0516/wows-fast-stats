@@ -2,6 +2,7 @@ package infra
 
 import (
 	"os"
+	"path/filepath"
 	"wfs/backend/data"
 
 	"github.com/morikuni/failure"
@@ -11,8 +12,8 @@ type FileStore struct {
 	basePath string
 }
 
-func NewFileStore(path string) *FileStore {
-	return &FileStore{basePath: path}
+func NewFileStore(basePath string) *FileStore {
+	return &FileStore{basePath: basePath}
 }
 
 func (fs FileStore) Put(path data.FileStorePath, value string) error {
@@ -46,19 +47,22 @@ func (fs FileStore) Delete(path data.FileStorePath) error {
 	return os.Remove(createFilePath(fs.basePath, path))
 }
 
-func (fs FileStore) Keys() ([]string, error) {
-	files, err := os.ReadDir(fs.basePath)
+func (fs FileStore) Files(childPath string) ([]string, error) {
+	p := filepath.Join(fs.basePath, childPath)
+	_ = os.MkdirAll(p, os.ModePerm)
+
+	entries, err := os.ReadDir(p)
 	if err != nil {
 		return nil, failure.Wrap(err)
 	}
 
-	keys := make([]string, 0, len(files))
-	for _, file := range files {
-		if !file.IsDir() {
-			keys = append(keys, file.Name())
+	files := make([]string, 0, len(entries))
+	for _, entry := range entries {
+		if !entry.IsDir() {
+			files = append(files, entry.Name())
 		}
 	}
-	return keys, nil
+	return files, nil
 }
 
 func createFilePath(basePath string, filePath data.FileStorePath) string {

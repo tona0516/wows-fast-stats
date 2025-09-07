@@ -4,9 +4,9 @@ import {data} from '../models';
 
 export function AlertPlayers():Promise<Array<data.AlertPlayer>>;
 
-export function EmptyBattle():Promise<data.Battle>;
+export function BasicColumnSetting():Promise<data.BasicColumnSetting>;
 
-export function InstallPath():Promise<string>;
+export function EmptyBattle():Promise<data.Battle>;
 
 export function LatestRelease():Promise<data.GHLatestRelease>;
 
@@ -16,15 +16,19 @@ export function LogInfo(arg1:string,arg2:{[key: string]: string}):Promise<void>;
 
 export function OpenDirectory(arg1:string):Promise<void>;
 
+export function OptionalSetting():Promise<data.OptionalSetting>;
+
 export function RemoveAlertPlayer(arg1:number):Promise<void>;
+
+export function RequiredSetting():Promise<data.RequiredSetting>;
 
 export function SearchPlayer(arg1:string):Promise<Array<data.WGAccountListData>>;
 
 export function Semver():Promise<string>;
 
-export function SendReport():Promise<boolean>;
-
 export function ShowMessageDialog(arg1:string):Promise<void>;
+
+export function StatsColumnSettings():Promise<data.StatsColumnSettings>;
 
 export function SubscribeBattle():Promise<void>;
 
@@ -32,6 +36,12 @@ export function TrySaveInstallPath():Promise<boolean>;
 
 export function UpdateAlertPlayer(arg1:data.AlertPlayer):Promise<void>;
 
-export function UpdateSendReport(arg1:boolean):Promise<void>;
+export function UpdateBasicColumnSetting(arg1:data.BasicColumnSetting):Promise<void>;
+
+export function UpdateOptionalSetting(arg1:data.OptionalSetting):Promise<void>;
+
+export function UpdateRequiredSetting(arg1:data.RequiredSetting):Promise<void>;
+
+export function UpdateStatsColumnSettings(arg1:data.StatsColumnSettings):Promise<void>;
 
 export function ValidateInstallPath(arg1:string):Promise<string>;
