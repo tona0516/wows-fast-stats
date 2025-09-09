@@ -142,3 +142,20 @@ export const RATING_NAMES: { [key: string]: string } = {
   unicum: "Unicum",
   super_unicum: "Super Unicum",
 } as const;
+
+type ColorPair = {
+  readonly text: ColorCode;
+  readonly background: ColorCode;
+};
+
+export const THREAT_LEVEL_COLORS: { [rank: string]: ColorPair } = {
+  ir: { text: new ColorCode("#FFFFFF"), background: new ColorCode("#000000") },
+  r: { text: new ColorCode("#FFFFFF"), background: new ColorCode("#FF0000") },
+  o: { text: new ColorCode("#331100"), background: new ColorCode("#FFA500") },
+  y: { text: new ColorCode("#331100"), background: new ColorCode("#FFFF00") },
+  g: { text: new ColorCode("#FFFFFF"), background: new ColorCode("#008000") },
+  b: { text: new ColorCode("#FFFFFF"), background: new ColorCode("#2255FF") },
+  i: { text: new ColorCode("#FFFFFF"), background: new ColorCode("#234794") },
+  v: { text: new ColorCode("#FFFFFF"), background: new ColorCode("#705DA8") },
+  uv: { text: new ColorCode("#FFFFFF"), background: new ColorCode("#800080") },
+} as const;

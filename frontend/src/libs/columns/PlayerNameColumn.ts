@@ -1,8 +1,7 @@
 import PlayerNameTableData from "@components/tabledata/PlayerNameTableData.svelte";
 import { ColorCode } from "@libs/ColorCode";
-import { RATING_COLORS } from "@libs/constants";
+import { RATING_COLORS, THREAT_LEVEL_COLORS } from "@libs/constants";
 import { storedBasicColumnSetting, storedOptionalSetting } from "@libs/stores";
-import { ThreatLevel } from "@libs/ThreatLevel";
 import type { Optional, StatsExtra } from "@libs/types";
 import type { data } from "@wails/go/models";
 import { get } from "svelte/store";
@@ -32,8 +31,7 @@ export class PlayerNameColumn extends AbstractColumn {
       }
       case "threat_level": {
         const value = player[statsExtra].overall.threat_level;
-        const level = ThreatLevel.fromScore(value.raw);
-        return level?.getColor().text;
+        return THREAT_LEVEL_COLORS[value.rank].text;
       }
       case "none":
         return undefined;
@@ -57,8 +55,7 @@ export class PlayerNameColumn extends AbstractColumn {
       }
       case "threat_level": {
         const value = player[statsExtra].overall.threat_level;
-        const level = ThreatLevel.fromScore(value.raw);
-        return level?.getColor().background;
+        return THREAT_LEVEL_COLORS[value.rank].background;
       }
       case "none":
         return undefined;

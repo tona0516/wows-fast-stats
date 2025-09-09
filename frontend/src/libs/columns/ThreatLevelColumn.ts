@@ -1,5 +1,5 @@
 import SingleTableData from "@components/tabledata/SingleTableData.svelte";
-import { ThreatLevel } from "@libs/ThreatLevel";
+import { THREAT_LEVEL_COLORS } from "@libs/constants";
 import type { data } from "@wails/go/models";
 import type { ColorCode } from "../ColorCode";
 import type { Optional } from "../types";
@@ -11,15 +11,12 @@ export class ThreatLevelColumn extends AbstractStatsColumn<string> {
   }
 
   override getTextColorCode(player: data.Player): Optional<ColorCode> {
-    return ThreatLevel.fromScore(
-      player.pvp_all.overall.threat_level.raw,
-    )?.getColor().text;
+    return THREAT_LEVEL_COLORS[player.pvp_all.overall.threat_level.rank].text;
   }
 
   override getBgColorCode(player: data.Player): Optional<ColorCode> {
-    return ThreatLevel.fromScore(
-      player.pvp_all.overall.threat_level.raw,
-    )?.getColor().background;
+    return THREAT_LEVEL_COLORS[player.pvp_all.overall.threat_level.rank]
+      .background;
   }
 
   override getTableDataComponent() {

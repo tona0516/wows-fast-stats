@@ -137,6 +137,7 @@ export namespace data {
 	    }
 	}
 	export class ThreatLevel {
+	    rank: string;
 	    raw: number;
 	    modified: number;
 	
@@ -146,6 +147,7 @@ export namespace data {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.rank = source["rank"];
 	        this.raw = source["raw"];
 	        this.modified = source["modified"];
 	    }
