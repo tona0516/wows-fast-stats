@@ -7,6 +7,27 @@ import (
 	"github.com/shopspring/decimal"
 )
 
+//nolint:gochecknoglobals
+var coef = 0.5
+
+type threshold struct {
+	rank      Rank
+	threshold float64
+}
+
+//nolint:gochecknoglobals
+var thresholds = []threshold{
+	{rank: RankUV, threshold: 44000 * coef},
+	{rank: RankV, threshold: 40000 * coef},
+	{rank: RankI, threshold: 35000 * coef},
+	{rank: RankB, threshold: 32000 * coef},
+	{rank: RankG, threshold: 25000 * coef},
+	{rank: RankY, threshold: 19000 * coef},
+	{rank: RankO, threshold: 13000 * coef},
+	{rank: RankR, threshold: 8000 * coef},
+	{rank: RankIR, threshold: 0},
+}
+
 type specialAAShipMap map[int]struct {
 	avg  float64
 	coef float64
@@ -136,7 +157,17 @@ func CalculateThreatLevel(f ThreatLevelFactor) data.ThreatLevel {
 	// マッチのおける脅威レベルの補正
 	modified := correctBasedOnMatch(raw, f.warships, f.shipID, shipAAIndex, isCVMatch, topTier, bottomTier)
 
+	// ランクの決定
+	var rank = RankIR
+	for _, t := range thresholds {
+		if raw >= t.threshold {
+			rank = t.rank
+			break
+		}
+	}
+
 	return data.ThreatLevel{
+		Rank:     string(rank),
 		Raw:      raw,
 		Modified: modified,
 	}

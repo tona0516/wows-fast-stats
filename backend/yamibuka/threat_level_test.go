@@ -66,6 +66,7 @@ func TestThreatLevel_CalculateThreatLevel_CV_CVあり_Tierミドル(t *testing.T
 		Modified: 18111,
 	}
 
+	assert.Equal(t, RankI, Rank(actual.Rank))
 	assert.InDelta(t, expected.Raw, actual.Raw, allowableDelta)
 	assert.InDelta(t, expected.Modified, actual.Modified, allowableDelta)
 }
@@ -116,6 +117,7 @@ func TestThreatLevel_CalculateThreatLevel_BB_CVあり_Tierトップ(t *testing.T
 		Modified: 21497,
 	}
 
+	assert.Equal(t, RankI, Rank(actual.Rank))
 	assert.InDelta(t, expected.Raw, actual.Raw, allowableDelta)
 	assert.InDelta(t, expected.Modified, actual.Modified, allowableDelta)
 }
@@ -154,6 +156,7 @@ func TestThreatLevel_CalculateThreatLevel_CL_CVなし_Tierミドル(t *testing.T
 		Modified: 24184,
 	}
 
+	assert.Equal(t, RankV, Rank(actual.Rank))
 	assert.InDelta(t, expected.Raw, actual.Raw, allowableDelta)
 	assert.InDelta(t, expected.Modified, actual.Modified, allowableDelta)
 }
