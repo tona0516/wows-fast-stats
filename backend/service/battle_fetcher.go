@@ -489,8 +489,30 @@ func (b *BattleFetcher) compose(
 	sort.Sort(enemies)
 
 	teams := []data.Team{
-		{Players: friends},
-		{Players: enemies},
+		{
+			Players: friends,
+			PvPAll: data.TeamStats{
+				TeamThreatLevel: yamibuka.CalculateTeamThreatLevel(friends, data.StatsPatternPvPAll),
+			},
+			PvPSolo: data.TeamStats{
+				TeamThreatLevel: yamibuka.CalculateTeamThreatLevel(friends, data.StatsPatternPvPSolo),
+			},
+			RankSolo: data.TeamStats{
+				TeamThreatLevel: yamibuka.CalculateTeamThreatLevel(friends, data.StatsPatternRankSolo),
+			},
+		},
+		{
+			Players: enemies,
+			PvPAll: data.TeamStats{
+				TeamThreatLevel: yamibuka.CalculateTeamThreatLevel(enemies, data.StatsPatternPvPAll),
+			},
+			PvPSolo: data.TeamStats{
+				TeamThreatLevel: yamibuka.CalculateTeamThreatLevel(enemies, data.StatsPatternPvPSolo),
+			},
+			RankSolo: data.TeamStats{
+				TeamThreatLevel: yamibuka.CalculateTeamThreatLevel(enemies, data.StatsPatternRankSolo),
+			},
+		},
 	}
 
 	battle := data.Battle{

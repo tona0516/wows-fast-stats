@@ -1,48 +1,6 @@
 import { data } from "@wails/go/models";
-import { geometricMean } from "simple-statistics";
 import { ROMAN_NUMERALS } from "./constants";
-import type {
-  RowPattern,
-  ShipType,
-  StatsExtra,
-  TeamThreatLevel,
-} from "./types";
-
-export const getTeamThreatLevels = (
-  battle: data.Battle | undefined,
-  statsExtra: StatsExtra,
-): TeamThreatLevel[] => {
-  if (!battle || !battle.teams) {
-    return [];
-  }
-
-  return battle.teams.map((team) => {
-    const players = team.players;
-    const values = players
-      .filter((player) => {
-        const id = player.player_info.id;
-        return !(id === 0 || player.player_info.is_hidden);
-      })
-      .map((player) => player[statsExtra].overall.threat_level.modified);
-
-    if (values.length === 0) {
-      return {
-        average: Number.NaN,
-        dissociationDegree: Number.NaN,
-        accuracy: Number.NaN,
-      };
-    }
-
-    const maxScore = Math.max(...values);
-    const average = geometricMean(values);
-
-    return {
-      average: average,
-      dissociationDegree: (maxScore / average - 1) * 100,
-      accuracy: Math.round((values.length / players.length) * 100),
-    };
-  });
-};
+import type { RowPattern, ShipType, StatsExtra } from "./types";
 
 export const toTierString = (value: number): string => {
   if (value === 11) return "★";

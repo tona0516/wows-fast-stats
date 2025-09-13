@@ -5,14 +5,8 @@ import {
   UpdateStatsColumnSettings,
 } from "@wails/go/main/App";
 import type { data } from "@wails/go/models";
-import { derived, type Writable, writable } from "svelte/store";
-import type {
-  EditModalParam,
-  Optional,
-  StatsExtra,
-  TonakoParam,
-} from "./types";
-import { getTeamThreatLevels } from "./utils";
+import { type Writable, writable } from "svelte/store";
+import type { EditModalParam, Optional, TonakoParam } from "./types";
 
 export const storedRequiredSetting =
   writable() as Writable<data.RequiredSetting>;
@@ -48,15 +42,6 @@ export const storedBattle = writable(undefined) as Writable<
 >;
 export const storedAlertPlayers = writable([]) as Writable<data.AlertPlayer[]>;
 export const storedInstallPathError = writable("") as Writable<string>;
-export const storedTeamThreatLevels = derived(
-  [storedBattle, storedOptionalSetting],
-  ([battle, optionalSetting]) => {
-    return getTeamThreatLevels(
-      battle,
-      optionalSetting.stats_extra as StatsExtra,
-    );
-  },
-);
 export const storedEditAlertPlayer = writable(undefined) as Writable<
   Optional<EditModalParam>
 >;

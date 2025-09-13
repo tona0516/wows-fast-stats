@@ -6,9 +6,8 @@
   import {
     storedOptionalSetting,
     storedStatsColumnSettings,
-    storedTeamThreatLevels,
   } from "@libs/stores";
-  import type { ColumnCategory } from "@libs/types";
+  import type { ColumnCategory, StatsExtra } from "@libs/types";
   import type { data } from "@wails/go/models";
   import ColspanTableData from "./tabledata/ColspanTableData.svelte";
   import { AvgTierColumn } from "@libs/columns/AvgTierColumn";
@@ -94,6 +93,8 @@
     overallCategory.showCount();
   const showThreatLevel =
     $storedStatsColumnSettings.threat_level.is_show_overall;
+
+  $: statsExtra = $storedOptionalSetting.stats_extra as StatsExtra;
 </script>
 
 <div class="overflow-x-auto rounded-xl border border-base-300 bg-base-200">
@@ -101,8 +102,8 @@
     {#each teams as team, i}
       {#if team.players.length !== 0}
         <thead>
-          {#if showThreatLevel && $storedTeamThreatLevels && $storedTeamThreatLevels[i]}
-            {@const teamThreatLevel = $storedTeamThreatLevels[i]}
+          {#if showThreatLevel && team[statsExtra].team_threat_level.average !== 0}
+            {@const teamThreatLevel = team[statsExtra].team_threat_level}
             <tr class="bg-base-300/80">
               <th colspan={allColumnCount} class="p-2">
                 <div class="flex flex-wrap items-center gap-3 text-sm">
@@ -121,7 +122,7 @@
                   <div class="badge badge-warning badge-outline gap-1">
                     <span class="opacity-70">介護指数</span>
                     <span class="font-mono"
-                      >{teamThreatLevel.dissociationDegree.toFixed(0)}%</span
+                      >{teamThreatLevel.dissociation_degree.toFixed(0)}%</span
                     >
                   </div>
                 </div>

@@ -34,12 +34,6 @@ export type RowPattern =
   | "no_ship_stats"
   | "full";
 
-export type TeamThreatLevel = {
-  readonly average: number;
-  readonly dissociationDegree: number;
-  readonly accuracy: number;
-};
-
 export type ColumnInfo = {
   readonly min: string;
   readonly full: string;

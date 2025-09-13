@@ -82,6 +82,52 @@ export namespace data {
 		    return a;
 		}
 	}
+	export class TeamThreatLevel {
+	    average: number;
+	    dissociation_degree: number;
+	    accuracy: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new TeamThreatLevel(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.average = source["average"];
+	        this.dissociation_degree = source["dissociation_degree"];
+	        this.accuracy = source["accuracy"];
+	    }
+	}
+	export class TeamStats {
+	    team_threat_level: TeamThreatLevel;
+	
+	    static createFrom(source: any = {}) {
+	        return new TeamStats(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.team_threat_level = this.convertValues(source["team_threat_level"], TeamThreatLevel);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
 	export class EfficiencyBadgeGroup {
 	    expert: number;
 	    first: number;
@@ -496,6 +542,9 @@ export namespace data {
 	}
 	export class Team {
 	    players: Player[];
+	    pvp_solo: TeamStats;
+	    pvp_all: TeamStats;
+	    rank_solo: TeamStats;
 	
 	    static createFrom(source: any = {}) {
 	        return new Team(source);
@@ -504,6 +553,9 @@ export namespace data {
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.players = this.convertValues(source["players"], Player);
+	        this.pvp_solo = this.convertValues(source["pvp_solo"], TeamStats);
+	        this.pvp_all = this.convertValues(source["pvp_all"], TeamStats);
+	        this.rank_solo = this.convertValues(source["rank_solo"], TeamStats);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -715,6 +767,8 @@ export namespace data {
 		    return a;
 		}
 	}
+	
+	
 	
 	
 	
