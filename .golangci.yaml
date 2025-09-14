@@ -7,7 +7,8 @@ linters:
     - wrapcheck
     - forbidigo
     - funlen
-    - wsl
+    - wsl # deprecated
+    - wsl_v5
     - exhaustruct
     - ireturn
     - tagliatelle
@@ -26,6 +27,8 @@ linters:
     - godox
     - containedctx
     - contextcheck
+    - embeddedstructfieldcheck
+    - noinlineerr
   exclusions:
     paths:
       - _test\.go
