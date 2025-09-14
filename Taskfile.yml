@@ -12,7 +12,7 @@ tasks:
     desc: setup project
     cmds:
       - for:
-          - github.com/wailsapp/wails/v2/cmd/wails@v2.9.3
+          - github.com/wailsapp/wails/v2/cmd/wails@v2.10.2
           - github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest
           - go.uber.org/mock/mockgen@latest
           - github.com/arch-go/arch-go@latest
@@ -84,5 +84,5 @@ tasks:
   update:
     desc: update dependencies
     cmds:
-      - go get
+      - go get -u
       - "{{.NPM}} update"

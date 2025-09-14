@@ -10,9 +10,9 @@ export function EmptyBattle():Promise<data.Battle>;
 
 export function LatestRelease():Promise<data.GHLatestRelease>;
 
-export function LogError(arg1:string,arg2:{[key: string]: string}):Promise<void>;
+export function LogError(arg1:string,arg2:Record<string, string>):Promise<void>;
 
-export function LogInfo(arg1:string,arg2:{[key: string]: string}):Promise<void>;
+export function LogInfo(arg1:string,arg2:Record<string, string>):Promise<void>;
 
 export function OpenDirectory(arg1:string):Promise<void>;
 
