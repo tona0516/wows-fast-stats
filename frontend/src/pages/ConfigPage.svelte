@@ -36,6 +36,8 @@
       storedInstallPathError.set(error as string);
     }
   };
+
+  $: installPath = $storedRequiredSetting.install_path;
 </script>
 
 <div class="container mx-auto max-w-3xl py-3 flex flex-col gap-4">
@@ -48,12 +50,12 @@
     <p class="text-sm text-gray-500 mb-2">
       WorldOfWarships.exeが存在するフォルダを選択してください
     </p>
-    {#if $storedRequiredSetting.install_path}
+    {#if installPath}
       <div class="stats shadow w-full mb-2">
         <div class="stat">
           <div class="stat-title">ゲームクライアント インストールパス</div>
           <div class="stat-value text-lg break-all">
-            {$storedRequiredSetting.install_path}
+            {installPath}
           </div>
         </div>
       </div>
