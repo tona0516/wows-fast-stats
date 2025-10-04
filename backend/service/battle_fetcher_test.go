@@ -58,9 +58,6 @@ func TestBattle_Get_正常系_初回(t *testing.T) {
 	mockNumbers := repository.NewMockNumbersInterface(ctrl)
 	mockNumbers.EXPECT().ExpectedStats().Return(data.ExpectedStats{}, nil)
 
-	mockUnregistered := repository.NewMockUnregisteredInterface(ctrl)
-	mockUnregistered.EXPECT().Warship().Return(data.Warships{}, nil)
-
 	mockLogger := repository.NewMockLoggerInterface(ctrl)
 	mockLogger.EXPECT().SetOwnIGN(gomock.Any()).Return()
 
@@ -76,7 +73,6 @@ func TestBattle_Get_正常系_初回(t *testing.T) {
 		mockWargaming,
 		mockUnofficialWargaming,
 		mockNumbers,
-		mockUnregistered,
 		infra.NewFileStore(t.TempDir()),
 		mockLogger,
 		emitFunc,
@@ -127,8 +123,6 @@ func TestBattle_Get_正常系_2回目以降(t *testing.T) {
 
 	mockNumbers := repository.NewMockNumbersInterface(ctrl)
 
-	mockUnregistered := repository.NewMockUnregisteredInterface(ctrl)
-
 	mockLogger := repository.NewMockLoggerInterface(ctrl)
 	mockLogger.EXPECT().SetOwnIGN(gomock.Any()).Return()
 
@@ -144,7 +138,6 @@ func TestBattle_Get_正常系_2回目以降(t *testing.T) {
 		mockWargaming,
 		mockUnofficialWargaming,
 		mockNumbers,
-		mockUnregistered,
 		infra.NewFileStore(t.TempDir()),
 		mockLogger,
 		emitFunc,
@@ -175,8 +168,6 @@ func TestBattle_Get_異常系_アカウントリスト取得失敗(t *testing.T)
 
 	mockNumbers := repository.NewMockNumbersInterface(ctrl)
 
-	mockUnregistered := repository.NewMockUnregisteredInterface(ctrl)
-
 	mockLogger := repository.NewMockLoggerInterface(ctrl)
 	mockLogger.EXPECT().SetOwnIGN(gomock.Any()).Return()
 
@@ -192,7 +183,6 @@ func TestBattle_Get_異常系_アカウントリスト取得失敗(t *testing.T)
 		mockWargaming,
 		mockUnofficialWargaming,
 		mockNumbers,
-		mockUnregistered,
 		infra.NewFileStore(t.TempDir()),
 		mockLogger,
 		emitFunc,

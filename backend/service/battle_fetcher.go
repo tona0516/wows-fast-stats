@@ -21,7 +21,6 @@ type BattleFetcher struct {
 	wargaming      repository.WargamingInterface
 	uwargaming     repository.UnofficialWargamingInterface
 	numbers        repository.NumbersInterface
-	unregistered   repository.UnregisteredInterface
 	fileStore      repository.FileStoreInterface
 	logger         repository.LoggerInterface
 	eventsEmitFunc eventEmitFunc
@@ -39,7 +38,6 @@ func NewBattleFetcher(
 	wargaming repository.WargamingInterface,
 	uwargaming repository.UnofficialWargamingInterface,
 	numbers repository.NumbersInterface,
-	unregistered repository.UnregisteredInterface,
 	fileStore repository.FileStoreInterface,
 	logger repository.LoggerInterface,
 	eventsEmitFunc eventEmitFunc,
@@ -49,7 +47,6 @@ func NewBattleFetcher(
 		wargaming:                          wargaming,
 		uwargaming:                         uwargaming,
 		numbers:                            numbers,
-		unregistered:                       unregistered,
 		fileStore:                          fileStore,
 		logger:                             logger,
 		eventsEmitFunc:                     eventsEmitFunc,
@@ -202,18 +199,6 @@ func (b *BattleFetcher) fetchWarships(channel chan data.Result[data.Warships]) {
 		result.Error = err
 		channel <- result
 		return
-	}
-
-	unregisteredShipInfo, err := b.unregistered.Warship()
-	if err != nil {
-		result.Error = err
-		channel <- result
-		return
-	}
-	for k, v := range unregisteredShipInfo {
-		if _, ok := warships[k]; !ok {
-			warships[k] = v
-		}
 	}
 
 	result.Value = warships

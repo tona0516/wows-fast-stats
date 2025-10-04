@@ -67,7 +67,6 @@ func NewDependencyContainer(ctx context.Context, config Config) *DependencyConta
 		config.Numbers.TimeoutSec,
 	)
 	localFile := infra.NewLocalFile()
-	unregistered := infra.NewUnregistered()
 	github := infra.NewGithub(
 		config.Github.URL,
 		config.Github.MaxRetry,
@@ -81,7 +80,6 @@ func NewDependencyContainer(ctx context.Context, config Config) *DependencyConta
 		wargaming,
 		uwargaming,
 		numbers,
-		unregistered,
 		fileStore,
 		logger,
 		runtime.EventsEmit,
