@@ -2,11 +2,11 @@ package service
 
 import (
 	"context"
-	"encoding/json"
 	"testing"
 	"time"
 
 	"wfs/backend/data"
+	"wfs/backend/domain"
 	"wfs/backend/mock/repository"
 
 	"github.com/stretchr/testify/assert"
@@ -33,20 +33,18 @@ func TestBattlePublisher_CanSubcribe(t *testing.T) {
 	}
 
 	ctrl := gomock.NewController(t)
-	mockFileStore := repository.NewMockFileStoreInterface(ctrl)
+	mockUserConfig := repository.NewMockUserConfigInterface(ctrl)
 
 	for _, v := range params {
-		settingByte, _ := json.Marshal(data.RequiredSetting{
-			Version:     1,
+		mockUserConfig.EXPECT().Load().Return(domain.UserConfig{
 			InstallPath: v.installPath,
-		})
-		mockFileStore.EXPECT().Get(data.FileNameRequiredSetting).Return(string(settingByte), nil)
+		}, nil)
 
 		bp := NewBattlePublisher(
 			context.Background(),
 			1,
 			nil,
-			mockFileStore,
+			mockUserConfig,
 			nil,
 			nil,
 		)
@@ -65,12 +63,8 @@ func TestBattlePublisher_Subcribe(t *testing.T) {
 	mockLocalFile := repository.NewMockLocalFileInterface(ctrl)
 	mockLocalFile.EXPECT().TempArenaInfo("test").Return(testArena, nil).AnyTimes()
 
-	settingByte, _ := json.Marshal(data.RequiredSetting{
-		Version:     1,
-		InstallPath: "test",
-	})
-	mockFileStore := repository.NewMockFileStoreInterface(ctrl)
-	mockFileStore.EXPECT().Get(data.FileNameRequiredSetting).Return(string(settingByte), nil).AnyTimes()
+	mockUserConfig := repository.NewMockUserConfigInterface(ctrl)
+	mockUserConfig.EXPECT().Load().Return(domain.UserConfig{InstallPath: "test"}, nil).AnyTimes()
 
 	// イベント発火履歴を記録するモック
 	var events []string
@@ -82,7 +76,7 @@ func TestBattlePublisher_Subcribe(t *testing.T) {
 		context.Background(),
 		0, // intervalを0にして即時実行
 		mockLocalFile,
-		mockFileStore,
+		mockUserConfig,
 		nil,
 		emitFunc,
 	)

@@ -3,8 +3,8 @@ package service
 import (
 	"context"
 	"crypto/sha256"
-	"encoding/json"
 	"fmt"
+	"path/filepath"
 	"time"
 	"wfs/backend/apperr"
 	"wfs/backend/data"
@@ -17,7 +17,7 @@ type BattlePublisher struct {
 	ctx            context.Context
 	interval       time.Duration
 	localFile      repository.LocalFileInterface
-	fileStore      repository.FileStoreInterface
+	userConfig     repository.UserConfigInterface
 	logger         repository.LoggerInterface
 	eventsEmitFunc eventEmitFunc
 
@@ -28,7 +28,7 @@ func NewBattlePublisher(
 	ctx context.Context,
 	interval time.Duration,
 	localFile repository.LocalFileInterface,
-	fileStore repository.FileStoreInterface,
+	userConfig repository.UserConfigInterface,
 	logger repository.LoggerInterface,
 	eventsEmitFunc eventEmitFunc,
 ) *BattlePublisher {
@@ -36,28 +36,23 @@ func NewBattlePublisher(
 		ctx:            ctx,
 		interval:       interval,
 		localFile:      localFile,
-		fileStore:      fileStore,
+		userConfig:     userConfig,
 		logger:         logger,
 		eventsEmitFunc: eventsEmitFunc,
 	}
 }
 
 func (bp *BattlePublisher) CanSubcribe() bool {
-	text, err := bp.fileStore.Get(data.FileNameRequiredSetting)
+	config, err := bp.userConfig.Load()
 	if err != nil {
 		return false
 	}
 
-	var required data.RequiredSetting
-	if err := json.Unmarshal([]byte(text), &required); err != nil {
+	if !filepath.IsLocal(config.InstallPath) {
 		return false
 	}
 
-	if required.InstallPath == "" {
-		return false
-	}
-
-	bp.installPath = required.InstallPath
+	bp.installPath = config.InstallPath
 	return true
 }
 
