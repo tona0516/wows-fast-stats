@@ -1,12 +1,12 @@
 <script lang="ts">
   import "bootstrap-icons/font/bootstrap-icons.css";
   import "charts.css";
-  import EditAlertPlayerModal from "@components/modals/EditAlertPlayerModal.svelte";
+  import EditBlackListModal from "@components/modals/EditBlackListModal.svelte";
   import ExternalLink from "@components/ExternalLink.svelte";
   import SideMenu from "@components/SideMenu.svelte";
   import Toast from "@components/Toast.svelte";
   import {
-    storedAlertPlayers,
+    storedBlackList,
     storedBasicColumnSetting,
     storedBattle,
     storedInstallPathError,
@@ -15,13 +15,12 @@
     storedStatsColumnSettings,
   } from "@libs/stores";
   import type { Page } from "@libs/types";
-  import AlertPlayerPage from "@pages/AlertPlayerPage.svelte";
+  import BlackListPage from "@pages/BlackListPage.svelte";
   import ConfigPage from "@pages/ConfigPage.svelte";
   import InfoPage from "@pages/InfoPage.svelte";
   import StatsPage from "@pages/StatsPage.svelte";
   import {
     ValidateInstallPath,
-    AlertPlayers,
     SubscribeBattle,
     ShowMessageDialog,
     LogError,
@@ -29,14 +28,15 @@
     BasicColumnSetting,
     StatsColumnSettings,
     RequiredSetting,
+    GetBlackList,
   } from "@wails/go/main/App";
-  import type { data } from "@wails/go/models";
+  import type { data, domain } from "@wails/go/models";
   import { EventsOn } from "@wails/runtime/runtime";
   import { onMount } from "svelte";
   import { themeChange } from "theme-change";
   import { TonakoManager } from "@libs/TonakoManager";
   import PlayerDetailModal from "@components/modals/PlayerDetailModal.svelte";
-  import RemoveAlertPlayerModal from "@components/modals/RemoveAlertPlayerModal.svelte";
+  import RemoveBlackListModal from "@components/modals/RemoveBlackListModal.svelte";
   import ShipDetailModal from "@components/modals/ShipDetailModal.svelte";
 
   let statsPage: StatsPage | undefined;
@@ -49,8 +49,8 @@
     themeChange(false);
   });
 
-  EventsOn("ALERT_PLAYERS_UPDATE", (players: data.AlertPlayer[]) =>
-    storedAlertPlayers.set(players),
+  EventsOn("BLACKLIST_UPDATE", (list: domain.BlackListItem[]) =>
+    storedBlackList.set(list),
   );
   EventsOn("BATTLE_START", () => {
     TonakoManager.instance.setStartBattleState();
@@ -101,7 +101,7 @@
       storedOptionalSetting.set(await OptionalSetting());
       storedBasicColumnSetting.set(await BasicColumnSetting());
       storedStatsColumnSettings.set(await StatsColumnSettings());
-      storedAlertPlayers.set(await AlertPlayers());
+      storedBlackList.set(await GetBlackList());
 
       const installPathError = await ValidateInstallPath(
         requiredSetting.install_path,
@@ -148,8 +148,8 @@
   <div>
     <Toast />
 
-    <EditAlertPlayerModal />
-    <RemoveAlertPlayerModal />
+    <EditBlackListModal />
+    <RemoveBlackListModal />
     <PlayerDetailModal />
     <ShipDetailModal />
 
@@ -172,7 +172,7 @@
           {#if page === "stats"}
             <StatsPage bind:this={statsPage} />
           {:else if page === "ap_config"}
-            <AlertPlayerPage />
+            <BlackListPage />
           {:else if page === "config"}
             <ConfigPage />
           {:else if page === "info"}

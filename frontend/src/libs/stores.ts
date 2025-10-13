@@ -4,7 +4,7 @@ import {
   UpdateRequiredSetting,
   UpdateStatsColumnSettings,
 } from "@wails/go/main/App";
-import type { data } from "@wails/go/models";
+import type { data, domain } from "@wails/go/models";
 import { type Writable, writable } from "svelte/store";
 import type { EditModalParam, Optional, TonakoParam } from "./types";
 
@@ -40,13 +40,13 @@ storedStatsColumnSettings.subscribe(async (value) => {
 export const storedBattle = writable(undefined) as Writable<
   Optional<data.Battle>
 >;
-export const storedAlertPlayers = writable([]) as Writable<data.AlertPlayer[]>;
+export const storedBlackList = writable([]) as Writable<domain.BlackListItem[]>;
 export const storedInstallPathError = writable("") as Writable<string>;
-export const storedEditAlertPlayer = writable(undefined) as Writable<
+export const storedEditBlackListItem = writable(undefined) as Writable<
   Optional<EditModalParam>
 >;
-export const storedDeleteAlertPlayer = writable(undefined) as Writable<
-  Optional<data.AlertPlayer>
+export const storedRemoveBlackListItem = writable(undefined) as Writable<
+  Optional<domain.BlackListItem>
 >;
 export const storedPlayerDetail = writable(undefined) as Writable<
   Optional<data.Player>

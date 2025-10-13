@@ -36,7 +36,7 @@ func TestBattlePublisher_CanSubcribe(t *testing.T) {
 	mockUserConfig := repository.NewMockUserConfigInterface(ctrl)
 
 	for _, v := range params {
-		mockUserConfig.EXPECT().Load().Return(domain.UserConfig{
+		mockUserConfig.EXPECT().Load().Return(&domain.UserConfig{
 			InstallPath: v.installPath,
 		}, nil)
 
@@ -64,7 +64,7 @@ func TestBattlePublisher_Subcribe(t *testing.T) {
 	mockLocalFile.EXPECT().TempArenaInfo("test").Return(testArena, nil).AnyTimes()
 
 	mockUserConfig := repository.NewMockUserConfigInterface(ctrl)
-	mockUserConfig.EXPECT().Load().Return(domain.UserConfig{InstallPath: "test"}, nil).AnyTimes()
+	mockUserConfig.EXPECT().Load().Return(&domain.UserConfig{InstallPath: "test"}, nil).AnyTimes()
 
 	// イベント発火履歴を記録するモック
 	var events []string

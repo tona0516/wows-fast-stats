@@ -1,9 +1,9 @@
-import type { data } from "@wails/go/models";
-import { DEFAULT_ALERT_PLAYER } from "./constants";
+import type { data, domain } from "@wails/go/models";
+import { DEFAULT_BLACK_LIST_ITEM } from "./constants";
 import {
-  storedEditAlertPlayer,
+  storedEditBlackListItem,
   storedPlayerDetail,
-  storedDeleteAlertPlayer as storedRemoveAlertPlayer,
+  storedRemoveBlackListItem,
   storedPlayerShipDetail as storedShipDetail,
 } from "./stores";
 
@@ -20,42 +20,43 @@ export class ModalManager {
   }
 
   openForCreate() {
-    storedEditAlertPlayer.set({
+    storedEditBlackListItem.set({
       mode: "create",
-      form: structuredClone(DEFAULT_ALERT_PLAYER),
+      form: structuredClone(DEFAULT_BLACK_LIST_ITEM),
     });
   }
 
   openForSpecify(accountID: number, name: string) {
-    const defaultValue = structuredClone(DEFAULT_ALERT_PLAYER);
-    storedEditAlertPlayer.set({
+    const defaultValue = structuredClone(DEFAULT_BLACK_LIST_ITEM);
+    storedEditBlackListItem.set({
       mode: "specify",
       form: {
         account_id: accountID,
         name: name,
         pattern: defaultValue.pattern,
         message: defaultValue.message,
-      } as data.AlertPlayer,
+        created_at: defaultValue.created_at,
+      } as domain.BlackListItem,
     });
   }
 
-  openForEdit(ap: data.AlertPlayer) {
-    storedEditAlertPlayer.set({
+  openForEdit(item: domain.BlackListItem) {
+    storedEditBlackListItem.set({
       mode: "edit",
-      form: ap,
+      form: item,
     });
   }
 
   closeForEdit() {
-    storedEditAlertPlayer.set(undefined);
+    storedEditBlackListItem.set(undefined);
   }
 
-  openForRemove(ap: data.AlertPlayer) {
-    storedRemoveAlertPlayer.set(ap);
+  openForRemove(item: domain.BlackListItem) {
+    storedRemoveBlackListItem.set(item);
   }
 
   closeForDelete() {
-    storedRemoveAlertPlayer.set(undefined);
+    storedRemoveBlackListItem.set(undefined);
   }
 
   openForPlayerDetail(player: data.Player) {

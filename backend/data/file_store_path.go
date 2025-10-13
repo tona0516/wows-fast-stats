@@ -1,12 +1,6 @@
 package data
 
-import "strconv"
-
 type FileStorePath string
-
-func (p FileStorePath) ToAlertPlayerFileName(accountID int) FileStorePath {
-	return FilePathAlertPlayer + FileStorePath(strconv.Itoa(accountID)) + ".json"
-}
 
 func (p FileStorePath) ToString() string {
 	return string(p)
@@ -21,6 +15,4 @@ const (
 	// cache.
 	FileNameExpectedStats FileStorePath = "expected_stats.json"
 	FileNameOwnIGN        FileStorePath = "own_ign.txt"
-
-	FilePathAlertPlayer FileStorePath = "alert_player/"
 )

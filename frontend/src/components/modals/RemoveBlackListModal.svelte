@@ -1,17 +1,17 @@
 <script lang="ts">
-  import { showToast, storedDeleteAlertPlayer } from "@libs/stores";
-  import { RemoveAlertPlayer } from "@wails/go/main/App";
+  import { showToast, storedRemoveBlackListItem } from "@libs/stores";
+  import { RemoveFromBlackList } from "@wails/go/main/App";
   import ModalCommon from "./ModalCommon.svelte";
   import { ModalManager } from "@libs/ModalManager";
 
   async function execute() {
-    if (!$storedDeleteAlertPlayer) {
+    if (!$storedRemoveBlackListItem) {
       ModalManager.instance.closeForDelete();
       return;
     }
 
     try {
-      await RemoveAlertPlayer($storedDeleteAlertPlayer.account_id);
+      await RemoveFromBlackList($storedRemoveBlackListItem.account_id);
       showToast("削除しました");
     } catch (error) {
       showToast("削除に失敗しました");
@@ -21,13 +21,13 @@
   }
 </script>
 
-{#if $storedDeleteAlertPlayer}
+{#if $storedRemoveBlackListItem}
   <ModalCommon zValue={51} close={ModalManager.instance.closeForDelete}>
     <h3 class="font-bold text-lg mb-4">本当に削除しますか？</h3>
     <div class="mb-4 text-center">
-      <span class="font-bold">{$storedDeleteAlertPlayer.name}</span>
+      <span class="font-bold">{$storedRemoveBlackListItem.name}</span>
       <span class="ml-2 text-xs text-gray-500"
-        >(ID: {$storedDeleteAlertPlayer.account_id})</span
+        >(ID: {$storedRemoveBlackListItem.account_id})</span
       >
     </div>
     <form class="modal-action">

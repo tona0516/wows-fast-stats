@@ -5,6 +5,7 @@ import (
 	"os"
 	"wfs/backend/apperr"
 	"wfs/backend/data"
+	"wfs/backend/domain"
 	"wfs/backend/service"
 
 	"github.com/mitchellh/go-ps"
@@ -177,50 +178,6 @@ func (a *App) Semver() string {
 	return a.config.App.Semver
 }
 
-func (a *App) AlertPlayers() ([]data.AlertPlayer, error) {
-	players, err := a.container.configService.AlertPlayers()
-	if err != nil {
-		a.container.logger.Error(err, nil)
-		return nil, apperr.Unwrap(err)
-	}
-
-	return players, nil
-}
-
-func (a *App) UpdateAlertPlayer(player data.AlertPlayer) error {
-	if err := a.container.configService.UpdateAlertPlayer(player); err != nil {
-		a.container.logger.Error(err, nil)
-		return apperr.Unwrap(err)
-	}
-
-	players, err := a.container.configService.AlertPlayers()
-	if err != nil {
-		a.container.logger.Error(err, nil)
-		return apperr.Unwrap(err)
-	}
-
-	runtime.EventsEmit(a.ctx, service.EventUpdateAlertPlayers, players)
-
-	return nil
-}
-
-func (a *App) RemoveAlertPlayer(accountID int) error {
-	if err := a.container.configService.RemoveAlertPlayer(accountID); err != nil {
-		a.container.logger.Error(err, nil)
-		return apperr.Unwrap(err)
-	}
-
-	players, err := a.container.configService.AlertPlayers()
-	if err != nil {
-		a.container.logger.Error(err, nil)
-		return apperr.Unwrap(err)
-	}
-
-	runtime.EventsEmit(a.ctx, service.EventUpdateAlertPlayers, players)
-
-	return nil
-}
-
 func (a *App) SearchPlayer(prefix string) ([]data.WGAccountListData, error) {
 	result, err := a.container.configService.SearchPlayer(prefix)
 
@@ -246,6 +203,18 @@ func (a *App) ShowMessageDialog(message string) {
 		Title:   a.config.App.Name,
 		Message: message,
 	})
+}
+
+func (a *App) GetBlackList() (domain.BlackList, error) {
+	return a.container.blackListService.Get()
+}
+
+func (a *App) UpdateBlackList(item domain.BlackListItem) error {
+	return a.container.blackListService.Update(item)
+}
+
+func (a *App) RemoveFromBlackList(accountID int) error {
+	return a.container.blackListService.Remove(accountID)
 }
 
 // 構造体のバインド用のメソッド.

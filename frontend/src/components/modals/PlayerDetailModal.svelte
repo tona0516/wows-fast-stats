@@ -1,6 +1,6 @@
 <script lang="ts">
   import {
-    storedAlertPlayers,
+    storedBlackList,
     storedPlayerDetail,
     showToast,
   } from "@libs/stores";
@@ -9,7 +9,7 @@
   import { ModalManager } from "@libs/ModalManager";
   import { NumbersURL } from "@libs/NumbersURL";
 
-  $: alertPlayer = $storedAlertPlayers.find(
+  $: blackListItem = $storedBlackList.find(
     (ap) => ap.account_id === $storedPlayerDetail?.player_info.id,
   );
 </script>
@@ -38,24 +38,24 @@
     </h2>
 
     <div class="grid xl:grid-cols-1 gap-4 mt-2">
-      {#if alertPlayer}
-        {#if alertPlayer.message !== ""}
+      {#if blackListItem}
+        {#if blackListItem.message !== ""}
           <p>
-            <i class="bi {alertPlayer.pattern}"></i>
-            {alertPlayer.message}
+            <i class="bi {blackListItem.pattern}"></i>
+            {blackListItem.message}
           </p>
         {/if}
 
         <button
           class="btn btn-primary"
-          on:click={() => ModalManager.instance.openForEdit(alertPlayer)}
+          on:click={() => ModalManager.instance.openForEdit(blackListItem)}
           >アラートプレイヤーの編集</button
         >
 
         <button
           class="btn btn-error"
           on:click={() => {
-            ModalManager.instance.openForRemove(alertPlayer);
+            ModalManager.instance.openForRemove(blackListItem);
           }}
         >
           アラートプレイヤーの削除

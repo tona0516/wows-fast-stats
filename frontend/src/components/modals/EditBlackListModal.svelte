@@ -1,16 +1,16 @@
 <script lang="ts">
   import {
     showToast,
-    storedAlertPlayers,
-    storedEditAlertPlayer,
+    storedBlackList,
+    storedEditBlackListItem,
   } from "@libs/stores";
-  import { SearchPlayer, UpdateAlertPlayer } from "@wails/go/main/App";
+  import { SearchPlayer, UpdateBlackList } from "@wails/go/main/App";
   import type { data } from "@wails/go/models";
   import ModalCommon from "./ModalCommon.svelte";
   import { ModalManager } from "@libs/ModalManager";
 
   const MAX_MESSAGE_LENGTH = 100;
-  const ALERT_PATTERNS = [
+  const BLACKLIST_PATTERNS = [
     "bi-check-circle-fill",
     "bi-exclamation-triangle-fill",
     "bi-patch-question-fill",
@@ -22,9 +22,9 @@
 
   let suggestedPlayers: data.WGAccountListData[] = [];
 
-  function includesAlertPlayers(accountID: number): boolean {
-    for (const alertPlayer of $storedAlertPlayers) {
-      if (alertPlayer.account_id === accountID) {
+  function includesBlackList(accountID: number): boolean {
+    for (const item of $storedBlackList) {
+      if (item.account_id === accountID) {
         return true;
       }
     }
@@ -41,7 +41,7 @@
     try {
       const result = await SearchPlayer(input);
       suggestedPlayers = result.filter(
-        (player) => !includesAlertPlayers(player.account_id),
+        (player) => !includesBlackList(player.account_id),
       );
     } catch (error) {
       suggestedPlayers = [];
@@ -49,23 +49,23 @@
   }
 
   function selectPlayer(player: data.WGAccountListData) {
-    if (!$storedEditAlertPlayer) {
+    if (!$storedEditBlackListItem) {
       return;
     }
 
-    $storedEditAlertPlayer.form.account_id = player.account_id;
-    $storedEditAlertPlayer.form.name = player.nickname;
+    $storedEditBlackListItem.form.account_id = player.account_id;
+    $storedEditBlackListItem.form.name = player.nickname;
     suggestedPlayers = [];
   }
 
   async function save() {
-    if (!$storedEditAlertPlayer) {
+    if (!$storedEditBlackListItem) {
       ModalManager.instance.closeForEdit();
       return;
     }
 
     try {
-      await UpdateAlertPlayer($storedEditAlertPlayer.form);
+      await UpdateBlackList($storedEditBlackListItem.form);
       showToast("保存しました");
     } catch (error) {
       showToast("保存に失敗しました");
@@ -75,15 +75,15 @@
   }
 </script>
 
-{#if $storedEditAlertPlayer}
+{#if $storedEditBlackListItem}
   <ModalCommon zValue={Z_VALUE} close={ModalManager.instance.closeForEdit}>
     <h3 class="font-bold text-lg mb-4">
-      アラートプレイヤー{$storedEditAlertPlayer.mode === "edit"
+      アラートプレイヤー{$storedEditBlackListItem.mode === "edit"
         ? "編集"
         : "追加"}
     </h3>
 
-    {#if $storedEditAlertPlayer.mode === "create"}
+    {#if $storedEditBlackListItem.mode === "create"}
       <fieldset class="fieldset">
         <legend class="fieldset-legend">プレイヤー名</legend>
         <div class="dropdown">
@@ -93,7 +93,7 @@
               id="player-search"
               class="grow"
               type="text"
-              bind:value={$storedEditAlertPlayer.form.name}
+              bind:value={$storedEditBlackListItem.form.name}
               on:input={searchPlayer}
               autocomplete="off"
             />
@@ -127,7 +127,7 @@
           id="player-name"
           class="input input-bordered"
           type="text"
-          value={$storedEditAlertPlayer.form.name}
+          value={$storedEditBlackListItem.form.name}
           readonly
         />
       </fieldset>
@@ -136,13 +136,13 @@
     <fieldset class="fieldset">
       <legend class="fieldset-legend">アイコン</legend>
       <div class="flex flex-wrap gap-4">
-        {#each ALERT_PATTERNS as pattern}
+        {#each BLACKLIST_PATTERNS as pattern}
           <label class="flex items-center gap-1">
             <input
               type="radio"
               class="radio"
               value={pattern}
-              bind:group={$storedEditAlertPlayer.form.pattern}
+              bind:group={$storedEditBlackListItem.form.pattern}
             />
             <i class="{`bi ${pattern}`} text-lg"></i>
           </label>
@@ -156,11 +156,11 @@
         id="message"
         class="input input-bordered"
         type="text"
-        bind:value={$storedEditAlertPlayer.form.message}
+        bind:value={$storedEditBlackListItem.form.message}
         maxlength={MAX_MESSAGE_LENGTH}
       />
       <div class="text-xs text-gray-500 mt-1">
-        {$storedEditAlertPlayer.form.message.length}/{MAX_MESSAGE_LENGTH}文字
+        {$storedEditBlackListItem.form.message.length}/{MAX_MESSAGE_LENGTH}文字
       </div>
     </fieldset>
 
@@ -168,7 +168,7 @@
       <button
         type="button"
         class="btn btn-primary"
-        disabled={$storedEditAlertPlayer.form.account_id === 0}
+        disabled={$storedEditBlackListItem.form.account_id === 0}
         on:click={save}>保存</button
       >
     </div>

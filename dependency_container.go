@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"path/filepath"
 	"time"
 	"wfs/backend/data"
 	"wfs/backend/infra"
@@ -16,11 +17,12 @@ type DependencyContainer struct {
 	config Config
 
 	// services
-	configService   *service.Setting
-	battlePublisher *service.BattlePublisher
-	battleService   *service.BattleFetcher
-	updaterService  *service.Updater
-	logger          repository.LoggerInterface
+	configService    *service.Setting
+	battlePublisher  *service.BattlePublisher
+	battleService    *service.BattleFetcher
+	updaterService   *service.Updater
+	blackListService *service.BlackList
+	logger           repository.LoggerInterface
 }
 
 func NewDependencyContainer(ctx context.Context, config Config) *DependencyContainer {
@@ -36,6 +38,11 @@ func NewDependencyContainer(ctx context.Context, config Config) *DependencyConta
 	)
 
 	fileStore := infra.NewFileStore(config.Local.StoragePath)
+	userConfigPath := filepath.Join(config.Local.StoragePath, "user_config.json")
+	blackListPath := filepath.Join(config.Local.StoragePath, "blacklist.json")
+	blackListRepo := infra.NewBlackList(blackListPath)
+
+	userConfig := infra.NewUserConfig(userConfigPath)
 	ownIGN, _ := fileStore.Get(data.FileNameOwnIGN)
 
 	logger := infra.NewLogger(
@@ -74,7 +81,7 @@ func NewDependencyContainer(ctx context.Context, config Config) *DependencyConta
 	)
 
 	// services
-	configService := service.NewSetting(localFile, wargaming, fileStore, logger)
+	configService := service.NewSetting(localFile, userConfig, wargaming, logger)
 	battleFetcher := service.NewBattleFetcher(
 		ctx,
 		wargaming,
@@ -88,18 +95,19 @@ func NewDependencyContainer(ctx context.Context, config Config) *DependencyConta
 		ctx,
 		time.Duration(config.Watcher.IntervalSec)*time.Second,
 		localFile,
-		fileStore,
+		userConfig,
 		logger,
 		runtime.EventsEmit,
 	)
 	updaterService := service.NewUpdater(config.App.Semver, github, logger)
 
 	return &DependencyContainer{
-		config:          config,
-		configService:   configService,
-		battlePublisher: battlePublisher,
-		battleService:   battleFetcher,
-		updaterService:  updaterService,
-		logger:          logger,
+		config:           config,
+		configService:    configService,
+		battlePublisher:  battlePublisher,
+		battleService:    battleFetcher,
+		updaterService:   updaterService,
+		blackListService: service.NewBlackList(ctx, blackListRepo, runtime.EventsEmit),
+		logger:           logger,
 	}
 }

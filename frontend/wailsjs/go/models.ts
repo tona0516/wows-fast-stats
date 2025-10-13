@@ -1,23 +1,17 @@
 export namespace data {
 	
-	export class AlertPlayer {
-	    account_id: number;
-	    name: string;
-	    pattern: string;
-	    message: string;
-	    created_at: number;
+	export class ShipColumnSetting {
+	    enable_nation_flag: boolean;
+	    is_colored: boolean;
 	
 	    static createFrom(source: any = {}) {
-	        return new AlertPlayer(source);
+	        return new ShipColumnSetting(source);
 	    }
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.account_id = source["account_id"];
-	        this.name = source["name"];
-	        this.pattern = source["pattern"];
-	        this.message = source["message"];
-	        this.created_at = source["created_at"];
+	        this.enable_nation_flag = source["enable_nation_flag"];
+	        this.is_colored = source["is_colored"];
 	    }
 	}
 	export class PlayerColumnSetting {
@@ -34,24 +28,10 @@ export namespace data {
 	        this.color_pattern = source["color_pattern"];
 	    }
 	}
-	export class ShipColumnSetting {
-	    enable_nation_flag: boolean;
-	    is_colored: boolean;
-	
-	    static createFrom(source: any = {}) {
-	        return new ShipColumnSetting(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.enable_nation_flag = source["enable_nation_flag"];
-	        this.is_colored = source["is_colored"];
-	    }
-	}
 	export class BasicColumnSetting {
 	    version: number;
-	    ship: ShipColumnSetting;
 	    player: PlayerColumnSetting;
+	    ship: ShipColumnSetting;
 	
 	    static createFrom(source: any = {}) {
 	        return new BasicColumnSetting(source);
@@ -60,8 +40,8 @@ export namespace data {
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.version = source["version"];
-	        this.ship = this.convertValues(source["ship"], ShipColumnSetting);
 	        this.player = this.convertValues(source["player"], PlayerColumnSetting);
+	        this.ship = this.convertValues(source["ship"], ShipColumnSetting);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -785,6 +765,31 @@ export namespace data {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.nickname = source["nickname"];
 	        this.account_id = source["account_id"];
+	    }
+	}
+
+}
+
+export namespace domain {
+	
+	export class BlackListItem {
+	    account_id: number;
+	    name: string;
+	    pattern: string;
+	    message: string;
+	    created_at: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new BlackListItem(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.account_id = source["account_id"];
+	        this.name = source["name"];
+	        this.pattern = source["pattern"];
+	        this.message = source["message"];
+	        this.created_at = source["created_at"];
 	    }
 	}
 

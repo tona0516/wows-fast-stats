@@ -1,6 +1,8 @@
-package data
+package domain
 
-type AlertPlayer struct {
+type BlackList []BlackListItem
+
+type BlackListItem struct {
 	AccountID int    `json:"account_id"`
 	Name      string `json:"name"`
 	Pattern   string `json:"pattern"`

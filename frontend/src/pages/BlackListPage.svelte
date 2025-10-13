@@ -1,6 +1,6 @@
 <script lang="ts">
   import { ModalManager } from "@libs/ModalManager";
-  import { storedAlertPlayers } from "@libs/stores";
+  import { storedBlackList } from "@libs/stores";
 </script>
 
 <div class="container mx-auto max-w-3xl py-3 flex flex-col gap-4">
@@ -24,7 +24,7 @@
           </tr>
         </thead>
         <tbody>
-          {#each $storedAlertPlayers as player, i}
+          {#each $storedBlackList as player, i}
             <tr class="hover:bg-base-100">
               <td class="text-center">{player.account_id}</td>
               <td class="text-center">{player.name}</td>
