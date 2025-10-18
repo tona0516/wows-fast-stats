@@ -17,7 +17,7 @@ type DependencyContainer struct {
 	config Config
 
 	// services
-	configService    *service.Setting
+	configService    *service.Config
 	battlePublisher  *service.BattlePublisher
 	battleService    *service.BattleFetcher
 	updaterService   *service.Updater
@@ -81,7 +81,7 @@ func NewDependencyContainer(ctx context.Context, config Config) *DependencyConta
 	)
 
 	// services
-	configService := service.NewSetting(localFile, userConfig, wargaming, logger)
+	configService := service.NewSetting(userConfig, wargaming, logger)
 	battleFetcher := service.NewBattleFetcher(
 		ctx,
 		wargaming,

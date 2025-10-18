@@ -23,7 +23,7 @@ func TestBattlePublisher_CanSubcribe(t *testing.T) {
 
 	params := []ExpectedCanSubcribe{
 		{
-			installPath: "test",
+			installPath: "/test",
 			expected:    true,
 		},
 		{
@@ -61,10 +61,10 @@ func TestBattlePublisher_Subcribe(t *testing.T) {
 	// モックの作成
 	testArena := data.TempArenaInfo{PlayerName: "testPlayer"}
 	mockLocalFile := repository.NewMockLocalFileInterface(ctrl)
-	mockLocalFile.EXPECT().TempArenaInfo("test").Return(testArena, nil).AnyTimes()
+	mockLocalFile.EXPECT().TempArenaInfo("/test").Return(testArena, nil).AnyTimes()
 
 	mockUserConfig := repository.NewMockUserConfigInterface(ctrl)
-	mockUserConfig.EXPECT().Load().Return(&domain.UserConfig{InstallPath: "test"}, nil).AnyTimes()
+	mockUserConfig.EXPECT().Load().Return(&domain.UserConfig{InstallPath: "/test"}, nil).AnyTimes()
 
 	// イベント発火履歴を記録するモック
 	var events []string

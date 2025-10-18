@@ -6,7 +6,6 @@ import (
 	"wfs/backend/apperr"
 	"wfs/backend/data"
 	"wfs/backend/domain"
-	"wfs/backend/service"
 
 	"github.com/mitchellh/go-ps"
 	"github.com/morikuni/failure"
@@ -44,115 +43,16 @@ func (a *App) SubscribeBattle() {
 	}
 }
 
-func (a *App) RequiredSetting() (data.RequiredSetting, error) {
-	setting, err := a.container.configService.RequiredSetting()
-	if err != nil {
-		a.container.logger.Error(err, nil)
-		return data.RequiredSetting{}, apperr.Unwrap(err)
-	}
-
-	return setting, nil
+func (a *App) GetUserConfig() (domain.UserConfig, error) {
+	return a.container.configService.GetUserConfig()
 }
 
-func (a *App) UpdateRequiredSetting(setting data.RequiredSetting) error {
-	if err := a.container.configService.UpdateRequiredSetting(setting); err != nil {
-		a.container.logger.Error(err, nil)
-		return apperr.Unwrap(err)
-	}
-
-	runtime.EventsEmit(a.ctx, service.EventUpdateConfig)
-
-	return nil
+func (a *App) SaveUserConfig(config domain.UserConfig) error {
+	return a.container.configService.SaveUserConfig(config)
 }
 
 func (a *App) TrySaveInstallPath() (bool, error) {
-	path, err := a.container.configService.SelectDirectory(a.ctx)
-	if err != nil {
-		return false, apperr.Unwrap(err)
-	}
-
-	if path == "" {
-		return false, nil
-	}
-
-	required, err := a.container.configService.RequiredSetting()
-	if err != nil {
-		return false, apperr.Unwrap(err)
-	}
-
-	required.InstallPath = path
-
-	err = a.container.configService.UpdateRequiredSetting(required)
-	if err != nil {
-		return false, apperr.Unwrap(err)
-	}
-
-	runtime.EventsEmit(a.ctx, service.EventUpdateConfig)
-
-	return true, nil
-}
-
-func (a *App) OptionalSetting() (data.OptionalSetting, error) {
-	setting, err := a.container.configService.OptionalSetting()
-	if err != nil {
-		a.container.logger.Error(err, nil)
-		return data.OptionalSetting{}, apperr.Unwrap(err)
-	}
-
-	return setting, nil
-}
-
-func (a *App) UpdateOptionalSetting(setting data.OptionalSetting) error {
-	if err := a.container.configService.UpdateOptionalSetting(setting); err != nil {
-		a.container.logger.Error(err, nil)
-		return apperr.Unwrap(err)
-	}
-
-	runtime.EventsEmit(a.ctx, service.EventUpdateConfig)
-
-	return nil
-}
-
-func (a *App) BasicColumnSetting() (data.BasicColumnSetting, error) {
-	setting, err := a.container.configService.BasicColumnSetting()
-	if err != nil {
-		a.container.logger.Error(err, nil)
-		return data.BasicColumnSetting{}, apperr.Unwrap(err)
-	}
-
-	return setting, nil
-}
-
-func (a *App) UpdateBasicColumnSetting(setting data.BasicColumnSetting) error {
-	if err := a.container.configService.UpdateBasicColumnSetting(setting); err != nil {
-		a.container.logger.Error(err, nil)
-		return apperr.Unwrap(err)
-	}
-
-	runtime.EventsEmit(a.ctx, service.EventUpdateConfig)
-
-	return nil
-}
-
-func (a *App) StatsColumnSettings() (data.StatsColumnSettings, error) {
-	setting, err := a.container.configService.StatsColumnSettings()
-	if err != nil {
-		a.container.logger.Error(err, nil)
-		return data.StatsColumnSettings{}, apperr.Unwrap(err)
-	}
-
-	return setting, nil
-}
-
-func (a *App) UpdateStatsColumnSettings(setting data.StatsColumnSettings) error {
-	if err := a.container.configService.UpdateStatsColumnSettings(setting); err != nil {
-		a.container.logger.Error(err, nil)
-		return apperr.Unwrap(err)
-	}
-
-	runtime.EventsEmit(a.ctx, service.EventUpdateConfig)
-
-	return nil
+	return a.container.configService.TrySaveInstallPath(a.ctx)
 }
 
 func (a *App) OpenDirectory(path string) error {

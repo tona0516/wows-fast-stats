@@ -3,10 +3,6 @@
   import { CATEGORY_NAMES } from "@libs/constants";
   import { getColumnText, getRowPattern } from "@libs/utils";
 
-  import {
-    storedOptionalSetting,
-    storedStatsColumnSettings,
-  } from "@libs/stores";
   import type { ColumnCategory, StatsExtra } from "@libs/types";
   import type { data } from "@wails/go/models";
   import ColspanTableData from "./tabledata/ColspanTableData.svelte";
@@ -29,6 +25,7 @@
   import { TierRateColumn } from "@libs/columns/TierRateColumn";
   import { WinRateColumn } from "@libs/columns/WinRateColumn";
   import { EfficiencyBadgeColumn } from "@libs/columns/EfficiencyBadgeColumn";
+  import { storedUserConfig } from "@libs/stores";
 
   export let teams: data.Team[];
 
@@ -92,9 +89,9 @@
     shipCategory.showCount() +
     overallCategory.showCount();
   const showThreatLevel =
-    $storedStatsColumnSettings.threat_level.is_show_overall;
+    $storedUserConfig.column.stats.threat_level.is_show_overall;
 
-  $: statsExtra = $storedOptionalSetting.stats_extra as StatsExtra;
+  $: statsExtra = $storedUserConfig.stats_extra as StatsExtra;
 </script>
 
 <div class="overflow-x-auto rounded-xl border border-base-300 bg-base-200">
@@ -160,7 +157,7 @@
           {#each team.players as player}
             {@const rowPattern = getRowPattern(
               player,
-              $storedOptionalSetting.stats_extra,
+              $storedUserConfig.stats_extra,
               shipCategory.showCount(),
               overallCategory.showCount(),
             )}

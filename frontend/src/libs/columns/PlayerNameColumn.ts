@@ -1,7 +1,7 @@
 import PlayerNameTableData from "@components/tabledata/PlayerNameTableData.svelte";
 import { ColorCode } from "@libs/ColorCode";
 import { RATING_COLORS, THREAT_LEVEL_COLORS } from "@libs/constants";
-import { storedBasicColumnSetting, storedOptionalSetting } from "@libs/stores";
+import { storedUserConfig } from "@libs/stores";
 import type { Optional, StatsExtra } from "@libs/types";
 import type { data } from "@wails/go/models";
 import { get } from "svelte/store";
@@ -17,8 +17,8 @@ export class PlayerNameColumn extends AbstractColumn {
   }
 
   override getTextColorCode(player: data.Player): Optional<ColorCode> {
-    const statsExtra = get(storedOptionalSetting).stats_extra as StatsExtra;
-    const colorPattern = get(storedBasicColumnSetting).player.color_pattern;
+    const statsExtra = get(storedUserConfig).stats_extra as StatsExtra;
+    const colorPattern = get(storedUserConfig).column.player.color_pattern;
 
     switch (colorPattern) {
       case "pr_ship": {
@@ -41,8 +41,8 @@ export class PlayerNameColumn extends AbstractColumn {
   }
 
   override getBgColorCode(player: data.Player): Optional<ColorCode> {
-    const statsExtra = get(storedOptionalSetting).stats_extra as StatsExtra;
-    const colorPattern = get(storedBasicColumnSetting).player.color_pattern;
+    const statsExtra = get(storedUserConfig).stats_extra as StatsExtra;
+    const colorPattern = get(storedUserConfig).column.player.color_pattern;
 
     switch (colorPattern) {
       case "pr_ship": {
@@ -76,7 +76,7 @@ export class PlayerNameColumn extends AbstractColumn {
   }
 
   getNationFlagClass(player: data.Player): string {
-    if (!get(storedBasicColumnSetting).player.enable_nation_flag) {
+    if (!get(storedUserConfig).column.player.enable_nation_flag) {
       return "";
     }
 

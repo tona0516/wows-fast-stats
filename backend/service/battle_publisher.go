@@ -48,7 +48,7 @@ func (bp *BattlePublisher) CanSubcribe() bool {
 		return false
 	}
 
-	if !filepath.IsLocal(config.InstallPath) {
+	if !filepath.IsAbs(config.InstallPath) {
 		return false
 	}
 

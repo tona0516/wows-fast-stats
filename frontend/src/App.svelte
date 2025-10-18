@@ -7,12 +7,9 @@
   import Toast from "@components/Toast.svelte";
   import {
     storedBlackList,
-    storedBasicColumnSetting,
     storedBattle,
     storedInstallPathError,
-    storedOptionalSetting,
-    storedRequiredSetting,
-    storedStatsColumnSettings,
+    storedUserConfig,
   } from "@libs/stores";
   import type { Page } from "@libs/types";
   import BlackListPage from "@pages/BlackListPage.svelte";
@@ -24,14 +21,11 @@
     SubscribeBattle,
     ShowMessageDialog,
     LogError,
-    OptionalSetting,
-    BasicColumnSetting,
-    StatsColumnSettings,
-    RequiredSetting,
     GetBlackList,
+    GetUserConfig,
   } from "@wails/go/main/App";
   import type { data, domain } from "@wails/go/models";
-  import { EventsOn } from "@wails/runtime/runtime";
+  import { EventsOn, LogInfo } from "@wails/runtime/runtime";
   import { onMount } from "svelte";
   import { themeChange } from "theme-change";
   import { TonakoManager } from "@libs/TonakoManager";
@@ -49,25 +43,32 @@
     themeChange(false);
   });
 
-  EventsOn("BLACKLIST_UPDATE", (list: domain.BlackListItem[]) =>
-    storedBlackList.set(list),
-  );
+  EventsOn("BLACKLIST_UPDATE", (list: domain.BlackListItem[]) => {
+    LogInfo("BLACKLIST_UPDATE");
+    storedBlackList.set(list);
+  });
   EventsOn("BATTLE_START", () => {
+    LogInfo("BATTLE_START");
     TonakoManager.instance.setStartBattleState();
   });
   EventsOn("BATTLE_END", () => {
+    LogInfo("BATTLE_END");
     TonakoManager.instance.setEndBattleState();
   });
   EventsOn("BATTLE_ERR", (message: string) => {
+    LogInfo("BATTLE_ERR");
     TonakoManager.instance.setBattleErrorState(message);
   });
   EventsOn("BATTLE_FETCH_OTHERS", () => {
+    LogInfo("BATTLE_FETCH_OTHERS");
     TonakoManager.instance.setFetchOtherDataState();
   });
   EventsOn("BATTLE_FETCH_PLAYERS", () => {
+    LogInfo("BATTLE_FETCH_PLAYERS");
     TonakoManager.instance.setFetchPlayerDataState();
   });
   EventsOn("BATTLE_FETCH_DONE", (battle: data.Battle) => {
+    LogInfo("BATTLE_FETCH_DONE");
     TonakoManager.instance.setHidden();
     storedBattle.set(battle);
   });
@@ -95,16 +96,12 @@
 
   const initialize = async (): Promise<void> => {
     try {
-      const requiredSetting = await RequiredSetting();
-      storedRequiredSetting.set(requiredSetting);
-
-      storedOptionalSetting.set(await OptionalSetting());
-      storedBasicColumnSetting.set(await BasicColumnSetting());
-      storedStatsColumnSettings.set(await StatsColumnSettings());
+      const userConfig = await GetUserConfig();
+      storedUserConfig.set(userConfig);
       storedBlackList.set(await GetBlackList());
 
       const installPathError = await ValidateInstallPath(
-        requiredSetting.install_path,
+        userConfig.install_path,
       );
       if (installPathError) {
         storedInstallPathError.set(installPathError);
@@ -113,6 +110,7 @@
       initialized = true;
 
       if (!$storedInstallPathError) {
+        LogInfo("call SubscribeBattle")
         SubscribeBattle();
       }
     } catch (error) {
