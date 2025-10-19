@@ -18,7 +18,7 @@ import (
 const GameExeName = "WorldOfWarships.exe"
 
 type Config struct {
-	userConfig          repository.UserConfigInterface
+	persistence         repository.PersistenceInterface
 	wargaming           repository.WargamingInterface
 	logger              repository.LoggerInterface
 	OpenDirectoryDialog openDirectoryDialogFunc
@@ -26,12 +26,12 @@ type Config struct {
 }
 
 func NewSetting(
-	userConfig repository.UserConfigInterface,
+	persistence repository.PersistenceInterface,
 	wargaming repository.WargamingInterface,
 	logger repository.LoggerInterface,
 ) *Config {
 	return &Config{
-		userConfig:          userConfig,
+		persistence:         persistence,
 		wargaming:           wargaming,
 		logger:              logger,
 		OpenDirectoryDialog: runtime.OpenDirectoryDialog,
@@ -91,7 +91,7 @@ func (c *Config) OpenDirectory(path string) error {
 }
 
 func (c *Config) GetUserConfig() (domain.UserConfig, error) {
-	cfg, err := c.userConfig.Load()
+	cfg, err := c.persistence.LoadUserConfig()
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
 			return defaultUserConfig(), nil
@@ -100,15 +100,11 @@ func (c *Config) GetUserConfig() (domain.UserConfig, error) {
 		return domain.UserConfig{}, failure.Wrap(err)
 	}
 
-	if cfg == nil {
-		return defaultUserConfig(), nil
-	}
-
-	return *cfg, nil
+	return cfg, nil
 }
 
 func (c *Config) SaveUserConfig(cfg domain.UserConfig) error {
-	if err := c.userConfig.Save(cfg); err != nil {
+	if err := c.persistence.SaveUserConfig(cfg); err != nil {
 		return failure.Wrap(err)
 	}
 

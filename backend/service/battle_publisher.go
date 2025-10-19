@@ -17,7 +17,7 @@ type BattlePublisher struct {
 	ctx            context.Context
 	interval       time.Duration
 	localFile      repository.LocalFileInterface
-	userConfig     repository.UserConfigInterface
+	persistence    repository.PersistenceInterface
 	logger         repository.LoggerInterface
 	eventsEmitFunc eventEmitFunc
 
@@ -28,7 +28,7 @@ func NewBattlePublisher(
 	ctx context.Context,
 	interval time.Duration,
 	localFile repository.LocalFileInterface,
-	userConfig repository.UserConfigInterface,
+	persistence repository.PersistenceInterface,
 	logger repository.LoggerInterface,
 	eventsEmitFunc eventEmitFunc,
 ) *BattlePublisher {
@@ -36,14 +36,14 @@ func NewBattlePublisher(
 		ctx:            ctx,
 		interval:       interval,
 		localFile:      localFile,
-		userConfig:     userConfig,
+		persistence:    persistence,
 		logger:         logger,
 		eventsEmitFunc: eventsEmitFunc,
 	}
 }
 
 func (bp *BattlePublisher) CanSubcribe() bool {
-	config, err := bp.userConfig.Load()
+	config, err := bp.persistence.LoadUserConfig()
 	if err != nil {
 		return false
 	}

@@ -5,7 +5,6 @@ import (
 	"errors"
 	"testing"
 	"wfs/backend/data"
-	"wfs/backend/infra"
 	"wfs/backend/mock/repository"
 
 	"github.com/stretchr/testify/assert"
@@ -58,6 +57,10 @@ func TestBattle_Get_正常系_初回(t *testing.T) {
 	mockNumbers := repository.NewMockNumbersInterface(ctrl)
 	mockNumbers.EXPECT().ExpectedStats().Return(data.ExpectedStats{}, nil)
 
+	mockPersistence := repository.NewMockPersistenceInterface(ctrl)
+	mockPersistence.EXPECT().SaveOwnIGN(gomock.Any()).Return(nil)
+	mockPersistence.EXPECT().SaveExpectedStats(gomock.Any()).Return(nil)
+
 	mockLogger := repository.NewMockLoggerInterface(ctrl)
 	mockLogger.EXPECT().SetOwnIGN(gomock.Any()).Return()
 
@@ -73,7 +76,7 @@ func TestBattle_Get_正常系_初回(t *testing.T) {
 		mockWargaming,
 		mockUnofficialWargaming,
 		mockNumbers,
-		infra.NewFileStore(t.TempDir()),
+		mockPersistence,
 		mockLogger,
 		emitFunc,
 	)
@@ -123,6 +126,9 @@ func TestBattle_Get_正常系_2回目以降(t *testing.T) {
 
 	mockNumbers := repository.NewMockNumbersInterface(ctrl)
 
+	mockPersistence := repository.NewMockPersistenceInterface(ctrl)
+	mockPersistence.EXPECT().SaveOwnIGN(gomock.Any()).Return(nil)
+
 	mockLogger := repository.NewMockLoggerInterface(ctrl)
 	mockLogger.EXPECT().SetOwnIGN(gomock.Any()).Return()
 
@@ -138,7 +144,7 @@ func TestBattle_Get_正常系_2回目以降(t *testing.T) {
 		mockWargaming,
 		mockUnofficialWargaming,
 		mockNumbers,
-		infra.NewFileStore(t.TempDir()),
+		mockPersistence,
 		mockLogger,
 		emitFunc,
 	)
@@ -168,6 +174,9 @@ func TestBattle_Get_異常系_アカウントリスト取得失敗(t *testing.T)
 
 	mockNumbers := repository.NewMockNumbersInterface(ctrl)
 
+	mockPersistence := repository.NewMockPersistenceInterface(ctrl)
+	mockPersistence.EXPECT().SaveOwnIGN(gomock.Any()).Return(nil)
+
 	mockLogger := repository.NewMockLoggerInterface(ctrl)
 	mockLogger.EXPECT().SetOwnIGN(gomock.Any()).Return()
 
@@ -183,7 +192,7 @@ func TestBattle_Get_異常系_アカウントリスト取得失敗(t *testing.T)
 		mockWargaming,
 		mockUnofficialWargaming,
 		mockNumbers,
-		infra.NewFileStore(t.TempDir()),
+		mockPersistence,
 		mockLogger,
 		emitFunc,
 	)

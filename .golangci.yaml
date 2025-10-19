@@ -29,6 +29,7 @@ linters:
     - contextcheck
     - embeddedstructfieldcheck
     - noinlineerr
+    - godoclint
   exclusions:
     paths:
       - _test\.go
@@ -38,3 +39,4 @@ linters:
         - G301
         - G302
         - G304
+        - G306

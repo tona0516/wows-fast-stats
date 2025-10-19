@@ -2,9 +2,7 @@ package main
 
 import (
 	"context"
-	"path/filepath"
 	"time"
-	"wfs/backend/data"
 	"wfs/backend/infra"
 	"wfs/backend/repository"
 	"wfs/backend/service"
@@ -37,14 +35,9 @@ func NewDependencyContainer(ctx context.Context, config Config) *DependencyConta
 		config.Discord.TimeoutSec,
 	)
 
-	fileStore := infra.NewFileStore(config.Local.StoragePath)
-	userConfigPath := filepath.Join(config.Local.StoragePath, "user_config.json")
-	blackListPath := filepath.Join(config.Local.StoragePath, "blacklist.json")
-	blackListRepo := infra.NewBlackList(blackListPath)
+	persistence := infra.NewPersistence(config.Local.StoragePath)
 
-	userConfig := infra.NewUserConfig(userConfigPath)
-	ownIGN, _ := fileStore.Get(data.FileNameOwnIGN)
-
+	ownIGN, _ := persistence.LoadOwnIGN()
 	logger := infra.NewLogger(
 		config.App.Name,
 		config.App.Semver,
@@ -81,13 +74,13 @@ func NewDependencyContainer(ctx context.Context, config Config) *DependencyConta
 	)
 
 	// services
-	configService := service.NewSetting(userConfig, wargaming, logger)
+	configService := service.NewSetting(persistence, wargaming, logger)
 	battleFetcher := service.NewBattleFetcher(
 		ctx,
 		wargaming,
 		uwargaming,
 		numbers,
-		fileStore,
+		persistence,
 		logger,
 		runtime.EventsEmit,
 	)
@@ -95,7 +88,7 @@ func NewDependencyContainer(ctx context.Context, config Config) *DependencyConta
 		ctx,
 		time.Duration(config.Watcher.IntervalSec)*time.Second,
 		localFile,
-		userConfig,
+		persistence,
 		logger,
 		runtime.EventsEmit,
 	)
@@ -107,7 +100,7 @@ func NewDependencyContainer(ctx context.Context, config Config) *DependencyConta
 		battlePublisher:  battlePublisher,
 		battleService:    battleFetcher,
 		updaterService:   updaterService,
-		blackListService: service.NewBlackList(ctx, blackListRepo, runtime.EventsEmit),
+		blackListService: service.NewBlackList(ctx, persistence, runtime.EventsEmit),
 		logger:           logger,
 	}
 }

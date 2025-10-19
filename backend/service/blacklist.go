@@ -12,24 +12,24 @@ import (
 
 type BlackList struct {
 	ctx          context.Context
-	repo         repository.BlackListInterface
+	persistence  repository.PersistenceInterface
 	notifyUpdate eventEmitFunc
 }
 
 func NewBlackList(
 	ctx context.Context,
-	repo repository.BlackListInterface,
+	persistence repository.PersistenceInterface,
 	notifyUpdate eventEmitFunc,
 ) *BlackList {
 	return &BlackList{
 		ctx:          ctx,
-		repo:         repo,
+		persistence:  persistence,
 		notifyUpdate: notifyUpdate,
 	}
 }
 
 func (b *BlackList) Get() (domain.BlackList, error) {
-	list, err := b.repo.Load()
+	list, err := b.persistence.LoadBlackList()
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
 			return domain.BlackList{}, nil
@@ -42,7 +42,7 @@ func (b *BlackList) Get() (domain.BlackList, error) {
 		return domain.BlackList{}, nil
 	}
 
-	return *list, nil
+	return list, nil
 }
 
 func (b *BlackList) Update(item domain.BlackListItem) error {
@@ -64,7 +64,7 @@ func (b *BlackList) Update(item domain.BlackListItem) error {
 		list = append(list, item)
 	}
 
-	if err := b.repo.Save(list); err != nil {
+	if err := b.persistence.SaveBlackList(list); err != nil {
 		return failure.Wrap(err)
 	}
 
@@ -86,5 +86,5 @@ func (b *BlackList) Remove(accountID int) error {
 		}
 	}
 
-	return failure.Wrap(b.repo.Save(filtered))
+	return failure.Wrap(b.persistence.SaveBlackList(filtered))
 }
