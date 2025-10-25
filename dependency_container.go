@@ -18,7 +18,7 @@ type DependencyContainer struct {
 	configService    *service.Config
 	battlePublisher  *service.BattlePublisher
 	battleService    *service.BattleFetcher
-	updaterService   *service.Updater
+	updaterService   *service.UpdateChecker
 	blackListService *service.BlackList
 	logger           repository.LoggerInterface
 }
@@ -92,7 +92,7 @@ func NewDependencyContainer(ctx context.Context, config Config) *DependencyConta
 		logger,
 		runtime.EventsEmit,
 	)
-	updaterService := service.NewUpdater(config.App.Semver, github, logger)
+	updaterService := service.NewUpdateChecker(config.App.Semver, github)
 
 	return &DependencyContainer{
 		config:           config,

@@ -9,11 +9,11 @@ export function GetBlackList():Promise<domain.BlackList>;
 
 export function GetUserConfig():Promise<domain.UserConfig>;
 
-export function LatestRelease():Promise<data.GHLatestRelease>;
-
 export function LogError(arg1:string,arg2:Record<string, string>):Promise<void>;
 
 export function LogInfo(arg1:string,arg2:Record<string, string>):Promise<void>;
+
+export function NewVersion():Promise<domain.NewVersion>;
 
 export function OpenDirectory(arg1:string):Promise<void>;
 

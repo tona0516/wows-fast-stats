@@ -93,9 +93,8 @@ func (a *App) LogInfo(message string, contexts map[string]string) {
 	a.container.logger.Info(message, contexts)
 }
 
-func (a *App) LatestRelease() (data.GHLatestRelease, error) {
-	latestRelease, err := a.container.updaterService.IsUpdatable()
-	return latestRelease, apperr.Unwrap(err)
+func (a *App) NewVersion() *domain.NewVersion {
+	return a.container.updaterService.Invoke()
 }
 
 func (a *App) ShowMessageDialog(message string) {

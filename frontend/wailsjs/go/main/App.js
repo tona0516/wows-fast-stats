@@ -14,16 +14,16 @@ export function GetUserConfig() {
   return window['go']['main']['App']['GetUserConfig']();
 }
 
-export function LatestRelease() {
-  return window['go']['main']['App']['LatestRelease']();
-}
-
 export function LogError(arg1, arg2) {
   return window['go']['main']['App']['LogError'](arg1, arg2);
 }
 
 export function LogInfo(arg1, arg2) {
   return window['go']['main']['App']['LogInfo'](arg1, arg2);
+}
+
+export function NewVersion() {
+  return window['go']['main']['App']['NewVersion']();
 }
 
 export function OpenDirectory(arg1) {

@@ -545,22 +545,6 @@ export namespace data {
 	
 	
 	
-	export class GHLatestRelease {
-	    tag_name: string;
-	    html_url: string;
-	    updatable: boolean;
-	
-	    static createFrom(source: any = {}) {
-	        return new GHLatestRelease(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.tag_name = source["tag_name"];
-	        this.html_url = source["html_url"];
-	        this.updatable = source["updatable"];
-	    }
-	}
 	
 	
 	
@@ -757,6 +741,20 @@ export namespace domain {
 		}
 	}
 	
+	export class NewVersion {
+	    semver: string;
+	    url: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new NewVersion(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.semver = source["semver"];
+	        this.url = source["url"];
+	    }
+	}
 	
 	
 	
