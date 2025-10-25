@@ -1,6 +1,7 @@
 <script lang="ts">
   import ExternalLink from "@components/ExternalLink.svelte";
-  import { Semver } from "@wails/go/main/App";
+  import { Semver, NewVersion, ShowMessageDialog } from "@wails/go/main/App";
+  import type { domain } from "@wails/go/models";
   import iconApp from "src/assets/images/appicon.png";
 
   const LINKS = [
@@ -20,12 +21,51 @@
       text: "tona0516/wows-fast-stats",
     },
   ];
+
+  let checkingUpdate = false;
+
+  const onClickCheckUpdate = async () => {
+    if (checkingUpdate) return;
+
+    checkingUpdate = true;
+
+    try {
+      const newVersion = (await NewVersion()) as domain.NewVersion | null;
+
+      if (newVersion?.semver && newVersion.url) {
+        await ShowMessageDialog(
+          `新しいバージョン ${newVersion.semver} が利用可能です。\n${newVersion.url}`,
+        );
+        return;
+      }
+
+      await ShowMessageDialog("現在利用中のバージョンが最新です。");
+    } catch (error) {
+      await ShowMessageDialog(`アップデートの確認に失敗しました: ${error}`);
+    } finally {
+      checkingUpdate = false;
+    }
+  };
 </script>
 
 <div class="p-4 flex flex-col items-center">
   <img src={iconApp} alt="" width="128px" height="128px" />
   <div class="pt-1">
     wows-fast-stats {#await Semver() then semver} {semver} {/await}
+  </div>
+  <div class="pt-3">
+    <button
+      class="btn btn-primary"
+      on:click={onClickCheckUpdate}
+      disabled={checkingUpdate}
+    >
+      {#if checkingUpdate}
+        <span class="loading loading-spinner loading-xs"></span>
+        <span class="ml-2">確認中...</span>
+      {:else}
+        アップデートを確認
+      {/if}
+    </button>
   </div>
   <div class="pt-2">
     {#each LINKS as link}

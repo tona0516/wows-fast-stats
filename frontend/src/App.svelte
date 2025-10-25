@@ -35,7 +35,6 @@
 
   let statsPage: StatsPage | undefined;
   let initialized = false;
-  let updatableRelease: data.GHLatestRelease;
 
   let page: Page = "stats";
 
@@ -118,22 +117,6 @@
     }
   };
 
-  // const notifyUpdate = async (config: data.UserConfigV2) => {
-  //   return;
-
-  //   if (!config.notify_updatable) return;
-
-  //   try {
-  //     const latestRelease = await LatestRelease();
-  //     if (latestRelease.updatable) {
-  //       updatableRelease = latestRelease;
-  //     }
-  //   } catch (error) {
-  //     Notifier.failure(error);
-  //     return;
-  //   }
-  // };
-
   const main = async () => {
     await initialize();
     // await notifyUpdate(config);
@@ -157,15 +140,6 @@
       </div>
 
       <div class="flex-1 min-w-[1px] m-4">
-        {#if updatableRelease}
-          <div>
-            新しいバージョンがあります:
-            <ExternalLink url={updatableRelease.html_url}>
-              {updatableRelease.tag_name}
-            </ExternalLink>
-          </div>
-        {/if}
-
         {#if initialized}
           {#if page === "stats"}
             <StatsPage bind:this={statsPage} />
