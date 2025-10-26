@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"wfs/backend/data"
-	"wfs/backend/domain"
 	"wfs/backend/mock/repository"
 
 	"github.com/stretchr/testify/assert"
@@ -36,7 +35,7 @@ func TestBattlePublisher_CanSubcribe(t *testing.T) {
 
 	for _, v := range params {
 		mockPersistence := repository.NewMockPersistenceInterface(ctrl)
-		mockPersistence.EXPECT().LoadUserConfig().Return(domain.UserConfig{InstallPath: v.installPath}, nil).AnyTimes()
+		mockPersistence.EXPECT().LoadUserConfig().Return(data.UserConfig{InstallPath: v.installPath}, nil).AnyTimes()
 
 		bp := NewBattlePublisher(
 			context.Background(),
@@ -62,7 +61,7 @@ func TestBattlePublisher_Subcribe(t *testing.T) {
 	mockLocalFile.EXPECT().TempArenaInfo("/test").Return(testArena, nil).AnyTimes()
 
 	mockPersistence := repository.NewMockPersistenceInterface(ctrl)
-	mockPersistence.EXPECT().LoadUserConfig().Return(domain.UserConfig{InstallPath: "/test"}, nil).AnyTimes()
+	mockPersistence.EXPECT().LoadUserConfig().Return(data.UserConfig{InstallPath: "/test"}, nil).AnyTimes()
 
 	// イベント発火履歴を記録するモック
 	var events []string

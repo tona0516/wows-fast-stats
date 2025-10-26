@@ -1,7 +1,7 @@
 <script lang="ts">
   import ExternalLink from "@components/ExternalLink.svelte";
   import { Semver, NewVersion, ShowMessageDialog } from "@wails/go/main/App";
-  import type { domain } from "@wails/go/models";
+  import type { data } from "@wails/go/models";
   import iconApp from "src/assets/images/appicon.png";
 
   const LINKS = [
@@ -30,7 +30,7 @@
     checkingUpdate = true;
 
     try {
-      const newVersion = (await NewVersion()) as domain.NewVersion | null;
+      const newVersion = (await NewVersion()) as data.NewVersion | null;
 
       if (newVersion?.semver && newVersion.url) {
         await ShowMessageDialog(

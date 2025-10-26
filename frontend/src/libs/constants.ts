@@ -1,4 +1,4 @@
-import type { domain } from "@wails/go/models";
+import type { data } from "@wails/go/models";
 import { ColorCode } from "./ColorCode";
 import type {
   ColumnCategory,
@@ -120,7 +120,7 @@ export const DEFAULT_BLACK_LIST_ITEM = {
   pattern: "bi-check-circle-fill",
   message: "",
   created_at: 0,
-} as domain.BlackListItem;
+} as data.BlackListItem;
 
 export const RATING_COLORS: { [key: string]: ColorCode } = {
   bad: new ColorCode("#FE0E00"),

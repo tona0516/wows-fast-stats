@@ -8,7 +8,6 @@ import (
 	"path/filepath"
 	"wfs/backend/apperr"
 	"wfs/backend/data"
-	"wfs/backend/domain"
 	"wfs/backend/repository"
 
 	"github.com/morikuni/failure"
@@ -90,20 +89,20 @@ func (c *Config) OpenDirectory(path string) error {
 	return nil
 }
 
-func (c *Config) GetUserConfig() (domain.UserConfig, error) {
+func (c *Config) GetUserConfig() (data.UserConfig, error) {
 	cfg, err := c.persistence.LoadUserConfig()
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
 			return defaultUserConfig(), nil
 		}
 
-		return domain.UserConfig{}, failure.Wrap(err)
+		return data.UserConfig{}, failure.Wrap(err)
 	}
 
 	return cfg, nil
 }
 
-func (c *Config) SaveUserConfig(cfg domain.UserConfig) error {
+func (c *Config) SaveUserConfig(cfg data.UserConfig) error {
 	if err := c.persistence.SaveUserConfig(cfg); err != nil {
 		return failure.Wrap(err)
 	}
@@ -111,104 +110,104 @@ func (c *Config) SaveUserConfig(cfg domain.UserConfig) error {
 	return nil
 }
 
-func defaultUserConfig() domain.UserConfig {
-	return domain.UserConfig{
+func defaultUserConfig() data.UserConfig {
+	return data.UserConfig{
 		Version:      1,
 		InstallPath:  "",
 		ZoomRate:     100,
 		StatsExtra:   "pvp_all",
 		IsSendReport: true,
-		Column: domain.ColumnConfig{
-			Player: domain.PlayerColumnConfig{
+		Column: data.ColumnConfig{
+			Player: data.PlayerColumnConfig{
 				EnableNationFlag: false,
 				ColorPattern:     "none",
 			},
-			Ship: domain.ShipColumnConfig{
+			Ship: data.ShipColumnConfig{
 				EnableNationFlag: true,
 				IsColored:        false,
 			},
-			Stats: domain.StatsColumnConfig{
-				Battles: domain.DetailStatsColumnConfig{
+			Stats: data.StatsColumnConfig{
+				Battles: data.DetailStatsColumnConfig{
 					IsShowShip:    true,
 					IsShowOverall: true,
 					Digit:         0,
 				},
-				Damage: domain.DetailStatsColumnConfig{
+				Damage: data.DetailStatsColumnConfig{
 					IsShowShip:    true,
 					IsShowOverall: true,
 					Digit:         0,
 				},
-				MaxDamage: domain.DetailStatsColumnConfig{
+				MaxDamage: data.DetailStatsColumnConfig{
 					IsShowShip:    true,
 					IsShowOverall: true,
 					Digit:         0,
 				},
-				WinRate: domain.DetailStatsColumnConfig{
+				WinRate: data.DetailStatsColumnConfig{
 					IsShowShip:    true,
 					IsShowOverall: true,
 					Digit:         1,
 				},
-				SurvivedRate: domain.DetailStatsColumnConfig{
+				SurvivedRate: data.DetailStatsColumnConfig{
 					IsShowShip:    false,
 					IsShowOverall: false,
 					Digit:         1,
 				},
-				KdRate: domain.DetailStatsColumnConfig{
+				KdRate: data.DetailStatsColumnConfig{
 					IsShowShip:    false,
 					IsShowOverall: false,
 					Digit:         2,
 				},
-				Kill: domain.DetailStatsColumnConfig{
+				Kill: data.DetailStatsColumnConfig{
 					IsShowShip:    true,
 					IsShowOverall: true,
 					Digit:         2,
 				},
-				Exp: domain.DetailStatsColumnConfig{
+				Exp: data.DetailStatsColumnConfig{
 					IsShowShip:    true,
 					IsShowOverall: true,
 					Digit:         0,
 				},
-				PR: domain.DetailStatsColumnConfig{
+				PR: data.DetailStatsColumnConfig{
 					IsShowShip:    false,
 					IsShowOverall: false,
 					Digit:         0,
 				},
-				HitRate: domain.DetailStatsColumnConfig{
+				HitRate: data.DetailStatsColumnConfig{
 					IsShowShip:    false,
 					IsShowOverall: false,
 					Digit:         1,
 				},
-				PlanesKilled: domain.DetailStatsColumnConfig{
+				PlanesKilled: data.DetailStatsColumnConfig{
 					IsShowShip:    false,
 					IsShowOverall: false,
 					Digit:         0,
 				},
-				PlatoonRate: domain.DetailStatsColumnConfig{
+				PlatoonRate: data.DetailStatsColumnConfig{
 					IsShowShip:    false,
 					IsShowOverall: false,
 					Digit:         1,
 				},
-				EfficiencyBadge: domain.DetailStatsColumnConfig{
+				EfficiencyBadge: data.DetailStatsColumnConfig{
 					IsShowShip:    false,
 					IsShowOverall: false,
 					Digit:         0,
 				},
-				ThreatLevel: domain.DetailStatsColumnConfig{
+				ThreatLevel: data.DetailStatsColumnConfig{
 					IsShowShip:    false,
 					IsShowOverall: false,
 					Digit:         1,
 				},
-				AvgTier: domain.DetailStatsColumnConfig{
+				AvgTier: data.DetailStatsColumnConfig{
 					IsShowShip:    false,
 					IsShowOverall: false,
 					Digit:         1,
 				},
-				UsingShipTypeRate: domain.DetailStatsColumnConfig{
+				UsingShipTypeRate: data.DetailStatsColumnConfig{
 					IsShowShip:    false,
 					IsShowOverall: false,
 					Digit:         1,
 				},
-				UsingTierRate: domain.DetailStatsColumnConfig{
+				UsingTierRate: data.DetailStatsColumnConfig{
 					IsShowShip:    false,
 					IsShowOverall: false,
 					Digit:         1,

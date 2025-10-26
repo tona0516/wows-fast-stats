@@ -1,4 +1,4 @@
-import type { data, domain } from "@wails/go/models";
+import type { data } from "@wails/go/models";
 import { DEFAULT_BLACK_LIST_ITEM } from "./constants";
 import {
   storedEditBlackListItem,
@@ -36,11 +36,11 @@ export class ModalManager {
         pattern: defaultValue.pattern,
         message: defaultValue.message,
         created_at: defaultValue.created_at,
-      } as domain.BlackListItem,
+      } as data.BlackListItem,
     });
   }
 
-  openForEdit(item: domain.BlackListItem) {
+  openForEdit(item: data.BlackListItem) {
     storedEditBlackListItem.set({
       mode: "edit",
       form: item,
@@ -51,7 +51,7 @@ export class ModalManager {
     storedEditBlackListItem.set(undefined);
   }
 
-  openForRemove(item: domain.BlackListItem) {
+  openForRemove(item: data.BlackListItem) {
     storedRemoveBlackListItem.set(item);
   }
 

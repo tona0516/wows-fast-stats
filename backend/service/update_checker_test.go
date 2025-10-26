@@ -4,7 +4,6 @@ import (
 	"testing"
 	"wfs/backend/apperr"
 	"wfs/backend/data"
-	"wfs/backend/domain"
 	"wfs/backend/mock/repository"
 
 	"github.com/morikuni/failure"
@@ -30,7 +29,7 @@ func TestUpdateChecker_Invoke(t *testing.T) {
 		actual := uc.Invoke()
 
 		// アサーション
-		assert.Equal(t, domain.NewVersion{
+		assert.Equal(t, data.NewVersion{
 			Semver: "2.0.0",
 			URL:    "https://hoge.com",
 		}, *actual)

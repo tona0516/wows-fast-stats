@@ -2,7 +2,6 @@ package repository
 
 import (
 	"wfs/backend/data"
-	"wfs/backend/domain"
 )
 
 //go:generate mockgen -source=$GOFILE -destination ../mock/$GOPACKAGE/$GOFILE -package $GOPACKAGE
@@ -14,9 +13,9 @@ type PersistenceInterface interface {
 	LoadExpectedStats() (data.ExpectedStats, error)
 	SaveExpectedStats(data data.ExpectedStats) error
 	// User Config.
-	LoadUserConfig() (domain.UserConfig, error)
-	SaveUserConfig(data domain.UserConfig) error
+	LoadUserConfig() (data.UserConfig, error)
+	SaveUserConfig(data data.UserConfig) error
 	// Blacklist.
-	LoadBlackList() (domain.BlackList, error)
-	SaveBlackList(data domain.BlackList) error
+	LoadBlackList() (data.BlackList, error)
+	SaveBlackList(data data.BlackList) error
 }

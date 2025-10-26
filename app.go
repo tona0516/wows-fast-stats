@@ -5,7 +5,6 @@ import (
 	"os"
 	"wfs/backend/apperr"
 	"wfs/backend/data"
-	"wfs/backend/domain"
 
 	"github.com/mitchellh/go-ps"
 	"github.com/morikuni/failure"
@@ -43,11 +42,11 @@ func (a *App) SubscribeBattle() {
 	}
 }
 
-func (a *App) GetUserConfig() (domain.UserConfig, error) {
+func (a *App) GetUserConfig() (data.UserConfig, error) {
 	return a.container.configService.GetUserConfig()
 }
 
-func (a *App) SaveUserConfig(config domain.UserConfig) error {
+func (a *App) SaveUserConfig(config data.UserConfig) error {
 	return a.container.configService.SaveUserConfig(config)
 }
 
@@ -93,7 +92,7 @@ func (a *App) LogInfo(message string, contexts map[string]string) {
 	a.container.logger.Info(message, contexts)
 }
 
-func (a *App) NewVersion() *domain.NewVersion {
+func (a *App) NewVersion() *data.NewVersion {
 	return a.container.updaterService.Invoke()
 }
 
@@ -104,11 +103,11 @@ func (a *App) ShowMessageDialog(message string) {
 	})
 }
 
-func (a *App) GetBlackList() (domain.BlackList, error) {
+func (a *App) GetBlackList() (data.BlackList, error) {
 	return a.container.blackListService.Get()
 }
 
-func (a *App) UpdateBlackList(item domain.BlackListItem) error {
+func (a *App) UpdateBlackList(item data.BlackListItem) error {
 	return a.container.blackListService.Update(item)
 }
 

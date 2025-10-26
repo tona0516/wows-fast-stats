@@ -12,7 +12,6 @@ package repository
 import (
 	reflect "reflect"
 	data "wfs/backend/data"
-	domain "wfs/backend/domain"
 
 	gomock "go.uber.org/mock/gomock"
 )
@@ -42,10 +41,10 @@ func (m *MockPersistenceInterface) EXPECT() *MockPersistenceInterfaceMockRecorde
 }
 
 // LoadBlackList mocks base method.
-func (m *MockPersistenceInterface) LoadBlackList() (domain.BlackList, error) {
+func (m *MockPersistenceInterface) LoadBlackList() (data.BlackList, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "LoadBlackList")
-	ret0, _ := ret[0].(domain.BlackList)
+	ret0, _ := ret[0].(data.BlackList)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -87,10 +86,10 @@ func (mr *MockPersistenceInterfaceMockRecorder) LoadOwnIGN() *gomock.Call {
 }
 
 // LoadUserConfig mocks base method.
-func (m *MockPersistenceInterface) LoadUserConfig() (domain.UserConfig, error) {
+func (m *MockPersistenceInterface) LoadUserConfig() (data.UserConfig, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "LoadUserConfig")
-	ret0, _ := ret[0].(domain.UserConfig)
+	ret0, _ := ret[0].(data.UserConfig)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -102,7 +101,7 @@ func (mr *MockPersistenceInterfaceMockRecorder) LoadUserConfig() *gomock.Call {
 }
 
 // SaveBlackList mocks base method.
-func (m *MockPersistenceInterface) SaveBlackList(arg0 domain.BlackList) error {
+func (m *MockPersistenceInterface) SaveBlackList(arg0 data.BlackList) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SaveBlackList", arg0)
 	ret0, _ := ret[0].(error)
@@ -144,7 +143,7 @@ func (mr *MockPersistenceInterfaceMockRecorder) SaveOwnIGN(ign any) *gomock.Call
 }
 
 // SaveUserConfig mocks base method.
-func (m *MockPersistenceInterface) SaveUserConfig(arg0 domain.UserConfig) error {
+func (m *MockPersistenceInterface) SaveUserConfig(arg0 data.UserConfig) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SaveUserConfig", arg0)
 	ret0, _ := ret[0].(error)

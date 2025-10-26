@@ -24,7 +24,7 @@
     GetBlackList,
     GetUserConfig,
   } from "@wails/go/main/App";
-  import type { data, domain } from "@wails/go/models";
+  import type { data } from "@wails/go/models";
   import { EventsOn, LogInfo } from "@wails/runtime/runtime";
   import { onMount } from "svelte";
   import { themeChange } from "theme-change";
@@ -42,7 +42,7 @@
     themeChange(false);
   });
 
-  EventsOn("BLACKLIST_UPDATE", (list: domain.BlackListItem[]) => {
+  EventsOn("BLACKLIST_UPDATE", (list: data.BlackListItem[]) => {
     LogInfo("BLACKLIST_UPDATE");
     storedBlackList.set(list);
   });

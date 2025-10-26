@@ -1,4 +1,4 @@
-package domain
+package data
 
 type BlackList []BlackListItem
 

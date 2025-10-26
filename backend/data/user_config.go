@@ -1,4 +1,4 @@
-package domain
+package data
 
 type UserConfig struct {
 	Version      int          `json:"version"`

@@ -1,4 +1,4 @@
-package domain
+package data
 
 type NewVersion struct {
 	Semver string `json:"semver"`

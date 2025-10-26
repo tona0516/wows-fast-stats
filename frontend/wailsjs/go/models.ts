@@ -543,43 +543,6 @@ export namespace data {
 		}
 	}
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	export class WGAccountListData {
-	    nickname: string;
-	    account_id: number;
-	
-	    static createFrom(source: any = {}) {
-	        return new WGAccountListData(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.nickname = source["nickname"];
-	        this.account_id = source["account_id"];
-	    }
-	}
-
-}
-
-export namespace domain {
-	
 	export class BlackListItem {
 	    account_id: number;
 	    name: string;
@@ -600,6 +563,7 @@ export namespace domain {
 	        this.created_at = source["created_at"];
 	    }
 	}
+	
 	export class DetailStatsColumnConfig {
 	    is_show_ship: boolean;
 	    is_show_overall: boolean;
@@ -741,6 +705,9 @@ export namespace domain {
 		}
 	}
 	
+	
+	
+	
 	export class NewVersion {
 	    semver: string;
 	    url: string;
@@ -755,6 +722,20 @@ export namespace domain {
 	        this.url = source["url"];
 	    }
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	
@@ -797,6 +778,20 @@ export namespace domain {
 		    }
 		    return a;
 		}
+	}
+	export class WGAccountListData {
+	    nickname: string;
+	    account_id: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new WGAccountListData(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.nickname = source["nickname"];
+	        this.account_id = source["account_id"];
+	    }
 	}
 
 }

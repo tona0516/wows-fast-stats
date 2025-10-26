@@ -1,7 +1,7 @@
 package service
 
 import (
-	"wfs/backend/domain"
+	"wfs/backend/data"
 	"wfs/backend/repository"
 
 	"github.com/Masterminds/semver/v3"
@@ -22,7 +22,7 @@ func NewUpdateChecker(
 	}
 }
 
-func (c *UpdateChecker) Invoke() *domain.NewVersion {
+func (c *UpdateChecker) Invoke() *data.NewVersion {
 	constraint, err := semver.NewConstraint("> " + c.currentSemver)
 	if err != nil {
 		return nil
@@ -42,7 +42,7 @@ func (c *UpdateChecker) Invoke() *domain.NewVersion {
 		return nil
 	}
 
-	return &domain.NewVersion{
+	return &data.NewVersion{
 		Semver: latestRelease.TagName,
 		URL:    latestRelease.HTMLURL,
 	}

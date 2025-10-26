@@ -6,7 +6,6 @@ import (
 	"path/filepath"
 	"strings"
 	"wfs/backend/data"
-	"wfs/backend/domain"
 
 	"github.com/morikuni/failure"
 )
@@ -38,18 +37,18 @@ func (p *Persistence) SaveExpectedStats(data data.ExpectedStats) error {
 }
 
 // User Config.
-func (p *Persistence) LoadUserConfig() (domain.UserConfig, error) {
-	return _readJSON[domain.UserConfig](filepath.Join(p.basePath, "user_config.json"))
+func (p *Persistence) LoadUserConfig() (data.UserConfig, error) {
+	return _readJSON[data.UserConfig](filepath.Join(p.basePath, "user_config.json"))
 }
-func (p *Persistence) SaveUserConfig(data domain.UserConfig) error {
+func (p *Persistence) SaveUserConfig(data data.UserConfig) error {
 	return _writeJSON(filepath.Join(p.basePath, "user_config.json"), data)
 }
 
 // Blacklist.
-func (p *Persistence) LoadBlackList() (domain.BlackList, error) {
-	return _readJSON[domain.BlackList](filepath.Join(p.basePath, "blacklist.json"))
+func (p *Persistence) LoadBlackList() (data.BlackList, error) {
+	return _readJSON[data.BlackList](filepath.Join(p.basePath, "blacklist.json"))
 }
-func (p *Persistence) SaveBlackList(data domain.BlackList) error {
+func (p *Persistence) SaveBlackList(data data.BlackList) error {
 	return _writeJSON(filepath.Join(p.basePath, "blacklist.json"), data)
 }
 

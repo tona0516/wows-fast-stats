@@ -1,4 +1,4 @@
-import type { data, domain } from "@wails/go/models";
+import type { data } from "@wails/go/models";
 import type { ColorCode } from "./ColorCode";
 import type { Tonako } from "./Tonako";
 
@@ -49,7 +49,7 @@ export type StackedBarChartParam = {
 export type EditModalMode = "create" | "specify" | "edit";
 export type EditModalParam = {
   mode: EditModalMode;
-  form: domain.BlackListItem;
+  form: data.BlackListItem;
 };
 
 export type TonakoParam = {

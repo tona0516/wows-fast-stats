@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"os"
-	"wfs/backend/domain"
+	"wfs/backend/data"
 	"wfs/backend/repository"
 
 	"github.com/morikuni/failure"
@@ -28,24 +28,24 @@ func NewBlackList(
 	}
 }
 
-func (b *BlackList) Get() (domain.BlackList, error) {
+func (b *BlackList) Get() (data.BlackList, error) {
 	list, err := b.persistence.LoadBlackList()
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
-			return domain.BlackList{}, nil
+			return data.BlackList{}, nil
 		}
 
 		return nil, failure.Wrap(err)
 	}
 
 	if list == nil {
-		return domain.BlackList{}, nil
+		return data.BlackList{}, nil
 	}
 
 	return list, nil
 }
 
-func (b *BlackList) Update(item domain.BlackListItem) error {
+func (b *BlackList) Update(item data.BlackListItem) error {
 	list, err := b.Get()
 	if err != nil {
 		return failure.Wrap(err)
@@ -79,7 +79,7 @@ func (b *BlackList) Remove(accountID int) error {
 		return failure.Wrap(err)
 	}
 
-	filtered := make(domain.BlackList, 0, len(list))
+	filtered := make(data.BlackList, 0, len(list))
 	for _, item := range list {
 		if item.AccountID != accountID {
 			filtered = append(filtered, item)
