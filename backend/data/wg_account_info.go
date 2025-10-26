@@ -1,6 +1,17 @@
 package data
 
-type WGAccountInfo map[int]WGAccountInfoData
+import (
+	"reflect"
+	"wfs/backend/util"
+)
+
+type WGAccountInfo struct {
+	WGResponseCommon[map[int]WGAccountInfoData]
+}
+
+func (w WGAccountInfo) Field() string {
+	return util.FieldQuery(reflect.TypeOf(&WGAccountInfoData{}).Elem())
+}
 
 type WGAccountInfoData struct {
 	HiddenProfile bool `json:"hidden_profile"`

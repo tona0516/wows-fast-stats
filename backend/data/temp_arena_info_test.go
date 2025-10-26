@@ -39,9 +39,16 @@ func TestTempArenaInfo_Unixtime(t *testing.T) {
 
 func TestTempArenaInfo_BattleArena(t *testing.T) {
 	t.Parallel()
+
 	w := WGBattleArenas{
-		1: {Name: "Arena1"},
-		2: {Name: "Arena2"},
+		WGResponseCommon: WGResponseCommon[map[int]WGBattleArenasData]{
+			Status: "",
+			Error:  WGError{},
+			Data: map[int]WGBattleArenasData{
+				1: {Name: "Arena1"},
+				2: {Name: "Arena2"},
+			},
+		},
 	}
 
 	info := &TempArenaInfo{
@@ -56,9 +63,16 @@ func TestTempArenaInfo_BattleArena(t *testing.T) {
 
 func TestTempArenaInfo_BattleType(t *testing.T) {
 	t.Parallel()
+
 	w := WGBattleTypes{
-		"RANDOM": {Name: "Random Battle"},
-		"COOP":   {Name: "Co-op Battle"},
+		WGResponseCommon: WGResponseCommon[map[string]WGBattleTypesData]{
+			Status: "",
+			Error:  WGError{},
+			Data: map[string]WGBattleTypesData{
+				"RANDOM": {Name: "Random Battle"},
+				"COOP":   {Name: "Co-op Battle"},
+			},
+		},
 	}
 
 	info := &TempArenaInfo{

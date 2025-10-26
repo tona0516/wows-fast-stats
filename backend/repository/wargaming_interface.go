@@ -9,7 +9,7 @@ type WargamingInterface interface {
 	AccountListForSearch(prefix string) (data.WGAccountList, error)
 	ClansAccountInfo(accountIDs []int) (data.WGClansAccountInfo, error)
 	ClansInfo(clanIDs []int) (data.WGClansInfo, error)
-	EncycShips(pageNo int) (data.WGEncycShips, int, error)
+	EncycShips(pageNo int) (data.WGEncycShips, error)
 	ShipsStats(accountID int) (data.WGShipsStats, error)
 	BattleArenas() (data.WGBattleArenas, error)
 	BattleTypes() (data.WGBattleTypes, error)

@@ -1,12 +1,23 @@
 package data
 
+import (
+	"reflect"
+	"wfs/backend/util"
+)
+
 type AllPlayerShipsStats map[int]WGShipsStats
 
 func (w AllPlayerShipsStats) Player(accountID int) []WGShipsStatsData {
-	return w[accountID][accountID]
+	return w[accountID].Data[accountID]
 }
 
-type WGShipsStats map[int][]WGShipsStatsData
+type WGShipsStats struct {
+	WGResponseCommon[map[int][]WGShipsStatsData]
+}
+
+func (w WGShipsStats) Field() string {
+	return util.FieldQuery(reflect.TypeOf(&WGShipsStatsData{}).Elem())
+}
 
 type WGShipsStatsData struct {
 	Pvp     WGShipStatsValues `json:"pvp"`

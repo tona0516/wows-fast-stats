@@ -19,18 +19,37 @@ func TestBattle_Get_正常系_初回(t *testing.T) {
 	// 準備
 	mockWargaming := repository.NewMockWargamingInterface(ctrl)
 	mockWargaming.EXPECT().AccountList(gomock.Any()).Return(data.WGAccountList{
-		{NickName: "player_1", AccountID: 1},
-		{NickName: "player_2", AccountID: 2},
+		WGResponseCommon: data.WGResponseCommon[[]data.WGAccountListData]{
+			Status: "",
+			Error:  data.WGError{},
+			Data: []data.WGAccountListData{
+				{NickName: "player_1", AccountID: 1},
+				{NickName: "player_2", AccountID: 2},
+			},
+		},
 	}, nil)
 	mockWargaming.EXPECT().EncycShips(gomock.Any()).Return(data.WGEncycShips{
-		1: data.WGEncycShipsData{
-			Tier:      1,
-			Type:      "Battleship",
-			Name:      "ship_1",
-			Nation:    "japan",
-			IsPremium: false,
+		WGResponseCommon: data.WGResponseCommon[map[int]data.WGEncycShipsData]{
+			Status: "",
+			Error:  data.WGError{},
+			Data: map[int]data.WGEncycShipsData{
+				1: {
+					Tier:      1,
+					Type:      "Battleship",
+					Name:      "ship_1",
+					Nation:    "japan",
+					IsPremium: false,
+				},
+			},
 		},
-	}, 2, nil).Times(2)
+		Meta: struct {
+			PageTotal int "json:\"page_total\""
+			Page      int "json:\"page\""
+		}{
+			PageTotal: 2,
+			Page:      1,
+		},
+	}, nil).Times(2)
 	mockWargaming.EXPECT().BattleArenas().Return(data.WGBattleArenas{}, nil)
 	mockWargaming.EXPECT().BattleTypes().Return(data.WGBattleTypes{}, nil)
 	mockWargaming.EXPECT().AccountInfo(gomock.Any()).Return(data.WGAccountInfo{}, nil)
@@ -100,8 +119,14 @@ func TestBattle_Get_正常系_2回目以降(t *testing.T) {
 	// 準備
 	mockWargaming := repository.NewMockWargamingInterface(ctrl)
 	mockWargaming.EXPECT().AccountList(gomock.Any()).Return(data.WGAccountList{
-		{NickName: "player_1", AccountID: 1},
-		{NickName: "player_2", AccountID: 2},
+		WGResponseCommon: data.WGResponseCommon[[]data.WGAccountListData]{
+			Status: "",
+			Error:  data.WGError{},
+			Data: []data.WGAccountListData{
+				{NickName: "player_1", AccountID: 1},
+				{NickName: "player_2", AccountID: 2},
+			},
+		},
 	}, nil)
 	mockWargaming.EXPECT().AccountInfo(gomock.Any()).Return(data.WGAccountInfo{}, nil)
 	mockWargaming.EXPECT().ShipsStats(gomock.Any()).Return(data.WGShipsStats{}, nil).AnyTimes()
@@ -168,7 +193,7 @@ func TestBattle_Get_異常系_アカウントリスト取得失敗(t *testing.T)
 
 	// 準備
 	mockWargaming := repository.NewMockWargamingInterface(ctrl)
-	mockWargaming.EXPECT().AccountList(gomock.Any()).Return(nil, errors.New("hoge"))
+	mockWargaming.EXPECT().AccountList(gomock.Any()).Return(data.WGAccountList{}, errors.New("hoge"))
 
 	mockUnofficialWargaming := repository.NewMockUnofficialWargamingInterface(ctrl)
 

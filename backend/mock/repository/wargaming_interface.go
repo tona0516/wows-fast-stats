@@ -146,13 +146,12 @@ func (mr *MockWargamingInterfaceMockRecorder) ClansInfo(clanIDs any) *gomock.Cal
 }
 
 // EncycShips mocks base method.
-func (m *MockWargamingInterface) EncycShips(pageNo int) (data.WGEncycShips, int, error) {
+func (m *MockWargamingInterface) EncycShips(pageNo int) (data.WGEncycShips, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "EncycShips", pageNo)
 	ret0, _ := ret[0].(data.WGEncycShips)
-	ret1, _ := ret[1].(int)
-	ret2, _ := ret[2].(error)
-	return ret0, ret1, ret2
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // EncycShips indicates an expected call of EncycShips.

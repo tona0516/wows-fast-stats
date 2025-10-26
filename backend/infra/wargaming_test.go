@@ -8,7 +8,6 @@ import (
 	"testing"
 	"wfs/backend/apperr"
 	"wfs/backend/data"
-	"wfs/backend/infra/response"
 
 	"github.com/morikuni/failure"
 	"github.com/stretchr/testify/assert"
@@ -20,20 +19,23 @@ func TestWargaming_AccountInfo(t *testing.T) {
 
 	t.Run("正常系", func(t *testing.T) {
 		t.Parallel()
-		server := simpleMockServer(200, response.WGAccountInfo{
-			WGResponseCommon: response.WGResponseCommon[data.WGAccountInfo]{
+
+		expected := data.WGAccountInfo{
+			WGResponseCommon: data.WGResponseCommon[map[int]data.WGAccountInfoData]{
 				Status: "",
-				Error:  response.WGError{},
+				Error:  data.WGError{},
 				Data:   map[int]data.WGAccountInfoData{},
 			},
-		})
+		}
+
+		server := simpleMockServer(200, expected)
 		defer server.Close()
 
 		wargaming := NewWargaming(server.URL, 0, 0, 0, 1, "")
 		result, err := wargaming.AccountInfo([]int{123, 456})
 
 		require.NoError(t, err)
-		assert.Equal(t, data.WGAccountInfo{}, result)
+		assert.Equal(t, expected, result)
 	})
 
 	t.Run("異常系_リトライなし", func(t *testing.T) {
@@ -97,7 +99,7 @@ func TestWargaming_AccountInfo(t *testing.T) {
 					return
 				}
 
-				body, _ := json.Marshal(response.WGAccountInfo{})
+				body, _ := json.Marshal(data.WGAccountInfo{})
 				_, _ = w.Write(body)
 			}))
 			defer server.Close()
@@ -152,108 +154,116 @@ func TestWargaming_AccountInfo(t *testing.T) {
 func TestWargaming_AccountListForSearch(t *testing.T) {
 	t.Parallel()
 
-	server := simpleMockServer(200, response.WGAccountList{
-		WGResponseCommon: response.WGResponseCommon[data.WGAccountList]{
+	expected := data.WGAccountList{
+		WGResponseCommon: data.WGResponseCommon[[]data.WGAccountListData]{
 			Status: "",
-			Error:  response.WGError{},
+			Error:  data.WGError{},
 			Data:   []data.WGAccountListData{},
 		},
-	})
+	}
+
+	server := simpleMockServer(200, expected)
 	defer server.Close()
 
 	wargaming := NewWargaming(server.URL, 0, 0, 0, 1, "")
 	result, err := wargaming.AccountListForSearch("player")
 
 	require.NoError(t, err)
-	assert.Equal(t, data.WGAccountList{}, result)
+	assert.Equal(t, expected, result)
 }
 
 func TestWargaming_ClansAccountInfo(t *testing.T) {
 	t.Parallel()
 
-	server := simpleMockServer(200, response.WGClansAccountInfo{
-		WGResponseCommon: response.WGResponseCommon[data.WGClansAccountInfo]{
+	expected := data.WGClansAccountInfo{
+		WGResponseCommon: data.WGResponseCommon[map[int]data.WGClansAccountInfoData]{
 			Status: "",
-			Error:  response.WGError{},
+			Error:  data.WGError{},
 			Data:   map[int]data.WGClansAccountInfoData{},
 		},
-	})
+	}
+
+	server := simpleMockServer(200, expected)
 	defer server.Close()
 
 	wargaming := NewWargaming(server.URL, 0, 0, 0, 1, "")
 	result, err := wargaming.ClansAccountInfo([]int{123, 456})
 
 	require.NoError(t, err)
-	assert.Equal(t, data.WGClansAccountInfo{}, result)
+	assert.Equal(t, expected, result)
 }
 
 func TestWargaming_ClansInfo(t *testing.T) {
 	t.Parallel()
 
-	server := simpleMockServer(200, response.WGClansInfo{
-		WGResponseCommon: response.WGResponseCommon[data.WGClansInfo]{
+	expected := data.WGClansInfo{
+		WGResponseCommon: data.WGResponseCommon[map[int]data.WGClansInfoData]{
 			Status: "",
-			Error:  response.WGError{},
+			Error:  data.WGError{},
 			Data:   map[int]data.WGClansInfoData{},
 		},
-	})
+	}
+
+	server := simpleMockServer(200, expected)
 	defer server.Close()
 
 	wargaming := NewWargaming(server.URL, 0, 0, 0, 1, "")
 	result, err := wargaming.ClansInfo([]int{123, 456})
 
 	require.NoError(t, err)
-	assert.Equal(t, data.WGClansInfo{}, result)
+	assert.Equal(t, expected, result)
 }
 
 func TestWargaming_ShipsStats(t *testing.T) {
 	t.Parallel()
 
-	server := simpleMockServer(200, response.WGShipsStats{
-		WGResponseCommon: response.WGResponseCommon[data.WGShipsStats]{
+	expected := data.WGShipsStats{
+		WGResponseCommon: data.WGResponseCommon[map[int][]data.WGShipsStatsData]{
 			Status: "",
-			Error:  response.WGError{},
+			Error:  data.WGError{},
 			Data:   map[int][]data.WGShipsStatsData{},
 		},
-	})
+	}
+
+	server := simpleMockServer(200, expected)
 	defer server.Close()
 
 	wargaming := NewWargaming(server.URL, 0, 0, 0, 1, "")
 	result, err := wargaming.ShipsStats(123)
 
 	require.NoError(t, err)
-	assert.Equal(t, data.WGShipsStats{}, result)
+	assert.Equal(t, expected, result)
 }
 
 func TestWargaming_EncycShips(t *testing.T) {
 	t.Parallel()
 
-	expectedPageTotal := 5
-	server := simpleMockServer(200, response.WGEncycShips{
-		WGResponseCommon: response.WGResponseCommon[data.WGEncycShips]{
+	expected := data.WGEncycShips{
+		WGResponseCommon: data.WGResponseCommon[map[int]data.WGEncycShipsData]{
 			Status: "",
-			Error:  response.WGError{},
+			Error:  data.WGError{},
 			Data:   map[int]data.WGEncycShipsData{},
 		},
 		Meta: struct {
 			PageTotal int `json:"page_total"`
 			Page      int `json:"page"`
-		}{PageTotal: expectedPageTotal},
-	})
+		}{PageTotal: 5},
+	}
+
+	server := simpleMockServer(200, expected)
 	defer server.Close()
 
 	wargaming := NewWargaming(server.URL, 0, 0, 0, 1, "")
-	result, pageTotal, err := wargaming.EncycShips(1)
+	result, err := wargaming.EncycShips(1)
 
 	require.NoError(t, err)
-	assert.Equal(t, data.WGEncycShips{}, result)
-	assert.Equal(t, expectedPageTotal, pageTotal)
+	assert.Equal(t, expected, result)
 }
 
 func TestWargaming_EncycInfo(t *testing.T) {
 	t.Parallel()
 
-	server := simpleMockServer(200, response.WGEncycInfo{})
+	server := simpleMockServer(200, data.WGEncycInfo{})
 	defer server.Close()
 
 	wargaming := NewWargaming(server.URL, 0, 0, 0, 1, "")
@@ -266,56 +276,62 @@ func TestWargaming_EncycInfo(t *testing.T) {
 func TestWargaming_BattleArena(t *testing.T) {
 	t.Parallel()
 
-	server := simpleMockServer(200, response.WGBattleArenas{
-		WGResponseCommon: response.WGResponseCommon[data.WGBattleArenas]{
+	expected := data.WGBattleArenas{
+		WGResponseCommon: data.WGResponseCommon[map[int]data.WGBattleArenasData]{
 			Status: "",
-			Error:  response.WGError{},
+			Error:  data.WGError{},
 			Data:   map[int]data.WGBattleArenasData{},
 		},
-	})
+	}
+
+	server := simpleMockServer(200, expected)
 	defer server.Close()
 
 	wargaming := NewWargaming(server.URL, 0, 0, 0, 1, "")
 	result, err := wargaming.BattleArenas()
 
 	require.NoError(t, err)
-	assert.Equal(t, data.WGBattleArenas{}, result)
+	assert.Equal(t, expected, result)
 }
 
 func TestWargaming_BattleTypes(t *testing.T) {
 	t.Parallel()
 
-	server := simpleMockServer(200, response.WGBattleTypes{
-		WGResponseCommon: response.WGResponseCommon[data.WGBattleTypes]{
+	expected := data.WGBattleTypes{
+		WGResponseCommon: data.WGResponseCommon[map[string]data.WGBattleTypesData]{
 			Status: "",
-			Error:  response.WGError{},
+			Error:  data.WGError{},
 			Data:   map[string]data.WGBattleTypesData{},
 		},
-	})
+	}
+
+	server := simpleMockServer(200, expected)
 	defer server.Close()
 
 	wargaming := NewWargaming(server.URL, 0, 0, 0, 1, "")
 	result, err := wargaming.BattleTypes()
 
 	require.NoError(t, err)
-	assert.Equal(t, data.WGBattleTypes{}, result)
+	assert.Equal(t, expected, result)
 }
 
 func TestWargaming_ShipsBadges(t *testing.T) {
 	t.Parallel()
 
-	server := simpleMockServer(200, response.WGShipsBadges{
-		WGResponseCommon: response.WGResponseCommon[data.WGShipsBadges]{
+	expected := data.WGShipsBadges{
+		WGResponseCommon: data.WGResponseCommon[map[int][]data.WGShipsBadgesData]{
 			Status: "",
-			Error:  response.WGError{},
+			Error:  data.WGError{},
 			Data:   map[int][]data.WGShipsBadgesData{},
 		},
-	})
+	}
+
+	server := simpleMockServer(200, expected)
 	defer server.Close()
 
 	wargaming := NewWargaming(server.URL, 0, 0, 0, 1, "")
 	result, err := wargaming.ShipsBadges(123)
 
 	require.NoError(t, err)
-	assert.Equal(t, data.WGShipsBadges{}, result)
+	assert.Equal(t, expected, result)
 }

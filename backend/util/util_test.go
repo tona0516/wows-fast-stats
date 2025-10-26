@@ -1,4 +1,4 @@
-package response
+package util
 
 import (
 	"reflect"
@@ -24,7 +24,7 @@ func TestUtil_FieldQuery(t *testing.T) {
 	dataType := reflect.TypeOf(TestData{})
 
 	// fieldQuery 関数を実行して結果を取得
-	result := fieldQuery(dataType)
+	result := FieldQuery(dataType)
 
 	// 期待される結果
 	expectedResult := "id,name,detail.hoge,detail.fuga"
@@ -52,7 +52,7 @@ func TestUtil_ToSnakeCase(t *testing.T) {
 	// 各テストケースを実行
 	for _, tc := range testCases {
 		// toSnakeCase 関数を実行して結果を取得
-		result := toSnakeCase(tc.input)
+		result := ToSnakeCase(tc.input)
 
 		// 結果の比較
 		assert.Equal(t, tc.expected, result)

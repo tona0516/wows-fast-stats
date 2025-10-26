@@ -8,7 +8,6 @@ import (
 	"time"
 	"wfs/backend/apperr"
 	"wfs/backend/data"
-	"wfs/backend/infra/response"
 
 	"github.com/imroc/req/v3"
 	"github.com/morikuni/failure"
@@ -48,13 +47,13 @@ func (w *Wargaming) AccountInfo(accountIDs []int) (data.WGAccountInfo, error) {
 		strAccountIDs[i] = strconv.Itoa(v)
 	}
 
-	res, err := request[response.WGAccountInfo](
+	res, err := request[data.WGAccountInfo](
 		w,
 		"/wows/account/info/",
 		map[string]string{
 			"application_id": w.appID,
 			"account_id":     strings.Join(strAccountIDs, ","),
-			"fields":         response.WGAccountInfo{}.Field(),
+			"fields":         data.WGAccountInfo{}.Field(),
 			"extra": strings.Join([]string{
 				"statistics.pvp_solo",
 				"statistics.pvp_div2",
@@ -64,37 +63,37 @@ func (w *Wargaming) AccountInfo(accountIDs []int) (data.WGAccountInfo, error) {
 		},
 	)
 
-	return res.Data, err
+	return res, err
 }
 
 func (w *Wargaming) AccountList(accountNames []string) (data.WGAccountList, error) {
-	res, err := request[response.WGAccountList](
+	res, err := request[data.WGAccountList](
 		w,
 		"/wows/account/list/",
 		map[string]string{
 			"application_id": w.appID,
 			"search":         strings.Join(accountNames, ","),
-			"fields":         response.WGAccountList{}.Field(),
+			"fields":         data.WGAccountList{}.Field(),
 			"type":           "exact",
 		},
 	)
 
-	return res.Data, err
+	return res, err
 }
 
 func (w *Wargaming) AccountListForSearch(prefix string) (data.WGAccountList, error) {
-	res, err := request[response.WGAccountList](
+	res, err := request[data.WGAccountList](
 		w,
 		"/wows/account/list/",
 		map[string]string{
 			"application_id": w.appID,
 			"search":         prefix,
-			"fields":         response.WGAccountList{}.Field(),
+			"fields":         data.WGAccountList{}.Field(),
 			"limit":          "10",
 		},
 	)
 
-	return res.Data, err
+	return res, err
 }
 
 func (w *Wargaming) ClansAccountInfo(accountIDs []int) (data.WGClansAccountInfo, error) {
@@ -103,17 +102,17 @@ func (w *Wargaming) ClansAccountInfo(accountIDs []int) (data.WGClansAccountInfo,
 		strAccountIDs[i] = strconv.Itoa(v)
 	}
 
-	res, err := request[response.WGClansAccountInfo](
+	res, err := request[data.WGClansAccountInfo](
 		w,
 		"/wows/clans/accountinfo/",
 		map[string]string{
 			"application_id": w.appID,
 			"account_id":     strings.Join(strAccountIDs, ","),
-			"fields":         response.WGClansAccountInfo{}.Field(),
+			"fields":         data.WGClansAccountInfo{}.Field(),
 		},
 	)
 
-	return res.Data, err
+	return res, err
 }
 
 func (w *Wargaming) ClansInfo(clanIDs []int) (data.WGClansInfo, error) {
@@ -126,27 +125,27 @@ func (w *Wargaming) ClansInfo(clanIDs []int) (data.WGClansInfo, error) {
 		return data.WGClansInfo{}, nil
 	}
 
-	res, err := request[response.WGClansInfo](
+	res, err := request[data.WGClansInfo](
 		w,
 		"/wows/clans/info/",
 		map[string]string{
 			"application_id": w.appID,
 			"clan_id":        strings.Join(strClanIDs, ","),
-			"fields":         response.WGClansInfo{}.Field(),
+			"fields":         data.WGClansInfo{}.Field(),
 		},
 	)
 
-	return res.Data, err
+	return res, err
 }
 
 func (w *Wargaming) ShipsStats(accountID int) (data.WGShipsStats, error) {
-	res, err := request[response.WGShipsStats](
+	res, err := request[data.WGShipsStats](
 		w,
 		"/wows/ships/stats/",
 		map[string]string{
 			"application_id": w.appID,
 			"account_id":     strconv.Itoa(accountID),
-			"fields":         response.WGShipsStats{}.Field(),
+			"fields":         data.WGShipsStats{}.Field(),
 			"extra": strings.Join([]string{
 				"pvp_solo",
 				"pvp_div2",
@@ -156,31 +155,31 @@ func (w *Wargaming) ShipsStats(accountID int) (data.WGShipsStats, error) {
 		},
 	)
 
-	return res.Data, err
+	return res, err
 }
 
-func (w *Wargaming) EncycShips(pageNo int) (data.WGEncycShips, int, error) {
-	res, err := request[response.WGEncycShips](
+func (w *Wargaming) EncycShips(pageNo int) (data.WGEncycShips, error) {
+	res, err := request[data.WGEncycShips](
 		w,
 		"/wows/encyclopedia/ships/",
 		map[string]string{
 			"application_id": w.appID,
-			"fields":         response.WGEncycShips{}.Field(),
+			"fields":         data.WGEncycShips{}.Field(),
 			"language":       "ja",
 			"page_no":        strconv.Itoa(pageNo),
 		},
 	)
 
-	return res.Data, res.Meta.PageTotal, err
+	return res, err
 }
 
 func (w *Wargaming) EncycInfo() (data.WGEncycInfoData, error) {
-	res, err := request[response.WGEncycInfo](
+	res, err := request[data.WGEncycInfo](
 		w,
 		"/wows/encyclopedia/info/",
 		map[string]string{
 			"application_id": w.appID,
-			"fields":         response.WGEncycInfo{}.Field(),
+			"fields":         data.WGEncycInfo{}.Field(),
 		},
 	)
 
@@ -188,48 +187,48 @@ func (w *Wargaming) EncycInfo() (data.WGEncycInfoData, error) {
 }
 
 func (w *Wargaming) BattleArenas() (data.WGBattleArenas, error) {
-	res, err := request[response.WGBattleArenas](
+	res, err := request[data.WGBattleArenas](
 		w,
 		"/wows/encyclopedia/battlearenas/",
 		map[string]string{
 			"application_id": w.appID,
-			"fields":         response.WGBattleArenas{}.Field(),
+			"fields":         data.WGBattleArenas{}.Field(),
 			"language":       "ja",
 		},
 	)
 
-	return res.Data, err
+	return res, err
 }
 
 func (w *Wargaming) BattleTypes() (data.WGBattleTypes, error) {
-	res, err := request[response.WGBattleTypes](
+	res, err := request[data.WGBattleTypes](
 		w,
 		"/wows/encyclopedia/battletypes/",
 		map[string]string{
 			"application_id": w.appID,
-			"fields":         response.WGBattleTypes{}.Field(),
+			"fields":         data.WGBattleTypes{}.Field(),
 			"language":       "ja",
 		},
 	)
 
-	return res.Data, err
+	return res, err
 }
 
 func (w *Wargaming) ShipsBadges(accountID int) (data.WGShipsBadges, error) {
-	res, err := request[response.WGShipsBadges](
+	res, err := request[data.WGShipsBadges](
 		w,
 		"/wows/ships/badges/",
 		map[string]string{
 			"application_id": w.appID,
 			"account_id":     strconv.Itoa(accountID),
-			"fields":         response.WGShipsBadges{}.Field(),
+			"fields":         data.WGShipsBadges{}.Field(),
 		},
 	)
 
-	return res.Data, err
+	return res, err
 }
 
-func request[T response.WGResponse](
+func request[T data.WGResponse](
 	w *Wargaming,
 	path string,
 	queries map[string]string,
@@ -244,7 +243,7 @@ func request[T response.WGResponse](
 				return true
 			}
 
-			var body response.WGResponseCommon[any]
+			var body data.WGResponseCommon[any]
 			if err := json.Unmarshal(resp.Bytes(), &body); err == nil {
 				err := convertError(body.Status, body.Error.Message)
 				if failure.Is(err, apperr.WGAPITemporaryUnavaillalble) {

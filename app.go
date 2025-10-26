@@ -80,7 +80,7 @@ func (a *App) Semver() string {
 func (a *App) SearchPlayer(prefix string) ([]data.WGAccountListData, error) {
 	result, err := a.container.configService.SearchPlayer(prefix)
 
-	return result, apperr.Unwrap(err)
+	return result.Data, apperr.Unwrap(err)
 }
 
 func (a *App) LogError(errString string, contexts map[string]string) {

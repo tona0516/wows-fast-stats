@@ -162,12 +162,12 @@ func (b *BattleFetcher) fetchWarships(channel chan data.Result[data.Warships]) {
 	var mu sync.Mutex
 
 	fetch := func(page int) (int, error) {
-		res, pageTotal, err := b.wargaming.EncycShips(page)
+		res, err := b.wargaming.EncycShips(page)
 		if err != nil {
 			return 0, err
 		}
 
-		for shipID, warship := range res {
+		for shipID, warship := range res.Data {
 			mu.Lock()
 			warships[shipID] = data.Warship{
 				Name:      warship.Name,
@@ -178,7 +178,7 @@ func (b *BattleFetcher) fetchWarships(channel chan data.Result[data.Warships]) {
 			}
 			mu.Unlock()
 		}
-		return pageTotal, nil
+		return res.Meta.PageTotal, nil
 	}
 
 	first := 1
@@ -294,8 +294,8 @@ func (b *BattleFetcher) fetchClan(accountIDs []int, channel chan data.Result[dat
 
 	clans := make(data.Clans)
 	for _, accountID := range accountIDs {
-		clanID := clansAccountInfo[accountID].ClanID
-		clanTag := clansInfo[clanID].Tag
+		clanID := clansAccountInfo.Data[accountID].ClanID
+		clanTag := clansInfo.Data[clanID].Tag
 		hexColor := colorMap[clanTag]
 		language := languageMap[clanTag]
 
@@ -386,7 +386,7 @@ func (b *BattleFetcher) fetchAllPlayerShipsBadges(
 		}
 
 		mu.Lock()
-		shipsBadgesMap[accountID] = shipsBadges[accountID]
+		shipsBadgesMap[accountID] = shipsBadges.Data[accountID]
 		mu.Unlock()
 
 		return nil
@@ -427,7 +427,7 @@ func (b *BattleFetcher) compose(
 
 		stats := data.NewPersonalStats(
 			vehicle.ShipID,
-			accountInfo[accountID],
+			accountInfo.Data[accountID],
 			allPlayerShipsStats.Player(accountID),
 			allPlayerShipsBadges[accountID],
 			allExpectedStats,
@@ -440,7 +440,7 @@ func (b *BattleFetcher) compose(
 				ID:       accountID,
 				Name:     nickname,
 				Clan:     clan,
-				IsHidden: accountInfo[accountID].HiddenProfile,
+				IsHidden: accountInfo.Data[accountID].HiddenProfile,
 			},
 			ShipInfo: data.ShipInfo{
 				ID:            vehicle.ShipID,

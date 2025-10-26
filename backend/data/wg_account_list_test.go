@@ -10,11 +10,17 @@ func TestWGAccountList_AccountIDs(t *testing.T) {
 	t.Parallel()
 
 	w := WGAccountList{
-		{NickName: "John", AccountID: 123},
-		{NickName: "Alice", AccountID: 0},
-		{NickName: "Bob", AccountID: 456},
-		{NickName: "Charlie", AccountID: 789},
-		{NickName: "John", AccountID: 123},
+		WGResponseCommon: WGResponseCommon[[]WGAccountListData]{
+			Status: "",
+			Error:  WGError{},
+			Data: []WGAccountListData{
+				{NickName: "John", AccountID: 123},
+				{NickName: "Alice", AccountID: 0},
+				{NickName: "Bob", AccountID: 456},
+				{NickName: "Charlie", AccountID: 789},
+				{NickName: "John", AccountID: 123},
+			},
+		},
 	}
 
 	expectedIDs := []int{123, 456, 789}
@@ -27,9 +33,15 @@ func TestWGAccountList_AccountID(t *testing.T) {
 	t.Parallel()
 
 	w := WGAccountList{
-		{NickName: "John", AccountID: 123},
-		{NickName: "Alice", AccountID: 456},
-		{NickName: "Bob", AccountID: 789},
+		WGResponseCommon: WGResponseCommon[[]WGAccountListData]{
+			Status: "",
+			Error:  WGError{},
+			Data: []WGAccountListData{
+				{NickName: "John", AccountID: 123},
+				{NickName: "Alice", AccountID: 456},
+				{NickName: "Bob", AccountID: 789},
+			},
+		},
 	}
 
 	t.Run("正常系", func(t *testing.T) {

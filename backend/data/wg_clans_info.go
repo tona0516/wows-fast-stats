@@ -1,10 +1,21 @@
 package data
 
-type WGClansInfo map[int]WGClansInfoData
+import (
+	"reflect"
+	"wfs/backend/util"
+)
+
+type WGClansInfo struct {
+	WGResponseCommon[map[int]WGClansInfoData]
+}
+
+func (w WGClansInfo) Field() string {
+	return util.FieldQuery(reflect.TypeOf(&WGClansInfoData{}).Elem())
+}
 
 func (w WGClansInfo) ToArray() []WGClansInfoData {
 	array := make([]WGClansInfoData, 0)
-	for _, v := range w {
+	for _, v := range w.Data {
 		array = append(array, v)
 	}
 	return array

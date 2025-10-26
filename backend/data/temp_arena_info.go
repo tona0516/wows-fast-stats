@@ -42,11 +42,11 @@ func (t *TempArenaInfo) Unixtime() int64 {
 }
 
 func (t *TempArenaInfo) BattleArena(battleArenas WGBattleArenas) string {
-	return battleArenas[t.MapID].Name
+	return battleArenas.Data[t.MapID].Name
 }
 
 func (t *TempArenaInfo) BattleType(battleTypes WGBattleTypes) string {
-	rawBattleType := battleTypes[strings.ToUpper(t.MatchGroup)].Name
+	rawBattleType := battleTypes.Data[strings.ToUpper(t.MatchGroup)].Name
 	return strings.ReplaceAll(rawBattleType, " ", "")
 }
 
