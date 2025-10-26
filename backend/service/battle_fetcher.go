@@ -9,6 +9,7 @@ import (
 	"wfs/backend/apperr"
 	"wfs/backend/data"
 	"wfs/backend/repository"
+	"wfs/backend/util"
 	"wfs/backend/yamibuka"
 
 	"github.com/abadojack/whatlanggo"
@@ -189,8 +190,8 @@ func (b *BattleFetcher) fetchWarships(channel chan data.Result[data.Warships]) {
 		return
 	}
 
-	pages := makeRange(first+1, pageTotal+1)
-	err = doParallel(pages, func(page int) error {
+	pages := util.MakeRange(first+1, pageTotal+1)
+	err = util.DoParallel(pages, func(page int) error {
 		_, err := fetch(page)
 		return err
 	})
@@ -254,7 +255,7 @@ func (b *BattleFetcher) fetchAllPlayerShipsStats(
 ) {
 	shipStatsMap := make(data.AllPlayerShipsStats)
 	var mu sync.Mutex
-	err := doParallel(accountIDs, func(accountID int) error {
+	err := util.DoParallel(accountIDs, func(accountID int) error {
 		shipStats, err := b.wargaming.ShipsStats(accountID)
 		if err != nil {
 			return err
@@ -310,7 +311,7 @@ func (b *BattleFetcher) fetchClanColor(clanInfoArray []data.WGClansInfoData) map
 	result := make(map[string]string)
 
 	var mu sync.Mutex
-	err := doParallel(clanInfoArray, func(clan data.WGClansInfoData) error {
+	err := util.DoParallel(clanInfoArray, func(clan data.WGClansInfoData) error {
 		autocomplete, err := b.uwargaming.ClansAutoComplete(clan.Tag)
 		if err != nil {
 			return err
@@ -348,7 +349,7 @@ func (b *BattleFetcher) fetchClanLanguage(clanInfoArray []data.WGClansInfoData) 
 	}
 
 	var mu sync.Mutex
-	err := doParallel(clanInfoArray, func(clan data.WGClansInfoData) error {
+	err := util.DoParallel(clanInfoArray, func(clan data.WGClansInfoData) error {
 		// URLを空文字に
 		description := re.ReplaceAllString(clan.Description, "")
 		// 改行を空文字に
@@ -379,7 +380,7 @@ func (b *BattleFetcher) fetchAllPlayerShipsBadges(
 ) {
 	shipsBadgesMap := make(data.AllPlayerShipsBadges)
 	var mu sync.Mutex
-	err := doParallel(accountIDs, func(accountID int) error {
+	err := util.DoParallel(accountIDs, func(accountID int) error {
 		shipsBadges, err := b.wargaming.ShipsBadges(accountID)
 		if err != nil {
 			return err
