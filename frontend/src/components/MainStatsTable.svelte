@@ -106,19 +106,19 @@
                 <div class="flex flex-wrap items-center gap-3 text-sm">
                   <div class="badge badge-info badge-outline gap-1">
                     <span class="opacity-70">戦力</span>
-                    <span class="font-mono"
+                    <span class="font-mono text-base"
                       >{teamThreatLevel.average.toFixed(0)}</span
                     >
                   </div>
                   <div class="badge badge-success badge-outline gap-1">
                     <span class="opacity-70">確度</span>
-                    <span class="font-mono"
+                    <span class="font-mono text-base"
                       >{teamThreatLevel.accuracy.toFixed(0)}%</span
                     >
                   </div>
                   <div class="badge badge-warning badge-outline gap-1">
                     <span class="opacity-70">介護指数</span>
-                    <span class="font-mono"
+                    <span class="font-mono text-base"
                       >{teamThreatLevel.dissociation_degree.toFixed(0)}%</span
                     >
                   </div>
