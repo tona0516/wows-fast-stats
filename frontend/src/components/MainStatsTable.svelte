@@ -145,7 +145,7 @@
               {#each category.columns as column}
                 {#if column.needsShow()}
                   <th
-                    class="px-2 py-1 text-center font-medium whitespace-pre-line"
+                    class="px-2 py-1 text-center font-medium whitespace-nowrap"
                     scope="col">{column.header}</th
                   >
                 {/if}
