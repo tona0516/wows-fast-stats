@@ -17,51 +17,11 @@ export class PlayerNameColumn extends AbstractColumn {
   }
 
   override getTextColorCode(player: data.Player): Optional<ColorCode> {
-    const statsExtra = get(storedUserConfig).stats_extra as StatsExtra;
-    const colorPattern = get(storedUserConfig).column.player.color_pattern;
-
-    switch (colorPattern) {
-      case "pr_ship": {
-        const value = player[statsExtra].ship.pr.rating;
-        return RATING_COLORS[value].getFixedTextColor();
-      }
-      case "pr_overall": {
-        const value = player[statsExtra].overall.pr.rating;
-        return RATING_COLORS[value].getFixedTextColor();
-      }
-      case "threat_level": {
-        const value = player[statsExtra].overall.threat_level;
-        return THREAT_LEVEL_COLORS[value.rank].text;
-      }
-      case "none":
-        return undefined;
-      default:
-        return undefined;
-    }
+    return this.getResolvedColors(player).text;
   }
 
   override getBgColorCode(player: data.Player): Optional<ColorCode> {
-    const statsExtra = get(storedUserConfig).stats_extra as StatsExtra;
-    const colorPattern = get(storedUserConfig).column.player.color_pattern;
-
-    switch (colorPattern) {
-      case "pr_ship": {
-        const value = player[statsExtra].ship.pr.rating;
-        return RATING_COLORS[value].getFixedBgColor();
-      }
-      case "pr_overall": {
-        const value = player[statsExtra].overall.pr.rating;
-        return RATING_COLORS[value].getFixedBgColor();
-      }
-      case "threat_level": {
-        const value = player[statsExtra].overall.threat_level;
-        return THREAT_LEVEL_COLORS[value.rank].background;
-      }
-      case "none":
-        return undefined;
-      default:
-        return undefined;
-    }
+    return this.getResolvedColors(player).bg;
   }
 
   override getTableDataComponent() {
@@ -79,25 +39,9 @@ export class PlayerNameColumn extends AbstractColumn {
     if (!get(storedUserConfig).column.player.enable_nation_flag) {
       return "";
     }
-
-    let fragIcon = "";
-    switch (player.player_info.clan.language) {
-      case "ja":
-        fragIcon = "jp";
-        break;
-      case "zh":
-        fragIcon = "cn";
-        break;
-      case "ko":
-        fragIcon = "kr";
-        break;
-    }
-
-    if (!fragIcon) {
-      return "";
-    }
-
-    return `fi fi-${fragIcon}`;
+    const langMap: Record<string, string> = { ja: "jp", zh: "cn", ko: "kr" };
+    const fragIcon = langMap[player.player_info.clan.language] ?? "";
+    return fragIcon ? `fi fi-${fragIcon}` : "";
   }
 
   getPlayerName(player: data.Player): string {
@@ -119,5 +63,46 @@ export class PlayerNameColumn extends AbstractColumn {
     }
 
     return colorCode.getFixedTextColor();
+  }
+
+  /**
+   * 複数メソッドで重複していた色決定ロジックを集約。
+   * プレイヤー名表示用のテキスト色 / 背景色を同時に取得する。
+   */
+  private getResolvedColors(player: data.Player): {
+    text?: ColorCode;
+    bg?: ColorCode;
+  } {
+    const cfg = get(storedUserConfig);
+    const statsExtra = cfg.stats_extra as StatsExtra;
+    const pattern = cfg.column.player.color_pattern;
+
+    if (pattern === "none") {
+      return {};
+    }
+
+    switch (pattern) {
+      case "pr_ship": {
+        const rating = player[statsExtra].ship.pr.rating;
+        const code = RATING_COLORS[rating];
+        return code
+          ? { text: code.getFixedTextColor(), bg: code.getFixedBgColor() }
+          : {};
+      }
+      case "pr_overall": {
+        const rating = player[statsExtra].overall.pr.rating;
+        const code = RATING_COLORS[rating];
+        return code
+          ? { text: code.getFixedTextColor(), bg: code.getFixedBgColor() }
+          : {};
+      }
+      case "threat_level": {
+        const threat = player[statsExtra].overall.threat_level;
+        const pair = THREAT_LEVEL_COLORS[threat.rank];
+        return pair ? { text: pair.text, bg: pair.background } : {};
+      }
+      default:
+        return {};
+    }
   }
 }
