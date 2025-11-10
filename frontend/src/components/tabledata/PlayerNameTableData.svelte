@@ -15,7 +15,7 @@
   $: isNPC = column.isNPC(player);
 </script>
 
-<td class="p-1" style="background-color: {column.getBgColorCode(player)?.raw}">
+<td class="p-1">
   <div class="w-48 flex place-items-center">
     {#if isNPC}
       <div class="truncate">
@@ -38,7 +38,10 @@
           {clanTag}
         </span>
       {/if}
-      <div class="truncate">
+      <div
+        class="truncate"
+        style="color: {column.getTextColorCode(player)?.raw};"
+      >
         {column.getPlayerName(player)}
       </div>
     {/if}

@@ -17,11 +17,33 @@ export class PlayerNameColumn extends AbstractColumn {
   }
 
   override getTextColorCode(player: data.Player): Optional<ColorCode> {
-    return this.getResolvedColors(player).text;
-  }
+    const cfg = get(storedUserConfig);
+    const statsExtra = cfg.stats_extra as StatsExtra;
+    const pattern = cfg.column.player.color_pattern;
 
-  override getBgColorCode(player: data.Player): Optional<ColorCode> {
-    return this.getResolvedColors(player).bg;
+    if (pattern === "none") {
+      return undefined;
+    }
+
+    switch (pattern) {
+      case "pr_ship": {
+        const rating = player[statsExtra].ship.pr.rating;
+        const code = RATING_COLORS[rating];
+        return code ? code.getFixedTextColor() : undefined;
+      }
+      case "pr_overall": {
+        const rating = player[statsExtra].overall.pr.rating;
+        const code = RATING_COLORS[rating];
+        return code ? code.getFixedTextColor() : undefined;
+      }
+      case "threat_level": {
+        const threat = player[statsExtra].overall.threat_level;
+        const pair = THREAT_LEVEL_COLORS[threat.rank];
+        return pair ? pair.background : undefined;
+      }
+      default:
+        return undefined;
+    }
   }
 
   override getTableDataComponent() {
@@ -63,46 +85,5 @@ export class PlayerNameColumn extends AbstractColumn {
     }
 
     return colorCode.getFixedTextColor();
-  }
-
-  /**
-   * 複数メソッドで重複していた色決定ロジックを集約。
-   * プレイヤー名表示用のテキスト色 / 背景色を同時に取得する。
-   */
-  private getResolvedColors(player: data.Player): {
-    text?: ColorCode;
-    bg?: ColorCode;
-  } {
-    const cfg = get(storedUserConfig);
-    const statsExtra = cfg.stats_extra as StatsExtra;
-    const pattern = cfg.column.player.color_pattern;
-
-    if (pattern === "none") {
-      return {};
-    }
-
-    switch (pattern) {
-      case "pr_ship": {
-        const rating = player[statsExtra].ship.pr.rating;
-        const code = RATING_COLORS[rating];
-        return code
-          ? { text: code.getFixedTextColor(), bg: code.getFixedBgColor() }
-          : {};
-      }
-      case "pr_overall": {
-        const rating = player[statsExtra].overall.pr.rating;
-        const code = RATING_COLORS[rating];
-        return code
-          ? { text: code.getFixedTextColor(), bg: code.getFixedBgColor() }
-          : {};
-      }
-      case "threat_level": {
-        const threat = player[statsExtra].overall.threat_level;
-        const pair = THREAT_LEVEL_COLORS[threat.rank];
-        return pair ? { text: pair.text, bg: pair.background } : {};
-      }
-      default:
-        return {};
-    }
   }
 }
