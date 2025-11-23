@@ -5,7 +5,7 @@ import (
 	"errors"
 	"testing"
 	"wfs/backend/data"
-	"wfs/backend/mock/repository"
+	"wfs/backend/mock"
 
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
@@ -17,7 +17,7 @@ func TestBattle_Get_正常系_初回(t *testing.T) {
 	ctrl := gomock.NewController(t)
 
 	// 準備
-	mockWargaming := repository.NewMockWargamingInterface(ctrl)
+	mockWargaming := mock.NewMockWargamingInterface(ctrl)
 	mockWargaming.EXPECT().AccountList(gomock.Any()).Return(data.WGAccountList{
 		WGResponseCommon: data.WGResponseCommon[[]data.WGAccountListData]{
 			Status: "",
@@ -58,7 +58,7 @@ func TestBattle_Get_正常系_初回(t *testing.T) {
 	mockWargaming.EXPECT().ClansAccountInfo(gomock.Any()).Return(data.WGClansAccountInfo{}, nil)
 	mockWargaming.EXPECT().ClansInfo(gomock.Any()).Return(data.WGClansInfo{}, nil)
 
-	mockUnofficialWargaming := repository.NewMockUnofficialWargamingInterface(ctrl)
+	mockUnofficialWargaming := mock.NewMockUnofficialWargamingInterface(ctrl)
 	mockUnofficialWargaming.EXPECT().ClansAutoComplete(gomock.Any()).Return(data.UWGClansAutocomplete{
 		SearchAutocompleteResult: []struct {
 			HexColor string `json:"hex_color"`
@@ -73,14 +73,14 @@ func TestBattle_Get_正常系_初回(t *testing.T) {
 		},
 	}, nil).AnyTimes()
 
-	mockNumbers := repository.NewMockNumbersInterface(ctrl)
+	mockNumbers := mock.NewMockNumbersInterface(ctrl)
 	mockNumbers.EXPECT().ExpectedStats().Return(data.ExpectedStats{}, nil)
 
-	mockPersistence := repository.NewMockPersistenceInterface(ctrl)
+	mockPersistence := mock.NewMockPersistenceInterface(ctrl)
 	mockPersistence.EXPECT().SaveOwnIGN(gomock.Any()).Return(nil)
 	mockPersistence.EXPECT().SaveExpectedStats(gomock.Any()).Return(nil)
 
-	mockLogger := repository.NewMockLoggerInterface(ctrl)
+	mockLogger := mock.NewMockLoggerInterface(ctrl)
 	mockLogger.EXPECT().SetOwnIGN(gomock.Any()).Return()
 
 	// イベント発火履歴を記録するモック
@@ -117,7 +117,7 @@ func TestBattle_Get_正常系_2回目以降(t *testing.T) {
 	ctrl := gomock.NewController(t)
 
 	// 準備
-	mockWargaming := repository.NewMockWargamingInterface(ctrl)
+	mockWargaming := mock.NewMockWargamingInterface(ctrl)
 	mockWargaming.EXPECT().AccountList(gomock.Any()).Return(data.WGAccountList{
 		WGResponseCommon: data.WGResponseCommon[[]data.WGAccountListData]{
 			Status: "",
@@ -134,7 +134,7 @@ func TestBattle_Get_正常系_2回目以降(t *testing.T) {
 	mockWargaming.EXPECT().ClansAccountInfo(gomock.Any()).Return(data.WGClansAccountInfo{}, nil)
 	mockWargaming.EXPECT().ClansInfo(gomock.Any()).Return(data.WGClansInfo{}, nil)
 
-	mockUnofficialWargaming := repository.NewMockUnofficialWargamingInterface(ctrl)
+	mockUnofficialWargaming := mock.NewMockUnofficialWargamingInterface(ctrl)
 	mockUnofficialWargaming.EXPECT().ClansAutoComplete(gomock.Any()).Return(data.UWGClansAutocomplete{
 		SearchAutocompleteResult: []struct {
 			HexColor string `json:"hex_color"`
@@ -149,12 +149,12 @@ func TestBattle_Get_正常系_2回目以降(t *testing.T) {
 		},
 	}, nil).AnyTimes()
 
-	mockNumbers := repository.NewMockNumbersInterface(ctrl)
+	mockNumbers := mock.NewMockNumbersInterface(ctrl)
 
-	mockPersistence := repository.NewMockPersistenceInterface(ctrl)
+	mockPersistence := mock.NewMockPersistenceInterface(ctrl)
 	mockPersistence.EXPECT().SaveOwnIGN(gomock.Any()).Return(nil)
 
-	mockLogger := repository.NewMockLoggerInterface(ctrl)
+	mockLogger := mock.NewMockLoggerInterface(ctrl)
 	mockLogger.EXPECT().SetOwnIGN(gomock.Any()).Return()
 
 	// イベント発火履歴を記録するモック
@@ -192,17 +192,17 @@ func TestBattle_Get_異常系_アカウントリスト取得失敗(t *testing.T)
 	ctrl := gomock.NewController(t)
 
 	// 準備
-	mockWargaming := repository.NewMockWargamingInterface(ctrl)
+	mockWargaming := mock.NewMockWargamingInterface(ctrl)
 	mockWargaming.EXPECT().AccountList(gomock.Any()).Return(data.WGAccountList{}, errors.New("hoge"))
 
-	mockUnofficialWargaming := repository.NewMockUnofficialWargamingInterface(ctrl)
+	mockUnofficialWargaming := mock.NewMockUnofficialWargamingInterface(ctrl)
 
-	mockNumbers := repository.NewMockNumbersInterface(ctrl)
+	mockNumbers := mock.NewMockNumbersInterface(ctrl)
 
-	mockPersistence := repository.NewMockPersistenceInterface(ctrl)
+	mockPersistence := mock.NewMockPersistenceInterface(ctrl)
 	mockPersistence.EXPECT().SaveOwnIGN(gomock.Any()).Return(nil)
 
-	mockLogger := repository.NewMockLoggerInterface(ctrl)
+	mockLogger := mock.NewMockLoggerInterface(ctrl)
 	mockLogger.EXPECT().SetOwnIGN(gomock.Any()).Return()
 
 	// イベント発火履歴を記録するモック

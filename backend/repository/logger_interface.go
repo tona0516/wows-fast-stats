@@ -4,7 +4,7 @@ import (
 	"context"
 )
 
-//go:generate mockgen -source=$GOFILE -destination ../mock/$GOPACKAGE/$GOFILE -package $GOPACKAGE
+//go:generate mockgen -source=$GOFILE -destination ../mock/$GOFILE -package mock
 type LoggerInterface interface {
 	Init(appCtx context.Context)
 	SetOwnIGN(ownIGN string)

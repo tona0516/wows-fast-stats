@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"wfs/backend/data"
-	"wfs/backend/mock/repository"
+	"wfs/backend/mock"
 
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
@@ -34,7 +34,7 @@ func TestBattlePublisher_CanSubcribe(t *testing.T) {
 	ctrl := gomock.NewController(t)
 
 	for _, v := range params {
-		mockPersistence := repository.NewMockPersistenceInterface(ctrl)
+		mockPersistence := mock.NewMockPersistenceInterface(ctrl)
 		mockPersistence.EXPECT().LoadUserConfig().Return(data.UserConfig{InstallPath: v.installPath}, nil).AnyTimes()
 
 		bp := NewBattlePublisher(
@@ -57,10 +57,10 @@ func TestBattlePublisher_Subcribe(t *testing.T) {
 
 	// モックの作成
 	testArena := data.TempArenaInfo{PlayerName: "testPlayer"}
-	mockLocalFile := repository.NewMockLocalFileInterface(ctrl)
+	mockLocalFile := mock.NewMockLocalFileInterface(ctrl)
 	mockLocalFile.EXPECT().TempArenaInfo("/test").Return(testArena, nil).AnyTimes()
 
-	mockPersistence := repository.NewMockPersistenceInterface(ctrl)
+	mockPersistence := mock.NewMockPersistenceInterface(ctrl)
 	mockPersistence.EXPECT().LoadUserConfig().Return(data.UserConfig{InstallPath: "/test"}, nil).AnyTimes()
 
 	// イベント発火履歴を記録するモック

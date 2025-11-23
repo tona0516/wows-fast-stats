@@ -4,7 +4,7 @@ import (
 	"testing"
 	"wfs/backend/apperr"
 	"wfs/backend/data"
-	"wfs/backend/mock/repository"
+	"wfs/backend/mock"
 
 	"github.com/morikuni/failure"
 	"github.com/stretchr/testify/assert"
@@ -20,7 +20,7 @@ func TestUpdateChecker_Invoke(t *testing.T) {
 		t.Parallel()
 
 		// 準備
-		mockGithub := repository.NewMockGithubInterface(ctrl)
+		mockGithub := mock.NewMockGithubInterface(ctrl)
 		response := data.GHLatestRelease{TagName: "2.0.0", HTMLURL: "https://hoge.com"}
 		mockGithub.EXPECT().LatestRelease().Return(response, nil)
 
@@ -39,7 +39,7 @@ func TestUpdateChecker_Invoke(t *testing.T) {
 		t.Parallel()
 
 		// 準備
-		mockGithub := repository.NewMockGithubInterface(ctrl)
+		mockGithub := mock.NewMockGithubInterface(ctrl)
 		response := data.GHLatestRelease{TagName: "1.0.0", HTMLURL: "https://hoge.com"}
 		mockGithub.EXPECT().LatestRelease().Return(response, nil)
 
@@ -55,7 +55,7 @@ func TestUpdateChecker_Invoke(t *testing.T) {
 		t.Parallel()
 
 		// 準備
-		mockGithub := repository.NewMockGithubInterface(ctrl)
+		mockGithub := mock.NewMockGithubInterface(ctrl)
 		expected := failure.New(apperr.HTTPRequestError)
 		mockGithub.EXPECT().LatestRelease().Return(data.GHLatestRelease{}, expected)
 

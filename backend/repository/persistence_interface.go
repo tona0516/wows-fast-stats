@@ -4,7 +4,7 @@ import (
 	"wfs/backend/data"
 )
 
-//go:generate mockgen -source=$GOFILE -destination ../mock/$GOPACKAGE/$GOFILE -package $GOPACKAGE
+//go:generate mockgen -source=$GOFILE -destination ../mock/$GOFILE -package mock
 type PersistenceInterface interface {
 	// IGN
 	LoadOwnIGN() (string, error)
