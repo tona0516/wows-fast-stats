@@ -99,34 +99,6 @@
     {#each teams as team, i}
       {#if team.players.length !== 0}
         <thead>
-          {#if showThreatLevel && team[statsExtra].team_threat_level.average !== 0}
-            {@const teamThreatLevel = team[statsExtra].team_threat_level}
-            <tr class="bg-base-300/80">
-              <th colspan={allColumnCount} class="p-2">
-                <div class="flex flex-wrap items-center gap-3 text-sm">
-                  <div class="badge badge-info badge-outline gap-1">
-                    <span class="opacity-70">戦力</span>
-                    <span class="font-mono text-base"
-                      >{teamThreatLevel.average.toFixed(0)}</span
-                    >
-                  </div>
-                  <div class="badge badge-success badge-outline gap-1">
-                    <span class="opacity-70">確度</span>
-                    <span class="font-mono text-base"
-                      >{teamThreatLevel.accuracy.toFixed(0)}%</span
-                    >
-                  </div>
-                  <div class="badge badge-warning badge-outline gap-1">
-                    <span class="opacity-70">介護指数</span>
-                    <span class="font-mono text-base"
-                      >{teamThreatLevel.dissociation_degree.toFixed(0)}%</span
-                    >
-                  </div>
-                </div>
-              </th>
-            </tr>
-          {/if}
-
           <tr class="bg-base-300 text-xs">
             {#each categories as category}
               {#if category.showCount() > 0}
