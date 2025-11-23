@@ -1,9 +1,6 @@
 import type { data } from "@wails/go/models";
-import { DEFAULT_BLACK_LIST_ITEM } from "./constants";
 import {
-  storedEditBlackListItem,
   storedPlayerDetail,
-  storedRemoveBlackListItem,
   storedPlayerShipDetail as storedShipDetail,
 } from "./stores";
 
@@ -17,46 +14,6 @@ export class ModalManager {
       ModalManager._instance = new ModalManager();
     }
     return ModalManager._instance;
-  }
-
-  openForCreate() {
-    storedEditBlackListItem.set({
-      mode: "create",
-      form: structuredClone(DEFAULT_BLACK_LIST_ITEM),
-    });
-  }
-
-  openForSpecify(accountID: number, name: string) {
-    const defaultValue = structuredClone(DEFAULT_BLACK_LIST_ITEM);
-    storedEditBlackListItem.set({
-      mode: "specify",
-      form: {
-        account_id: accountID,
-        name: name,
-        pattern: defaultValue.pattern,
-        message: defaultValue.message,
-        created_at: defaultValue.created_at,
-      } as data.BlackListItem,
-    });
-  }
-
-  openForEdit(item: data.BlackListItem) {
-    storedEditBlackListItem.set({
-      mode: "edit",
-      form: item,
-    });
-  }
-
-  closeForEdit() {
-    storedEditBlackListItem.set(undefined);
-  }
-
-  openForRemove(item: data.BlackListItem) {
-    storedRemoveBlackListItem.set(item);
-  }
-
-  closeForDelete() {
-    storedRemoveBlackListItem.set(undefined);
   }
 
   openForPlayerDetail(player: data.Player) {

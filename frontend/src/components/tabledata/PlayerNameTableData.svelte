@@ -1,15 +1,11 @@
 <script lang="ts">
   import type { PlayerNameColumn } from "@libs/columns/PlayerNameColumn";
   import { ModalManager } from "@libs/ModalManager";
-  import { storedBlackList } from "@libs/stores";
   import type { data } from "@wails/go/models";
 
   export let column: PlayerNameColumn;
   export let player: data.Player;
 
-  $: blackListItem = $storedBlackList.find(
-    (it) => it.account_id === player.player_info.id,
-  );
   $: clanTag = column.getClanTag(player);
   $: nationFlagClass = column.getNationFlagClass(player);
   $: isNPC = column.isNPC(player);
@@ -26,9 +22,6 @@
         class="btn btn-xs bi bi-info-square p-1 mr-1"
         on:click={() => ModalManager.instance.openForPlayerDetail(player)}
       />
-      {#if blackListItem}
-        <span class="bi {blackListItem.pattern}"></span>
-      {/if}
 
       {#if clanTag}
         {#if nationFlagClass}

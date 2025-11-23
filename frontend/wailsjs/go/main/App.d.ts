@@ -4,8 +4,6 @@ import {data} from '../models';
 
 export function EmptyBattle():Promise<data.Battle>;
 
-export function GetBlackList():Promise<data.BlackList>;
-
 export function GetUserConfig():Promise<data.UserConfig>;
 
 export function LogError(arg1:string,arg2:Record<string, string>):Promise<void>;
@@ -15,8 +13,6 @@ export function LogInfo(arg1:string,arg2:Record<string, string>):Promise<void>;
 export function NewVersion():Promise<data.NewVersion>;
 
 export function OpenDirectory(arg1:string):Promise<void>;
-
-export function RemoveFromBlackList(arg1:number):Promise<void>;
 
 export function SaveUserConfig(arg1:data.UserConfig):Promise<void>;
 
@@ -29,7 +25,5 @@ export function ShowMessageDialog(arg1:string):Promise<void>;
 export function SubscribeBattle():Promise<void>;
 
 export function TrySaveInstallPath():Promise<boolean>;
-
-export function UpdateBlackList(arg1:data.BlackListItem):Promise<void>;
 
 export function ValidateInstallPath(arg1:string):Promise<string>;

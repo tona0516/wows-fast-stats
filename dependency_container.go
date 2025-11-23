@@ -15,12 +15,11 @@ type DependencyContainer struct {
 	config Config
 
 	// services
-	configService    *service.Config
-	battlePublisher  *service.BattlePublisher
-	battleService    *service.BattleFetcher
-	updaterService   *service.UpdateChecker
-	blackListService *service.BlackList
-	logger           repository.LoggerInterface
+	configService   *service.Config
+	battlePublisher *service.BattlePublisher
+	battleService   *service.BattleFetcher
+	updaterService  *service.UpdateChecker
+	logger          repository.LoggerInterface
 }
 
 func NewDependencyContainer(ctx context.Context, config Config) *DependencyContainer {
@@ -95,12 +94,11 @@ func NewDependencyContainer(ctx context.Context, config Config) *DependencyConta
 	updaterService := service.NewUpdateChecker(config.App.Semver, github)
 
 	return &DependencyContainer{
-		config:           config,
-		configService:    configService,
-		battlePublisher:  battlePublisher,
-		battleService:    battleFetcher,
-		updaterService:   updaterService,
-		blackListService: service.NewBlackList(ctx, persistence, runtime.EventsEmit),
-		logger:           logger,
+		config:          config,
+		configService:   configService,
+		battlePublisher: battlePublisher,
+		battleService:   battleFetcher,
+		updaterService:  updaterService,
+		logger:          logger,
 	}
 }

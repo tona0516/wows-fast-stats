@@ -1,7 +1,7 @@
 import { SaveUserConfig } from "@wails/go/main/App";
 import type { data } from "@wails/go/models";
 import { type Writable, writable } from "svelte/store";
-import type { EditModalParam, Optional, TonakoParam } from "./types";
+import type { Optional, TonakoParam } from "./types";
 
 export const storedUserConfig = writable() as Writable<data.UserConfig>;
 storedUserConfig.subscribe(async (value) => {
@@ -12,21 +12,13 @@ storedUserConfig.subscribe(async (value) => {
 export const storedBattle = writable(undefined) as Writable<
   Optional<data.Battle>
 >;
-export const storedBlackList = writable([]) as Writable<data.BlackListItem[]>;
 export const storedInstallPathError = writable("") as Writable<string>;
-export const storedEditBlackListItem = writable(undefined) as Writable<
-  Optional<EditModalParam>
->;
-export const storedRemoveBlackListItem = writable(undefined) as Writable<
-  Optional<data.BlackListItem>
->;
 export const storedPlayerDetail = writable(undefined) as Writable<
   Optional<data.Player>
 >;
 export const storedPlayerShipDetail = writable(undefined) as Writable<
   Optional<data.Player>
 >;
-
 export const storedTonako = writable(undefined) as Writable<
   Optional<TonakoParam>
 >;

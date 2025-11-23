@@ -44,14 +44,6 @@ func (p *Persistence) SaveUserConfig(data data.UserConfig) error {
 	return _writeJSON(filepath.Join(p.basePath, "user_config.json"), data)
 }
 
-// Blacklist.
-func (p *Persistence) LoadBlackList() (data.BlackList, error) {
-	return _readJSON[data.BlackList](filepath.Join(p.basePath, "blacklist.json"))
-}
-func (p *Persistence) SaveBlackList(data data.BlackList) error {
-	return _writeJSON(filepath.Join(p.basePath, "blacklist.json"), data)
-}
-
 // Private functions.
 
 func _readString(path string) (string, error) {

@@ -15,7 +15,4 @@ type PersistenceInterface interface {
 	// User Config.
 	LoadUserConfig() (data.UserConfig, error)
 	SaveUserConfig(data data.UserConfig) error
-	// Blacklist.
-	LoadBlackList() (data.BlackList, error)
-	SaveBlackList(data data.BlackList) error
 }

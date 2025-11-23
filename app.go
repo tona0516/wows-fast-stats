@@ -103,18 +103,6 @@ func (a *App) ShowMessageDialog(message string) {
 	})
 }
 
-func (a *App) GetBlackList() (data.BlackList, error) {
-	return a.container.blackListService.Get()
-}
-
-func (a *App) UpdateBlackList(item data.BlackListItem) error {
-	return a.container.blackListService.Update(item)
-}
-
-func (a *App) RemoveFromBlackList(accountID int) error {
-	return a.container.blackListService.Remove(accountID)
-}
-
 // 構造体のバインド用のメソッド.
 func (a *App) EmptyBattle() data.Battle {
 	return data.Battle{}

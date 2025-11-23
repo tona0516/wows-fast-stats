@@ -6,10 +6,6 @@ export function EmptyBattle() {
   return window['go']['main']['App']['EmptyBattle']();
 }
 
-export function GetBlackList() {
-  return window['go']['main']['App']['GetBlackList']();
-}
-
 export function GetUserConfig() {
   return window['go']['main']['App']['GetUserConfig']();
 }
@@ -28,10 +24,6 @@ export function NewVersion() {
 
 export function OpenDirectory(arg1) {
   return window['go']['main']['App']['OpenDirectory'](arg1);
-}
-
-export function RemoveFromBlackList(arg1) {
-  return window['go']['main']['App']['RemoveFromBlackList'](arg1);
 }
 
 export function SaveUserConfig(arg1) {
@@ -56,10 +48,6 @@ export function SubscribeBattle() {
 
 export function TrySaveInstallPath() {
   return window['go']['main']['App']['TrySaveInstallPath']();
-}
-
-export function UpdateBlackList(arg1) {
-  return window['go']['main']['App']['UpdateBlackList'](arg1);
 }
 
 export function ValidateInstallPath(arg1) {

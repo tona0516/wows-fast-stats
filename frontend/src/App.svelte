@@ -1,18 +1,14 @@
 <script lang="ts">
   import "bootstrap-icons/font/bootstrap-icons.css";
   import "charts.css";
-  import EditBlackListModal from "@components/modals/EditBlackListModal.svelte";
-  import ExternalLink from "@components/ExternalLink.svelte";
   import SideMenu from "@components/SideMenu.svelte";
   import Toast from "@components/Toast.svelte";
   import {
-    storedBlackList,
     storedBattle,
     storedInstallPathError,
     storedUserConfig,
   } from "@libs/stores";
   import type { Page } from "@libs/types";
-  import BlackListPage from "@pages/BlackListPage.svelte";
   import ConfigPage from "@pages/ConfigPage.svelte";
   import InfoPage from "@pages/InfoPage.svelte";
   import StatsPage from "@pages/StatsPage.svelte";
@@ -21,7 +17,6 @@
     SubscribeBattle,
     ShowMessageDialog,
     LogError,
-    GetBlackList,
     GetUserConfig,
   } from "@wails/go/main/App";
   import type { data } from "@wails/go/models";
@@ -29,8 +24,6 @@
   import { onMount } from "svelte";
   import { themeChange } from "theme-change";
   import { TonakoManager } from "@libs/TonakoManager";
-  import PlayerDetailModal from "@components/modals/PlayerDetailModal.svelte";
-  import RemoveBlackListModal from "@components/modals/RemoveBlackListModal.svelte";
   import ShipDetailModal from "@components/modals/ShipDetailModal.svelte";
 
   let statsPage: StatsPage | undefined;
@@ -42,10 +35,6 @@
     themeChange(false);
   });
 
-  EventsOn("BLACKLIST_UPDATE", (list: data.BlackListItem[]) => {
-    LogInfo("BLACKLIST_UPDATE");
-    storedBlackList.set(list);
-  });
   EventsOn("BATTLE_START", () => {
     LogInfo("BATTLE_START");
     TonakoManager.instance.setStartBattleState();
@@ -97,7 +86,6 @@
     try {
       const userConfig = await GetUserConfig();
       storedUserConfig.set(userConfig);
-      storedBlackList.set(await GetBlackList());
 
       const installPathError = await ValidateInstallPath(
         userConfig.install_path,
@@ -109,7 +97,7 @@
       initialized = true;
 
       if (!$storedInstallPathError) {
-        LogInfo("call SubscribeBattle")
+        LogInfo("call SubscribeBattle");
         SubscribeBattle();
       }
     } catch (error) {
@@ -128,10 +116,6 @@
 <main>
   <div>
     <Toast />
-
-    <EditBlackListModal />
-    <RemoveBlackListModal />
-    <PlayerDetailModal />
     <ShipDetailModal />
 
     <div class="flex divide-x-1 divide-neutral-500">
@@ -143,8 +127,6 @@
         {#if initialized}
           {#if page === "stats"}
             <StatsPage bind:this={statsPage} />
-          {:else if page === "ap_config"}
-            <BlackListPage />
           {:else if page === "config"}
             <ConfigPage />
           {:else if page === "info"}

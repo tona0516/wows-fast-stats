@@ -40,21 +40,6 @@ func (m *MockPersistenceInterface) EXPECT() *MockPersistenceInterfaceMockRecorde
 	return m.recorder
 }
 
-// LoadBlackList mocks base method.
-func (m *MockPersistenceInterface) LoadBlackList() (data.BlackList, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "LoadBlackList")
-	ret0, _ := ret[0].(data.BlackList)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// LoadBlackList indicates an expected call of LoadBlackList.
-func (mr *MockPersistenceInterfaceMockRecorder) LoadBlackList() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LoadBlackList", reflect.TypeOf((*MockPersistenceInterface)(nil).LoadBlackList))
-}
-
 // LoadExpectedStats mocks base method.
 func (m *MockPersistenceInterface) LoadExpectedStats() (data.ExpectedStats, error) {
 	m.ctrl.T.Helper()
@@ -98,20 +83,6 @@ func (m *MockPersistenceInterface) LoadUserConfig() (data.UserConfig, error) {
 func (mr *MockPersistenceInterfaceMockRecorder) LoadUserConfig() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LoadUserConfig", reflect.TypeOf((*MockPersistenceInterface)(nil).LoadUserConfig))
-}
-
-// SaveBlackList mocks base method.
-func (m *MockPersistenceInterface) SaveBlackList(arg0 data.BlackList) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SaveBlackList", arg0)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// SaveBlackList indicates an expected call of SaveBlackList.
-func (mr *MockPersistenceInterfaceMockRecorder) SaveBlackList(arg0 any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveBlackList", reflect.TypeOf((*MockPersistenceInterface)(nil).SaveBlackList), arg0)
 }
 
 // SaveExpectedStats mocks base method.

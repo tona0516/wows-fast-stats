@@ -1,4 +1,3 @@
-import type { data } from "@wails/go/models";
 import { ColorCode } from "./ColorCode";
 import type {
   ColumnCategory,
@@ -113,14 +112,6 @@ export const ROMAN_NUMERALS: { [key: number]: string } = {
   9: "IX",
   10: "X",
 } as const;
-
-export const DEFAULT_BLACK_LIST_ITEM = {
-  account_id: 0,
-  name: "",
-  pattern: "bi-check-circle-fill",
-  message: "",
-  created_at: 0,
-} as data.BlackListItem;
 
 export const RATING_COLORS: { [key: string]: ColorCode } = {
   bad: new ColorCode("#FE0E00"),

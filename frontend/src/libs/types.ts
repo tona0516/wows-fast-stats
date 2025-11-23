@@ -17,7 +17,7 @@ export type StatsKey = ShipStatsKey | OverallStatsKey;
 
 export type Optional<T> = T | undefined;
 
-export type Page = "stats" | "ap_config" | "config" | "info";
+export type Page = "stats" | "config" | "info";
 
 export type ColumnSettingPattern = "ship" | "overall" | "both";
 
@@ -44,12 +44,6 @@ export type StackedBarChartParam = {
   readonly label: string;
   readonly colorCode?: ColorCode;
   readonly value: number;
-};
-
-export type EditModalMode = "create" | "specify" | "edit";
-export type EditModalParam = {
-  mode: EditModalMode;
-  form: data.BlackListItem;
 };
 
 export type TonakoParam = {
