@@ -261,9 +261,6 @@
           class="toggle toggle-success"
           type="checkbox"
           bind:checked={$storedUserConfig.is_send_report}
-          on:change={() =>
-            ($storedUserConfig.is_send_report =
-              !$storedUserConfig.is_send_report)}
         />
         <span>アプリ改善のためのデータ送信を許可する</span>
       </li>
