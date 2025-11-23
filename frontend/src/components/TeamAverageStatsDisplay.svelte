@@ -1,6 +1,8 @@
 <script lang="ts">
   import { SHIP_TYPES } from "@libs/constants";
   import type { data } from "@wails/go/models";
+  import StatCell from "./StatCell.svelte";
+  import StatSection from "./StatSection.svelte";
 
   export let friendTeam: data.Team;
   export let enemyTeam: data.Team;
@@ -27,17 +29,6 @@
   }
   $: if (enemyTeam) {
     enemyTeamAvg = calculateTeamAverage(enemyTeam);
-  }
-
-  function formatValue(value: number): string {
-    if (!value || value === 0) return "0";
-    return value.toFixed(0);
-  }
-
-  function getDiffColor(diff: number): string {
-    if (diff > 0) return "text-green-600";
-    if (diff < 0) return "text-red-600";
-    return "text-gray-600";
   }
 
   function calculateTeamAverage(team: data.Team): data.TeamAverageStats {
@@ -71,6 +62,15 @@
       overall_win_rate: totalOverallWinRate / count,
     };
   }
+
+  function formatValue(value: number): string {
+    if (!value || value === 0) return "0";
+    return value.toFixed(0);
+  }
+
+  function formatPercent(value: number): string {
+    return value.toFixed(1);
+  }
 </script>
 
 <div class="flex gap-8 mt-4 px-4 justify-center flex-wrap">
@@ -79,274 +79,122 @@
     <h3 class="font-semibold text-lg mb-4 text-center">チーム平均</h3>
     <div class="space-y-3">
       <div class="pb-2">
-        <div class="text-xs font-semibold text-gray-600 mb-2">艦成績</div>
-        <div class="space-y-2">
-          <div class="flex items-center gap-3 text-sm">
-            <span class="w-12">PR</span>
-            <div class="flex gap-2">
-              <div class="text-center w-12">
-                <div class="text-xs text-gray-500">味方</div>
-                <div>{formatValue(friendTeamAvg.ship_avg_pr)}</div>
-              </div>
-              <div class="text-center w-12">
-                <div class="text-xs text-gray-500">敵</div>
-                <div>{formatValue(enemyTeamAvg.ship_avg_pr)}</div>
-              </div>
-              <div class="text-center w-12">
-                <div class="text-xs text-gray-500">差分</div>
-                <div
-                  class={getDiffColor(
-                    friendTeamAvg.ship_avg_pr - enemyTeamAvg.ship_avg_pr,
-                  )}
-                >
-                  {formatValue(
-                    friendTeamAvg.ship_avg_pr - enemyTeamAvg.ship_avg_pr,
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="flex items-center gap-3 text-sm">
-            <span class="w-12">Dmg</span>
-            <div class="flex gap-2">
-              <div class="text-center w-12">
-                <div class="text-xs text-gray-500">味方</div>
-                <div>{formatValue(friendTeamAvg.ship_avg_damage)}</div>
-              </div>
-              <div class="text-center w-12">
-                <div class="text-xs text-gray-500">敵</div>
-                <div>{formatValue(enemyTeamAvg.ship_avg_damage)}</div>
-              </div>
-              <div class="text-center w-12">
-                <div class="text-xs text-gray-500">差分</div>
-                <div
-                  class={getDiffColor(
-                    friendTeamAvg.ship_avg_damage -
-                      enemyTeamAvg.ship_avg_damage,
-                  )}
-                >
-                  {formatValue(
-                    friendTeamAvg.ship_avg_damage -
-                      enemyTeamAvg.ship_avg_damage,
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="flex items-center gap-3 text-sm">
-            <span class="w-12">勝率</span>
-            <div class="flex gap-2">
-              <div class="text-center w-12">
-                <div class="text-xs text-gray-500">味方</div>
-                <div>{friendTeamAvg.ship_win_rate.toFixed(1)}%</div>
-              </div>
-              <div class="text-center w-12">
-                <div class="text-xs text-gray-500">敵</div>
-                <div>{enemyTeamAvg.ship_win_rate.toFixed(1)}%</div>
-              </div>
-              <div class="text-center w-12">
-                <div class="text-xs text-gray-500">差分</div>
-                <div
-                  class={getDiffColor(
-                    friendTeamAvg.ship_win_rate - enemyTeamAvg.ship_win_rate,
-                  )}
-                >
-                  {(
-                    friendTeamAvg.ship_win_rate - enemyTeamAvg.ship_win_rate
-                  ).toFixed(1)}%
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <StatSection title="艦成績">
+          <StatCell
+            label="PR"
+            friendValue={formatValue(friendTeamAvg.ship_avg_pr)}
+            enemyValue={formatValue(enemyTeamAvg.ship_avg_pr)}
+            diffValue={formatValue(
+              friendTeamAvg.ship_avg_pr - enemyTeamAvg.ship_avg_pr,
+            )}
+            diffValueNum={friendTeamAvg.ship_avg_pr - enemyTeamAvg.ship_avg_pr}
+          />
+          <StatCell
+            label="Dmg"
+            friendValue={formatValue(friendTeamAvg.ship_avg_damage)}
+            enemyValue={formatValue(enemyTeamAvg.ship_avg_damage)}
+            diffValue={formatValue(
+              friendTeamAvg.ship_avg_damage - enemyTeamAvg.ship_avg_damage,
+            )}
+            diffValueNum={friendTeamAvg.ship_avg_damage -
+              enemyTeamAvg.ship_avg_damage}
+          />
+          <StatCell
+            label="勝率"
+            friendValue={formatPercent(friendTeamAvg.ship_win_rate)}
+            enemyValue={formatPercent(enemyTeamAvg.ship_win_rate)}
+            diffValue={formatPercent(
+              friendTeamAvg.ship_win_rate - enemyTeamAvg.ship_win_rate,
+            )}
+            diffValueNum={friendTeamAvg.ship_win_rate -
+              enemyTeamAvg.ship_win_rate}
+            isPercentage={true}
+          />
+        </StatSection>
       </div>
+
       <div class="border-t border-base-300 pt-2">
-        <div class="text-xs font-semibold text-gray-600 mb-2">総合成績</div>
-        <div class="space-y-2">
-          <div class="flex items-center gap-3 text-sm">
-            <span class="w-12">PR</span>
-            <div class="flex gap-2">
-              <div class="text-center w-12">
-                <div class="text-xs text-gray-500">味方</div>
-                <div>{formatValue(friendTeamAvg.overall_avg_pr)}</div>
-              </div>
-              <div class="text-center w-12">
-                <div class="text-xs text-gray-500">敵</div>
-                <div>{formatValue(enemyTeamAvg.overall_avg_pr)}</div>
-              </div>
-              <div class="text-center w-12">
-                <div class="text-xs text-gray-500">差分</div>
-                <div
-                  class={getDiffColor(
-                    friendTeamAvg.overall_avg_pr - enemyTeamAvg.overall_avg_pr,
-                  )}
-                >
-                  {formatValue(
-                    friendTeamAvg.overall_avg_pr - enemyTeamAvg.overall_avg_pr,
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="flex items-center gap-3 text-sm">
-            <span class="w-12">Dmg</span>
-            <div class="flex gap-2">
-              <div class="text-center w-12">
-                <div class="text-xs text-gray-500">味方</div>
-                <div>{formatValue(friendTeamAvg.overall_avg_damage)}</div>
-              </div>
-              <div class="text-center w-12">
-                <div class="text-xs text-gray-500">敵</div>
-                <div>{formatValue(enemyTeamAvg.overall_avg_damage)}</div>
-              </div>
-              <div class="text-center w-12">
-                <div class="text-xs text-gray-500">差分</div>
-                <div
-                  class={getDiffColor(
-                    friendTeamAvg.overall_avg_damage -
-                      enemyTeamAvg.overall_avg_damage,
-                  )}
-                >
-                  {formatValue(
-                    friendTeamAvg.overall_avg_damage -
-                      enemyTeamAvg.overall_avg_damage,
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="flex items-center gap-3 text-sm">
-            <span class="w-12">勝率</span>
-            <div class="flex gap-2">
-              <div class="text-center w-12">
-                <div class="text-xs text-gray-500">味方</div>
-                <div>{friendTeamAvg.overall_win_rate.toFixed(1)}%</div>
-              </div>
-              <div class="text-center w-12">
-                <div class="text-xs text-gray-500">敵</div>
-                <div>{formatValue(enemyTeamAvg.overall_win_rate)}</div>
-              </div>
-              <div class="text-center w-12">
-                <div class="text-xs text-gray-500">差分</div>
-                <div
-                  class={getDiffColor(
-                    friendTeamAvg.overall_win_rate -
-                      enemyTeamAvg.overall_win_rate,
-                  )}
-                >
-                  {(
-                    friendTeamAvg.overall_win_rate -
-                    enemyTeamAvg.overall_win_rate
-                  ).toFixed(1)}%
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <StatSection title="総合成績">
+          <StatCell
+            label="PR"
+            friendValue={formatValue(friendTeamAvg.overall_avg_pr)}
+            enemyValue={formatValue(enemyTeamAvg.overall_avg_pr)}
+            diffValue={formatValue(
+              friendTeamAvg.overall_avg_pr - enemyTeamAvg.overall_avg_pr,
+            )}
+            diffValueNum={friendTeamAvg.overall_avg_pr -
+              enemyTeamAvg.overall_avg_pr}
+          />
+          <StatCell
+            label="Dmg"
+            friendValue={formatValue(friendTeamAvg.overall_avg_damage)}
+            enemyValue={formatValue(enemyTeamAvg.overall_avg_damage)}
+            diffValue={formatValue(
+              friendTeamAvg.overall_avg_damage -
+                enemyTeamAvg.overall_avg_damage,
+            )}
+            diffValueNum={friendTeamAvg.overall_avg_damage -
+              enemyTeamAvg.overall_avg_damage}
+          />
+          <StatCell
+            label="勝率"
+            friendValue={formatPercent(friendTeamAvg.overall_win_rate)}
+            enemyValue={formatPercent(enemyTeamAvg.overall_win_rate)}
+            diffValue={formatPercent(
+              friendTeamAvg.overall_win_rate - enemyTeamAvg.overall_win_rate,
+            )}
+            diffValueNum={friendTeamAvg.overall_win_rate -
+              enemyTeamAvg.overall_win_rate}
+            isPercentage={true}
+          />
+        </StatSection>
       </div>
+
       <div class="border-t border-base-300 pt-2">
-        <div class="text-xs font-semibold text-gray-600 mb-2">
-          戦力評価(by 178usagi)
-        </div>
-        <div class="space-y-2">
-          <div class="flex items-center gap-3 text-sm">
-            <span class="w-12">脅威度</span>
-            <div class="flex gap-2">
-              <div class="text-center w-12">
-                <div class="text-xs text-gray-500">味方</div>
-                <div>
-                  {friendTeam.pvp_all.team_threat_level.average.toFixed(1)}
-                </div>
-              </div>
-              <div class="text-center w-12">
-                <div class="text-xs text-gray-500">敵</div>
-                <div>
-                  {enemyTeam.pvp_all.team_threat_level.average.toFixed(1)}
-                </div>
-              </div>
-              <div class="text-center w-12">
-                <div class="text-xs text-gray-500">差分</div>
-                <div
-                  class={getDiffColor(
-                    friendTeam.pvp_all.team_threat_level.average -
-                      enemyTeam.pvp_all.team_threat_level.average,
-                  )}
-                >
-                  {(
-                    friendTeam.pvp_all.team_threat_level.average -
-                    enemyTeam.pvp_all.team_threat_level.average
-                  ).toFixed(1)}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="flex items-center gap-3 text-sm">
-          <span class="w-12">確度</span>
-          <div class="flex gap-2">
-            <div class="text-center w-12">
-              <div class="text-xs text-gray-500">味方</div>
-              <div>
-                {friendTeam.pvp_all.team_threat_level.accuracy.toFixed(1)}
-              </div>
-            </div>
-            <div class="text-center w-12">
-              <div class="text-xs text-gray-500">敵</div>
-              <div>
-                {enemyTeam.pvp_all.team_threat_level.accuracy.toFixed(1)}
-              </div>
-            </div>
-            <div class="text-center w-12">
-              <div class="text-xs text-gray-500">差分</div>
-              <div
-                class={getDiffColor(
-                  friendTeam.pvp_all.team_threat_level.accuracy -
-                    enemyTeam.pvp_all.team_threat_level.accuracy,
-                )}
-              >
-                {(
-                  friendTeam.pvp_all.team_threat_level.accuracy -
-                  enemyTeam.pvp_all.team_threat_level.accuracy
-                ).toFixed(1)}
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="flex items-center gap-3 text-sm">
-          <span class="w-12">介護指数</span>
-          <div class="flex gap-2">
-            <div class="text-center w-12">
-              <div class="text-xs text-gray-500">味方</div>
-              <div>
-                {friendTeam.pvp_all.team_threat_level.dissociation_degree.toFixed(
-                  1,
-                )}
-              </div>
-            </div>
-            <div class="text-center w-12">
-              <div class="text-xs text-gray-500">敵</div>
-              <div>
-                {enemyTeam.pvp_all.team_threat_level.dissociation_degree.toFixed(
-                  1,
-                )}
-              </div>
-            </div>
-            <div class="text-center w-12">
-              <div class="text-xs text-gray-500">差分</div>
-              <div
-                class={getDiffColor(
-                  friendTeam.pvp_all.team_threat_level.dissociation_degree -
-                    enemyTeam.pvp_all.team_threat_level.dissociation_degree,
-                )}
-              >
-                {(
-                  friendTeam.pvp_all.team_threat_level.dissociation_degree -
-                  enemyTeam.pvp_all.team_threat_level.dissociation_degree
-                ).toFixed(1)}
-              </div>
-            </div>
-          </div>
-        </div>
+        <StatSection title="戦力評価(by 178usagi)">
+          <StatCell
+            label="脅威度"
+            friendValue={friendTeam.pvp_all.team_threat_level.average.toFixed(
+              1,
+            )}
+            enemyValue={enemyTeam.pvp_all.team_threat_level.average.toFixed(1)}
+            diffValue={(
+              friendTeam.pvp_all.team_threat_level.average -
+              enemyTeam.pvp_all.team_threat_level.average
+            ).toFixed(1)}
+            diffValueNum={friendTeam.pvp_all.team_threat_level.average -
+              enemyTeam.pvp_all.team_threat_level.average}
+          />
+          <StatCell
+            label="確度"
+            friendValue={friendTeam.pvp_all.team_threat_level.accuracy.toFixed(
+              1,
+            )}
+            enemyValue={enemyTeam.pvp_all.team_threat_level.accuracy.toFixed(1)}
+            diffValue={(
+              friendTeam.pvp_all.team_threat_level.accuracy -
+              enemyTeam.pvp_all.team_threat_level.accuracy
+            ).toFixed(1)}
+            diffValueNum={friendTeam.pvp_all.team_threat_level.accuracy -
+              enemyTeam.pvp_all.team_threat_level.accuracy}
+          />
+          <StatCell
+            label="介護指数"
+            friendValue={friendTeam.pvp_all.team_threat_level.dissociation_degree.toFixed(
+              1,
+            )}
+            enemyValue={enemyTeam.pvp_all.team_threat_level.dissociation_degree.toFixed(
+              1,
+            )}
+            diffValue={(
+              friendTeam.pvp_all.team_threat_level.dissociation_degree -
+              enemyTeam.pvp_all.team_threat_level.dissociation_degree
+            ).toFixed(1)}
+            diffValueNum={friendTeam.pvp_all.team_threat_level
+              .dissociation_degree -
+              enemyTeam.pvp_all.team_threat_level.dissociation_degree}
+          />
+        </StatSection>
       </div>
     </div>
   </div>
@@ -362,187 +210,78 @@
         <h3 class="font-semibold text-lg mb-4 text-center">{shipTypeName}</h3>
         <div class="space-y-3">
           <div class="pb-2">
-            <div class="text-xs font-semibold text-gray-600 mb-2">艦成績</div>
-            <div class="space-y-2">
-              <div class="flex items-center gap-3 text-sm">
-                <span class="w-12">PR</span>
-                <div class="flex gap-2">
-                  <div class="text-center w-12">
-                    <div class="text-xs text-gray-500">味方</div>
-                    <div>{formatValue(friendStats.ship_avg_pr)}</div>
-                  </div>
-                  <div class="text-center w-12">
-                    <div class="text-xs text-gray-500">敵</div>
-                    <div>{formatValue(enemyStats.ship_avg_pr)}</div>
-                  </div>
-                  <div class="text-center w-12">
-                    <div class="text-xs text-gray-500">差分</div>
-                    <div
-                      class={getDiffColor(
-                        friendStats.ship_avg_pr - enemyStats.ship_avg_pr,
-                      )}
-                    >
-                      {formatValue(
-                        friendStats.ship_avg_pr - enemyStats.ship_avg_pr,
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="flex items-center gap-3 text-sm">
-                <span class="w-12">Dmg</span>
-                <div class="flex gap-2">
-                  <div class="text-center w-12">
-                    <div class="text-xs text-gray-500">味方</div>
-                    <div>{formatValue(friendStats.ship_avg_damage)}</div>
-                  </div>
-                  <div class="text-center w-12">
-                    <div class="text-xs text-gray-500">敵</div>
-                    <div>{formatValue(enemyStats.ship_avg_damage)}</div>
-                  </div>
-                  <div class="text-center w-12">
-                    <div class="text-xs text-gray-500">差分</div>
-                    <div
-                      class={getDiffColor(
-                        friendStats.ship_avg_damage -
-                          enemyStats.ship_avg_damage,
-                      )}
-                    >
-                      {formatValue(
-                        friendStats.ship_avg_damage -
-                          enemyStats.ship_avg_damage,
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="flex items-center gap-3 text-sm">
-                <span class="w-12">勝率</span>
-                <div class="flex gap-2">
-                  <div class="text-center w-12">
-                    <div class="text-xs text-gray-500">味方</div>
-                    <div>{friendStats.ship_win_rate.toFixed(1)}%</div>
-                  </div>
-                  <div class="text-center w-12">
-                    <div class="text-xs text-gray-500">敵</div>
-                    <div>{enemyStats.ship_win_rate.toFixed(1)}%</div>
-                  </div>
-                  <div class="text-center w-12">
-                    <div class="text-xs text-gray-500">差分</div>
-                    <div
-                      class={getDiffColor(
-                        friendStats.ship_win_rate - enemyStats.ship_win_rate,
-                      )}
-                    >
-                      {(
-                        friendStats.ship_win_rate - enemyStats.ship_win_rate
-                      ).toFixed(1)}%
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <StatSection title="艦成績">
+              <StatCell
+                label="PR"
+                friendValue={formatValue(friendStats.ship_avg_pr)}
+                enemyValue={formatValue(enemyStats.ship_avg_pr)}
+                diffValue={formatValue(
+                  friendStats.ship_avg_pr - enemyStats.ship_avg_pr,
+                )}
+                diffValueNum={friendStats.ship_avg_pr - enemyStats.ship_avg_pr}
+              />
+              <StatCell
+                label="Dmg"
+                friendValue={formatValue(friendStats.ship_avg_damage)}
+                enemyValue={formatValue(enemyStats.ship_avg_damage)}
+                diffValue={formatValue(
+                  friendStats.ship_avg_damage - enemyStats.ship_avg_damage,
+                )}
+                diffValueNum={friendStats.ship_avg_damage -
+                  enemyStats.ship_avg_damage}
+              />
+              <StatCell
+                label="勝率"
+                friendValue={formatPercent(friendStats.ship_win_rate)}
+                enemyValue={formatPercent(enemyStats.ship_win_rate)}
+                diffValue={formatPercent(
+                  friendStats.ship_win_rate - enemyStats.ship_win_rate,
+                )}
+                diffValueNum={friendStats.ship_win_rate -
+                  enemyStats.ship_win_rate}
+                isPercentage={true}
+              />
+            </StatSection>
           </div>
+
           <div class="border-t border-base-300 pt-2">
-            <div class="text-xs font-semibold text-gray-600 mb-2">総合成績</div>
-            <div class="space-y-2">
-              <div class="flex items-center gap-3 text-sm">
-                <span class="w-12">PR</span>
-                <div class="flex gap-2">
-                  <div class="text-center w-12">
-                    <div class="text-xs text-gray-500">味方</div>
-                    <div>{formatValue(friendStats.overall_avg_pr)}</div>
-                  </div>
-                  <div class="text-center w-12">
-                    <div class="text-xs text-gray-500">敵</div>
-                    <div>{formatValue(enemyStats.overall_avg_pr)}</div>
-                  </div>
-                  <div class="text-center w-12">
-                    <div class="text-xs text-gray-500">差分</div>
-                    <div
-                      class={getDiffColor(
-                        friendStats.overall_avg_pr - enemyStats.overall_avg_pr,
-                      )}
-                    >
-                      {formatValue(
-                        friendStats.overall_avg_pr - enemyStats.overall_avg_pr,
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="flex items-center gap-3 text-sm">
-                <span class="w-12">Dmg</span>
-                <div class="flex gap-2">
-                  <div class="text-center w-12">
-                    <div class="text-xs text-gray-500">味方</div>
-                    <div>{formatValue(friendStats.overall_avg_damage)}</div>
-                  </div>
-                  <div class="text-center w-12">
-                    <div class="text-xs text-gray-500">敵</div>
-                    <div>{formatValue(enemyStats.overall_avg_damage)}</div>
-                  </div>
-                  <div class="text-center w-12">
-                    <div class="text-xs text-gray-500">差分</div>
-                    <div
-                      class={getDiffColor(
-                        friendStats.overall_avg_damage -
-                          enemyStats.overall_avg_damage,
-                      )}
-                    >
-                      {formatValue(
-                        friendStats.overall_avg_damage -
-                          enemyStats.overall_avg_damage,
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="flex items-center gap-3 text-sm">
-                <span class="w-12">勝率</span>
-                <div class="flex gap-2">
-                  <div class="text-center w-12">
-                    <div class="text-xs text-gray-500">味方</div>
-                    <div>{friendStats.overall_win_rate.toFixed(1)}%</div>
-                  </div>
-                  <div class="text-center w-12">
-                    <div class="text-xs text-gray-500">敵</div>
-                    <div>{enemyStats.overall_win_rate.toFixed(1)}%</div>
-                  </div>
-                  <div class="text-center w-12">
-                    <div class="text-xs text-gray-500">差分</div>
-                    <div
-                      class={getDiffColor(
-                        friendStats.overall_win_rate -
-                          enemyStats.overall_win_rate,
-                      )}
-                    >
-                      {(
-                        friendStats.overall_win_rate -
-                        enemyStats.overall_win_rate
-                      ).toFixed(1)}%
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <StatSection title="総合成績">
+              <StatCell
+                label="PR"
+                friendValue={formatValue(friendStats.overall_avg_pr)}
+                enemyValue={formatValue(enemyStats.overall_avg_pr)}
+                diffValue={formatValue(
+                  friendStats.overall_avg_pr - enemyStats.overall_avg_pr,
+                )}
+                diffValueNum={friendStats.overall_avg_pr -
+                  enemyStats.overall_avg_pr}
+              />
+              <StatCell
+                label="Dmg"
+                friendValue={formatValue(friendStats.overall_avg_damage)}
+                enemyValue={formatValue(enemyStats.overall_avg_damage)}
+                diffValue={formatValue(
+                  friendStats.overall_avg_damage -
+                    enemyStats.overall_avg_damage,
+                )}
+                diffValueNum={friendStats.overall_avg_damage -
+                  enemyStats.overall_avg_damage}
+              />
+              <StatCell
+                label="勝率"
+                friendValue={formatPercent(friendStats.overall_win_rate)}
+                enemyValue={formatPercent(enemyStats.overall_win_rate)}
+                diffValue={formatPercent(
+                  friendStats.overall_win_rate - enemyStats.overall_win_rate,
+                )}
+                diffValueNum={friendStats.overall_win_rate -
+                  enemyStats.overall_win_rate}
+                isPercentage={true}
+              />
+            </StatSection>
           </div>
         </div>
       </div>
     {/if}
   {/each}
 </div>
-
-<style>
-  :global(.text-green-600) {
-    color: #16a34a;
-  }
-
-  :global(.text-red-600) {
-    color: #dc2626;
-  }
-
-  :global(.text-gray-600) {
-    color: #4b5563;
-  }
-</style>
