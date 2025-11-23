@@ -1,6 +1,7 @@
 <script lang="ts">
   import BattleMetadata from "@components/BattleMetadata.svelte";
   import MainStatsTable from "@components/MainStatsTable.svelte";
+  import TeamAverageStatsDisplay from "@components/TeamAverageStatsDisplay.svelte";
   import MessagingTonako from "@components/MessagingTonako.svelte";
   import {
     storedInstallPathError,
@@ -30,5 +31,14 @@
     <div class="flex justify-center">
       <MainStatsTable teams={$storedBattle.teams} />
     </div>
+
+    {#if $storedBattle.teams.length === 2}
+      <div class="flex justify-center px-4">
+        <TeamAverageStatsDisplay
+          friendTeam={$storedBattle.teams[0]}
+          enemyTeam={$storedBattle.teams[1]}
+        />
+      </div>
+    {/if}
   {/if}
 </div>

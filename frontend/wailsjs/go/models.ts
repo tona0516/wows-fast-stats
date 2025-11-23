@@ -1,5 +1,65 @@
 export namespace data {
 	
+	export class TeamAverageStats {
+	    ship_avg_pr: number;
+	    ship_avg_damage: number;
+	    ship_win_rate: number;
+	    overall_avg_pr: number;
+	    overall_avg_damage: number;
+	    overall_win_rate: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new TeamAverageStats(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.ship_avg_pr = source["ship_avg_pr"];
+	        this.ship_avg_damage = source["ship_avg_damage"];
+	        this.ship_win_rate = source["ship_win_rate"];
+	        this.overall_avg_pr = source["overall_avg_pr"];
+	        this.overall_avg_damage = source["overall_avg_damage"];
+	        this.overall_win_rate = source["overall_win_rate"];
+	    }
+	}
+	export class TeamShipTypeStats {
+	    cv: TeamAverageStats;
+	    bb: TeamAverageStats;
+	    cl: TeamAverageStats;
+	    dd: TeamAverageStats;
+	    ss: TeamAverageStats;
+	
+	    static createFrom(source: any = {}) {
+	        return new TeamShipTypeStats(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.cv = this.convertValues(source["cv"], TeamAverageStats);
+	        this.bb = this.convertValues(source["bb"], TeamAverageStats);
+	        this.cl = this.convertValues(source["cl"], TeamAverageStats);
+	        this.dd = this.convertValues(source["dd"], TeamAverageStats);
+	        this.ss = this.convertValues(source["ss"], TeamAverageStats);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
 	export class TeamThreatLevel {
 	    average: number;
 	    dissociation_degree: number;
@@ -463,6 +523,7 @@ export namespace data {
 	    pvp_solo: TeamStats;
 	    pvp_all: TeamStats;
 	    rank_solo: TeamStats;
+	    ship_type_stats: TeamShipTypeStats;
 	
 	    static createFrom(source: any = {}) {
 	        return new Team(source);
@@ -474,6 +535,7 @@ export namespace data {
 	        this.pvp_solo = this.convertValues(source["pvp_solo"], TeamStats);
 	        this.pvp_all = this.convertValues(source["pvp_all"], TeamStats);
 	        this.rank_solo = this.convertValues(source["rank_solo"], TeamStats);
+	        this.ship_type_stats = this.convertValues(source["ship_type_stats"], TeamShipTypeStats);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -702,6 +764,8 @@ export namespace data {
 	        this.url = source["url"];
 	    }
 	}
+	
+	
 	
 	
 	

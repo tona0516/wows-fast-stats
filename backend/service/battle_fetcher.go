@@ -495,6 +495,11 @@ func (b *BattleFetcher) compose(
 		},
 	}
 
+	// Calculate ship type stats for each team
+	for i := range teams {
+		teams[i].ShipTypeStats = calculateTeamShipTypeStats(teams[i].Players)
+	}
+
 	battle := data.Battle{
 		Meta: data.BattleMetaData{
 			Unixtime: tempArenaInfo.Unixtime(),
@@ -565,5 +570,55 @@ func playerStats(
 			EfficiencyBadge:   stats.EfficiencyBadges(),
 			ThreatLevel:       threatLevel,
 		},
+	}
+}
+
+func calculateTeamShipTypeStats(players data.Players) data.TeamShipTypeStats {
+	shipTypeGroups := make(map[data.ShipType][]data.Player)
+	for _, player := range players {
+		shipType := player.ShipInfo.Type
+		shipTypeGroups[shipType] = append(shipTypeGroups[shipType], player)
+	}
+
+	return data.TeamShipTypeStats{
+		CV: calculateShipTypeAverage(shipTypeGroups[data.ShipTypeCV]),
+		BB: calculateShipTypeAverage(shipTypeGroups[data.ShipTypeBB]),
+		CL: calculateShipTypeAverage(shipTypeGroups[data.ShipTypeCL]),
+		DD: calculateShipTypeAverage(shipTypeGroups[data.ShipTypeDD]),
+		SS: calculateShipTypeAverage(shipTypeGroups[data.ShipTypeSS]),
+	}
+}
+
+func calculateShipTypeAverage(players []data.Player) data.TeamAverageStats {
+	if len(players) == 0 {
+		return data.TeamAverageStats{}
+	}
+
+	var (
+		shipPRSum         float64
+		shipDamageSum     float64
+		shipWinRateSum    float64
+		overallPRSum      float64
+		overallDamageSum  float64
+		overallWinRateSum float64
+	)
+
+	for _, player := range players {
+		shipPRSum += player.PvPAll.ShipStats.PR.Value
+		shipDamageSum += player.PvPAll.ShipStats.Damage.Value
+		shipWinRateSum += player.PvPAll.ShipStats.WinRate.Value
+		overallPRSum += player.PvPAll.OverallStats.PR.Value
+		overallDamageSum += player.PvPAll.OverallStats.Damage.Value
+		overallWinRateSum += player.PvPAll.OverallStats.WinRate.Value
+	}
+
+	count := float64(len(players))
+	return data.TeamAverageStats{
+		ShipAvgPR:        shipPRSum / count,
+		ShipAvgDamage:    shipDamageSum / count,
+		ShipWinRate:      shipWinRateSum / count,
+		OverallAvgPR:     overallPRSum / count,
+		OverallAvgDamage: overallDamageSum / count,
+		OverallWinRate:   overallWinRateSum / count,
 	}
 }
