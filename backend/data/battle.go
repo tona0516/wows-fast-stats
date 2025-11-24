@@ -12,32 +12,26 @@ type BattleMetaData struct {
 }
 
 type Team struct {
-	Players       Players           `json:"players"`
-	PvPSolo       TeamStats         `json:"pvp_solo"`
-	PvPAll        TeamStats         `json:"pvp_all"`
-	RankSolo      TeamStats         `json:"rank_solo"`
-	ShipTypeStats TeamShipTypeStats `json:"ship_type_stats"`
+	Players  Players   `json:"players"`
+	PvPSolo  TeamStats `json:"pvp_solo"`
+	PvPAll   TeamStats `json:"pvp_all"`
+	RankSolo TeamStats `json:"rank_solo"`
 }
 
 type TeamStats struct {
-	TeamThreatLevel TeamThreatLevel `json:"team_threat_level"`
+	TeamAverageStats TeamAverageStats `json:"team_average_stats"`
+	TeamThreatLevel  TeamThreatLevel  `json:"team_threat_level"`
 }
 
 type TeamAverageStats struct {
-	ShipAvgPR        float64 `json:"ship_avg_pr"`
-	ShipAvgDamage    float64 `json:"ship_avg_damage"`
-	ShipWinRate      float64 `json:"ship_win_rate"`
-	OverallAvgPR     float64 `json:"overall_avg_pr"`
-	OverallAvgDamage float64 `json:"overall_avg_damage"`
-	OverallWinRate   float64 `json:"overall_win_rate"`
-}
-
-type TeamShipTypeStats struct {
-	CV TeamAverageStats `json:"cv"`
-	BB TeamAverageStats `json:"bb"`
-	CL TeamAverageStats `json:"cl"`
-	DD TeamAverageStats `json:"dd"`
-	SS TeamAverageStats `json:"ss"`
+	ShipPR         float64 `json:"ship_pr"`
+	ShipDamage     float64 `json:"ship_damage"`
+	ShipWinRate    float64 `json:"ship_win_rate"`
+	ShipBattles    uint    `json:"ship_battles"`
+	OverallPR      float64 `json:"overall_pr"`
+	OverallDamage  float64 `json:"overall_damage"`
+	OverallWinRate float64 `json:"overall_win_rate"`
+	OverallBattles uint    `json:"overall_battles"`
 }
 
 type TeamThreatLevel struct {

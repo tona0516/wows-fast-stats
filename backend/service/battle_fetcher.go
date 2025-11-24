@@ -472,32 +472,33 @@ func (b *BattleFetcher) compose(
 		{
 			Players: friends,
 			PvPAll: data.TeamStats{
-				TeamThreatLevel: yamibuka.CalculateTeamThreatLevel(friends, data.StatsPatternPvPAll),
+				TeamAverageStats: calculateTeamAverageStats(friends, data.StatsPatternPvPAll),
+				TeamThreatLevel:  yamibuka.CalculateTeamThreatLevel(friends, data.StatsPatternPvPAll),
 			},
 			PvPSolo: data.TeamStats{
-				TeamThreatLevel: yamibuka.CalculateTeamThreatLevel(friends, data.StatsPatternPvPSolo),
+				TeamAverageStats: calculateTeamAverageStats(friends, data.StatsPatternPvPSolo),
+				TeamThreatLevel:  yamibuka.CalculateTeamThreatLevel(friends, data.StatsPatternPvPSolo),
 			},
 			RankSolo: data.TeamStats{
-				TeamThreatLevel: yamibuka.CalculateTeamThreatLevel(friends, data.StatsPatternRankSolo),
+				TeamAverageStats: calculateTeamAverageStats(friends, data.StatsPatternRankSolo),
+				TeamThreatLevel:  yamibuka.CalculateTeamThreatLevel(friends, data.StatsPatternRankSolo),
 			},
 		},
 		{
 			Players: enemies,
 			PvPAll: data.TeamStats{
-				TeamThreatLevel: yamibuka.CalculateTeamThreatLevel(enemies, data.StatsPatternPvPAll),
+				TeamAverageStats: calculateTeamAverageStats(enemies, data.StatsPatternPvPAll),
+				TeamThreatLevel:  yamibuka.CalculateTeamThreatLevel(enemies, data.StatsPatternPvPAll),
 			},
 			PvPSolo: data.TeamStats{
-				TeamThreatLevel: yamibuka.CalculateTeamThreatLevel(enemies, data.StatsPatternPvPSolo),
+				TeamAverageStats: calculateTeamAverageStats(enemies, data.StatsPatternPvPSolo),
+				TeamThreatLevel:  yamibuka.CalculateTeamThreatLevel(enemies, data.StatsPatternPvPSolo),
 			},
 			RankSolo: data.TeamStats{
-				TeamThreatLevel: yamibuka.CalculateTeamThreatLevel(enemies, data.StatsPatternRankSolo),
+				TeamAverageStats: calculateTeamAverageStats(enemies, data.StatsPatternRankSolo),
+				TeamThreatLevel:  yamibuka.CalculateTeamThreatLevel(enemies, data.StatsPatternRankSolo),
 			},
 		},
-	}
-
-	// Calculate ship type stats for each team
-	for i := range teams {
-		teams[i].ShipTypeStats = calculateTeamShipTypeStats(teams[i].Players)
 	}
 
 	battle := data.Battle{
@@ -573,52 +574,58 @@ func playerStats(
 	}
 }
 
-func calculateTeamShipTypeStats(players data.Players) data.TeamShipTypeStats {
-	shipTypeGroups := make(map[data.ShipType][]data.Player)
-	for _, player := range players {
-		shipType := player.ShipInfo.Type
-		shipTypeGroups[shipType] = append(shipTypeGroups[shipType], player)
-	}
+func calculateTeamAverageStats(
+	players data.Players,
+	statsPattern data.StatsPattern,
+) data.TeamAverageStats {
+	var shipPRSum, shipDamageSum, shipWinRateSum float64
+	var shipBattlesSum, shipStatsCount uint
 
-	return data.TeamShipTypeStats{
-		CV: calculateShipTypeAverage(shipTypeGroups[data.ShipTypeCV]),
-		BB: calculateShipTypeAverage(shipTypeGroups[data.ShipTypeBB]),
-		CL: calculateShipTypeAverage(shipTypeGroups[data.ShipTypeCL]),
-		DD: calculateShipTypeAverage(shipTypeGroups[data.ShipTypeDD]),
-		SS: calculateShipTypeAverage(shipTypeGroups[data.ShipTypeSS]),
-	}
-}
-
-func calculateShipTypeAverage(players []data.Player) data.TeamAverageStats {
-	if len(players) == 0 {
-		return data.TeamAverageStats{}
-	}
-
-	var (
-		shipPRSum         float64
-		shipDamageSum     float64
-		shipWinRateSum    float64
-		overallPRSum      float64
-		overallDamageSum  float64
-		overallWinRateSum float64
-	)
+	var overallPRSum, overallDamageSum, overallWinRateSum float64
+	var overallBattlesSum, overallStatsCount uint
 
 	for _, player := range players {
-		shipPRSum += player.PvPAll.ShipStats.PR.Value
-		shipDamageSum += player.PvPAll.ShipStats.Damage.Value
-		shipWinRateSum += player.PvPAll.ShipStats.WinRate.Value
-		overallPRSum += player.PvPAll.OverallStats.PR.Value
-		overallDamageSum += player.PvPAll.OverallStats.Damage.Value
-		overallWinRateSum += player.PvPAll.OverallStats.WinRate.Value
+		var shipStats data.ShipStats
+		var overallStats data.OverallStats
+		switch statsPattern {
+		case data.StatsPatternPvPSolo:
+			shipStats = player.PvPSolo.ShipStats
+			overallStats = player.PvPSolo.OverallStats
+		case data.StatsPatternPvPAll:
+			shipStats = player.PvPAll.ShipStats
+			overallStats = player.PvPAll.OverallStats
+		case data.StatsPatternRankSolo:
+			shipStats = player.RankSolo.ShipStats
+			overallStats = player.RankSolo.OverallStats
+		}
+
+		if shipStats.Battles > 0 {
+			shipPRSum += shipStats.PR.Value
+			shipDamageSum += shipStats.Damage.Value
+			shipWinRateSum += shipStats.WinRate.Value
+			shipBattlesSum += shipStats.Battles
+
+			shipStatsCount++
+		}
+
+		if overallStats.Battles > 0 {
+			overallPRSum += overallStats.PR.Value
+			overallDamageSum += overallStats.Damage.Value
+			overallWinRateSum += overallStats.WinRate.Value
+			overallBattlesSum += overallStats.Battles
+
+			overallStatsCount++
+		}
 	}
 
-	count := float64(len(players))
 	return data.TeamAverageStats{
-		ShipAvgPR:        shipPRSum / count,
-		ShipAvgDamage:    shipDamageSum / count,
-		ShipWinRate:      shipWinRateSum / count,
-		OverallAvgPR:     overallPRSum / count,
-		OverallAvgDamage: overallDamageSum / count,
-		OverallWinRate:   overallWinRateSum / count,
+		ShipPR:         util.SafeDivide(shipPRSum, shipStatsCount),
+		ShipDamage:     util.SafeDivide(shipDamageSum, shipStatsCount),
+		ShipWinRate:    util.SafeDivide(shipWinRateSum, shipStatsCount),
+		ShipBattles:    uint(util.SafeDivide(float64(shipBattlesSum), shipStatsCount)),
+		OverallPR:      util.SafeDivide(overallPRSum, overallStatsCount),
+		OverallDamage:  util.SafeDivide(overallDamageSum, overallStatsCount),
+		OverallWinRate: util.SafeDivide(overallWinRateSum, overallStatsCount),
+		OverallBattles: uint(util.SafeDivide(float64(overallBattlesSum), overallStatsCount)),
 	}
 }

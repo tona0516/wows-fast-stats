@@ -79,3 +79,10 @@ func fieldsRecursive(parentNames []string, t reflect.Type, result *[]string) {
 		}
 	}
 }
+
+func SafeDivide(numerator float64, denominator uint) float64 {
+	if denominator == 0 {
+		return 0
+	}
+	return numerator / float64(denominator)
+}
