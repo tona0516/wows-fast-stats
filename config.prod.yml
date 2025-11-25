@@ -1,6 +1,6 @@
 app:
   name: wows-fast-stats
-  semver: 0.16.999
+  semver: 1.0.0-alpha.1
   width: 1280
   height: 720
   min_width: 640
