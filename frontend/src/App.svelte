@@ -25,6 +25,7 @@
   import { themeChange } from "theme-change";
   import { TonakoManager } from "@libs/TonakoManager";
   import ShipDetailModal from "@components/modals/ShipDetailModal.svelte";
+  import PlayerDetailModal from "@components/modals/PlayerDetailModal.svelte";
 
   let statsPage: StatsPage | undefined;
   let initialized = false;
@@ -107,7 +108,6 @@
 
   const main = async () => {
     await initialize();
-    // await notifyUpdate(config);
   };
 
   main();
@@ -116,6 +116,7 @@
 <main>
   <div>
     <Toast />
+    <PlayerDetailModal />
     <ShipDetailModal />
 
     <div class="flex divide-x-1 divide-neutral-500">
