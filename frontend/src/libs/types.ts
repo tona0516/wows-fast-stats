@@ -1,6 +1,4 @@
 import type { data } from "@wails/go/models";
-import type { ColorCode } from "./ColorCode";
-import type { Tonako } from "./Tonako";
 
 type BasicKey = "player_info" | "ship_info";
 type CommonMethod = "convertValues";
@@ -40,14 +38,14 @@ export type ColumnInfo = {
   readonly pattern: ColumnSettingPattern;
 };
 
-export type StackedBarChartParam = {
-  readonly label: string;
-  readonly colorCode?: ColorCode;
-  readonly value: number;
-};
+export type TierGroup = Readonly<keyof data.TierGroup>;
 
-export type TonakoParam = {
-  message: string;
-  isLoading: boolean;
-  tonako: Tonako;
-};
+export type Rating =
+  | "bad"
+  | "below_avg"
+  | "avg"
+  | "good"
+  | "very_good"
+  | "great"
+  | "unicum"
+  | "super_unicum";

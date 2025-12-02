@@ -1,10 +1,9 @@
 import StackedBarGraphTableData from "@components/tabledata/StackedBarGraphTableData.svelte";
 import { ColorCode } from "@libs/ColorCode";
-import type { StackedBarChartParam } from "@libs/types";
+import type { StackedBarChartParam } from "@libs/StackedBarChartParam";
+import type { TierGroup } from "@libs/types";
 import type { data } from "@wails/go/models";
 import { AbstractStatsColumn } from "./AbstractStatsColumn";
-
-type TierGroup = Readonly<keyof data.TierGroup>;
 
 const DISPLAY_NAMES: { [tierGroup in TierGroup]: string } = {
   low: "1~4",
@@ -13,9 +12,9 @@ const DISPLAY_NAMES: { [tierGroup in TierGroup]: string } = {
 } as const;
 
 const COLORS: { [tierGroup in TierGroup]: ColorCode } = {
-  low: new ColorCode("#8CA113"),
-  middle: new ColorCode("#205B85"),
-  high: new ColorCode("#990F4F"),
+  low: new ColorCode("#187FC4"),
+  middle: new ColorCode("#AACF52"),
+  high: new ColorCode("#EA5532"),
 } as const;
 
 export class TierRateColumn extends AbstractStatsColumn<

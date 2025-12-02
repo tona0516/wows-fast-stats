@@ -1,7 +1,6 @@
 import SingleTableData from "@components/tabledata/SingleTableData.svelte";
-import type { ColorCode } from "@libs/ColorCode";
-import { RATING_COLORS } from "@libs/constants";
-import type { Optional, StatsCategory } from "@libs/types";
+import { type ColorCode, RATING_COLORS } from "@libs/ColorCode";
+import type { Optional, Rating, StatsCategory } from "@libs/types";
 import type { data } from "@wails/go/models";
 import { AbstractStatsColumn } from "./AbstractStatsColumn";
 
@@ -26,7 +25,7 @@ export class DamageColumn extends AbstractStatsColumn<string> {
     }
     const value = this.getPlayerStats(player).ship.damage.rating;
 
-    return RATING_COLORS[value].getFixedTextColor();
+    return RATING_COLORS[value as Rating].getFixedTextColor();
   }
 
   override getCssClass(): string {

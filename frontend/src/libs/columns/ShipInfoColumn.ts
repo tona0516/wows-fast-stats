@@ -1,6 +1,5 @@
 import ShipInfoTableData from "@components/tabledata/ShipInfoTableData.svelte";
-import { ColorCode } from "@libs/ColorCode";
-import { SHIP_TYPE_COLORS } from "@libs/constants";
+import { type ColorCode, SHIP_TYPE_COLORS } from "@libs/ColorCode";
 import { storedUserConfig } from "@libs/stores";
 import type { Optional } from "@libs/types";
 import { toShipType, toTierString } from "@libs/utils";
@@ -88,8 +87,8 @@ export class ShipInfoColumn extends AbstractColumn {
       return undefined;
     }
 
-    const color = SHIP_TYPE_COLORS.get(type);
-    return color?.getFixedBgColor(ColorCode.SHIP_TYPE_BG_FIXED_RATE);
+    const color = SHIP_TYPE_COLORS[type];
+    return color?.getFixedBgColor();
   }
 
   getDisplayValue(player: data.Player): string {

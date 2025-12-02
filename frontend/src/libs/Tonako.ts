@@ -2,6 +2,12 @@ import tonakoPointing from "src/assets/images/tonako_pointing.png";
 import tonakoSorry from "src/assets/images/tonako_sorry.png";
 import tonakoStandby from "src/assets/images/tonako_standby.png";
 
+export type TonakoParam = {
+  message: string;
+  isLoading: boolean;
+  tonako: Tonako;
+};
+
 export class Tonako {
   private constructor(private readonly imgPath: string) {}
 

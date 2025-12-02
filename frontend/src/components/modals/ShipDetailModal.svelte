@@ -4,9 +4,10 @@
   import { ClipboardSetText, BrowserOpenURL } from "@wails/runtime/runtime";
   import ModalCommon from "./ModalCommon.svelte";
   import { ModalManager } from "@libs/ModalManager";
-  import type { ColorCode } from "@libs/ColorCode";
+  import { RATING_COLORS, type ColorCode } from "@libs/ColorCode";
   import { NumbersURL } from "@libs/NumbersURL";
-  import { RATING_COLORS, RATING_NAMES } from "@libs/constants";
+  import { RATING_NAMES } from "@libs/constants";
+    import type { Rating } from "@libs/types";
 
   interface DamageRating {
     displayName: string;
@@ -26,7 +27,7 @@
     return player.ship_info.damage_ratings.map((dr) => {
       return {
         displayName: RATING_NAMES[dr.rating],
-        colorCode: RATING_COLORS[dr.rating].getFixedTextColor(),
+        colorCode: RATING_COLORS[dr.rating as Rating].getFixedTextColor(),
         value: `${dr.value.toFixed()}~`,
       };
     });

@@ -1,7 +1,6 @@
 import SingleTableData from "@components/tabledata/SingleTableData.svelte";
-import { THREAT_LEVEL_COLORS } from "@libs/constants";
 import type { data } from "@wails/go/models";
-import type { ColorCode } from "../ColorCode";
+import { type ColorCode, THREAT_LEVEL_COLORS } from "../ColorCode";
 import type { Optional } from "../types";
 import { AbstractStatsColumn } from "./AbstractStatsColumn";
 

@@ -1,8 +1,7 @@
 import PlayerNameTableData from "@components/tabledata/PlayerNameTableData.svelte";
-import { ColorCode } from "@libs/ColorCode";
-import { RATING_COLORS, THREAT_LEVEL_COLORS } from "@libs/constants";
+import { ColorCode, RATING_COLORS, THREAT_LEVEL_COLORS } from "@libs/ColorCode";
 import { storedUserConfig } from "@libs/stores";
-import type { Optional, StatsExtra } from "@libs/types";
+import type { Optional, Rating, StatsExtra } from "@libs/types";
 import type { data } from "@wails/go/models";
 import { get } from "svelte/store";
 import { AbstractColumn } from "./AbstractColumn";
@@ -28,12 +27,12 @@ export class PlayerNameColumn extends AbstractColumn {
     switch (pattern) {
       case "pr_ship": {
         const rating = player[statsExtra].ship.pr.rating;
-        const code = RATING_COLORS[rating];
+        const code = RATING_COLORS[rating as Rating];
         return code ? code.getFixedTextColor() : undefined;
       }
       case "pr_overall": {
         const rating = player[statsExtra].overall.pr.rating;
-        const code = RATING_COLORS[rating];
+        const code = RATING_COLORS[rating as Rating];
         return code ? code.getFixedTextColor() : undefined;
       }
       case "threat_level": {
