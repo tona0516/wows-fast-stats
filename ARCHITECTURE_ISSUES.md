@@ -35,7 +35,7 @@ type BattleFetcher struct {
 	eventsEmitFunc eventEmitFunc
 
 	isFirstBattle                      bool
-	isNotifyExpectedStatsUnavaillalble bool
+	isNotifyExpectedStatsUnavaillalble bool  // Note: typo in source (Unavaillalble)
 	warship                            data.Warships
 	allExpectedStats                   data.ExpectedStats
 	battleArenas                       data.WGBattleArenas
@@ -179,7 +179,7 @@ func (b *AppBuilder) Build() (*App, error) { ... }
 type BattleFetcher struct {
     // ...
     isFirstBattle                      bool
-    isNotifyExpectedStatsUnavaillalble bool
+    isNotifyExpectedStatsUnavaillalble bool  // Note: typo in source (Unavaillalble)
     warship                            data.Warships
     allExpectedStats                   data.ExpectedStats
     battleArenas                       data.WGBattleArenas
@@ -681,5 +681,6 @@ func (s *BattleService) FetchBattle(ctx context.Context, info data.TempArenaInfo
    - ドキュメントの整備
    - パフォーマンス最適化
    - 技術的負債の削減
+   - コードの typo 修正（例: `isNotifyExpectedStatsUnavaillalble` → `isNotifyExpectedStatsUnavailable`）
 
 これらの改善により、コードの保守性、テスタビリティ、拡張性が大幅に向上し、長期的な開発速度の維持が可能になります。
