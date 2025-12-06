@@ -9,5 +9,6 @@
 
 ### アーキテクチャドキュメント
 - [Architecture Issues (日本語)](./ARCHITECTURE_ISSUES.md) - ソフトウェアアーキテクチャの詳細な問題分析と改善提案
+- [Architecture Matrix (日本語)](./ARCHITECTURE_MATRIX.md) - 問題の優先度マトリクスとROI分析
 - [Architecture Summary (English)](./ARCHITECTURE_SUMMARY.md) - Executive summary of architectural issues
 - [Architecture Documentation](./docs/README.md) - Documentation index

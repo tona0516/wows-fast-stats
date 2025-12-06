@@ -5,16 +5,19 @@ This directory contains architecture documentation for the wows-fast-stats proje
 ## Documents
 
 - [Architecture Issues](../ARCHITECTURE_ISSUES.md) - Detailed analysis of architectural problems and improvement proposals (日本語)
+- [Architecture Matrix](../ARCHITECTURE_MATRIX.md) - Priority matrix and ROI analysis (日本語)
+- [Architecture Summary](../ARCHITECTURE_SUMMARY.md) - Executive summary (English)
 
 ## Overview
 
-The `ARCHITECTURE_ISSUES.md` document provides:
+The architecture documentation provides:
 
-1. Comprehensive analysis of 7 major architectural problems
-2. Current state code examples
-3. Concrete refactoring proposals
-4. Prioritized roadmap
-5. Measurable improvement targets
+1. **Comprehensive analysis** of 7 major architectural problems
+2. **Current state** code examples from the actual codebase
+3. **Concrete refactoring proposals** with code samples
+4. **Prioritized roadmap** with 5 implementation phases
+5. **Measurable improvement targets** and metrics
+6. **ROI analysis** to guide implementation priority
 
 ## Quick Links
 
