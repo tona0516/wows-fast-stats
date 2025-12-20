@@ -104,7 +104,7 @@
   <!-- Charts Section -->
   <div class="bg-base-200 rounded-xl border border-base-300 p-6">
     <h3 class="font-semibold text-xl mb-6 text-center">チーム平均比較</h3>
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div class="grid grid-cols-1 gap-8">
       <div>
         <h4 class="font-medium text-center mb-4">艦成績</h4>
         <BarChart data={shipChartData} />

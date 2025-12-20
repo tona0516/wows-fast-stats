@@ -39,9 +39,9 @@
   });
 </script>
 
-<div class="space-y-4">
+<div class="w-xl grid grid-cols-2 gap-4">
   {#each chartData as item}
-    <div class="space-y-1">
+    <div class="flex-1 space-y-1">
       <div class="flex items-center justify-between text-sm">
         <span class="font-medium">{item.label}</span>
         <span
@@ -55,41 +55,37 @@
       <div class="space-y-1">
         <!-- Friend Team Bar -->
         <div class="flex items-center gap-2">
-          <span class="text-xs w-12 text-right text-primary font-medium"
+          <span class="text-xs w-10 text-right text-primary font-medium"
             >味方</span
           >
-          <div class="flex-1 flex items-center">
-            <div class="relative h-6 bg-base-300 rounded-r w-full">
+          <div class="flex-1">
+            <div class="h-4 bg-base-300 rounded">
               <div
-                class="absolute left-0 h-full bg-primary rounded-r transition-all duration-300"
+                class="h-full bg-primary rounded transition-all duration-300"
                 style="width: {item.friendWidth}%"
               />
-              <div
-                class="absolute left-2 top-1/2 -translate-y-1/2 text-xs font-mono text-primary-content"
-              >
-                {formatValue(item.friendValue)}
-              </div>
             </div>
           </div>
+          <span class="text-xs w-14 text-right font-mono text-primary">
+            {formatValue(item.friendValue)}
+          </span>
         </div>
         <!-- Enemy Team Bar -->
         <div class="flex items-center gap-2">
-          <span class="text-xs w-12 text-right text-secondary font-medium"
+          <span class="text-xs w-10 text-right text-secondary font-medium"
             >敵</span
           >
-          <div class="flex-1 flex items-center">
-            <div class="relative h-6 bg-base-300 rounded-r w-full">
+          <div class="flex-1">
+            <div class="h-4 bg-base-300 rounded">
               <div
-                class="absolute left-0 h-full bg-secondary rounded-r transition-all duration-300"
+                class="h-full bg-secondary rounded transition-all duration-300"
                 style="width: {item.enemyWidth}%"
               />
-              <div
-                class="absolute left-2 top-1/2 -translate-y-1/2 text-xs font-mono text-secondary-content"
-              >
-                {formatValue(item.enemyValue)}
-              </div>
             </div>
           </div>
+          <span class="text-xs w-14 text-right font-mono text-secondary">
+            {formatValue(item.enemyValue)}
+          </span>
         </div>
       </div>
     </div>
