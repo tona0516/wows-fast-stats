@@ -4,8 +4,6 @@ version: "3"
 
 vars:
   NPM: npm --prefix ./frontend
-  CONFIG_PROD: config.prod.yml
-  CONFIG_DEV: config.dev.yml
 
 tasks:
   setup:
@@ -16,7 +14,6 @@ tasks:
           - github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest
           - go.uber.org/mock/mockgen@latest
           - github.com/arch-go/arch-go@latest
-          - github.com/mikefarah/yq/v4@latest
         cmd: go install {{.ITEM}}
   gen-mock:
     desc: generate mocks
@@ -45,23 +42,13 @@ tasks:
       # - "{{.NPM}} run test"
   dev:
     desc: run app in development mode
-    vars:
-      BASE64_CONFIG:
-        sh: yq -n 'load("{{.CONFIG_PROD}}") * load("{{.CONFIG_DEV}}")' | base64
     cmds:
-      - wails dev -ldflags="-X main.Base64ConfigYml={{.BASE64_CONFIG}}"
+      - wails dev -ldflags="-X main.env=dev"
   build:
     desc: build
     deps: [test]
-    vars:
-      BASE64_CONFIG:
-        sh: cat {{.CONFIG_PROD}} | base64
-      CONFIG_JSON:
-        sh: yq {{.CONFIG_PROD}} | yq -o=json
-      CONFIG_MAP:
-        ref: "fromJson .CONFIG_JSON" # https://github.com/go-task/task/issues/2217
     cmds:
-      - wails build -ldflags="-X main.Base64ConfigYml={{.BASE64_CONFIG}}" -platform windows/amd64 -o {{.CONFIG_MAP.app.name}}-{{.CONFIG_MAP.app.semver}}.exe -trimpath -webview2 embed
+      - wails build -ldflags="-X main.env=prod" -platform windows/amd64 -trimpath -webview2 embed
   chbtl:
     desc: change battle
     vars:

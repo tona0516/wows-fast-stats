@@ -2,10 +2,9 @@ package main
 
 import (
 	"embed"
-	"encoding/base64"
 	"log"
+	"wfs/internal/di"
 
-	"github.com/goccy/go-yaml"
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
@@ -15,17 +14,13 @@ import (
 var assets embed.FS
 
 //nolint:gochecknoglobals
-var Base64ConfigYml string
+var env string
 
 func main() {
-	config, err := getConfig()
-	if err != nil {
-		log.Fatalln(err.Error())
-	}
+	config := di.NewConfig(env)
+	app := NewApp(config)
 
-	app := NewApp(*config)
-
-	err = wails.Run(&options.App{
+	err := wails.Run(&options.App{
 		Title:     config.App.Name,
 		Width:     config.App.Width,
 		Height:    config.App.Height,
@@ -42,18 +37,4 @@ func main() {
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
-}
-
-func getConfig() (*Config, error) {
-	configYml, err := base64.StdEncoding.DecodeString(Base64ConfigYml)
-	if err != nil {
-		return nil, err
-	}
-
-	config := Config{}
-	if err := yaml.Unmarshal(configYml, &config); err != nil {
-		return nil, err
-	}
-
-	return &config, nil
 }

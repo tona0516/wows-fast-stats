@@ -5,6 +5,7 @@ import (
 	"os"
 	"wfs/internal/apperr"
 	"wfs/internal/data"
+	"wfs/internal/di"
 
 	"github.com/mitchellh/go-ps"
 	"github.com/morikuni/failure"
@@ -13,18 +14,18 @@ import (
 )
 
 type App struct {
-	config            Config
+	config            di.Config
 	ctx               context.Context
-	container         *DependencyContainer
+	container         *di.Container
 	unsubscribeBattle context.CancelFunc
 }
 
-func NewApp(config Config) *App {
+func NewApp(config di.Config) *App {
 	return &App{config: config}
 }
 
 func (a *App) SubscribeBattle() {
-	if !a.container.battlePublisher.CanSubcribe() {
+	if !a.container.BattlePublisher.CanSubcribe() {
 		return
 	}
 
@@ -36,35 +37,35 @@ func (a *App) SubscribeBattle() {
 	a.unsubscribeBattle = unsubscribeBattle
 	channel := make(chan data.TempArenaInfo)
 
-	go a.container.battlePublisher.Subcribe(cancelCtx, channel)
+	go a.container.BattlePublisher.Subcribe(cancelCtx, channel)
 	for tempArenaInfo := range channel {
-		a.container.battleService.Invoke(tempArenaInfo)
+		a.container.BattleService.Invoke(tempArenaInfo)
 	}
 }
 
 func (a *App) GetUserConfig() (data.UserConfig, error) {
-	return a.container.configService.GetUserConfig()
+	return a.container.ConfigService.GetUserConfig()
 }
 
 func (a *App) SaveUserConfig(config data.UserConfig) error {
-	return a.container.configService.SaveUserConfig(config)
+	return a.container.ConfigService.SaveUserConfig(config)
 }
 
 func (a *App) TrySaveInstallPath() (bool, error) {
-	return a.container.configService.TrySaveInstallPath(a.ctx)
+	return a.container.ConfigService.TrySaveInstallPath(a.ctx)
 }
 
 func (a *App) OpenDirectory(path string) error {
-	err := a.container.configService.OpenDirectory(path)
+	err := a.container.ConfigService.OpenDirectory(path)
 	if err != nil {
-		a.container.logger.Warn(err, nil)
+		a.container.Logger.Warn(err, nil)
 	}
 
 	return apperr.Unwrap(err)
 }
 
 func (a *App) ValidateInstallPath(path string) string {
-	err := a.container.configService.ValidateInstallPath(path)
+	err := a.container.ConfigService.ValidateInstallPath(path)
 
 	if err := apperr.Unwrap(err); err != nil {
 		return err.Error()
@@ -78,22 +79,22 @@ func (a *App) Semver() string {
 }
 
 func (a *App) SearchPlayer(prefix string) ([]data.WGAccountListData, error) {
-	result, err := a.container.configService.SearchPlayer(prefix)
+	result, err := a.container.ConfigService.SearchPlayer(prefix)
 
 	return result.Data, apperr.Unwrap(err)
 }
 
 func (a *App) LogError(errString string, contexts map[string]string) {
 	err := failure.New(apperr.FrontendError, failure.Messagef("%s", errString))
-	a.container.logger.Error(err, contexts)
+	a.container.Logger.Error(err, contexts)
 }
 
 func (a *App) LogInfo(message string, contexts map[string]string) {
-	a.container.logger.Info(message, contexts)
+	a.container.Logger.Info(message, contexts)
 }
 
 func (a *App) NewVersion() *data.NewVersion {
-	return a.container.updaterService.Invoke()
+	return a.container.UpdaterService.Invoke()
 }
 
 func (a *App) ShowMessageDialog(message string) {
@@ -116,7 +117,7 @@ func (a *App) onStartup(ctx context.Context) {
 		a.showExistDialog("すでに起動しています。", 1)
 	}
 
-	a.container = NewDependencyContainer(ctx, a.config)
+	a.container = di.NewContainer(ctx, a.config)
 }
 
 func isAlreadyRunning() bool {

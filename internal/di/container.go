@@ -1,4 +1,4 @@
-package main
+package di
 
 import (
 	"context"
@@ -10,19 +10,19 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
-type DependencyContainer struct {
-	// config
-	config Config
+type Container struct {
+	// Config
+	Config Config
 
 	// services
-	configService   *service.Config
-	battlePublisher *service.BattlePublisher
-	battleService   *service.BattleFetcher
-	updaterService  *service.UpdateChecker
-	logger          repository.LoggerInterface
+	ConfigService   *service.Config
+	BattlePublisher *service.BattlePublisher
+	BattleService   *service.BattleFetcher
+	UpdaterService  *service.UpdateChecker
+	Logger          repository.LoggerInterface
 }
 
-func NewDependencyContainer(ctx context.Context, config Config) *DependencyContainer {
+func NewContainer(ctx context.Context, config Config) *Container {
 	alertDiscord := infra.NewDiscord(
 		config.Discord.AlertURL,
 		config.Discord.MaxRetry,
@@ -93,12 +93,12 @@ func NewDependencyContainer(ctx context.Context, config Config) *DependencyConta
 	)
 	updaterService := service.NewUpdateChecker(config.App.Semver, github)
 
-	return &DependencyContainer{
-		config:          config,
-		configService:   configService,
-		battlePublisher: battlePublisher,
-		battleService:   battleFetcher,
-		updaterService:  updaterService,
-		logger:          logger,
+	return &Container{
+		Config:          config,
+		ConfigService:   configService,
+		BattlePublisher: battlePublisher,
+		BattleService:   battleFetcher,
+		UpdaterService:  updaterService,
+		Logger:          logger,
 	}
 }
