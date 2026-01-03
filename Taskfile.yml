@@ -21,8 +21,7 @@ tasks:
   gen-mock:
     desc: generate mocks
     cmds:
-      - rm -rf backend/domain/mock
-      - rm -rf backend/infra/mock
+      - rm -rf internal/mock
       - go generate ./...
   lint:
     desc: lint

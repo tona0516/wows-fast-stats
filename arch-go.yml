@@ -3,21 +3,21 @@ threshold:
   compliance: 100
   coverage: 0
 dependenciesRules:
-  - package: 'backend.infra'
+  - package: 'internal.infra'
     shouldNotDependsOn:
       internal:
-        - backend.service'
-  - package: 'backend.service'
+        - internal.service'
+  - package: 'internal.service'
     shouldNotDependsOn:
       internal:
-        - 'backend.infra'
-  - package: 'backend.data'
+        - 'internal.infra'
+  - package: 'internal.data'
     shouldNotDependsOn:
       internal:
-        - 'backend.infra'
-        - 'backend.service'
+        - 'internal.infra'
+        - 'internal.service'
       external:
         - "github.com/wailsapp/wails/v2/pkg/runtime"
 contentsRules:
-  - package: 'backend.repository'
+  - package: 'internal.repository'
     shouldOnlyContainInterfaces: true

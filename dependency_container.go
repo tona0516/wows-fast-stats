@@ -3,9 +3,9 @@ package main
 import (
 	"context"
 	"time"
-	"wfs/backend/infra"
-	"wfs/backend/repository"
-	"wfs/backend/service"
+	"wfs/internal/infra"
+	"wfs/internal/repository"
+	"wfs/internal/service"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )

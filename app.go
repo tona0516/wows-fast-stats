@@ -3,8 +3,8 @@ package main
 import (
 	"context"
 	"os"
-	"wfs/backend/apperr"
-	"wfs/backend/data"
+	"wfs/internal/apperr"
+	"wfs/internal/data"
 
 	"github.com/mitchellh/go-ps"
 	"github.com/morikuni/failure"
