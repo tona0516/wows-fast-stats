@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"wfs/internal/apperr"
 	"wfs/internal/data"
-	"wfs/internal/repository"
+	"wfs/internal/infra"
 
 	"github.com/morikuni/failure"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
@@ -17,22 +17,19 @@ import (
 const GameExeName = "WorldOfWarships.exe"
 
 type Config struct {
-	persistence         repository.PersistenceInterface
-	wargaming           repository.WargamingInterface
-	logger              repository.LoggerInterface
+	localStorage        infra.LocalStorage
+	wargaming           infra.WargamingApiClient
 	OpenDirectoryDialog openDirectoryDialogFunc
 	OpenWithDefaultApp  openWithDefaultAppFunc
 }
 
-func NewSetting(
-	persistence repository.PersistenceInterface,
-	wargaming repository.WargamingInterface,
-	logger repository.LoggerInterface,
+func NewConfig(
+	localStorage infra.LocalStorage,
+	wargaming infra.WargamingApiClient,
 ) *Config {
 	return &Config{
-		persistence:         persistence,
+		localStorage:        localStorage,
 		wargaming:           wargaming,
-		logger:              logger,
 		OpenDirectoryDialog: runtime.OpenDirectoryDialog,
 		OpenWithDefaultApp: func(input string) error {
 			return exec.Command("explorer", input).Start()
@@ -90,7 +87,7 @@ func (c *Config) OpenDirectory(path string) error {
 }
 
 func (c *Config) GetUserConfig() (data.UserConfig, error) {
-	cfg, err := c.persistence.LoadUserConfig()
+	cfg, err := c.localStorage.UserConfig()
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
 			return defaultUserConfig(), nil
@@ -103,7 +100,7 @@ func (c *Config) GetUserConfig() (data.UserConfig, error) {
 }
 
 func (c *Config) SaveUserConfig(cfg data.UserConfig) error {
-	if err := c.persistence.SaveUserConfig(cfg); err != nil {
+	if err := c.localStorage.SetUserConfig(cfg); err != nil {
 		return failure.Wrap(err)
 	}
 

@@ -8,7 +8,7 @@ import (
 	"time"
 	"wfs/internal/apperr"
 	"wfs/internal/data"
-	"wfs/internal/repository"
+	"wfs/internal/infra"
 
 	"github.com/morikuni/failure"
 )
@@ -16,9 +16,8 @@ import (
 type BattlePublisher struct {
 	ctx            context.Context
 	interval       time.Duration
-	localFile      repository.LocalFileInterface
-	persistence    repository.PersistenceInterface
-	logger         repository.LoggerInterface
+	localStorage   infra.LocalStorage
+	logger         infra.Logger
 	eventsEmitFunc eventEmitFunc
 
 	installPath string
@@ -27,23 +26,21 @@ type BattlePublisher struct {
 func NewBattlePublisher(
 	ctx context.Context,
 	interval time.Duration,
-	localFile repository.LocalFileInterface,
-	persistence repository.PersistenceInterface,
-	logger repository.LoggerInterface,
+	localStorage infra.LocalStorage,
+	logger infra.Logger,
 	eventsEmitFunc eventEmitFunc,
 ) *BattlePublisher {
 	return &BattlePublisher{
 		ctx:            ctx,
 		interval:       interval,
-		localFile:      localFile,
-		persistence:    persistence,
+		localStorage:   localStorage,
 		logger:         logger,
 		eventsEmitFunc: eventsEmitFunc,
 	}
 }
 
 func (bp *BattlePublisher) CanSubcribe() bool {
-	config, err := bp.persistence.LoadUserConfig()
+	config, err := bp.localStorage.UserConfig()
 	if err != nil {
 		return false
 	}
@@ -69,7 +66,7 @@ func (bp *BattlePublisher) Subcribe(cancelCtx context.Context, channel chan data
 
 			// tempArenaInfo.jsonを取得
 			// 取得できない場合は、イベントを発行して次のループ
-			tempArenaInfo, err := bp.localFile.TempArenaInfo(bp.installPath)
+			tempArenaInfo, err := bp.localStorage.TempArenaInfo(bp.installPath)
 			if err != nil {
 				if failure.Is(err, apperr.FileNotExist) || failure.Is(err, apperr.ReplayDirNotFoundError) {
 					bp.eventsEmitFunc(bp.ctx, EventEnd)

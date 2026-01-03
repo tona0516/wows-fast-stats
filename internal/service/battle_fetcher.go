@@ -8,7 +8,7 @@ import (
 	"sync"
 	"wfs/internal/apperr"
 	"wfs/internal/data"
-	"wfs/internal/repository"
+	"wfs/internal/infra"
 	"wfs/internal/util"
 	"wfs/internal/yamibuka"
 
@@ -18,11 +18,11 @@ import (
 
 type BattleFetcher struct {
 	ctx            context.Context
-	wargaming      repository.WargamingInterface
-	uwargaming     repository.UnofficialWargamingInterface
-	numbers        repository.NumbersInterface
-	persistence    repository.PersistenceInterface
-	logger         repository.LoggerInterface
+	localStorage   infra.LocalStorage
+	wargaming      infra.WargamingApiClient
+	uwargaming     infra.ClanApiClient
+	numbers        infra.NumbersApiClient
+	logger         infra.Logger
 	eventsEmitFunc eventEmitFunc
 
 	isFirstBattle                      bool
@@ -35,19 +35,19 @@ type BattleFetcher struct {
 
 func NewBattleFetcher(
 	ctx context.Context,
-	wargaming repository.WargamingInterface,
-	uwargaming repository.UnofficialWargamingInterface,
-	numbers repository.NumbersInterface,
-	persistence repository.PersistenceInterface,
-	logger repository.LoggerInterface,
+	localStorage infra.LocalStorage,
+	wargaming infra.WargamingApiClient,
+	uwargaming infra.ClanApiClient,
+	numbers infra.NumbersApiClient,
+	logger infra.Logger,
 	eventsEmitFunc eventEmitFunc,
 ) *BattleFetcher {
 	return &BattleFetcher{
 		ctx:                                ctx,
+		localStorage:                       localStorage,
 		wargaming:                          wargaming,
 		uwargaming:                         uwargaming,
 		numbers:                            numbers,
-		persistence:                        persistence,
 		logger:                             logger,
 		eventsEmitFunc:                     eventsEmitFunc,
 		isFirstBattle:                      true,
@@ -71,7 +71,7 @@ func (b *BattleFetcher) Invoke(tempArenaInfo data.TempArenaInfo) {
 	}
 
 	// persist own ign for reporting
-	_ = b.persistence.SaveOwnIGN(tempArenaInfo.PlayerName)
+	_ = b.localStorage.SetOwnIGN(tempArenaInfo.PlayerName)
 	b.logger.SetOwnIGN(tempArenaInfo.PlayerName)
 
 	accountList, err := b.wargaming.AccountList(tempArenaInfo.AccountNames())
@@ -211,17 +211,17 @@ func (b *BattleFetcher) fetchExpectedStats(channel chan data.Result[data.Expecte
 	// 最新の予測成績を取得
 	expectedStats, errFetch := b.numbers.ExpectedStats()
 	if errFetch == nil {
-		_ = b.persistence.SaveExpectedStats(expectedStats)
+		_ = b.localStorage.SetExpectedStats(expectedStats)
 
-		result.Value = expectedStats
+		result.Value = expectedStats.Data
 		channel <- result
 		return
 	}
 
 	// 取得できない場合、キャッシュを利用する
-	expectedStatsCache, errCache := b.persistence.LoadExpectedStats()
+	expectedStatsCache, errCache := b.localStorage.ExpectedStats()
 	if errCache == nil {
-		result.Value = expectedStatsCache
+		result.Value = expectedStatsCache.Data
 		channel <- result
 		return
 	}
@@ -312,7 +312,7 @@ func (b *BattleFetcher) fetchClanColor(clanInfoArray []data.WGClansInfoData) map
 
 	var mu sync.Mutex
 	err := util.DoParallel(clanInfoArray, func(clan data.WGClansInfoData) error {
-		autocomplete, err := b.uwargaming.ClansAutoComplete(clan.Tag)
+		autocomplete, err := b.uwargaming.ClanAutoComplete(clan.Tag)
 		if err != nil {
 			return err
 		}

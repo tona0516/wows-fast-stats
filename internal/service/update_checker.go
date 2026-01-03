@@ -2,19 +2,19 @@ package service
 
 import (
 	"wfs/internal/data"
-	"wfs/internal/repository"
+	"wfs/internal/infra"
 
 	"github.com/Masterminds/semver/v3"
 )
 
 type UpdateChecker struct {
 	currentSemver string
-	github        repository.GithubInterface
+	github        infra.GithubApiClient
 }
 
 func NewUpdateChecker(
 	semver string,
-	github repository.GithubInterface,
+	github infra.GithubApiClient,
 ) *UpdateChecker {
 	return &UpdateChecker{
 		currentSemver: semver,

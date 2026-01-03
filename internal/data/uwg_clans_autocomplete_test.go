@@ -9,7 +9,7 @@ import (
 func TestUWGClansAutocomplete_HexColor(t *testing.T) {
 	t.Parallel()
 
-	instance := UWGClansAutocomplete{
+	instance := ClanAutocomplete{
 		SearchAutocompleteResult: []struct {
 			HexColor string `json:"hex_color"`
 			Tag      string `json:"tag"`

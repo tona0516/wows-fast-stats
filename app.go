@@ -75,7 +75,7 @@ func (a *App) ValidateInstallPath(path string) string {
 }
 
 func (a *App) Semver() string {
-	return a.config.App.Semver
+	return a.config.Basic.Version
 }
 
 func (a *App) SearchPlayer(prefix string) ([]data.WGAccountListData, error) {
@@ -99,7 +99,7 @@ func (a *App) NewVersion() *data.NewVersion {
 
 func (a *App) ShowMessageDialog(message string) {
 	_, _ = runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
-		Title:   a.config.App.Name,
+		Title:   a.config.Basic.Name,
 		Message: message,
 	})
 }

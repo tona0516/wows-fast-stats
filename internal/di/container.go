@@ -2,12 +2,11 @@ package di
 
 import (
 	"context"
-	"time"
 	"wfs/internal/infra"
-	"wfs/internal/repository"
 	"wfs/internal/service"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
+	"go.uber.org/ratelimit"
 )
 
 type Container struct {
@@ -19,79 +18,100 @@ type Container struct {
 	BattlePublisher *service.BattlePublisher
 	BattleService   *service.BattleFetcher
 	UpdaterService  *service.UpdateChecker
-	Logger          repository.LoggerInterface
+	Logger          infra.Logger
 }
 
 func NewContainer(ctx context.Context, config Config) *Container {
-	alertDiscord := infra.NewDiscord(
-		config.Discord.AlertURL,
-		config.Discord.MaxRetry,
-		config.Discord.TimeoutSec,
+	alertDiscordApiClient := infra.NewDiscordApiClient(
+		*infra.NewApiConfig(
+			config.DiscordApi.AlertWebhookURL,
+			config.DiscordApi.RetryCount,
+			config.DiscordApi.Timeout,
+		),
 	)
-	infoDiscord := infra.NewDiscord(
-		config.Discord.InfoURL,
-		config.Discord.MaxRetry,
-		config.Discord.TimeoutSec,
+	infoDiscordApiClient := infra.NewDiscordApiClient(
+		*infra.NewApiConfig(
+			config.DiscordApi.InfoWebhookURL,
+			config.DiscordApi.RetryCount,
+			config.DiscordApi.Timeout,
+		),
 	)
 
-	persistence := infra.NewPersistence(config.Local.StoragePath)
+	localStorage := infra.NewLocalStorage(
+		config.LocalStorage.UserDataDir,
+	)
+	var ownIGN string
+	ownIGN, err := localStorage.OwnIGN()
+	if err != nil {
+		ownIGN = ""
+	}
 
-	ownIGN, _ := persistence.LoadOwnIGN()
 	logger := infra.NewLogger(
-		config.App.Name,
-		config.App.Semver,
-		config.Logger.ZerologLogLevel,
-		alertDiscord,
-		infoDiscord,
+		config.Basic.Name,
+		config.Basic.Version,
+		config.LocalStorage.UserDataDir,
+		config.Logger.Level,
+		alertDiscordApiClient,
+		infoDiscordApiClient,
 	)
 	logger.SetOwnIGN(ownIGN)
-	logger.Init(ctx)
 
-	wargaming := infra.NewWargaming(
-		config.Wargaming.URL,
-		config.Wargaming.MaxRetry,
-		config.Wargaming.TimeoutSec,
-		config.Wargaming.RetryIntervalMs,
-		config.Wargaming.RateLimitRPS,
-		config.Wargaming.AppID,
+	wargamingApiClient := infra.NewWargamingApiClient(
+		config.WargamingApi.AppID,
+		*infra.NewApiConfig(
+			config.WargamingApi.URL,
+			config.WargamingApi.RetryCount,
+			config.WargamingApi.Timeout,
+		),
+		ratelimit.New(config.WargamingApi.RateLimitRPS),
 	)
-	uwargaming := infra.NewUnofficialWargaming(
-		config.UnofficialWargaming.URL,
-		config.UnofficialWargaming.MaxRetry,
-		config.UnofficialWargaming.TimeoutSec,
+	clansApiClient := infra.NewClansApiClient(
+		*infra.NewApiConfig(
+			config.ClanApi.URL,
+			config.ClanApi.RetryCount,
+			config.ClanApi.Timeout,
+		),
 	)
-	numbers := infra.NewNumbers(
-		config.Numbers.URL,
-		config.Numbers.MaxRetry,
-		config.Numbers.TimeoutSec,
+	numbersApiClient := infra.NewNumbersApiClient(
+		*infra.NewApiConfig(
+			config.NumbersApi.URL,
+			config.NumbersApi.RetryCount,
+			config.NumbersApi.Timeout,
+		),
 	)
-	localFile := infra.NewLocalFile()
-	github := infra.NewGithub(
-		config.Github.URL,
-		config.Github.MaxRetry,
-		config.Github.TimeoutSec,
+	githubApiClient := infra.NewGithubApiClient(
+		*infra.NewApiConfig(
+			config.GithubApi.URL,
+			config.GithubApi.RetryCount,
+			config.GithubApi.Timeout,
+		),
 	)
 
 	// services
-	configService := service.NewSetting(persistence, wargaming, logger)
+	configService := service.NewConfig(
+		localStorage,
+		wargamingApiClient,
+	)
 	battleFetcher := service.NewBattleFetcher(
 		ctx,
-		wargaming,
-		uwargaming,
-		numbers,
-		persistence,
+		localStorage,
+		wargamingApiClient,
+		clansApiClient,
+		numbersApiClient,
 		logger,
 		runtime.EventsEmit,
 	)
 	battlePublisher := service.NewBattlePublisher(
 		ctx,
-		time.Duration(config.Watcher.IntervalSec)*time.Second,
-		localFile,
-		persistence,
+		config.Basic.PollingInterval,
+		localStorage,
 		logger,
 		runtime.EventsEmit,
 	)
-	updaterService := service.NewUpdateChecker(config.App.Semver, github)
+	updaterService := service.NewUpdateChecker(
+		config.Basic.Version,
+		githubApiClient,
+	)
 
 	return &Container{
 		Config:          config,

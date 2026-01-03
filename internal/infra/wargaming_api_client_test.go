@@ -1,20 +1,21 @@
 package infra
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"wfs/internal/apperr"
+	"time"
 	"wfs/internal/data"
 
-	"github.com/morikuni/failure"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/ratelimit"
 )
 
-func TestWargaming_AccountInfo(t *testing.T) {
+func TestWargamingApiClient_AccountInfo(t *testing.T) {
 	t.Parallel()
 
 	t.Run("正常系", func(t *testing.T) {
@@ -22,20 +23,53 @@ func TestWargaming_AccountInfo(t *testing.T) {
 
 		expected := data.WGAccountInfo{
 			WGResponseCommon: data.WGResponseCommon[map[int]data.WGAccountInfoData]{
-				Status: "",
+				Status: "ok",
 				Error:  data.WGError{},
 				Data:   map[int]data.WGAccountInfoData{},
 			},
 		}
-
-		server := simpleMockServer(200, expected)
+		server := simpleMockServer(t, 200, expected)
 		defer server.Close()
 
-		wargaming := NewWargaming(server.URL, 0, 0, 0, 1, "")
+		wargaming := NewWargamingApiClient(
+			"",
+			*NewApiConfig(
+				server.URL,
+				0,
+				0,
+			),
+			ratelimit.NewUnlimited(),
+		)
 		result, err := wargaming.AccountInfo([]int{123, 456})
 
-		require.NoError(t, err)
+		assert.NoError(t, err)
 		assert.Equal(t, expected, result)
+	})
+
+	t.Run("異常系_タイムアウト", func(t *testing.T) {
+		t.Parallel()
+
+		timeout := time.Millisecond * 10
+		server := timeoutMockServer(
+			t,
+			http.StatusOK,
+			map[string]any{},
+			timeout,
+		)
+		defer server.Close()
+
+		instance := NewWargamingApiClient(
+			"",
+			*NewApiConfig(
+				server.URL,
+				0,
+				timeout-1,
+			),
+			ratelimit.NewUnlimited(),
+		)
+		_, err := instance.AccountInfo([]int{123, 456})
+
+		assert.ErrorIs(t, err, context.DeadlineExceeded)
 	})
 
 	t.Run("異常系_リトライなし", func(t *testing.T) {
@@ -55,16 +89,22 @@ func TestWargaming_AccountInfo(t *testing.T) {
 			calls++
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusOK)
-			_, _ = w.Write([]byte(body))
+			w.Write([]byte(body))
 		}))
 		defer server.Close()
 
-		wargaming := NewWargaming(server.URL, 0, 0, 0, 1, "")
-		_, err := wargaming.AccountInfo([]int{123, 456})
+		instance := NewWargamingApiClient(
+			"",
+			*NewApiConfig(
+				server.URL,
+				0,
+				0,
+			),
+			ratelimit.NewUnlimited(),
+		)
+		_, err := instance.AccountInfo([]int{123, 456})
 
-		code, ok := failure.CodeOf(err)
-		assert.True(t, ok)
-		assert.Equal(t, apperr.WGAPIError, code)
+		assert.Error(t, err, ErrErrorResponse)
 		assert.Equal(t, 1, calls)
 	})
 
@@ -99,15 +139,30 @@ func TestWargaming_AccountInfo(t *testing.T) {
 					return
 				}
 
-				body, _ := json.Marshal(data.WGAccountInfo{})
-				_, _ = w.Write(body)
+				body, err := json.Marshal(data.WGAccountInfo{
+					WGResponseCommon: data.WGResponseCommon[map[int]data.WGAccountInfoData]{
+						Status: "ok",
+						Error:  data.WGError{},
+						Data:   map[int]data.WGAccountInfoData{},
+					},
+				})
+				require.NoError(t, err)
+				w.Write(body)
 			}))
 			defer server.Close()
 
-			wargaming := NewWargaming(server.URL, retry, 0, 0, 1, "")
-			_, err := wargaming.AccountInfo([]int{123, 456})
+			instance := NewWargamingApiClient(
+				"",
+				*NewApiConfig(
+					server.URL,
+					retry,
+					0,
+				),
+				ratelimit.NewUnlimited(),
+			)
+			_, err := instance.AccountInfo([]int{123, 456})
 
-			require.NoError(t, err)
+			assert.NoError(t, err)
 			assert.Equal(t, retry+1, calls)
 		}
 	})
@@ -136,111 +191,145 @@ func TestWargaming_AccountInfo(t *testing.T) {
 				calls++
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(http.StatusOK)
-				_, _ = w.Write([]byte(body))
+				w.Write([]byte(body))
 			}))
 			defer server.Close()
 
-			wargaming := NewWargaming(server.URL, retry, 0, 0, 1, "")
-			_, err := wargaming.AccountInfo([]int{123, 456})
+			instance := NewWargamingApiClient(
+				"",
+				*NewApiConfig(
+					server.URL,
+					retry,
+					0,
+				),
+				ratelimit.NewUnlimited(),
+			)
+			_, err := instance.AccountInfo([]int{123, 456})
 
-			code, ok := failure.CodeOf(err)
-			assert.True(t, ok)
-			assert.Equal(t, apperr.WGAPITemporaryUnavaillalble, code)
+			assert.Error(t, err, ErrTemporaryUnavaillalble)
 			assert.Equal(t, retry+1, calls)
 		}
 	})
 }
 
-func TestWargaming_AccountListForSearch(t *testing.T) {
+func TestWargamingApiClient_AccountListForSearch(t *testing.T) {
 	t.Parallel()
 
 	expected := data.WGAccountList{
 		WGResponseCommon: data.WGResponseCommon[[]data.WGAccountListData]{
-			Status: "",
+			Status: "ok",
 			Error:  data.WGError{},
 			Data:   []data.WGAccountListData{},
 		},
 	}
-
-	server := simpleMockServer(200, expected)
+	server := simpleMockServer(t, 200, expected)
 	defer server.Close()
 
-	wargaming := NewWargaming(server.URL, 0, 0, 0, 1, "")
-	result, err := wargaming.AccountListForSearch("player")
+	instance := NewWargamingApiClient(
+		"",
+		*NewApiConfig(
+			server.URL,
+			0,
+			0,
+		),
+		ratelimit.NewUnlimited(),
+	)
+	result, err := instance.AccountListForSearch("player")
 
-	require.NoError(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, expected, result)
 }
 
-func TestWargaming_ClansAccountInfo(t *testing.T) {
+func TestWargamingApiClient_ClansAccountInfo(t *testing.T) {
 	t.Parallel()
 
 	expected := data.WGClansAccountInfo{
 		WGResponseCommon: data.WGResponseCommon[map[int]data.WGClansAccountInfoData]{
-			Status: "",
+			Status: "ok",
 			Error:  data.WGError{},
 			Data:   map[int]data.WGClansAccountInfoData{},
 		},
 	}
-
-	server := simpleMockServer(200, expected)
+	server := simpleMockServer(t, 200, expected)
 	defer server.Close()
 
-	wargaming := NewWargaming(server.URL, 0, 0, 0, 1, "")
-	result, err := wargaming.ClansAccountInfo([]int{123, 456})
+	instance := NewWargamingApiClient(
+		"",
+		*NewApiConfig(
+			server.URL,
+			0,
+			0,
+		),
+		ratelimit.NewUnlimited(),
+	)
+	result, err := instance.ClansAccountInfo([]int{123, 456})
 
-	require.NoError(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, expected, result)
 }
 
-func TestWargaming_ClansInfo(t *testing.T) {
+func TestWargamingApiClient_ClansInfo(t *testing.T) {
 	t.Parallel()
 
 	expected := data.WGClansInfo{
 		WGResponseCommon: data.WGResponseCommon[map[int]data.WGClansInfoData]{
-			Status: "",
+			Status: "ok",
 			Error:  data.WGError{},
 			Data:   map[int]data.WGClansInfoData{},
 		},
 	}
-
-	server := simpleMockServer(200, expected)
+	server := simpleMockServer(t, 200, expected)
 	defer server.Close()
 
-	wargaming := NewWargaming(server.URL, 0, 0, 0, 1, "")
-	result, err := wargaming.ClansInfo([]int{123, 456})
+	instance := NewWargamingApiClient(
+		"",
+		*NewApiConfig(
+			server.URL,
+			0,
+			0,
+		),
+		ratelimit.NewUnlimited(),
+	)
+	result, err := instance.ClansInfo([]int{123, 456})
 
-	require.NoError(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, expected, result)
 }
 
-func TestWargaming_ShipsStats(t *testing.T) {
+func TestWargamingApiClient_ShipsStats(t *testing.T) {
 	t.Parallel()
 
 	expected := data.WGShipsStats{
 		WGResponseCommon: data.WGResponseCommon[map[int][]data.WGShipsStatsData]{
-			Status: "",
+			Status: "ok",
 			Error:  data.WGError{},
 			Data:   map[int][]data.WGShipsStatsData{},
 		},
 	}
-
-	server := simpleMockServer(200, expected)
+	server := simpleMockServer(t, 200, expected)
 	defer server.Close()
 
-	wargaming := NewWargaming(server.URL, 0, 0, 0, 1, "")
-	result, err := wargaming.ShipsStats(123)
+	instance := NewWargamingApiClient(
+		"",
+		*NewApiConfig(
+			server.URL,
+			0,
+			0,
+		),
+		ratelimit.NewUnlimited(),
+	)
+	result, err := instance.ShipsStats(123)
 
-	require.NoError(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, expected, result)
 }
 
-func TestWargaming_EncycShips(t *testing.T) {
+func TestWargamingApiClient_EncycShips(t *testing.T) {
 	t.Parallel()
 
 	expected := data.WGEncycShips{
 		WGResponseCommon: data.WGResponseCommon[map[int]data.WGEncycShipsData]{
-			Status: "",
+			Status: "ok",
 			Error:  data.WGError{},
 			Data:   map[int]data.WGEncycShipsData{},
 		},
@@ -249,89 +338,104 @@ func TestWargaming_EncycShips(t *testing.T) {
 			Page      int `json:"page"`
 		}{PageTotal: 5},
 	}
-
-	server := simpleMockServer(200, expected)
+	server := simpleMockServer(t, 200, expected)
 	defer server.Close()
 
-	wargaming := NewWargaming(server.URL, 0, 0, 0, 1, "")
-	result, err := wargaming.EncycShips(1)
+	instance := NewWargamingApiClient(
+		"",
+		*NewApiConfig(
+			server.URL,
+			0,
+			0,
+		),
+		ratelimit.NewUnlimited(),
+	)
+	result, err := instance.EncycShips(1)
 
-	require.NoError(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, expected, result)
 }
 
-func TestWargaming_EncycInfo(t *testing.T) {
-	t.Parallel()
-
-	server := simpleMockServer(200, data.WGEncycInfo{})
-	defer server.Close()
-
-	wargaming := NewWargaming(server.URL, 0, 0, 0, 1, "")
-	result, err := wargaming.EncycInfo()
-
-	require.NoError(t, err)
-	assert.Equal(t, data.WGEncycInfoData{}, result)
-}
-
-func TestWargaming_BattleArena(t *testing.T) {
+func TestWargamingApiClient_BattleArena(t *testing.T) {
 	t.Parallel()
 
 	expected := data.WGBattleArenas{
 		WGResponseCommon: data.WGResponseCommon[map[int]data.WGBattleArenasData]{
-			Status: "",
+			Status: "ok",
 			Error:  data.WGError{},
 			Data:   map[int]data.WGBattleArenasData{},
 		},
 	}
-
-	server := simpleMockServer(200, expected)
+	server := simpleMockServer(t, 200, expected)
 	defer server.Close()
 
-	wargaming := NewWargaming(server.URL, 0, 0, 0, 1, "")
-	result, err := wargaming.BattleArenas()
+	instance := NewWargamingApiClient(
+		"",
+		*NewApiConfig(
+			server.URL,
+			0,
+			0,
+		),
+		ratelimit.NewUnlimited(),
+	)
+	result, err := instance.BattleArenas()
 
-	require.NoError(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, expected, result)
 }
 
-func TestWargaming_BattleTypes(t *testing.T) {
+func TestWargamingApiClient_BattleTypes(t *testing.T) {
 	t.Parallel()
 
 	expected := data.WGBattleTypes{
 		WGResponseCommon: data.WGResponseCommon[map[string]data.WGBattleTypesData]{
-			Status: "",
+			Status: "ok",
 			Error:  data.WGError{},
 			Data:   map[string]data.WGBattleTypesData{},
 		},
 	}
-
-	server := simpleMockServer(200, expected)
+	server := simpleMockServer(t, 200, expected)
 	defer server.Close()
 
-	wargaming := NewWargaming(server.URL, 0, 0, 0, 1, "")
-	result, err := wargaming.BattleTypes()
+	instance := NewWargamingApiClient(
+		"",
+		*NewApiConfig(
+			server.URL,
+			0,
+			0,
+		),
+		ratelimit.NewUnlimited(),
+	)
+	result, err := instance.BattleTypes()
 
-	require.NoError(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, expected, result)
 }
 
-func TestWargaming_ShipsBadges(t *testing.T) {
+func TestWargamingApiClient_ShipsBadges(t *testing.T) {
 	t.Parallel()
 
 	expected := data.WGShipsBadges{
 		WGResponseCommon: data.WGResponseCommon[map[int][]data.WGShipsBadgesData]{
-			Status: "",
+			Status: "ok",
 			Error:  data.WGError{},
 			Data:   map[int][]data.WGShipsBadgesData{},
 		},
 	}
-
-	server := simpleMockServer(200, expected)
+	server := simpleMockServer(t, 200, expected)
 	defer server.Close()
 
-	wargaming := NewWargaming(server.URL, 0, 0, 0, 1, "")
-	result, err := wargaming.ShipsBadges(123)
+	instance := NewWargamingApiClient(
+		"",
+		*NewApiConfig(
+			server.URL,
+			0,
+			0,
+		),
+		ratelimit.NewUnlimited(),
+	)
+	result, err := instance.ShipsBadges(123)
 
-	require.NoError(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, expected, result)
 }

@@ -20,7 +20,7 @@ func TestUpdateChecker_Invoke(t *testing.T) {
 		t.Parallel()
 
 		// 準備
-		mockGithub := mock.NewMockGithubInterface(ctrl)
+		mockGithub := mock.NewMockGithubApiClient(ctrl)
 		response := data.GHLatestRelease{TagName: "2.0.0", HTMLURL: "https://hoge.com"}
 		mockGithub.EXPECT().LatestRelease().Return(response, nil)
 
@@ -39,7 +39,7 @@ func TestUpdateChecker_Invoke(t *testing.T) {
 		t.Parallel()
 
 		// 準備
-		mockGithub := mock.NewMockGithubInterface(ctrl)
+		mockGithub := mock.NewMockGithubApiClient(ctrl)
 		response := data.GHLatestRelease{TagName: "1.0.0", HTMLURL: "https://hoge.com"}
 		mockGithub.EXPECT().LatestRelease().Return(response, nil)
 
@@ -55,7 +55,7 @@ func TestUpdateChecker_Invoke(t *testing.T) {
 		t.Parallel()
 
 		// 準備
-		mockGithub := mock.NewMockGithubInterface(ctrl)
+		mockGithub := mock.NewMockGithubApiClient(ctrl)
 		expected := failure.New(apperr.HTTPRequestError)
 		mockGithub.EXPECT().LatestRelease().Return(data.GHLatestRelease{}, expected)
 

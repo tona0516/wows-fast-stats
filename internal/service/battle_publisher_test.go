@@ -34,13 +34,12 @@ func TestBattlePublisher_CanSubcribe(t *testing.T) {
 	ctrl := gomock.NewController(t)
 
 	for _, v := range params {
-		mockPersistence := mock.NewMockPersistenceInterface(ctrl)
-		mockPersistence.EXPECT().LoadUserConfig().Return(data.UserConfig{InstallPath: v.installPath}, nil).AnyTimes()
+		mockPersistence := mock.NewMockLocalStorage(ctrl)
+		mockPersistence.EXPECT().UserConfig().Return(data.UserConfig{InstallPath: v.installPath}, nil).AnyTimes()
 
 		bp := NewBattlePublisher(
 			context.Background(),
 			1,
-			nil,
 			mockPersistence,
 			nil,
 			nil,
@@ -57,11 +56,9 @@ func TestBattlePublisher_Subcribe(t *testing.T) {
 
 	// モックの作成
 	testArena := data.TempArenaInfo{PlayerName: "testPlayer"}
-	mockLocalFile := mock.NewMockLocalFileInterface(ctrl)
+	mockLocalFile := mock.NewMockLocalStorage(ctrl)
 	mockLocalFile.EXPECT().TempArenaInfo("/test").Return(testArena, nil).AnyTimes()
-
-	mockPersistence := mock.NewMockPersistenceInterface(ctrl)
-	mockPersistence.EXPECT().LoadUserConfig().Return(data.UserConfig{InstallPath: "/test"}, nil).AnyTimes()
+	mockLocalFile.EXPECT().UserConfig().Return(data.UserConfig{InstallPath: "/test"}, nil).AnyTimes()
 
 	// イベント発火履歴を記録するモック
 	var events []string
@@ -73,7 +70,6 @@ func TestBattlePublisher_Subcribe(t *testing.T) {
 		context.Background(),
 		0, // intervalを0にして即時実行
 		mockLocalFile,
-		mockPersistence,
 		nil,
 		emitFunc,
 	)

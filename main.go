@@ -14,18 +14,22 @@ import (
 var assets embed.FS
 
 //nolint:gochecknoglobals
-var env string
+var (
+	appName string
+	version string
+	env     string
+)
 
 func main() {
-	config := di.NewConfig(env)
+	config := di.NewConfig(appName, version, env)
 	app := NewApp(config)
 
 	err := wails.Run(&options.App{
-		Title:     config.App.Name,
-		Width:     config.App.Width,
-		Height:    config.App.Height,
-		MinWidth:  config.App.MinWidth,
-		MinHeight: config.App.MinHeight,
+		Title:     config.Basic.Name,
+		Width:     config.Basic.Width,
+		Height:    config.Basic.Height,
+		MinWidth:  config.Basic.MinWidth,
+		MinHeight: config.Basic.MinHeight,
 		AssetServer: &assetserver.Options{
 			Assets: assets,
 		},

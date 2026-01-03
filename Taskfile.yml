@@ -4,6 +4,8 @@ version: "3"
 
 vars:
   NPM: npm --prefix ./frontend
+  APP_NAME: wows-fast-stats
+  VERSION: 1.0.0-alpha.1
 
 tasks:
   setup:
@@ -13,7 +15,6 @@ tasks:
           - github.com/wailsapp/wails/v2/cmd/wails@v2.10.2
           - github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest
           - go.uber.org/mock/mockgen@latest
-          - github.com/arch-go/arch-go@latest
         cmd: go install {{.ITEM}}
   gen-mock:
     desc: generate mocks
@@ -36,19 +37,18 @@ tasks:
   test:
     desc: unit testing
     cmds:
-      - arch-go
       - go clean -testcache
       - go test -cover ./...
       # - "{{.NPM}} run test"
   dev:
     desc: run app in development mode
     cmds:
-      - wails dev -ldflags="-X main.env=dev"
+      - wails dev -ldflags="-X main.appName={{.APP_NAME}} -X main.semver={{.VERSION}} -X main.env=dev"
   build:
     desc: build
     deps: [test]
     cmds:
-      - wails build -ldflags="-X main.env=prod" -platform windows/amd64 -trimpath -webview2 embed
+      - wails build -ldflags="-X main.appName={{.APP_NAME}} -X main.semver={{.VERSION}} -X main.env=prod" -platform windows/amd64 -o {{.APP_NAME}}-{{.VERSION}}.exe -trimpath -webview2 embed
   chbtl:
     desc: change battle
     vars:
