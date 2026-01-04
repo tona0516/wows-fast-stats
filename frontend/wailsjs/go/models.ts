@@ -788,20 +788,6 @@ export namespace data {
 		    return a;
 		}
 	}
-	export class WGAccountListData {
-	    nickname: string;
-	    account_id: number;
-	
-	    static createFrom(source: any = {}) {
-	        return new WGAccountListData(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.nickname = source["nickname"];
-	        this.account_id = source["account_id"];
-	    }
-	}
 
 }
 

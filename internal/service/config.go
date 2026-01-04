@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"wfs/internal/apperr"
 	"wfs/internal/data"
@@ -20,7 +19,6 @@ type Config struct {
 	localStorage        infra.LocalStorage
 	wargaming           infra.WargamingApiClient
 	OpenDirectoryDialog openDirectoryDialogFunc
-	OpenWithDefaultApp  openWithDefaultAppFunc
 }
 
 func NewConfig(
@@ -31,9 +29,6 @@ func NewConfig(
 		localStorage:        localStorage,
 		wargaming:           wargaming,
 		OpenDirectoryDialog: runtime.OpenDirectoryDialog,
-		OpenWithDefaultApp: func(input string) error {
-			return exec.Command("explorer", input).Start()
-		},
 	}
 }
 
@@ -71,19 +66,6 @@ func (c *Config) TrySaveInstallPath(ctx context.Context) (bool, error) {
 	}
 
 	return true, nil
-}
-
-func (c *Config) SearchPlayer(prefix string) (data.WGAccountList, error) {
-	return c.wargaming.AccountListForSearch(prefix)
-}
-
-func (c *Config) OpenDirectory(path string) error {
-	err := c.OpenWithDefaultApp(path)
-	if err != nil {
-		return failure.New(apperr.OpenDirectoryError, failure.Context{"path": path}, failure.Messagef("%s", err.Error()))
-	}
-
-	return nil
 }
 
 func (c *Config) GetUserConfig() (data.UserConfig, error) {

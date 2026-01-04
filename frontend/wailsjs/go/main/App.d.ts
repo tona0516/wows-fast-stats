@@ -6,17 +6,9 @@ export function EmptyBattle():Promise<data.Battle>;
 
 export function GetUserConfig():Promise<data.UserConfig>;
 
-export function LogError(arg1:string,arg2:Record<string, string>):Promise<void>;
-
-export function LogInfo(arg1:string,arg2:Record<string, string>):Promise<void>;
-
 export function NewVersion():Promise<data.NewVersion>;
 
-export function OpenDirectory(arg1:string):Promise<void>;
-
 export function SaveUserConfig(arg1:data.UserConfig):Promise<void>;
-
-export function SearchPlayer(arg1:string):Promise<Array<data.WGAccountListData>>;
 
 export function Semver():Promise<string>;
 

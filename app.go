@@ -8,14 +8,12 @@ import (
 	"wfs/internal/di"
 
 	"github.com/mitchellh/go-ps"
-	"github.com/morikuni/failure"
-	"github.com/wailsapp/wails/v2/pkg/logger"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 type App struct {
-	config            di.Config
 	ctx               context.Context
+	config            di.Config
 	container         *di.Container
 	unsubscribeBattle context.CancelFunc
 }
@@ -55,15 +53,6 @@ func (a *App) TrySaveInstallPath() (bool, error) {
 	return a.container.ConfigService.TrySaveInstallPath(a.ctx)
 }
 
-func (a *App) OpenDirectory(path string) error {
-	err := a.container.ConfigService.OpenDirectory(path)
-	if err != nil {
-		a.container.Logger.Error(err, nil)
-	}
-
-	return apperr.Unwrap(err)
-}
-
 func (a *App) ValidateInstallPath(path string) string {
 	err := a.container.ConfigService.ValidateInstallPath(path)
 
@@ -76,21 +65,6 @@ func (a *App) ValidateInstallPath(path string) string {
 
 func (a *App) Semver() string {
 	return a.config.Basic.Version
-}
-
-func (a *App) SearchPlayer(prefix string) ([]data.WGAccountListData, error) {
-	result, err := a.container.ConfigService.SearchPlayer(prefix)
-
-	return result.Data, apperr.Unwrap(err)
-}
-
-func (a *App) LogError(errString string, contexts map[string]string) {
-	err := failure.New(apperr.FrontendError, failure.Messagef("%s", errString))
-	a.container.Logger.Error(err, contexts)
-}
-
-func (a *App) LogInfo(message string, contexts map[string]string) {
-	a.container.Logger.Info(message, contexts)
 }
 
 func (a *App) NewVersion() *data.NewVersion {
@@ -111,10 +85,11 @@ func (a *App) EmptyBattle() data.Battle {
 
 func (a *App) onStartup(ctx context.Context) {
 	a.ctx = ctx
-	runtime.LogSetLogLevel(ctx, logger.INFO)
 
 	if isAlreadyRunning() {
-		a.showExistDialog("すでに起動しています。", 1)
+		a.ShowMessageDialog("すでに起動しています。")
+		os.Exit(1)
+		return
 	}
 
 	a.container = di.NewContainer(ctx, a.config)
@@ -143,9 +118,4 @@ func isAlreadyRunning() bool {
 	}
 
 	return isRunning
-}
-
-func (a *App) showExistDialog(message string, code int) {
-	a.ShowMessageDialog(message)
-	os.Exit(code)
 }

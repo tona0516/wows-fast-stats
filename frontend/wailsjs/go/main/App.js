@@ -10,28 +10,12 @@ export function GetUserConfig() {
   return window['go']['main']['App']['GetUserConfig']();
 }
 
-export function LogError(arg1, arg2) {
-  return window['go']['main']['App']['LogError'](arg1, arg2);
-}
-
-export function LogInfo(arg1, arg2) {
-  return window['go']['main']['App']['LogInfo'](arg1, arg2);
-}
-
 export function NewVersion() {
   return window['go']['main']['App']['NewVersion']();
 }
 
-export function OpenDirectory(arg1) {
-  return window['go']['main']['App']['OpenDirectory'](arg1);
-}
-
 export function SaveUserConfig(arg1) {
   return window['go']['main']['App']['SaveUserConfig'](arg1);
-}
-
-export function SearchPlayer(arg1) {
-  return window['go']['main']['App']['SearchPlayer'](arg1);
 }
 
 export function Semver() {

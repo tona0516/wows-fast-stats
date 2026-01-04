@@ -212,34 +212,6 @@ func TestWargamingApiClient_AccountInfo(t *testing.T) {
 	})
 }
 
-func TestWargamingApiClient_AccountListForSearch(t *testing.T) {
-	t.Parallel()
-
-	expected := data.WGAccountList{
-		WGResponseCommon: data.WGResponseCommon[[]data.WGAccountListData]{
-			Status: "ok",
-			Error:  data.WGError{},
-			Data:   []data.WGAccountListData{},
-		},
-	}
-	server := simpleMockServer(t, 200, expected)
-	defer server.Close()
-
-	instance := NewWargamingApiClient(
-		"",
-		*NewApiConfig(
-			server.URL,
-			0,
-			0,
-		),
-		ratelimit.NewUnlimited(),
-	)
-	result, err := instance.AccountListForSearch("player")
-
-	assert.NoError(t, err)
-	assert.Equal(t, expected, result)
-}
-
 func TestWargamingApiClient_ClansAccountInfo(t *testing.T) {
 	t.Parallel()
 

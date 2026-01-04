@@ -16,7 +16,6 @@
     ValidateInstallPath,
     SubscribeBattle,
     ShowMessageDialog,
-    LogError,
     GetUserConfig,
   } from "@wails/go/main/App";
   import type { data } from "@wails/go/models";
@@ -61,27 +60,6 @@
     TonakoManager.instance.setHidden();
     storedBattle.set(battle);
   });
-
-  window.onunhandledrejection = (event) => {
-    const message = "window.onunhandledrejection";
-    const error = event.reason;
-    if (error instanceof Error) {
-      sendFronendError(message, error);
-    } else {
-      LogError(message, { error: JSON.stringify(error) });
-    }
-  };
-  window.onerror = (_event, _source, _lineno, _colno, error) => {
-    sendFronendError("window.onerror", error);
-  };
-
-  const sendFronendError = (message: string, error: Error | undefined) => {
-    LogError(message, {
-      "error.name": error?.name ?? "",
-      "error.message": error?.message ?? "",
-      "error.stack": error?.stack ?? "",
-    });
-  };
 
   const initialize = async (): Promise<void> => {
     try {

@@ -23,7 +23,6 @@ var temporaryUnavaillalbleMessages = []string{
 type WargamingApiClient interface {
 	AccountInfo(accountIDs []int) (data.WGAccountInfo, error)
 	AccountList(accountNames []string) (data.WGAccountList, error)
-	AccountListForSearch(prefix string) (data.WGAccountList, error)
 	ClansAccountInfo(accountIDs []int) (data.WGClansAccountInfo, error)
 	ClansInfo(clanIDs []int) (data.WGClansInfo, error)
 	EncycShips(pageNo int) (data.WGEncycShips, error)
@@ -105,20 +104,6 @@ func (c *wargamingApiClient) AccountList(accountNames []string) (data.WGAccountL
 			"search": strings.Join(accountNames, ","),
 			"fields": data.WGAccountList{}.Field(),
 			"type":   "exact",
-		},
-	)
-
-	return res, err
-}
-
-func (c *wargamingApiClient) AccountListForSearch(prefix string) (data.WGAccountList, error) {
-	res, err := request[data.WGAccountList](
-		c,
-		"/wows/account/list/",
-		map[string]string{
-			"search": prefix,
-			"fields": data.WGAccountList{}.Field(),
-			"limit":  "10",
 		},
 	)
 
