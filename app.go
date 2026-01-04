@@ -58,7 +58,7 @@ func (a *App) TrySaveInstallPath() (bool, error) {
 func (a *App) OpenDirectory(path string) error {
 	err := a.container.ConfigService.OpenDirectory(path)
 	if err != nil {
-		a.container.Logger.Warn(err, nil)
+		a.container.Logger.Error(err, nil)
 	}
 
 	return apperr.Unwrap(err)

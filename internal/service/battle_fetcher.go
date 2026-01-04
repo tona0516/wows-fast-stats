@@ -327,7 +327,7 @@ func (b *BattleFetcher) fetchClanColor(clanInfoArray []data.WGClansInfoData) map
 		return nil
 	})
 	if err != nil {
-		b.logger.Warn(err, nil)
+		b.logger.Error(err, nil)
 	}
 
 	return result
@@ -368,7 +368,7 @@ func (b *BattleFetcher) fetchClanLanguage(clanInfoArray []data.WGClansInfoData) 
 		return nil
 	})
 	if err != nil {
-		b.logger.Warn(err, nil)
+		b.logger.Error(err, nil)
 	}
 
 	return result

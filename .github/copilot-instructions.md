@@ -6,7 +6,7 @@
 ## 1. プロジェクト概要
 - リポジトリ名: `wows-fast-stats`
 - 主目的: World of Warships の対戦中のマッチの各種統計・効率指標を高速に取得/表示するデスクトップアプリ。
-- 主構成: Go (`internal/`), Svelte + TypeScript フロントエンド (`frontend/`), 設定ファイル・ユーザーデータ (`config.*.yml`, `user_data/`).
+- 主構成: Go (`internal/`), Svelte + TypeScript フロントエンド (`frontend/`), 設定ファイル・ユーザーデータ (`user_data/`).
 
 ## 2. 技術スタック
 - Go 1.x (`go.mod` 参照)
@@ -27,9 +27,10 @@
 
 ## 5. ディレクトリ指針
 - `internal/data/`: 外部APIレスポンスのマッピングや計算ロジック。
+- `internal/di/`: 依存注入設定。
 - `internal/infra/`: 外部サービス接続 (Discord, GitHub, ローカルファイル等)。
 - `internal/service/`: ビジネスロジック (必要なら階層化)。
-- `internal/mock/`, `internal/repository/`: インターフェース定義とモック/実装。
+- `internal/mock/`: `go.uber.org/mock`で自動生成されたモック。この配下は手動編集禁止。
 - `frontend/src/`: Svelte コンポーネント・ストア・ユーティリティ。
 
 ## 6. 依存追加
@@ -38,7 +39,11 @@
 
 ## 7. テスト戦略
 - 新規ロジックには原則ユニットテスト。難読な計算は例示的ケースを複数。
+- Go テスト: `testing` + `go.uber.org/mock/gomock` + `github.com/stretchr/testify`  を利用。テーブル駆動テスト推奨。
 - 外部 API 呼び出しはモック (`mock/` / インターフェース) を利用。
+- ファイル操作は一時ディレクトリ (`t.TempDir()`) を使用。
+- 並列実行可能な場合は `t.Parallel()` を利用。
+- テスト名は日本語で正常系/異常系を明示。
 - フロントは状態計算/ストアロジックを Jest でテスト。UI のみの小変更多発は Snapshot 多用しすぎない。
 
 ## 8. AI / Copilot 利用ルール
@@ -54,7 +59,8 @@
 - `task test` でフロントエンド/バックエンドテスト実行。
 
 ## 10. コンフィグ / 環境
-- `config.dev.yml` / `config.prod.yml`: 差分は最小に。共通値は `config.go` 経由で集約も検討。
+- `di/config.go` 経由で集約も検討。
+- `di/container.go` で依存注入設定。
 - ユーザーデータ (`user_data/`): 開発中に個人情報追加しない。
 
 ## 11. 既存計算ロジック参照

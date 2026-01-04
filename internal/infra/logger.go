@@ -14,9 +14,7 @@ type Logger interface {
 	SetOwnIGN(ownIGN string)
 	Debug(message string, contexts map[string]string)
 	Info(message string, contexts map[string]string)
-	Warn(err error, contexts map[string]string)
 	Error(err error, contexts map[string]string)
-	Fatal(err error, contexts map[string]string)
 }
 
 type logger struct {
@@ -45,7 +43,7 @@ func NewLogger(
 	logFile, _ := os.OpenFile(
 		filepath.Join(userDataDir, appName+".log"),
 		os.O_APPEND|os.O_CREATE|os.O_WRONLY,
-		0o664,
+		os.ModePerm,
 	)
 	multiLevelWriter := zerolog.MultiLevelWriter(consoleWriter, &remoteWriter, logFile)
 
@@ -78,24 +76,8 @@ func (l *logger) Info(message string, contexts map[string]string) {
 	e.Send()
 }
 
-func (l *logger) Warn(err error, contexts map[string]string) {
-	e := l.zlog.Warn().
-		Str("ign", l.ownIGN).
-		Str("error", fmt.Sprintf("%+v", err))
-	l.addContext(e, contexts)
-	e.Send()
-}
-
 func (l *logger) Error(err error, contexts map[string]string) {
 	e := l.zlog.Error().
-		Str("ign", l.ownIGN).
-		Str("error", fmt.Sprintf("%+v", err))
-	l.addContext(e, contexts)
-	e.Send()
-}
-
-func (l *logger) Fatal(err error, contexts map[string]string) {
-	e := l.zlog.Fatal().
 		Str("ign", l.ownIGN).
 		Str("error", fmt.Sprintf("%+v", err))
 	l.addContext(e, contexts)
