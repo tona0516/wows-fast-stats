@@ -198,18 +198,6 @@ func (c *wargamingApiClient) EncycShips(pageNo int) (data.WGEncycShips, error) {
 	return res, err
 }
 
-func (c *wargamingApiClient) EncycInfo() (data.WGEncycInfoData, error) {
-	res, err := request[data.WGEncycInfo](
-		c,
-		"/wows/encyclopedia/info/",
-		map[string]string{
-			"fields": data.WGEncycInfo{}.Field(),
-		},
-	)
-
-	return res.Data, err
-}
-
 func (c *wargamingApiClient) BattleArenas() (data.WGBattleArenas, error) {
 	res, err := request[data.WGBattleArenas](
 		c,
