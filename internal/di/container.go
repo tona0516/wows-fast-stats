@@ -4,6 +4,7 @@ import (
 	"context"
 	"wfs/internal/infra"
 	"wfs/internal/service"
+	"wfs/internal/usecase"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 	"go.uber.org/ratelimit"
@@ -12,6 +13,9 @@ import (
 type Container struct {
 	// Config
 	Config Config
+
+	// usecase
+	InstallPathSettingUsecase *usecase.InstallPathSetting
 
 	// services
 	ConfigService   *service.Config
@@ -87,11 +91,13 @@ func NewContainer(ctx context.Context, config Config) *Container {
 		),
 	)
 
+	// usecase
+	installPathSetting := usecase.NewInstallPathSetting(localStorage, func(ctx context.Context) (string, error) {
+		return runtime.OpenDirectoryDialog(ctx, runtime.OpenDialogOptions{})
+	})
+
 	// services
-	configService := service.NewConfig(
-		localStorage,
-		wargamingApiClient,
-	)
+	configService := service.NewConfig(localStorage)
 	battleFetcher := service.NewBattleFetcher(
 		ctx,
 		localStorage,
@@ -114,11 +120,12 @@ func NewContainer(ctx context.Context, config Config) *Container {
 	)
 
 	return &Container{
-		Config:          config,
-		ConfigService:   configService,
-		BattlePublisher: battlePublisher,
-		BattleService:   battleFetcher,
-		UpdaterService:  updaterService,
-		Logger:          logger,
+		Config:                    config,
+		InstallPathSettingUsecase: installPathSetting,
+		ConfigService:             configService,
+		BattlePublisher:           battlePublisher,
+		BattleService:             battleFetcher,
+		UpdaterService:            updaterService,
+		Logger:                    logger,
 	}
 }

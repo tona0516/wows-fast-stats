@@ -50,7 +50,7 @@ func (a *App) SaveUserConfig(config data.UserConfig) error {
 }
 
 func (a *App) TrySaveInstallPath() (bool, error) {
-	return a.container.ConfigService.TrySaveInstallPath(a.ctx)
+	return a.container.InstallPathSettingUsecase.Invoke(a.ctx)
 }
 
 func (a *App) ValidateInstallPath(path string) string {

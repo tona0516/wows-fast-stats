@@ -1,7 +1,6 @@
 package service
 
 import (
-	"context"
 	"errors"
 	"os"
 	"path/filepath"
@@ -10,25 +9,19 @@ import (
 	"wfs/internal/infra"
 
 	"github.com/morikuni/failure"
-	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 const GameExeName = "WorldOfWarships.exe"
 
 type Config struct {
-	localStorage        infra.LocalStorage
-	wargaming           infra.WargamingApiClient
-	OpenDirectoryDialog openDirectoryDialogFunc
+	localStorage infra.LocalStorage
 }
 
 func NewConfig(
 	localStorage infra.LocalStorage,
-	wargaming infra.WargamingApiClient,
 ) *Config {
 	return &Config{
-		localStorage:        localStorage,
-		wargaming:           wargaming,
-		OpenDirectoryDialog: runtime.OpenDirectoryDialog,
+		localStorage: localStorage,
 	}
 }
 
@@ -42,30 +35,6 @@ func (c *Config) ValidateInstallPath(path string) error {
 	}
 
 	return nil
-}
-
-func (c *Config) TrySaveInstallPath(ctx context.Context) (bool, error) {
-	selected, err := c.OpenDirectoryDialog(ctx, runtime.OpenDialogOptions{})
-	if err != nil {
-		return false, failure.New(apperr.WailsError, failure.Messagef("%s", err.Error()))
-	}
-
-	if selected == "" {
-		return false, nil
-	}
-
-	cfg, err := c.GetUserConfig()
-	if err != nil {
-		return false, failure.Wrap(err)
-	}
-
-	cfg.InstallPath = selected
-
-	if err = c.SaveUserConfig(cfg); err != nil {
-		return false, failure.Wrap(err)
-	}
-
-	return true, nil
 }
 
 func (c *Config) GetUserConfig() (data.UserConfig, error) {
