@@ -8,8 +8,7 @@ import type {
 } from "./types";
 
 export const ZOOM_RATES = [
-  25, 33, 50, 67, 75, 80, 90, 100, 110, 120, 125, 133, 150, 167, 175, 200, 250,
-  300, 400, 500,
+  50, 67, 75, 80, 90, 100, 110, 120, 125, 133, 150, 167, 175, 200,
 ] as const;
 
 export const STATS_EXTRAS: Readonly<Map<string, string>> = new Map<

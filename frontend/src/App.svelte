@@ -26,6 +26,11 @@
 
   let page: Page = "stats";
 
+  $: {
+    // @ts-ignore
+    document.body.style.zoom = ($storedUserConfig?.zoom_rate || 1.0) / 100;
+  }
+
   onMount(() => {
     themeChange(false);
   });
