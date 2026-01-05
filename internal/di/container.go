@@ -14,15 +14,15 @@ type Container struct {
 	// Config
 	Config Config
 
-	// usecase
+	// Usecase
 	InstallPathSettingUsecase *usecase.InstallPathSetting
 	UpdateCheckUsecase        *usecase.UpdateCheck
+	PollMatchUsecase          *usecase.PollMatch
 
 	// services
-	ConfigService   *service.Config
-	BattlePublisher *service.BattlePublisher
-	BattleService   *service.BattleFetcher
-	Logger          infra.Logger
+	ConfigService *service.Config
+	BattleService *service.BattleFetcher
+	Logger        infra.Logger
 }
 
 func NewContainer(ctx context.Context, config Config) *Container {
@@ -99,6 +99,11 @@ func NewContainer(ctx context.Context, config Config) *Container {
 		config.Basic.Version,
 		githubApiClient,
 	)
+	pollMatchUsecase := usecase.NewPollMatch(
+		config.Basic.PollingInterval,
+		localStorage,
+		runtime.EventsEmit,
+	)
 
 	// services
 	configService := service.NewConfig(localStorage)
@@ -111,20 +116,13 @@ func NewContainer(ctx context.Context, config Config) *Container {
 		logger,
 		runtime.EventsEmit,
 	)
-	battlePublisher := service.NewBattlePublisher(
-		ctx,
-		config.Basic.PollingInterval,
-		localStorage,
-		logger,
-		runtime.EventsEmit,
-	)
 
 	return &Container{
 		Config:                    config,
 		InstallPathSettingUsecase: installPathSettingUsecase,
 		UpdateCheckUsecase:        updateCheckUsecase,
+		PollMatchUsecase:          pollMatchUsecase,
 		ConfigService:             configService,
-		BattlePublisher:           battlePublisher,
 		BattleService:             battleFetcher,
 		Logger:                    logger,
 	}

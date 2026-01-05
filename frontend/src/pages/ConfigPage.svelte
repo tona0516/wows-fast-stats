@@ -6,13 +6,9 @@
     STATS_COLUMN_INFO,
     PLAYER_NAME_COLORS,
   } from "@libs/constants";
-  import {
-    storedInstallPathError,
-    showToast,
-    storedUserConfig,
-  } from "@libs/stores";
+  import { showToast, storedUserConfig } from "@libs/stores";
   import { Theme } from "@libs/Theme";
-  import { TrySaveInstallPath, SubscribeBattle } from "@wails/go/main/App";
+  import { StartPollingMatch, TrySaveInstallPath } from "@wails/go/main/App";
   import { onMount } from "svelte";
   import { themeChange } from "theme-change";
 
@@ -24,13 +20,11 @@
     try {
       const isSuccess = await TrySaveInstallPath();
       if (isSuccess) {
-        storedInstallPathError.set("");
-
         showToast("インストールパスを設定しました");
-        SubscribeBattle();
+        StartPollingMatch();
       }
     } catch (error) {
-      storedInstallPathError.set(error as string);
+      showToast(`設定できませんでした: " + ${error as string}`);
     }
   };
 </script>
@@ -53,11 +47,6 @@
             {$storedUserConfig.install_path}
           </div>
         </div>
-      </div>
-    {/if}
-    {#if $storedInstallPathError}
-      <div role="alert" class="alert alert-error alert-soft mb-2">
-        <span>{$storedInstallPathError}</span>
       </div>
     {/if}
     <button class="btn btn-primary w-full" on:click={onClickSelectDirectory}>

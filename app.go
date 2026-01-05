@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"os"
-	"wfs/internal/apperr"
 	"wfs/internal/data"
 	"wfs/internal/di"
 
@@ -12,30 +11,26 @@ import (
 )
 
 type App struct {
-	ctx               context.Context
-	config            di.Config
-	container         *di.Container
-	unsubscribeBattle context.CancelFunc
+	ctx                 context.Context
+	config              di.Config
+	container           *di.Container
+	pollMatchCancelFunc context.CancelFunc
 }
 
 func NewApp(config di.Config) *App {
 	return &App{config: config}
 }
 
-func (a *App) SubscribeBattle() {
-	if !a.container.BattlePublisher.CanSubcribe() {
-		return
+func (a *App) StartPollingMatch() {
+	if a.pollMatchCancelFunc != nil {
+		a.pollMatchCancelFunc()
 	}
 
-	if a.unsubscribeBattle != nil {
-		a.unsubscribeBattle()
-	}
-
-	cancelCtx, unsubscribeBattle := context.WithCancel(context.Background())
-	a.unsubscribeBattle = unsubscribeBattle
+	cancelCtx, cancelFunc := context.WithCancel(context.Background())
+	a.pollMatchCancelFunc = cancelFunc
 	channel := make(chan data.TempArenaInfo)
 
-	go a.container.BattlePublisher.Subcribe(cancelCtx, channel)
+	go a.container.PollMatchUsecase.Invoke(a.ctx, cancelCtx, channel)
 	for tempArenaInfo := range channel {
 		a.container.BattleService.Invoke(tempArenaInfo)
 	}
@@ -53,17 +48,7 @@ func (a *App) TrySaveInstallPath() (bool, error) {
 	return a.container.InstallPathSettingUsecase.Invoke(a.ctx)
 }
 
-func (a *App) ValidateInstallPath(path string) string {
-	err := a.container.ConfigService.ValidateInstallPath(path)
-
-	if err := apperr.Unwrap(err); err != nil {
-		return err.Error()
-	}
-
-	return ""
-}
-
-func (a *App) Semver() string {
+func (a *App) CurrentVersion() string {
 	return a.config.Basic.Version
 }
 

@@ -1,6 +1,10 @@
 <script lang="ts">
   import ExternalLink from "@components/ExternalLink.svelte";
-  import { Semver, NewVersion, ShowMessageDialog } from "@wails/go/main/App";
+  import {
+    CurrentVersion,
+    NewVersion,
+    ShowMessageDialog,
+  } from "@wails/go/main/App";
   import type { data } from "@wails/go/models";
   import iconApp from "src/assets/images/appicon.png";
 
@@ -51,7 +55,7 @@
 <div class="p-4 flex flex-col items-center">
   <img src={iconApp} alt="" width="128px" height="128px" />
   <div class="pt-1">
-    wows-fast-stats {#await Semver() then semver} {semver} {/await}
+    wows-fast-stats {#await CurrentVersion() then semver} {semver} {/await}
   </div>
   <div class="pt-3">
     <button

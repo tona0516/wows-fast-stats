@@ -3,8 +3,6 @@ package service
 import (
 	"errors"
 	"os"
-	"path/filepath"
-	"wfs/internal/apperr"
 	"wfs/internal/data"
 	"wfs/internal/infra"
 
@@ -23,18 +21,6 @@ func NewConfig(
 	return &Config{
 		localStorage: localStorage,
 	}
-}
-
-func (c *Config) ValidateInstallPath(path string) error {
-	if path == "" {
-		return failure.New(apperr.EmptyInstallPath)
-	}
-
-	if _, err := os.Stat(filepath.Join(path, GameExeName)); err != nil {
-		return failure.New(apperr.InvalidInstallPath)
-	}
-
-	return nil
 }
 
 func (c *Config) GetUserConfig() (data.UserConfig, error) {

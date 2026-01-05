@@ -2,21 +2,25 @@ package usecase
 
 import (
 	"context"
+	"os"
+	"path/filepath"
 	"wfs/internal/infra"
 
 	"github.com/morikuni/failure"
 )
 
-type OpenDirectoryDialogFunc func(ctx context.Context) (string, error)
+const gameClientFile = "WorldOfWarships.exe"
+
+type openDirectoryDialogFunc func(ctx context.Context) (string, error)
 
 type InstallPathSetting struct {
 	localStorage        infra.LocalStorage
-	openDirectoryDialog OpenDirectoryDialogFunc
+	openDirectoryDialog openDirectoryDialogFunc
 }
 
 func NewInstallPathSetting(
 	localStorage infra.LocalStorage,
-	openDirectoryDialogFunc OpenDirectoryDialogFunc,
+	openDirectoryDialogFunc openDirectoryDialogFunc,
 ) *InstallPathSetting {
 	return &InstallPathSetting{
 		localStorage:        localStorage,
@@ -32,6 +36,10 @@ func (s *InstallPathSetting) Invoke(ctx context.Context) (bool, error) {
 
 	if selected == "" {
 		return false, nil
+	}
+
+	if _, err := os.Stat(filepath.Join(selected, gameClientFile)); err != nil {
+		return false, failure.Wrap(err)
 	}
 
 	config, err := s.localStorage.UserConfig()

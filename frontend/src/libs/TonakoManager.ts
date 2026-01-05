@@ -2,15 +2,23 @@ import { storedTonako } from "./stores";
 import { Tonako } from "./Tonako";
 
 export class TonakoManager {
-  private static _instance: TonakoManager;
+  private static instance: TonakoManager;
 
   private constructor() {}
 
-  public static get instance(): TonakoManager {
-    if (!TonakoManager._instance) {
-      TonakoManager._instance = new TonakoManager();
+  public static get getInstance(): TonakoManager {
+    if (!TonakoManager.instance) {
+      TonakoManager.instance = new TonakoManager();
     }
-    return TonakoManager._instance;
+    return TonakoManager.instance;
+  }
+
+  setNeedInitialSettingState() {
+    storedTonako.set({
+      message: "設定画面から初期設定をおこなってください",
+      isLoading: false,
+      tonako: Tonako.Pointing,
+    });
   }
 
   setStartBattleState() {
@@ -21,7 +29,7 @@ export class TonakoManager {
     });
   }
 
-  setEndBattleState() {
+  setPollingStartState() {
     storedTonako.set({
       message: "戦闘開始時に自動的にリロードします",
       isLoading: false,

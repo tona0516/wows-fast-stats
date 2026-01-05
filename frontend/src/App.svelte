@@ -3,20 +3,15 @@
   import "charts.css";
   import SideMenu from "@components/SideMenu.svelte";
   import Toast from "@components/Toast.svelte";
-  import {
-    storedBattle,
-    storedInstallPathError,
-    storedUserConfig,
-  } from "@libs/stores";
+  import { storedBattle, storedUserConfig } from "@libs/stores";
   import type { Page } from "@libs/types";
   import ConfigPage from "@pages/ConfigPage.svelte";
   import InfoPage from "@pages/InfoPage.svelte";
   import StatsPage from "@pages/StatsPage.svelte";
   import {
-    ValidateInstallPath,
-    SubscribeBattle,
     ShowMessageDialog,
     GetUserConfig,
+    StartPollingMatch,
   } from "@wails/go/main/App";
   import type { data } from "@wails/go/models";
   import { EventsOn, LogInfo } from "@wails/runtime/runtime";
@@ -35,29 +30,33 @@
     themeChange(false);
   });
 
+  EventsOn("NEED_INITIAL_SETTING", () => {
+    LogInfo("NEED_INITIAL_SETTING");
+    TonakoManager.getInstance.setNeedInitialSettingState();
+  });
+  EventsOn("POLLING_START", () => {
+    LogInfo("POLLING_START");
+    TonakoManager.getInstance.setPollingStartState();
+  });
   EventsOn("BATTLE_START", () => {
     LogInfo("BATTLE_START");
-    TonakoManager.instance.setStartBattleState();
-  });
-  EventsOn("BATTLE_END", () => {
-    LogInfo("BATTLE_END");
-    TonakoManager.instance.setEndBattleState();
+    TonakoManager.getInstance.setStartBattleState();
   });
   EventsOn("BATTLE_ERR", (message: string) => {
     LogInfo("BATTLE_ERR");
-    TonakoManager.instance.setBattleErrorState(message);
+    TonakoManager.getInstance.setBattleErrorState(message);
   });
   EventsOn("BATTLE_FETCH_OTHERS", () => {
     LogInfo("BATTLE_FETCH_OTHERS");
-    TonakoManager.instance.setFetchOtherDataState();
+    TonakoManager.getInstance.setFetchOtherDataState();
   });
   EventsOn("BATTLE_FETCH_PLAYERS", () => {
     LogInfo("BATTLE_FETCH_PLAYERS");
-    TonakoManager.instance.setFetchPlayerDataState();
+    TonakoManager.getInstance.setFetchPlayerDataState();
   });
   EventsOn("BATTLE_FETCH_DONE", (battle: data.Battle) => {
     LogInfo("BATTLE_FETCH_DONE");
-    TonakoManager.instance.setHidden();
+    TonakoManager.getInstance.setHidden();
     storedBattle.set(battle);
   });
 
@@ -66,19 +65,9 @@
       const userConfig = await GetUserConfig();
       storedUserConfig.set(userConfig);
 
-      const installPathError = await ValidateInstallPath(
-        userConfig.install_path,
-      );
-      if (installPathError) {
-        storedInstallPathError.set(installPathError);
-      }
+      StartPollingMatch();
 
       initialized = true;
-
-      if (!$storedInstallPathError) {
-        LogInfo("call SubscribeBattle");
-        SubscribeBattle();
-      }
     } catch (error) {
       ShowMessageDialog(`初期化に失敗しました: ${error as string}`);
     }

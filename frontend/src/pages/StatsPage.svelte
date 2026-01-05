@@ -3,21 +3,11 @@
   import MainStatsTable from "@components/MainStatsTable.svelte";
   import TeamAverageStatsDisplay from "@components/TeamAverageStatsDisplay.svelte";
   import MessagingTonako from "@components/MessagingTonako.svelte";
-  import {
-    storedInstallPathError,
-    storedTonako,
-    storedBattle,
-  } from "@libs/stores";
-  import { Tonako } from "@libs/Tonako";
+  import { storedTonako, storedBattle, storedUserConfig } from "@libs/stores";
 </script>
 
 <div>
-  {#if $storedInstallPathError}
-    <MessagingTonako
-      tonako={Tonako.Pointing}
-      message="設定画面から初期設定をおこなってください"
-    />
-  {:else if $storedTonako}
+  {#if $storedTonako}
     <MessagingTonako
       tonako={$storedTonako.tonako}
       message={$storedTonako.message}

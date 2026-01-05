@@ -12,7 +12,6 @@ storedUserConfig.subscribe(async (value) => {
 export const storedBattle = writable(undefined) as Writable<
   Optional<data.Battle>
 >;
-export const storedInstallPathError = writable("") as Writable<string>;
 export const storedPlayerDetail = writable(undefined) as Writable<
   Optional<data.Player>
 >;
