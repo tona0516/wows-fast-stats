@@ -68,7 +68,7 @@ func (a *App) Semver() string {
 }
 
 func (a *App) NewVersion() *data.NewVersion {
-	return a.container.UpdaterService.Invoke()
+	return a.container.UpdateCheckUsecase.Invoke()
 }
 
 func (a *App) ShowMessageDialog(message string) {

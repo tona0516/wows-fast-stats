@@ -16,12 +16,12 @@ type Container struct {
 
 	// usecase
 	InstallPathSettingUsecase *usecase.InstallPathSetting
+	UpdateCheckUsecase        *usecase.UpdateCheck
 
 	// services
 	ConfigService   *service.Config
 	BattlePublisher *service.BattlePublisher
 	BattleService   *service.BattleFetcher
-	UpdaterService  *service.UpdateChecker
 	Logger          infra.Logger
 }
 
@@ -92,9 +92,13 @@ func NewContainer(ctx context.Context, config Config) *Container {
 	)
 
 	// usecase
-	installPathSetting := usecase.NewInstallPathSetting(localStorage, func(ctx context.Context) (string, error) {
+	installPathSettingUsecase := usecase.NewInstallPathSetting(localStorage, func(ctx context.Context) (string, error) {
 		return runtime.OpenDirectoryDialog(ctx, runtime.OpenDialogOptions{})
 	})
+	updateCheckUsecase := usecase.NewUpdateCheck(
+		config.Basic.Version,
+		githubApiClient,
+	)
 
 	// services
 	configService := service.NewConfig(localStorage)
@@ -114,18 +118,14 @@ func NewContainer(ctx context.Context, config Config) *Container {
 		logger,
 		runtime.EventsEmit,
 	)
-	updaterService := service.NewUpdateChecker(
-		config.Basic.Version,
-		githubApiClient,
-	)
 
 	return &Container{
 		Config:                    config,
-		InstallPathSettingUsecase: installPathSetting,
+		InstallPathSettingUsecase: installPathSettingUsecase,
+		UpdateCheckUsecase:        updateCheckUsecase,
 		ConfigService:             configService,
 		BattlePublisher:           battlePublisher,
 		BattleService:             battleFetcher,
-		UpdaterService:            updaterService,
 		Logger:                    logger,
 	}
 }

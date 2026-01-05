@@ -17,8 +17,6 @@ func TestInstallPathSetting_Invoke(t *testing.T) {
 		t.Parallel()
 
 		ctrl := gomock.NewController(t)
-		defer ctrl.Finish()
-
 		mockLocalStorage := mock.NewMockLocalStorage(ctrl)
 		originalConfig := data.UserConfig{
 			Version:     1,
@@ -52,8 +50,6 @@ func TestInstallPathSetting_Invoke(t *testing.T) {
 		t.Parallel()
 
 		ctrl := gomock.NewController(t)
-		defer ctrl.Finish()
-
 		mockLocalStorage := mock.NewMockLocalStorage(ctrl)
 		mockLocalStorage.EXPECT().UserConfig().Times(0)
 		mockLocalStorage.EXPECT().SetUserConfig(gomock.Any()).Times(0)
@@ -73,8 +69,6 @@ func TestInstallPathSetting_Invoke(t *testing.T) {
 		t.Parallel()
 
 		ctrl := gomock.NewController(t)
-		defer ctrl.Finish()
-
 		mockLocalStorage := mock.NewMockLocalStorage(ctrl)
 		mockLocalStorage.EXPECT().UserConfig().Times(0)
 		mockLocalStorage.EXPECT().SetUserConfig(gomock.Any()).Times(0)
@@ -94,8 +88,6 @@ func TestInstallPathSetting_Invoke(t *testing.T) {
 		t.Parallel()
 
 		ctrl := gomock.NewController(t)
-		defer ctrl.Finish()
-
 		mockLocalStorage := mock.NewMockLocalStorage(ctrl)
 		expectedErr := errors.New("user config read error")
 		mockLocalStorage.EXPECT().UserConfig().Return(data.UserConfig{}, expectedErr)
@@ -116,8 +108,6 @@ func TestInstallPathSetting_Invoke(t *testing.T) {
 		t.Parallel()
 
 		ctrl := gomock.NewController(t)
-		defer ctrl.Finish()
-
 		mockLocalStorage := mock.NewMockLocalStorage(ctrl)
 		originalConfig := data.UserConfig{
 			Version:     1,
@@ -144,8 +134,6 @@ func TestInstallPathSetting_Invoke(t *testing.T) {
 		t.Parallel()
 
 		ctrl := gomock.NewController(t)
-		defer ctrl.Finish()
-
 		mockLocalStorage := mock.NewMockLocalStorage(ctrl)
 		originalConfig := data.UserConfig{
 			Version:      1,

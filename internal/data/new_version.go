@@ -1,6 +1,6 @@
 package data
 
 type NewVersion struct {
-	Semver string `json:"semver"`
-	URL    string `json:"url"`
+	Version     string `json:"semver"`
+	DownloadURL string `json:"url"`
 }
