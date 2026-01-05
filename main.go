@@ -22,7 +22,8 @@ var (
 
 func main() {
 	config := di.NewConfig(appName, version, env)
-	app := NewApp(config)
+	container := di.NewContainer(config)
+	app := NewApp(&config, container)
 
 	err := wails.Run(&options.App{
 		Title:     config.Basic.Name,

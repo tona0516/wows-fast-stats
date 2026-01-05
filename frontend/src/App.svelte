@@ -91,12 +91,12 @@
     <PlayerDetailModal />
     <ShipDetailModal />
 
-    <div class="flex divide-x-1 divide-neutral-500">
+    <div class="flex divide-x divide-neutral-500">
       <div class="flex-none z-10">
         <SideMenu bind:page />
       </div>
 
-      <div class="flex-1 min-w-[1px] m-4">
+      <div class="flex-1 min-w-px m-4">
         {#if initialized}
           {#if page === "stats"}
             <StatsPage bind:this={statsPage} />

@@ -91,7 +91,6 @@ func TestBattle_Get_正常系_初回(t *testing.T) {
 
 	// テスト
 	b := NewBattleFetcher(
-		context.TODO(),
 		mockPersistence,
 		mockWargaming,
 		mockUnofficialWargaming,
@@ -99,7 +98,7 @@ func TestBattle_Get_正常系_初回(t *testing.T) {
 		mockLogger,
 		emitFunc,
 	)
-	b.Invoke(data.TempArenaInfo{
+	b.Invoke(context.Background(), data.TempArenaInfo{
 		Vehicles: []data.Vehicle{
 			{ShipID: 1, Name: "player_1", Relation: 0},
 			{ShipID: 2, Name: "player_2", Relation: 2},
@@ -165,7 +164,6 @@ func TestBattle_Get_正常系_2回目以降(t *testing.T) {
 
 	// テスト
 	b := NewBattleFetcher(
-		context.TODO(),
 		mockPersistence,
 		mockWargaming,
 		mockUnofficialWargaming,
@@ -174,7 +172,7 @@ func TestBattle_Get_正常系_2回目以降(t *testing.T) {
 		emitFunc,
 	)
 	b.isFirstBattle = false
-	b.Invoke(data.TempArenaInfo{
+	b.Invoke(context.Background(), data.TempArenaInfo{
 		Vehicles: []data.Vehicle{
 			{ShipID: 1, Name: "player_1", Relation: 0},
 			{ShipID: 2, Name: "player_2", Relation: 2},
@@ -213,7 +211,6 @@ func TestBattle_Get_異常系_アカウントリスト取得失敗(t *testing.T)
 
 	// テスト
 	b := NewBattleFetcher(
-		context.TODO(),
 		mockPersistence,
 		mockWargaming,
 		mockUnofficialWargaming,
@@ -222,7 +219,7 @@ func TestBattle_Get_異常系_アカウントリスト取得失敗(t *testing.T)
 		emitFunc,
 	)
 	b.isFirstBattle = false
-	b.Invoke(data.TempArenaInfo{
+	b.Invoke(context.Background(), data.TempArenaInfo{
 		Vehicles: []data.Vehicle{
 			{ShipID: 1, Name: "player_1", Relation: 0},
 			{ShipID: 2, Name: "player_2", Relation: 2},

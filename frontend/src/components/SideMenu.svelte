@@ -16,7 +16,7 @@
     {#each MENU_ITEMS as item}
       <button
         class="btn btn-sm btn-ghost tooltip tooltip-right {page === item.page &&
-          'bg-current/[15%]'} "
+          'bg-current/15'} "
         data-tip={item.tooltip}
         on:click={() => (page = item.page)}
       >

@@ -11,14 +11,18 @@ import (
 )
 
 type App struct {
+	config    *di.Config
+	container *di.Container
+
 	ctx                 context.Context
-	config              di.Config
-	container           *di.Container
 	pollMatchCancelFunc context.CancelFunc
 }
 
-func NewApp(config di.Config) *App {
-	return &App{config: config}
+func NewApp(
+	config *di.Config,
+	container *di.Container,
+) *App {
+	return &App{config: config, container: container}
 }
 
 func (a *App) StartPollingMatch() {
@@ -32,7 +36,7 @@ func (a *App) StartPollingMatch() {
 
 	go a.container.PollMatchUsecase.Invoke(a.ctx, cancelCtx, channel)
 	for tempArenaInfo := range channel {
-		a.container.BattleService.Invoke(tempArenaInfo)
+		a.container.BattleService.Invoke(a.ctx, tempArenaInfo)
 	}
 }
 
@@ -76,8 +80,6 @@ func (a *App) onStartup(ctx context.Context) {
 		os.Exit(1)
 		return
 	}
-
-	a.container = di.NewContainer(ctx, a.config)
 }
 
 func isAlreadyRunning() bool {

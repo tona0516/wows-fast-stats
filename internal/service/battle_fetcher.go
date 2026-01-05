@@ -17,7 +17,6 @@ import (
 )
 
 type BattleFetcher struct {
-	ctx            context.Context
 	localStorage   infra.LocalStorage
 	wargaming      infra.WargamingApiClient
 	uwargaming     infra.ClanApiClient
@@ -34,7 +33,6 @@ type BattleFetcher struct {
 }
 
 func NewBattleFetcher(
-	ctx context.Context,
 	localStorage infra.LocalStorage,
 	wargaming infra.WargamingApiClient,
 	uwargaming infra.ClanApiClient,
@@ -43,7 +41,6 @@ func NewBattleFetcher(
 	eventsEmitFunc eventEmitFunc,
 ) *BattleFetcher {
 	return &BattleFetcher{
-		ctx:                                ctx,
 		localStorage:                       localStorage,
 		wargaming:                          wargaming,
 		uwargaming:                         uwargaming,
@@ -55,7 +52,7 @@ func NewBattleFetcher(
 	}
 }
 
-func (b *BattleFetcher) Invoke(tempArenaInfo data.TempArenaInfo) {
+func (b *BattleFetcher) Invoke(ctx context.Context, tempArenaInfo data.TempArenaInfo) {
 	var result data.Battle
 
 	// Fetch on-memory stored data
@@ -76,7 +73,7 @@ func (b *BattleFetcher) Invoke(tempArenaInfo data.TempArenaInfo) {
 
 	accountList, err := b.wargaming.AccountList(tempArenaInfo.AccountNames())
 	if err != nil {
-		b.eventsEmitFunc(b.ctx, EventErr, apperr.ToStringCode(err))
+		b.eventsEmitFunc(ctx, EventErr, apperr.ToStringCode(err))
 		return
 	}
 	accountIDs := accountList.AccountIDs()
@@ -93,7 +90,7 @@ func (b *BattleFetcher) Invoke(tempArenaInfo data.TempArenaInfo) {
 
 	errs := make([]error, 0)
 	if b.isFirstBattle {
-		b.eventsEmitFunc(b.ctx, EventFetchOthers, nil)
+		b.eventsEmitFunc(ctx, EventFetchOthers, nil)
 
 		warship := <-warshipResult
 		b.warship = warship.Value
@@ -112,7 +109,7 @@ func (b *BattleFetcher) Invoke(tempArenaInfo data.TempArenaInfo) {
 		errs = append(errs, battleTypes.Error)
 	}
 
-	b.eventsEmitFunc(b.ctx, EventFetchPlayers, nil)
+	b.eventsEmitFunc(ctx, EventFetchPlayers, nil)
 
 	accountInfo := <-accountInfoResult
 	errs = append(errs, accountInfo.Error)
@@ -129,12 +126,12 @@ func (b *BattleFetcher) Invoke(tempArenaInfo data.TempArenaInfo) {
 	for _, err := range errs {
 		if err != nil {
 			if failure.Is(err, apperr.ExpectedStatsUnavaillalble) && !b.isNotifyExpectedStatsUnavaillalble {
-				b.eventsEmitFunc(b.ctx, EventErr, apperr.ExpectedStatsUnavaillalble.ErrorCode())
+				b.eventsEmitFunc(ctx, EventErr, apperr.ExpectedStatsUnavaillalble.ErrorCode())
 				b.isNotifyExpectedStatsUnavaillalble = true
 				continue
 			}
 
-			b.eventsEmitFunc(b.ctx, EventErr, apperr.ToStringCode(err))
+			b.eventsEmitFunc(ctx, EventErr, apperr.ToStringCode(err))
 			return
 		}
 	}
@@ -153,7 +150,7 @@ func (b *BattleFetcher) Invoke(tempArenaInfo data.TempArenaInfo) {
 	)
 
 	b.isFirstBattle = false
-	b.eventsEmitFunc(b.ctx, EventFetchDone, result)
+	b.eventsEmitFunc(ctx, EventFetchDone, result)
 }
 
 func (b *BattleFetcher) fetchWarships(channel chan data.Result[data.Warships]) {

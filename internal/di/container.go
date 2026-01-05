@@ -19,13 +19,13 @@ type Container struct {
 	UpdateCheckUsecase        *usecase.UpdateCheck
 	PollMatchUsecase          *usecase.PollMatch
 
-	// services
+	// Services
 	ConfigService *service.Config
 	BattleService *service.BattleFetcher
 	Logger        infra.Logger
 }
 
-func NewContainer(ctx context.Context, config Config) *Container {
+func NewContainer(config Config) *Container {
 	alertDiscordApiClient := infra.NewDiscordApiClient(
 		*infra.NewApiConfig(
 			config.DiscordApi.AlertWebhookURL,
@@ -108,7 +108,6 @@ func NewContainer(ctx context.Context, config Config) *Container {
 	// services
 	configService := service.NewConfig(localStorage)
 	battleFetcher := service.NewBattleFetcher(
-		ctx,
 		localStorage,
 		wargamingApiClient,
 		clansApiClient,
