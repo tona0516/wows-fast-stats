@@ -20,7 +20,7 @@ export class PRColumn extends AbstractStatsColumn<string> {
       return undefined;
     }
 
-    return RATING_COLORS[pr.rating].getFixedTextColor();
+    return RATING_COLORS[pr.rating]?.getFixedTextColor();
   }
 
   override getDisplayValue(player: data.Player): string {

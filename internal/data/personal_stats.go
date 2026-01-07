@@ -5,14 +5,13 @@ import (
 )
 
 type PersonalStats struct {
-	useShipID        int
-	accountInfo      WGAccountInfoData
-	useShipStats     WGShipsStatsData
-	allShipsStats    []WGShipsStatsData
-	shipsBadges      []WGShipsBadgesData
-	allExpectedStats ExpectedStats
-	warships         Warships
-	tempArenaInfo    TempArenaInfo
+	useShipID     int
+	accountInfo   WGAccountInfoData
+	useShipStats  WGShipsStatsData
+	allShipsStats []WGShipsStatsData
+	shipsBadges   []WGShipsBadgesData
+	warships      Warships
+	tempArenaInfo TempArenaInfo
 }
 
 func NewPersonalStats(
@@ -20,7 +19,6 @@ func NewPersonalStats(
 	accountInfo WGAccountInfoData,
 	allShipsStats []WGShipsStatsData,
 	shipsBadges []WGShipsBadgesData,
-	expectedStats ExpectedStats,
 	warships Warships,
 	tempArenaInfo TempArenaInfo,
 ) *PersonalStats {
@@ -33,14 +31,13 @@ func NewPersonalStats(
 	}
 
 	return &PersonalStats{
-		useShipID:        useShipID,
-		accountInfo:      accountInfo,
-		useShipStats:     useShipStats,
-		allShipsStats:    allShipsStats,
-		shipsBadges:      shipsBadges,
-		allExpectedStats: expectedStats,
-		warships:         warships,
-		tempArenaInfo:    tempArenaInfo,
+		useShipID:     useShipID,
+		accountInfo:   accountInfo,
+		useShipStats:  useShipStats,
+		allShipsStats: allShipsStats,
+		shipsBadges:   shipsBadges,
+		warships:      warships,
+		tempArenaInfo: tempArenaInfo,
 	}
 }
 
@@ -57,9 +54,9 @@ func (s *PersonalStats) PR(category StatsCategory, pattern StatsPattern) RatingV
 				wins:   winRate(values.Wins, battles),
 			},
 			PRFactor{
-				damage: s.allExpectedStats[s.useShipID].AverageDamageDealt,
-				frags:  s.allExpectedStats[s.useShipID].AverageFrags,
-				wins:   s.allExpectedStats[s.useShipID].WinRate,
+				damage: s.warships[s.useShipID].ServerAverage.Damage,
+				frags:  s.warships[s.useShipID].ServerAverage.Frags,
+				wins:   s.warships[s.useShipID].ServerAverage.WinRate,
 			},
 			battles,
 		)
@@ -75,7 +72,7 @@ func (s *PersonalStats) PR(category StatsCategory, pattern StatsPattern) RatingV
 			values := s.statsValuesForm(ship, pattern)
 			battles := values.Battles
 
-			es, ok := s.allExpectedStats[ship.ShipID]
+			warship, ok := s.warships[ship.ShipID]
 			if !ok {
 				continue
 			}
@@ -84,9 +81,9 @@ func (s *PersonalStats) PR(category StatsCategory, pattern StatsPattern) RatingV
 			actual.frags += float64(values.Frags)
 			actual.wins += float64(values.Wins)
 
-			expected.damage += es.AverageDamageDealt * float64(battles)
-			expected.frags += es.AverageFrags * float64(battles)
-			expected.wins += es.WinRate / 100 * float64(battles)
+			expected.damage += warship.ServerAverage.Damage * float64(battles)
+			expected.frags += warship.ServerAverage.Frags * float64(battles)
+			expected.wins += warship.ServerAverage.WinRate / 100 * float64(battles)
 
 			allBattles += battles
 		}
@@ -114,7 +111,7 @@ func (s *PersonalStats) AvgDamage(category StatsCategory, pattern StatsPattern) 
 	switch category {
 	case StatsCategoryShip:
 		value := avgDamage(ship.DamageDealt, ship.Battles)
-		rating := NewRatingFromShipDamage(value, s.allExpectedStats[s.useShipID].AverageDamageDealt)
+		rating := NewRatingFromShipDamage(value, s.warships[s.useShipID].ServerAverage.Damage)
 		return NewRatingValue(value, rating)
 	case StatsCategoryOverall:
 		value := avgDamage(player.DamageDealt, player.Battles)

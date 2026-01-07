@@ -66,6 +66,7 @@ type DiscordApiConfig struct {
 
 type LocalStorageConfig struct {
 	UserDataDir string
+	CacheDir    string
 }
 
 type LoggerConfig struct {
@@ -121,6 +122,7 @@ func newProdConfig(appName, version string) Config {
 		},
 		LocalStorage: LocalStorageConfig{
 			UserDataDir: "./user_data",
+			CacheDir:    "./cache",
 		},
 		Logger: LoggerConfig{
 			Level: zerolog.InfoLevel,

@@ -2,7 +2,7 @@ import type { data } from "@wails/go/models";
 import type { ColorCode } from "./ColorCode";
 import type { Tonako } from "./Tonako";
 
-type BasicKey = "player_info" | "ship_info";
+type BasicKey = "player_info" | "warship";
 type CommonMethod = "convertValues";
 
 export type StatsCategory = Exclude<keyof data.PlayerStats, CommonMethod>;

@@ -67,7 +67,7 @@ const PREMIUM_SHIP_ICONS: { [key: string]: string } = {
 
 export class ShipInfoColumn extends AbstractColumn {
   constructor() {
-    super("ship_info", "艦");
+    super("warship", "艦");
   }
 
   override needsShow(): boolean {
@@ -83,7 +83,7 @@ export class ShipInfoColumn extends AbstractColumn {
       return undefined;
     }
 
-    const type = player.ship_info.type;
+    const type = player.warship.type;
     if (!toShipType(type)) {
       return undefined;
     }
@@ -93,23 +93,23 @@ export class ShipInfoColumn extends AbstractColumn {
   }
 
   getDisplayValue(player: data.Player): string {
-    return `${toTierString(player.ship_info.tier)} ${player.ship_info.name}`;
+    return `${toTierString(player.warship.tier)} ${player.warship.name}`;
   }
 
   getShipIconPath(player: data.Player): string {
-    const shipInfo = player.ship_info;
-    const type = shipInfo.type;
+    const warship = player.warship;
+    const type = warship.type;
     if (!toShipType(type)) {
       return ShipNone;
     }
 
-    return shipInfo.is_premium ? PREMIUM_SHIP_ICONS[type] : SHIP_ICONS[type];
+    return warship.isPremium ? PREMIUM_SHIP_ICONS[type] : SHIP_ICONS[type];
   }
 
   getNationIconPath(player: data.Player): string {
     if (!get(storedUserConfig).column.ship.enable_nation_flag) {
       return "";
     }
-    return FLAGS[player.ship_info.nation] ?? FlagNone;
+    return FLAGS[player.warship.nation] ?? FlagNone;
   }
 }

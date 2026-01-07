@@ -350,30 +350,46 @@ export namespace data {
 	        this.rating = source["rating"];
 	    }
 	}
-	export class ShipInfo {
-	    id: number;
-	    name: string;
-	    nation: string;
-	    tier: number;
-	    type: string;
-	    is_premium: boolean;
-	    avg_damage: number;
-	    damage_ratings: RatingValue[];
+	export class ServerAverage {
+	    damage: number;
+	    frags: number;
+	    winRate: number;
 	
 	    static createFrom(source: any = {}) {
-	        return new ShipInfo(source);
+	        return new ServerAverage(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.damage = source["damage"];
+	        this.frags = source["frags"];
+	        this.winRate = source["winRate"];
+	    }
+	}
+	export class Warship {
+	    id: number;
+	    name: string;
+	    tier: number;
+	    type: string;
+	    nation: string;
+	    isPremium: boolean;
+	    serverAverage: ServerAverage;
+	    damageRatings: RatingValue[];
+	
+	    static createFrom(source: any = {}) {
+	        return new Warship(source);
 	    }
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.id = source["id"];
 	        this.name = source["name"];
-	        this.nation = source["nation"];
 	        this.tier = source["tier"];
 	        this.type = source["type"];
-	        this.is_premium = source["is_premium"];
-	        this.avg_damage = source["avg_damage"];
-	        this.damage_ratings = this.convertValues(source["damage_ratings"], RatingValue);
+	        this.nation = source["nation"];
+	        this.isPremium = source["isPremium"];
+	        this.serverAverage = this.convertValues(source["serverAverage"], ServerAverage);
+	        this.damageRatings = this.convertValues(source["damageRatings"], RatingValue);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -395,8 +411,8 @@ export namespace data {
 		}
 	}
 	export class Clan {
-	    tag: string;
 	    id: number;
+	    tag: string;
 	    hex_color: string;
 	    language: string;
 	
@@ -406,8 +422,8 @@ export namespace data {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.tag = source["tag"];
 	        this.id = source["id"];
+	        this.tag = source["tag"];
 	        this.hex_color = source["hex_color"];
 	        this.language = source["language"];
 	    }
@@ -450,7 +466,7 @@ export namespace data {
 	}
 	export class Player {
 	    player_info: PlayerInfo;
-	    ship_info: ShipInfo;
+	    warship: Warship;
 	    pvp_solo: PlayerStats;
 	    pvp_all: PlayerStats;
 	    rank_solo: PlayerStats;
@@ -462,7 +478,7 @@ export namespace data {
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.player_info = this.convertValues(source["player_info"], PlayerInfo);
-	        this.ship_info = this.convertValues(source["ship_info"], ShipInfo);
+	        this.warship = this.convertValues(source["warship"], Warship);
 	        this.pvp_solo = this.convertValues(source["pvp_solo"], PlayerStats);
 	        this.pvp_all = this.convertValues(source["pvp_all"], PlayerStats);
 	        this.rank_solo = this.convertValues(source["rank_solo"], PlayerStats);

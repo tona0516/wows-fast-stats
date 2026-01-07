@@ -63,18 +63,6 @@ func (mr *MockLoggerMockRecorder) Error(err, contexts any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Error", reflect.TypeOf((*MockLogger)(nil).Error), err, contexts)
 }
 
-// Fatal mocks base method.
-func (m *MockLogger) Fatal(err error, contexts map[string]string) {
-	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "Fatal", err, contexts)
-}
-
-// Fatal indicates an expected call of Fatal.
-func (mr *MockLoggerMockRecorder) Fatal(err, contexts any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Fatal", reflect.TypeOf((*MockLogger)(nil).Fatal), err, contexts)
-}
-
 // Info mocks base method.
 func (m *MockLogger) Info(message string, contexts map[string]string) {
 	m.ctrl.T.Helper()
@@ -97,16 +85,4 @@ func (m *MockLogger) SetOwnIGN(ownIGN string) {
 func (mr *MockLoggerMockRecorder) SetOwnIGN(ownIGN any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetOwnIGN", reflect.TypeOf((*MockLogger)(nil).SetOwnIGN), ownIGN)
-}
-
-// Warn mocks base method.
-func (m *MockLogger) Warn(err error, contexts map[string]string) {
-	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "Warn", err, contexts)
-}
-
-// Warn indicates an expected call of Warn.
-func (mr *MockLoggerMockRecorder) Warn(err, contexts any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Warn", reflect.TypeOf((*MockLogger)(nil).Warn), err, contexts)
 }

@@ -70,21 +70,6 @@ func (mr *MockWargamingApiClientMockRecorder) AccountList(accountNames any) *gom
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AccountList", reflect.TypeOf((*MockWargamingApiClient)(nil).AccountList), accountNames)
 }
 
-// AccountListForSearch mocks base method.
-func (m *MockWargamingApiClient) AccountListForSearch(prefix string) (data.WGAccountList, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "AccountListForSearch", prefix)
-	ret0, _ := ret[0].(data.WGAccountList)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// AccountListForSearch indicates an expected call of AccountListForSearch.
-func (mr *MockWargamingApiClientMockRecorder) AccountListForSearch(prefix any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AccountListForSearch", reflect.TypeOf((*MockWargamingApiClient)(nil).AccountListForSearch), prefix)
-}
-
 // BattleArenas mocks base method.
 func (m *MockWargamingApiClient) BattleArenas() (data.WGBattleArenas, error) {
 	m.ctrl.T.Helper()

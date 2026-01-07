@@ -1,4 +1,4 @@
-package service
+package usecase
 
 import (
 	"context"
@@ -9,65 +9,58 @@ import (
 	"wfs/internal/apperr"
 	"wfs/internal/data"
 	"wfs/internal/infra"
+	"wfs/internal/service"
 	"wfs/internal/util"
 	"wfs/internal/yamibuka"
 
 	"github.com/abadojack/whatlanggo"
 	"github.com/morikuni/failure"
+	"golang.org/x/sync/errgroup"
 )
 
-type BattleFetcher struct {
-	localStorage   infra.LocalStorage
-	wargaming      infra.WargamingApiClient
-	uwargaming     infra.ClanApiClient
-	numbers        infra.NumbersApiClient
-	logger         infra.Logger
-	eventsEmitFunc eventEmitFunc
-
-	isFirstBattle                      bool
-	isNotifyExpectedStatsUnavaillalble bool
-	warship                            data.Warships
-	allExpectedStats                   data.ExpectedStats
-	battleArenas                       data.WGBattleArenas
-	battleTypes                        data.WGBattleTypes
+type FetchBattle struct {
+	nonUserDataFetcher *service.NonUserDataFetcher
+	localStorage       infra.LocalStorage
+	wargaming          infra.WargamingApiClient
+	uwargaming         infra.ClanApiClient
+	numbers            infra.NumbersApiClient
+	logger             infra.Logger
+	eventsEmitFunc     eventEmitFunc
 }
 
-func NewBattleFetcher(
+func NewFetchBattle(
+	nonUserDataFetcher *service.NonUserDataFetcher,
 	localStorage infra.LocalStorage,
 	wargaming infra.WargamingApiClient,
 	uwargaming infra.ClanApiClient,
 	numbers infra.NumbersApiClient,
 	logger infra.Logger,
 	eventsEmitFunc eventEmitFunc,
-) *BattleFetcher {
-	return &BattleFetcher{
-		localStorage:                       localStorage,
-		wargaming:                          wargaming,
-		uwargaming:                         uwargaming,
-		numbers:                            numbers,
-		logger:                             logger,
-		eventsEmitFunc:                     eventsEmitFunc,
-		isFirstBattle:                      true,
-		isNotifyExpectedStatsUnavaillalble: false,
+) *FetchBattle {
+	return &FetchBattle{
+		nonUserDataFetcher: nonUserDataFetcher,
+		localStorage:       localStorage,
+		wargaming:          wargaming,
+		uwargaming:         uwargaming,
+		numbers:            numbers,
+		logger:             logger,
+		eventsEmitFunc:     eventsEmitFunc,
 	}
 }
 
-func (b *BattleFetcher) Invoke(ctx context.Context, tempArenaInfo data.TempArenaInfo) {
-	var result data.Battle
+func (b *FetchBattle) Invoke(
+	ctx context.Context,
+	tempArenaInfo data.TempArenaInfo,
+) {
+	eg := errgroup.Group{}
 
-	// Fetch on-memory stored data
-	warshipResult := make(chan data.Result[data.Warships])
-	allExpectedStatsResult := make(chan data.Result[data.ExpectedStats])
-	battleArenasResult := make(chan data.Result[data.WGBattleArenas])
-	battleTypesResult := make(chan data.Result[data.WGBattleTypes])
-	if b.isFirstBattle {
-		go b.fetchWarships(warshipResult)
-		go b.fetchExpectedStats(allExpectedStatsResult)
-		go b.fetchBattleArenas(battleArenasResult)
-		go b.fetchBattleTypes(battleTypesResult)
-	}
+	var nonUserData *service.NonUserData
+	eg.Go(func() error {
+		var err error
+		nonUserData, err = b.nonUserDataFetcher.Fetch()
+		return err
+	})
 
-	// persist own ign for reporting
 	_ = b.localStorage.SetOwnIGN(tempArenaInfo.PlayerName)
 	b.logger.SetOwnIGN(tempArenaInfo.PlayerName)
 
@@ -78,259 +71,154 @@ func (b *BattleFetcher) Invoke(ctx context.Context, tempArenaInfo data.TempArena
 	}
 	accountIDs := accountList.AccountIDs()
 
-	// Fetch each stats
-	accountInfoResult := make(chan data.Result[data.WGAccountInfo])
-	shipStatsResult := make(chan data.Result[data.AllPlayerShipsStats])
-	clanResult := make(chan data.Result[data.Clans])
-	shipsBadgesResult := make(chan data.Result[data.AllPlayerShipsBadges])
-	go b.fetchAccountInfo(accountIDs, accountInfoResult)
-	go b.fetchAllPlayerShipsStats(accountIDs, shipStatsResult)
-	go b.fetchAllPlayerShipsBadges(accountIDs, shipsBadgesResult)
-	go b.fetchClan(accountIDs, clanResult)
+	var accountInfo data.WGAccountInfo
+	eg.Go(func() error {
+		var err error
+		accountInfo, err = b.wargaming.AccountInfo(accountIDs)
+		return err
+	})
 
-	errs := make([]error, 0)
-	if b.isFirstBattle {
-		b.eventsEmitFunc(ctx, EventFetchOthers, nil)
+	var allShipStats data.AllPlayerShipsStats
+	eg.Go(func() error {
+		var err error
+		allShipStats, err = b.fetchAllPlayerShipsStats(accountIDs)
+		return err
+	})
 
-		warship := <-warshipResult
-		b.warship = warship.Value
-		errs = append(errs, warship.Error)
+	var allShipBadges data.AllPlayerShipsBadges
+	eg.Go(func() error {
+		var err error
+		allShipBadges, err = b.fetchAllPlayerShipsBadges(accountIDs)
+		return err
+	})
 
-		expectedStats := <-allExpectedStatsResult
-		b.allExpectedStats = expectedStats.Value
-		errs = append(errs, expectedStats.Error)
+	var clans data.Clans
+	eg.Go(func() error {
+		var err error
+		clans, err = b.fetchClan(accountIDs)
+		return err
+	})
 
-		battleArenas := <-battleArenasResult
-		b.battleArenas = battleArenas.Value
-		errs = append(errs, battleArenas.Error)
-
-		battleTypes := <-battleTypesResult
-		b.battleTypes = battleTypes.Value
-		errs = append(errs, battleTypes.Error)
+	if err := eg.Wait(); err != nil {
+		b.eventsEmitFunc(ctx, EventErr, err)
+		return
 	}
 
-	b.eventsEmitFunc(ctx, EventFetchPlayers, nil)
-
-	accountInfo := <-accountInfoResult
-	errs = append(errs, accountInfo.Error)
-
-	shipStats := <-shipStatsResult
-	errs = append(errs, shipStats.Error)
-
-	shipsBadges := <-shipsBadgesResult
-	errs = append(errs, shipsBadges.Error)
-
-	clan := <-clanResult
-	errs = append(errs, clan.Error)
-
-	for _, err := range errs {
-		if err != nil {
-			if failure.Is(err, apperr.ExpectedStatsUnavaillalble) && !b.isNotifyExpectedStatsUnavaillalble {
-				b.eventsEmitFunc(ctx, EventErr, apperr.ExpectedStatsUnavaillalble.ErrorCode())
-				b.isNotifyExpectedStatsUnavaillalble = true
-				continue
-			}
-
-			b.eventsEmitFunc(ctx, EventErr, apperr.ToStringCode(err))
-			return
-		}
-	}
-
-	result = b.compose(
+	result := b.compose(
 		tempArenaInfo,
-		accountInfo.Value,
+		accountInfo,
 		accountList,
-		clan.Value,
-		shipStats.Value,
-		shipsBadges.Value,
-		b.warship,
-		b.allExpectedStats,
-		b.battleArenas,
-		b.battleTypes,
+		clans,
+		allShipStats,
+		allShipBadges,
+		nonUserData.Warships,
+		nonUserData.BattleArenas,
+		nonUserData.BattleTypes,
 	)
 
-	b.isFirstBattle = false
 	b.eventsEmitFunc(ctx, EventFetchDone, result)
 }
 
-func (b *BattleFetcher) fetchWarships(channel chan data.Result[data.Warships]) {
-	warships := make(data.Warships)
-	var result data.Result[data.Warships]
-
+func (b *FetchBattle) fetchAllPlayerShipsStats(accountIDs []int) (data.AllPlayerShipsStats, error) {
+	result := make(data.AllPlayerShipsStats)
 	var mu sync.Mutex
 
-	fetch := func(page int) (int, error) {
-		res, err := b.wargaming.EncycShips(page)
-		if err != nil {
-			return 0, err
-		}
+	eg := errgroup.Group{}
 
-		for shipID, warship := range res.Data {
-			mu.Lock()
-			warships[shipID] = data.Warship{
-				Name:      warship.Name,
-				Tier:      warship.Tier,
-				Type:      data.NewShipType(warship.Type),
-				Nation:    data.Nation(warship.Nation),
-				IsPremium: warship.IsPremium,
+	for _, accountID := range accountIDs {
+		eg.Go(func() error {
+			resp, err := b.wargaming.ShipsStats(accountID)
+			if err != nil {
+				return failure.Wrap(err)
 			}
+
+			mu.Lock()
+			result[accountID] = resp
 			mu.Unlock()
-		}
-		return res.Meta.PageTotal, nil
+
+			return nil
+		})
 	}
 
-	first := 1
-	pageTotal, err := fetch(first)
-	if err != nil {
-		result.Error = err
-		channel <- result
-		return
+	if err := eg.Wait(); err != nil {
+		return nil, failure.Wrap(err)
 	}
 
-	pages := util.MakeRange(first+1, pageTotal+1)
-	err = util.DoParallel(pages, func(page int) error {
-		_, err := fetch(page)
-		return err
-	})
-	if err != nil {
-		result.Error = err
-		channel <- result
-		return
-	}
-
-	result.Value = warships
-	channel <- result
+	return result, nil
 }
 
-func (b *BattleFetcher) fetchExpectedStats(channel chan data.Result[data.ExpectedStats]) {
-	var result data.Result[data.ExpectedStats]
-
-	// 最新の予測成績を取得
-	expectedStats, errFetch := b.numbers.ExpectedStats()
-	if errFetch == nil {
-		_ = b.localStorage.SetExpectedStats(expectedStats)
-
-		result.Value = expectedStats.Data
-		channel <- result
-		return
-	}
-
-	// 取得できない場合、キャッシュを利用する
-	expectedStatsCache, errCache := b.localStorage.ExpectedStats()
-	if errCache == nil {
-		result.Value = expectedStatsCache.Data
-		channel <- result
-		return
-	}
-
-	// APIからもキャッシュも取得できない場合、エラーを返す
-	result.Error = failure.New(apperr.ExpectedStatsUnavaillalble, failure.Context{
-		"err_fetch": errFetch.Error(),
-		"err_cache": errCache.Error(),
-	})
-	channel <- result
-}
-
-func (b *BattleFetcher) fetchBattleArenas(channel chan data.Result[data.WGBattleArenas]) {
-	battleArenas, err := b.wargaming.BattleArenas()
-	channel <- data.Result[data.WGBattleArenas]{Value: battleArenas, Error: err}
-}
-
-func (b *BattleFetcher) fetchBattleTypes(channel chan data.Result[data.WGBattleTypes]) {
-	battleTypes, err := b.wargaming.BattleTypes()
-	channel <- data.Result[data.WGBattleTypes]{Value: battleTypes, Error: err}
-}
-
-func (b *BattleFetcher) fetchAccountInfo(accountIDs []int, channel chan data.Result[data.WGAccountInfo]) {
-	accountInfo, err := b.wargaming.AccountInfo(accountIDs)
-	channel <- data.Result[data.WGAccountInfo]{Value: accountInfo, Error: err}
-}
-
-func (b *BattleFetcher) fetchAllPlayerShipsStats(
-	accountIDs []int,
-	channel chan data.Result[data.AllPlayerShipsStats],
-) {
-	shipStatsMap := make(data.AllPlayerShipsStats)
-	var mu sync.Mutex
-	err := util.DoParallel(accountIDs, func(accountID int) error {
-		shipStats, err := b.wargaming.ShipsStats(accountID)
-		if err != nil {
-			return err
-		}
-
-		mu.Lock()
-		shipStatsMap[accountID] = shipStats
-		mu.Unlock()
-
-		return nil
-	})
-
-	channel <- data.Result[data.AllPlayerShipsStats]{Value: shipStatsMap, Error: err}
-}
-
-func (b *BattleFetcher) fetchClan(accountIDs []int, channel chan data.Result[data.Clans]) {
-	var result data.Result[data.Clans]
+func (b *FetchBattle) fetchClan(accountIDs []int) (data.Clans, error) {
+	result := make(data.Clans)
 
 	clansAccountInfo, err := b.wargaming.ClansAccountInfo(accountIDs)
 	if err != nil {
-		result.Error = err
-		channel <- result
-		return
+		return nil, failure.Wrap(err)
 	}
 
 	clanIDs := clansAccountInfo.ClanIDs()
 	clansInfo, err := b.wargaming.ClansInfo(clanIDs)
 	if err != nil {
-		result.Error = err
-		channel <- result
-		return
+		return nil, failure.Wrap(err)
 	}
 
 	clanInfoArray := clansInfo.ToArray()
-	colorMap := b.fetchClanColor(clanInfoArray)
+	colorMap, err := b.fetchClanColor(clanInfoArray)
+	if err != nil {
+		return nil, failure.Wrap(err)
+	}
+
 	languageMap := b.fetchClanLanguage(clanInfoArray)
 
-	clans := make(data.Clans)
 	for _, accountID := range accountIDs {
 		clanID := clansAccountInfo.Data[accountID].ClanID
 		clanTag := clansInfo.Data[clanID].Tag
 		hexColor := colorMap[clanTag]
 		language := languageMap[clanTag]
 
-		clans[accountID] = data.Clan{Tag: clanTag, ID: clanID, HexColor: hexColor, Language: language}
+		result[accountID] = data.Clan{
+			ID:       clanID,
+			Tag:      clanTag,
+			HexColor: hexColor,
+			Language: language,
+		}
 	}
 
-	result.Value = clans
-	channel <- result
+	return result, nil
 }
 
-func (b *BattleFetcher) fetchClanColor(clanInfoArray []data.WGClansInfoData) map[string]string {
+func (b *FetchBattle) fetchClanColor(clanInfoArray []data.WGClansInfoData) (map[string]string, error) {
 	result := make(map[string]string)
-
 	var mu sync.Mutex
-	err := util.DoParallel(clanInfoArray, func(clan data.WGClansInfoData) error {
-		autocomplete, err := b.uwargaming.ClanAutoComplete(clan.Tag)
-		if err != nil {
-			return err
-		}
 
-		hexColor := autocomplete.HexColor(clan.Tag)
-		if hexColor != "" {
+	eg := errgroup.Group{}
+	for _, clanInfo := range clanInfoArray {
+		eg.Go(func() error {
+			autocomplete, err := b.uwargaming.ClanAutoComplete(clanInfo.Tag)
+			if err != nil {
+				return err
+			}
+
+			hexColor := autocomplete.HexColor(clanInfo.Tag)
+			if hexColor == "" {
+				return nil
+			}
+
 			mu.Lock()
-			result[clan.Tag] = hexColor
+			result[clanInfo.Tag] = hexColor
 			mu.Unlock()
-		}
 
-		return nil
-	})
-	if err != nil {
-		b.logger.Error(err, nil)
+			return nil
+		})
 	}
 
-	return result
+	if err := eg.Wait(); err != nil {
+		return nil, failure.Wrap(err)
+	}
+
+	return result, nil
 }
 
-func (b *BattleFetcher) fetchClanLanguage(clanInfoArray []data.WGClansInfoData) map[string]string {
+func (b *FetchBattle) fetchClanLanguage(clanInfoArray []data.WGClansInfoData) map[string]string {
 	result := make(map[string]string)
 
 	// URLを検出する正規表現パターン
@@ -371,29 +259,34 @@ func (b *BattleFetcher) fetchClanLanguage(clanInfoArray []data.WGClansInfoData) 
 	return result
 }
 
-func (b *BattleFetcher) fetchAllPlayerShipsBadges(
-	accountIDs []int,
-	channel chan data.Result[data.AllPlayerShipsBadges],
-) {
-	shipsBadgesMap := make(data.AllPlayerShipsBadges)
+func (b *FetchBattle) fetchAllPlayerShipsBadges(accountIDs []int) (data.AllPlayerShipsBadges, error) {
+	result := make(data.AllPlayerShipsBadges)
 	var mu sync.Mutex
-	err := util.DoParallel(accountIDs, func(accountID int) error {
-		shipsBadges, err := b.wargaming.ShipsBadges(accountID)
-		if err != nil {
-			return err
-		}
 
-		mu.Lock()
-		shipsBadgesMap[accountID] = shipsBadges.Data[accountID]
-		mu.Unlock()
+	eg := errgroup.Group{}
+	for _, accountID := range accountIDs {
+		eg.Go(func() error {
+			shipsBadges, err := b.wargaming.ShipsBadges(accountID)
+			if err != nil {
+				return failure.Wrap(err)
+			}
 
-		return nil
-	})
+			mu.Lock()
+			result[accountID] = shipsBadges.Data[accountID]
+			mu.Unlock()
 
-	channel <- data.Result[data.AllPlayerShipsBadges]{Value: shipsBadgesMap, Error: err}
+			return nil
+		})
+	}
+
+	if err := eg.Wait(); err != nil {
+		return nil, failure.Wrap(err)
+	}
+
+	return result, nil
 }
 
-func (b *BattleFetcher) compose(
+func (b *FetchBattle) compose(
 	tempArenaInfo data.TempArenaInfo,
 	accountInfo data.WGAccountInfo,
 	accountList data.WGAccountList,
@@ -401,9 +294,8 @@ func (b *BattleFetcher) compose(
 	allPlayerShipsStats data.AllPlayerShipsStats,
 	allPlayerShipsBadges data.AllPlayerShipsBadges,
 	warships data.Warships,
-	allExpectedStats data.ExpectedStats,
-	battleArenas data.WGBattleArenas,
-	battleTypes data.WGBattleTypes,
+	battleArenas map[int]string,
+	battleTypes map[string]string,
 ) data.Battle {
 	friends := make(data.Players, 0)
 	enemies := make(data.Players, 0)
@@ -415,12 +307,8 @@ func (b *BattleFetcher) compose(
 
 		warship, ok := warships[vehicle.ShipID]
 		if !ok {
-			warship = data.Warship{
-				Name:   "UNKNOWN",
-				Tier:   0,
-				Type:   data.ShipTypeNONE,
-				Nation: "",
-			}
+			println("unknown ship: ", vehicle.ShipID)
+			warship = *data.NewUnknownWarship()
 		}
 
 		stats := data.NewPersonalStats(
@@ -428,7 +316,6 @@ func (b *BattleFetcher) compose(
 			accountInfo.Data[accountID],
 			allPlayerShipsStats.Player(accountID),
 			allPlayerShipsBadges[accountID],
-			allExpectedStats,
 			warships,
 			tempArenaInfo,
 		)
@@ -440,16 +327,7 @@ func (b *BattleFetcher) compose(
 				Clan:     clan,
 				IsHidden: accountInfo.Data[accountID].HiddenProfile,
 			},
-			ShipInfo: data.ShipInfo{
-				ID:            vehicle.ShipID,
-				Name:          warship.Name,
-				Nation:        warship.Nation,
-				Tier:          warship.Tier,
-				Type:          warship.Type,
-				IsPremium:     warship.IsPremium,
-				AvgDamage:     allExpectedStats[vehicle.ShipID].AverageDamageDealt,
-				DamageRatings: data.NewDamageRatings(allExpectedStats[vehicle.ShipID].AverageDamageDealt),
-			},
+			Warship:  warship,
 			PvPSolo:  playerStats(data.StatsPatternPvPSolo, stats, accountID, vehicle.ShipID, tempArenaInfo, warships),
 			PvPAll:   playerStats(data.StatsPatternPvPAll, stats, accountID, vehicle.ShipID, tempArenaInfo, warships),
 			RankSolo: playerStats(data.StatsPatternRankSolo, stats, accountID, vehicle.ShipID, tempArenaInfo, warships),

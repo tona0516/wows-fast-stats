@@ -7,17 +7,6 @@ type PlayerInfo struct {
 	IsHidden bool   `json:"is_hidden"`
 }
 
-type ShipInfo struct {
-	ID            int           `json:"id"`
-	Name          string        `json:"name"`
-	Nation        Nation        `json:"nation"`
-	Tier          uint          `json:"tier"`
-	Type          ShipType      `json:"type"`
-	IsPremium     bool          `json:"is_premium"`
-	AvgDamage     float64       `json:"avg_damage"`
-	DamageRatings []RatingValue `json:"damage_ratings"`
-}
-
 type PlayerStats struct {
 	ShipStats    ShipStats    `json:"ship"`
 	OverallStats OverallStats `json:"overall"`
@@ -59,7 +48,7 @@ type OverallStats struct {
 
 type Player struct {
 	PlayerInfo PlayerInfo  `json:"player_info"`
-	ShipInfo   ShipInfo    `json:"ship_info"`
+	Warship    Warship     `json:"warship"`
 	PvPSolo    PlayerStats `json:"pvp_solo"`
 	PvPAll     PlayerStats `json:"pvp_all"`
 	RankSolo   PlayerStats `json:"rank_solo"`

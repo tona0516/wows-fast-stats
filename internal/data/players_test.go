@@ -11,18 +11,18 @@ func TestPlayers_Sorter(t *testing.T) {
 	t.Parallel()
 
 	expected := Players{
-		{ShipInfo: ShipInfo{Name: "CV2", Type: ShipTypeCV, Tier: 8, Nation: "usa"}},
-		{ShipInfo: ShipInfo{Name: "CV1", Type: ShipTypeCV, Tier: 6, Nation: "japan"}},
-		{ShipInfo: ShipInfo{Name: "BB3", Type: ShipTypeBB, Tier: 8, Nation: "japan"}},
-		{ShipInfo: ShipInfo{Name: "BB2", Type: ShipTypeBB, Tier: 7, Nation: "japan"}},
-		{ShipInfo: ShipInfo{Name: "BB1", Type: ShipTypeBB, Tier: 6, Nation: "japan"}},
-		{ShipInfo: ShipInfo{Name: "CL3", Type: ShipTypeCL, Tier: 6, Nation: "ussr"}},
-		{ShipInfo: ShipInfo{Name: "CL2", Type: ShipTypeCL, Tier: 6, Nation: "germany"}},
-		{ShipInfo: ShipInfo{Name: "CL1", Type: ShipTypeCL, Tier: 6, Nation: "uk"}},
-		{ShipInfo: ShipInfo{Name: "DD2", Type: ShipTypeDD, Tier: 8, Nation: "japan"}},
-		{ShipInfo: ShipInfo{Name: "DD1", Type: ShipTypeDD, Tier: 8, Nation: "unspecified"}},
-		{ShipInfo: ShipInfo{Name: "SS-A", Type: ShipTypeSS, Tier: 6, Nation: "japan"}},
-		{ShipInfo: ShipInfo{Name: "SS-Z", Type: ShipTypeSS, Tier: 6, Nation: "japan"}},
+		{Warship: Warship{Name: "CV2", Type: ShipTypeCV, Tier: 8, Nation: "usa"}},
+		{Warship: Warship{Name: "CV1", Type: ShipTypeCV, Tier: 6, Nation: "japan"}},
+		{Warship: Warship{Name: "BB3", Type: ShipTypeBB, Tier: 8, Nation: "japan"}},
+		{Warship: Warship{Name: "BB2", Type: ShipTypeBB, Tier: 7, Nation: "japan"}},
+		{Warship: Warship{Name: "BB1", Type: ShipTypeBB, Tier: 6, Nation: "japan"}},
+		{Warship: Warship{Name: "CL3", Type: ShipTypeCL, Tier: 6, Nation: "ussr"}},
+		{Warship: Warship{Name: "CL2", Type: ShipTypeCL, Tier: 6, Nation: "germany"}},
+		{Warship: Warship{Name: "CL1", Type: ShipTypeCL, Tier: 6, Nation: "uk"}},
+		{Warship: Warship{Name: "DD2", Type: ShipTypeDD, Tier: 8, Nation: "japan"}},
+		{Warship: Warship{Name: "DD1", Type: ShipTypeDD, Tier: 8, Nation: "unspecified"}},
+		{Warship: Warship{Name: "SS-A", Type: ShipTypeSS, Tier: 6, Nation: "japan"}},
+		{Warship: Warship{Name: "SS-Z", Type: ShipTypeSS, Tier: 6, Nation: "japan"}},
 	}
 
 	for i := range 100 {

@@ -40,19 +40,34 @@ func (m *MockLocalStorage) EXPECT() *MockLocalStorageMockRecorder {
 	return m.recorder
 }
 
-// ExpectedStats mocks base method.
-func (m *MockLocalStorage) ExpectedStats() (data.NSExpectedStats, error) {
+// BattleArenas mocks base method.
+func (m *MockLocalStorage) BattleArenas() (map[int]string, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ExpectedStats")
-	ret0, _ := ret[0].(data.NSExpectedStats)
+	ret := m.ctrl.Call(m, "BattleArenas")
+	ret0, _ := ret[0].(map[int]string)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// ExpectedStats indicates an expected call of ExpectedStats.
-func (mr *MockLocalStorageMockRecorder) ExpectedStats() *gomock.Call {
+// BattleArenas indicates an expected call of BattleArenas.
+func (mr *MockLocalStorageMockRecorder) BattleArenas() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExpectedStats", reflect.TypeOf((*MockLocalStorage)(nil).ExpectedStats))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BattleArenas", reflect.TypeOf((*MockLocalStorage)(nil).BattleArenas))
+}
+
+// BattleTypes mocks base method.
+func (m *MockLocalStorage) BattleTypes() (map[string]string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "BattleTypes")
+	ret0, _ := ret[0].(map[string]string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// BattleTypes indicates an expected call of BattleTypes.
+func (mr *MockLocalStorageMockRecorder) BattleTypes() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BattleTypes", reflect.TypeOf((*MockLocalStorage)(nil).BattleTypes))
 }
 
 // OwnIGN mocks base method.
@@ -70,18 +85,32 @@ func (mr *MockLocalStorageMockRecorder) OwnIGN() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "OwnIGN", reflect.TypeOf((*MockLocalStorage)(nil).OwnIGN))
 }
 
-// SetExpectedStats mocks base method.
-func (m *MockLocalStorage) SetExpectedStats(arg0 data.NSExpectedStats) error {
+// SetBattleArenas mocks base method.
+func (m *MockLocalStorage) SetBattleArenas(arg0 map[int]string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SetExpectedStats", arg0)
+	ret := m.ctrl.Call(m, "SetBattleArenas", arg0)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// SetExpectedStats indicates an expected call of SetExpectedStats.
-func (mr *MockLocalStorageMockRecorder) SetExpectedStats(arg0 any) *gomock.Call {
+// SetBattleArenas indicates an expected call of SetBattleArenas.
+func (mr *MockLocalStorageMockRecorder) SetBattleArenas(arg0 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetExpectedStats", reflect.TypeOf((*MockLocalStorage)(nil).SetExpectedStats), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetBattleArenas", reflect.TypeOf((*MockLocalStorage)(nil).SetBattleArenas), arg0)
+}
+
+// SetBattleTypes mocks base method.
+func (m *MockLocalStorage) SetBattleTypes(arg0 map[string]string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SetBattleTypes", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SetBattleTypes indicates an expected call of SetBattleTypes.
+func (mr *MockLocalStorageMockRecorder) SetBattleTypes(arg0 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetBattleTypes", reflect.TypeOf((*MockLocalStorage)(nil).SetBattleTypes), arg0)
 }
 
 // SetOwnIGN mocks base method.
@@ -112,6 +141,20 @@ func (mr *MockLocalStorageMockRecorder) SetUserConfig(arg0 any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetUserConfig", reflect.TypeOf((*MockLocalStorage)(nil).SetUserConfig), arg0)
 }
 
+// SetWarships mocks base method.
+func (m *MockLocalStorage) SetWarships(arg0 data.Warships) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SetWarships", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SetWarships indicates an expected call of SetWarships.
+func (mr *MockLocalStorageMockRecorder) SetWarships(arg0 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetWarships", reflect.TypeOf((*MockLocalStorage)(nil).SetWarships), arg0)
+}
+
 // TempArenaInfo mocks base method.
 func (m *MockLocalStorage) TempArenaInfo(installPath string) (data.TempArenaInfo, error) {
 	m.ctrl.T.Helper()
@@ -140,4 +183,19 @@ func (m *MockLocalStorage) UserConfig() (data.UserConfig, error) {
 func (mr *MockLocalStorageMockRecorder) UserConfig() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UserConfig", reflect.TypeOf((*MockLocalStorage)(nil).UserConfig))
+}
+
+// Warships mocks base method.
+func (m *MockLocalStorage) Warships() (data.Warships, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Warships")
+	ret0, _ := ret[0].(data.Warships)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Warships indicates an expected call of Warships.
+func (mr *MockLocalStorageMockRecorder) Warships() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Warships", reflect.TypeOf((*MockLocalStorage)(nil).Warships))
 }

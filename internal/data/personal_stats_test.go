@@ -14,7 +14,6 @@ const (
 var (
 	emptyAccountInfo   = WGAccountInfoData{}
 	emptyShipsStats    = []WGShipsStatsData{}
-	emptyExpectedStats = ExpectedStats{}
 	emptyWarships      = Warships{}
 	emptyTempArenaInfo = TempArenaInfo{}
 	emptyShipsBadges   = []WGShipsBadgesData{}
@@ -49,14 +48,15 @@ func TestPersonalStats_PR_Ship(t *testing.T) {
 				},
 			},
 			emptyShipsBadges,
-			ExpectedStats{
+			Warships{
 				useShipID: {
-					AverageDamageDealt: 8000,
-					AverageFrags:       1,
-					WinRate:            50,
+					ServerAverage: ServerAverage{
+						Damage:  8000,
+						Frags:   1,
+						WinRate: 50,
+					},
 				},
 			},
-			emptyWarships,
 			emptyTempArenaInfo,
 		)
 
@@ -113,29 +113,12 @@ func TestPersonalStats_PR_Overall(t *testing.T) {
 			},
 		},
 		emptyShipsBadges,
-		ExpectedStats{
-			1: {
-				AverageDamageDealt: 53792.23172971,
-				WinRate:            50.092406353286,
-				AverageFrags:       0.6935181784796,
-			},
-			2: {
-				AverageDamageDealt: 46228.419395466,
-				WinRate:            51.202824307302,
-				AverageFrags:       0.80128883291351,
-			},
-			3: {
-				AverageDamageDealt: 25864.417248367,
-				WinRate:            51.11762215717,
-				AverageFrags:       0.69715604593558,
-			},
-			4: {
-				AverageDamageDealt: 77931.580907796,
-				WinRate:            50.386342357012,
-				AverageFrags:       0.68628943618969,
-			},
+		Warships{
+			1: {ServerAverage: ServerAverage{Damage: 53792.23172971, Frags: 0.6935181784796, WinRate: 50.092406353286}},
+			2: {ServerAverage: ServerAverage{Damage: 46228.419395466, Frags: 0.80128883291351, WinRate: 51.202824307302}},
+			3: {ServerAverage: ServerAverage{Damage: 25864.417248367, Frags: 0.69715604593558, WinRate: 51.11762215717}},
+			4: {ServerAverage: ServerAverage{Damage: 77931.580907796, Frags: 0.68628943618969, WinRate: 50.386342357012}},
 		},
-		emptyWarships,
 		emptyTempArenaInfo,
 	)
 
@@ -165,7 +148,6 @@ func TestPersonalStats_AvgDamage_Overall(t *testing.T) {
 		},
 		emptyShipsStats,
 		emptyShipsBadges,
-		emptyExpectedStats,
 		emptyWarships,
 		emptyTempArenaInfo,
 	)
@@ -196,7 +178,6 @@ func TestPersonalStats_AvgDamage_Overall_Solo(t *testing.T) {
 		},
 		emptyShipsStats,
 		emptyShipsBadges,
-		emptyExpectedStats,
 		emptyWarships,
 		emptyTempArenaInfo,
 	)
@@ -227,7 +208,6 @@ func TestPersonalStats_AvgDamage_Overall_Rank(t *testing.T) {
 		},
 		emptyShipsStats,
 		emptyShipsBadges,
-		emptyExpectedStats,
 		emptyWarships,
 		emptyTempArenaInfo,
 	)
@@ -253,12 +233,13 @@ func TestPersonalStats_AvgDamage_Ship(t *testing.T) {
 			},
 		},
 		emptyShipsBadges,
-		ExpectedStats{
+		Warships{
 			1: {
-				AverageDamageDealt: 12000,
+				ServerAverage: ServerAverage{
+					Damage: 12000,
+				},
 			},
 		},
-		emptyWarships,
 		emptyTempArenaInfo,
 	)
 
@@ -283,12 +264,13 @@ func TestPersonalStats_AvgDamage_Ship_Solo(t *testing.T) {
 			},
 		},
 		emptyShipsBadges,
-		ExpectedStats{
+		Warships{
 			1: {
-				AverageDamageDealt: 12000,
+				ServerAverage: ServerAverage{
+					Damage: 12000,
+				},
 			},
 		},
-		emptyWarships,
 		emptyTempArenaInfo,
 	)
 
@@ -313,12 +295,13 @@ func TestPersonalStats_AvgDamage_Ship_Rank(t *testing.T) {
 			},
 		},
 		emptyShipsBadges,
-		ExpectedStats{
+		Warships{
 			1: {
-				AverageDamageDealt: 12000,
+				ServerAverage: ServerAverage{
+					Damage: 12000,
+				},
 			},
 		},
-		emptyWarships,
 		emptyTempArenaInfo,
 	)
 
@@ -347,7 +330,6 @@ func TestPersonalStats_MaxDamage_Ship(t *testing.T) {
 			},
 		},
 		emptyShipsBadges,
-		emptyExpectedStats,
 		emptyWarships,
 		emptyTempArenaInfo,
 	)
@@ -383,7 +365,6 @@ func TestPersonalStats_MaxDamage_Overall(t *testing.T) {
 		},
 		emptyShipsStats,
 		emptyShipsBadges,
-		emptyExpectedStats,
 		Warships{
 			expected.ShipID: {
 				Name: expected.ShipName,
@@ -416,7 +397,6 @@ func TestPersonalStats_Battles(t *testing.T) {
 		},
 		emptyShipsStats,
 		emptyShipsBadges,
-		emptyExpectedStats,
 		emptyWarships,
 		emptyTempArenaInfo,
 	)
@@ -446,7 +426,6 @@ func TestPersonalStats_KdRate(t *testing.T) {
 		},
 		emptyShipsStats,
 		emptyShipsBadges,
-		emptyExpectedStats,
 		emptyWarships,
 		emptyTempArenaInfo,
 	)
@@ -475,7 +454,6 @@ func TestPersonalStats_AvgKill(t *testing.T) {
 		},
 		emptyShipsStats,
 		emptyShipsBadges,
-		emptyExpectedStats,
 		emptyWarships,
 		emptyTempArenaInfo,
 	)
@@ -504,7 +482,6 @@ func TestPersonalStats_AvgExp(t *testing.T) {
 		},
 		emptyShipsStats,
 		emptyShipsBadges,
-		emptyExpectedStats,
 		emptyWarships,
 		emptyTempArenaInfo,
 	)
@@ -533,7 +510,6 @@ func TestPersonalStats_WinRate(t *testing.T) {
 		},
 		emptyShipsStats,
 		emptyShipsBadges,
-		emptyExpectedStats,
 		emptyWarships,
 		emptyTempArenaInfo,
 	)
@@ -566,7 +542,6 @@ func TestPersonalStats_SurvivedRate(t *testing.T) {
 		},
 		emptyShipsStats,
 		emptyShipsBadges,
-		emptyExpectedStats,
 		emptyWarships,
 		emptyTempArenaInfo,
 	)
@@ -606,7 +581,6 @@ func TestPersonalStats_HitRate(t *testing.T) {
 			},
 		},
 		emptyShipsBadges,
-		emptyExpectedStats,
 		emptyWarships,
 		emptyTempArenaInfo,
 	)
@@ -633,7 +607,6 @@ func TestPersonalStats_PlanesKilled(t *testing.T) {
 			},
 		},
 		emptyShipsBadges,
-		emptyExpectedStats,
 		emptyWarships,
 		emptyTempArenaInfo,
 	)
@@ -658,7 +631,6 @@ func TestPersonalStats_AvgTier(t *testing.T) {
 			},
 		},
 		emptyShipsBadges,
-		emptyExpectedStats,
 		Warships{
 			100: {Tier: 5},
 			200: {Tier: 8},
@@ -690,7 +662,6 @@ func TestPersonalStats_UsingTierRate(t *testing.T) {
 			},
 		},
 		emptyShipsBadges,
-		emptyExpectedStats,
 		Warships{
 			100: {Tier: 5},
 			200: {Tier: 8},
@@ -730,7 +701,6 @@ func TestPersonalStats_UsingShipTypeRate(t *testing.T) {
 			},
 		},
 		emptyShipsBadges,
-		emptyExpectedStats,
 		Warships{
 			100: {Type: ShipTypeDD},
 			200: {Type: ShipTypeCL},
@@ -777,7 +747,6 @@ func TestPersonalStats_PlatoonRate(t *testing.T) {
 		},
 		emptyShipsStats,
 		emptyShipsBadges,
-		emptyExpectedStats,
 		emptyWarships,
 		emptyTempArenaInfo,
 	)
@@ -806,7 +775,6 @@ func TestPersonalStats_EfficiencyBadge(t *testing.T) {
 				TopGradeClass: 1,
 			},
 		},
-		emptyExpectedStats,
 		emptyWarships,
 		emptyTempArenaInfo,
 	)
@@ -843,7 +811,6 @@ func TestPersonalStats_EfficiencyBadges(t *testing.T) {
 				TopGradeClass: 4,
 			},
 		},
-		emptyExpectedStats,
 		emptyWarships,
 		emptyTempArenaInfo,
 	)

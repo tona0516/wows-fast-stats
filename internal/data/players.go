@@ -11,8 +11,8 @@ func (p Players) Swap(i, j int) {
 }
 
 func (p Players) Less(i, j int) bool {
-	one := p[i].ShipInfo
-	second := p[j].ShipInfo
+	one := p[i].Warship
+	second := p[j].Warship
 
 	if one.Type != second.Type {
 		return one.Type.Priority() < second.Type.Priority()

@@ -36,7 +36,7 @@ func (a *App) StartPollingMatch() {
 
 	go a.container.PollMatchUsecase.Invoke(a.ctx, cancelCtx, channel)
 	for tempArenaInfo := range channel {
-		a.container.BattleService.Invoke(a.ctx, tempArenaInfo)
+		a.container.FetchBattleUsecase.Invoke(a.ctx, tempArenaInfo)
 	}
 }
 

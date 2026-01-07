@@ -15,8 +15,8 @@ const (
 )
 
 func NewDamageRatings(expect float64) []RatingValue {
-	var result = make([]RatingValue, 0, len(thresholds))
-	for _, v := range thresholds {
+	var result = make([]RatingValue, 0, len(ratingThresholds))
+	for _, v := range ratingThresholds {
 		value := expect * v.ShipDamageRatio
 		result = append(result, RatingValue{
 			Value:  value,
@@ -35,7 +35,7 @@ type RatingThreshold struct {
 }
 
 //nolint:gochecknoglobals
-var thresholds = []RatingThreshold{
+var ratingThresholds = []RatingThreshold{
 	{Rating: RatingSuperUnicum, PR: 2450, ShipDamageRatio: 1.6, WinRate: 65},
 	{Rating: RatingUnicum, PR: 2100, ShipDamageRatio: 1.5, WinRate: 60},
 	{Rating: RatingGreat, PR: 1750, ShipDamageRatio: 1.4, WinRate: 56},
@@ -47,7 +47,7 @@ var thresholds = []RatingThreshold{
 }
 
 func NewRatingFromPR(value float64) Rating {
-	for _, t := range thresholds {
+	for _, t := range ratingThresholds {
 		if value >= t.PR {
 			return t.Rating
 		}
@@ -57,7 +57,7 @@ func NewRatingFromPR(value float64) Rating {
 }
 
 func NewRatingFromWinRate(value float64) Rating {
-	for _, t := range thresholds {
+	for _, t := range ratingThresholds {
 		if value >= t.WinRate {
 			return t.Rating
 		}
@@ -72,7 +72,7 @@ func NewRatingFromShipDamage(value, expected float64) Rating {
 	}
 
 	ratio := value / expected
-	for _, t := range thresholds {
+	for _, t := range ratingThresholds {
 		if ratio >= t.ShipDamageRatio {
 			return t.Rating
 		}

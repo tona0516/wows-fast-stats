@@ -23,10 +23,10 @@
       return undefined;
     }
 
-    return player.ship_info.damage_ratings.map((dr) => {
+    return player.warship.damageRatings.map((dr) => {
       return {
         displayName: RATING_NAMES[dr.rating],
-        colorCode: RATING_COLORS[dr.rating].getFixedTextColor(),
+        colorCode: RATING_COLORS[dr.rating]?.getFixedTextColor(),
         value: `${dr.value.toFixed()}~`,
       };
     });
@@ -34,8 +34,8 @@
 </script>
 
 {#if $storedPlayerShipDetail}
-  {@const shipName = $storedPlayerShipDetail.ship_info.name}
-  {@const shipID = $storedPlayerShipDetail.ship_info.id}
+  {@const shipName = $storedPlayerShipDetail.warship.name}
+  {@const shipID = $storedPlayerShipDetail.warship.id}
 
   <ModalCommon zValue={50} close={ModalManager.instance.closeShipDetail}>
     <h2 class="text-lg font-bold">

@@ -16,7 +16,7 @@ export class WinRateColumn extends AbstractStatsColumn<string> {
 
   override getTextColorCode(player: data.Player): Optional<ColorCode> {
     const rating = this.getPlayerStats(player)[this.category].win_rate.rating;
-    return RATING_COLORS[rating].getFixedTextColor();
+    return RATING_COLORS[rating]?.getFixedTextColor();
   }
 
   override getDisplayValue(player: data.Player): string {

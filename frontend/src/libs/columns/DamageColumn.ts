@@ -26,7 +26,7 @@ export class DamageColumn extends AbstractStatsColumn<string> {
     }
     const value = this.getPlayerStats(player).ship.damage.rating;
 
-    return RATING_COLORS[value].getFixedTextColor();
+    return RATING_COLORS[value]?.getFixedTextColor();
   }
 
   override getCssClass(): string {

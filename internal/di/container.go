@@ -18,10 +18,10 @@ type Container struct {
 	InstallPathSettingUsecase *usecase.InstallPathSetting
 	UpdateCheckUsecase        *usecase.UpdateCheck
 	PollMatchUsecase          *usecase.PollMatch
+	FetchBattleUsecase        *usecase.FetchBattle
 
 	// Services
 	ConfigService *service.Config
-	BattleService *service.BattleFetcher
 	Logger        infra.Logger
 }
 
@@ -43,6 +43,7 @@ func NewContainer(config Config) *Container {
 
 	localStorage := infra.NewLocalStorage(
 		config.LocalStorage.UserDataDir,
+		config.LocalStorage.CacheDir,
 	)
 	var ownIGN string
 	ownIGN, err := localStorage.OwnIGN()
@@ -91,6 +92,10 @@ func NewContainer(config Config) *Container {
 		),
 	)
 
+	// services
+	nonUserDataFetcher := service.NewNonUserDataFetcher(localStorage, wargamingApiClient, numbersApiClient)
+	configService := service.NewConfig(localStorage)
+
 	// usecase
 	installPathSettingUsecase := usecase.NewInstallPathSetting(localStorage, func(ctx context.Context) (string, error) {
 		return runtime.OpenDirectoryDialog(ctx, runtime.OpenDialogOptions{})
@@ -104,10 +109,8 @@ func NewContainer(config Config) *Container {
 		localStorage,
 		runtime.EventsEmit,
 	)
-
-	// services
-	configService := service.NewConfig(localStorage)
-	battleFetcher := service.NewBattleFetcher(
+	fetchBattleUsecase := usecase.NewFetchBattle(
+		nonUserDataFetcher,
 		localStorage,
 		wargamingApiClient,
 		clansApiClient,
@@ -121,8 +124,8 @@ func NewContainer(config Config) *Container {
 		InstallPathSettingUsecase: installPathSettingUsecase,
 		UpdateCheckUsecase:        updateCheckUsecase,
 		PollMatchUsecase:          pollMatchUsecase,
+		FetchBattleUsecase:        fetchBattleUsecase,
 		ConfigService:             configService,
-		BattleService:             battleFetcher,
 		Logger:                    logger,
 	}
 }
