@@ -3,9 +3,7 @@ package data
 import (
 	"encoding/json"
 	"testing"
-	"wfs/internal/apperr"
 
-	"github.com/morikuni/failure"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -56,7 +54,7 @@ func TestNSExpectedStats_UnmarshalJSON(t *testing.T) {
 		err := json.Unmarshal([]byte(input), &actual)
 		require.NoError(t, err)
 		assert.Equal(t, NSExpectedStats{
-			Data: ExpectedStats{
+			Data: NSExpectedStatsData{
 				1: {
 					AverageDamageDealt: 50000.0,
 					AverageFrags:       1.5,
@@ -83,11 +81,7 @@ func TestNSExpectedStats_UnmarshalJSON(t *testing.T) {
 
 		for _, input := range inputs {
 			err := json.Unmarshal([]byte(input), &NSExpectedStats{})
-			require.Error(t, err)
-			code, ok := failure.CodeOf(err)
-			require.True(t, ok)
-			// assert.Equal(t, apperr.ParseExpectedStatsError, code, fmt.Sprintf("actual=%s", code))
-			assert.Equal(t, apperr.ParseExpectedStatsError, code)
+			assert.ErrorIs(t, err, ErrNSExpectedStatsNoDataKey)
 		}
 	})
 }

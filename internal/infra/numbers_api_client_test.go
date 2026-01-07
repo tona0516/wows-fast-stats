@@ -44,13 +44,13 @@ func TestNumbersApiClient_ExpectedStats(t *testing.T) {
 
 		assert.NoError(t, err)
 		assert.Equal(t, data.NSExpectedStats{
-			Data: data.ExpectedStats{
-				1234: data.ExpectedValues{
+			Data: data.NSExpectedStatsData{
+				1234: data.NSExpectedStatsValues{
 					AverageDamageDealt: 50000,
 					AverageFrags:       1.2,
 					WinRate:            52.3,
 				},
-				5678: data.ExpectedValues{
+				5678: data.NSExpectedStatsValues{
 					AverageDamageDealt: 60000,
 					AverageFrags:       1.5,
 					WinRate:            56.8,

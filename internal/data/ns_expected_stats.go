@@ -2,8 +2,8 @@ package data
 
 import (
 	"encoding/json"
+	"errors"
 	"strconv"
-	"wfs/internal/apperr"
 
 	"github.com/morikuni/failure"
 )
@@ -14,32 +14,32 @@ const (
 	NumbersWinrate   = "win_rate"
 )
 
-type ExpectedValues struct {
+var ErrNSExpectedStatsNoDataKey = errors.New("NSExpectedStats: no data key")
+
+type NSExpectedStats struct {
+	Data NSExpectedStatsData `json:"data"`
+}
+
+type NSExpectedStatsData map[int]NSExpectedStatsValues
+
+type NSExpectedStatsValues struct {
 	AverageDamageDealt float64 `json:"average_damage_dealt"`
 	AverageFrags       float64 `json:"average_frags"`
 	WinRate            float64 `json:"win_rate"`
 }
 
-type ExpectedStats map[int]ExpectedValues
-
-type NSExpectedStats struct {
-	Data ExpectedStats `json:"data"`
-}
-
 func (n *NSExpectedStats) UnmarshalJSON(b []byte) error {
-	errCtx := failure.Context{"body": string(b)}
-
 	root := make(map[string]any)
 	if err := json.Unmarshal(b, &root); err != nil {
-		return failure.New(apperr.ParseExpectedStatsError, errCtx, failure.Messagef("%s", err.Error()))
+		return failure.Wrap(err)
 	}
 
 	data, ok := root["data"].(map[string]any)
 	if !ok {
-		return failure.New(apperr.ParseExpectedStatsError, errCtx, failure.Messagef("%s", "no data key"))
+		return failure.Wrap(ErrNSExpectedStatsNoDataKey)
 	}
 
-	es := make(ExpectedStats)
+	es := make(NSExpectedStatsData)
 	for key, value := range data {
 		shipID, err := strconv.Atoi(key)
 		if err != nil {
@@ -66,7 +66,7 @@ func (n *NSExpectedStats) UnmarshalJSON(b []byte) error {
 			continue
 		}
 
-		es[shipID] = ExpectedValues{
+		es[shipID] = NSExpectedStatsValues{
 			AverageDamageDealt: damage,
 			AverageFrags:       frags,
 			WinRate:            wr,
