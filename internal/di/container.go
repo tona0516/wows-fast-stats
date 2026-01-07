@@ -93,6 +93,7 @@ func NewContainer(config Config) *Container {
 	)
 
 	// services
+	userDataFetcher := service.NewUserDataFetcher(wargamingApiClient, clansApiClient)
 	nonUserDataFetcher := service.NewNonUserDataFetcher(localStorage, wargamingApiClient, numbersApiClient)
 	configService := service.NewConfig(localStorage)
 
@@ -110,11 +111,9 @@ func NewContainer(config Config) *Container {
 		runtime.EventsEmit,
 	)
 	fetchBattleUsecase := usecase.NewFetchBattle(
+		userDataFetcher,
 		nonUserDataFetcher,
 		localStorage,
-		wargamingApiClient,
-		clansApiClient,
-		numbersApiClient,
 		logger,
 		runtime.EventsEmit,
 	)

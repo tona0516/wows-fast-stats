@@ -2,47 +2,35 @@ package usecase
 
 import (
 	"context"
-	"regexp"
 	"sort"
-	"strings"
-	"sync"
-	"wfs/internal/apperr"
 	"wfs/internal/data"
 	"wfs/internal/infra"
 	"wfs/internal/service"
 	"wfs/internal/util"
 	"wfs/internal/yamibuka"
 
-	"github.com/abadojack/whatlanggo"
-	"github.com/morikuni/failure"
 	"golang.org/x/sync/errgroup"
 )
 
 type FetchBattle struct {
+	userDataFetcher    *service.UserDataFetcher
 	nonUserDataFetcher *service.NonUserDataFetcher
 	localStorage       infra.LocalStorage
-	wargaming          infra.WargamingApiClient
-	uwargaming         infra.ClanApiClient
-	numbers            infra.NumbersApiClient
 	logger             infra.Logger
 	eventsEmitFunc     eventEmitFunc
 }
 
 func NewFetchBattle(
+	userDataFetcher *service.UserDataFetcher,
 	nonUserDataFetcher *service.NonUserDataFetcher,
 	localStorage infra.LocalStorage,
-	wargaming infra.WargamingApiClient,
-	uwargaming infra.ClanApiClient,
-	numbers infra.NumbersApiClient,
 	logger infra.Logger,
 	eventsEmitFunc eventEmitFunc,
 ) *FetchBattle {
 	return &FetchBattle{
+		userDataFetcher:    userDataFetcher,
 		nonUserDataFetcher: nonUserDataFetcher,
 		localStorage:       localStorage,
-		wargaming:          wargaming,
-		uwargaming:         uwargaming,
-		numbers:            numbers,
 		logger:             logger,
 		eventsEmitFunc:     eventsEmitFunc,
 	}
@@ -52,50 +40,22 @@ func (b *FetchBattle) Invoke(
 	ctx context.Context,
 	tempArenaInfo data.TempArenaInfo,
 ) {
+	_ = b.localStorage.SetOwnIGN(tempArenaInfo.PlayerName)
+	b.logger.SetOwnIGN(tempArenaInfo.PlayerName)
+
 	eg := errgroup.Group{}
+
+	var userData *service.UserData
+	eg.Go(func() error {
+		var err error
+		userData, err = b.userDataFetcher.Fetch(tempArenaInfo.AccountNames())
+		return err
+	})
 
 	var nonUserData *service.NonUserData
 	eg.Go(func() error {
 		var err error
 		nonUserData, err = b.nonUserDataFetcher.Fetch()
-		return err
-	})
-
-	_ = b.localStorage.SetOwnIGN(tempArenaInfo.PlayerName)
-	b.logger.SetOwnIGN(tempArenaInfo.PlayerName)
-
-	accountList, err := b.wargaming.AccountList(tempArenaInfo.AccountNames())
-	if err != nil {
-		b.eventsEmitFunc(ctx, EventErr, apperr.ToStringCode(err))
-		return
-	}
-	accountIDs := accountList.AccountIDs()
-
-	var accountInfo data.WGAccountInfo
-	eg.Go(func() error {
-		var err error
-		accountInfo, err = b.wargaming.AccountInfo(accountIDs)
-		return err
-	})
-
-	var allShipStats data.AllPlayerShipsStats
-	eg.Go(func() error {
-		var err error
-		allShipStats, err = b.fetchAllPlayerShipsStats(accountIDs)
-		return err
-	})
-
-	var allShipBadges data.AllPlayerShipsBadges
-	eg.Go(func() error {
-		var err error
-		allShipBadges, err = b.fetchAllPlayerShipsBadges(accountIDs)
-		return err
-	})
-
-	var clans data.Clans
-	eg.Go(func() error {
-		var err error
-		clans, err = b.fetchClan(accountIDs)
 		return err
 	})
 
@@ -106,217 +66,37 @@ func (b *FetchBattle) Invoke(
 
 	result := b.compose(
 		tempArenaInfo,
-		accountInfo,
-		accountList,
-		clans,
-		allShipStats,
-		allShipBadges,
-		nonUserData.Warships,
-		nonUserData.BattleArenas,
-		nonUserData.BattleTypes,
+		userData,
+		nonUserData,
 	)
 
 	b.eventsEmitFunc(ctx, EventFetchDone, result)
 }
 
-func (b *FetchBattle) fetchAllPlayerShipsStats(accountIDs []int) (data.AllPlayerShipsStats, error) {
-	result := make(data.AllPlayerShipsStats)
-	var mu sync.Mutex
-
-	eg := errgroup.Group{}
-
-	for _, accountID := range accountIDs {
-		eg.Go(func() error {
-			resp, err := b.wargaming.ShipsStats(accountID)
-			if err != nil {
-				return failure.Wrap(err)
-			}
-
-			mu.Lock()
-			result[accountID] = resp
-			mu.Unlock()
-
-			return nil
-		})
-	}
-
-	if err := eg.Wait(); err != nil {
-		return nil, failure.Wrap(err)
-	}
-
-	return result, nil
-}
-
-func (b *FetchBattle) fetchClan(accountIDs []int) (data.Clans, error) {
-	result := make(data.Clans)
-
-	clansAccountInfo, err := b.wargaming.ClansAccountInfo(accountIDs)
-	if err != nil {
-		return nil, failure.Wrap(err)
-	}
-
-	clanIDs := clansAccountInfo.ClanIDs()
-	clansInfo, err := b.wargaming.ClansInfo(clanIDs)
-	if err != nil {
-		return nil, failure.Wrap(err)
-	}
-
-	clanInfoArray := clansInfo.ToArray()
-	colorMap, err := b.fetchClanColor(clanInfoArray)
-	if err != nil {
-		return nil, failure.Wrap(err)
-	}
-
-	languageMap := b.fetchClanLanguage(clanInfoArray)
-
-	for _, accountID := range accountIDs {
-		clanID := clansAccountInfo.Data[accountID].ClanID
-		clanTag := clansInfo.Data[clanID].Tag
-		hexColor := colorMap[clanTag]
-		language := languageMap[clanTag]
-
-		result[accountID] = data.Clan{
-			ID:       clanID,
-			Tag:      clanTag,
-			HexColor: hexColor,
-			Language: language,
-		}
-	}
-
-	return result, nil
-}
-
-func (b *FetchBattle) fetchClanColor(clanInfoArray []data.WGClansInfoData) (map[string]string, error) {
-	result := make(map[string]string)
-	var mu sync.Mutex
-
-	eg := errgroup.Group{}
-	for _, clanInfo := range clanInfoArray {
-		eg.Go(func() error {
-			autocomplete, err := b.uwargaming.ClanAutoComplete(clanInfo.Tag)
-			if err != nil {
-				return err
-			}
-
-			hexColor := autocomplete.HexColor(clanInfo.Tag)
-			if hexColor == "" {
-				return nil
-			}
-
-			mu.Lock()
-			result[clanInfo.Tag] = hexColor
-			mu.Unlock()
-
-			return nil
-		})
-	}
-
-	if err := eg.Wait(); err != nil {
-		return nil, failure.Wrap(err)
-	}
-
-	return result, nil
-}
-
-func (b *FetchBattle) fetchClanLanguage(clanInfoArray []data.WGClansInfoData) map[string]string {
-	result := make(map[string]string)
-
-	// URLを検出する正規表現パターン
-	urlPattern := `https?://[^\s]+`
-	re := regexp.MustCompile(urlPattern)
-
-	options := whatlanggo.Options{
-		Whitelist: map[whatlanggo.Lang]bool{
-			whatlanggo.Jpn: true,
-			whatlanggo.Kor: true,
-			whatlanggo.Cmn: true,
-		},
-	}
-
-	var mu sync.Mutex
-	err := util.DoParallel(clanInfoArray, func(clan data.WGClansInfoData) error {
-		// URLを空文字に
-		description := re.ReplaceAllString(clan.Description, "")
-		// 改行を空文字に
-		description = strings.ReplaceAll(description, "\n", "")
-
-		if len(description) == 0 {
-			return nil
-		}
-
-		info := whatlanggo.DetectWithOptions(description, options)
-
-		mu.Lock()
-		result[clan.Tag] = info.Lang.Iso6391()
-		mu.Unlock()
-
-		return nil
-	})
-	if err != nil {
-		b.logger.Error(err, nil)
-	}
-
-	return result
-}
-
-func (b *FetchBattle) fetchAllPlayerShipsBadges(accountIDs []int) (data.AllPlayerShipsBadges, error) {
-	result := make(data.AllPlayerShipsBadges)
-	var mu sync.Mutex
-
-	eg := errgroup.Group{}
-	for _, accountID := range accountIDs {
-		eg.Go(func() error {
-			shipsBadges, err := b.wargaming.ShipsBadges(accountID)
-			if err != nil {
-				return failure.Wrap(err)
-			}
-
-			mu.Lock()
-			result[accountID] = shipsBadges.Data[accountID]
-			mu.Unlock()
-
-			return nil
-		})
-	}
-
-	if err := eg.Wait(); err != nil {
-		return nil, failure.Wrap(err)
-	}
-
-	return result, nil
-}
-
 func (b *FetchBattle) compose(
 	tempArenaInfo data.TempArenaInfo,
-	accountInfo data.WGAccountInfo,
-	accountList data.WGAccountList,
-	clans data.Clans,
-	allPlayerShipsStats data.AllPlayerShipsStats,
-	allPlayerShipsBadges data.AllPlayerShipsBadges,
-	warships data.Warships,
-	battleArenas map[int]string,
-	battleTypes map[string]string,
+	userData *service.UserData,
+	nonUserData *service.NonUserData,
 ) data.Battle {
 	friends := make(data.Players, 0)
 	enemies := make(data.Players, 0)
 
 	for _, vehicle := range tempArenaInfo.Vehicles {
 		nickname := vehicle.Name
-		accountID := accountList.AccountID(nickname)
-		clan := clans[accountID]
+		accountID := userData.AccountList.AccountID(nickname)
+		clan := userData.Clans[accountID]
 
-		warship, ok := warships[vehicle.ShipID]
+		warship, ok := nonUserData.Warships[vehicle.ShipID]
 		if !ok {
-			println("unknown ship: ", vehicle.ShipID)
 			warship = *data.NewUnknownWarship()
 		}
 
 		stats := data.NewPersonalStats(
 			vehicle.ShipID,
-			accountInfo.Data[accountID],
-			allPlayerShipsStats.Player(accountID),
-			allPlayerShipsBadges[accountID],
-			warships,
+			userData.AccountInfo.Data[accountID],
+			userData.AllPlayerShipsStats.Player(accountID),
+			userData.AllPlayerShipsBadges[accountID],
+			nonUserData.Warships,
 			tempArenaInfo,
 		)
 
@@ -325,12 +105,33 @@ func (b *FetchBattle) compose(
 				ID:       accountID,
 				Name:     nickname,
 				Clan:     clan,
-				IsHidden: accountInfo.Data[accountID].HiddenProfile,
+				IsHidden: userData.AccountInfo.Data[accountID].HiddenProfile,
 			},
-			Warship:  warship,
-			PvPSolo:  playerStats(data.StatsPatternPvPSolo, stats, accountID, vehicle.ShipID, tempArenaInfo, warships),
-			PvPAll:   playerStats(data.StatsPatternPvPAll, stats, accountID, vehicle.ShipID, tempArenaInfo, warships),
-			RankSolo: playerStats(data.StatsPatternRankSolo, stats, accountID, vehicle.ShipID, tempArenaInfo, warships),
+			Warship: warship,
+			PvPSolo: playerStats(
+				data.StatsPatternPvPSolo,
+				stats,
+				accountID,
+				vehicle.ShipID,
+				tempArenaInfo,
+				nonUserData.Warships,
+			),
+			PvPAll: playerStats(
+				data.StatsPatternPvPAll,
+				stats,
+				accountID,
+				vehicle.ShipID,
+				tempArenaInfo,
+				nonUserData.Warships,
+			),
+			RankSolo: playerStats(
+				data.StatsPatternRankSolo,
+				stats,
+				accountID,
+				vehicle.ShipID,
+				tempArenaInfo,
+				nonUserData.Warships,
+			),
 		}
 
 		if vehicle.IsFriend() {
@@ -379,8 +180,8 @@ func (b *FetchBattle) compose(
 	battle := data.Battle{
 		Meta: data.BattleMetaData{
 			Unixtime: tempArenaInfo.Unixtime(),
-			Arena:    tempArenaInfo.BattleArena(battleArenas),
-			Type:     tempArenaInfo.BattleType(battleTypes),
+			Arena:    tempArenaInfo.BattleArena(nonUserData.BattleArenas),
+			Type:     tempArenaInfo.BattleType(nonUserData.BattleTypes),
 		},
 		Teams: teams,
 	}

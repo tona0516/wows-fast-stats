@@ -1,12 +1,9 @@
 package util
 
 import (
-	"context"
 	"reflect"
 	"strings"
 	"unicode"
-
-	"golang.org/x/sync/errgroup"
 )
 
 func FieldQuery(target reflect.Type) string {
@@ -33,31 +30,6 @@ func ToSnakeCase(s string) string {
 	}
 
 	return string(result)
-}
-
-func MakeRange(min, max int) []int {
-	if min > max {
-		return []int{}
-	}
-
-	a := make([]int, max-min)
-	for i := range a {
-		a[i] = min + i
-	}
-
-	return a
-}
-
-func DoParallel[T any](values []T, fn func(value T) error) error {
-	eg, _ := errgroup.WithContext(context.Background())
-
-	for _, v := range values {
-		eg.Go(func() error {
-			return fn(v)
-		})
-	}
-
-	return eg.Wait()
 }
 
 func fieldsRecursive(parentNames []string, t reflect.Type, result *[]string) {
