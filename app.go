@@ -2,11 +2,14 @@ package main
 
 import (
 	"context"
+	"errors"
+	"io/fs"
 	"os"
 	"wfs/internal/data"
 	"wfs/internal/di"
 
 	"github.com/mitchellh/go-ps"
+	"github.com/morikuni/failure"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
@@ -41,11 +44,24 @@ func (a *App) StartPollingMatch() {
 }
 
 func (a *App) GetUserConfig() (data.UserConfig, error) {
-	return a.container.ConfigService.GetUserConfig()
+	config, err := a.container.ConfigStore.UserConfig()
+	if err == nil {
+		return config, nil
+	}
+
+	if errors.Is(err, fs.ErrNotExist) {
+		return data.DefaultUserConfig(), nil
+	}
+
+	return data.UserConfig{}, failure.Wrap(err)
 }
 
 func (a *App) SaveUserConfig(config data.UserConfig) error {
-	return a.container.ConfigService.SaveUserConfig(config)
+	if err := a.container.ConfigStore.SetUserConfig(config); err != nil {
+		return failure.Wrap(err)
+	}
+
+	return nil
 }
 
 func (a *App) TrySaveInstallPath() (bool, error) {

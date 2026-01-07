@@ -28,7 +28,7 @@ func TestInstallPathSetting_Invoke(t *testing.T) {
 		t.Parallel()
 
 		ctrl := gomock.NewController(t)
-		mockLocalStorage := mock.NewMockLocalStorage(ctrl)
+		mockConfigStore := mock.NewMockConfigStore(ctrl)
 		originalConfig := data.UserConfig{
 			Version:      1,
 			InstallPath:  "/old/path",
@@ -48,15 +48,15 @@ func TestInstallPathSetting_Invoke(t *testing.T) {
 		}
 
 		gomock.InOrder(
-			mockLocalStorage.EXPECT().UserConfig().Return(originalConfig, nil),
-			mockLocalStorage.EXPECT().SetUserConfig(expectedUpdatedConfig).Return(nil),
+			mockConfigStore.EXPECT().UserConfig().Return(originalConfig, nil),
+			mockConfigStore.EXPECT().SetUserConfig(expectedUpdatedConfig).Return(nil),
 		)
 
 		mockOpenDirectoryDialog := func(ctx context.Context) (string, error) {
 			return tempDir, nil
 		}
 
-		instance := NewInstallPathSetting(mockLocalStorage, mockOpenDirectoryDialog)
+		instance := NewInstallPathSetting(mockConfigStore, mockOpenDirectoryDialog)
 		ok, err := instance.Invoke(context.Background())
 
 		assert.NoError(t, err)
@@ -67,15 +67,15 @@ func TestInstallPathSetting_Invoke(t *testing.T) {
 		t.Parallel()
 
 		ctrl := gomock.NewController(t)
-		mockLocalStorage := mock.NewMockLocalStorage(ctrl)
-		mockLocalStorage.EXPECT().UserConfig().Times(0)
-		mockLocalStorage.EXPECT().SetUserConfig(gomock.Any()).Times(0)
+		mockConfigStore := mock.NewMockConfigStore(ctrl)
+		mockConfigStore.EXPECT().UserConfig().Times(0)
+		mockConfigStore.EXPECT().SetUserConfig(gomock.Any()).Times(0)
 
 		mockOpenDirectoryDialog := func(ctx context.Context) (string, error) {
 			return "", nil
 		}
 
-		instance := NewInstallPathSetting(mockLocalStorage, mockOpenDirectoryDialog)
+		instance := NewInstallPathSetting(mockConfigStore, mockOpenDirectoryDialog)
 		ok, err := instance.Invoke(context.Background())
 
 		assert.NoError(t, err)
@@ -86,15 +86,15 @@ func TestInstallPathSetting_Invoke(t *testing.T) {
 		t.Parallel()
 
 		ctrl := gomock.NewController(t)
-		mockLocalStorage := mock.NewMockLocalStorage(ctrl)
-		mockLocalStorage.EXPECT().UserConfig().Times(0)
-		mockLocalStorage.EXPECT().SetUserConfig(gomock.Any()).Times(0)
+		mockConfigStore := mock.NewMockConfigStore(ctrl)
+		mockConfigStore.EXPECT().UserConfig().Times(0)
+		mockConfigStore.EXPECT().SetUserConfig(gomock.Any()).Times(0)
 
 		mockOpenDirectoryDialog := func(ctx context.Context) (string, error) {
 			return "", errors.New("dialog error")
 		}
 
-		instance := NewInstallPathSetting(mockLocalStorage, mockOpenDirectoryDialog)
+		instance := NewInstallPathSetting(mockConfigStore, mockOpenDirectoryDialog)
 		ok, err := instance.Invoke(context.Background())
 
 		assert.Error(t, err)
@@ -105,15 +105,15 @@ func TestInstallPathSetting_Invoke(t *testing.T) {
 		t.Parallel()
 
 		ctrl := gomock.NewController(t)
-		mockLocalStorage := mock.NewMockLocalStorage(ctrl)
-		mockLocalStorage.EXPECT().UserConfig().Times(0)
-		mockLocalStorage.EXPECT().SetUserConfig(gomock.Any()).Times(0)
+		mockConfigStore := mock.NewMockConfigStore(ctrl)
+		mockConfigStore.EXPECT().UserConfig().Times(0)
+		mockConfigStore.EXPECT().SetUserConfig(gomock.Any()).Times(0)
 
 		mockOpenDirectoryDialog := func(ctx context.Context) (string, error) {
 			return "/invalid/path", nil
 		}
 
-		instance := NewInstallPathSetting(mockLocalStorage, mockOpenDirectoryDialog)
+		instance := NewInstallPathSetting(mockConfigStore, mockOpenDirectoryDialog)
 		ok, err := instance.Invoke(context.Background())
 
 		assert.Error(t, err)
@@ -124,10 +124,10 @@ func TestInstallPathSetting_Invoke(t *testing.T) {
 		t.Parallel()
 
 		ctrl := gomock.NewController(t)
-		mockLocalStorage := mock.NewMockLocalStorage(ctrl)
+		mockConfigStore := mock.NewMockConfigStore(ctrl)
 		expectedErr := errors.New("user config read error")
-		mockLocalStorage.EXPECT().UserConfig().Return(data.UserConfig{}, expectedErr)
-		mockLocalStorage.EXPECT().SetUserConfig(gomock.Any()).Times(0)
+		mockConfigStore.EXPECT().UserConfig().Return(data.UserConfig{}, expectedErr)
+		mockConfigStore.EXPECT().SetUserConfig(gomock.Any()).Times(0)
 
 		tempDir := createWorldOfWarshipsExeDir(t)
 
@@ -135,7 +135,7 @@ func TestInstallPathSetting_Invoke(t *testing.T) {
 			return tempDir, nil
 		}
 
-		instance := NewInstallPathSetting(mockLocalStorage, mockOpenDirectoryDialog)
+		instance := NewInstallPathSetting(mockConfigStore, mockOpenDirectoryDialog)
 		ok, err := instance.Invoke(context.Background())
 
 		assert.Error(t, err)
@@ -146,15 +146,15 @@ func TestInstallPathSetting_Invoke(t *testing.T) {
 		t.Parallel()
 
 		ctrl := gomock.NewController(t)
-		mockLocalStorage := mock.NewMockLocalStorage(ctrl)
+		mockConfigStore := mock.NewMockConfigStore(ctrl)
 		originalConfig := data.UserConfig{
 			Version:     1,
 			InstallPath: "/old/path",
 		}
 
 		gomock.InOrder(
-			mockLocalStorage.EXPECT().UserConfig().Return(originalConfig, nil),
-			mockLocalStorage.EXPECT().SetUserConfig(gomock.Any()).Return(errors.New("user config write error")),
+			mockConfigStore.EXPECT().UserConfig().Return(originalConfig, nil),
+			mockConfigStore.EXPECT().SetUserConfig(gomock.Any()).Return(errors.New("user config write error")),
 		)
 
 		tempDir := createWorldOfWarshipsExeDir(t)
@@ -163,7 +163,7 @@ func TestInstallPathSetting_Invoke(t *testing.T) {
 			return tempDir, nil
 		}
 
-		instance := NewInstallPathSetting(mockLocalStorage, mockOpenDirectoryDialog)
+		instance := NewInstallPathSetting(mockConfigStore, mockOpenDirectoryDialog)
 		ok, err := instance.Invoke(context.Background())
 
 		require.Error(t, err)

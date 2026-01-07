@@ -10,7 +10,12 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestLocalStorage_TempArenaInfo(t *testing.T) {
+func TestReplayReader_TempArenaInfo(t *testing.T) {
+	const (
+		replaysDir        = "replays"
+		tempArenaInfoFile = "tempArenaInfo.json"
+	)
+
 	t.Run("正常系", func(t *testing.T) {
 		t.Parallel()
 
@@ -35,7 +40,7 @@ func TestLocalStorage_TempArenaInfo(t *testing.T) {
 			err := writeJSON(path, expected)
 			require.NoError(t, err)
 
-			instance := NewLocalStorage("", "")
+			instance := NewReplayReader()
 			actual, err := instance.TempArenaInfo(testInstallDir)
 
 			assert.NoError(t, err)
@@ -77,7 +82,7 @@ func TestLocalStorage_TempArenaInfo(t *testing.T) {
 		err = writeJSON(filepath.Join(testInstallDir, replaysDir, "12.4.0", tempArenaInfoFile), expected)
 		require.NoError(t, err)
 
-		instance := NewLocalStorage("", "")
+		instance := NewReplayReader()
 		actual, err := instance.TempArenaInfo(testInstallDir)
 
 		assert.NoError(t, err)
@@ -98,7 +103,7 @@ func TestLocalStorage_TempArenaInfo(t *testing.T) {
 			err = writeJSON(path, data.TempArenaInfo{})
 			require.NoError(t, err)
 
-			instance := NewLocalStorage("", "")
+			instance := NewReplayReader()
 			_, err = instance.TempArenaInfo(testInstallDir)
 
 			assert.Error(t, err)
@@ -107,7 +112,7 @@ func TestLocalStorage_TempArenaInfo(t *testing.T) {
 	t.Run("異常系_replayフォルダなし", func(t *testing.T) {
 		testInstallDir := t.TempDir()
 
-		instance := NewLocalStorage("", "")
+		instance := NewReplayReader()
 		_, err := instance.TempArenaInfo(testInstallDir)
 
 		assert.Error(t, err, fs.ErrNotExist)

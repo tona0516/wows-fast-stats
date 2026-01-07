@@ -15,7 +15,7 @@ import (
 type FetchBattle struct {
 	userDataFetcher    *service.UserDataFetcher
 	nonUserDataFetcher *service.NonUserDataFetcher
-	localStorage       infra.LocalStorage
+	cacheStorage       infra.CacheStore
 	logger             infra.Logger
 	eventsEmitFunc     eventEmitFunc
 }
@@ -23,14 +23,14 @@ type FetchBattle struct {
 func NewFetchBattle(
 	userDataFetcher *service.UserDataFetcher,
 	nonUserDataFetcher *service.NonUserDataFetcher,
-	localStorage infra.LocalStorage,
+	cacheStorage infra.CacheStore,
 	logger infra.Logger,
 	eventsEmitFunc eventEmitFunc,
 ) *FetchBattle {
 	return &FetchBattle{
 		userDataFetcher:    userDataFetcher,
 		nonUserDataFetcher: nonUserDataFetcher,
-		localStorage:       localStorage,
+		cacheStorage:       cacheStorage,
 		logger:             logger,
 		eventsEmitFunc:     eventsEmitFunc,
 	}
@@ -40,7 +40,7 @@ func (b *FetchBattle) Invoke(
 	ctx context.Context,
 	tempArenaInfo data.TempArenaInfo,
 ) {
-	_ = b.localStorage.SetOwnIGN(tempArenaInfo.PlayerName)
+	_ = b.cacheStorage.SetOwnIGN(tempArenaInfo.PlayerName)
 	b.logger.SetOwnIGN(tempArenaInfo.PlayerName)
 
 	eg := errgroup.Group{}

@@ -17,7 +17,7 @@ type Config struct {
 	NumbersApi   NumbersApiConfig
 	GithubApi    GithubApiConfig
 	DiscordApi   DiscordApiConfig
-	LocalStorage LocalStorageConfig
+	LocalStorage LocalFileConfig
 	Logger       LoggerConfig
 }
 
@@ -64,9 +64,9 @@ type DiscordApiConfig struct {
 	Timeout         time.Duration
 }
 
-type LocalStorageConfig struct {
-	UserDataDir string
-	CacheDir    string
+type LocalFileConfig struct {
+	UserDir  string
+	CacheDir string
 }
 
 type LoggerConfig struct {
@@ -120,9 +120,9 @@ func newProdConfig(appName, version string) Config {
 			RetryCount:      2,
 			Timeout:         time.Duration(10) * time.Second,
 		},
-		LocalStorage: LocalStorageConfig{
-			UserDataDir: "./user_data",
-			CacheDir:    "./cache",
+		LocalStorage: LocalFileConfig{
+			UserDir:  "./user_data",
+			CacheDir: "./cache",
 		},
 		Logger: LoggerConfig{
 			Level: zerolog.InfoLevel,

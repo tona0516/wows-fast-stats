@@ -16,18 +16,18 @@ type NonUserData struct {
 }
 
 type NonUserDataFetcher struct {
-	localStorage       infra.LocalStorage
+	cacheStorage       infra.CacheStore
 	wargamingApiClient infra.WargamingApiClient
 	numbersApiClient   infra.NumbersApiClient
 }
 
 func NewNonUserDataFetcher(
-	localStorage infra.LocalStorage,
+	cacheStorage infra.CacheStore,
 	wargamingApiClient infra.WargamingApiClient,
 	numbersApiClient infra.NumbersApiClient,
 ) *NonUserDataFetcher {
 	return &NonUserDataFetcher{
-		localStorage:       localStorage,
+		cacheStorage:       cacheStorage,
 		wargamingApiClient: wargamingApiClient,
 		numbersApiClient:   numbersApiClient,
 	}
@@ -92,7 +92,7 @@ func (f *NonUserDataFetcher) fetchWarships() (data.Warships, error) {
 	})
 
 	if err := eg.Wait(); err != nil {
-		cache, errCache := f.localStorage.Warships()
+		cache, errCache := f.cacheStorage.Warships()
 		if errCache != nil {
 			return nil, failure.Wrap(err)
 		}
@@ -101,7 +101,7 @@ func (f *NonUserDataFetcher) fetchWarships() (data.Warships, error) {
 	}
 
 	warships := f.composeWarships(encycShips, expectedStats)
-	_ = f.localStorage.SetWarships(warships)
+	_ = f.cacheStorage.SetWarships(warships)
 
 	return warships, nil
 }
@@ -109,7 +109,7 @@ func (f *NonUserDataFetcher) fetchWarships() (data.Warships, error) {
 func (f *NonUserDataFetcher) fetchBattleArenas() (map[int]string, error) {
 	resp, err := f.wargamingApiClient.BattleArenas()
 	if err != nil {
-		cache, errCache := f.localStorage.BattleArenas()
+		cache, errCache := f.cacheStorage.BattleArenas()
 		if errCache != nil {
 			return nil, failure.Wrap(err)
 		}
@@ -121,7 +121,7 @@ func (f *NonUserDataFetcher) fetchBattleArenas() (map[int]string, error) {
 		result[id] = arena.Name
 	}
 
-	_ = f.localStorage.SetBattleArenas(result)
+	_ = f.cacheStorage.SetBattleArenas(result)
 
 	return result, nil
 }
@@ -129,7 +129,7 @@ func (f *NonUserDataFetcher) fetchBattleArenas() (map[int]string, error) {
 func (f *NonUserDataFetcher) fetchBattleTypes() (map[string]string, error) {
 	resp, err := f.wargamingApiClient.BattleTypes()
 	if err != nil {
-		cache, errCache := f.localStorage.BattleTypes()
+		cache, errCache := f.cacheStorage.BattleTypes()
 		if errCache != nil {
 			return nil, failure.Wrap(err)
 		}
@@ -141,7 +141,7 @@ func (f *NonUserDataFetcher) fetchBattleTypes() (map[string]string, error) {
 		result[key] = battleType.Name
 	}
 
-	_ = f.localStorage.SetBattleTypes(result)
+	_ = f.cacheStorage.SetBattleTypes(result)
 
 	return result, nil
 }

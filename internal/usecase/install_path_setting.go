@@ -14,12 +14,12 @@ const gameClientFile = "WorldOfWarships.exe"
 type openDirectoryDialogFunc func(ctx context.Context) (string, error)
 
 type InstallPathSetting struct {
-	localStorage        infra.LocalStorage
+	localStorage        infra.ConfigStore
 	openDirectoryDialog openDirectoryDialogFunc
 }
 
 func NewInstallPathSetting(
-	localStorage infra.LocalStorage,
+	localStorage infra.ConfigStore,
 	openDirectoryDialogFunc openDirectoryDialogFunc,
 ) *InstallPathSetting {
 	return &InstallPathSetting{

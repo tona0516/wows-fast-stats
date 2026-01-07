@@ -15,31 +15,17 @@ import (
 	"go.uber.org/mock/gomock"
 )
 
-func TestPollMatch_NewPollMatch(t *testing.T) {
-	t.Parallel()
-
-	interval := 100 * time.Millisecond
-	mockStorage := mock.NewMockLocalStorage(gomock.NewController(t))
-	emitFunc := func(ctx context.Context, eventName string, optionalData ...any) {}
-
-	pm := NewPollMatch(interval, mockStorage, emitFunc)
-
-	assert.NotNil(t, pm)
-	assert.Equal(t, interval, pm.pollingInterval)
-	assert.Equal(t, mockStorage, pm.localStorage)
-}
-
 func TestPollMatch_Invoke(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
 		name             string
-		setupMock        func(*mock.MockLocalStorage)
+		setupMock        func(*mock.MockConfigStore)
 		expectEventNames []string
 	}{
 		{
 			name: "UserConfigが存在しない場合",
-			setupMock: func(m *mock.MockLocalStorage) {
+			setupMock: func(m *mock.MockConfigStore) {
 				m.EXPECT().
 					UserConfig().
 					Return(data.UserConfig{}, fs.ErrNotExist)
@@ -48,7 +34,7 @@ func TestPollMatch_Invoke(t *testing.T) {
 		},
 		{
 			name: "UserConfig取得でエラーが発生した場合",
-			setupMock: func(m *mock.MockLocalStorage) {
+			setupMock: func(m *mock.MockConfigStore) {
 				m.EXPECT().
 					UserConfig().
 					Return(data.UserConfig{}, errors.New("read error"))
@@ -57,7 +43,7 @@ func TestPollMatch_Invoke(t *testing.T) {
 		},
 		{
 			name: "InstallPathが空文字の場合",
-			setupMock: func(m *mock.MockLocalStorage) {
+			setupMock: func(m *mock.MockConfigStore) {
 				userConfig := data.UserConfig{InstallPath: ""}
 				m.EXPECT().
 					UserConfig().
@@ -73,8 +59,9 @@ func TestPollMatch_Invoke(t *testing.T) {
 
 			ctrl := gomock.NewController(t)
 
-			mockStorage := mock.NewMockLocalStorage(ctrl)
-			tt.setupMock(mockStorage)
+			configStore := mock.NewMockConfigStore(ctrl)
+			mockReplayReader := mock.NewMockReplayReader(ctrl)
+			tt.setupMock(configStore)
 
 			var emittedEvents []string
 			var eventsMutex sync.Mutex
@@ -84,7 +71,7 @@ func TestPollMatch_Invoke(t *testing.T) {
 				emittedEvents = append(emittedEvents, eventName)
 			}
 
-			pm := NewPollMatch(50*time.Millisecond, mockStorage, emitFunc)
+			pm := NewPollMatch(50*time.Millisecond, configStore, mockReplayReader, emitFunc)
 
 			ctx := context.Background()
 			cancelCtx, cancel := context.WithTimeout(context.Background(), 300*time.Millisecond)
@@ -111,10 +98,11 @@ func TestPollMatch_InvokeWithDataChange(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 
-	mockStorage := mock.NewMockLocalStorage(ctrl)
+	MockConfigStore := mock.NewMockConfigStore(ctrl)
+	mockReplayReader := mock.NewMockReplayReader(ctrl)
 
 	userConfig := data.UserConfig{InstallPath: "/path/to/install"}
-	mockStorage.EXPECT().
+	MockConfigStore.EXPECT().
 		UserConfig().
 		Return(userConfig, nil)
 
@@ -130,7 +118,7 @@ func TestPollMatch_InvokeWithDataChange(t *testing.T) {
 
 	// TempArenaInfoを複数回呼び出して、最初は同じデータ、その後異なるデータを返す
 	callCount := 0
-	mockStorage.EXPECT().
+	mockReplayReader.EXPECT().
 		TempArenaInfo("/path/to/install").
 		DoAndReturn(func(path string) (data.TempArenaInfo, error) {
 			callCount++
@@ -158,7 +146,7 @@ func TestPollMatch_InvokeWithDataChange(t *testing.T) {
 		emittedEvents = append(emittedEvents, eventName)
 	}
 
-	pm := NewPollMatch(30*time.Millisecond, mockStorage, emitFunc)
+	pm := NewPollMatch(30*time.Millisecond, MockConfigStore, mockReplayReader, emitFunc)
 
 	ctx := context.Background()
 	cancelCtx, cancel := context.WithTimeout(context.Background(), 300*time.Millisecond)

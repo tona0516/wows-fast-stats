@@ -14,6 +14,9 @@ type Container struct {
 	// Config
 	Config Config
 
+	// Infrastructure
+	ConfigStore infra.ConfigStore
+
 	// Usecase
 	InstallPathSettingUsecase *usecase.InstallPathSetting
 	UpdateCheckUsecase        *usecase.UpdateCheck
@@ -21,11 +24,23 @@ type Container struct {
 	FetchBattleUsecase        *usecase.FetchBattle
 
 	// Services
-	ConfigService *service.Config
-	Logger        infra.Logger
+	Logger infra.Logger
 }
 
 func NewContainer(config Config) *Container {
+	replayReader := infra.NewReplayReader()
+	configStore := infra.NewConfigStore(
+		config.LocalStorage.UserDir,
+	)
+	cacheStore := infra.NewCacheStore(
+		config.LocalStorage.CacheDir,
+	)
+	var ownIGN string
+	ownIGN, err := cacheStore.OwnIGN()
+	if err != nil {
+		ownIGN = ""
+	}
+
 	alertDiscordApiClient := infra.NewDiscordApiClient(
 		*infra.NewApiConfig(
 			config.DiscordApi.AlertWebhookURL,
@@ -41,20 +56,10 @@ func NewContainer(config Config) *Container {
 		),
 	)
 
-	localStorage := infra.NewLocalStorage(
-		config.LocalStorage.UserDataDir,
-		config.LocalStorage.CacheDir,
-	)
-	var ownIGN string
-	ownIGN, err := localStorage.OwnIGN()
-	if err != nil {
-		ownIGN = ""
-	}
-
 	logger := infra.NewLogger(
 		config.Basic.Name,
 		config.Basic.Version,
-		config.LocalStorage.UserDataDir,
+		config.LocalStorage.UserDir,
 		config.Logger.Level,
 		alertDiscordApiClient,
 		infoDiscordApiClient,
@@ -94,37 +99,40 @@ func NewContainer(config Config) *Container {
 
 	// services
 	userDataFetcher := service.NewUserDataFetcher(wargamingApiClient, clansApiClient)
-	nonUserDataFetcher := service.NewNonUserDataFetcher(localStorage, wargamingApiClient, numbersApiClient)
-	configService := service.NewConfig(localStorage)
+	nonUserDataFetcher := service.NewNonUserDataFetcher(cacheStore, wargamingApiClient, numbersApiClient)
 
 	// usecase
-	installPathSettingUsecase := usecase.NewInstallPathSetting(localStorage, func(ctx context.Context) (string, error) {
-		return runtime.OpenDirectoryDialog(ctx, runtime.OpenDialogOptions{})
-	})
+	installPathSettingUsecase := usecase.NewInstallPathSetting(
+		configStore,
+		func(ctx context.Context) (string, error) {
+			return runtime.OpenDirectoryDialog(ctx, runtime.OpenDialogOptions{})
+		},
+	)
 	updateCheckUsecase := usecase.NewUpdateCheck(
 		config.Basic.Version,
 		githubApiClient,
 	)
 	pollMatchUsecase := usecase.NewPollMatch(
 		config.Basic.PollingInterval,
-		localStorage,
+		configStore,
+		replayReader,
 		runtime.EventsEmit,
 	)
 	fetchBattleUsecase := usecase.NewFetchBattle(
 		userDataFetcher,
 		nonUserDataFetcher,
-		localStorage,
+		cacheStore,
 		logger,
 		runtime.EventsEmit,
 	)
 
 	return &Container{
 		Config:                    config,
+		ConfigStore:               configStore,
 		InstallPathSettingUsecase: installPathSettingUsecase,
 		UpdateCheckUsecase:        updateCheckUsecase,
 		PollMatchUsecase:          pollMatchUsecase,
 		FetchBattleUsecase:        fetchBattleUsecase,
-		ConfigService:             configService,
 		Logger:                    logger,
 	}
 }

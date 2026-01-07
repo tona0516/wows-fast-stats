@@ -15,18 +15,21 @@ type eventEmitFunc func(ctx context.Context, eventName string, optionalData ...a
 
 type PollMatch struct {
 	pollingInterval time.Duration
-	localStorage    infra.LocalStorage
+	configStore     infra.ConfigStore
+	replayReader    infra.ReplayReader
 	eventsEmitFunc  eventEmitFunc
 }
 
 func NewPollMatch(
 	pollingInterval time.Duration,
-	localStorage infra.LocalStorage,
+	configStore infra.ConfigStore,
+	replayReader infra.ReplayReader,
 	eventsEmitFunc eventEmitFunc,
 ) *PollMatch {
 	return &PollMatch{
 		pollingInterval: pollingInterval,
-		localStorage:    localStorage,
+		configStore:     configStore,
+		replayReader:    replayReader,
 		eventsEmitFunc:  eventsEmitFunc,
 	}
 }
@@ -36,7 +39,7 @@ func (pm *PollMatch) Invoke(
 	cancelCtx context.Context,
 	channel chan data.TempArenaInfo,
 ) {
-	userConfig, err := pm.localStorage.UserConfig()
+	userConfig, err := pm.configStore.UserConfig()
 	if err != nil {
 		if errors.Is(err, fs.ErrNotExist) {
 			pm.emitNeedInitialSetting(ctx)
@@ -62,7 +65,7 @@ func (pm *PollMatch) Invoke(
 		default:
 			time.Sleep(pm.pollingInterval)
 
-			tempArenaInfo, err := pm.localStorage.TempArenaInfo(userConfig.InstallPath)
+			tempArenaInfo, err := pm.replayReader.TempArenaInfo(userConfig.InstallPath)
 			if err != nil {
 				if errors.Is(err, fs.ErrNotExist) {
 					continue

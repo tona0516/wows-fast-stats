@@ -50,3 +50,110 @@ type DetailStatsColumnConfig struct {
 	IsShowOverall bool `json:"is_show_overall"`
 	Digit         int  `json:"digit"`
 }
+
+func DefaultUserConfig() UserConfig {
+	return UserConfig{
+		Version:      1,
+		InstallPath:  "",
+		ZoomRate:     100,
+		StatsExtra:   "pvp_all",
+		IsSendReport: true,
+		Column: ColumnConfig{
+			Player: PlayerColumnConfig{
+				EnableNationFlag: false,
+				ColorPattern:     "none",
+			},
+			Ship: ShipColumnConfig{
+				EnableNationFlag: true,
+				IsColored:        false,
+			},
+			Stats: StatsColumnConfig{
+				Battles: DetailStatsColumnConfig{
+					IsShowShip:    true,
+					IsShowOverall: true,
+					Digit:         0,
+				},
+				Damage: DetailStatsColumnConfig{
+					IsShowShip:    true,
+					IsShowOverall: true,
+					Digit:         0,
+				},
+				MaxDamage: DetailStatsColumnConfig{
+					IsShowShip:    true,
+					IsShowOverall: true,
+					Digit:         0,
+				},
+				WinRate: DetailStatsColumnConfig{
+					IsShowShip:    true,
+					IsShowOverall: true,
+					Digit:         1,
+				},
+				SurvivedRate: DetailStatsColumnConfig{
+					IsShowShip:    false,
+					IsShowOverall: false,
+					Digit:         1,
+				},
+				KdRate: DetailStatsColumnConfig{
+					IsShowShip:    false,
+					IsShowOverall: false,
+					Digit:         2,
+				},
+				Kill: DetailStatsColumnConfig{
+					IsShowShip:    true,
+					IsShowOverall: true,
+					Digit:         2,
+				},
+				Exp: DetailStatsColumnConfig{
+					IsShowShip:    true,
+					IsShowOverall: true,
+					Digit:         0,
+				},
+				PR: DetailStatsColumnConfig{
+					IsShowShip:    false,
+					IsShowOverall: false,
+					Digit:         0,
+				},
+				HitRate: DetailStatsColumnConfig{
+					IsShowShip:    false,
+					IsShowOverall: false,
+					Digit:         1,
+				},
+				PlanesKilled: DetailStatsColumnConfig{
+					IsShowShip:    false,
+					IsShowOverall: false,
+					Digit:         0,
+				},
+				PlatoonRate: DetailStatsColumnConfig{
+					IsShowShip:    false,
+					IsShowOverall: false,
+					Digit:         1,
+				},
+				EfficiencyBadge: DetailStatsColumnConfig{
+					IsShowShip:    false,
+					IsShowOverall: false,
+					Digit:         0,
+				},
+				ThreatLevel: DetailStatsColumnConfig{
+					IsShowShip:    false,
+					IsShowOverall: false,
+					Digit:         1,
+				},
+				AvgTier: DetailStatsColumnConfig{
+					IsShowShip:    false,
+					IsShowOverall: false,
+					Digit:         1,
+				},
+				UsingShipTypeRate: DetailStatsColumnConfig{
+					IsShowShip:    false,
+					IsShowOverall: false,
+					Digit:         1,
+				},
+				UsingTierRate: DetailStatsColumnConfig{
+					IsShowShip:    false,
+					IsShowOverall: false,
+					Digit:         1,
+				},
+			},
+		},
+	}
+}
