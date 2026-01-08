@@ -16,7 +16,6 @@
 
 ## 3. コーディング一般方針
 - 可読性 > 省行数。過度なチェーンやマジックナンバー禁止。
-- エラー処理: `internal/apperr` のパターン・`error` をラップする既存方式踏襲。
 - ログ: `internal/infra/logger.go` を経由。直接 `fmt.Println` しない。
 - 同期/並行: 明確な競合がない限りチャネルよりもシンプルなロック/直列処理を優先。
 
@@ -26,10 +25,14 @@
 - 定数: バックエンドは`UpperCamelCase`、フロントエンドは`SNAKE_CASE`。
 
 ## 5. ディレクトリ指針
+- `internal/`: Go バックエンドコード全般。
+- `internal/config/`: アプリ設定管理。
+- `internal/controller/`: Wails ハンドラ。
 - `internal/data/`: 外部APIレスポンスのマッピングや計算ロジック。
-- `internal/di/`: 依存注入設定。
+- `internal/gateway/`: 外部APIインターフェース。
 - `internal/infra/`: 外部サービス接続 (Discord, GitHub, ローカルファイル等)。
 - `internal/service/`: ビジネスロジック (必要なら階層化)。
+- `internal/usecase/`: ユースケース実装 (必要なら階層化)。
 - `internal/mock/`: `go.uber.org/mock`で自動生成されたモック。この配下は手動編集禁止。
 - `frontend/src/`: Svelte コンポーネント・ストア・ユーティリティ。
 
@@ -58,11 +61,6 @@
 - `task dev` で開発サーバ起動 (フロント + バックエンド)。
 - `task build` で本番ビルド生成。
 - `task test` でフロントエンド/バックエンドテスト実行。
-
-## 10. コンフィグ / 環境
-- `di/config.go` 経由で集約も検討。
-- `di/container.go` で依存注入設定。
-- ユーザーデータ (`user_data/`): 開発中に個人情報追加しない。
 
 ## 11. 既存計算ロジック参照
 - 新規指標追加時は `internal/data/rating.go`, `pr_factor.go`, `stats_pattern.go` 等の既存式/パターンを参照し整合性を確保。
