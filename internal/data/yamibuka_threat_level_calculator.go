@@ -1,31 +1,30 @@
-package yamibuka
+package data
 
 import (
 	"math"
-	"wfs/internal/data"
 
 	"github.com/shopspring/decimal"
 )
 
 //nolint:gochecknoglobals
-var coef = 0.5
+var threatLevelCoef = 0.5
 
-type threshold struct {
-	rank      Rank
+type threatLevelThreshold struct {
+	rank      ThreatLevelRank
 	threshold float64
 }
 
 //nolint:gochecknoglobals
-var thresholds = []threshold{
-	{rank: RankUV, threshold: 44000 * coef},
-	{rank: RankV, threshold: 40000 * coef},
-	{rank: RankI, threshold: 35000 * coef},
-	{rank: RankB, threshold: 32000 * coef},
-	{rank: RankG, threshold: 25000 * coef},
-	{rank: RankY, threshold: 19000 * coef},
-	{rank: RankO, threshold: 13000 * coef},
-	{rank: RankR, threshold: 8000 * coef},
-	{rank: RankIR, threshold: 0},
+var threatLevelThresholds = []threatLevelThreshold{
+	{rank: ThreatLevelRankUV, threshold: 44000 * threatLevelCoef},
+	{rank: ThreatLevelRankV, threshold: 40000 * threatLevelCoef},
+	{rank: ThreatLevelRankI, threshold: 35000 * threatLevelCoef},
+	{rank: ThreatLevelRankB, threshold: 32000 * threatLevelCoef},
+	{rank: ThreatLevelRankG, threshold: 25000 * threatLevelCoef},
+	{rank: ThreatLevelRankY, threshold: 19000 * threatLevelCoef},
+	{rank: ThreatLevelRankO, threshold: 13000 * threatLevelCoef},
+	{rank: ThreatLevelRankR, threshold: 8000 * threatLevelCoef},
+	{rank: ThreatLevelRankIR, threshold: 0},
 }
 
 type specialAAShipMap map[int]struct {
@@ -118,55 +117,109 @@ func specialShipScores() specialShipScoreMap {
 	}
 }
 
-func CalculateThreatLevel(f ThreatLevelFactor) data.ThreatLevel {
+// ThreatLevelCalculatorFactor represents the input parameters for calculating a player's threat level.
+type ThreatLevelCalculatorFactor struct {
+	AccountID        int
+	TempArenaInfo    TempArenaInfo
+	Warships         Warships
+	ShipID           int
+	ShipBattles      uint
+	ShipDamage       float64
+	ShipWinRate      float64
+	ShipSurvivedRate float64
+	ShipPlanesKilled float64
+	OverallBattles   uint
+	OverallDamage    float64
+	OverallWinRate   float64
+	OverallKill      float64
+	OverallKdRate    float64
+}
+
+// NewThreatLevelCalculatorFactor creates a new threat level calculator factor.
+func NewThreatLevelCalculatorFactor(
+	accountID int,
+	tempArenaInfo TempArenaInfo,
+	warships Warships,
+	shipID int,
+	shipBattles uint,
+	shipDamage float64,
+	shipWinRate float64,
+	shipSurvivedRate float64,
+	shipPlanesKilled float64,
+	overallBattles uint,
+	overallDamage float64,
+	overallWinRate float64,
+	overallKill float64,
+	overallKdRate float64,
+) ThreatLevelCalculatorFactor {
+	return ThreatLevelCalculatorFactor{
+		AccountID:        accountID,
+		TempArenaInfo:    tempArenaInfo,
+		Warships:         warships,
+		ShipID:           shipID,
+		ShipBattles:      shipBattles,
+		ShipDamage:       shipDamage,
+		ShipWinRate:      shipWinRate,
+		ShipSurvivedRate: shipSurvivedRate,
+		ShipPlanesKilled: shipPlanesKilled,
+		OverallBattles:   overallBattles,
+		OverallDamage:    overallDamage,
+		OverallWinRate:   overallWinRate,
+		OverallKill:      overallKill,
+		OverallKdRate:    overallKdRate,
+	}
+}
+
+// CalculateThreatLevel calculates the threat level for a player in a specific match.
+func CalculateThreatLevel(f ThreatLevelCalculatorFactor) ThreatLevel {
 	// 戦闘情報の取得
-	isCVMatch, topTier, bottomTier := matchInfo(f.tempArenaInfo, f.warships)
+	isCVMatch, topTier, bottomTier := matchInfo(f.TempArenaInfo, f.Warships)
 
 	// プレイヤー総合補正指数
 	playerOverallScore := playerOverallScore(
-		f.overallBattles,
-		f.overallDamage,
-		f.overallKill,
-		f.overallKdRate,
-		f.overallWinRate,
+		f.OverallBattles,
+		f.OverallDamage,
+		f.OverallKill,
+		f.OverallKdRate,
+		f.OverallWinRate,
 	)
 
 	// 艦成績補正
 	playerShipScore := playerShipScore(
-		f.warships,
-		f.shipID,
-		f.shipBattles,
-		f.shipDamage,
-		f.shipSurvivedRate,
-		f.shipPlanesKilled,
-		f.shipWinRate,
+		f.Warships,
+		f.ShipID,
+		f.ShipBattles,
+		f.ShipDamage,
+		f.ShipSurvivedRate,
+		f.ShipPlanesKilled,
+		f.ShipWinRate,
 	)
 
 	// 最後に数値の幅を作る係数を設定
 	playerTotalSkillScore := (playerOverallScore + playerShipScore) * 0.5
 
 	// 特に補正が必要だと思う艦級を含めた脅威度補正
-	shipClassScore := shipClassScore(f.warships, f.shipID)
+	shipClassScore := shipClassScore(f.Warships, f.ShipID)
 
 	// AA特化艦補正
-	shipAAIndex := antiAirCoefficient(f.shipID, f.shipPlanesKilled)
+	shipAAIndex := antiAirCoefficient(f.ShipID, f.ShipPlanesKilled)
 
 	// 脅威レベルの算出
 	raw := (playerTotalSkillScore + 1) * shipClassScore * 10000
 
 	// マッチのおける脅威レベルの補正
-	modified := correctBasedOnMatch(raw, f.warships, f.shipID, shipAAIndex, isCVMatch, topTier, bottomTier)
+	modified := correctBasedOnMatch(raw, f.Warships, f.ShipID, shipAAIndex, isCVMatch, topTier, bottomTier)
 
 	// ランクの決定
-	var rank = RankIR
-	for _, t := range thresholds {
+	var rank = ThreatLevelRankIR
+	for _, t := range threatLevelThresholds {
 		if raw >= t.threshold {
 			rank = t.rank
 			break
 		}
 	}
 
-	return data.ThreatLevel{
+	return ThreatLevel{
 		Rank:     string(rank),
 		Raw:      raw,
 		Modified: modified,
@@ -175,8 +228,8 @@ func CalculateThreatLevel(f ThreatLevelFactor) data.ThreatLevel {
 
 //nolint:nonamedreturns
 func matchInfo(
-	tempArenaInfo data.TempArenaInfo,
-	warships data.Warships,
+	tempArenaInfo TempArenaInfo,
+	warships Warships,
 ) (isCVMatch bool, topTier uint, bottomTier uint) {
 	isCVMatch = false
 	topTier = 1
@@ -188,7 +241,7 @@ func matchInfo(
 			continue
 		}
 
-		if warship.Type == data.ShipTypeCV {
+		if warship.Type == ShipTypeCV {
 			isCVMatch = true
 		}
 
@@ -295,7 +348,7 @@ func playerOverallScore(
 
 //nolint:cyclop
 func playerShipScore(
-	warships data.Warships,
+	warships Warships,
 	shipID int,
 	shipBattles uint,
 	shipAvgDamage float64,
@@ -327,28 +380,28 @@ func playerShipScore(
 	var std shipClassStd
 	//nolint:exhaustive
 	switch shipType {
-	case data.ShipTypeDD:
+	case ShipTypeDD:
 		std = shipClassStd{
 			damage:       shipTier * 4000,
 			aaScore:      0,
 			survivedRate: 0.4,
 			influence:    1.3,
 		}
-	case data.ShipTypeCL:
+	case ShipTypeCL:
 		std = shipClassStd{
 			damage:       shipTier * 6000,
 			aaScore:      0,
 			survivedRate: 0.5,
 			influence:    1,
 		}
-	case data.ShipTypeBB:
+	case ShipTypeBB:
 		std = shipClassStd{
 			damage:       shipTier * 7200,
 			aaScore:      0,
 			survivedRate: 0.45,
 			influence:    1.1,
 		}
-	case data.ShipTypeCV:
+	case ShipTypeCV:
 		std = shipClassStd{
 			damage:       shipTier * 8000,
 			aaScore:      (shipTier - 2) * 3.5,
@@ -379,7 +432,7 @@ func playerShipScore(
 
 	// 空母の場合、制空の補正を考慮
 	var shipAAScore float64
-	if shipType == data.ShipTypeCV {
+	if shipType == ShipTypeCV {
 		shipAAScore = shipAvgPlanesKilled / std.aaScore
 		if shipAAScore > 1 {
 			shipAAScore = floorU4((shipAAScore - 1) / 2)
@@ -393,7 +446,7 @@ func playerShipScore(
 	winRate := shipWinRate / 100 // %で与えられるため0~100に変換する
 	shipWinRateScore := limitedValue(winRate, 0.6, 0.4) - 0.5
 	// 空母の場合、勝率の影響を3割増加
-	if shipType == data.ShipTypeCV {
+	if shipType == ShipTypeCV {
 		shipWinRateScore *= 1.3
 	}
 	shipWinRateScore = floorU4(shipWinRateScore * std.influence * 1.5)
@@ -421,7 +474,7 @@ func antiAirCoefficient(
 }
 
 func shipClassScore(
-	warships data.Warships,
+	warships Warships,
 	shipID int,
 ) float64 {
 	result := 1.0
@@ -450,7 +503,7 @@ func shipClassScore(
 
 func correctBasedOnMatch(
 	raw float64,
-	warships data.Warships,
+	warships Warships,
 	shipID int,
 	shipAAIndex float64,
 	isCVMatch bool,
@@ -498,7 +551,7 @@ func floor(value float64) float64 {
 	return result
 }
 
-func round(value float64, digits uint16) float64 {
-	result, _ := decimal.NewFromFloat(value).Round(int32(digits)).Float64()
-	return result
+func round(value float64, places int) float64 {
+	pow := math.Pow(10, float64(places))
+	return math.Round(value*pow) / pow
 }

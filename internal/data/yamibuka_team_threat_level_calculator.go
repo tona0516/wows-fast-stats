@@ -1,16 +1,11 @@
-package yamibuka
+package data
 
-import (
-	"math"
-	"wfs/internal/data"
-)
+import "math"
 
-type TeamThreatLevel struct {
-}
-
-func CalculateTeamThreatLevel(players data.Players, statsPattern data.StatsPattern) data.TeamThreatLevel {
+// CalculateTeamThreatLevel calculates the threat level statistics for a team.
+func CalculateTeamThreatLevel(players Players, statsPattern StatsPattern) TeamThreatLevel {
 	if len(players) == 0 {
-		return data.TeamThreatLevel{}
+		return TeamThreatLevel{}
 	}
 
 	scores := make([]float64, 0, len(players))
@@ -25,11 +20,11 @@ func CalculateTeamThreatLevel(players data.Players, statsPattern data.StatsPatte
 
 		var score float64
 		switch statsPattern {
-		case data.StatsPatternPvPSolo:
+		case StatsPatternPvPSolo:
 			score = player.PvPSolo.OverallStats.ThreatLevel.Modified
-		case data.StatsPatternPvPAll:
+		case StatsPatternPvPAll:
 			score = player.PvPAll.OverallStats.ThreatLevel.Modified
-		case data.StatsPatternRankSolo:
+		case StatsPatternRankSolo:
 			score = player.RankSolo.OverallStats.ThreatLevel.Modified
 		default:
 			continue
@@ -39,20 +34,20 @@ func CalculateTeamThreatLevel(players data.Players, statsPattern data.StatsPatte
 	}
 
 	if len(scores) == 0 {
-		return data.TeamThreatLevel{}
+		return TeamThreatLevel{}
 	}
 
-	maxScore := max(scores)
-	mean := geometricMean(scores)
+	maxScore := maxThreatLevelScore(scores)
+	mean := geometricMeanThreatLevel(scores)
 
-	return data.TeamThreatLevel{
+	return TeamThreatLevel{
 		Average:            mean,
 		DissociationDegree: (maxScore/mean - 1) * 100,
 		Accuracy:           float64(len(scores)) / float64(len(players)) * 100,
 	}
 }
 
-func max(values []float64) float64 {
+func maxThreatLevelScore(values []float64) float64 {
 	if len(values) == 0 {
 		return 0
 	}
@@ -66,7 +61,7 @@ func max(values []float64) float64 {
 	return maxValue
 }
 
-func geometricMean(values []float64) float64 {
+func geometricMeanThreatLevel(values []float64) float64 {
 	if len(values) == 0 {
 		return 0
 	}

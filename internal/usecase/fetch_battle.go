@@ -7,7 +7,6 @@ import (
 	"wfs/internal/gateway"
 	"wfs/internal/service"
 	"wfs/internal/util"
-	"wfs/internal/yamibuka"
 
 	"github.com/samber/do/v2"
 	"golang.org/x/sync/errgroup"
@@ -144,30 +143,30 @@ func (b *FetchBattle) compose(
 			Players: friends,
 			PvPAll: data.TeamStats{
 				TeamAverageStats: calculateTeamAverageStats(friends, data.StatsPatternPvPAll),
-				TeamThreatLevel:  yamibuka.CalculateTeamThreatLevel(friends, data.StatsPatternPvPAll),
+				TeamThreatLevel:  data.CalculateTeamThreatLevel(friends, data.StatsPatternPvPAll),
 			},
 			PvPSolo: data.TeamStats{
 				TeamAverageStats: calculateTeamAverageStats(friends, data.StatsPatternPvPSolo),
-				TeamThreatLevel:  yamibuka.CalculateTeamThreatLevel(friends, data.StatsPatternPvPSolo),
+				TeamThreatLevel:  data.CalculateTeamThreatLevel(friends, data.StatsPatternPvPSolo),
 			},
 			RankSolo: data.TeamStats{
 				TeamAverageStats: calculateTeamAverageStats(friends, data.StatsPatternRankSolo),
-				TeamThreatLevel:  yamibuka.CalculateTeamThreatLevel(friends, data.StatsPatternRankSolo),
+				TeamThreatLevel:  data.CalculateTeamThreatLevel(friends, data.StatsPatternRankSolo),
 			},
 		},
 		{
 			Players: enemies,
 			PvPAll: data.TeamStats{
 				TeamAverageStats: calculateTeamAverageStats(enemies, data.StatsPatternPvPAll),
-				TeamThreatLevel:  yamibuka.CalculateTeamThreatLevel(enemies, data.StatsPatternPvPAll),
+				TeamThreatLevel:  data.CalculateTeamThreatLevel(enemies, data.StatsPatternPvPAll),
 			},
 			PvPSolo: data.TeamStats{
 				TeamAverageStats: calculateTeamAverageStats(enemies, data.StatsPatternPvPSolo),
-				TeamThreatLevel:  yamibuka.CalculateTeamThreatLevel(enemies, data.StatsPatternPvPSolo),
+				TeamThreatLevel:  data.CalculateTeamThreatLevel(enemies, data.StatsPatternPvPSolo),
 			},
 			RankSolo: data.TeamStats{
 				TeamAverageStats: calculateTeamAverageStats(enemies, data.StatsPatternRankSolo),
-				TeamThreatLevel:  yamibuka.CalculateTeamThreatLevel(enemies, data.StatsPatternRankSolo),
+				TeamThreatLevel:  data.CalculateTeamThreatLevel(enemies, data.StatsPatternRankSolo),
 			},
 		},
 	}
@@ -192,7 +191,7 @@ func playerStats(
 	tempArenaInfo data.TempArenaInfo,
 	warships data.Warships,
 ) data.PlayerStats {
-	threatLevel := yamibuka.CalculateThreatLevel(yamibuka.NewThreatLevelFactor(
+	threatLevel := data.CalculateThreatLevel(data.NewThreatLevelCalculatorFactor(
 		accountID,
 		tempArenaInfo,
 		warships,

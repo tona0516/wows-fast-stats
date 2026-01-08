@@ -1,14 +1,12 @@
-package yamibuka
+package data
 
 import (
 	"testing"
-	"wfs/internal/data"
 
 	"github.com/stretchr/testify/assert"
 )
 
 const (
-	allowableDelta = 1.0
 	shipIDMutsuki  = 4184749776
 	shipIDRanger   = 4183799792
 	shipIDSims     = 4264441840
@@ -23,30 +21,30 @@ const (
 func TestThreatLevel_CalculateThreatLevel_CV_CVあり_Tierミドル(t *testing.T) {
 	t.Parallel()
 
-	actual := CalculateThreatLevel(NewThreatLevelFactor(
+	actual := CalculateThreatLevel(NewThreatLevelCalculatorFactor(
 		0,
-		data.TempArenaInfo{
-			Vehicles: []data.Vehicle{
+		TempArenaInfo{
+			Vehicles: []Vehicle{
 				{ShipID: shipIDNagato},
 				{ShipID: shipIDYorktown},
 				{ShipID: shipIDKitakaze},
 			},
 		},
-		data.Warships{
+		Warships{
 			shipIDNagato: {
 				Name: "長門",
 				Tier: 7,
-				Type: data.ShipTypeBB,
+				Type: ShipTypeBB,
 			},
 			shipIDYorktown: {
 				Name: "Yorktown",
 				Tier: 8,
-				Type: data.ShipTypeCV,
+				Type: ShipTypeCV,
 			},
 			shipIDKitakaze: {
 				Name: "北風",
 				Tier: 9,
-				Type: data.ShipTypeDD,
+				Type: ShipTypeDD,
 			},
 		},
 		shipIDYorktown,
@@ -61,43 +59,43 @@ func TestThreatLevel_CalculateThreatLevel_CV_CVあり_Tierミドル(t *testing.T
 		1.0761351636747625,
 		2.34,
 	))
-	expected := data.ThreatLevel{
+	expected := ThreatLevel{
 		Raw:      18111,
 		Modified: 18111,
 	}
 
-	assert.Equal(t, RankI, Rank(actual.Rank))
-	assert.InDelta(t, expected.Raw, actual.Raw, allowableDelta)
-	assert.InDelta(t, expected.Modified, actual.Modified, allowableDelta)
+	assert.Equal(t, string(ThreatLevelRankI), actual.Rank)
+	assert.InDelta(t, expected.Raw, actual.Raw, 1.0)
+	assert.InDelta(t, expected.Modified, actual.Modified, 1.0)
 }
 
 func TestThreatLevel_CalculateThreatLevel_BB_CVあり_Tierトップ(t *testing.T) {
 	t.Parallel()
 
-	actual := CalculateThreatLevel(NewThreatLevelFactor(
+	actual := CalculateThreatLevel(NewThreatLevelCalculatorFactor(
 		0,
-		data.TempArenaInfo{
-			Vehicles: []data.Vehicle{
+		TempArenaInfo{
+			Vehicles: []Vehicle{
 				{ShipID: shipIDMutsuki},
 				{ShipID: shipIDRanger},
 				{ShipID: shipIDSinop},
 			},
 		},
-		data.Warships{
+		Warships{
 			shipIDMutsuki: {
 				Name: "睦月",
 				Tier: 5,
-				Type: data.ShipTypeDD,
+				Type: ShipTypeDD,
 			},
 			shipIDRanger: {
 				Name: "Ranger",
 				Tier: 6,
-				Type: data.ShipTypeCV,
+				Type: ShipTypeCV,
 			},
 			shipIDSinop: {
 				Name: "Sinop",
 				Tier: 7,
-				Type: data.ShipTypeBB,
+				Type: ShipTypeBB,
 			},
 		},
 		shipIDSinop,
@@ -112,31 +110,31 @@ func TestThreatLevel_CalculateThreatLevel_BB_CVあり_Tierトップ(t *testing.T
 		1.0761351636747625,
 		2.34,
 	))
-	expected := data.ThreatLevel{
+	expected := ThreatLevel{
 		Raw:      19543,
 		Modified: 21497,
 	}
 
-	assert.Equal(t, RankI, Rank(actual.Rank))
-	assert.InDelta(t, expected.Raw, actual.Raw, allowableDelta)
-	assert.InDelta(t, expected.Modified, actual.Modified, allowableDelta)
+	assert.Equal(t, string(ThreatLevelRankI), actual.Rank)
+	assert.InDelta(t, expected.Raw, actual.Raw, 1.0)
+	assert.InDelta(t, expected.Modified, actual.Modified, 1.0)
 }
 
 func TestThreatLevel_CalculateThreatLevel_CL_CVなし_Tierミドル(t *testing.T) {
 	t.Parallel()
 
-	actual := CalculateThreatLevel(NewThreatLevelFactor(
+	actual := CalculateThreatLevel(NewThreatLevelCalculatorFactor(
 		0,
-		data.TempArenaInfo{
-			Vehicles: []data.Vehicle{
+		TempArenaInfo{
+			Vehicles: []Vehicle{
 				{ShipID: shipIDYoshino},
 			},
 		},
-		data.Warships{
+		Warships{
 			shipIDYoshino: {
 				Name: "吉野",
 				Tier: 10,
-				Type: data.ShipTypeCL,
+				Type: ShipTypeCL,
 			},
 		},
 		shipIDYoshino,
@@ -151,47 +149,43 @@ func TestThreatLevel_CalculateThreatLevel_CL_CVなし_Tierミドル(t *testing.T
 		1.0761351636747625,
 		2.34,
 	))
-	expected := data.ThreatLevel{
+	expected := ThreatLevel{
 		Raw:      21985,
 		Modified: 24184,
 	}
 
-	assert.Equal(t, RankV, Rank(actual.Rank))
-	assert.InDelta(t, expected.Raw, actual.Raw, allowableDelta)
-	assert.InDelta(t, expected.Modified, actual.Modified, allowableDelta)
+	assert.Equal(t, string(ThreatLevelRankV), actual.Rank)
+	assert.InDelta(t, expected.Raw, actual.Raw, 1.0)
+	assert.InDelta(t, expected.Modified, actual.Modified, 1.0)
 }
 
 func TestThreatLevel_CalculateThreatLevel_DD_CVあり_Tierボトム_特殊補正艦(t *testing.T) {
 	t.Parallel()
 
-	shipIDSims := 4264441840
-	shipIDYorktown := 4265588720
-	shipIDAlaska := 3760109552
-
-	actual := CalculateThreatLevel(NewThreatLevelFactor(
+	actual := CalculateThreatLevel(NewThreatLevelCalculatorFactor(
 		0,
-		data.TempArenaInfo{
-			Vehicles: []data.Vehicle{
+		TempArenaInfo{
+			Vehicles: []Vehicle{
 				{ShipID: shipIDSims},
 				{ShipID: shipIDYorktown},
 				{ShipID: shipIDAlaska},
 			},
 		},
-		data.Warships{
+		Warships{
 			shipIDSims: {
 				Name: "Sims",
 				Tier: 7,
-				Type: data.ShipTypeDD,
+				Type: ShipTypeDD,
 			},
 			shipIDYorktown: {
 				Name: "Yorktown",
 				Tier: 8,
-				Type: data.ShipTypeCV,
+				Type: ShipTypeCV,
 			},
 			shipIDAlaska: {
 				Name: "Alaska",
 				Tier: 9,
-				Type: data.ShipTypeCL,
+				Type: ShipTypeCL,
 			},
 		},
 		shipIDSims,
@@ -206,11 +200,11 @@ func TestThreatLevel_CalculateThreatLevel_DD_CVあり_Tierボトム_特殊補正
 		1.0761351636747625,
 		2.34,
 	))
-	expected := data.ThreatLevel{
+	expected := ThreatLevel{
 		Raw:      20255,
 		Modified: 22331,
 	}
 
-	assert.InDelta(t, expected.Raw, actual.Raw, allowableDelta)
-	assert.InDelta(t, expected.Modified, actual.Modified, allowableDelta)
+	assert.InDelta(t, expected.Raw, actual.Raw, 1.0)
+	assert.InDelta(t, expected.Modified, actual.Modified, 1.0)
 }
