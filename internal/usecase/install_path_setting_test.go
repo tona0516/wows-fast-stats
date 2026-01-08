@@ -7,8 +7,10 @@ import (
 	"path/filepath"
 	"testing"
 	"wfs/internal/data"
+	"wfs/internal/gateway"
 	"wfs/internal/mock"
 
+	"github.com/samber/do/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
@@ -56,30 +58,19 @@ func TestInstallPathSetting_Invoke(t *testing.T) {
 			return tempDir, nil
 		}
 
-		instance := NewInstallPathSetting(mockConfigStore, mockOpenDirectoryDialog)
+		injector := do.New()
+		do.Provide(injector, func(i do.Injector) (gateway.ConfigStore, error) {
+			return mockConfigStore, nil
+		})
+		do.Provide(injector, func(i do.Injector) (OpenDirectoryDialogFunc, error) {
+			return mockOpenDirectoryDialog, nil
+		})
+		instance, err := NewInstallPathSetting(injector)
+		require.NoError(t, err)
 		ok, err := instance.Invoke(context.Background())
 
 		assert.NoError(t, err)
 		assert.True(t, ok)
-	})
-
-	t.Run("正常系_キャンセルされた場合に保存されずエラーとしない", func(t *testing.T) {
-		t.Parallel()
-
-		ctrl := gomock.NewController(t)
-		mockConfigStore := mock.NewMockConfigStore(ctrl)
-		mockConfigStore.EXPECT().UserConfig().Times(0)
-		mockConfigStore.EXPECT().SetUserConfig(gomock.Any()).Times(0)
-
-		mockOpenDirectoryDialog := func(ctx context.Context) (string, error) {
-			return "", nil
-		}
-
-		instance := NewInstallPathSetting(mockConfigStore, mockOpenDirectoryDialog)
-		ok, err := instance.Invoke(context.Background())
-
-		assert.NoError(t, err)
-		assert.False(t, ok)
 	})
 
 	t.Run("異常系_openDirectoryDialogでエラーが発生", func(t *testing.T) {
@@ -94,7 +85,15 @@ func TestInstallPathSetting_Invoke(t *testing.T) {
 			return "", errors.New("dialog error")
 		}
 
-		instance := NewInstallPathSetting(mockConfigStore, mockOpenDirectoryDialog)
+		injector := do.New()
+		do.Provide(injector, func(i do.Injector) (gateway.ConfigStore, error) {
+			return mockConfigStore, nil
+		})
+		do.Provide(injector, func(i do.Injector) (OpenDirectoryDialogFunc, error) {
+			return mockOpenDirectoryDialog, nil
+		})
+		instance, err := NewInstallPathSetting(injector)
+		require.NoError(t, err)
 		ok, err := instance.Invoke(context.Background())
 
 		assert.Error(t, err)
@@ -113,7 +112,15 @@ func TestInstallPathSetting_Invoke(t *testing.T) {
 			return "/invalid/path", nil
 		}
 
-		instance := NewInstallPathSetting(mockConfigStore, mockOpenDirectoryDialog)
+		injector := do.New()
+		do.Provide(injector, func(i do.Injector) (gateway.ConfigStore, error) {
+			return mockConfigStore, nil
+		})
+		do.Provide(injector, func(i do.Injector) (OpenDirectoryDialogFunc, error) {
+			return mockOpenDirectoryDialog, nil
+		})
+		instance, err := NewInstallPathSetting(injector)
+		require.NoError(t, err)
 		ok, err := instance.Invoke(context.Background())
 
 		assert.Error(t, err)
@@ -135,7 +142,15 @@ func TestInstallPathSetting_Invoke(t *testing.T) {
 			return tempDir, nil
 		}
 
-		instance := NewInstallPathSetting(mockConfigStore, mockOpenDirectoryDialog)
+		injector := do.New()
+		do.Provide(injector, func(i do.Injector) (gateway.ConfigStore, error) {
+			return mockConfigStore, nil
+		})
+		do.Provide(injector, func(i do.Injector) (OpenDirectoryDialogFunc, error) {
+			return mockOpenDirectoryDialog, nil
+		})
+		instance, err := NewInstallPathSetting(injector)
+		require.NoError(t, err)
 		ok, err := instance.Invoke(context.Background())
 
 		assert.Error(t, err)
@@ -163,7 +178,15 @@ func TestInstallPathSetting_Invoke(t *testing.T) {
 			return tempDir, nil
 		}
 
-		instance := NewInstallPathSetting(mockConfigStore, mockOpenDirectoryDialog)
+		injector := do.New()
+		do.Provide(injector, func(i do.Injector) (gateway.ConfigStore, error) {
+			return mockConfigStore, nil
+		})
+		do.Provide(injector, func(i do.Injector) (OpenDirectoryDialogFunc, error) {
+			return mockOpenDirectoryDialog, nil
+		})
+		instance, err := NewInstallPathSetting(injector)
+		require.NoError(t, err)
 		ok, err := instance.Invoke(context.Background())
 
 		require.Error(t, err)

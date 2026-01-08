@@ -1,23 +1,26 @@
 package infra
 
 import (
+	"wfs/internal/config"
 	"wfs/internal/data"
 
 	"github.com/imroc/req/v3"
 	"github.com/morikuni/failure"
+	"github.com/samber/do/v2"
 )
 
 type ClanClient struct {
 	client *req.Client
 }
 
-func NewClanClient(ac apiConfig) *ClanClient {
+func NewClanClient(i do.Injector) (*ClanClient, error) {
+	config := do.MustInvoke[config.Config](i)
 	return &ClanClient{
 		client: req.C().
-			SetBaseURL(ac.url).
-			SetCommonRetryCount(ac.retryCount).
-			SetTimeout(ac.timeout),
-	}
+			SetBaseURL(config.ClanClient.URL).
+			SetCommonRetryCount(config.ClanClient.RetryCount).
+			SetTimeout(config.ClanClient.Timeout),
+	}, nil
 }
 
 func (c *ClanClient) ClanAutoComplete(search string) (data.ClanAutocomplete, error) {

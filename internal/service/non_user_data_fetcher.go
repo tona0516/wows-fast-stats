@@ -6,6 +6,7 @@ import (
 	"wfs/internal/gateway"
 
 	"github.com/morikuni/failure"
+	"github.com/samber/do/v2"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -21,16 +22,12 @@ type NonUserDataFetcher struct {
 	numbersClient   gateway.NumbersClient
 }
 
-func NewNonUserDataFetcher(
-	cacheStore gateway.CacheStore,
-	wargamingClient gateway.WargamingClient,
-	numbersClient gateway.NumbersClient,
-) *NonUserDataFetcher {
+func NewNonUserDataFetcher(i do.Injector) (*NonUserDataFetcher, error) {
 	return &NonUserDataFetcher{
-		cacheStore:      cacheStore,
-		wargamingClient: wargamingClient,
-		numbersClient:   numbersClient,
-	}
+		cacheStore:      do.MustInvoke[gateway.CacheStore](i),
+		wargamingClient: do.MustInvoke[gateway.WargamingClient](i),
+		numbersClient:   do.MustInvoke[gateway.NumbersClient](i),
+	}, nil
 }
 
 func (f *NonUserDataFetcher) Fetch() (*NonUserData, error) {

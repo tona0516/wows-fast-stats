@@ -8,7 +8,7 @@
   } from "@libs/constants";
   import { showToast, storedUserConfig } from "@libs/stores";
   import { Theme } from "@libs/Theme";
-  import { StartPollingMatch, TrySaveInstallPath } from "@wails/go/main/App";
+  import { StartPollingMatch, TrySaveInstallPath } from "@wails/go/controller/Controller";
   import { onMount } from "svelte";
   import { themeChange } from "theme-change";
 

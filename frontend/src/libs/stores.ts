@@ -1,4 +1,4 @@
-import { SaveUserConfig } from "@wails/go/main/App";
+import { SaveUserConfig } from "@wails/go/controller/Controller";
 import type { data } from "@wails/go/models";
 import { type Writable, writable } from "svelte/store";
 import type { Optional, TonakoParam } from "./types";

@@ -2,24 +2,27 @@ package infra
 
 import (
 	"encoding/json"
+	"wfs/internal/config"
 	"wfs/internal/data"
 
 	"github.com/imroc/req/v3"
 	"github.com/morikuni/failure"
+	"github.com/samber/do/v2"
 )
 
 type NumbersClient struct {
 	client *req.Client
 }
 
-func NewNumbersClient(ac apiConfig) *NumbersClient {
+func NewNumbersClient(i do.Injector) (*NumbersClient, error) {
+	config := do.MustInvoke[config.Config](i)
 	return &NumbersClient{
 		client: req.C().
-			SetBaseURL(ac.url).
-			SetCommonRetryCount(ac.retryCount).
-			SetTimeout(ac.timeout).
+			SetBaseURL(config.NumbersClient.URL).
+			SetCommonRetryCount(config.NumbersClient.RetryCount).
+			SetTimeout(config.NumbersClient.Timeout).
 			EnableInsecureSkipVerify(),
-	}
+	}, nil
 }
 
 func (c *NumbersClient) ExpectedStats() (data.NSExpectedStats, error) {

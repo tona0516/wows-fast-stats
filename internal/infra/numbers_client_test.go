@@ -5,9 +5,12 @@ import (
 	"net/http"
 	"testing"
 	"time"
+	"wfs/internal/config"
 	"wfs/internal/data"
 
+	"github.com/samber/do/v2"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestNumbersClient_ExpectedStats(t *testing.T) {
@@ -35,11 +38,16 @@ func TestNumbersClient_ExpectedStats(t *testing.T) {
 		server := simpleMockServer(t, http.StatusOK, body)
 		defer server.Close()
 
-		instance := NewNumbersClient(apiConfig{
-			url:        server.URL,
-			retryCount: 0,
-			timeout:    0,
+		injector := do.New()
+		do.ProvideValue(injector, config.Config{
+			NumbersClient: config.NumbersClientConfig{
+				URL:        server.URL,
+				RetryCount: 0,
+				Timeout:    0,
+			},
 		})
+		instance, err := NewNumbersClient(injector)
+		require.NoError(t, err)
 		actual, err := instance.ExpectedStats()
 
 		assert.NoError(t, err)
@@ -69,12 +77,17 @@ func TestNumbersClient_ExpectedStats(t *testing.T) {
 		server := simpleMockServer(t, http.StatusInternalServerError, body)
 		defer server.Close()
 
-		instance := NewNumbersClient(apiConfig{
-			url:        server.URL,
-			retryCount: 0,
-			timeout:    0,
+		injector := do.New()
+		do.ProvideValue(injector, config.Config{
+			NumbersClient: config.NumbersClientConfig{
+				URL:        server.URL,
+				RetryCount: 0,
+				Timeout:    0,
+			},
 		})
-		_, err := instance.ExpectedStats()
+		instance, err := NewNumbersClient(injector)
+		require.NoError(t, err)
+		_, err = instance.ExpectedStats()
 
 		assert.Error(t, err, ErrErrorResponse)
 	})
@@ -91,12 +104,17 @@ func TestNumbersClient_ExpectedStats(t *testing.T) {
 		)
 		defer server.Close()
 
-		instance := NewNumbersClient(apiConfig{
-			url:        server.URL,
-			retryCount: 0,
-			timeout:    timeout - 1,
+		injector := do.New()
+		do.ProvideValue(injector, config.Config{
+			NumbersClient: config.NumbersClientConfig{
+				URL:        server.URL,
+				RetryCount: 0,
+				Timeout:    timeout - 1,
+			},
 		})
-		_, err := instance.ExpectedStats()
+		instance, err := NewNumbersClient(injector)
+		require.NoError(t, err)
+		_, err = instance.ExpectedStats()
 
 		assert.ErrorIs(t, err, context.DeadlineExceeded)
 	})

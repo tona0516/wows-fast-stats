@@ -7,6 +7,7 @@ import (
 	"wfs/internal/data"
 
 	"github.com/morikuni/failure"
+	"github.com/samber/do/v2"
 )
 
 type ReplayReader struct {
@@ -14,11 +15,11 @@ type ReplayReader struct {
 	fileName  string
 }
 
-func NewReplayReader() *ReplayReader {
+func NewReplayReader(i do.Injector) (*ReplayReader, error) {
 	return &ReplayReader{
 		replayDir: "replays",
 		fileName:  "tempArenaInfo.json",
-	}
+	}, nil
 }
 
 func (r *ReplayReader) TempArenaInfo(installPath string) (data.TempArenaInfo, error) {

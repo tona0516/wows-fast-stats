@@ -1,23 +1,26 @@
 package infra
 
 import (
+	"wfs/internal/config"
 	"wfs/internal/data"
 
 	"github.com/imroc/req/v3"
 	"github.com/morikuni/failure"
+	"github.com/samber/do/v2"
 )
 
 type GithubClient struct {
 	client *req.Client
 }
 
-func NewGithubClient(ac apiConfig) *GithubClient {
+func NewGithubClient(i do.Injector) (*GithubClient, error) {
+	config := do.MustInvoke[config.Config](i)
 	return &GithubClient{
 		client: req.C().
-			SetBaseURL(ac.url).
-			SetCommonRetryCount(ac.retryCount).
-			SetTimeout(ac.timeout),
-	}
+			SetBaseURL(config.GithubClient.URL).
+			SetCommonRetryCount(config.GithubClient.RetryCount).
+			SetTimeout(config.GithubClient.Timeout),
+	}, nil
 }
 
 func (c *GithubClient) LatestRelease() (data.GHLatestRelease, error) {

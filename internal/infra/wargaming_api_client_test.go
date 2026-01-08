@@ -8,11 +8,12 @@ import (
 	"net/http/httptest"
 	"testing"
 	"time"
+	"wfs/internal/config"
 	"wfs/internal/data"
 
+	"github.com/samber/do/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.uber.org/ratelimit"
 )
 
 func TestWargamingClient_AccountInfo(t *testing.T) {
@@ -31,15 +32,18 @@ func TestWargamingClient_AccountInfo(t *testing.T) {
 		server := simpleMockServer(t, 200, expected)
 		defer server.Close()
 
-		wargaming := NewWargamingClient(
-			"",
-			*NewApiConfig(
-				server.URL,
-				0,
-				0,
-			),
-			ratelimit.NewUnlimited(),
-		)
+		injector := do.New()
+		do.ProvideValue(injector, config.Config{
+			WargamingClient: config.WargamingConfig{
+				URL:          server.URL,
+				RetryCount:   0,
+				Timeout:      0,
+				RateLimitRPS: 1,
+				AppID:        "",
+			},
+		})
+		wargaming, err := NewWargamingClient(injector)
+		require.NoError(t, err)
 		result, err := wargaming.AccountInfo([]int{123, 456})
 
 		assert.NoError(t, err)
@@ -58,16 +62,19 @@ func TestWargamingClient_AccountInfo(t *testing.T) {
 		)
 		defer server.Close()
 
-		instance := NewWargamingClient(
-			"",
-			*NewApiConfig(
-				server.URL,
-				0,
-				timeout-1,
-			),
-			ratelimit.NewUnlimited(),
-		)
-		_, err := instance.AccountInfo([]int{123, 456})
+		injector := do.New()
+		do.ProvideValue(injector, config.Config{
+			WargamingClient: config.WargamingConfig{
+				URL:          server.URL,
+				RetryCount:   0,
+				Timeout:      timeout - 1,
+				RateLimitRPS: 1,
+				AppID:        "",
+			},
+		})
+		instance, err := NewWargamingClient(injector)
+		require.NoError(t, err)
+		_, err = instance.AccountInfo([]int{123, 456})
 
 		assert.ErrorIs(t, err, context.DeadlineExceeded)
 	})
@@ -93,16 +100,19 @@ func TestWargamingClient_AccountInfo(t *testing.T) {
 		}))
 		defer server.Close()
 
-		instance := NewWargamingClient(
-			"",
-			*NewApiConfig(
-				server.URL,
-				0,
-				0,
-			),
-			ratelimit.NewUnlimited(),
-		)
-		_, err := instance.AccountInfo([]int{123, 456})
+		injector := do.New()
+		do.ProvideValue(injector, config.Config{
+			WargamingClient: config.WargamingConfig{
+				URL:          server.URL,
+				RetryCount:   0,
+				Timeout:      0,
+				RateLimitRPS: 1,
+				AppID:        "",
+			},
+		})
+		instance, err := NewWargamingClient(injector)
+		require.NoError(t, err)
+		_, err = instance.AccountInfo([]int{123, 456})
 
 		assert.Error(t, err, ErrErrorResponse)
 		assert.Equal(t, 1, calls)
@@ -151,16 +161,19 @@ func TestWargamingClient_AccountInfo(t *testing.T) {
 			}))
 			defer server.Close()
 
-			instance := NewWargamingClient(
-				"",
-				*NewApiConfig(
-					server.URL,
-					retry,
-					0,
-				),
-				ratelimit.NewUnlimited(),
-			)
-			_, err := instance.AccountInfo([]int{123, 456})
+			injector := do.New()
+			do.ProvideValue(injector, config.Config{
+				WargamingClient: config.WargamingConfig{
+					URL:          server.URL,
+					RetryCount:   retry,
+					Timeout:      0,
+					RateLimitRPS: 1,
+					AppID:        "",
+				},
+			})
+			instance, err := NewWargamingClient(injector)
+			require.NoError(t, err)
+			_, err = instance.AccountInfo([]int{123, 456})
 
 			assert.NoError(t, err)
 			assert.Equal(t, retry+1, calls)
@@ -195,16 +208,19 @@ func TestWargamingClient_AccountInfo(t *testing.T) {
 			}))
 			defer server.Close()
 
-			instance := NewWargamingClient(
-				"",
-				*NewApiConfig(
-					server.URL,
-					retry,
-					0,
-				),
-				ratelimit.NewUnlimited(),
-			)
-			_, err := instance.AccountInfo([]int{123, 456})
+			injector := do.New()
+			do.ProvideValue(injector, config.Config{
+				WargamingClient: config.WargamingConfig{
+					URL:          server.URL,
+					RetryCount:   retry,
+					Timeout:      0,
+					RateLimitRPS: 1,
+					AppID:        "",
+				},
+			})
+			instance, err := NewWargamingClient(injector)
+			require.NoError(t, err)
+			_, err = instance.AccountInfo([]int{123, 456})
 
 			assert.Error(t, err, ErrTemporaryUnavaillalble)
 			assert.Equal(t, retry+1, calls)
@@ -225,15 +241,18 @@ func TestWargamingClient_ClansAccountInfo(t *testing.T) {
 	server := simpleMockServer(t, 200, expected)
 	defer server.Close()
 
-	instance := NewWargamingClient(
-		"",
-		*NewApiConfig(
-			server.URL,
-			0,
-			0,
-		),
-		ratelimit.NewUnlimited(),
-	)
+	injector := do.New()
+	do.ProvideValue(injector, config.Config{
+		WargamingClient: config.WargamingConfig{
+			URL:          server.URL,
+			RetryCount:   0,
+			Timeout:      0,
+			RateLimitRPS: 1,
+			AppID:        "",
+		},
+	})
+	instance, err := NewWargamingClient(injector)
+	require.NoError(t, err)
 	result, err := instance.ClansAccountInfo([]int{123, 456})
 
 	assert.NoError(t, err)
@@ -253,15 +272,18 @@ func TestWargamingClient_ClansInfo(t *testing.T) {
 	server := simpleMockServer(t, 200, expected)
 	defer server.Close()
 
-	instance := NewWargamingClient(
-		"",
-		*NewApiConfig(
-			server.URL,
-			0,
-			0,
-		),
-		ratelimit.NewUnlimited(),
-	)
+	injector := do.New()
+	do.ProvideValue(injector, config.Config{
+		WargamingClient: config.WargamingConfig{
+			URL:          server.URL,
+			RetryCount:   0,
+			Timeout:      0,
+			RateLimitRPS: 1,
+			AppID:        "",
+		},
+	})
+	instance, err := NewWargamingClient(injector)
+	require.NoError(t, err)
 	result, err := instance.ClansInfo([]int{123, 456})
 
 	assert.NoError(t, err)
@@ -281,15 +303,18 @@ func TestWargamingClient_ShipsStats(t *testing.T) {
 	server := simpleMockServer(t, 200, expected)
 	defer server.Close()
 
-	instance := NewWargamingClient(
-		"",
-		*NewApiConfig(
-			server.URL,
-			0,
-			0,
-		),
-		ratelimit.NewUnlimited(),
-	)
+	injector := do.New()
+	do.ProvideValue(injector, config.Config{
+		WargamingClient: config.WargamingConfig{
+			URL:          server.URL,
+			RetryCount:   0,
+			Timeout:      0,
+			RateLimitRPS: 1,
+			AppID:        "",
+		},
+	})
+	instance, err := NewWargamingClient(injector)
+	require.NoError(t, err)
 	result, err := instance.ShipsStats(123)
 
 	assert.NoError(t, err)
@@ -313,15 +338,18 @@ func TestWargamingClient_EncycShips(t *testing.T) {
 	server := simpleMockServer(t, 200, expected)
 	defer server.Close()
 
-	instance := NewWargamingClient(
-		"",
-		*NewApiConfig(
-			server.URL,
-			0,
-			0,
-		),
-		ratelimit.NewUnlimited(),
-	)
+	injector := do.New()
+	do.ProvideValue(injector, config.Config{
+		WargamingClient: config.WargamingConfig{
+			URL:          server.URL,
+			RetryCount:   0,
+			Timeout:      0,
+			RateLimitRPS: 1,
+			AppID:        "",
+		},
+	})
+	instance, err := NewWargamingClient(injector)
+	require.NoError(t, err)
 	result, err := instance.EncycShips(1)
 
 	assert.NoError(t, err)
@@ -341,15 +369,18 @@ func TestWargamingClient_BattleArena(t *testing.T) {
 	server := simpleMockServer(t, 200, expected)
 	defer server.Close()
 
-	instance := NewWargamingClient(
-		"",
-		*NewApiConfig(
-			server.URL,
-			0,
-			0,
-		),
-		ratelimit.NewUnlimited(),
-	)
+	injector := do.New()
+	do.ProvideValue(injector, config.Config{
+		WargamingClient: config.WargamingConfig{
+			URL:          server.URL,
+			RetryCount:   0,
+			Timeout:      0,
+			RateLimitRPS: 1,
+			AppID:        "",
+		},
+	})
+	instance, err := NewWargamingClient(injector)
+	require.NoError(t, err)
 	result, err := instance.BattleArenas()
 
 	assert.NoError(t, err)
@@ -369,15 +400,18 @@ func TestWargamingClient_BattleTypes(t *testing.T) {
 	server := simpleMockServer(t, 200, expected)
 	defer server.Close()
 
-	instance := NewWargamingClient(
-		"",
-		*NewApiConfig(
-			server.URL,
-			0,
-			0,
-		),
-		ratelimit.NewUnlimited(),
-	)
+	injector := do.New()
+	do.ProvideValue(injector, config.Config{
+		WargamingClient: config.WargamingConfig{
+			URL:          server.URL,
+			RetryCount:   0,
+			Timeout:      0,
+			RateLimitRPS: 1,
+			AppID:        "",
+		},
+	})
+	instance, err := NewWargamingClient(injector)
+	require.NoError(t, err)
 	result, err := instance.BattleTypes()
 
 	assert.NoError(t, err)
@@ -397,15 +431,18 @@ func TestWargamingClient_ShipsBadges(t *testing.T) {
 	server := simpleMockServer(t, 200, expected)
 	defer server.Close()
 
-	instance := NewWargamingClient(
-		"",
-		*NewApiConfig(
-			server.URL,
-			0,
-			0,
-		),
-		ratelimit.NewUnlimited(),
-	)
+	injector := do.New()
+	do.ProvideValue(injector, config.Config{
+		WargamingClient: config.WargamingConfig{
+			URL:          server.URL,
+			RetryCount:   0,
+			Timeout:      0,
+			RateLimitRPS: 1,
+			AppID:        "",
+		},
+	})
+	instance, err := NewWargamingClient(injector)
+	require.NoError(t, err)
 	result, err := instance.ShipsBadges(123)
 
 	assert.NoError(t, err)

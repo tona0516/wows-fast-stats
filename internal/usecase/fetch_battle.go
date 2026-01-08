@@ -9,6 +9,7 @@ import (
 	"wfs/internal/util"
 	"wfs/internal/yamibuka"
 
+	"github.com/samber/do/v2"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -17,23 +18,17 @@ type FetchBattle struct {
 	nonUserDataFetcher *service.NonUserDataFetcher
 	cacheStore         gateway.CacheStore
 	logger             gateway.Logger
-	eventsEmitFunc     eventEmitFunc
+	eventsEmitFunc     EventsEmitFunc
 }
 
-func NewFetchBattle(
-	userDataFetcher *service.UserDataFetcher,
-	nonUserDataFetcher *service.NonUserDataFetcher,
-	cacheStore gateway.CacheStore,
-	logger gateway.Logger,
-	eventsEmitFunc eventEmitFunc,
-) *FetchBattle {
+func NewFetchBattle(i do.Injector) (*FetchBattle, error) {
 	return &FetchBattle{
-		userDataFetcher:    userDataFetcher,
-		nonUserDataFetcher: nonUserDataFetcher,
-		cacheStore:         cacheStore,
-		logger:             logger,
-		eventsEmitFunc:     eventsEmitFunc,
-	}
+		userDataFetcher:    do.MustInvoke[*service.UserDataFetcher](i),
+		nonUserDataFetcher: do.MustInvoke[*service.NonUserDataFetcher](i),
+		cacheStore:         do.MustInvoke[gateway.CacheStore](i),
+		logger:             do.MustInvoke[gateway.Logger](i),
+		eventsEmitFunc:     do.MustInvoke[EventsEmitFunc](i),
+	}, nil
 }
 
 func (b *FetchBattle) Invoke(

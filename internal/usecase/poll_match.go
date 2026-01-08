@@ -7,31 +7,28 @@ import (
 	"fmt"
 	"io/fs"
 	"time"
+	"wfs/internal/config"
 	"wfs/internal/data"
 	"wfs/internal/gateway"
-)
 
-type eventEmitFunc func(ctx context.Context, eventName string, optionalData ...any)
+	"github.com/samber/do/v2"
+)
 
 type PollMatch struct {
 	pollingInterval time.Duration
 	configStore     gateway.ConfigStore
 	replayReader    gateway.ReplayReader
-	eventsEmitFunc  eventEmitFunc
+	eventsEmitFunc  EventsEmitFunc
 }
 
-func NewPollMatch(
-	pollingInterval time.Duration,
-	configStore gateway.ConfigStore,
-	replayReader gateway.ReplayReader,
-	eventsEmitFunc eventEmitFunc,
-) *PollMatch {
+func NewPollMatch(i do.Injector) (*PollMatch, error) {
+	config := do.MustInvoke[config.Config](i)
 	return &PollMatch{
-		pollingInterval: pollingInterval,
-		configStore:     configStore,
-		replayReader:    replayReader,
-		eventsEmitFunc:  eventsEmitFunc,
-	}
+		pollingInterval: config.Basic.PollingInterval,
+		configStore:     do.MustInvoke[gateway.ConfigStore](i),
+		replayReader:    do.MustInvoke[gateway.ReplayReader](i),
+		eventsEmitFunc:  do.MustInvoke[EventsEmitFunc](i),
+	}, nil
 }
 
 func (pm *PollMatch) Invoke(

@@ -4,7 +4,7 @@
     CurrentVersion,
     NewVersion,
     ShowMessageDialog,
-  } from "@wails/go/main/App";
+  } from "@wails/go/controller/Controller";
   import type { data } from "@wails/go/models";
   import iconApp from "src/assets/images/appicon.png";
 

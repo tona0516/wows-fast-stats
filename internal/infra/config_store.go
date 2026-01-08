@@ -2,7 +2,10 @@ package infra
 
 import (
 	"path/filepath"
+	"wfs/internal/config"
 	"wfs/internal/data"
+
+	"github.com/samber/do/v2"
 )
 
 type ConfigStore struct {
@@ -10,11 +13,12 @@ type ConfigStore struct {
 	userConfigFile string
 }
 
-func NewConfigStore(dir string) *ConfigStore {
+func NewConfigStore(i do.Injector) (*ConfigStore, error) {
+	config := do.MustInvoke[config.Config](i)
 	return &ConfigStore{
-		dir:            dir,
+		dir:            config.LocalFile.ConfigDir,
 		userConfigFile: "user_config.json",
-	}
+	}, nil
 }
 
 func (s *ConfigStore) UserConfig() (data.UserConfig, error) {

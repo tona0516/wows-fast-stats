@@ -9,6 +9,7 @@ import (
 
 	"github.com/abadojack/whatlanggo"
 	"github.com/morikuni/failure"
+	"github.com/samber/do/v2"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -28,14 +29,11 @@ type UserDataFetcher struct {
 	clanClient      gateway.ClanClient
 }
 
-func NewUserDataFetcher(
-	wargamingClient gateway.WargamingClient,
-	clanClient gateway.ClanClient,
-) *UserDataFetcher {
+func NewUserDataFetcher(i do.Injector) (*UserDataFetcher, error) {
 	return &UserDataFetcher{
-		wargamingClient: wargamingClient,
-		clanClient:      clanClient,
-	}
+		wargamingClient: do.MustInvoke[gateway.WargamingClient](i),
+		clanClient:      do.MustInvoke[gateway.ClanClient](i),
+	}, nil
 }
 
 func (f *UserDataFetcher) Fetch(accountNames []string) (*UserData, error) {

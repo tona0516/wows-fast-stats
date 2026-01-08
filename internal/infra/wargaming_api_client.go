@@ -6,10 +6,12 @@ import (
 	"slices"
 	"strconv"
 	"strings"
+	"wfs/internal/config"
 	"wfs/internal/data"
 
 	"github.com/imroc/req/v3"
 	"github.com/morikuni/failure"
+	"github.com/samber/do/v2"
 	"go.uber.org/ratelimit"
 )
 
@@ -23,17 +25,16 @@ type WargamingClient struct {
 	client *req.Client
 }
 
-func NewWargamingClient(
-	appID string,
-	ac apiConfig,
-	limiter ratelimit.Limiter,
-) *WargamingClient {
+func NewWargamingClient(i do.Injector) (*WargamingClient, error) {
+	config := do.MustInvoke[config.Config](i)
+	limiter := ratelimit.New(config.WargamingClient.RateLimitRPS)
+
 	return &WargamingClient{
 		client: req.C().
-			SetBaseURL(ac.url).
-			SetCommonRetryCount(ac.retryCount).
-			SetTimeout(ac.timeout).
-			SetCommonQueryParam("application_id", appID).
+			SetBaseURL(config.WargamingClient.URL).
+			SetCommonRetryCount(config.WargamingClient.RetryCount).
+			SetTimeout(config.WargamingClient.Timeout).
+			SetCommonQueryParam("application_id", config.WargamingClient.AppID).
 			SetCommonRetryCondition(func(resp *req.Response, err error) bool {
 				if err != nil {
 					return true
@@ -56,7 +57,7 @@ func NewWargamingClient(
 			SetCommonRetryHook(func(resp *req.Response, err error) {
 				limiter.Take()
 			}),
-	}
+	}, nil
 }
 
 func (c *WargamingClient) AccountInfo(accountIDs []int) (data.WGAccountInfo, error) {

@@ -16,12 +16,13 @@ require (
 	github.com/abadojack/whatlanggo v1.0.1
 	github.com/imroc/req/v3 v3.57.0
 	github.com/morikuni/failure v1.1.2
+	github.com/samber/do/v2 v2.0.0
 	github.com/shopspring/decimal v1.4.0
 	go.uber.org/mock v0.6.0
 	go.uber.org/ratelimit v0.3.1
 )
 
-require github.com/kr/text v0.2.0 // indirect
+require github.com/samber/go-type-to-string v1.8.0 // indirect
 
 require (
 	github.com/andybalholm/brotli v1.2.0 // indirect

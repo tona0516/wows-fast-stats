@@ -1,25 +1,25 @@
 package usecase
 
 import (
+	"wfs/internal/config"
 	"wfs/internal/data"
 	"wfs/internal/gateway"
 
 	"github.com/Masterminds/semver/v3"
+	"github.com/samber/do/v2"
 )
 
 type UpdateCheck struct {
 	currentVersion string
-	github         gateway.GithubClient
+	githubClient   gateway.GithubClient
 }
 
-func NewUpdateCheck(
-	currentVersion string,
-	githubClient gateway.GithubClient,
-) *UpdateCheck {
+func NewUpdateCheck(i do.Injector) (*UpdateCheck, error) {
+	config := do.MustInvoke[config.Config](i)
 	return &UpdateCheck{
-		currentVersion: currentVersion,
-		github:         githubClient,
-	}
+		currentVersion: config.Basic.Version,
+		githubClient:   do.MustInvoke[gateway.GithubClient](i),
+	}, nil
 }
 
 func (c *UpdateCheck) Invoke() *data.NewVersion {
@@ -28,7 +28,7 @@ func (c *UpdateCheck) Invoke() *data.NewVersion {
 		return nil
 	}
 
-	latestRelease, err := c.github.LatestRelease()
+	latestRelease, err := c.githubClient.LatestRelease()
 	if err != nil {
 		return nil
 	}

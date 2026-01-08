@@ -5,9 +5,12 @@ import (
 	"net/http"
 	"testing"
 	"time"
+	"wfs/internal/config"
 	"wfs/internal/data"
 
+	"github.com/samber/do/v2"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestClanClient_ClanAutoComplete(t *testing.T) {
@@ -29,11 +32,16 @@ func TestClanClient_ClanAutoComplete(t *testing.T) {
 		server := simpleMockServer(t, 200, expected)
 		defer server.Close()
 
-		instance := NewClanClient(*NewApiConfig(
-			server.URL,
-			0,
-			0,
-		))
+		injector := do.New()
+		do.ProvideValue(injector, config.Config{
+			ClanClient: config.ClanConfig{
+				URL:        server.URL,
+				RetryCount: 0,
+				Timeout:    0,
+			},
+		})
+		instance, err := NewClanClient(injector)
+		require.NoError(t, err)
 		result, err := instance.ClanAutoComplete("TEST")
 
 		assert.NoError(t, err)
@@ -54,12 +62,17 @@ func TestClanClient_ClanAutoComplete(t *testing.T) {
 		server := simpleMockServer(t, http.StatusConflict, body)
 		defer server.Close()
 
-		instance := NewClanClient(*NewApiConfig(
-			server.URL,
-			0,
-			0,
-		))
-		_, err := instance.ClanAutoComplete("")
+		injector := do.New()
+		do.ProvideValue(injector, config.Config{
+			ClanClient: config.ClanConfig{
+				URL:        server.URL,
+				RetryCount: 0,
+				Timeout:    0,
+			},
+		})
+		instance, err := NewClanClient(injector)
+		require.NoError(t, err)
+		_, err = instance.ClanAutoComplete("")
 
 		assert.Error(t, err, ErrErrorResponse)
 	})
@@ -76,12 +89,17 @@ func TestClanClient_ClanAutoComplete(t *testing.T) {
 		)
 		defer server.Close()
 
-		instance := NewClanClient(*NewApiConfig(
-			server.URL,
-			0,
-			timeout-1,
-		))
-		_, err := instance.ClanAutoComplete("")
+		injector := do.New()
+		do.ProvideValue(injector, config.Config{
+			ClanClient: config.ClanConfig{
+				URL:        server.URL,
+				RetryCount: 0,
+				Timeout:    timeout - 1,
+			},
+		})
+		instance, err := NewClanClient(injector)
+		require.NoError(t, err)
+		_, err = instance.ClanAutoComplete("")
 
 		assert.ErrorIs(t, err, context.DeadlineExceeded)
 	})

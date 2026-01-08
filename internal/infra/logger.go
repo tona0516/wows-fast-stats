@@ -5,9 +5,11 @@ import (
 	"os"
 	"path/filepath"
 	"time"
+	"wfs/internal/config"
 	"wfs/internal/gateway"
 
 	"github.com/rs/zerolog"
+	"github.com/samber/do/v2"
 )
 
 type Logger struct {
@@ -15,16 +17,13 @@ type Logger struct {
 	ownIGN string
 }
 
-func NewLogger(
-	appName string,
-	semver string,
-	userDataDir string,
-	logLevel zerolog.Level,
-	alertDiscord gateway.DiscordClient,
-	infoDiscord gateway.DiscordClient,
-) *Logger {
+func NewLogger(i do.Injector) (*Logger, error) {
+	config := do.MustInvoke[config.Config](i)
+	alertDiscord := do.MustInvokeNamed[gateway.DiscordClient](i, "alert-discord-client")
+	infoDiscord := do.MustInvokeNamed[gateway.DiscordClient](i, "info-discord-client")
+
 	zerolog.TimeFieldFormat = time.DateTime
-	zerolog.SetGlobalLevel(logLevel)
+	zerolog.SetGlobalLevel(config.Logger.Level)
 
 	consoleWriter := zerolog.ConsoleWriter{
 		Out: os.Stdout,
@@ -34,7 +33,7 @@ func NewLogger(
 		infoDiscord:  infoDiscord,
 	}
 	logFile, _ := os.OpenFile(
-		filepath.Join(userDataDir, appName+".log"),
+		filepath.Join(config.LocalFile.ConfigDir, config.Basic.Name+".log"),
 		os.O_APPEND|os.O_CREATE|os.O_WRONLY,
 		os.ModePerm,
 	)
@@ -43,10 +42,10 @@ func NewLogger(
 	zlog := zerolog.New(multiLevelWriter).
 		With().
 		Timestamp().
-		Str("semver", semver).
+		Str("semver", config.Basic.Version).
 		Logger()
 
-	return &Logger{zlog: zlog}
+	return &Logger{zlog: zlog}, nil
 }
 
 func (l *Logger) SetOwnIGN(ownIGN string) {

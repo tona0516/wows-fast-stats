@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestDiscordClient_Comment(t *testing.T) {
@@ -18,12 +19,9 @@ func TestDiscordClient_Comment(t *testing.T) {
 		server := simpleMockServer(t, http.StatusOK, map[string]string{})
 		defer server.Close()
 
-		instance := NewDiscordClient(apiConfig{
-			url:        server.URL,
-			retryCount: 0,
-			timeout:    0,
-		})
-		err := instance.Comment("test message")
+		instance, err := NewDiscordClient(server.URL, 0, 0)
+		require.NoError(t, err)
+		err = instance.Comment("test message")
 
 		assert.NoError(t, err)
 	})
@@ -38,12 +36,9 @@ func TestDiscordClient_Comment(t *testing.T) {
 		server := simpleMockServer(t, http.StatusUnauthorized, body)
 		defer server.Close()
 
-		instance := NewDiscordClient(apiConfig{
-			url:        server.URL,
-			retryCount: 0,
-			timeout:    0,
-		})
-		err := instance.Comment("test message")
+		instance, err := NewDiscordClient(server.URL, 0, 0)
+		require.NoError(t, err)
+		err = instance.Comment("test message")
 
 		assert.Error(t, err, ErrErrorResponse)
 	})
@@ -60,12 +55,9 @@ func TestDiscordClient_Comment(t *testing.T) {
 		)
 		defer server.Close()
 
-		instance := NewDiscordClient(apiConfig{
-			url:        server.URL,
-			retryCount: 0,
-			timeout:    timeout - 1,
-		})
-		err := instance.Comment("test message")
+		instance, err := NewDiscordClient(server.URL, 0, timeout-1)
+		require.NoError(t, err)
+		err = instance.Comment("test message")
 
 		assert.ErrorIs(t, err, context.DeadlineExceeded)
 	})

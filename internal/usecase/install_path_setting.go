@@ -7,29 +7,25 @@ import (
 	"wfs/internal/gateway"
 
 	"github.com/morikuni/failure"
+	"github.com/samber/do/v2"
 )
 
-const gameClientFile = "WorldOfWarships.exe"
-
-type openDirectoryDialogFunc func(ctx context.Context) (string, error)
-
 type InstallPathSetting struct {
-	configStore         gateway.ConfigStore
-	openDirectoryDialog openDirectoryDialogFunc
+	configStore             gateway.ConfigStore
+	openDirectoryDialogFunc OpenDirectoryDialogFunc
+	gameClientFile          string
 }
 
-func NewInstallPathSetting(
-	configStore gateway.ConfigStore,
-	openDirectoryDialogFunc openDirectoryDialogFunc,
-) *InstallPathSetting {
+func NewInstallPathSetting(i do.Injector) (*InstallPathSetting, error) {
 	return &InstallPathSetting{
-		configStore:         configStore,
-		openDirectoryDialog: openDirectoryDialogFunc,
-	}
+		configStore:             do.MustInvoke[gateway.ConfigStore](i),
+		openDirectoryDialogFunc: do.MustInvoke[OpenDirectoryDialogFunc](i),
+		gameClientFile:          "WorldOfWarships.exe",
+	}, nil
 }
 
 func (s *InstallPathSetting) Invoke(ctx context.Context) (bool, error) {
-	selected, err := s.openDirectoryDialog(ctx)
+	selected, err := s.openDirectoryDialogFunc(ctx)
 	if err != nil {
 		return false, failure.Wrap(err)
 	}
@@ -38,7 +34,7 @@ func (s *InstallPathSetting) Invoke(ctx context.Context) (bool, error) {
 		return false, nil
 	}
 
-	if _, err := os.Stat(filepath.Join(selected, gameClientFile)); err != nil {
+	if _, err := os.Stat(filepath.Join(selected, s.gameClientFile)); err != nil {
 		return false, failure.Wrap(err)
 	}
 

@@ -8,10 +8,14 @@ import (
 	"sync"
 	"testing"
 	"time"
+	"wfs/internal/config"
 	"wfs/internal/data"
+	"wfs/internal/gateway"
 	"wfs/internal/mock"
 
+	"github.com/samber/do/v2"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
 )
 
@@ -71,7 +75,24 @@ func TestPollMatch_Invoke(t *testing.T) {
 				emittedEvents = append(emittedEvents, eventName)
 			}
 
-			pm := NewPollMatch(50*time.Millisecond, configStore, mockReplayReader, emitFunc)
+			injector := do.New()
+			cfg := config.Config{
+				Basic: config.BasicConfig{
+					PollingInterval: 50 * time.Millisecond,
+				},
+			}
+			do.ProvideValue(injector, cfg)
+			do.Provide(injector, func(i do.Injector) (gateway.ConfigStore, error) {
+				return configStore, nil
+			})
+			do.Provide(injector, func(i do.Injector) (gateway.ReplayReader, error) {
+				return mockReplayReader, nil
+			})
+			do.Provide(injector, func(i do.Injector) (EventsEmitFunc, error) {
+				return emitFunc, nil
+			})
+			pm, err := NewPollMatch(injector)
+			require.NoError(t, err)
 
 			ctx := context.Background()
 			cancelCtx, cancel := context.WithTimeout(context.Background(), 300*time.Millisecond)
@@ -146,7 +167,24 @@ func TestPollMatch_InvokeWithDataChange(t *testing.T) {
 		emittedEvents = append(emittedEvents, eventName)
 	}
 
-	pm := NewPollMatch(30*time.Millisecond, MockConfigStore, mockReplayReader, emitFunc)
+	injector := do.New()
+	cfg := config.Config{
+		Basic: config.BasicConfig{
+			PollingInterval: 30 * time.Millisecond,
+		},
+	}
+	do.ProvideValue(injector, cfg)
+	do.Provide(injector, func(i do.Injector) (gateway.ConfigStore, error) {
+		return MockConfigStore, nil
+	})
+	do.Provide(injector, func(i do.Injector) (gateway.ReplayReader, error) {
+		return mockReplayReader, nil
+	})
+	do.Provide(injector, func(i do.Injector) (EventsEmitFunc, error) {
+		return emitFunc, nil
+	})
+	pm, err := NewPollMatch(injector)
+	require.NoError(t, err)
 
 	ctx := context.Background()
 	cancelCtx, cancel := context.WithTimeout(context.Background(), 300*time.Millisecond)

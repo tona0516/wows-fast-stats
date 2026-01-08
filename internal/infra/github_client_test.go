@@ -5,9 +5,12 @@ import (
 	"net/http"
 	"testing"
 	"time"
+	"wfs/internal/config"
 	"wfs/internal/data"
 
+	"github.com/samber/do/v2"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestGithubClient_LatestRelease(t *testing.T) {
@@ -23,11 +26,16 @@ func TestGithubClient_LatestRelease(t *testing.T) {
 		server := simpleMockServer(t, http.StatusOK, expected)
 		defer server.Close()
 
-		instance := NewGithubClient(apiConfig{
-			url:        server.URL,
-			retryCount: 0,
-			timeout:    0,
+		injector := do.New()
+		do.ProvideValue(injector, config.Config{
+			GithubClient: config.GithubClientConfig{
+				URL:        server.URL,
+				RetryCount: 0,
+				Timeout:    0,
+			},
 		})
+		instance, err := NewGithubClient(injector)
+		require.NoError(t, err)
 		result, err := instance.LatestRelease()
 
 		assert.NoError(t, err)
@@ -44,12 +52,17 @@ func TestGithubClient_LatestRelease(t *testing.T) {
 		server := simpleMockServer(t, http.StatusNotFound, body)
 		defer server.Close()
 
-		instance := NewGithubClient(apiConfig{
-			url:        server.URL,
-			retryCount: 0,
-			timeout:    0,
+		injector := do.New()
+		do.ProvideValue(injector, config.Config{
+			GithubClient: config.GithubClientConfig{
+				URL:        server.URL,
+				RetryCount: 0,
+				Timeout:    0,
+			},
 		})
-		_, err := instance.LatestRelease()
+		instance, err := NewGithubClient(injector)
+		require.NoError(t, err)
+		_, err = instance.LatestRelease()
 
 		assert.Error(t, err, ErrErrorResponse)
 	})
@@ -66,12 +79,17 @@ func TestGithubClient_LatestRelease(t *testing.T) {
 		)
 		defer server.Close()
 
-		instance := NewGithubClient(apiConfig{
-			url:        server.URL,
-			retryCount: 0,
-			timeout:    timeout - 1,
+		injector := do.New()
+		do.ProvideValue(injector, config.Config{
+			GithubClient: config.GithubClientConfig{
+				URL:        server.URL,
+				RetryCount: 0,
+				Timeout:    timeout - 1,
+			},
 		})
-		_, err := instance.LatestRelease()
+		instance, err := NewGithubClient(injector)
+		require.NoError(t, err)
+		_, err = instance.LatestRelease()
 
 		assert.ErrorIs(t, err, context.DeadlineExceeded)
 	})

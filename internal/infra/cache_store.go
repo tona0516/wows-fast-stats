@@ -2,7 +2,10 @@ package infra
 
 import (
 	"path/filepath"
+	"wfs/internal/config"
 	"wfs/internal/data"
+
+	"github.com/samber/do/v2"
 )
 
 type CacheStore struct {
@@ -13,14 +16,15 @@ type CacheStore struct {
 	battleTypesFile  string
 }
 
-func NewCacheStore(dir string) *CacheStore {
+func NewCacheStore(i do.Injector) (*CacheStore, error) {
+	config := do.MustInvoke[config.Config](i)
 	return &CacheStore{
-		dir:              dir,
+		dir:              config.LocalFile.CacheDir,
 		ownIGNFile:       "own_ign.txt",
 		warshipsFile:     "warships.json",
 		battleArenasFile: "battle_arenas.json",
 		battleTypesFile:  "battle_types.json",
-	}
+	}, nil
 }
 
 func (s *CacheStore) OwnIGN() (string, error) {

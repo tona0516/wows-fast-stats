@@ -12,7 +12,7 @@
     ShowMessageDialog,
     GetUserConfig,
     StartPollingMatch,
-  } from "@wails/go/main/App";
+  } from "@wails/go/controller/Controller";
   import type { data } from "@wails/go/models";
   import { EventsOn, LogInfo } from "@wails/runtime/runtime";
   import { onMount } from "svelte";
