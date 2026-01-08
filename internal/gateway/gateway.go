@@ -8,7 +8,7 @@ import (
 //go:generate mockgen -source=$GOFILE -destination ../mock/$GOFILE -package mock
 type Wails interface {
 	EmitEvent(ctx context.Context, eventName string, optionalData ...any)
-	OpenDirectoryDialog(context.Context) (string, error)
+	OpenDirectoryDialog(ctx context.Context) (string, error)
 }
 
 //go:generate mockgen -source=$GOFILE -destination ../mock/$GOFILE -package mock
