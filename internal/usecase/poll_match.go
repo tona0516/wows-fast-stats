@@ -16,18 +16,18 @@ import (
 
 type PollMatch struct {
 	pollingInterval time.Duration
+	wails           gateway.Wails
 	configStore     gateway.ConfigStore
 	replayReader    gateway.ReplayReader
-	eventsEmitFunc  EventsEmitFunc
 }
 
 func NewPollMatch(i do.Injector) (*PollMatch, error) {
 	config := do.MustInvoke[config.Config](i)
 	return &PollMatch{
 		pollingInterval: config.Basic.PollingInterval,
+		wails:           do.MustInvoke[gateway.Wails](i),
 		configStore:     do.MustInvoke[gateway.ConfigStore](i),
 		replayReader:    do.MustInvoke[gateway.ReplayReader](i),
-		eventsEmitFunc:  do.MustInvoke[EventsEmitFunc](i),
 	}, nil
 }
 
@@ -85,17 +85,17 @@ func (pm *PollMatch) Invoke(
 }
 
 func (pm *PollMatch) emitNeedInitialSetting(ctx context.Context) {
-	pm.eventsEmitFunc(ctx, EventNeedInitialSetting)
+	pm.wails.EmitEvent(ctx, EventNeedInitialSetting)
 }
 
 func (pm *PollMatch) emitPollingStart(ctx context.Context) {
-	pm.eventsEmitFunc(ctx, EventPollingStart)
+	pm.wails.EmitEvent(ctx, EventPollingStart)
 }
 
 func (pm *PollMatch) emitBattleStart(ctx context.Context) {
-	pm.eventsEmitFunc(ctx, EventBattleStart)
+	pm.wails.EmitEvent(ctx, EventBattleStart)
 }
 
 func (pm *PollMatch) emitError(ctx context.Context, err error) {
-	pm.eventsEmitFunc(ctx, EventErr, err)
+	pm.wails.EmitEvent(ctx, EventErr, err)
 }

@@ -33,6 +33,9 @@ func main() {
 	do.ProvideValue(injector, appConfig)
 
 	// infra
+	do.Provide(injector, func(i do.Injector) (gateway.Wails, error) {
+		return infra.NewWails(i)
+	})
 	do.Provide(injector, func(i do.Injector) (gateway.CacheStore, error) {
 		return infra.NewCacheStore(i)
 	})
@@ -75,10 +78,6 @@ func main() {
 	// service
 	do.Provide(injector, service.NewUserDataFetcher)
 	do.Provide(injector, service.NewNonUserDataFetcher)
-
-	// system func
-	do.Provide(injector, usecase.NewEventsEmitFunc)
-	do.Provide(injector, usecase.NewOpenDirectoryDialogFunc)
 
 	// usecase
 	do.Provide(injector, usecase.NewFetchBattle)

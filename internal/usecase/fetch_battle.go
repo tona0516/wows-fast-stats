@@ -16,18 +16,18 @@ import (
 type FetchBattle struct {
 	userDataFetcher    *service.UserDataFetcher
 	nonUserDataFetcher *service.NonUserDataFetcher
+	wails              gateway.Wails
 	cacheStore         gateway.CacheStore
 	logger             gateway.Logger
-	eventsEmitFunc     EventsEmitFunc
 }
 
 func NewFetchBattle(i do.Injector) (*FetchBattle, error) {
 	return &FetchBattle{
 		userDataFetcher:    do.MustInvoke[*service.UserDataFetcher](i),
 		nonUserDataFetcher: do.MustInvoke[*service.NonUserDataFetcher](i),
+		wails:              do.MustInvoke[gateway.Wails](i),
 		cacheStore:         do.MustInvoke[gateway.CacheStore](i),
 		logger:             do.MustInvoke[gateway.Logger](i),
-		eventsEmitFunc:     do.MustInvoke[EventsEmitFunc](i),
 	}, nil
 }
 
@@ -55,7 +55,7 @@ func (b *FetchBattle) Invoke(
 	})
 
 	if err := eg.Wait(); err != nil {
-		b.eventsEmitFunc(ctx, EventErr, err)
+		b.wails.EmitEvent(ctx, EventErr, err)
 		return
 	}
 
@@ -65,7 +65,7 @@ func (b *FetchBattle) Invoke(
 		nonUserData,
 	)
 
-	b.eventsEmitFunc(ctx, EventFetchDone, result)
+	b.wails.EmitEvent(ctx, EventFetchDone, result)
 }
 
 func (b *FetchBattle) compose(

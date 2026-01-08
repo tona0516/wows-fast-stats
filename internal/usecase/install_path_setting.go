@@ -11,21 +11,21 @@ import (
 )
 
 type InstallPathSetting struct {
-	configStore             gateway.ConfigStore
-	openDirectoryDialogFunc OpenDirectoryDialogFunc
-	gameClientFile          string
+	wails          gateway.Wails
+	configStore    gateway.ConfigStore
+	gameClientFile string
 }
 
 func NewInstallPathSetting(i do.Injector) (*InstallPathSetting, error) {
 	return &InstallPathSetting{
-		configStore:             do.MustInvoke[gateway.ConfigStore](i),
-		openDirectoryDialogFunc: do.MustInvoke[OpenDirectoryDialogFunc](i),
-		gameClientFile:          "WorldOfWarships.exe",
+		wails:          do.MustInvoke[gateway.Wails](i),
+		configStore:    do.MustInvoke[gateway.ConfigStore](i),
+		gameClientFile: "WorldOfWarships.exe",
 	}, nil
 }
 
 func (s *InstallPathSetting) Invoke(ctx context.Context) (bool, error) {
-	selected, err := s.openDirectoryDialogFunc(ctx)
+	selected, err := s.wails.OpenDirectoryDialog(ctx)
 	if err != nil {
 		return false, failure.Wrap(err)
 	}

@@ -31,6 +31,7 @@ func TestInstallPathSetting_Invoke(t *testing.T) {
 
 		ctrl := gomock.NewController(t)
 		mockConfigStore := mock.NewMockConfigStore(ctrl)
+		mockWails := mock.NewMockWails(ctrl)
 		originalConfig := data.UserConfig{
 			Version:      1,
 			InstallPath:  "/old/path",
@@ -54,16 +55,14 @@ func TestInstallPathSetting_Invoke(t *testing.T) {
 			mockConfigStore.EXPECT().SetUserConfig(expectedUpdatedConfig).Return(nil),
 		)
 
-		mockOpenDirectoryDialog := func(ctx context.Context) (string, error) {
-			return tempDir, nil
-		}
+		mockWails.EXPECT().OpenDirectoryDialog(gomock.Any()).Return(tempDir, nil)
 
 		injector := do.New()
 		do.Provide(injector, func(i do.Injector) (gateway.ConfigStore, error) {
 			return mockConfigStore, nil
 		})
-		do.Provide(injector, func(i do.Injector) (OpenDirectoryDialogFunc, error) {
-			return mockOpenDirectoryDialog, nil
+		do.Provide(injector, func(i do.Injector) (gateway.Wails, error) {
+			return mockWails, nil
 		})
 		instance, err := NewInstallPathSetting(injector)
 		require.NoError(t, err)
@@ -78,19 +77,18 @@ func TestInstallPathSetting_Invoke(t *testing.T) {
 
 		ctrl := gomock.NewController(t)
 		mockConfigStore := mock.NewMockConfigStore(ctrl)
+		mockWails := mock.NewMockWails(ctrl)
 		mockConfigStore.EXPECT().UserConfig().Times(0)
 		mockConfigStore.EXPECT().SetUserConfig(gomock.Any()).Times(0)
 
-		mockOpenDirectoryDialog := func(ctx context.Context) (string, error) {
-			return "", errors.New("dialog error")
-		}
+		mockWails.EXPECT().OpenDirectoryDialog(gomock.Any()).Return("", errors.New("dialog error"))
 
 		injector := do.New()
 		do.Provide(injector, func(i do.Injector) (gateway.ConfigStore, error) {
 			return mockConfigStore, nil
 		})
-		do.Provide(injector, func(i do.Injector) (OpenDirectoryDialogFunc, error) {
-			return mockOpenDirectoryDialog, nil
+		do.Provide(injector, func(i do.Injector) (gateway.Wails, error) {
+			return mockWails, nil
 		})
 		instance, err := NewInstallPathSetting(injector)
 		require.NoError(t, err)
@@ -105,19 +103,18 @@ func TestInstallPathSetting_Invoke(t *testing.T) {
 
 		ctrl := gomock.NewController(t)
 		mockConfigStore := mock.NewMockConfigStore(ctrl)
+		mockWails := mock.NewMockWails(ctrl)
 		mockConfigStore.EXPECT().UserConfig().Times(0)
 		mockConfigStore.EXPECT().SetUserConfig(gomock.Any()).Times(0)
 
-		mockOpenDirectoryDialog := func(ctx context.Context) (string, error) {
-			return "/invalid/path", nil
-		}
+		mockWails.EXPECT().OpenDirectoryDialog(gomock.Any()).Return("/invalid/path", nil)
 
 		injector := do.New()
 		do.Provide(injector, func(i do.Injector) (gateway.ConfigStore, error) {
 			return mockConfigStore, nil
 		})
-		do.Provide(injector, func(i do.Injector) (OpenDirectoryDialogFunc, error) {
-			return mockOpenDirectoryDialog, nil
+		do.Provide(injector, func(i do.Injector) (gateway.Wails, error) {
+			return mockWails, nil
 		})
 		instance, err := NewInstallPathSetting(injector)
 		require.NoError(t, err)
@@ -132,22 +129,21 @@ func TestInstallPathSetting_Invoke(t *testing.T) {
 
 		ctrl := gomock.NewController(t)
 		mockConfigStore := mock.NewMockConfigStore(ctrl)
+		mockWails := mock.NewMockWails(ctrl)
 		expectedErr := errors.New("user config read error")
 		mockConfigStore.EXPECT().UserConfig().Return(data.UserConfig{}, expectedErr)
 		mockConfigStore.EXPECT().SetUserConfig(gomock.Any()).Times(0)
 
 		tempDir := createWorldOfWarshipsExeDir(t)
 
-		mockOpenDirectoryDialog := func(ctx context.Context) (string, error) {
-			return tempDir, nil
-		}
+		mockWails.EXPECT().OpenDirectoryDialog(gomock.Any()).Return(tempDir, nil)
 
 		injector := do.New()
 		do.Provide(injector, func(i do.Injector) (gateway.ConfigStore, error) {
 			return mockConfigStore, nil
 		})
-		do.Provide(injector, func(i do.Injector) (OpenDirectoryDialogFunc, error) {
-			return mockOpenDirectoryDialog, nil
+		do.Provide(injector, func(i do.Injector) (gateway.Wails, error) {
+			return mockWails, nil
 		})
 		instance, err := NewInstallPathSetting(injector)
 		require.NoError(t, err)
@@ -162,6 +158,7 @@ func TestInstallPathSetting_Invoke(t *testing.T) {
 
 		ctrl := gomock.NewController(t)
 		mockConfigStore := mock.NewMockConfigStore(ctrl)
+		mockWails := mock.NewMockWails(ctrl)
 		originalConfig := data.UserConfig{
 			Version:     1,
 			InstallPath: "/old/path",
@@ -174,16 +171,14 @@ func TestInstallPathSetting_Invoke(t *testing.T) {
 
 		tempDir := createWorldOfWarshipsExeDir(t)
 
-		mockOpenDirectoryDialog := func(ctx context.Context) (string, error) {
-			return tempDir, nil
-		}
+		mockWails.EXPECT().OpenDirectoryDialog(gomock.Any()).Return(tempDir, nil)
 
 		injector := do.New()
 		do.Provide(injector, func(i do.Injector) (gateway.ConfigStore, error) {
 			return mockConfigStore, nil
 		})
-		do.Provide(injector, func(i do.Injector) (OpenDirectoryDialogFunc, error) {
-			return mockOpenDirectoryDialog, nil
+		do.Provide(injector, func(i do.Injector) (gateway.Wails, error) {
+			return mockWails, nil
 		})
 		instance, err := NewInstallPathSetting(injector)
 		require.NoError(t, err)

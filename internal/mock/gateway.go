@@ -10,11 +10,68 @@
 package mock
 
 import (
+	context "context"
 	reflect "reflect"
 	data "wfs/internal/data"
 
 	gomock "go.uber.org/mock/gomock"
 )
+
+// MockWails is a mock of Wails interface.
+type MockWails struct {
+	ctrl     *gomock.Controller
+	recorder *MockWailsMockRecorder
+	isgomock struct{}
+}
+
+// MockWailsMockRecorder is the mock recorder for MockWails.
+type MockWailsMockRecorder struct {
+	mock *MockWails
+}
+
+// NewMockWails creates a new mock instance.
+func NewMockWails(ctrl *gomock.Controller) *MockWails {
+	mock := &MockWails{ctrl: ctrl}
+	mock.recorder = &MockWailsMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockWails) EXPECT() *MockWailsMockRecorder {
+	return m.recorder
+}
+
+// EmitEvent mocks base method.
+func (m *MockWails) EmitEvent(ctx context.Context, eventName string, optionalData ...any) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, eventName}
+	for _, a := range optionalData {
+		varargs = append(varargs, a)
+	}
+	m.ctrl.Call(m, "EmitEvent", varargs...)
+}
+
+// EmitEvent indicates an expected call of EmitEvent.
+func (mr *MockWailsMockRecorder) EmitEvent(ctx, eventName any, optionalData ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, eventName}, optionalData...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EmitEvent", reflect.TypeOf((*MockWails)(nil).EmitEvent), varargs...)
+}
+
+// OpenDirectoryDialog mocks base method.
+func (m *MockWails) OpenDirectoryDialog(arg0 context.Context) (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "OpenDirectoryDialog", arg0)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// OpenDirectoryDialog indicates an expected call of OpenDirectoryDialog.
+func (mr *MockWailsMockRecorder) OpenDirectoryDialog(arg0 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "OpenDirectoryDialog", reflect.TypeOf((*MockWails)(nil).OpenDirectoryDialog), arg0)
+}
 
 // MockCacheStore is a mock of CacheStore interface.
 type MockCacheStore struct {

@@ -65,15 +65,19 @@ func TestPollMatch_Invoke(t *testing.T) {
 
 			configStore := mock.NewMockConfigStore(ctrl)
 			mockReplayReader := mock.NewMockReplayReader(ctrl)
+			mockWails := mock.NewMockWails(ctrl)
 			tt.setupMock(configStore)
 
 			var emittedEvents []string
 			var eventsMutex sync.Mutex
-			emitFunc := func(ctx context.Context, eventName string, optionalData ...any) {
-				eventsMutex.Lock()
-				defer eventsMutex.Unlock()
-				emittedEvents = append(emittedEvents, eventName)
-			}
+			mockWails.EXPECT().
+				EmitEvent(gomock.Any(), gomock.Any(), gomock.Any()).
+				DoAndReturn(func(ctx context.Context, eventName string, optionalData ...any) {
+					eventsMutex.Lock()
+					defer eventsMutex.Unlock()
+					emittedEvents = append(emittedEvents, eventName)
+				}).
+				AnyTimes()
 
 			injector := do.New()
 			cfg := config.Config{
@@ -88,8 +92,8 @@ func TestPollMatch_Invoke(t *testing.T) {
 			do.Provide(injector, func(i do.Injector) (gateway.ReplayReader, error) {
 				return mockReplayReader, nil
 			})
-			do.Provide(injector, func(i do.Injector) (EventsEmitFunc, error) {
-				return emitFunc, nil
+			do.Provide(injector, func(i do.Injector) (gateway.Wails, error) {
+				return mockWails, nil
 			})
 			pm, err := NewPollMatch(injector)
 			require.NoError(t, err)
@@ -117,10 +121,14 @@ func TestPollMatch_Invoke(t *testing.T) {
 func TestPollMatch_InvokeWithDataChange(t *testing.T) {
 	t.Parallel()
 
+	var emittedEvents []string
+	var eventsMutex sync.Mutex
+
 	ctrl := gomock.NewController(t)
 
 	MockConfigStore := mock.NewMockConfigStore(ctrl)
 	mockReplayReader := mock.NewMockReplayReader(ctrl)
+	mockWails := mock.NewMockWails(ctrl)
 
 	userConfig := data.UserConfig{InstallPath: "/path/to/install"}
 	MockConfigStore.EXPECT().
@@ -159,13 +167,14 @@ func TestPollMatch_InvokeWithDataChange(t *testing.T) {
 		}).
 		AnyTimes()
 
-	var emittedEvents []string
-	var eventsMutex sync.Mutex
-	emitFunc := func(ctx context.Context, eventName string, optionalData ...any) {
-		eventsMutex.Lock()
-		defer eventsMutex.Unlock()
-		emittedEvents = append(emittedEvents, eventName)
-	}
+	mockWails.EXPECT().
+		EmitEvent(gomock.Any(), gomock.Any(), gomock.Any()).
+		DoAndReturn(func(ctx context.Context, eventName string, optionalData ...any) {
+			eventsMutex.Lock()
+			defer eventsMutex.Unlock()
+			emittedEvents = append(emittedEvents, eventName)
+		}).
+		AnyTimes()
 
 	injector := do.New()
 	cfg := config.Config{
@@ -180,8 +189,8 @@ func TestPollMatch_InvokeWithDataChange(t *testing.T) {
 	do.Provide(injector, func(i do.Injector) (gateway.ReplayReader, error) {
 		return mockReplayReader, nil
 	})
-	do.Provide(injector, func(i do.Injector) (EventsEmitFunc, error) {
-		return emitFunc, nil
+	do.Provide(injector, func(i do.Injector) (gateway.Wails, error) {
+		return mockWails, nil
 	})
 	pm, err := NewPollMatch(injector)
 	require.NoError(t, err)

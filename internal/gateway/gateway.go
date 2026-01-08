@@ -1,8 +1,15 @@
 package gateway
 
-import "wfs/internal/data"
+import (
+	"context"
+	"wfs/internal/data"
+)
 
-// store and reader interfaces
+//go:generate mockgen -source=$GOFILE -destination ../mock/$GOFILE -package mock
+type Wails interface {
+	EmitEvent(ctx context.Context, eventName string, optionalData ...any)
+	OpenDirectoryDialog(context.Context) (string, error)
+}
 
 //go:generate mockgen -source=$GOFILE -destination ../mock/$GOFILE -package mock
 type CacheStore interface {
@@ -29,8 +36,6 @@ type ConfigStore interface {
 type ReplayReader interface {
 	TempArenaInfo(installPath string) (data.TempArenaInfo, error)
 }
-
-// api client interfaces
 
 //go:generate mockgen -source=$GOFILE -destination ../mock/$GOFILE -package mock
 type ClanClient interface {
@@ -64,8 +69,6 @@ type WargamingClient interface {
 	BattleTypes() (data.WGBattleTypes, error)
 	ShipsBadges(accountID int) (data.WGShipsBadges, error)
 }
-
-// logger interface
 
 //go:generate mockgen -source=$GOFILE -destination ../mock/$GOFILE -package mock
 type Logger interface {
