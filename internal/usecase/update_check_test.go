@@ -17,13 +17,13 @@ func TestUpdateCheck_Invoke(t *testing.T) {
 		t.Parallel()
 
 		ctrl := gomock.NewController(t)
-		mockGithub := mock.NewMockGithubApiClient(ctrl)
-		mockGithub.EXPECT().LatestRelease().Return(data.GHLatestRelease{
+		mockGithubClient := mock.NewMockGithubClient(ctrl)
+		mockGithubClient.EXPECT().LatestRelease().Return(data.GHLatestRelease{
 			TagName: "2.0.0",
 			HTMLURL: "https://hoge.com",
 		}, nil)
 
-		uc := NewUpdateCheck("1.0.0", mockGithub)
+		uc := NewUpdateCheck("1.0.0", mockGithubClient)
 		actual := uc.Invoke()
 
 		assert.Equal(t, data.NewVersion{
@@ -36,11 +36,11 @@ func TestUpdateCheck_Invoke(t *testing.T) {
 		t.Parallel()
 
 		ctrl := gomock.NewController(t)
-		mockGithub := mock.NewMockGithubApiClient(ctrl)
+		mockGithubClient := mock.NewMockGithubClient(ctrl)
 		response := data.GHLatestRelease{TagName: "1.0.0", HTMLURL: "https://hoge.com"}
-		mockGithub.EXPECT().LatestRelease().Return(response, nil)
+		mockGithubClient.EXPECT().LatestRelease().Return(response, nil)
 
-		uc := NewUpdateCheck("1.0.0", mockGithub)
+		uc := NewUpdateCheck("1.0.0", mockGithubClient)
 		actual := uc.Invoke()
 
 		assert.Nil(t, actual)
@@ -50,10 +50,10 @@ func TestUpdateCheck_Invoke(t *testing.T) {
 		t.Parallel()
 
 		ctrl := gomock.NewController(t)
-		mockGithub := mock.NewMockGithubApiClient(ctrl)
-		mockGithub.EXPECT().LatestRelease().Return(data.GHLatestRelease{}, errors.New("some error"))
+		mockGithubClient := mock.NewMockGithubClient(ctrl)
+		mockGithubClient.EXPECT().LatestRelease().Return(data.GHLatestRelease{}, errors.New("some error"))
 
-		uc := NewUpdateCheck("1.0.0", mockGithub)
+		uc := NewUpdateCheck("1.0.0", mockGithubClient)
 		actual := uc.Invoke()
 
 		assert.Nil(t, actual)

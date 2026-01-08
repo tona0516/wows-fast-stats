@@ -2,6 +2,7 @@ package di
 
 import (
 	"context"
+	"wfs/internal/gateway"
 	"wfs/internal/infra"
 	"wfs/internal/service"
 	"wfs/internal/usecase"
@@ -15,16 +16,14 @@ type Container struct {
 	Config Config
 
 	// Infrastructure
-	ConfigStore infra.ConfigStore
+	ConfigStore gateway.ConfigStore
+	Logger      gateway.Logger
 
 	// Usecase
 	InstallPathSettingUsecase *usecase.InstallPathSetting
 	UpdateCheckUsecase        *usecase.UpdateCheck
 	PollMatchUsecase          *usecase.PollMatch
 	FetchBattleUsecase        *usecase.FetchBattle
-
-	// Services
-	Logger infra.Logger
 }
 
 func NewContainer(config Config) *Container {
@@ -41,14 +40,14 @@ func NewContainer(config Config) *Container {
 		ownIGN = ""
 	}
 
-	alertDiscordApiClient := infra.NewDiscordApiClient(
+	alertDiscordClient := infra.NewDiscordClient(
 		*infra.NewApiConfig(
 			config.DiscordApi.AlertWebhookURL,
 			config.DiscordApi.RetryCount,
 			config.DiscordApi.Timeout,
 		),
 	)
-	infoDiscordApiClient := infra.NewDiscordApiClient(
+	infoDiscordClient := infra.NewDiscordClient(
 		*infra.NewApiConfig(
 			config.DiscordApi.InfoWebhookURL,
 			config.DiscordApi.RetryCount,
@@ -61,12 +60,12 @@ func NewContainer(config Config) *Container {
 		config.Basic.Version,
 		config.LocalStorage.UserDir,
 		config.Logger.Level,
-		alertDiscordApiClient,
-		infoDiscordApiClient,
+		alertDiscordClient,
+		infoDiscordClient,
 	)
 	logger.SetOwnIGN(ownIGN)
 
-	wargamingApiClient := infra.NewWargamingApiClient(
+	wargamingClient := infra.NewWargamingClient(
 		config.WargamingApi.AppID,
 		*infra.NewApiConfig(
 			config.WargamingApi.URL,
@@ -75,21 +74,21 @@ func NewContainer(config Config) *Container {
 		),
 		ratelimit.New(config.WargamingApi.RateLimitRPS),
 	)
-	clansApiClient := infra.NewClansApiClient(
+	clansClient := infra.NewClanClient(
 		*infra.NewApiConfig(
 			config.ClanApi.URL,
 			config.ClanApi.RetryCount,
 			config.ClanApi.Timeout,
 		),
 	)
-	numbersApiClient := infra.NewNumbersApiClient(
+	numbersClient := infra.NewNumbersClient(
 		*infra.NewApiConfig(
 			config.NumbersApi.URL,
 			config.NumbersApi.RetryCount,
 			config.NumbersApi.Timeout,
 		),
 	)
-	githubApiClient := infra.NewGithubApiClient(
+	githubClient := infra.NewGithubClient(
 		*infra.NewApiConfig(
 			config.GithubApi.URL,
 			config.GithubApi.RetryCount,
@@ -98,8 +97,8 @@ func NewContainer(config Config) *Container {
 	)
 
 	// services
-	userDataFetcher := service.NewUserDataFetcher(wargamingApiClient, clansApiClient)
-	nonUserDataFetcher := service.NewNonUserDataFetcher(cacheStore, wargamingApiClient, numbersApiClient)
+	userDataFetcher := service.NewUserDataFetcher(wargamingClient, clansClient)
+	nonUserDataFetcher := service.NewNonUserDataFetcher(cacheStore, wargamingClient, numbersClient)
 
 	// usecase
 	installPathSettingUsecase := usecase.NewInstallPathSetting(
@@ -110,7 +109,7 @@ func NewContainer(config Config) *Container {
 	)
 	updateCheckUsecase := usecase.NewUpdateCheck(
 		config.Basic.Version,
-		githubApiClient,
+		githubClient,
 	)
 	pollMatchUsecase := usecase.NewPollMatch(
 		config.Basic.PollingInterval,

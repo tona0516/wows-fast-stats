@@ -5,17 +5,12 @@ import (
 	"github.com/morikuni/failure"
 )
 
-//go:generate mockgen -source=$GOFILE -destination ../mock/$GOFILE -package mock
-type DiscordApiClient interface {
-	Comment(message string) error
-}
-
-type discordApiClient struct {
+type DiscordClient struct {
 	client *req.Client
 }
 
-func NewDiscordApiClient(ac apiConfig) DiscordApiClient {
-	return &discordApiClient{
+func NewDiscordClient(ac apiConfig) *DiscordClient {
+	return &DiscordClient{
 		client: req.C().
 			SetBaseURL(ac.url).
 			SetCommonRetryCount(ac.retryCount).
@@ -23,7 +18,7 @@ func NewDiscordApiClient(ac apiConfig) DiscordApiClient {
 	}
 }
 
-func (c *discordApiClient) Comment(message string) error {
+func (c *DiscordClient) Comment(message string) error {
 	resp, err := c.client.R().
 		SetHeader("Content-Type", "application/json").
 		SetBody(map[string]string{"content": message}).

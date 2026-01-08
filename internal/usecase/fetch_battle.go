@@ -4,7 +4,7 @@ import (
 	"context"
 	"sort"
 	"wfs/internal/data"
-	"wfs/internal/infra"
+	"wfs/internal/gateway"
 	"wfs/internal/service"
 	"wfs/internal/util"
 	"wfs/internal/yamibuka"
@@ -15,22 +15,22 @@ import (
 type FetchBattle struct {
 	userDataFetcher    *service.UserDataFetcher
 	nonUserDataFetcher *service.NonUserDataFetcher
-	cacheStorage       infra.CacheStore
-	logger             infra.Logger
+	cacheStore         gateway.CacheStore
+	logger             gateway.Logger
 	eventsEmitFunc     eventEmitFunc
 }
 
 func NewFetchBattle(
 	userDataFetcher *service.UserDataFetcher,
 	nonUserDataFetcher *service.NonUserDataFetcher,
-	cacheStorage infra.CacheStore,
-	logger infra.Logger,
+	cacheStore gateway.CacheStore,
+	logger gateway.Logger,
 	eventsEmitFunc eventEmitFunc,
 ) *FetchBattle {
 	return &FetchBattle{
 		userDataFetcher:    userDataFetcher,
 		nonUserDataFetcher: nonUserDataFetcher,
-		cacheStorage:       cacheStorage,
+		cacheStore:         cacheStore,
 		logger:             logger,
 		eventsEmitFunc:     eventsEmitFunc,
 	}
@@ -40,7 +40,7 @@ func (b *FetchBattle) Invoke(
 	ctx context.Context,
 	tempArenaInfo data.TempArenaInfo,
 ) {
-	_ = b.cacheStorage.SetOwnIGN(tempArenaInfo.PlayerName)
+	_ = b.cacheStore.SetOwnIGN(tempArenaInfo.PlayerName)
 	b.logger.SetOwnIGN(tempArenaInfo.PlayerName)
 
 	eg := errgroup.Group{}

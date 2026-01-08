@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestDiscordApiClient_Comment(t *testing.T) {
+func TestDiscordClient_Comment(t *testing.T) {
 	t.Parallel()
 
 	t.Run("正常系", func(t *testing.T) {
@@ -18,7 +18,7 @@ func TestDiscordApiClient_Comment(t *testing.T) {
 		server := simpleMockServer(t, http.StatusOK, map[string]string{})
 		defer server.Close()
 
-		instance := NewDiscordApiClient(apiConfig{
+		instance := NewDiscordClient(apiConfig{
 			url:        server.URL,
 			retryCount: 0,
 			timeout:    0,
@@ -38,7 +38,7 @@ func TestDiscordApiClient_Comment(t *testing.T) {
 		server := simpleMockServer(t, http.StatusUnauthorized, body)
 		defer server.Close()
 
-		instance := NewDiscordApiClient(apiConfig{
+		instance := NewDiscordClient(apiConfig{
 			url:        server.URL,
 			retryCount: 0,
 			timeout:    0,
@@ -60,7 +60,7 @@ func TestDiscordApiClient_Comment(t *testing.T) {
 		)
 		defer server.Close()
 
-		instance := NewDiscordApiClient(apiConfig{
+		instance := NewDiscordClient(apiConfig{
 			url:        server.URL,
 			retryCount: 0,
 			timeout:    timeout - 1,

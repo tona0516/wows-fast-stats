@@ -7,17 +7,12 @@ import (
 	"github.com/morikuni/failure"
 )
 
-//go:generate mockgen -source=$GOFILE -destination ../mock/$GOFILE -package mock
-type GithubApiClient interface {
-	LatestRelease() (data.GHLatestRelease, error)
-}
-
-type githubApiClient struct {
+type GithubClient struct {
 	client *req.Client
 }
 
-func NewGithubApiClient(ac apiConfig) GithubApiClient {
-	return &githubApiClient{
+func NewGithubClient(ac apiConfig) *GithubClient {
+	return &GithubClient{
 		client: req.C().
 			SetBaseURL(ac.url).
 			SetCommonRetryCount(ac.retryCount).
@@ -25,7 +20,7 @@ func NewGithubApiClient(ac apiConfig) GithubApiClient {
 	}
 }
 
-func (c *githubApiClient) LatestRelease() (data.GHLatestRelease, error) {
+func (c *GithubClient) LatestRelease() (data.GHLatestRelease, error) {
 	result := data.GHLatestRelease{}
 	resp, err := c.client.R().
 		SetSuccessResult(&result).

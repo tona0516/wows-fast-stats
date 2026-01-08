@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestClanApiClient_ClanAutoComplete(t *testing.T) {
+func TestClanClient_ClanAutoComplete(t *testing.T) {
 	t.Parallel()
 
 	t.Run("正常系", func(t *testing.T) {
@@ -29,7 +29,7 @@ func TestClanApiClient_ClanAutoComplete(t *testing.T) {
 		server := simpleMockServer(t, 200, expected)
 		defer server.Close()
 
-		instance := NewClansApiClient(*NewApiConfig(
+		instance := NewClanClient(*NewApiConfig(
 			server.URL,
 			0,
 			0,
@@ -54,7 +54,7 @@ func TestClanApiClient_ClanAutoComplete(t *testing.T) {
 		server := simpleMockServer(t, http.StatusConflict, body)
 		defer server.Close()
 
-		instance := NewClansApiClient(*NewApiConfig(
+		instance := NewClanClient(*NewApiConfig(
 			server.URL,
 			0,
 			0,
@@ -76,7 +76,7 @@ func TestClanApiClient_ClanAutoComplete(t *testing.T) {
 		)
 		defer server.Close()
 
-		instance := NewClansApiClient(*NewApiConfig(
+		instance := NewClanClient(*NewApiConfig(
 			server.URL,
 			0,
 			timeout-1,

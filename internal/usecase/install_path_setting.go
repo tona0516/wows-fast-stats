@@ -4,7 +4,7 @@ import (
 	"context"
 	"os"
 	"path/filepath"
-	"wfs/internal/infra"
+	"wfs/internal/gateway"
 
 	"github.com/morikuni/failure"
 )
@@ -14,16 +14,16 @@ const gameClientFile = "WorldOfWarships.exe"
 type openDirectoryDialogFunc func(ctx context.Context) (string, error)
 
 type InstallPathSetting struct {
-	localStorage        infra.ConfigStore
+	configStore         gateway.ConfigStore
 	openDirectoryDialog openDirectoryDialogFunc
 }
 
 func NewInstallPathSetting(
-	localStorage infra.ConfigStore,
+	configStore gateway.ConfigStore,
 	openDirectoryDialogFunc openDirectoryDialogFunc,
 ) *InstallPathSetting {
 	return &InstallPathSetting{
-		localStorage:        localStorage,
+		configStore:         configStore,
 		openDirectoryDialog: openDirectoryDialogFunc,
 	}
 }
@@ -42,14 +42,14 @@ func (s *InstallPathSetting) Invoke(ctx context.Context) (bool, error) {
 		return false, failure.Wrap(err)
 	}
 
-	config, err := s.localStorage.UserConfig()
+	config, err := s.configStore.UserConfig()
 	if err != nil {
 		return false, failure.Wrap(err)
 	}
 
 	config.InstallPath = selected
 
-	if err = s.localStorage.SetUserConfig(config); err != nil {
+	if err = s.configStore.SetUserConfig(config); err != nil {
 		return false, failure.Wrap(err)
 	}
 

@@ -2,23 +2,23 @@ package usecase
 
 import (
 	"wfs/internal/data"
-	"wfs/internal/infra"
+	"wfs/internal/gateway"
 
 	"github.com/Masterminds/semver/v3"
 )
 
 type UpdateCheck struct {
 	currentVersion string
-	github         infra.GithubApiClient
+	github         gateway.GithubClient
 }
 
 func NewUpdateCheck(
 	currentVersion string,
-	github infra.GithubApiClient,
+	githubClient gateway.GithubClient,
 ) *UpdateCheck {
 	return &UpdateCheck{
 		currentVersion: currentVersion,
-		github:         github,
+		github:         githubClient,
 	}
 }
 

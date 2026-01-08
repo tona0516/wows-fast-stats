@@ -15,7 +15,7 @@ import (
 	"go.uber.org/ratelimit"
 )
 
-func TestWargamingApiClient_AccountInfo(t *testing.T) {
+func TestWargamingClient_AccountInfo(t *testing.T) {
 	t.Parallel()
 
 	t.Run("正常系", func(t *testing.T) {
@@ -31,7 +31,7 @@ func TestWargamingApiClient_AccountInfo(t *testing.T) {
 		server := simpleMockServer(t, 200, expected)
 		defer server.Close()
 
-		wargaming := NewWargamingApiClient(
+		wargaming := NewWargamingClient(
 			"",
 			*NewApiConfig(
 				server.URL,
@@ -58,7 +58,7 @@ func TestWargamingApiClient_AccountInfo(t *testing.T) {
 		)
 		defer server.Close()
 
-		instance := NewWargamingApiClient(
+		instance := NewWargamingClient(
 			"",
 			*NewApiConfig(
 				server.URL,
@@ -93,7 +93,7 @@ func TestWargamingApiClient_AccountInfo(t *testing.T) {
 		}))
 		defer server.Close()
 
-		instance := NewWargamingApiClient(
+		instance := NewWargamingClient(
 			"",
 			*NewApiConfig(
 				server.URL,
@@ -151,7 +151,7 @@ func TestWargamingApiClient_AccountInfo(t *testing.T) {
 			}))
 			defer server.Close()
 
-			instance := NewWargamingApiClient(
+			instance := NewWargamingClient(
 				"",
 				*NewApiConfig(
 					server.URL,
@@ -195,7 +195,7 @@ func TestWargamingApiClient_AccountInfo(t *testing.T) {
 			}))
 			defer server.Close()
 
-			instance := NewWargamingApiClient(
+			instance := NewWargamingClient(
 				"",
 				*NewApiConfig(
 					server.URL,
@@ -212,7 +212,7 @@ func TestWargamingApiClient_AccountInfo(t *testing.T) {
 	})
 }
 
-func TestWargamingApiClient_ClansAccountInfo(t *testing.T) {
+func TestWargamingClient_ClansAccountInfo(t *testing.T) {
 	t.Parallel()
 
 	expected := data.WGClansAccountInfo{
@@ -225,7 +225,7 @@ func TestWargamingApiClient_ClansAccountInfo(t *testing.T) {
 	server := simpleMockServer(t, 200, expected)
 	defer server.Close()
 
-	instance := NewWargamingApiClient(
+	instance := NewWargamingClient(
 		"",
 		*NewApiConfig(
 			server.URL,
@@ -240,7 +240,7 @@ func TestWargamingApiClient_ClansAccountInfo(t *testing.T) {
 	assert.Equal(t, expected, result)
 }
 
-func TestWargamingApiClient_ClansInfo(t *testing.T) {
+func TestWargamingClient_ClansInfo(t *testing.T) {
 	t.Parallel()
 
 	expected := data.WGClansInfo{
@@ -253,7 +253,7 @@ func TestWargamingApiClient_ClansInfo(t *testing.T) {
 	server := simpleMockServer(t, 200, expected)
 	defer server.Close()
 
-	instance := NewWargamingApiClient(
+	instance := NewWargamingClient(
 		"",
 		*NewApiConfig(
 			server.URL,
@@ -268,7 +268,7 @@ func TestWargamingApiClient_ClansInfo(t *testing.T) {
 	assert.Equal(t, expected, result)
 }
 
-func TestWargamingApiClient_ShipsStats(t *testing.T) {
+func TestWargamingClient_ShipsStats(t *testing.T) {
 	t.Parallel()
 
 	expected := data.WGShipsStats{
@@ -281,7 +281,7 @@ func TestWargamingApiClient_ShipsStats(t *testing.T) {
 	server := simpleMockServer(t, 200, expected)
 	defer server.Close()
 
-	instance := NewWargamingApiClient(
+	instance := NewWargamingClient(
 		"",
 		*NewApiConfig(
 			server.URL,
@@ -296,7 +296,7 @@ func TestWargamingApiClient_ShipsStats(t *testing.T) {
 	assert.Equal(t, expected, result)
 }
 
-func TestWargamingApiClient_EncycShips(t *testing.T) {
+func TestWargamingClient_EncycShips(t *testing.T) {
 	t.Parallel()
 
 	expected := data.WGEncycShips{
@@ -313,7 +313,7 @@ func TestWargamingApiClient_EncycShips(t *testing.T) {
 	server := simpleMockServer(t, 200, expected)
 	defer server.Close()
 
-	instance := NewWargamingApiClient(
+	instance := NewWargamingClient(
 		"",
 		*NewApiConfig(
 			server.URL,
@@ -328,7 +328,7 @@ func TestWargamingApiClient_EncycShips(t *testing.T) {
 	assert.Equal(t, expected, result)
 }
 
-func TestWargamingApiClient_BattleArena(t *testing.T) {
+func TestWargamingClient_BattleArena(t *testing.T) {
 	t.Parallel()
 
 	expected := data.WGBattleArenas{
@@ -341,7 +341,7 @@ func TestWargamingApiClient_BattleArena(t *testing.T) {
 	server := simpleMockServer(t, 200, expected)
 	defer server.Close()
 
-	instance := NewWargamingApiClient(
+	instance := NewWargamingClient(
 		"",
 		*NewApiConfig(
 			server.URL,
@@ -356,7 +356,7 @@ func TestWargamingApiClient_BattleArena(t *testing.T) {
 	assert.Equal(t, expected, result)
 }
 
-func TestWargamingApiClient_BattleTypes(t *testing.T) {
+func TestWargamingClient_BattleTypes(t *testing.T) {
 	t.Parallel()
 
 	expected := data.WGBattleTypes{
@@ -369,7 +369,7 @@ func TestWargamingApiClient_BattleTypes(t *testing.T) {
 	server := simpleMockServer(t, 200, expected)
 	defer server.Close()
 
-	instance := NewWargamingApiClient(
+	instance := NewWargamingClient(
 		"",
 		*NewApiConfig(
 			server.URL,
@@ -384,7 +384,7 @@ func TestWargamingApiClient_BattleTypes(t *testing.T) {
 	assert.Equal(t, expected, result)
 }
 
-func TestWargamingApiClient_ShipsBadges(t *testing.T) {
+func TestWargamingClient_ShipsBadges(t *testing.T) {
 	t.Parallel()
 
 	expected := data.WGShipsBadges{
@@ -397,7 +397,7 @@ func TestWargamingApiClient_ShipsBadges(t *testing.T) {
 	server := simpleMockServer(t, 200, expected)
 	defer server.Close()
 
-	instance := NewWargamingApiClient(
+	instance := NewWargamingClient(
 		"",
 		*NewApiConfig(
 			server.URL,

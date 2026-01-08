@@ -5,7 +5,7 @@ import (
 	"strings"
 	"sync"
 	"wfs/internal/data"
-	"wfs/internal/infra"
+	"wfs/internal/gateway"
 
 	"github.com/abadojack/whatlanggo"
 	"github.com/morikuni/failure"
@@ -24,22 +24,22 @@ type UserData struct {
 }
 
 type UserDataFetcher struct {
-	wargamingApiClient infra.WargamingApiClient
-	clanApiClient      infra.ClanApiClient
+	wargamingClient gateway.WargamingClient
+	clanClient      gateway.ClanClient
 }
 
 func NewUserDataFetcher(
-	wargamingApiClient infra.WargamingApiClient,
-	clanApiClient infra.ClanApiClient,
+	wargamingClient gateway.WargamingClient,
+	clanClient gateway.ClanClient,
 ) *UserDataFetcher {
 	return &UserDataFetcher{
-		wargamingApiClient: wargamingApiClient,
-		clanApiClient:      clanApiClient,
+		wargamingClient: wargamingClient,
+		clanClient:      clanClient,
 	}
 }
 
 func (f *UserDataFetcher) Fetch(accountNames []string) (*UserData, error) {
-	accountList, err := f.wargamingApiClient.AccountList(accountNames)
+	accountList, err := f.wargamingClient.AccountList(accountNames)
 	if err != nil {
 		return nil, failure.Wrap(err)
 	}
@@ -50,7 +50,7 @@ func (f *UserDataFetcher) Fetch(accountNames []string) (*UserData, error) {
 	var accountInfo data.WGAccountInfo
 	eg.Go(func() error {
 		var err error
-		accountInfo, err = f.wargamingApiClient.AccountInfo(accountIDs)
+		accountInfo, err = f.wargamingClient.AccountInfo(accountIDs)
 		return err
 	})
 
@@ -96,7 +96,7 @@ func (f *UserDataFetcher) fetchAllPlayerShipsStats(accountIDs []int) (data.AllPl
 
 	for _, accountID := range accountIDs {
 		eg.Go(func() error {
-			resp, err := f.wargamingApiClient.ShipsStats(accountID)
+			resp, err := f.wargamingClient.ShipsStats(accountID)
 			if err != nil {
 				return failure.Wrap(err)
 			}
@@ -119,13 +119,13 @@ func (f *UserDataFetcher) fetchAllPlayerShipsStats(accountIDs []int) (data.AllPl
 func (f *UserDataFetcher) fetchClan(accountIDs []int) (data.Clans, error) {
 	result := make(data.Clans)
 
-	clansAccountInfo, err := f.wargamingApiClient.ClansAccountInfo(accountIDs)
+	clansAccountInfo, err := f.wargamingClient.ClansAccountInfo(accountIDs)
 	if err != nil {
 		return nil, failure.Wrap(err)
 	}
 
 	clanIDs := clansAccountInfo.ClanIDs()
-	clansInfo, err := f.wargamingApiClient.ClansInfo(clanIDs)
+	clansInfo, err := f.wargamingClient.ClansInfo(clanIDs)
 	if err != nil {
 		return nil, failure.Wrap(err)
 	}
@@ -162,7 +162,7 @@ func (f *UserDataFetcher) fetchClanColor(clanInfoSlice []data.WGClansInfoData) (
 	eg := errgroup.Group{}
 	for _, clanInfo := range clanInfoSlice {
 		eg.Go(func() error {
-			autocomplete, err := f.clanApiClient.ClanAutoComplete(clanInfo.Tag)
+			autocomplete, err := f.clanClient.ClanAutoComplete(clanInfo.Tag)
 			if err != nil {
 				return err
 			}
@@ -222,7 +222,7 @@ func (f *UserDataFetcher) fetchAllPlayerShipsBadges(accountIDs []int) (data.AllP
 	eg := errgroup.Group{}
 	for _, accountID := range accountIDs {
 		eg.Go(func() error {
-			shipsBadges, err := f.wargamingApiClient.ShipsBadges(accountID)
+			shipsBadges, err := f.wargamingClient.ShipsBadges(accountID)
 			if err != nil {
 				return failure.Wrap(err)
 			}

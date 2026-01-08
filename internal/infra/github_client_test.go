@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestGithubApiClient_LatestRelease(t *testing.T) {
+func TestGithubClient_LatestRelease(t *testing.T) {
 	t.Parallel()
 
 	t.Run("正常系", func(t *testing.T) {
@@ -23,7 +23,7 @@ func TestGithubApiClient_LatestRelease(t *testing.T) {
 		server := simpleMockServer(t, http.StatusOK, expected)
 		defer server.Close()
 
-		instance := NewGithubApiClient(apiConfig{
+		instance := NewGithubClient(apiConfig{
 			url:        server.URL,
 			retryCount: 0,
 			timeout:    0,
@@ -44,7 +44,7 @@ func TestGithubApiClient_LatestRelease(t *testing.T) {
 		server := simpleMockServer(t, http.StatusNotFound, body)
 		defer server.Close()
 
-		instance := NewGithubApiClient(apiConfig{
+		instance := NewGithubClient(apiConfig{
 			url:        server.URL,
 			retryCount: 0,
 			timeout:    0,
@@ -66,7 +66,7 @@ func TestGithubApiClient_LatestRelease(t *testing.T) {
 		)
 		defer server.Close()
 
-		instance := NewGithubApiClient(apiConfig{
+		instance := NewGithubClient(apiConfig{
 			url:        server.URL,
 			retryCount: 0,
 			timeout:    timeout - 1,

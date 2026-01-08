@@ -91,7 +91,7 @@ func TestLogger_Info(t *testing.T) {
 			t.Parallel()
 
 			ctrl := gomock.NewController(t)
-			mockInfoDiscord := mock.NewMockDiscordApiClient(ctrl)
+			mockInfoDiscord := mock.NewMockDiscordClient(ctrl)
 			mockInfoDiscord.EXPECT().Comment(gomock.Any()).Return(nil)
 			instance := NewLogger(
 				"test-app",
@@ -113,7 +113,7 @@ func TestLogger_Info_DicordError(t *testing.T) {
 	t.Parallel()
 
 	ctrl := gomock.NewController(t)
-	mockInfoDiscord := mock.NewMockDiscordApiClient(ctrl)
+	mockInfoDiscord := mock.NewMockDiscordClient(ctrl)
 	mockInfoDiscord.EXPECT().Comment(gomock.Any()).Return(errors.New("discord error"))
 	instance := NewLogger(
 		"test-app",
@@ -162,7 +162,7 @@ func TestLogger_Error(t *testing.T) {
 			t.Parallel()
 
 			ctrl := gomock.NewController(t)
-			mockAlertDiscord := mock.NewMockDiscordApiClient(ctrl)
+			mockAlertDiscord := mock.NewMockDiscordClient(ctrl)
 			mockAlertDiscord.EXPECT().Comment(gomock.Any()).Return(nil).AnyTimes()
 			instance := NewLogger(
 				"test-app",
@@ -184,7 +184,7 @@ func TestLogger_Error_DicordError(t *testing.T) {
 	t.Parallel()
 
 	ctrl := gomock.NewController(t)
-	mockAlertDiscord := mock.NewMockDiscordApiClient(ctrl)
+	mockAlertDiscord := mock.NewMockDiscordClient(ctrl)
 	mockAlertDiscord.EXPECT().Comment(gomock.Any()).Return(errors.New("discord error"))
 	instance := NewLogger(
 		"test-app",

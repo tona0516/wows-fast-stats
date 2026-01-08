@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestNumbersApiClient_ExpectedStats(t *testing.T) {
+func TestNumbersClient_ExpectedStats(t *testing.T) {
 	t.Parallel()
 
 	t.Run("正常系", func(t *testing.T) {
@@ -35,7 +35,7 @@ func TestNumbersApiClient_ExpectedStats(t *testing.T) {
 		server := simpleMockServer(t, http.StatusOK, body)
 		defer server.Close()
 
-		instance := NewNumbersApiClient(apiConfig{
+		instance := NewNumbersClient(apiConfig{
 			url:        server.URL,
 			retryCount: 0,
 			timeout:    0,
@@ -69,7 +69,7 @@ func TestNumbersApiClient_ExpectedStats(t *testing.T) {
 		server := simpleMockServer(t, http.StatusInternalServerError, body)
 		defer server.Close()
 
-		instance := NewNumbersApiClient(apiConfig{
+		instance := NewNumbersClient(apiConfig{
 			url:        server.URL,
 			retryCount: 0,
 			timeout:    0,
@@ -91,7 +91,7 @@ func TestNumbersApiClient_ExpectedStats(t *testing.T) {
 		)
 		defer server.Close()
 
-		instance := NewNumbersApiClient(apiConfig{
+		instance := NewNumbersClient(apiConfig{
 			url:        server.URL,
 			retryCount: 0,
 			timeout:    timeout - 1,

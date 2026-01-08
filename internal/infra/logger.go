@@ -5,19 +5,12 @@ import (
 	"os"
 	"path/filepath"
 	"time"
+	"wfs/internal/gateway"
 
 	"github.com/rs/zerolog"
 )
 
-//go:generate mockgen -source=$GOFILE -destination ../mock/$GOFILE -package mock
-type Logger interface {
-	SetOwnIGN(ownIGN string)
-	Debug(message string, contexts map[string]string)
-	Info(message string, contexts map[string]string)
-	Error(err error, contexts map[string]string)
-}
-
-type logger struct {
+type Logger struct {
 	zlog   zerolog.Logger
 	ownIGN string
 }
@@ -27,9 +20,9 @@ func NewLogger(
 	semver string,
 	userDataDir string,
 	logLevel zerolog.Level,
-	alertDiscord DiscordApiClient,
-	infoDiscord DiscordApiClient,
-) Logger {
+	alertDiscord gateway.DiscordClient,
+	infoDiscord gateway.DiscordClient,
+) *Logger {
 	zerolog.TimeFieldFormat = time.DateTime
 	zerolog.SetGlobalLevel(logLevel)
 
@@ -53,14 +46,14 @@ func NewLogger(
 		Str("semver", semver).
 		Logger()
 
-	return &logger{zlog: zlog}
+	return &Logger{zlog: zlog}
 }
 
-func (l *logger) SetOwnIGN(ownIGN string) {
+func (l *Logger) SetOwnIGN(ownIGN string) {
 	l.ownIGN = ownIGN
 }
 
-func (l *logger) Debug(message string, contexts map[string]string) {
+func (l *Logger) Debug(message string, contexts map[string]string) {
 	e := l.zlog.Debug().
 		Str("ign", l.ownIGN).
 		Str("message", message)
@@ -68,7 +61,7 @@ func (l *logger) Debug(message string, contexts map[string]string) {
 	e.Send()
 }
 
-func (l *logger) Info(message string, contexts map[string]string) {
+func (l *Logger) Info(message string, contexts map[string]string) {
 	e := l.zlog.Info().
 		Str("ign", l.ownIGN).
 		Str("message", message)
@@ -76,7 +69,7 @@ func (l *logger) Info(message string, contexts map[string]string) {
 	e.Send()
 }
 
-func (l *logger) Error(err error, contexts map[string]string) {
+func (l *Logger) Error(err error, contexts map[string]string) {
 	e := l.zlog.Error().
 		Str("ign", l.ownIGN).
 		Str("error", fmt.Sprintf("%+v", err))
@@ -84,7 +77,7 @@ func (l *logger) Error(err error, contexts map[string]string) {
 	e.Send()
 }
 
-func (l *logger) addContext(e *zerolog.Event, contexts map[string]string) {
+func (l *Logger) addContext(e *zerolog.Event, contexts map[string]string) {
 	if len(contexts) == 0 {
 		return
 	}

@@ -5,28 +5,22 @@ import (
 	"wfs/internal/data"
 )
 
-//go:generate mockgen -source=$GOFILE -destination ../mock/$GOFILE -package mock
-type ConfigStore interface {
-	UserConfig() (data.UserConfig, error)
-	SetUserConfig(data data.UserConfig) error
-}
-
-type configStore struct {
+type ConfigStore struct {
 	dir            string
 	userConfigFile string
 }
 
-func NewConfigStore(dir string) ConfigStore {
-	return &configStore{
+func NewConfigStore(dir string) *ConfigStore {
+	return &ConfigStore{
 		dir:            dir,
 		userConfigFile: "user_config.json",
 	}
 }
 
-func (s *configStore) UserConfig() (data.UserConfig, error) {
+func (s *ConfigStore) UserConfig() (data.UserConfig, error) {
 	return readJSON[data.UserConfig](filepath.Join(s.dir, s.userConfigFile))
 }
 
-func (s *configStore) SetUserConfig(data data.UserConfig) error {
+func (s *ConfigStore) SetUserConfig(data data.UserConfig) error {
 	return writeJSON(filepath.Join(s.dir, s.userConfigFile), data)
 }

@@ -3,7 +3,7 @@ package service
 import (
 	"sync"
 	"wfs/internal/data"
-	"wfs/internal/infra"
+	"wfs/internal/gateway"
 
 	"github.com/morikuni/failure"
 	"golang.org/x/sync/errgroup"
@@ -16,20 +16,20 @@ type NonUserData struct {
 }
 
 type NonUserDataFetcher struct {
-	cacheStorage       infra.CacheStore
-	wargamingApiClient infra.WargamingApiClient
-	numbersApiClient   infra.NumbersApiClient
+	cacheStore      gateway.CacheStore
+	wargamingClient gateway.WargamingClient
+	numbersClient   gateway.NumbersClient
 }
 
 func NewNonUserDataFetcher(
-	cacheStorage infra.CacheStore,
-	wargamingApiClient infra.WargamingApiClient,
-	numbersApiClient infra.NumbersApiClient,
+	cacheStore gateway.CacheStore,
+	wargamingClient gateway.WargamingClient,
+	numbersClient gateway.NumbersClient,
 ) *NonUserDataFetcher {
 	return &NonUserDataFetcher{
-		cacheStorage:       cacheStorage,
-		wargamingApiClient: wargamingApiClient,
-		numbersApiClient:   numbersApiClient,
+		cacheStore:      cacheStore,
+		wargamingClient: wargamingClient,
+		numbersClient:   numbersClient,
 	}
 }
 
@@ -83,7 +83,7 @@ func (f *NonUserDataFetcher) fetchWarships() (data.Warships, error) {
 
 	var expectedStats data.NSExpectedStats
 	eg.Go(func() error {
-		resp, err := f.numbersApiClient.ExpectedStats()
+		resp, err := f.numbersClient.ExpectedStats()
 		if err != nil {
 			return failure.Wrap(err)
 		}
@@ -92,7 +92,7 @@ func (f *NonUserDataFetcher) fetchWarships() (data.Warships, error) {
 	})
 
 	if err := eg.Wait(); err != nil {
-		cache, errCache := f.cacheStorage.Warships()
+		cache, errCache := f.cacheStore.Warships()
 		if errCache != nil {
 			return nil, failure.Wrap(err)
 		}
@@ -101,15 +101,15 @@ func (f *NonUserDataFetcher) fetchWarships() (data.Warships, error) {
 	}
 
 	warships := f.composeWarships(encycShips, expectedStats)
-	_ = f.cacheStorage.SetWarships(warships)
+	_ = f.cacheStore.SetWarships(warships)
 
 	return warships, nil
 }
 
 func (f *NonUserDataFetcher) fetchBattleArenas() (map[int]string, error) {
-	resp, err := f.wargamingApiClient.BattleArenas()
+	resp, err := f.wargamingClient.BattleArenas()
 	if err != nil {
-		cache, errCache := f.cacheStorage.BattleArenas()
+		cache, errCache := f.cacheStore.BattleArenas()
 		if errCache != nil {
 			return nil, failure.Wrap(err)
 		}
@@ -121,15 +121,15 @@ func (f *NonUserDataFetcher) fetchBattleArenas() (map[int]string, error) {
 		result[id] = arena.Name
 	}
 
-	_ = f.cacheStorage.SetBattleArenas(result)
+	_ = f.cacheStore.SetBattleArenas(result)
 
 	return result, nil
 }
 
 func (f *NonUserDataFetcher) fetchBattleTypes() (map[string]string, error) {
-	resp, err := f.wargamingApiClient.BattleTypes()
+	resp, err := f.wargamingClient.BattleTypes()
 	if err != nil {
-		cache, errCache := f.cacheStorage.BattleTypes()
+		cache, errCache := f.cacheStore.BattleTypes()
 		if errCache != nil {
 			return nil, failure.Wrap(err)
 		}
@@ -141,7 +141,7 @@ func (f *NonUserDataFetcher) fetchBattleTypes() (map[string]string, error) {
 		result[key] = battleType.Name
 	}
 
-	_ = f.cacheStorage.SetBattleTypes(result)
+	_ = f.cacheStore.SetBattleTypes(result)
 
 	return result, nil
 }
@@ -151,7 +151,7 @@ func (f *NonUserDataFetcher) fetchEncycShips() (map[int]data.WGEncycShips, error
 
 	var mu sync.Mutex
 	fetch := func(page int) (int, error) {
-		res, err := f.wargamingApiClient.EncycShips(page)
+		res, err := f.wargamingClient.EncycShips(page)
 		if err != nil {
 			return 0, failure.Wrap(err)
 		}

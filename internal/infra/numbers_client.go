@@ -8,17 +8,12 @@ import (
 	"github.com/morikuni/failure"
 )
 
-//go:generate mockgen -source=$GOFILE -destination ../mock/$GOFILE -package mock
-type NumbersApiClient interface {
-	ExpectedStats() (data.NSExpectedStats, error)
-}
-
-type numbersApiClient struct {
+type NumbersClient struct {
 	client *req.Client
 }
 
-func NewNumbersApiClient(ac apiConfig) NumbersApiClient {
-	return &numbersApiClient{
+func NewNumbersClient(ac apiConfig) *NumbersClient {
+	return &NumbersClient{
 		client: req.C().
 			SetBaseURL(ac.url).
 			SetCommonRetryCount(ac.retryCount).
@@ -27,7 +22,7 @@ func NewNumbersApiClient(ac apiConfig) NumbersApiClient {
 	}
 }
 
-func (c *numbersApiClient) ExpectedStats() (data.NSExpectedStats, error) {
+func (c *NumbersClient) ExpectedStats() (data.NSExpectedStats, error) {
 	var result data.NSExpectedStats
 
 	resp, err := c.client.R().

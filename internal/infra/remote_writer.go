@@ -4,14 +4,15 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"wfs/internal/gateway"
 
 	"github.com/rs/zerolog"
 )
 
 type remoteWriter struct {
 	zerolog.FilteredLevelWriter
-	alertDiscord DiscordApiClient
-	infoDiscord  DiscordApiClient
+	alertDiscord gateway.DiscordClient
+	infoDiscord  gateway.DiscordClient
 }
 
 func (w *remoteWriter) WriteLevel(level zerolog.Level, p []byte) (int, error) {
@@ -21,7 +22,7 @@ func (w *remoteWriter) WriteLevel(level zerolog.Level, p []byte) (int, error) {
 
 	formatted := fmt.Sprintf("```%s```", w.pretty(string(p)))
 
-	var client DiscordApiClient
+	var client gateway.DiscordClient
 	if level > zerolog.InfoLevel {
 		client = w.alertDiscord
 	} else {

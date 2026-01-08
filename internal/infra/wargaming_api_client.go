@@ -19,29 +19,16 @@ var temporaryUnavaillalbleMessages = []string{
 	"SOURCE_NOT_AVAILABLE",
 }
 
-//go:generate mockgen -source=$GOFILE -destination ../mock/$GOFILE -package mock
-type WargamingApiClient interface {
-	AccountInfo(accountIDs []int) (data.WGAccountInfo, error)
-	AccountList(accountNames []string) (data.WGAccountList, error)
-	ClansAccountInfo(accountIDs []int) (data.WGClansAccountInfo, error)
-	ClansInfo(clanIDs []int) (data.WGClansInfo, error)
-	EncycShips(pageNo int) (data.WGEncycShips, error)
-	ShipsStats(accountID int) (data.WGShipsStats, error)
-	BattleArenas() (data.WGBattleArenas, error)
-	BattleTypes() (data.WGBattleTypes, error)
-	ShipsBadges(accountID int) (data.WGShipsBadges, error)
-}
-
-type wargamingApiClient struct {
+type WargamingClient struct {
 	client *req.Client
 }
 
-func NewWargamingApiClient(
+func NewWargamingClient(
 	appID string,
 	ac apiConfig,
 	limiter ratelimit.Limiter,
-) WargamingApiClient {
-	return &wargamingApiClient{
+) *WargamingClient {
+	return &WargamingClient{
 		client: req.C().
 			SetBaseURL(ac.url).
 			SetCommonRetryCount(ac.retryCount).
@@ -72,7 +59,7 @@ func NewWargamingApiClient(
 	}
 }
 
-func (c *wargamingApiClient) AccountInfo(accountIDs []int) (data.WGAccountInfo, error) {
+func (c *WargamingClient) AccountInfo(accountIDs []int) (data.WGAccountInfo, error) {
 	strAccountIDs := make([]string, len(accountIDs))
 	for i, v := range accountIDs {
 		strAccountIDs[i] = strconv.Itoa(v)
@@ -96,7 +83,7 @@ func (c *wargamingApiClient) AccountInfo(accountIDs []int) (data.WGAccountInfo, 
 	return res, err
 }
 
-func (c *wargamingApiClient) AccountList(accountNames []string) (data.WGAccountList, error) {
+func (c *WargamingClient) AccountList(accountNames []string) (data.WGAccountList, error) {
 	res, err := request[data.WGAccountList](
 		c,
 		"/wows/account/list/",
@@ -110,7 +97,7 @@ func (c *wargamingApiClient) AccountList(accountNames []string) (data.WGAccountL
 	return res, err
 }
 
-func (c *wargamingApiClient) ClansAccountInfo(accountIDs []int) (data.WGClansAccountInfo, error) {
+func (c *WargamingClient) ClansAccountInfo(accountIDs []int) (data.WGClansAccountInfo, error) {
 	strAccountIDs := make([]string, len(accountIDs))
 	for i, v := range accountIDs {
 		strAccountIDs[i] = strconv.Itoa(v)
@@ -128,7 +115,7 @@ func (c *wargamingApiClient) ClansAccountInfo(accountIDs []int) (data.WGClansAcc
 	return res, err
 }
 
-func (c *wargamingApiClient) ClansInfo(clanIDs []int) (data.WGClansInfo, error) {
+func (c *WargamingClient) ClansInfo(clanIDs []int) (data.WGClansInfo, error) {
 	strClanIDs := make([]string, len(clanIDs))
 	for i, v := range clanIDs {
 		strClanIDs[i] = strconv.Itoa(v)
@@ -150,7 +137,7 @@ func (c *wargamingApiClient) ClansInfo(clanIDs []int) (data.WGClansInfo, error) 
 	return res, err
 }
 
-func (c *wargamingApiClient) ShipsStats(accountID int) (data.WGShipsStats, error) {
+func (c *WargamingClient) ShipsStats(accountID int) (data.WGShipsStats, error) {
 	res, err := request[data.WGShipsStats](
 		c,
 		"/wows/ships/stats/",
@@ -169,7 +156,7 @@ func (c *wargamingApiClient) ShipsStats(accountID int) (data.WGShipsStats, error
 	return res, err
 }
 
-func (c *wargamingApiClient) EncycShips(pageNo int) (data.WGEncycShips, error) {
+func (c *WargamingClient) EncycShips(pageNo int) (data.WGEncycShips, error) {
 	res, err := request[data.WGEncycShips](
 		c,
 		"/wows/encyclopedia/ships/",
@@ -183,7 +170,7 @@ func (c *wargamingApiClient) EncycShips(pageNo int) (data.WGEncycShips, error) {
 	return res, err
 }
 
-func (c *wargamingApiClient) BattleArenas() (data.WGBattleArenas, error) {
+func (c *WargamingClient) BattleArenas() (data.WGBattleArenas, error) {
 	res, err := request[data.WGBattleArenas](
 		c,
 		"/wows/encyclopedia/battlearenas/",
@@ -196,7 +183,7 @@ func (c *wargamingApiClient) BattleArenas() (data.WGBattleArenas, error) {
 	return res, err
 }
 
-func (c *wargamingApiClient) BattleTypes() (data.WGBattleTypes, error) {
+func (c *WargamingClient) BattleTypes() (data.WGBattleTypes, error) {
 	res, err := request[data.WGBattleTypes](
 		c,
 		"/wows/encyclopedia/battletypes/",
@@ -209,7 +196,7 @@ func (c *wargamingApiClient) BattleTypes() (data.WGBattleTypes, error) {
 	return res, err
 }
 
-func (c *wargamingApiClient) ShipsBadges(accountID int) (data.WGShipsBadges, error) {
+func (c *WargamingClient) ShipsBadges(accountID int) (data.WGShipsBadges, error) {
 	res, err := request[data.WGShipsBadges](
 		c,
 		"/wows/ships/badges/",
@@ -223,7 +210,7 @@ func (c *wargamingApiClient) ShipsBadges(accountID int) (data.WGShipsBadges, err
 }
 
 func request[T data.WGResponse](
-	c *wargamingApiClient,
+	c *WargamingClient,
 	path string,
 	queries map[string]string,
 ) (T, error) {

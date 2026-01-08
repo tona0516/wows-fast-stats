@@ -7,17 +7,12 @@ import (
 	"github.com/morikuni/failure"
 )
 
-//go:generate mockgen -source=$GOFILE -destination ../mock/$GOFILE -package mock
-type ClanApiClient interface {
-	ClanAutoComplete(search string) (data.ClanAutocomplete, error)
-}
-
-type clanApiClient struct {
+type ClanClient struct {
 	client *req.Client
 }
 
-func NewClansApiClient(ac apiConfig) ClanApiClient {
-	return &clanApiClient{
+func NewClanClient(ac apiConfig) *ClanClient {
+	return &ClanClient{
 		client: req.C().
 			SetBaseURL(ac.url).
 			SetCommonRetryCount(ac.retryCount).
@@ -25,7 +20,7 @@ func NewClansApiClient(ac apiConfig) ClanApiClient {
 	}
 }
 
-func (c *clanApiClient) ClanAutoComplete(search string) (data.ClanAutocomplete, error) {
+func (c *ClanClient) ClanAutoComplete(search string) (data.ClanAutocomplete, error) {
 	var result data.ClanAutocomplete
 	resp, err := c.client.R().
 		SetSuccessResult(&result).

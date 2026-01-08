@@ -8,22 +8,22 @@ import (
 	"io/fs"
 	"time"
 	"wfs/internal/data"
-	"wfs/internal/infra"
+	"wfs/internal/gateway"
 )
 
 type eventEmitFunc func(ctx context.Context, eventName string, optionalData ...any)
 
 type PollMatch struct {
 	pollingInterval time.Duration
-	configStore     infra.ConfigStore
-	replayReader    infra.ReplayReader
+	configStore     gateway.ConfigStore
+	replayReader    gateway.ReplayReader
 	eventsEmitFunc  eventEmitFunc
 }
 
 func NewPollMatch(
 	pollingInterval time.Duration,
-	configStore infra.ConfigStore,
-	replayReader infra.ReplayReader,
+	configStore gateway.ConfigStore,
+	replayReader gateway.ReplayReader,
 	eventsEmitFunc eventEmitFunc,
 ) *PollMatch {
 	return &PollMatch{

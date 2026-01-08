@@ -9,24 +9,19 @@ import (
 	"github.com/morikuni/failure"
 )
 
-//go:generate mockgen -source=$GOFILE -destination ../mock/$GOFILE -package mock
-type ReplayReader interface {
-	TempArenaInfo(installPath string) (data.TempArenaInfo, error)
-}
-
-type replayReader struct {
+type ReplayReader struct {
 	replayDir string
 	fileName  string
 }
 
-func NewReplayReader() ReplayReader {
-	return &replayReader{
+func NewReplayReader() *ReplayReader {
+	return &ReplayReader{
 		replayDir: "replays",
 		fileName:  "tempArenaInfo.json",
 	}
 }
 
-func (r *replayReader) TempArenaInfo(installPath string) (data.TempArenaInfo, error) {
+func (r *ReplayReader) TempArenaInfo(installPath string) (data.TempArenaInfo, error) {
 	var tempArenaInfo data.TempArenaInfo
 
 	tempArenaInfoPaths := []string{}
@@ -58,7 +53,7 @@ func (r *replayReader) TempArenaInfo(installPath string) (data.TempArenaInfo, er
 	return r.decideTempArenaInfo(tempArenaInfoPaths)
 }
 
-func (r *replayReader) decideTempArenaInfo(paths []string) (data.TempArenaInfo, error) {
+func (r *ReplayReader) decideTempArenaInfo(paths []string) (data.TempArenaInfo, error) {
 	var result data.TempArenaInfo
 	size := len(paths)
 
