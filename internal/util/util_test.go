@@ -52,7 +52,7 @@ func TestUtil_ToSnakeCase(t *testing.T) {
 	// 各テストケースを実行
 	for _, tc := range testCases {
 		// toSnakeCase 関数を実行して結果を取得
-		result := ToSnakeCase(tc.input)
+		result := toSnakeCase(tc.input)
 
 		// 結果の比較
 		assert.Equal(t, tc.expected, result)

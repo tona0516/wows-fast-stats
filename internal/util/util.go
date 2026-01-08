@@ -13,7 +13,27 @@ func FieldQuery(target reflect.Type) string {
 	return strings.Join(fields, ",")
 }
 
-func ToSnakeCase(s string) string {
+func fieldsRecursive(parentNames []string, t reflect.Type, result *[]string) {
+	for i := range t.NumField() {
+		field := t.Field(i)
+
+		if field.Type.Kind() == reflect.Struct {
+			name := toSnakeCase(field.Name)
+			fieldsRecursive(append(parentNames, name), field.Type, result)
+
+			continue
+		}
+
+		column := field.Tag.Get("json")
+		if len(parentNames) > 0 {
+			*result = append(*result, strings.Join(parentNames, ".")+"."+column)
+		} else {
+			*result = append(*result, column)
+		}
+	}
+}
+
+func toSnakeCase(s string) string {
 	runes := []rune(s)
 	result := make([]rune, 0)
 
@@ -30,26 +50,6 @@ func ToSnakeCase(s string) string {
 	}
 
 	return string(result)
-}
-
-func fieldsRecursive(parentNames []string, t reflect.Type, result *[]string) {
-	for i := range t.NumField() {
-		field := t.Field(i)
-
-		if field.Type.Kind() == reflect.Struct {
-			name := ToSnakeCase(field.Name)
-			fieldsRecursive(append(parentNames, name), field.Type, result)
-
-			continue
-		}
-
-		column := field.Tag.Get("json")
-		if len(parentNames) > 0 {
-			*result = append(*result, strings.Join(parentNames, ".")+"."+column)
-		} else {
-			*result = append(*result, column)
-		}
-	}
 }
 
 func SafeDivide(numerator float64, denominator uint) float64 {
