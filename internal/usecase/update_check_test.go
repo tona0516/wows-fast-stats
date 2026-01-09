@@ -3,9 +3,9 @@ package usecase
 import (
 	"errors"
 	"testing"
+	"wfs/internal/adapter"
 	"wfs/internal/config"
 	"wfs/internal/data"
-	"wfs/internal/gateway"
 	"wfs/internal/mock"
 
 	"github.com/samber/do/v2"
@@ -32,7 +32,7 @@ func TestUpdateCheck_Invoke(t *testing.T) {
 				Version: "1.0.0",
 			},
 		})
-		do.Provide(injector, func(i do.Injector) (gateway.GithubClient, error) {
+		do.Provide(injector, func(i do.Injector) (adapter.GithubClient, error) {
 			return mockGithubClient, nil
 		})
 		do.Provide(injector, NewUpdateCheck)
@@ -60,7 +60,7 @@ func TestUpdateCheck_Invoke(t *testing.T) {
 				Version: "1.0.0",
 			},
 		})
-		do.Provide(injector, func(i do.Injector) (gateway.GithubClient, error) {
+		do.Provide(injector, func(i do.Injector) (adapter.GithubClient, error) {
 			return mockGithubClient, nil
 		})
 		do.Provide(injector, NewUpdateCheck)
@@ -83,7 +83,7 @@ func TestUpdateCheck_Invoke(t *testing.T) {
 				Version: "1.0.0",
 			},
 		})
-		do.Provide(injector, func(i do.Injector) (gateway.GithubClient, error) {
+		do.Provide(injector, func(i do.Injector) (adapter.GithubClient, error) {
 			return mockGithubClient, nil
 		})
 		do.Provide(injector, NewUpdateCheck)

@@ -2,8 +2,8 @@ package service
 
 import (
 	"sync"
+	"wfs/internal/adapter"
 	"wfs/internal/data"
-	"wfs/internal/gateway"
 
 	"github.com/morikuni/failure"
 	"github.com/samber/do/v2"
@@ -17,16 +17,16 @@ type NonUserData struct {
 }
 
 type NonUserDataFetcher struct {
-	cacheStore      gateway.CacheStore
-	wargamingClient gateway.WargamingClient
-	numbersClient   gateway.NumbersClient
+	cacheStore      adapter.CacheStore
+	wargamingClient adapter.WargamingClient
+	numbersClient   adapter.NumbersClient
 }
 
 func NewNonUserDataFetcher(i do.Injector) (*NonUserDataFetcher, error) {
 	return &NonUserDataFetcher{
-		cacheStore:      do.MustInvoke[gateway.CacheStore](i),
-		wargamingClient: do.MustInvoke[gateway.WargamingClient](i),
-		numbersClient:   do.MustInvoke[gateway.NumbersClient](i),
+		cacheStore:      do.MustInvoke[adapter.CacheStore](i),
+		wargamingClient: do.MustInvoke[adapter.WargamingClient](i),
+		numbersClient:   do.MustInvoke[adapter.NumbersClient](i),
 	}, nil
 }
 

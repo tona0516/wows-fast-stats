@@ -5,9 +5,9 @@ import (
 	"errors"
 	"io/fs"
 	"os"
+	"wfs/internal/adapter"
 	"wfs/internal/config"
 	"wfs/internal/data"
-	"wfs/internal/gateway"
 	"wfs/internal/usecase"
 
 	"github.com/mitchellh/go-ps"
@@ -18,7 +18,7 @@ import (
 
 type Controller struct {
 	appConfig                 config.Config
-	configStore               gateway.ConfigStore
+	configStore               adapter.ConfigStore
 	fetchBattleUsecase        *usecase.FetchBattle
 	pollMatchUsecase          *usecase.PollMatch
 	installPathSettingUsecase *usecase.InstallPathSetting
@@ -31,7 +31,7 @@ type Controller struct {
 func NewController(i do.Injector) (*Controller, error) {
 	return &Controller{
 		appConfig:                 do.MustInvoke[config.Config](i),
-		configStore:               do.MustInvoke[gateway.ConfigStore](i),
+		configStore:               do.MustInvoke[adapter.ConfigStore](i),
 		fetchBattleUsecase:        do.MustInvoke[*usecase.FetchBattle](i),
 		pollMatchUsecase:          do.MustInvoke[*usecase.PollMatch](i),
 		installPathSettingUsecase: do.MustInvoke[*usecase.InstallPathSetting](i),

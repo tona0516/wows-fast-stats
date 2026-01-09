@@ -3,9 +3,9 @@ package main
 import (
 	"embed"
 	"log"
+	"wfs/internal/adapter"
 	"wfs/internal/config"
 	"wfs/internal/controller"
-	"wfs/internal/gateway"
 	"wfs/internal/infra"
 	"wfs/internal/service"
 	"wfs/internal/usecase"
@@ -33,41 +33,41 @@ func main() {
 	do.ProvideValue(injector, appConfig)
 
 	// infra
-	do.Provide(injector, func(i do.Injector) (gateway.Wails, error) {
+	do.Provide(injector, func(i do.Injector) (adapter.Wails, error) {
 		return infra.NewWails(i)
 	})
-	do.Provide(injector, func(i do.Injector) (gateway.CacheStore, error) {
+	do.Provide(injector, func(i do.Injector) (adapter.CacheStore, error) {
 		return infra.NewCacheStore(i)
 	})
-	do.Provide(injector, func(i do.Injector) (gateway.ConfigStore, error) {
+	do.Provide(injector, func(i do.Injector) (adapter.ConfigStore, error) {
 		return infra.NewConfigStore(i)
 	})
-	do.Provide(injector, func(i do.Injector) (gateway.ReplayReader, error) {
+	do.Provide(injector, func(i do.Injector) (adapter.ReplayReader, error) {
 		return infra.NewReplayReader(i)
 	})
-	do.Provide(injector, func(i do.Injector) (gateway.ClanClient, error) {
+	do.Provide(injector, func(i do.Injector) (adapter.ClanClient, error) {
 		return infra.NewClanClient(i)
 	})
-	do.Provide(injector, func(i do.Injector) (gateway.GithubClient, error) {
+	do.Provide(injector, func(i do.Injector) (adapter.GithubClient, error) {
 		return infra.NewGithubClient(i)
 	})
-	do.Provide(injector, func(i do.Injector) (gateway.NumbersClient, error) {
+	do.Provide(injector, func(i do.Injector) (adapter.NumbersClient, error) {
 		return infra.NewNumbersClient(i)
 	})
-	do.Provide(injector, func(i do.Injector) (gateway.WargamingClient, error) {
+	do.Provide(injector, func(i do.Injector) (adapter.WargamingClient, error) {
 		return infra.NewWargamingClient(i)
 	})
-	do.Provide(injector, func(i do.Injector) (gateway.Logger, error) {
+	do.Provide(injector, func(i do.Injector) (adapter.Logger, error) {
 		return infra.NewLogger(i)
 	})
-	do.ProvideNamed(injector, "alert-discord-client", func(i do.Injector) (gateway.DiscordClient, error) {
+	do.ProvideNamed(injector, "alert-discord-client", func(i do.Injector) (adapter.DiscordClient, error) {
 		return infra.NewDiscordClient(
 			appConfig.DiscordClient.AlertWebhookURL,
 			appConfig.DiscordClient.RetryCount,
 			appConfig.DiscordClient.Timeout,
 		)
 	})
-	do.ProvideNamed(injector, "info-discord-client", func(i do.Injector) (gateway.DiscordClient, error) {
+	do.ProvideNamed(injector, "info-discord-client", func(i do.Injector) (adapter.DiscordClient, error) {
 		return infra.NewDiscordClient(
 			appConfig.DiscordClient.InfoWebhookURL,
 			appConfig.DiscordClient.RetryCount,

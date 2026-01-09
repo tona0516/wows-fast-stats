@@ -7,27 +7,27 @@ import (
 	"fmt"
 	"io/fs"
 	"time"
+	"wfs/internal/adapter"
 	"wfs/internal/config"
 	"wfs/internal/data"
-	"wfs/internal/gateway"
 
 	"github.com/samber/do/v2"
 )
 
 type PollMatch struct {
 	pollingInterval time.Duration
-	wails           gateway.Wails
-	configStore     gateway.ConfigStore
-	replayReader    gateway.ReplayReader
+	wails           adapter.Wails
+	configStore     adapter.ConfigStore
+	replayReader    adapter.ReplayReader
 }
 
 func NewPollMatch(i do.Injector) (*PollMatch, error) {
 	config := do.MustInvoke[config.Config](i)
 	return &PollMatch{
 		pollingInterval: config.Basic.PollingInterval,
-		wails:           do.MustInvoke[gateway.Wails](i),
-		configStore:     do.MustInvoke[gateway.ConfigStore](i),
-		replayReader:    do.MustInvoke[gateway.ReplayReader](i),
+		wails:           do.MustInvoke[adapter.Wails](i),
+		configStore:     do.MustInvoke[adapter.ConfigStore](i),
+		replayReader:    do.MustInvoke[adapter.ReplayReader](i),
 	}, nil
 }
 

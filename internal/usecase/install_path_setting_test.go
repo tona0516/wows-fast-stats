@@ -6,8 +6,8 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+	"wfs/internal/adapter"
 	"wfs/internal/data"
-	"wfs/internal/gateway"
 	"wfs/internal/mock"
 
 	"github.com/samber/do/v2"
@@ -58,10 +58,10 @@ func TestInstallPathSetting_Invoke(t *testing.T) {
 		mockWails.EXPECT().OpenDirectoryDialog(gomock.Any()).Return(tempDir, nil)
 
 		injector := do.New()
-		do.Provide(injector, func(i do.Injector) (gateway.ConfigStore, error) {
+		do.Provide(injector, func(i do.Injector) (adapter.ConfigStore, error) {
 			return mockConfigStore, nil
 		})
-		do.Provide(injector, func(i do.Injector) (gateway.Wails, error) {
+		do.Provide(injector, func(i do.Injector) (adapter.Wails, error) {
 			return mockWails, nil
 		})
 		instance, err := NewInstallPathSetting(injector)
@@ -84,10 +84,10 @@ func TestInstallPathSetting_Invoke(t *testing.T) {
 		mockWails.EXPECT().OpenDirectoryDialog(gomock.Any()).Return("", errors.New("dialog error"))
 
 		injector := do.New()
-		do.Provide(injector, func(i do.Injector) (gateway.ConfigStore, error) {
+		do.Provide(injector, func(i do.Injector) (adapter.ConfigStore, error) {
 			return mockConfigStore, nil
 		})
-		do.Provide(injector, func(i do.Injector) (gateway.Wails, error) {
+		do.Provide(injector, func(i do.Injector) (adapter.Wails, error) {
 			return mockWails, nil
 		})
 		instance, err := NewInstallPathSetting(injector)
@@ -110,10 +110,10 @@ func TestInstallPathSetting_Invoke(t *testing.T) {
 		mockWails.EXPECT().OpenDirectoryDialog(gomock.Any()).Return("/invalid/path", nil)
 
 		injector := do.New()
-		do.Provide(injector, func(i do.Injector) (gateway.ConfigStore, error) {
+		do.Provide(injector, func(i do.Injector) (adapter.ConfigStore, error) {
 			return mockConfigStore, nil
 		})
-		do.Provide(injector, func(i do.Injector) (gateway.Wails, error) {
+		do.Provide(injector, func(i do.Injector) (adapter.Wails, error) {
 			return mockWails, nil
 		})
 		instance, err := NewInstallPathSetting(injector)
@@ -139,10 +139,10 @@ func TestInstallPathSetting_Invoke(t *testing.T) {
 		mockWails.EXPECT().OpenDirectoryDialog(gomock.Any()).Return(tempDir, nil)
 
 		injector := do.New()
-		do.Provide(injector, func(i do.Injector) (gateway.ConfigStore, error) {
+		do.Provide(injector, func(i do.Injector) (adapter.ConfigStore, error) {
 			return mockConfigStore, nil
 		})
-		do.Provide(injector, func(i do.Injector) (gateway.Wails, error) {
+		do.Provide(injector, func(i do.Injector) (adapter.Wails, error) {
 			return mockWails, nil
 		})
 		instance, err := NewInstallPathSetting(injector)
@@ -174,10 +174,10 @@ func TestInstallPathSetting_Invoke(t *testing.T) {
 		mockWails.EXPECT().OpenDirectoryDialog(gomock.Any()).Return(tempDir, nil)
 
 		injector := do.New()
-		do.Provide(injector, func(i do.Injector) (gateway.ConfigStore, error) {
+		do.Provide(injector, func(i do.Injector) (adapter.ConfigStore, error) {
 			return mockConfigStore, nil
 		})
-		do.Provide(injector, func(i do.Injector) (gateway.Wails, error) {
+		do.Provide(injector, func(i do.Injector) (adapter.Wails, error) {
 			return mockWails, nil
 		})
 		instance, err := NewInstallPathSetting(injector)

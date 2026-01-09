@@ -4,8 +4,8 @@ import (
 	"regexp"
 	"strings"
 	"sync"
+	"wfs/internal/adapter"
 	"wfs/internal/data"
-	"wfs/internal/gateway"
 
 	"github.com/abadojack/whatlanggo"
 	"github.com/morikuni/failure"
@@ -25,14 +25,14 @@ type UserData struct {
 }
 
 type UserDataFetcher struct {
-	wargamingClient gateway.WargamingClient
-	clanClient      gateway.ClanClient
+	wargamingClient adapter.WargamingClient
+	clanClient      adapter.ClanClient
 }
 
 func NewUserDataFetcher(i do.Injector) (*UserDataFetcher, error) {
 	return &UserDataFetcher{
-		wargamingClient: do.MustInvoke[gateway.WargamingClient](i),
-		clanClient:      do.MustInvoke[gateway.ClanClient](i),
+		wargamingClient: do.MustInvoke[adapter.WargamingClient](i),
+		clanClient:      do.MustInvoke[adapter.ClanClient](i),
 	}, nil
 }
 

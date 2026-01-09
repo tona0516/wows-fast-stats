@@ -3,8 +3,8 @@ package infra
 import (
 	"errors"
 	"testing"
+	"wfs/internal/adapter"
 	"wfs/internal/config"
-	"wfs/internal/gateway"
 	"wfs/internal/mock"
 
 	"github.com/rs/zerolog"
@@ -58,10 +58,10 @@ func TestLogger_Debug(t *testing.T) {
 					ConfigDir: t.TempDir(),
 				},
 			})
-			do.ProvideNamed(injector, "alert-discord-client", func(i do.Injector) (gateway.DiscordClient, error) {
+			do.ProvideNamed(injector, "alert-discord-client", func(i do.Injector) (adapter.DiscordClient, error) {
 				return (*mock.MockDiscordClient)(nil), nil
 			})
-			do.ProvideNamed(injector, "info-discord-client", func(i do.Injector) (gateway.DiscordClient, error) {
+			do.ProvideNamed(injector, "info-discord-client", func(i do.Injector) (adapter.DiscordClient, error) {
 				return (*mock.MockDiscordClient)(nil), nil
 			})
 			instance, err := NewLogger(injector)
@@ -122,10 +122,10 @@ func TestLogger_Info(t *testing.T) {
 					ConfigDir: t.TempDir(),
 				},
 			})
-			do.ProvideNamed(injector, "alert-discord-client", func(i do.Injector) (gateway.DiscordClient, error) {
+			do.ProvideNamed(injector, "alert-discord-client", func(i do.Injector) (adapter.DiscordClient, error) {
 				return (*mock.MockDiscordClient)(nil), nil
 			})
-			do.ProvideNamed(injector, "info-discord-client", func(i do.Injector) (gateway.DiscordClient, error) {
+			do.ProvideNamed(injector, "info-discord-client", func(i do.Injector) (adapter.DiscordClient, error) {
 				return mockInfoDiscord, nil
 			})
 			instance, err := NewLogger(injector)
@@ -157,10 +157,10 @@ func TestLogger_Info_DicordError(t *testing.T) {
 			ConfigDir: t.TempDir(),
 		},
 	})
-	do.ProvideNamed(injector, "alert-discord-client", func(i do.Injector) (gateway.DiscordClient, error) {
+	do.ProvideNamed(injector, "alert-discord-client", func(i do.Injector) (adapter.DiscordClient, error) {
 		return (*mock.MockDiscordClient)(nil), nil
 	})
-	do.ProvideNamed(injector, "info-discord-client", func(i do.Injector) (gateway.DiscordClient, error) {
+	do.ProvideNamed(injector, "info-discord-client", func(i do.Injector) (adapter.DiscordClient, error) {
 		return mockInfoDiscord, nil
 	})
 	instance, err := NewLogger(injector)
@@ -219,10 +219,10 @@ func TestLogger_Error(t *testing.T) {
 					ConfigDir: t.TempDir(),
 				},
 			})
-			do.ProvideNamed(injector, "alert-discord-client", func(i do.Injector) (gateway.DiscordClient, error) {
+			do.ProvideNamed(injector, "alert-discord-client", func(i do.Injector) (adapter.DiscordClient, error) {
 				return mockAlertDiscord, nil
 			})
-			do.ProvideNamed(injector, "info-discord-client", func(i do.Injector) (gateway.DiscordClient, error) {
+			do.ProvideNamed(injector, "info-discord-client", func(i do.Injector) (adapter.DiscordClient, error) {
 				return (*mock.MockDiscordClient)(nil), nil
 			})
 			instance, err := NewLogger(injector)
@@ -254,10 +254,10 @@ func TestLogger_Error_DicordError(t *testing.T) {
 			ConfigDir: t.TempDir(),
 		},
 	})
-	do.ProvideNamed[gateway.DiscordClient](injector, "alert-discord-client", func(i do.Injector) (gateway.DiscordClient, error) {
+	do.ProvideNamed[adapter.DiscordClient](injector, "alert-discord-client", func(i do.Injector) (adapter.DiscordClient, error) {
 		return mockAlertDiscord, nil
 	})
-	do.ProvideNamed[gateway.DiscordClient](injector, "info-discord-client", func(i do.Injector) (gateway.DiscordClient, error) {
+	do.ProvideNamed[adapter.DiscordClient](injector, "info-discord-client", func(i do.Injector) (adapter.DiscordClient, error) {
 		return (*mock.MockDiscordClient)(nil), nil
 	})
 	instance, err := NewLogger(injector)

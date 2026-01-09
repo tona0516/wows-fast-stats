@@ -8,9 +8,9 @@ import (
 	"sync"
 	"testing"
 	"time"
+	"wfs/internal/adapter"
 	"wfs/internal/config"
 	"wfs/internal/data"
-	"wfs/internal/gateway"
 	"wfs/internal/mock"
 
 	"github.com/samber/do/v2"
@@ -86,13 +86,13 @@ func TestPollMatch_Invoke(t *testing.T) {
 				},
 			}
 			do.ProvideValue(injector, cfg)
-			do.Provide(injector, func(i do.Injector) (gateway.ConfigStore, error) {
+			do.Provide(injector, func(i do.Injector) (adapter.ConfigStore, error) {
 				return configStore, nil
 			})
-			do.Provide(injector, func(i do.Injector) (gateway.ReplayReader, error) {
+			do.Provide(injector, func(i do.Injector) (adapter.ReplayReader, error) {
 				return mockReplayReader, nil
 			})
-			do.Provide(injector, func(i do.Injector) (gateway.Wails, error) {
+			do.Provide(injector, func(i do.Injector) (adapter.Wails, error) {
 				return mockWails, nil
 			})
 			pm, err := NewPollMatch(injector)
@@ -183,13 +183,13 @@ func TestPollMatch_InvokeWithDataChange(t *testing.T) {
 		},
 	}
 	do.ProvideValue(injector, cfg)
-	do.Provide(injector, func(i do.Injector) (gateway.ConfigStore, error) {
+	do.Provide(injector, func(i do.Injector) (adapter.ConfigStore, error) {
 		return MockConfigStore, nil
 	})
-	do.Provide(injector, func(i do.Injector) (gateway.ReplayReader, error) {
+	do.Provide(injector, func(i do.Injector) (adapter.ReplayReader, error) {
 		return mockReplayReader, nil
 	})
-	do.Provide(injector, func(i do.Injector) (gateway.Wails, error) {
+	do.Provide(injector, func(i do.Injector) (adapter.Wails, error) {
 		return mockWails, nil
 	})
 	pm, err := NewPollMatch(injector)

@@ -5,8 +5,8 @@ import (
 	"os"
 	"path/filepath"
 	"time"
+	"wfs/internal/adapter"
 	"wfs/internal/config"
-	"wfs/internal/gateway"
 
 	"github.com/rs/zerolog"
 	"github.com/samber/do/v2"
@@ -19,8 +19,8 @@ type Logger struct {
 
 func NewLogger(i do.Injector) (*Logger, error) {
 	config := do.MustInvoke[config.Config](i)
-	alertDiscord := do.MustInvokeNamed[gateway.DiscordClient](i, "alert-discord-client")
-	infoDiscord := do.MustInvokeNamed[gateway.DiscordClient](i, "info-discord-client")
+	alertDiscord := do.MustInvokeNamed[adapter.DiscordClient](i, "alert-discord-client")
+	infoDiscord := do.MustInvokeNamed[adapter.DiscordClient](i, "info-discord-client")
 
 	zerolog.TimeFieldFormat = time.DateTime
 	zerolog.SetGlobalLevel(config.Logger.Level)

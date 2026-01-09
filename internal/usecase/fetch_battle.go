@@ -3,8 +3,8 @@ package usecase
 import (
 	"context"
 	"sort"
+	"wfs/internal/adapter"
 	"wfs/internal/data"
-	"wfs/internal/gateway"
 	"wfs/internal/service"
 
 	"github.com/samber/do/v2"
@@ -14,18 +14,18 @@ import (
 type FetchBattle struct {
 	userDataFetcher    *service.UserDataFetcher
 	nonUserDataFetcher *service.NonUserDataFetcher
-	wails              gateway.Wails
-	cacheStore         gateway.CacheStore
-	logger             gateway.Logger
+	wails              adapter.Wails
+	cacheStore         adapter.CacheStore
+	logger             adapter.Logger
 }
 
 func NewFetchBattle(i do.Injector) (*FetchBattle, error) {
 	return &FetchBattle{
 		userDataFetcher:    do.MustInvoke[*service.UserDataFetcher](i),
 		nonUserDataFetcher: do.MustInvoke[*service.NonUserDataFetcher](i),
-		wails:              do.MustInvoke[gateway.Wails](i),
-		cacheStore:         do.MustInvoke[gateway.CacheStore](i),
-		logger:             do.MustInvoke[gateway.Logger](i),
+		wails:              do.MustInvoke[adapter.Wails](i),
+		cacheStore:         do.MustInvoke[adapter.CacheStore](i),
+		logger:             do.MustInvoke[adapter.Logger](i),
 	}, nil
 }
 

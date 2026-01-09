@@ -4,22 +4,22 @@ import (
 	"context"
 	"os"
 	"path/filepath"
-	"wfs/internal/gateway"
+	"wfs/internal/adapter"
 
 	"github.com/morikuni/failure"
 	"github.com/samber/do/v2"
 )
 
 type InstallPathSetting struct {
-	wails          gateway.Wails
-	configStore    gateway.ConfigStore
+	wails          adapter.Wails
+	configStore    adapter.ConfigStore
 	gameClientFile string
 }
 
 func NewInstallPathSetting(i do.Injector) (*InstallPathSetting, error) {
 	return &InstallPathSetting{
-		wails:          do.MustInvoke[gateway.Wails](i),
-		configStore:    do.MustInvoke[gateway.ConfigStore](i),
+		wails:          do.MustInvoke[adapter.Wails](i),
+		configStore:    do.MustInvoke[adapter.ConfigStore](i),
 		gameClientFile: "WorldOfWarships.exe",
 	}, nil
 }
