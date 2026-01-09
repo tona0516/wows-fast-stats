@@ -3,12 +3,12 @@ package main
 import (
 	"embed"
 	"log"
-	"wfs/internal/adapter"
-	"wfs/internal/config"
-	"wfs/internal/controller"
-	"wfs/internal/infra"
-	"wfs/internal/service"
-	"wfs/internal/usecase"
+	"wfs/backend/adapter"
+	"wfs/backend/config"
+	"wfs/backend/controller"
+	"wfs/backend/infra"
+	"wfs/backend/service"
+	"wfs/backend/usecase"
 
 	"github.com/samber/do/v2"
 	"github.com/wailsapp/wails/v2"

@@ -6,7 +6,7 @@
 ## 1. プロジェクト概要
 - リポジトリ名: `wows-fast-stats`
 - 主目的: World of Warships の対戦中のマッチの各種統計・効率指標を高速に取得/表示するデスクトップアプリ。
-- 主構成: Go (`internal/`), Svelte + TypeScript フロントエンド (`frontend/`), 設定ファイル・ユーザーデータ (`user_data/`).
+- 主構成: Go (`backend/`), Svelte + TypeScript フロントエンド (`frontend/`), 設定ファイル・ユーザーデータ (`user_data/`).
 
 ## 2. 技術スタック
 - Go 1.x (`go.mod` 参照)
@@ -16,7 +16,7 @@
 
 ## 3. コーディング一般方針
 - 可読性 > 省行数。過度なチェーンやマジックナンバー禁止。
-- ログ: `internal/infra/logger.go` を経由。直接 `fmt.Println` しない。
+- ログ: `backend/infra/logger.go` を経由。直接 `fmt.Println` しない。
 - 同期/並行: 明確な競合がない限りチャネルよりもシンプルなロック/直列処理を優先。
 
 ## 4. 命名規則
@@ -25,15 +25,15 @@
 - 定数: バックエンドは`UpperCamelCase`、フロントエンドは`SNAKE_CASE`。
 
 ## 5. ディレクトリ指針
-- `internal/`: Go バックエンドコード全般。
-- `internal/config/`: アプリ設定管理。
-- `internal/controller/`: Wails ハンドラ。
-- `internal/data/`: 外部APIレスポンスのマッピングや計算ロジック。
-- `internal/gateway/`: 外部APIインターフェース。
-- `internal/infra/`: 外部サービス接続 (Discord, GitHub, ローカルファイル等)。
-- `internal/service/`: ビジネスロジック (必要なら階層化)。
-- `internal/usecase/`: ユースケース実装 (必要なら階層化)。
-- `internal/mock/`: `go.uber.org/mock`で自動生成されたモック。この配下は手動編集禁止。
+- `backend/`: Go バックエンドコード全般。
+- `backend/config/`: アプリ設定管理。
+- `backend/controller/`: Wails ハンドラ。
+- `backend/data/`: 外部APIレスポンスのマッピングや計算ロジック。
+- `backend/gateway/`: 外部APIインターフェース。
+- `backend/infra/`: 外部サービス接続 (Discord, GitHub, ローカルファイル等)。
+- `backend/service/`: ビジネスロジック (必要なら階層化)。
+- `backend/usecase/`: ユースケース実装 (必要なら階層化)。
+- `backend/mock/`: `go.uber.org/mock`で自動生成されたモック。この配下は手動編集禁止。
 - `frontend/src/`: Svelte コンポーネント・ストア・ユーティリティ。
 
 ## 6. 依存追加
@@ -63,10 +63,10 @@
 - `task test` でフロントエンド/バックエンドテスト実行。
 
 ## 11. 既存計算ロジック参照
-- 新規指標追加時は `internal/data/rating.go`, `pr_factor.go`, `stats_pattern.go` 等の既存式/パターンを参照し整合性を確保。
+- 新規指標追加時は `backend/data/rating.go`, `pr_factor.go`, `stats_pattern.go` 等の既存式/パターンを参照し整合性を確保。
 
 ## 12. 新バージョン検出
-- `internal/data/new_version.go` 付近の処理を拡張する際は API レート/キャッシュを考慮。
+- `backend/data/new_version.go` 付近の処理を拡張する際は API レート/キャッシュを考慮。
 
 ## 13. ドキュメント更新
 - 公開 API/構造変更時は `README.md` とここ (必要なら) を更新。
