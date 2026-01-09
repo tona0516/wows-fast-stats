@@ -38,14 +38,14 @@ func (b *FetchBattle) Invoke(
 
 	eg := errgroup.Group{}
 
-	var userData *service.UserData
+	var userData *data.UserData
 	eg.Go(func() error {
 		var err error
 		userData, err = b.userDataFetcher.Fetch(tempArenaInfo.AccountNames())
 		return err
 	})
 
-	var nonUserData *service.NonUserData
+	var nonUserData *data.NonUserData
 	eg.Go(func() error {
 		var err error
 		nonUserData, err = b.nonUserDataFetcher.Fetch()
@@ -68,8 +68,8 @@ func (b *FetchBattle) Invoke(
 
 func (b *FetchBattle) compose(
 	tempArenaInfo data.TempArenaInfo,
-	userData *service.UserData,
-	nonUserData *service.NonUserData,
+	userData *data.UserData,
+	nonUserData *data.NonUserData,
 ) data.Battle {
 	friends := make(data.Players, 0)
 	enemies := make(data.Players, 0)

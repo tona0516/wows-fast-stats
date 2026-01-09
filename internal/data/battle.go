@@ -1,8 +1,128 @@
 package data
 
+import (
+	"sort"
+)
+
 type Battle struct {
 	Meta  BattleMetaData `json:"metadata"`
 	Teams []Team         `json:"teams"`
+}
+
+func NewBattle(
+	tempArenaInfo TempArenaInfo,
+	userData *UserData,
+	nonUserData *NonUserData,
+) Battle {
+	friends := make(Players, 0)
+	enemies := make(Players, 0)
+
+	for _, vehicle := range tempArenaInfo.Vehicles {
+		nickname := vehicle.Name
+		accountID := userData.AccountList.AccountID(nickname)
+		clan := userData.Clans[accountID]
+
+		warship, ok := nonUserData.Warships[vehicle.ShipID]
+		if !ok {
+			warship = *NewUnknownWarship()
+		}
+
+		stats := NewPersonalStats(
+			vehicle.ShipID,
+			userData.AccountInfo.Data[accountID],
+			userData.AllPlayerShipsStats.Player(accountID),
+			userData.AllPlayerShipsBadges[accountID],
+			nonUserData.Warships,
+			tempArenaInfo,
+		)
+
+		player := Player{
+			PlayerInfo: PlayerInfo{
+				ID:       accountID,
+				Name:     nickname,
+				Clan:     clan,
+				IsHidden: userData.AccountInfo.Data[accountID].HiddenProfile,
+			},
+			Warship: warship,
+			PvPSolo: BuildPlayerStats(
+				StatsPatternPvPSolo,
+				stats,
+				accountID,
+				vehicle.ShipID,
+				tempArenaInfo,
+				nonUserData.Warships,
+			),
+			PvPAll: BuildPlayerStats(
+				StatsPatternPvPAll,
+				stats,
+				accountID,
+				vehicle.ShipID,
+				tempArenaInfo,
+				nonUserData.Warships,
+			),
+			RankSolo: BuildPlayerStats(
+				StatsPatternRankSolo,
+				stats,
+				accountID,
+				vehicle.ShipID,
+				tempArenaInfo,
+				nonUserData.Warships,
+			),
+		}
+
+		if vehicle.IsFriend() {
+			friends = append(friends, player)
+		} else {
+			enemies = append(enemies, player)
+		}
+	}
+
+	sort.Sort(friends)
+	sort.Sort(enemies)
+
+	teams := []Team{
+		{
+			Players: friends,
+			PvPAll: TeamStats{
+				TeamAverageStats: CalculateTeamAverageStats(friends, StatsPatternPvPAll),
+				TeamThreatLevel:  CalculateTeamThreatLevel(friends, StatsPatternPvPAll),
+			},
+			PvPSolo: TeamStats{
+				TeamAverageStats: CalculateTeamAverageStats(friends, StatsPatternPvPSolo),
+				TeamThreatLevel:  CalculateTeamThreatLevel(friends, StatsPatternPvPSolo),
+			},
+			RankSolo: TeamStats{
+				TeamAverageStats: CalculateTeamAverageStats(friends, StatsPatternRankSolo),
+				TeamThreatLevel:  CalculateTeamThreatLevel(friends, StatsPatternRankSolo),
+			},
+		},
+		{
+			Players: enemies,
+			PvPAll: TeamStats{
+				TeamAverageStats: CalculateTeamAverageStats(enemies, StatsPatternPvPAll),
+				TeamThreatLevel:  CalculateTeamThreatLevel(enemies, StatsPatternPvPAll),
+			},
+			PvPSolo: TeamStats{
+				TeamAverageStats: CalculateTeamAverageStats(enemies, StatsPatternPvPSolo),
+				TeamThreatLevel:  CalculateTeamThreatLevel(enemies, StatsPatternPvPSolo),
+			},
+			RankSolo: TeamStats{
+				TeamAverageStats: CalculateTeamAverageStats(enemies, StatsPatternRankSolo),
+				TeamThreatLevel:  CalculateTeamThreatLevel(enemies, StatsPatternRankSolo),
+			},
+		},
+	}
+
+	battle := Battle{
+		Meta: BattleMetaData{
+			Unixtime: tempArenaInfo.Unixtime(),
+			Arena:    tempArenaInfo.BattleArena(nonUserData.BattleArenas),
+			Type:     tempArenaInfo.BattleType(nonUserData.BattleTypes),
+		},
+		Teams: teams,
+	}
+
+	return battle
 }
 
 type BattleMetaData struct {

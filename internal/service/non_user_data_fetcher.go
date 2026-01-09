@@ -10,12 +10,6 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-type NonUserData struct {
-	Warships     data.Warships
-	BattleArenas map[int]string
-	BattleTypes  map[string]string
-}
-
 type NonUserDataFetcher struct {
 	cacheStore      adapter.CacheStore
 	wargamingClient adapter.WargamingClient
@@ -30,7 +24,7 @@ func NewNonUserDataFetcher(i do.Injector) (*NonUserDataFetcher, error) {
 	}, nil
 }
 
-func (f *NonUserDataFetcher) Fetch() (*NonUserData, error) {
+func (f *NonUserDataFetcher) Fetch() (*data.NonUserData, error) {
 	eg := errgroup.Group{}
 
 	var warships data.Warships
@@ -58,7 +52,7 @@ func (f *NonUserDataFetcher) Fetch() (*NonUserData, error) {
 		return nil, failure.Wrap(err)
 	}
 
-	return &NonUserData{
+	return &data.NonUserData{
 		Warships:     warships,
 		BattleArenas: battleArenas,
 		BattleTypes:  battleTypes,

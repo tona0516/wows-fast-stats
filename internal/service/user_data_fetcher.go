@@ -16,14 +16,6 @@ import (
 // URLを検出する正規表現パターン.
 var urlRegex = regexp.MustCompile(`https?://[^\s]+`)
 
-type UserData struct {
-	AccountInfo          data.WGAccountInfo
-	AccountList          data.WGAccountList
-	Clans                data.Clans
-	AllPlayerShipsStats  data.AllPlayerShipsStats
-	AllPlayerShipsBadges data.AllPlayerShipsBadges
-}
-
 type UserDataFetcher struct {
 	wargamingClient adapter.WargamingClient
 	clanClient      adapter.ClanClient
@@ -36,7 +28,7 @@ func NewUserDataFetcher(i do.Injector) (*UserDataFetcher, error) {
 	}, nil
 }
 
-func (f *UserDataFetcher) Fetch(accountNames []string) (*UserData, error) {
+func (f *UserDataFetcher) Fetch(accountNames []string) (*data.UserData, error) {
 	accountList, err := f.wargamingClient.AccountList(accountNames)
 	if err != nil {
 		return nil, failure.Wrap(err)
@@ -77,7 +69,7 @@ func (f *UserDataFetcher) Fetch(accountNames []string) (*UserData, error) {
 		return nil, failure.Wrap(err)
 	}
 
-	return &UserData{
+	return &data.UserData{
 		AccountInfo:          accountInfo,
 		AccountList:          accountList,
 		Clans:                clans,
