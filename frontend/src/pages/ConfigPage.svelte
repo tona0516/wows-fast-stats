@@ -11,7 +11,7 @@
   import {
     StartPollingMatch,
     TrySaveInstallPath,
-  } from "@wails/go/controller/Controller";
+  } from "@wails/go/main/App";
   import { onMount } from "svelte";
   import { themeChange } from "theme-change";
 

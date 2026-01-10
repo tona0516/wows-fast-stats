@@ -1,4 +1,4 @@
-package controller
+package main
 
 import (
 	"context"
@@ -16,7 +16,7 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
-type Controller struct {
+type App struct {
 	appConfig                 config.Config
 	configStore               adapter.ConfigStore
 	fetchBattleUsecase        *usecase.FetchBattle
@@ -28,8 +28,8 @@ type Controller struct {
 	pollMatchCancelFunc context.CancelFunc
 }
 
-func NewController(i do.Injector) (*Controller, error) {
-	return &Controller{
+func NewApp(i do.Injector) (*App, error) {
+	return &App{
 		appConfig:                 do.MustInvoke[config.Config](i),
 		configStore:               do.MustInvoke[adapter.ConfigStore](i),
 		fetchBattleUsecase:        do.MustInvoke[*usecase.FetchBattle](i),
@@ -39,23 +39,23 @@ func NewController(i do.Injector) (*Controller, error) {
 	}, nil
 }
 
-func (c *Controller) StartPollingMatch() {
-	if c.pollMatchCancelFunc != nil {
-		c.pollMatchCancelFunc()
+func (a *App) StartPollingMatch() {
+	if a.pollMatchCancelFunc != nil {
+		a.pollMatchCancelFunc()
 	}
 
 	cancelCtx, cancelFunc := context.WithCancel(context.Background())
-	c.pollMatchCancelFunc = cancelFunc
+	a.pollMatchCancelFunc = cancelFunc
 	channel := make(chan data.TempArenaInfo)
 
-	go c.pollMatchUsecase.Invoke(c.ctx, cancelCtx, channel)
+	go a.pollMatchUsecase.Invoke(a.ctx, cancelCtx, channel)
 	for tempArenaInfo := range channel {
-		c.fetchBattleUsecase.Invoke(c.ctx, tempArenaInfo)
+		a.fetchBattleUsecase.Invoke(a.ctx, tempArenaInfo)
 	}
 }
 
-func (c *Controller) GetUserConfig() (data.UserConfig, error) {
-	config, err := c.configStore.UserConfig()
+func (a *App) GetUserConfig() (data.UserConfig, error) {
+	config, err := a.configStore.UserConfig()
 	if err == nil {
 		return config, nil
 	}
@@ -67,43 +67,43 @@ func (c *Controller) GetUserConfig() (data.UserConfig, error) {
 	return data.UserConfig{}, failure.Wrap(err)
 }
 
-func (c *Controller) SaveUserConfig(config data.UserConfig) error {
-	if err := c.configStore.SetUserConfig(config); err != nil {
+func (a *App) SaveUserConfig(config data.UserConfig) error {
+	if err := a.configStore.SetUserConfig(config); err != nil {
 		return failure.Wrap(err)
 	}
 
 	return nil
 }
 
-func (c *Controller) TrySaveInstallPath() (bool, error) {
-	return c.installPathSettingUsecase.Invoke(c.ctx)
+func (a *App) TrySaveInstallPath() (bool, error) {
+	return a.installPathSettingUsecase.Invoke(a.ctx)
 }
 
-func (c *Controller) CurrentVersion() string {
-	return c.appConfig.Basic.Version
+func (a *App) CurrentVersion() string {
+	return a.appConfig.Basic.Version
 }
 
-func (c *Controller) NewVersion() *data.NewVersion {
-	return c.updateCheckUsecase.Invoke()
+func (a *App) NewVersion() *data.NewVersion {
+	return a.updateCheckUsecase.Invoke()
 }
 
-func (c *Controller) ShowMessageDialog(message string) {
-	_, _ = runtime.MessageDialog(c.ctx, runtime.MessageDialogOptions{
-		Title:   c.appConfig.Basic.Name,
+func (a *App) ShowMessageDialog(message string) {
+	_, _ = runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
+		Title:   a.appConfig.Basic.Name,
 		Message: message,
 	})
 }
 
 // 構造体のバインド用のメソッド.
-func (c *Controller) EmptyBattle() data.Battle {
+func (a *App) EmptyBattle() data.Battle {
 	return data.Battle{}
 }
 
-func (c *Controller) OnStartup(ctx context.Context) {
-	c.ctx = ctx
+func (a *App) OnStartup(ctx context.Context) {
+	a.ctx = ctx
 
 	if isAlreadyRunning() {
-		c.ShowMessageDialog("すでに起動しています。")
+		a.ShowMessageDialog("すでに起動しています。")
 		os.Exit(1)
 		return
 	}

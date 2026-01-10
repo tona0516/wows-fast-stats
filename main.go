@@ -2,10 +2,8 @@ package main
 
 import (
 	"embed"
-	"log"
 	"wfs/backend/adapter"
 	"wfs/backend/config"
-	"wfs/backend/controller"
 	"wfs/backend/infra"
 	"wfs/backend/service"
 	"wfs/backend/usecase"
@@ -26,11 +24,11 @@ var (
 	env     string
 )
 
-func main() {
+func injectDependency() *options.App {
 	injector := do.New()
 
-	appConfig := config.NewConfig(appName, version, env)
-	do.ProvideValue(injector, appConfig)
+	config := config.NewConfig(appName, version, env)
+	do.ProvideValue(injector, config)
 
 	// infra
 	do.Provide(injector, func(i do.Injector) (adapter.Wails, error) {
@@ -62,16 +60,16 @@ func main() {
 	})
 	do.ProvideNamed(injector, "alert-discord-client", func(i do.Injector) (adapter.DiscordClient, error) {
 		return infra.NewDiscordClient(
-			appConfig.DiscordClient.AlertWebhookURL,
-			appConfig.DiscordClient.RetryCount,
-			appConfig.DiscordClient.Timeout,
+			config.DiscordClient.AlertWebhookURL,
+			config.DiscordClient.RetryCount,
+			config.DiscordClient.Timeout,
 		)
 	})
 	do.ProvideNamed(injector, "info-discord-client", func(i do.Injector) (adapter.DiscordClient, error) {
 		return infra.NewDiscordClient(
-			appConfig.DiscordClient.InfoWebhookURL,
-			appConfig.DiscordClient.RetryCount,
-			appConfig.DiscordClient.Timeout,
+			config.DiscordClient.InfoWebhookURL,
+			config.DiscordClient.RetryCount,
+			config.DiscordClient.Timeout,
 		)
 	})
 
@@ -86,23 +84,27 @@ func main() {
 	do.Provide(injector, usecase.NewUpdateCheck)
 
 	// controller
-	do.Provide(injector, controller.NewController)
+	do.Provide(injector, NewApp)
 
-	controller := do.MustInvoke[*controller.Controller](injector)
+	app := do.MustInvoke[*App](injector)
 
-	err := wails.Run(&options.App{
-		Title:     appConfig.Basic.Name,
-		Width:     appConfig.Basic.Width,
-		Height:    appConfig.Basic.Height,
-		MinWidth:  appConfig.Basic.MinWidth,
-		MinHeight: appConfig.Basic.MinHeight,
+	return &options.App{
+		Title:     config.Basic.Name,
+		Width:     config.Basic.Width,
+		Height:    config.Basic.Height,
+		MinWidth:  config.Basic.MinWidth,
+		MinHeight: config.Basic.MinHeight,
 		AssetServer: &assetserver.Options{
 			Assets: assets,
 		},
-		OnStartup: controller.OnStartup,
-		Bind:      []any{controller},
-	})
-	if err != nil {
-		log.Fatalln(err.Error())
+		OnStartup: app.OnStartup,
+		Bind:      []any{app},
+	}
+}
+
+func main() {
+	app := injectDependency()
+	if err := wails.Run(app); err != nil {
+		panic(err)
 	}
 }
