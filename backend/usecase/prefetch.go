@@ -1,4 +1,4 @@
-package service
+package usecase
 
 import (
 	"sync"
@@ -10,41 +10,47 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-type NonUserDataFetcher struct {
+type Prefetch struct {
 	cacheStore      adapter.CacheStore
 	wargamingClient adapter.WargamingClient
 	numbersClient   adapter.NumbersClient
 }
 
-func NewNonUserDataFetcher(i do.Injector) (*NonUserDataFetcher, error) {
-	return &NonUserDataFetcher{
+func NewPrefetch(i do.Injector) (*Prefetch, error) {
+	return &Prefetch{
 		cacheStore:      do.MustInvoke[adapter.CacheStore](i),
 		wargamingClient: do.MustInvoke[adapter.WargamingClient](i),
 		numbersClient:   do.MustInvoke[adapter.NumbersClient](i),
 	}, nil
 }
 
-func (f *NonUserDataFetcher) Fetch() (*data.NonUserData, error) {
+func (p *Prefetch) Invoke() (*data.PrefetchResult, error) {
 	eg := errgroup.Group{}
 
 	var warships data.Warships
 	eg.Go(func() error {
 		var err error
-		warships, err = f.fetchWarships()
+		measure("fetchWarships", func() {
+			warships, err = p.fetchWarships()
+		})
 		return err
 	})
 
 	var battleArenas map[int]string
 	eg.Go(func() error {
 		var err error
-		battleArenas, err = f.fetchBattleArenas()
+		measure("fetchBattleArenas", func() {
+			battleArenas, err = p.fetchBattleArenas()
+		})
 		return err
 	})
 
 	var battleTypes map[string]string
 	eg.Go(func() error {
 		var err error
-		battleTypes, err = f.fetchBattleTypes()
+		measure("fetchBattleTypes", func() {
+			battleTypes, err = p.fetchBattleTypes()
+		})
 		return err
 	})
 
@@ -52,19 +58,19 @@ func (f *NonUserDataFetcher) Fetch() (*data.NonUserData, error) {
 		return nil, failure.Wrap(err)
 	}
 
-	return &data.NonUserData{
+	return &data.PrefetchResult{
 		Warships:     warships,
 		BattleArenas: battleArenas,
 		BattleTypes:  battleTypes,
 	}, nil
 }
 
-func (f *NonUserDataFetcher) fetchWarships() (data.Warships, error) {
+func (p *Prefetch) fetchWarships() (data.Warships, error) {
 	eg := errgroup.Group{}
 
 	var encycShips map[int]data.WGEncycShips
 	eg.Go(func() error {
-		resp, err := f.fetchEncycShips()
+		resp, err := p.fetchEncycShips()
 		if err != nil {
 			return failure.Wrap(err)
 		}
@@ -74,7 +80,7 @@ func (f *NonUserDataFetcher) fetchWarships() (data.Warships, error) {
 
 	var expectedStats data.NSExpectedStats
 	eg.Go(func() error {
-		resp, err := f.numbersClient.ExpectedStats()
+		resp, err := p.numbersClient.ExpectedStats()
 		if err != nil {
 			return failure.Wrap(err)
 		}
@@ -83,7 +89,7 @@ func (f *NonUserDataFetcher) fetchWarships() (data.Warships, error) {
 	})
 
 	if err := eg.Wait(); err != nil {
-		cache, errCache := f.cacheStore.Warships()
+		cache, errCache := p.cacheStore.Warships()
 		if errCache != nil {
 			return nil, failure.Wrap(err)
 		}
@@ -91,16 +97,16 @@ func (f *NonUserDataFetcher) fetchWarships() (data.Warships, error) {
 		return cache, nil
 	}
 
-	warships := f.composeWarships(encycShips, expectedStats)
-	_ = f.cacheStore.SetWarships(warships)
+	warships := p.composeWarships(encycShips, expectedStats)
+	_ = p.cacheStore.SetWarships(warships)
 
 	return warships, nil
 }
 
-func (f *NonUserDataFetcher) fetchBattleArenas() (map[int]string, error) {
-	resp, err := f.wargamingClient.BattleArenas()
+func (p *Prefetch) fetchBattleArenas() (map[int]string, error) {
+	resp, err := p.wargamingClient.BattleArenas()
 	if err != nil {
-		cache, errCache := f.cacheStore.BattleArenas()
+		cache, errCache := p.cacheStore.BattleArenas()
 		if errCache != nil {
 			return nil, failure.Wrap(err)
 		}
@@ -112,15 +118,15 @@ func (f *NonUserDataFetcher) fetchBattleArenas() (map[int]string, error) {
 		result[id] = arena.Name
 	}
 
-	_ = f.cacheStore.SetBattleArenas(result)
+	_ = p.cacheStore.SetBattleArenas(result)
 
 	return result, nil
 }
 
-func (f *NonUserDataFetcher) fetchBattleTypes() (map[string]string, error) {
-	resp, err := f.wargamingClient.BattleTypes()
+func (p *Prefetch) fetchBattleTypes() (map[string]string, error) {
+	resp, err := p.wargamingClient.BattleTypes()
 	if err != nil {
-		cache, errCache := f.cacheStore.BattleTypes()
+		cache, errCache := p.cacheStore.BattleTypes()
 		if errCache != nil {
 			return nil, failure.Wrap(err)
 		}
@@ -132,17 +138,17 @@ func (f *NonUserDataFetcher) fetchBattleTypes() (map[string]string, error) {
 		result[key] = battleType.Name
 	}
 
-	_ = f.cacheStore.SetBattleTypes(result)
+	_ = p.cacheStore.SetBattleTypes(result)
 
 	return result, nil
 }
 
-func (f *NonUserDataFetcher) fetchEncycShips() (map[int]data.WGEncycShips, error) {
+func (p *Prefetch) fetchEncycShips() (map[int]data.WGEncycShips, error) {
 	result := make(map[int]data.WGEncycShips)
 
 	var mu sync.Mutex
 	fetch := func(page int) (int, error) {
-		res, err := f.wargamingClient.EncycShips(page)
+		res, err := p.wargamingClient.EncycShips(page)
 		if err != nil {
 			return 0, failure.Wrap(err)
 		}
@@ -177,7 +183,7 @@ func (f *NonUserDataFetcher) fetchEncycShips() (map[int]data.WGEncycShips, error
 	return result, nil
 }
 
-func (f *NonUserDataFetcher) composeWarships(
+func (p *Prefetch) composeWarships(
 	encycShips map[int]data.WGEncycShips,
 	expectedStats data.NSExpectedStats,
 ) data.Warships {

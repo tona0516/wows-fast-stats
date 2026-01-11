@@ -18,6 +18,10 @@ export function NewVersion() {
   return window['go']['main']['App']['NewVersion']();
 }
 
+export function Prefetch() {
+  return window['go']['main']['App']['Prefetch']();
+}
+
 export function SaveUserConfig(arg1) {
   return window['go']['main']['App']['SaveUserConfig'](arg1);
 }

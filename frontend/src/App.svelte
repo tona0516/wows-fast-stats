@@ -12,6 +12,7 @@
     ShowMessageDialog,
     GetUserConfig,
     StartPollingMatch,
+    Prefetch,
   } from "@wails/go/main/App";
   import type { data } from "@wails/go/models";
   import { EventsOn, LogInfo } from "@wails/runtime/runtime";
@@ -69,6 +70,8 @@
     try {
       const userConfig = await GetUserConfig();
       storedUserConfig.set(userConfig);
+
+      await Prefetch();
 
       StartPollingMatch();
 

@@ -26,12 +26,11 @@
 
 ## 5. ディレクトリ指針
 - `backend/`: Go バックエンドコード全般。
+- `backend/adapter/`: 外部APIインターフェース。
 - `backend/config/`: アプリ設定管理。
 - `backend/controller/`: Wails ハンドラ。
 - `backend/data/`: 外部APIレスポンスのマッピングや計算ロジック。
-- `backend/gateway/`: 外部APIインターフェース。
 - `backend/infra/`: 外部サービス接続 (Discord, GitHub, ローカルファイル等)。
-- `backend/service/`: ビジネスロジック (必要なら階層化)。
 - `backend/usecase/`: ユースケース実装 (必要なら階層化)。
 - `backend/mock/`: `go.uber.org/mock`で自動生成されたモック。この配下は手動編集禁止。
 - `frontend/src/`: Svelte コンポーネント・ストア・ユーティリティ。

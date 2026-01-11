@@ -5,7 +5,6 @@ import (
 	"wfs/backend/adapter"
 	"wfs/backend/config"
 	"wfs/backend/infra"
-	"wfs/backend/service"
 	"wfs/backend/usecase"
 
 	"github.com/samber/do/v2"
@@ -73,11 +72,8 @@ func injectDependency() *options.App {
 		)
 	})
 
-	// service
-	do.Provide(injector, service.NewUserDataFetcher)
-	do.Provide(injector, service.NewNonUserDataFetcher)
-
 	// usecase
+	do.Provide(injector, usecase.NewPrefetch)
 	do.Provide(injector, usecase.NewFetchBattle)
 	do.Provide(injector, usecase.NewPollMatch)
 	do.Provide(injector, usecase.NewInstallPathSetting)

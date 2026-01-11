@@ -10,6 +10,8 @@ export function GetUserConfig():Promise<data.UserConfig>;
 
 export function NewVersion():Promise<data.NewVersion>;
 
+export function Prefetch():Promise<void>;
+
 export function SaveUserConfig(arg1:data.UserConfig):Promise<void>;
 
 export function ShowMessageDialog(arg1:string):Promise<void>;

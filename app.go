@@ -19,6 +19,7 @@ import (
 type App struct {
 	appConfig                 config.Config
 	configStore               adapter.ConfigStore
+	prefetchUsecase           *usecase.Prefetch
 	fetchBattleUsecase        *usecase.FetchBattle
 	pollMatchUsecase          *usecase.PollMatch
 	installPathSettingUsecase *usecase.InstallPathSetting
@@ -26,17 +27,27 @@ type App struct {
 
 	ctx                 context.Context
 	pollMatchCancelFunc context.CancelFunc
+	prefetchResult      *data.PrefetchResult
 }
 
 func NewApp(i do.Injector) (*App, error) {
 	return &App{
 		appConfig:                 do.MustInvoke[config.Config](i),
 		configStore:               do.MustInvoke[adapter.ConfigStore](i),
+		prefetchUsecase:           do.MustInvoke[*usecase.Prefetch](i),
 		fetchBattleUsecase:        do.MustInvoke[*usecase.FetchBattle](i),
 		pollMatchUsecase:          do.MustInvoke[*usecase.PollMatch](i),
 		installPathSettingUsecase: do.MustInvoke[*usecase.InstallPathSetting](i),
 		updateCheckUsecase:        do.MustInvoke[*usecase.UpdateCheck](i),
 	}, nil
+}
+
+func (a *App) Prefetch() {
+	result, err := a.prefetchUsecase.Invoke()
+	if err != nil {
+		return
+	}
+	a.prefetchResult = result
 }
 
 func (a *App) StartPollingMatch() {
@@ -50,7 +61,7 @@ func (a *App) StartPollingMatch() {
 
 	go a.pollMatchUsecase.Invoke(a.ctx, cancelCtx, channel)
 	for tempArenaInfo := range channel {
-		a.fetchBattleUsecase.Invoke(a.ctx, tempArenaInfo)
+		a.fetchBattleUsecase.Invoke(a.ctx, tempArenaInfo, a.prefetchResult)
 	}
 }
 

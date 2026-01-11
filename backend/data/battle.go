@@ -12,7 +12,7 @@ type Battle struct {
 func NewBattle(
 	tempArenaInfo TempArenaInfo,
 	userData *UserData,
-	nonUserData *NonUserData,
+	startupResult *PrefetchResult,
 ) Battle {
 	friends := make(Players, 0)
 	enemies := make(Players, 0)
@@ -22,7 +22,7 @@ func NewBattle(
 		accountID := userData.AccountList.AccountID(nickname)
 		clan := userData.Clans[accountID]
 
-		warship, ok := nonUserData.Warships[vehicle.ShipID]
+		warship, ok := startupResult.Warships[vehicle.ShipID]
 		if !ok {
 			warship = *NewUnknownWarship()
 		}
@@ -32,7 +32,7 @@ func NewBattle(
 			userData.AccountInfo.Data[accountID],
 			userData.AllPlayerShipsStats.Player(accountID),
 			userData.AllPlayerShipsBadges[accountID],
-			nonUserData.Warships,
+			startupResult.Warships,
 			tempArenaInfo,
 		)
 
@@ -50,7 +50,7 @@ func NewBattle(
 				accountID,
 				vehicle.ShipID,
 				tempArenaInfo,
-				nonUserData.Warships,
+				startupResult.Warships,
 			),
 			PvPAll: BuildPlayerStats(
 				StatsPatternPvPAll,
@@ -58,7 +58,7 @@ func NewBattle(
 				accountID,
 				vehicle.ShipID,
 				tempArenaInfo,
-				nonUserData.Warships,
+				startupResult.Warships,
 			),
 			RankSolo: BuildPlayerStats(
 				StatsPatternRankSolo,
@@ -66,7 +66,7 @@ func NewBattle(
 				accountID,
 				vehicle.ShipID,
 				tempArenaInfo,
-				nonUserData.Warships,
+				startupResult.Warships,
 			),
 		}
 
@@ -116,8 +116,8 @@ func NewBattle(
 	battle := Battle{
 		Meta: BattleMetaData{
 			Unixtime: tempArenaInfo.Unixtime(),
-			Arena:    tempArenaInfo.BattleArena(nonUserData.BattleArenas),
-			Type:     tempArenaInfo.BattleType(nonUserData.BattleTypes),
+			Arena:    tempArenaInfo.BattleArena(startupResult.BattleArenas),
+			Type:     tempArenaInfo.BattleType(startupResult.BattleTypes),
 		},
 		Teams: teams,
 	}
