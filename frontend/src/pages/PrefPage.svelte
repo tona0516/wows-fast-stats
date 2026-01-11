@@ -6,7 +6,7 @@
     STATS_COLUMN_INFO,
     PLAYER_NAME_COLORS,
   } from "@libs/constants";
-  import { showToast, storedUserConfig } from "@libs/stores";
+  import { showToast, storedPref } from "@libs/stores";
   import { Theme } from "@libs/Theme";
   import { StartPollingMatch, TrySaveInstallPath } from "@wails/go/main/App";
   import { onMount } from "svelte";
@@ -39,12 +39,12 @@
     <p class="text-sm text-gray-500 mb-2">
       WorldOfWarships.exeが存在するフォルダを選択してください
     </p>
-    {#if $storedUserConfig.install_path}
+    {#if $storedPref.install_path}
       <div class="stats shadow w-full mb-2">
         <div class="stat">
           <div class="stat-title">ゲームクライアント インストールパス</div>
           <div class="stat-value text-lg break-all">
-            {$storedUserConfig.install_path}
+            {$storedPref.install_path}
           </div>
         </div>
       </div>
@@ -71,10 +71,10 @@
       <label class="label font-bold">UIサイズ</label>
       <select
         class="select select-bordered w-full"
-        bind:value={$storedUserConfig.zoom_rate}
+        bind:value={$storedPref.zoom_rate}
       >
         {#each ZOOM_RATES as zr}
-          <option selected={zr === $storedUserConfig.zoom_rate} value={zr}
+          <option selected={zr === $storedPref.zoom_rate} value={zr}
             >{zr}%</option
           >
         {/each}
@@ -85,12 +85,11 @@
       <label class="label font-bold">統計パターン</label>
       <select
         class="select select-bordered w-full my-2"
-        bind:value={$storedUserConfig.stats_extra}
+        bind:value={$storedPref.stats_extra}
       >
         {#each STATS_EXTRAS as se}
-          <option
-            selected={se[0] === $storedUserConfig.stats_extra}
-            value={se[0]}>{se[1]}</option
+          <option selected={se[0] === $storedPref.stats_extra} value={se[0]}
+            >{se[1]}</option
           >
         {/each}
       </select>
@@ -120,9 +119,7 @@
                   <input
                     class="toggle toggle-success"
                     type="checkbox"
-                    bind:checked={
-                      $storedUserConfig.column.player.enable_nation_flag
-                    }
+                    bind:checked={$storedPref.column.player.enable_nation_flag}
                   />
                   <span
                     >クラン国籍の国旗を表示する（クラン説明から言語検出）</span
@@ -132,12 +129,12 @@
                   <span>成績に基づく背景色</span>
                   <select
                     class="select select-sm select-bordered"
-                    bind:value={$storedUserConfig.column.player.color_pattern}
+                    bind:value={$storedPref.column.player.color_pattern}
                   >
                     {#each PLAYER_NAME_COLORS as color}
                       <option
                         selected={color[0] ===
-                          $storedUserConfig.column.player.color_pattern}
+                          $storedPref.column.player.color_pattern}
                         value={color[0]}>{color[1]}</option
                       >
                     {/each}
@@ -154,9 +151,7 @@
                   <input
                     class="toggle toggle-success"
                     type="checkbox"
-                    bind:checked={
-                      $storedUserConfig.column.ship.enable_nation_flag
-                    }
+                    bind:checked={$storedPref.column.ship.enable_nation_flag}
                   />
                   <span>国旗を表示する</span>
                 </label>
@@ -164,7 +159,7 @@
                   <input
                     class="toggle toggle-success"
                     type="checkbox"
-                    bind:checked={$storedUserConfig.column.ship.is_colored}
+                    bind:checked={$storedPref.column.ship.is_colored}
                   />
                   <span>艦種に基づく背景色にする</span>
                 </label>
@@ -196,7 +191,7 @@
                     class="toggle toggle-success"
                     type="checkbox"
                     bind:checked={
-                      $storedUserConfig.column.stats[statsKey].is_show_ship
+                      $storedPref.column.stats[statsKey].is_show_ship
                     }
                   />
                 </td>
@@ -209,7 +204,7 @@
                     class="toggle toggle-success"
                     type="checkbox"
                     bind:checked={
-                      $storedUserConfig.column.stats[statsKey].is_show_overall
+                      $storedPref.column.stats[statsKey].is_show_overall
                     }
                   />
                 </td>
@@ -220,12 +215,12 @@
                 <td class="text-center px-4 py-2">
                   <select
                     class="select select-sm select-bordered"
-                    bind:value={$storedUserConfig.column.stats[statsKey].digit}
+                    bind:value={$storedPref.column.stats[statsKey].digit}
                   >
                     {#each [0, 1, 2] as digit}
                       <option
                         selected={digit ===
-                          $storedUserConfig.column.stats[statsKey].digit}
+                          $storedPref.column.stats[statsKey].digit}
                         value={digit}>{digit}</option
                       >
                     {/each}
@@ -249,7 +244,7 @@
         <input
           class="toggle toggle-success"
           type="checkbox"
-          bind:checked={$storedUserConfig.is_send_report}
+          bind:checked={$storedPref.is_send_report}
         />
         <span>アプリ改善のためのデータ送信を許可する</span>
       </li>

@@ -213,57 +213,57 @@ func (mr *MockCacheStoreMockRecorder) Warships() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Warships", reflect.TypeOf((*MockCacheStore)(nil).Warships))
 }
 
-// MockConfigStore is a mock of ConfigStore interface.
-type MockConfigStore struct {
+// MockPrefStore is a mock of PrefStore interface.
+type MockPrefStore struct {
 	ctrl     *gomock.Controller
-	recorder *MockConfigStoreMockRecorder
+	recorder *MockPrefStoreMockRecorder
 	isgomock struct{}
 }
 
-// MockConfigStoreMockRecorder is the mock recorder for MockConfigStore.
-type MockConfigStoreMockRecorder struct {
-	mock *MockConfigStore
+// MockPrefStoreMockRecorder is the mock recorder for MockPrefStore.
+type MockPrefStoreMockRecorder struct {
+	mock *MockPrefStore
 }
 
-// NewMockConfigStore creates a new mock instance.
-func NewMockConfigStore(ctrl *gomock.Controller) *MockConfigStore {
-	mock := &MockConfigStore{ctrl: ctrl}
-	mock.recorder = &MockConfigStoreMockRecorder{mock}
+// NewMockPrefStore creates a new mock instance.
+func NewMockPrefStore(ctrl *gomock.Controller) *MockPrefStore {
+	mock := &MockPrefStore{ctrl: ctrl}
+	mock.recorder = &MockPrefStoreMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockConfigStore) EXPECT() *MockConfigStoreMockRecorder {
+func (m *MockPrefStore) EXPECT() *MockPrefStoreMockRecorder {
 	return m.recorder
 }
 
-// SetUserConfig mocks base method.
-func (m *MockConfigStore) SetUserConfig(arg0 data.UserConfig) error {
+// Pref mocks base method.
+func (m *MockPrefStore) Pref() (data.Pref, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SetUserConfig", arg0)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// SetUserConfig indicates an expected call of SetUserConfig.
-func (mr *MockConfigStoreMockRecorder) SetUserConfig(arg0 any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetUserConfig", reflect.TypeOf((*MockConfigStore)(nil).SetUserConfig), arg0)
-}
-
-// UserConfig mocks base method.
-func (m *MockConfigStore) UserConfig() (data.UserConfig, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UserConfig")
-	ret0, _ := ret[0].(data.UserConfig)
+	ret := m.ctrl.Call(m, "Pref")
+	ret0, _ := ret[0].(data.Pref)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// UserConfig indicates an expected call of UserConfig.
-func (mr *MockConfigStoreMockRecorder) UserConfig() *gomock.Call {
+// Pref indicates an expected call of Pref.
+func (mr *MockPrefStoreMockRecorder) Pref() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UserConfig", reflect.TypeOf((*MockConfigStore)(nil).UserConfig))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Pref", reflect.TypeOf((*MockPrefStore)(nil).Pref))
+}
+
+// SetPref mocks base method.
+func (m *MockPrefStore) SetPref(arg0 data.Pref) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SetPref", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SetPref indicates an expected call of SetPref.
+func (mr *MockPrefStoreMockRecorder) SetPref(arg0 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetPref", reflect.TypeOf((*MockPrefStore)(nil).SetPref), arg0)
 }
 
 // MockReplayReader is a mock of ReplayReader interface.

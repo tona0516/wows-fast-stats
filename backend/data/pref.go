@@ -1,6 +1,6 @@
 package data
 
-type UserConfig struct {
+type Pref struct {
 	Version      int          `json:"version"`
 	InstallPath  string       `json:"install_path"`
 	ZoomRate     int          `json:"zoom_rate"`
@@ -51,8 +51,8 @@ type DetailStatsColumnConfig struct {
 	Digit         int  `json:"digit"`
 }
 
-func DefaultUserConfig() UserConfig {
-	return UserConfig{
+func DefaultPref() Pref {
+	return Pref{
 		Version:      1,
 		InstallPath:  "",
 		ZoomRate:     100,

@@ -6,13 +6,13 @@ export function CurrentVersion():Promise<string>;
 
 export function EmptyBattle():Promise<data.Battle>;
 
-export function GetUserConfig():Promise<data.UserConfig>;
+export function LoadPref():Promise<data.Pref>;
 
 export function NewVersion():Promise<data.NewVersion>;
 
 export function Prefetch():Promise<void>;
 
-export function SaveUserConfig(arg1:data.UserConfig):Promise<void>;
+export function SavePref(arg1:data.Pref):Promise<void>;
 
 export function ShowMessageDialog(arg1:string):Promise<void>;
 

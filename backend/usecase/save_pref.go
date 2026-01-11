@@ -9,17 +9,17 @@ import (
 )
 
 type SavePref struct {
-	configStore adapter.ConfigStore
+	configStore adapter.PrefStore
 }
 
 func NewSavePref(i do.Injector) (*SavePref, error) {
 	return &SavePref{
-		configStore: do.MustInvoke[adapter.ConfigStore](i),
+		configStore: do.MustInvoke[adapter.PrefStore](i),
 	}, nil
 }
 
-func (sp *SavePref) Invoke(config data.UserConfig) error {
-	if err := sp.configStore.SetUserConfig(config); err != nil {
+func (sp *SavePref) Invoke(config data.Pref) error {
+	if err := sp.configStore.SetPref(config); err != nil {
 		return failure.Wrap(err)
 	}
 

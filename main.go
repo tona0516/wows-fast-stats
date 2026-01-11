@@ -36,8 +36,8 @@ func injectDependency() *options.App {
 	do.Provide(injector, func(i do.Injector) (adapter.CacheStore, error) {
 		return infra.NewCacheStore(i)
 	})
-	do.Provide(injector, func(i do.Injector) (adapter.ConfigStore, error) {
-		return infra.NewConfigStore(i)
+	do.Provide(injector, func(i do.Injector) (adapter.PrefStore, error) {
+		return infra.NewPrefStore(i)
 	})
 	do.Provide(injector, func(i do.Injector) (adapter.ReplayReader, error) {
 		return infra.NewReplayReader(i)

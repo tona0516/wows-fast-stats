@@ -1,7 +1,6 @@
 package usecase
 
 const (
-	EventUpdateConfig       = "CONFIG_UPDATE"
 	EventNeedInitialSetting = "NEED_INITIAL_SETTING"
 	EventPollingStart       = "POLLING_START"
 	EventBattleStart        = "BATTLE_START"

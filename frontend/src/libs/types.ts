@@ -17,7 +17,7 @@ export type StatsKey = ShipStatsKey | OverallStatsKey;
 
 export type Optional<T> = T | undefined;
 
-export type Page = "stats" | "config" | "info";
+export type Page = "stats" | "pref" | "info";
 
 export type ColumnSettingPattern = "ship" | "overall" | "both";
 

@@ -11,22 +11,22 @@ import (
 )
 
 type LoadPref struct {
-	configStore adapter.ConfigStore
+	configStore adapter.PrefStore
 }
 
 func NewLoadPref(i do.Injector) (*LoadPref, error) {
 	return &LoadPref{
-		configStore: do.MustInvoke[adapter.ConfigStore](i),
+		configStore: do.MustInvoke[adapter.PrefStore](i),
 	}, nil
 }
 
-func (lp *LoadPref) Invoke() (data.UserConfig, error) {
-	config, err := lp.configStore.UserConfig()
+func (lp *LoadPref) Invoke() (data.Pref, error) {
+	config, err := lp.configStore.Pref()
 	if err != nil {
 		if errors.Is(err, fs.ErrNotExist) {
-			return data.DefaultUserConfig(), nil
+			return data.DefaultPref(), nil
 		}
-		return data.UserConfig{}, failure.Wrap(err)
+		return data.Pref{}, failure.Wrap(err)
 	}
 
 	return config, nil

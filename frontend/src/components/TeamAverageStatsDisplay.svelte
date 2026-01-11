@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { data } from "@wails/go/models";
   import BarChart from "./BarChart.svelte";
-  import { storedUserConfig } from "@libs/stores";
+  import { storedPref } from "@libs/stores";
   import { get } from "svelte/store";
   import type { StatsExtra } from "@libs/types";
 
@@ -95,7 +95,7 @@
   }
 
   function getTeamStats(team: data.Team): data.TeamStats {
-    const statsExtra = get(storedUserConfig).stats_extra as StatsExtra;
+    const statsExtra = get(storedPref).stats_extra as StatsExtra;
     return team[statsExtra];
   }
 </script>

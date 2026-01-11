@@ -30,9 +30,9 @@ func TestInstallPathSetting_Invoke(t *testing.T) {
 		t.Parallel()
 
 		ctrl := gomock.NewController(t)
-		mockConfigStore := mock.NewMockConfigStore(ctrl)
+		mockConfigStore := mock.NewMockPrefStore(ctrl)
 		mockWails := mock.NewMockWails(ctrl)
-		originalConfig := data.UserConfig{
+		originalConfig := data.Pref{
 			Version:      1,
 			InstallPath:  "/old/path",
 			ZoomRate:     100,
@@ -42,7 +42,7 @@ func TestInstallPathSetting_Invoke(t *testing.T) {
 
 		tempDir := createWorldOfWarshipsExeDir(t)
 
-		expectedUpdatedConfig := data.UserConfig{
+		expectedUpdatedConfig := data.Pref{
 			Version:      1,
 			InstallPath:  tempDir,
 			ZoomRate:     100,
@@ -51,14 +51,14 @@ func TestInstallPathSetting_Invoke(t *testing.T) {
 		}
 
 		gomock.InOrder(
-			mockConfigStore.EXPECT().UserConfig().Return(originalConfig, nil),
-			mockConfigStore.EXPECT().SetUserConfig(expectedUpdatedConfig).Return(nil),
+			mockConfigStore.EXPECT().Pref().Return(originalConfig, nil),
+			mockConfigStore.EXPECT().SetPref(expectedUpdatedConfig).Return(nil),
 		)
 
 		mockWails.EXPECT().OpenDirectoryDialog(gomock.Any()).Return(tempDir, nil)
 
 		injector := do.New()
-		do.Provide(injector, func(i do.Injector) (adapter.ConfigStore, error) {
+		do.Provide(injector, func(i do.Injector) (adapter.PrefStore, error) {
 			return mockConfigStore, nil
 		})
 		do.Provide(injector, func(i do.Injector) (adapter.Wails, error) {
@@ -76,15 +76,15 @@ func TestInstallPathSetting_Invoke(t *testing.T) {
 		t.Parallel()
 
 		ctrl := gomock.NewController(t)
-		mockConfigStore := mock.NewMockConfigStore(ctrl)
+		mockConfigStore := mock.NewMockPrefStore(ctrl)
 		mockWails := mock.NewMockWails(ctrl)
-		mockConfigStore.EXPECT().UserConfig().Times(0)
-		mockConfigStore.EXPECT().SetUserConfig(gomock.Any()).Times(0)
+		mockConfigStore.EXPECT().Pref().Times(0)
+		mockConfigStore.EXPECT().SetPref(gomock.Any()).Times(0)
 
 		mockWails.EXPECT().OpenDirectoryDialog(gomock.Any()).Return("", errors.New("dialog error"))
 
 		injector := do.New()
-		do.Provide(injector, func(i do.Injector) (adapter.ConfigStore, error) {
+		do.Provide(injector, func(i do.Injector) (adapter.PrefStore, error) {
 			return mockConfigStore, nil
 		})
 		do.Provide(injector, func(i do.Injector) (adapter.Wails, error) {
@@ -102,15 +102,15 @@ func TestInstallPathSetting_Invoke(t *testing.T) {
 		t.Parallel()
 
 		ctrl := gomock.NewController(t)
-		mockConfigStore := mock.NewMockConfigStore(ctrl)
+		mockConfigStore := mock.NewMockPrefStore(ctrl)
 		mockWails := mock.NewMockWails(ctrl)
-		mockConfigStore.EXPECT().UserConfig().Times(0)
-		mockConfigStore.EXPECT().SetUserConfig(gomock.Any()).Times(0)
+		mockConfigStore.EXPECT().Pref().Times(0)
+		mockConfigStore.EXPECT().SetPref(gomock.Any()).Times(0)
 
 		mockWails.EXPECT().OpenDirectoryDialog(gomock.Any()).Return("/invalid/path", nil)
 
 		injector := do.New()
-		do.Provide(injector, func(i do.Injector) (adapter.ConfigStore, error) {
+		do.Provide(injector, func(i do.Injector) (adapter.PrefStore, error) {
 			return mockConfigStore, nil
 		})
 		do.Provide(injector, func(i do.Injector) (adapter.Wails, error) {
@@ -124,22 +124,22 @@ func TestInstallPathSetting_Invoke(t *testing.T) {
 		assert.False(t, ok)
 	})
 
-	t.Run("異常系_UserConfigでエラーが発生", func(t *testing.T) {
+	t.Run("異常系_Prefでエラーが発生", func(t *testing.T) {
 		t.Parallel()
 
 		ctrl := gomock.NewController(t)
-		mockConfigStore := mock.NewMockConfigStore(ctrl)
+		mockConfigStore := mock.NewMockPrefStore(ctrl)
 		mockWails := mock.NewMockWails(ctrl)
 		expectedErr := errors.New("user config read error")
-		mockConfigStore.EXPECT().UserConfig().Return(data.UserConfig{}, expectedErr)
-		mockConfigStore.EXPECT().SetUserConfig(gomock.Any()).Times(0)
+		mockConfigStore.EXPECT().Pref().Return(data.Pref{}, expectedErr)
+		mockConfigStore.EXPECT().SetPref(gomock.Any()).Times(0)
 
 		tempDir := createWorldOfWarshipsExeDir(t)
 
 		mockWails.EXPECT().OpenDirectoryDialog(gomock.Any()).Return(tempDir, nil)
 
 		injector := do.New()
-		do.Provide(injector, func(i do.Injector) (adapter.ConfigStore, error) {
+		do.Provide(injector, func(i do.Injector) (adapter.PrefStore, error) {
 			return mockConfigStore, nil
 		})
 		do.Provide(injector, func(i do.Injector) (adapter.Wails, error) {
@@ -153,20 +153,20 @@ func TestInstallPathSetting_Invoke(t *testing.T) {
 		assert.False(t, ok)
 	})
 
-	t.Run("異常系_SetUserConfigでエラーが発生", func(t *testing.T) {
+	t.Run("異常系_SetPrefでエラーが発生", func(t *testing.T) {
 		t.Parallel()
 
 		ctrl := gomock.NewController(t)
-		mockConfigStore := mock.NewMockConfigStore(ctrl)
+		mockConfigStore := mock.NewMockPrefStore(ctrl)
 		mockWails := mock.NewMockWails(ctrl)
-		originalConfig := data.UserConfig{
+		originalConfig := data.Pref{
 			Version:     1,
 			InstallPath: "/old/path",
 		}
 
 		gomock.InOrder(
-			mockConfigStore.EXPECT().UserConfig().Return(originalConfig, nil),
-			mockConfigStore.EXPECT().SetUserConfig(gomock.Any()).Return(errors.New("user config write error")),
+			mockConfigStore.EXPECT().Pref().Return(originalConfig, nil),
+			mockConfigStore.EXPECT().SetPref(gomock.Any()).Return(errors.New("user config write error")),
 		)
 
 		tempDir := createWorldOfWarshipsExeDir(t)
@@ -174,7 +174,7 @@ func TestInstallPathSetting_Invoke(t *testing.T) {
 		mockWails.EXPECT().OpenDirectoryDialog(gomock.Any()).Return(tempDir, nil)
 
 		injector := do.New()
-		do.Provide(injector, func(i do.Injector) (adapter.ConfigStore, error) {
+		do.Provide(injector, func(i do.Injector) (adapter.PrefStore, error) {
 			return mockConfigStore, nil
 		})
 		do.Provide(injector, func(i do.Injector) (adapter.Wails, error) {

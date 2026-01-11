@@ -751,20 +751,7 @@ export namespace data {
 	
 	
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	export class UserConfig {
+	export class Pref {
 	    version: number;
 	    install_path: string;
 	    zoom_rate: number;
@@ -773,7 +760,7 @@ export namespace data {
 	    column: ColumnConfig;
 	
 	    static createFrom(source: any = {}) {
-	        return new UserConfig(source);
+	        return new Pref(source);
 	    }
 	
 	    constructor(source: any = {}) {
@@ -804,6 +791,19 @@ export namespace data {
 		    return a;
 		}
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 
 }
 

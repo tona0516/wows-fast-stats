@@ -1,7 +1,7 @@
 import PlayerNameTableData from "@components/tabledata/PlayerNameTableData.svelte";
 import { ColorCode } from "@libs/ColorCode";
 import { RATING_COLORS, THREAT_LEVEL_COLORS } from "@libs/constants";
-import { storedUserConfig } from "@libs/stores";
+import { storedPref } from "@libs/stores";
 import type { Optional, StatsExtra } from "@libs/types";
 import type { data } from "@wails/go/models";
 import { get } from "svelte/store";
@@ -17,7 +17,7 @@ export class PlayerNameColumn extends AbstractColumn {
   }
 
   override getTextColorCode(player: data.Player): Optional<ColorCode> {
-    const cfg = get(storedUserConfig);
+    const cfg = get(storedPref);
     const statsExtra = cfg.stats_extra as StatsExtra;
     const pattern = cfg.column.player.color_pattern;
 
@@ -58,7 +58,7 @@ export class PlayerNameColumn extends AbstractColumn {
   }
 
   getNationFlagClass(player: data.Player): string {
-    if (!get(storedUserConfig).column.player.enable_nation_flag) {
+    if (!get(storedPref).column.player.enable_nation_flag) {
       return "";
     }
     const langMap: Record<string, string> = { ja: "jp", zh: "cn", ko: "kr" };

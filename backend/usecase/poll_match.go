@@ -17,7 +17,7 @@ import (
 type PollMatch struct {
 	pollingInterval time.Duration
 	wails           adapter.Wails
-	configStore     adapter.ConfigStore
+	configStore     adapter.PrefStore
 	replayReader    adapter.ReplayReader
 }
 
@@ -26,7 +26,7 @@ func NewPollMatch(i do.Injector) (*PollMatch, error) {
 	return &PollMatch{
 		pollingInterval: config.Basic.PollingInterval,
 		wails:           do.MustInvoke[adapter.Wails](i),
-		configStore:     do.MustInvoke[adapter.ConfigStore](i),
+		configStore:     do.MustInvoke[adapter.PrefStore](i),
 		replayReader:    do.MustInvoke[adapter.ReplayReader](i),
 	}, nil
 }
@@ -36,7 +36,7 @@ func (pm *PollMatch) Invoke(
 	cancelCtx context.Context,
 	channel chan data.TempArenaInfo,
 ) {
-	userConfig, err := pm.configStore.UserConfig()
+	pref, err := pm.configStore.Pref()
 	if err != nil {
 		if errors.Is(err, fs.ErrNotExist) {
 			pm.emitNeedInitialSetting(ctx)
@@ -47,7 +47,7 @@ func (pm *PollMatch) Invoke(
 		return
 	}
 
-	if userConfig.InstallPath == "" {
+	if pref.InstallPath == "" {
 		pm.emitNeedInitialSetting(ctx)
 		return
 	}
@@ -62,7 +62,7 @@ func (pm *PollMatch) Invoke(
 		default:
 			time.Sleep(pm.pollingInterval)
 
-			tempArenaInfo, err := pm.replayReader.TempArenaInfo(userConfig.InstallPath)
+			tempArenaInfo, err := pm.replayReader.TempArenaInfo(pref.InstallPath)
 			if err != nil {
 				if errors.Is(err, fs.ErrNotExist) {
 					continue

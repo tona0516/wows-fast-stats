@@ -63,12 +63,12 @@ func (a *App) StartPollingMatch() {
 	}
 }
 
-func (a *App) GetUserConfig() (data.UserConfig, error) {
+func (a *App) LoadPref() (data.Pref, error) {
 	return a.loadPrefUsecase.Invoke()
 }
 
-func (a *App) SaveUserConfig(config data.UserConfig) error {
-	return a.savePrefUsecase.Invoke(config)
+func (a *App) SavePref(pref data.Pref) error {
+	return a.savePrefUsecase.Invoke(pref)
 }
 
 func (a *App) TrySaveInstallPath() (bool, error) {

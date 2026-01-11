@@ -1,12 +1,12 @@
-import { SaveUserConfig } from "@wails/go/main/App";
+import { SavePref } from "@wails/go/main/App";
 import type { data } from "@wails/go/models";
 import { type Writable, writable } from "svelte/store";
 import type { Optional, TonakoParam } from "./types";
 
-export const storedUserConfig = writable() as Writable<data.UserConfig>;
-storedUserConfig.subscribe(async (value) => {
+export const storedPref = writable() as Writable<data.Pref>;
+storedPref.subscribe(async (value) => {
   if (!value) return;
-  await SaveUserConfig(value);
+  await SavePref(value);
 });
 
 export const storedBattle = writable(undefined) as Writable<

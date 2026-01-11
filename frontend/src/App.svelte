@@ -3,14 +3,14 @@
   import "charts.css";
   import SideMenu from "@components/SideMenu.svelte";
   import Toast from "@components/Toast.svelte";
-  import { storedBattle, storedUserConfig } from "@libs/stores";
+  import { storedBattle, storedPref } from "@libs/stores";
   import type { Page } from "@libs/types";
-  import ConfigPage from "@pages/ConfigPage.svelte";
+  import PrefPage from "@pages/PrefPage.svelte";
   import InfoPage from "@pages/InfoPage.svelte";
   import StatsPage from "@pages/StatsPage.svelte";
   import {
     ShowMessageDialog,
-    GetUserConfig,
+    LoadPref,
     StartPollingMatch,
     Prefetch,
   } from "@wails/go/main/App";
@@ -29,7 +29,7 @@
 
   $: {
     // @ts-ignore
-    document.body.style.zoom = ($storedUserConfig?.zoom_rate || 1.0) / 100;
+    document.body.style.zoom = ($storedPref?.zoom_rate || 1.0) / 100;
   }
 
   onMount(() => {
@@ -68,8 +68,8 @@
 
   const initialize = async (): Promise<void> => {
     try {
-      const userConfig = await GetUserConfig();
-      storedUserConfig.set(userConfig);
+      const pref = await LoadPref();
+      storedPref.set(pref);
 
       await Prefetch();
 
@@ -103,8 +103,8 @@
         {#if initialized}
           {#if page === "stats"}
             <StatsPage bind:this={statsPage} />
-          {:else if page === "config"}
-            <ConfigPage />
+          {:else if page === "pref"}
+            <PrefPage />
           {:else if page === "info"}
             <InfoPage />
           {/if}

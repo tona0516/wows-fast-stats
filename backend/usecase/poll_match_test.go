@@ -24,34 +24,34 @@ func TestPollMatch_Invoke(t *testing.T) {
 
 	tests := []struct {
 		name             string
-		setupMock        func(*mock.MockConfigStore)
+		setupMock        func(*mock.MockPrefStore)
 		expectEventNames []string
 	}{
 		{
-			name: "UserConfigが存在しない場合",
-			setupMock: func(m *mock.MockConfigStore) {
+			name: "Prefが存在しない場合",
+			setupMock: func(m *mock.MockPrefStore) {
 				m.EXPECT().
-					UserConfig().
-					Return(data.UserConfig{}, fs.ErrNotExist)
+					Pref().
+					Return(data.Pref{}, fs.ErrNotExist)
 			},
 			expectEventNames: []string{EventNeedInitialSetting},
 		},
 		{
-			name: "UserConfig取得でエラーが発生した場合",
-			setupMock: func(m *mock.MockConfigStore) {
+			name: "Pref取得でエラーが発生した場合",
+			setupMock: func(m *mock.MockPrefStore) {
 				m.EXPECT().
-					UserConfig().
-					Return(data.UserConfig{}, errors.New("read error"))
+					Pref().
+					Return(data.Pref{}, errors.New("read error"))
 			},
 			expectEventNames: []string{EventErr},
 		},
 		{
 			name: "InstallPathが空文字の場合",
-			setupMock: func(m *mock.MockConfigStore) {
-				userConfig := data.UserConfig{InstallPath: ""}
+			setupMock: func(m *mock.MockPrefStore) {
+				pref := data.Pref{InstallPath: ""}
 				m.EXPECT().
-					UserConfig().
-					Return(userConfig, nil)
+					Pref().
+					Return(pref, nil)
 			},
 			expectEventNames: []string{EventNeedInitialSetting},
 		},
@@ -63,7 +63,7 @@ func TestPollMatch_Invoke(t *testing.T) {
 
 			ctrl := gomock.NewController(t)
 
-			configStore := mock.NewMockConfigStore(ctrl)
+			configStore := mock.NewMockPrefStore(ctrl)
 			mockReplayReader := mock.NewMockReplayReader(ctrl)
 			mockWails := mock.NewMockWails(ctrl)
 			tt.setupMock(configStore)
@@ -86,7 +86,7 @@ func TestPollMatch_Invoke(t *testing.T) {
 				},
 			}
 			do.ProvideValue(injector, cfg)
-			do.Provide(injector, func(i do.Injector) (adapter.ConfigStore, error) {
+			do.Provide(injector, func(i do.Injector) (adapter.PrefStore, error) {
 				return configStore, nil
 			})
 			do.Provide(injector, func(i do.Injector) (adapter.ReplayReader, error) {
@@ -126,14 +126,14 @@ func TestPollMatch_InvokeWithDataChange(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 
-	MockConfigStore := mock.NewMockConfigStore(ctrl)
+	MockConfigStore := mock.NewMockPrefStore(ctrl)
 	mockReplayReader := mock.NewMockReplayReader(ctrl)
 	mockWails := mock.NewMockWails(ctrl)
 
-	userConfig := data.UserConfig{InstallPath: "/path/to/install"}
+	pref := data.Pref{InstallPath: "/path/to/install"}
 	MockConfigStore.EXPECT().
-		UserConfig().
-		Return(userConfig, nil)
+		Pref().
+		Return(pref, nil)
 
 	tempArenaInfo1 := data.TempArenaInfo{
 		Vehicles: []data.Vehicle{
@@ -183,7 +183,7 @@ func TestPollMatch_InvokeWithDataChange(t *testing.T) {
 		},
 	}
 	do.ProvideValue(injector, cfg)
-	do.Provide(injector, func(i do.Injector) (adapter.ConfigStore, error) {
+	do.Provide(injector, func(i do.Injector) (adapter.PrefStore, error) {
 		return MockConfigStore, nil
 	})
 	do.Provide(injector, func(i do.Injector) (adapter.ReplayReader, error) {

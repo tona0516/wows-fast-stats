@@ -10,8 +10,8 @@ export function EmptyBattle() {
   return window['go']['main']['App']['EmptyBattle']();
 }
 
-export function GetUserConfig() {
-  return window['go']['main']['App']['GetUserConfig']();
+export function LoadPref() {
+  return window['go']['main']['App']['LoadPref']();
 }
 
 export function NewVersion() {
@@ -22,8 +22,8 @@ export function Prefetch() {
   return window['go']['main']['App']['Prefetch']();
 }
 
-export function SaveUserConfig(arg1) {
-  return window['go']['main']['App']['SaveUserConfig'](arg1);
+export function SavePref(arg1) {
+  return window['go']['main']['App']['SavePref'](arg1);
 }
 
 export function ShowMessageDialog(arg1) {

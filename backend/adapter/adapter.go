@@ -27,9 +27,9 @@ type CacheStore interface {
 }
 
 //go:generate mockgen -source=$GOFILE -destination ../mock/$GOFILE -package mock
-type ConfigStore interface {
-	UserConfig() (data.UserConfig, error)
-	SetUserConfig(data data.UserConfig) error
+type PrefStore interface {
+	Pref() (data.Pref, error)
+	SetPref(data data.Pref) error
 }
 
 //go:generate mockgen -source=$GOFILE -destination ../mock/$GOFILE -package mock

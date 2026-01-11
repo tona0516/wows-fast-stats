@@ -1,5 +1,5 @@
 import { STATS_COLUMN_INFO } from "@libs/constants";
-import { storedUserConfig } from "@libs/stores";
+import { storedPref } from "@libs/stores";
 import type { StatsCategory, StatsExtra, StatsKey } from "@libs/types";
 import type { data } from "@wails/go/models";
 import { get } from "svelte/store";
@@ -16,7 +16,7 @@ export abstract class AbstractStatsColumn<T> extends AbstractColumn {
   abstract getDisplayValue(player: data.Player): T;
 
   override needsShow(): boolean {
-    const cs = get(storedUserConfig).column.stats[this.key];
+    const cs = get(storedPref).column.stats[this.key];
     switch (this.category) {
       case "ship":
         return cs.is_show_ship;
@@ -26,11 +26,11 @@ export abstract class AbstractStatsColumn<T> extends AbstractColumn {
   }
 
   getDigit(): number {
-    return get(storedUserConfig).column.stats[this.key].digit;
+    return get(storedPref).column.stats[this.key].digit;
   }
 
   getPlayerStats(player: data.Player): data.PlayerStats {
-    return player[get(storedUserConfig).stats_extra as StatsExtra];
+    return player[get(storedPref).stats_extra as StatsExtra];
   }
 
   getCssClass(): string {
