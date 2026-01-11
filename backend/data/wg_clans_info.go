@@ -14,7 +14,7 @@ func (w WGClansInfo) Field() string {
 }
 
 func (w WGClansInfo) ToArray() []WGClansInfoData {
-	array := make([]WGClansInfoData, 0)
+	array := make([]WGClansInfoData, 0, len(w.Data))
 	for _, v := range w.Data {
 		array = append(array, v)
 	}

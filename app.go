@@ -2,28 +2,25 @@ package main
 
 import (
 	"context"
-	"errors"
-	"io/fs"
 	"os"
-	"wfs/backend/adapter"
 	"wfs/backend/config"
 	"wfs/backend/data"
 	"wfs/backend/usecase"
 
 	"github.com/mitchellh/go-ps"
-	"github.com/morikuni/failure"
 	"github.com/samber/do/v2"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 type App struct {
 	appConfig                 config.Config
-	configStore               adapter.ConfigStore
 	prefetchUsecase           *usecase.Prefetch
 	fetchBattleUsecase        *usecase.FetchBattle
 	pollMatchUsecase          *usecase.PollMatch
 	installPathSettingUsecase *usecase.InstallPathSetting
 	updateCheckUsecase        *usecase.UpdateCheck
+	loadPrefUsecase           *usecase.LoadPref
+	savePrefUsecase           *usecase.SavePref
 
 	ctx                 context.Context
 	pollMatchCancelFunc context.CancelFunc
@@ -33,12 +30,13 @@ type App struct {
 func NewApp(i do.Injector) (*App, error) {
 	return &App{
 		appConfig:                 do.MustInvoke[config.Config](i),
-		configStore:               do.MustInvoke[adapter.ConfigStore](i),
 		prefetchUsecase:           do.MustInvoke[*usecase.Prefetch](i),
 		fetchBattleUsecase:        do.MustInvoke[*usecase.FetchBattle](i),
 		pollMatchUsecase:          do.MustInvoke[*usecase.PollMatch](i),
 		installPathSettingUsecase: do.MustInvoke[*usecase.InstallPathSetting](i),
 		updateCheckUsecase:        do.MustInvoke[*usecase.UpdateCheck](i),
+		loadPrefUsecase:           do.MustInvoke[*usecase.LoadPref](i),
+		savePrefUsecase:           do.MustInvoke[*usecase.SavePref](i),
 	}, nil
 }
 
@@ -66,24 +64,11 @@ func (a *App) StartPollingMatch() {
 }
 
 func (a *App) GetUserConfig() (data.UserConfig, error) {
-	config, err := a.configStore.UserConfig()
-	if err == nil {
-		return config, nil
-	}
-
-	if errors.Is(err, fs.ErrNotExist) {
-		return data.DefaultUserConfig(), nil
-	}
-
-	return data.UserConfig{}, failure.Wrap(err)
+	return a.loadPrefUsecase.Invoke()
 }
 
 func (a *App) SaveUserConfig(config data.UserConfig) error {
-	if err := a.configStore.SetUserConfig(config); err != nil {
-		return failure.Wrap(err)
-	}
-
-	return nil
+	return a.savePrefUsecase.Invoke(config)
 }
 
 func (a *App) TrySaveInstallPath() (bool, error) {

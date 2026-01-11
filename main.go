@@ -78,6 +78,8 @@ func injectDependency() *options.App {
 	do.Provide(injector, usecase.NewPollMatch)
 	do.Provide(injector, usecase.NewInstallPathSetting)
 	do.Provide(injector, usecase.NewUpdateCheck)
+	do.Provide(injector, usecase.NewLoadPref)
+	do.Provide(injector, usecase.NewSavePref)
 
 	// controller
 	do.Provide(injector, NewApp)
