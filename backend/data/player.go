@@ -17,12 +17,13 @@ func NewPlayerStats(
 	stats *PersonalStats,
 	accountID int,
 	shipID int,
-	tempArenaInfo TempArenaInfo,
+	vehicles []Vehicle,
 	warships Warships,
 ) PlayerStats {
-	threatLevel := CalculateThreatLevel(NewThreatLevelCalculatorFactor(
+	tlc := NewThreatLevelCalculator()
+	threatLevel := tlc.Calculate(NewThreatLevelInput(
 		accountID,
-		tempArenaInfo,
+		vehicles,
 		warships,
 		shipID,
 		stats.Battles(StatsCategoryShip, statsPattern),

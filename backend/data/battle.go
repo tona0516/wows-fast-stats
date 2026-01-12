@@ -3,7 +3,6 @@ package data
 import (
 	"math"
 	"sort"
-	"wfs/backend/util"
 )
 
 type Battle struct {
@@ -55,7 +54,7 @@ func NewBattle(
 				stats,
 				accountID,
 				vehicle.ShipID,
-				tempArenaInfo,
+				tempArenaInfo.Vehicles,
 				prefetchResult.Warships,
 			),
 			PvPAll: NewPlayerStats(
@@ -63,7 +62,7 @@ func NewBattle(
 				stats,
 				accountID,
 				vehicle.ShipID,
-				tempArenaInfo,
+				tempArenaInfo.Vehicles,
 				prefetchResult.Warships,
 			),
 			RankSolo: NewPlayerStats(
@@ -71,7 +70,7 @@ func NewBattle(
 				stats,
 				accountID,
 				vehicle.ShipID,
-				tempArenaInfo,
+				tempArenaInfo.Vehicles,
 				prefetchResult.Warships,
 			),
 		}
@@ -190,14 +189,14 @@ func NewTeamAverageStats(players Players, statsPattern StatsPattern) TeamAverage
 	}
 
 	return TeamAverageStats{
-		ShipPR:         util.SafeDivide(shipPRSum, shipStatsCount),
-		ShipDamage:     util.SafeDivide(shipDamageSum, shipStatsCount),
-		ShipWinRate:    util.SafeDivide(shipWinRateSum, shipStatsCount),
-		ShipBattles:    uint(util.SafeDivide(float64(shipBattlesSum), shipStatsCount)),
-		OverallPR:      util.SafeDivide(overallPRSum, overallStatsCount),
-		OverallDamage:  util.SafeDivide(overallDamageSum, overallStatsCount),
-		OverallWinRate: util.SafeDivide(overallWinRateSum, overallStatsCount),
-		OverallBattles: uint(util.SafeDivide(float64(overallBattlesSum), overallStatsCount)),
+		ShipPR:         safeDivide(shipPRSum, shipStatsCount),
+		ShipDamage:     safeDivide(shipDamageSum, shipStatsCount),
+		ShipWinRate:    safeDivide(shipWinRateSum, shipStatsCount),
+		ShipBattles:    uint(safeDivide(float64(shipBattlesSum), shipStatsCount)),
+		OverallPR:      safeDivide(overallPRSum, overallStatsCount),
+		OverallDamage:  safeDivide(overallDamageSum, overallStatsCount),
+		OverallWinRate: safeDivide(overallWinRateSum, overallStatsCount),
+		OverallBattles: uint(safeDivide(float64(overallBattlesSum), overallStatsCount)),
 	}
 }
 

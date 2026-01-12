@@ -51,10 +51,3 @@ func toSnakeCase(s string) string {
 
 	return string(result)
 }
-
-func SafeDivide(numerator float64, denominator uint) float64 {
-	if denominator == 0 {
-		return 0
-	}
-	return numerator / float64(denominator)
-}

@@ -21,14 +21,13 @@ const (
 func TestThreatLevel_CalculateThreatLevel_CV_CVあり_Tierミドル(t *testing.T) {
 	t.Parallel()
 
-	actual := CalculateThreatLevel(NewThreatLevelCalculatorFactor(
+	instance := NewThreatLevelCalculator()
+	actual := instance.Calculate(NewThreatLevelInput(
 		0,
-		TempArenaInfo{
-			Vehicles: []Vehicle{
-				{ShipID: shipIDNagato},
-				{ShipID: shipIDYorktown},
-				{ShipID: shipIDKitakaze},
-			},
+		[]Vehicle{
+			{ShipID: shipIDNagato},
+			{ShipID: shipIDYorktown},
+			{ShipID: shipIDKitakaze},
 		},
 		Warships{
 			shipIDNagato: {
@@ -64,7 +63,7 @@ func TestThreatLevel_CalculateThreatLevel_CV_CVあり_Tierミドル(t *testing.T
 		Modified: 18111,
 	}
 
-	assert.Equal(t, string(ThreatLevelRankI), actual.Rank)
+	assert.Equal(t, ThreatLevelRankI, actual.Rank)
 	assert.InDelta(t, expected.Raw, actual.Raw, 1.0)
 	assert.InDelta(t, expected.Modified, actual.Modified, 1.0)
 }
@@ -72,14 +71,13 @@ func TestThreatLevel_CalculateThreatLevel_CV_CVあり_Tierミドル(t *testing.T
 func TestThreatLevel_CalculateThreatLevel_BB_CVあり_Tierトップ(t *testing.T) {
 	t.Parallel()
 
-	actual := CalculateThreatLevel(NewThreatLevelCalculatorFactor(
+	instance := NewThreatLevelCalculator()
+	actual := instance.Calculate(NewThreatLevelInput(
 		0,
-		TempArenaInfo{
-			Vehicles: []Vehicle{
-				{ShipID: shipIDMutsuki},
-				{ShipID: shipIDRanger},
-				{ShipID: shipIDSinop},
-			},
+		[]Vehicle{
+			{ShipID: shipIDMutsuki},
+			{ShipID: shipIDRanger},
+			{ShipID: shipIDSinop},
 		},
 		Warships{
 			shipIDMutsuki: {
@@ -115,7 +113,7 @@ func TestThreatLevel_CalculateThreatLevel_BB_CVあり_Tierトップ(t *testing.T
 		Modified: 21497,
 	}
 
-	assert.Equal(t, string(ThreatLevelRankI), actual.Rank)
+	assert.Equal(t, ThreatLevelRankI, actual.Rank)
 	assert.InDelta(t, expected.Raw, actual.Raw, 1.0)
 	assert.InDelta(t, expected.Modified, actual.Modified, 1.0)
 }
@@ -123,12 +121,11 @@ func TestThreatLevel_CalculateThreatLevel_BB_CVあり_Tierトップ(t *testing.T
 func TestThreatLevel_CalculateThreatLevel_CL_CVなし_Tierミドル(t *testing.T) {
 	t.Parallel()
 
-	actual := CalculateThreatLevel(NewThreatLevelCalculatorFactor(
+	instance := NewThreatLevelCalculator()
+	actual := instance.Calculate(NewThreatLevelInput(
 		0,
-		TempArenaInfo{
-			Vehicles: []Vehicle{
-				{ShipID: shipIDYoshino},
-			},
+		[]Vehicle{
+			{ShipID: shipIDYoshino},
 		},
 		Warships{
 			shipIDYoshino: {
@@ -154,7 +151,7 @@ func TestThreatLevel_CalculateThreatLevel_CL_CVなし_Tierミドル(t *testing.T
 		Modified: 24184,
 	}
 
-	assert.Equal(t, string(ThreatLevelRankV), actual.Rank)
+	assert.Equal(t, ThreatLevelRankV, actual.Rank)
 	assert.InDelta(t, expected.Raw, actual.Raw, 1.0)
 	assert.InDelta(t, expected.Modified, actual.Modified, 1.0)
 }
@@ -162,14 +159,13 @@ func TestThreatLevel_CalculateThreatLevel_CL_CVなし_Tierミドル(t *testing.T
 func TestThreatLevel_CalculateThreatLevel_DD_CVあり_Tierボトム_特殊補正艦(t *testing.T) {
 	t.Parallel()
 
-	actual := CalculateThreatLevel(NewThreatLevelCalculatorFactor(
+	instance := NewThreatLevelCalculator()
+	actual := instance.Calculate(NewThreatLevelInput(
 		0,
-		TempArenaInfo{
-			Vehicles: []Vehicle{
-				{ShipID: shipIDSims},
-				{ShipID: shipIDYorktown},
-				{ShipID: shipIDAlaska},
-			},
+		[]Vehicle{
+			{ShipID: shipIDSims},
+			{ShipID: shipIDYorktown},
+			{ShipID: shipIDAlaska},
 		},
 		Warships{
 			shipIDSims: {
