@@ -1,18 +1,12 @@
 package data
 
 import (
-	"reflect"
 	"slices"
 	"sort"
-	"wfs/backend/util"
 )
 
 type WGAccountList struct {
 	WGResponseCommon[[]WGAccountListData]
-}
-
-func (w WGAccountList) Field() string {
-	return util.FieldQuery(reflect.TypeFor[WGAccountListData]())
 }
 
 func (w WGAccountList) AccountIDs() []int {

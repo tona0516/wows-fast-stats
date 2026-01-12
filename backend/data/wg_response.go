@@ -16,7 +16,6 @@ type WGError struct {
 type WGResponse interface {
 	GetStatus() string
 	GetError() WGError
-	Field() string
 }
 
 func (r WGResponseCommon[T]) GetStatus() string {

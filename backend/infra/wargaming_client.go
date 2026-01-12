@@ -3,9 +3,11 @@ package infra
 import (
 	"encoding/json"
 	"errors"
+	"reflect"
 	"slices"
 	"strconv"
 	"strings"
+	"unicode"
 	"wfs/backend/config"
 	"wfs/backend/data"
 
@@ -71,7 +73,7 @@ func (c *WargamingClient) AccountInfo(accountIDs []int) (data.WGAccountInfo, err
 		"/wows/account/info/",
 		map[string]string{
 			"account_id": strings.Join(strAccountIDs, ","),
-			"fields":     data.WGAccountInfo{}.Field(),
+			"fields":     c.fieldQuery(reflect.TypeFor[data.WGAccountInfoData]()),
 			"extra": strings.Join([]string{
 				"statistics.pvp_solo",
 				"statistics.pvp_div2",
@@ -90,7 +92,7 @@ func (c *WargamingClient) AccountList(accountNames []string) (data.WGAccountList
 		"/wows/account/list/",
 		map[string]string{
 			"search": strings.Join(accountNames, ","),
-			"fields": data.WGAccountList{}.Field(),
+			"fields": c.fieldQuery(reflect.TypeFor[data.WGAccountListData]()),
 			"type":   "exact",
 		},
 	)
@@ -109,7 +111,7 @@ func (c *WargamingClient) ClansAccountInfo(accountIDs []int) (data.WGClansAccoun
 		"/wows/clans/accountinfo/",
 		map[string]string{
 			"account_id": strings.Join(strAccountIDs, ","),
-			"fields":     data.WGClansAccountInfo{}.Field(),
+			"fields":     c.fieldQuery(reflect.TypeFor[data.WGClansAccountInfoData]()),
 		},
 	)
 
@@ -131,7 +133,7 @@ func (c *WargamingClient) ClansInfo(clanIDs []int) (data.WGClansInfo, error) {
 		"/wows/clans/info/",
 		map[string]string{
 			"clan_id": strings.Join(strClanIDs, ","),
-			"fields":  data.WGClansInfo{}.Field(),
+			"fields":  c.fieldQuery(reflect.TypeFor[data.WGClansInfoData]()),
 		},
 	)
 
@@ -144,7 +146,7 @@ func (c *WargamingClient) ShipsStats(accountID int) (data.WGShipsStats, error) {
 		"/wows/ships/stats/",
 		map[string]string{
 			"account_id": strconv.Itoa(accountID),
-			"fields":     data.WGShipsStats{}.Field(),
+			"fields":     c.fieldQuery(reflect.TypeFor[data.WGShipsStatsData]()),
 			"extra": strings.Join([]string{
 				"pvp_solo",
 				"pvp_div2",
@@ -162,7 +164,7 @@ func (c *WargamingClient) EncycShips(pageNo int) (data.WGEncycShips, error) {
 		c,
 		"/wows/encyclopedia/ships/",
 		map[string]string{
-			"fields":   data.WGEncycShips{}.Field(),
+			"fields":   c.fieldQuery(reflect.TypeFor[data.WGEncycShipsData]()),
 			"language": "ja",
 			"page_no":  strconv.Itoa(pageNo),
 		},
@@ -176,7 +178,7 @@ func (c *WargamingClient) BattleArenas() (data.WGBattleArenas, error) {
 		c,
 		"/wows/encyclopedia/battlearenas/",
 		map[string]string{
-			"fields":   data.WGBattleArenas{}.Field(),
+			"fields":   c.fieldQuery(reflect.TypeFor[data.WGBattleArenasData]()),
 			"language": "ja",
 		},
 	)
@@ -189,7 +191,7 @@ func (c *WargamingClient) BattleTypes() (data.WGBattleTypes, error) {
 		c,
 		"/wows/encyclopedia/battletypes/",
 		map[string]string{
-			"fields":   data.WGBattleTypes{}.Field(),
+			"fields":   c.fieldQuery(reflect.TypeFor[data.WGBattleTypesData]()),
 			"language": "ja",
 		},
 	)
@@ -203,11 +205,57 @@ func (c *WargamingClient) ShipsBadges(accountID int) (data.WGShipsBadges, error)
 		"/wows/ships/badges/",
 		map[string]string{
 			"account_id": strconv.Itoa(accountID),
-			"fields":     data.WGShipsBadges{}.Field(),
+			"fields":     c.fieldQuery(reflect.TypeFor[data.WGShipsBadgesData]()),
 		},
 	)
 
 	return res, err
+}
+
+func (c *WargamingClient) fieldQuery(target reflect.Type) string {
+	fields := []string{}
+	c.fieldQueryRecursive([]string{}, target, &fields)
+
+	return strings.Join(fields, ",")
+}
+
+func (c *WargamingClient) fieldQueryRecursive(parentNames []string, t reflect.Type, result *[]string) {
+	for i := range t.NumField() {
+		field := t.Field(i)
+
+		if field.Type.Kind() == reflect.Struct {
+			name := c.toSnakeCase(field.Name)
+			c.fieldQueryRecursive(append(parentNames, name), field.Type, result)
+
+			continue
+		}
+
+		column := field.Tag.Get("json")
+		if len(parentNames) > 0 {
+			*result = append(*result, strings.Join(parentNames, ".")+"."+column)
+		} else {
+			*result = append(*result, column)
+		}
+	}
+}
+
+func (c *WargamingClient) toSnakeCase(s string) string {
+	runes := []rune(s)
+	result := make([]rune, 0)
+
+	for i, r := range runes {
+		if !unicode.IsUpper(r) {
+			result = append(result, r)
+			continue
+		}
+
+		if i > 0 && unicode.IsLower(runes[i-1]) {
+			result = append(result, '_')
+		}
+		result = append(result, unicode.ToLower(r))
+	}
+
+	return string(result)
 }
 
 func request[T data.WGResponse](

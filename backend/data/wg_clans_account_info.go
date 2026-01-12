@@ -1,18 +1,12 @@
 package data
 
 import (
-	"reflect"
 	"slices"
 	"sort"
-	"wfs/backend/util"
 )
 
 type WGClansAccountInfo struct {
 	WGResponseCommon[map[int]WGClansAccountInfoData]
-}
-
-func (w WGClansAccountInfo) Field() string {
-	return util.FieldQuery(reflect.TypeFor[WGClansAccountInfoData]())
 }
 
 func (w WGClansAccountInfo) ClanIDs() []int {

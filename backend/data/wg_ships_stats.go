@@ -1,10 +1,5 @@
 package data
 
-import (
-	"reflect"
-	"wfs/backend/util"
-)
-
 type AllPlayerShipsStats map[int]WGShipsStats
 
 func (w AllPlayerShipsStats) Player(accountID int) []WGShipsStatsData {
@@ -13,10 +8,6 @@ func (w AllPlayerShipsStats) Player(accountID int) []WGShipsStatsData {
 
 type WGShipsStats struct {
 	WGResponseCommon[map[int][]WGShipsStatsData]
-}
-
-func (w WGShipsStats) Field() string {
-	return util.FieldQuery(reflect.TypeFor[WGShipsStatsData]())
 }
 
 type WGShipsStatsData struct {

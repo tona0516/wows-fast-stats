@@ -1,16 +1,7 @@
 package data
 
-import (
-	"reflect"
-	"wfs/backend/util"
-)
-
 type WGAccountInfo struct {
 	WGResponseCommon[map[int]WGAccountInfoData]
-}
-
-func (w WGAccountInfo) Field() string {
-	return util.FieldQuery(reflect.TypeFor[WGAccountInfoData]())
 }
 
 type WGAccountInfoData struct {
