@@ -12,6 +12,67 @@ type PlayerStats struct {
 	OverallStats OverallStats `json:"overall"`
 }
 
+func NewPlayerStats(
+	statsPattern StatsPattern,
+	stats *PersonalStats,
+	accountID int,
+	shipID int,
+	tempArenaInfo TempArenaInfo,
+	warships Warships,
+) PlayerStats {
+	threatLevel := CalculateThreatLevel(NewThreatLevelCalculatorFactor(
+		accountID,
+		tempArenaInfo,
+		warships,
+		shipID,
+		stats.Battles(StatsCategoryShip, statsPattern),
+		stats.AvgDamage(StatsCategoryShip, statsPattern).Value,
+		stats.WinRate(StatsCategoryShip, statsPattern).Value,
+		stats.SurvivedRate(StatsCategoryShip, statsPattern).All,
+		stats.PlanesKilled(StatsCategoryShip),
+		stats.Battles(StatsCategoryOverall, statsPattern),
+		stats.AvgDamage(StatsCategoryOverall, statsPattern).Value,
+		stats.WinRate(StatsCategoryOverall, statsPattern).Value,
+		stats.AvgKill(StatsCategoryOverall, statsPattern),
+		stats.KdRate(StatsCategoryOverall, statsPattern),
+	))
+
+	return PlayerStats{
+		ShipStats: ShipStats{
+			Battles:         stats.Battles(StatsCategoryShip, statsPattern),
+			Damage:          stats.AvgDamage(StatsCategoryShip, statsPattern),
+			MaxDamage:       stats.MaxDamage(StatsCategoryShip, statsPattern),
+			WinRate:         stats.WinRate(StatsCategoryShip, statsPattern),
+			SurvivedRate:    stats.SurvivedRate(StatsCategoryShip, statsPattern),
+			KdRate:          stats.KdRate(StatsCategoryShip, statsPattern),
+			Kill:            stats.AvgKill(StatsCategoryShip, statsPattern),
+			Exp:             stats.AvgExp(StatsCategoryShip, statsPattern),
+			PR:              stats.PR(StatsCategoryShip, statsPattern),
+			HitRate:         stats.HitRate(statsPattern),
+			PlanesKilled:    stats.PlanesKilled(statsPattern),
+			PlatoonRate:     stats.PlatoonRate(StatsCategoryShip),
+			EfficiencyBadge: stats.EfficiencyBadge(),
+		},
+		OverallStats: OverallStats{
+			Battles:           stats.Battles(StatsCategoryOverall, statsPattern),
+			Damage:            stats.AvgDamage(StatsCategoryOverall, statsPattern),
+			MaxDamage:         stats.MaxDamage(StatsCategoryOverall, statsPattern),
+			WinRate:           stats.WinRate(StatsCategoryOverall, statsPattern),
+			SurvivedRate:      stats.SurvivedRate(StatsCategoryOverall, statsPattern),
+			KdRate:            stats.KdRate(StatsCategoryOverall, statsPattern),
+			Kill:              stats.AvgKill(StatsCategoryOverall, statsPattern),
+			Exp:               stats.AvgExp(StatsCategoryOverall, statsPattern),
+			PR:                stats.PR(StatsCategoryOverall, statsPattern),
+			AvgTier:           stats.AvgTier(statsPattern),
+			UsingShipTypeRate: stats.UsingShipTypeRate(statsPattern),
+			UsingTierRate:     stats.UsingTierRate(statsPattern),
+			PlatoonRate:       stats.PlatoonRate(StatsCategoryOverall),
+			EfficiencyBadge:   stats.EfficiencyBadges(),
+			ThreatLevel:       threatLevel,
+		},
+	}
+}
+
 type ShipStats struct {
 	Battles         uint            `json:"battles"`
 	Damage          RatingValue     `json:"damage"`

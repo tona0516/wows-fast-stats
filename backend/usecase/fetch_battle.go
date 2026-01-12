@@ -3,7 +3,6 @@ package usecase
 import (
 	"context"
 	"regexp"
-	"sort"
 	"strings"
 	"sync"
 	"wfs/backend/adapter"
@@ -100,7 +99,7 @@ func (b *FetchBattle) Invoke(
 		return
 	}
 
-	result := b.compose(
+	result := data.NewBattle(
 		prefetchResult,
 		tempArenaInfo,
 		accountInfo,
@@ -265,124 +264,4 @@ func (b *FetchBattle) fetchAllPlayerShipsBadges(accountIDs []int) (data.AllPlaye
 	}
 
 	return result, nil
-}
-
-func (b *FetchBattle) compose(
-	prefetchResult *data.PrefetchResult,
-	tempArenaInfo data.TempArenaInfo,
-	accountInfo data.WGAccountInfo,
-	accountList data.WGAccountList,
-	clans data.Clans,
-	allPlayerShipsStats data.AllPlayerShipsStats,
-	allPlayerShipsBadges data.AllPlayerShipsBadges,
-) data.Battle {
-	friends := make(data.Players, 0)
-	enemies := make(data.Players, 0)
-
-	for _, vehicle := range tempArenaInfo.Vehicles {
-		nickname := vehicle.Name
-		accountID := accountList.AccountID(nickname)
-		clan := clans[accountID]
-
-		warship, ok := prefetchResult.Warships[vehicle.ShipID]
-		if !ok {
-			warship = *data.NewUnknownWarship()
-		}
-
-		stats := data.NewPersonalStats(
-			vehicle.ShipID,
-			accountInfo.Data[accountID],
-			allPlayerShipsStats.Player(accountID),
-			allPlayerShipsBadges[accountID],
-			prefetchResult.Warships,
-			tempArenaInfo,
-		)
-
-		player := data.Player{
-			PlayerInfo: data.PlayerInfo{
-				ID:       accountID,
-				Name:     nickname,
-				Clan:     clan,
-				IsHidden: accountInfo.Data[accountID].HiddenProfile,
-			},
-			Warship: warship,
-			PvPSolo: data.BuildPlayerStats(
-				data.StatsPatternPvPSolo,
-				stats,
-				accountID,
-				vehicle.ShipID,
-				tempArenaInfo,
-				prefetchResult.Warships,
-			),
-			PvPAll: data.BuildPlayerStats(
-				data.StatsPatternPvPAll,
-				stats,
-				accountID,
-				vehicle.ShipID,
-				tempArenaInfo,
-				prefetchResult.Warships,
-			),
-			RankSolo: data.BuildPlayerStats(
-				data.StatsPatternRankSolo,
-				stats,
-				accountID,
-				vehicle.ShipID,
-				tempArenaInfo,
-				prefetchResult.Warships,
-			),
-		}
-
-		if vehicle.IsFriend() {
-			friends = append(friends, player)
-		} else {
-			enemies = append(enemies, player)
-		}
-	}
-
-	sort.Sort(friends)
-	sort.Sort(enemies)
-
-	teams := []data.Team{
-		{
-			Players: friends,
-			PvPAll: data.TeamStats{
-				TeamAverageStats: data.CalculateTeamAverageStats(friends, data.StatsPatternPvPAll),
-				TeamThreatLevel:  data.CalculateTeamThreatLevel(friends, data.StatsPatternPvPAll),
-			},
-			PvPSolo: data.TeamStats{
-				TeamAverageStats: data.CalculateTeamAverageStats(friends, data.StatsPatternPvPSolo),
-				TeamThreatLevel:  data.CalculateTeamThreatLevel(friends, data.StatsPatternPvPSolo),
-			},
-			RankSolo: data.TeamStats{
-				TeamAverageStats: data.CalculateTeamAverageStats(friends, data.StatsPatternRankSolo),
-				TeamThreatLevel:  data.CalculateTeamThreatLevel(friends, data.StatsPatternRankSolo),
-			},
-		},
-		{
-			Players: enemies,
-			PvPAll: data.TeamStats{
-				TeamAverageStats: data.CalculateTeamAverageStats(enemies, data.StatsPatternPvPAll),
-				TeamThreatLevel:  data.CalculateTeamThreatLevel(enemies, data.StatsPatternPvPAll),
-			},
-			PvPSolo: data.TeamStats{
-				TeamAverageStats: data.CalculateTeamAverageStats(enemies, data.StatsPatternPvPSolo),
-				TeamThreatLevel:  data.CalculateTeamThreatLevel(enemies, data.StatsPatternPvPSolo),
-			},
-			RankSolo: data.TeamStats{
-				TeamAverageStats: data.CalculateTeamAverageStats(enemies, data.StatsPatternRankSolo),
-				TeamThreatLevel:  data.CalculateTeamThreatLevel(enemies, data.StatsPatternRankSolo),
-			},
-		},
-	}
-
-	battle := data.Battle{
-		Meta: data.BattleMetaData{
-			Unixtime: tempArenaInfo.Unixtime(),
-			Arena:    tempArenaInfo.BattleArena(prefetchResult.BattleArenas),
-			Type:     tempArenaInfo.BattleType(prefetchResult.BattleTypes),
-		},
-		Teams: teams,
-	}
-
-	return battle
 }
