@@ -22,3 +22,22 @@ type WGShipsStatsData struct {
 	RankSolo WGShipStatsValues `json:"rank_solo"`
 	ShipID   int               `json:"ship_id"`
 }
+
+type WGShipStatsValues struct {
+	Wins            uint       `json:"wins"`
+	Battles         uint       `json:"battles"`
+	DamageDealt     uint       `json:"damage_dealt"`
+	MaxDamageDealt  uint       `json:"max_damage_dealt"`
+	Frags           uint       `json:"frags"`
+	SurvivedWins    uint       `json:"survived_wins"`
+	SurvivedBattles uint       `json:"survived_battles"`
+	Xp              uint       `json:"xp"`
+	MainBattery     WGArmament `json:"main_battery"`
+	Torpedoes       WGArmament `json:"torpedoes"`
+	PlanesKilled    uint       `json:"planes_killed"`
+}
+
+type WGArmament struct {
+	Hits  uint `json:"hits"`
+	Shots uint `json:"shots"`
+}
