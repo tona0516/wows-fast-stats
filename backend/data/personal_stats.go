@@ -5,39 +5,26 @@ import (
 )
 
 type PersonalStats struct {
-	useShipID     int
-	accountInfo   WGAccountInfoData
-	useShipStats  WGShipsStatsData
-	allShipsStats []WGShipsStatsData
-	shipsBadges   []WGShipsBadgesData
-	warships      Warships
-	tempArenaInfo TempArenaInfo
+	useShipID        ShipID
+	accountInfo      WGAccountInfoData
+	playerShipStats  PlayerShipStats
+	playerShipBadges PlayerShipBadges
+	warships         Warships
 }
 
 func NewPersonalStats(
-	useShipID int,
+	useShipID ShipID,
 	accountInfo WGAccountInfoData,
-	allShipsStats []WGShipsStatsData,
-	shipsBadges []WGShipsBadgesData,
+	playerShipStats PlayerShipStats,
+	playerShipBadges PlayerShipBadges,
 	warships Warships,
-	tempArenaInfo TempArenaInfo,
 ) *PersonalStats {
-	var useShipStats WGShipsStatsData
-	for _, v := range allShipsStats {
-		if v.ShipID == useShipID {
-			useShipStats = v
-			break
-		}
-	}
-
 	return &PersonalStats{
-		useShipID:     useShipID,
-		accountInfo:   accountInfo,
-		useShipStats:  useShipStats,
-		allShipsStats: allShipsStats,
-		shipsBadges:   shipsBadges,
-		warships:      warships,
-		tempArenaInfo: tempArenaInfo,
+		useShipID:        useShipID,
+		accountInfo:      accountInfo,
+		playerShipStats:  playerShipStats,
+		playerShipBadges: playerShipBadges,
+		warships:         warships,
 	}
 }
 
@@ -68,7 +55,7 @@ func (s *PersonalStats) PR(category StatsCategory, pattern StatsPattern) RatingV
 			allBattles uint
 		)
 
-		for _, ship := range s.allShipsStats {
+		for _, ship := range s.playerShipStats {
 			values := s.statsValuesForm(ship, pattern)
 			battles := values.Battles
 
@@ -246,7 +233,7 @@ func (s *PersonalStats) AvgTier(
 		allBattles uint
 	)
 
-	for _, stats := range s.allShipsStats {
+	for _, stats := range s.playerShipStats {
 		warship, ok := s.warships[stats.ShipID]
 		if !ok {
 			continue
@@ -265,7 +252,7 @@ func (s *PersonalStats) UsingTierRate(
 ) TierGroup {
 	tierGroupMap := make(map[string]uint)
 
-	for _, ship := range s.allShipsStats {
+	for _, ship := range s.playerShipStats {
 		warship, ok := s.warships[ship.ShipID]
 		if !ok {
 			continue
@@ -301,7 +288,7 @@ func (s *PersonalStats) UsingShipTypeRate(
 ) ShipTypeGroup {
 	shipTypeMap := make(map[ShipType]uint)
 
-	for _, ship := range s.allShipsStats {
+	for _, ship := range s.playerShipStats {
 		warship, ok := s.warships[ship.ShipID]
 		if !ok {
 			continue
@@ -330,7 +317,7 @@ func (s *PersonalStats) PlatoonRate(
 ) float64 {
 	switch category {
 	case StatsCategoryShip:
-		stats := s.useShipStats
+		stats := s.playerShipStats[s.useShipID]
 		return platoonRate(
 			stats.Pvp.Battles,
 			stats.PvpSolo.Battles,
@@ -351,7 +338,7 @@ func (s *PersonalStats) PlatoonRate(
 }
 
 func (s *PersonalStats) EfficiencyBadge() EfficiencyBadge {
-	for _, b := range s.shipsBadges {
+	for _, b := range s.playerShipBadges {
 		if b.ShipID == s.useShipID {
 			return s.toEfficiencyBadge(b.TopGradeClass)
 		}
@@ -363,7 +350,7 @@ func (s *PersonalStats) EfficiencyBadge() EfficiencyBadge {
 func (s *PersonalStats) EfficiencyBadges() EfficiencyBadgeGroup {
 	var badges EfficiencyBadgeGroup
 
-	for _, b := range s.shipsBadges {
+	for _, b := range s.playerShipBadges {
 		switch s.toEfficiencyBadge(b.TopGradeClass) {
 		case EfficiencyBadgeExpert:
 			badges.Expert++
@@ -397,11 +384,11 @@ func (s *PersonalStats) toEfficiencyBadge(value int) EfficiencyBadge {
 func (s *PersonalStats) statsValues(pattern StatsPattern) (WGShipStatsValues, WGPlayerStatsValues) {
 	switch pattern {
 	case StatsPatternPvPAll:
-		return s.useShipStats.Pvp, s.accountInfo.Statistics.Pvp
+		return s.playerShipStats[s.useShipID].Pvp, s.accountInfo.Statistics.Pvp
 	case StatsPatternPvPSolo:
-		return s.useShipStats.PvpSolo, s.accountInfo.Statistics.PvpSolo
+		return s.playerShipStats[s.useShipID].PvpSolo, s.accountInfo.Statistics.PvpSolo
 	case StatsPatternRankSolo:
-		return s.useShipStats.RankSolo, s.accountInfo.Statistics.RankSolo
+		return s.playerShipStats[s.useShipID].RankSolo, s.accountInfo.Statistics.RankSolo
 	}
 
 	return WGShipStatsValues{}, WGPlayerStatsValues{}

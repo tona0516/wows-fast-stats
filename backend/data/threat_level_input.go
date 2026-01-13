@@ -1,10 +1,9 @@
 package data
 
 type ThreatLevelInput struct {
-	AccountID        int
 	Vehicles         []Vehicle
 	Warships         Warships
-	ShipID           int
+	ShipID           ShipID
 	ShipBattles      uint
 	ShipDamage       float64
 	ShipWinRate      float64
@@ -18,10 +17,9 @@ type ThreatLevelInput struct {
 }
 
 func NewThreatLevelInput(
-	accountID int,
 	vehicles []Vehicle,
 	warships Warships,
-	shipID int,
+	shipID ShipID,
 	shipBattles uint,
 	shipDamage float64,
 	shipWinRate float64,
@@ -34,7 +32,6 @@ func NewThreatLevelInput(
 	overallKdRate float64,
 ) ThreatLevelInput {
 	return ThreatLevelInput{
-		AccountID:        accountID,
 		Vehicles:         vehicles,
 		Warships:         warships,
 		ShipID:           shipID,

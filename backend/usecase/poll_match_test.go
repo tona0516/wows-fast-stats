@@ -137,7 +137,7 @@ func TestPollMatch_InvokeWithDataChange(t *testing.T) {
 
 	tempArenaInfo1 := data.TempArenaInfo{
 		Vehicles: []data.Vehicle{
-			{ShipID: 1, Relation: 0, ID: 100, Name: "player1"},
+			{ShipID: 1, Relation: 0, Name: "player1"},
 		},
 		DateTime:   "22.05.2023 12:34:56",
 		MapID:      10,
@@ -155,7 +155,7 @@ func TestPollMatch_InvokeWithDataChange(t *testing.T) {
 				// 3回目以降は異なるデータを返す
 				return data.TempArenaInfo{
 					Vehicles: []data.Vehicle{
-						{ShipID: 2, Relation: 0, ID: 100, Name: "player1"},
+						{ShipID: 2, Relation: 0, Name: "player1"},
 					},
 					DateTime:   "22.05.2023 12:35:00",
 					MapID:      10,

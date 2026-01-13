@@ -1,12 +1,14 @@
 package data
 
-type AllPlayerShipsBadges map[int][]WGShipsBadgesData
-
 type WGShipsBadges struct {
-	WGResponseCommon[map[int][]WGShipsBadgesData]
+	WGResponseCommon[map[AccountID][]WGShipsBadgesData]
 }
 
 type WGShipsBadgesData struct {
-	ShipID        int `json:"ship_id"`
-	TopGradeClass int `json:"top_grade_class"`
+	ShipID        ShipID `json:"ship_id"`
+	TopGradeClass int    `json:"top_grade_class"`
 }
+
+type AllPlayerShipBadges map[AccountID]PlayerShipBadges
+
+type PlayerShipBadges map[ShipID]WGShipsBadgesData

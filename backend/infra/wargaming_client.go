@@ -62,10 +62,10 @@ func NewWargamingClient(i do.Injector) (*WargamingClient, error) {
 	}, nil
 }
 
-func (c *WargamingClient) AccountInfo(accountIDs []int) (data.WGAccountInfo, error) {
+func (c *WargamingClient) AccountInfo(accountIDs []data.AccountID) (data.WGAccountInfo, error) {
 	strAccountIDs := make([]string, len(accountIDs))
 	for i, v := range accountIDs {
-		strAccountIDs[i] = strconv.Itoa(v)
+		strAccountIDs[i] = strconv.Itoa(int(v))
 	}
 
 	res, err := request[data.WGAccountInfo](
@@ -100,10 +100,10 @@ func (c *WargamingClient) AccountList(accountNames []string) (data.WGAccountList
 	return res, err
 }
 
-func (c *WargamingClient) ClansAccountInfo(accountIDs []int) (data.WGClansAccountInfo, error) {
+func (c *WargamingClient) ClansAccountInfo(accountIDs []data.AccountID) (data.WGClansAccountInfo, error) {
 	strAccountIDs := make([]string, len(accountIDs))
 	for i, v := range accountIDs {
-		strAccountIDs[i] = strconv.Itoa(v)
+		strAccountIDs[i] = strconv.Itoa(int(v))
 	}
 
 	res, err := request[data.WGClansAccountInfo](
@@ -118,10 +118,10 @@ func (c *WargamingClient) ClansAccountInfo(accountIDs []int) (data.WGClansAccoun
 	return res, err
 }
 
-func (c *WargamingClient) ClansInfo(clanIDs []int) (data.WGClansInfo, error) {
+func (c *WargamingClient) ClansInfo(clanIDs []data.ClanID) (data.WGClansInfo, error) {
 	strClanIDs := make([]string, len(clanIDs))
 	for i, v := range clanIDs {
-		strClanIDs[i] = strconv.Itoa(v)
+		strClanIDs[i] = strconv.Itoa(int(v))
 	}
 
 	if len(strClanIDs) == 0 {
@@ -140,12 +140,12 @@ func (c *WargamingClient) ClansInfo(clanIDs []int) (data.WGClansInfo, error) {
 	return res, err
 }
 
-func (c *WargamingClient) ShipsStats(accountID int) (data.WGShipsStats, error) {
+func (c *WargamingClient) ShipsStats(accountID data.AccountID) (data.WGShipsStats, error) {
 	res, err := request[data.WGShipsStats](
 		c,
 		"/wows/ships/stats/",
 		map[string]string{
-			"account_id": strconv.Itoa(accountID),
+			"account_id": strconv.Itoa(int(accountID)),
 			"fields":     c.fieldQuery(reflect.TypeFor[data.WGShipsStatsData]()),
 			"extra": strings.Join([]string{
 				"pvp_solo",
@@ -199,12 +199,12 @@ func (c *WargamingClient) BattleTypes() (data.WGBattleTypes, error) {
 	return res, err
 }
 
-func (c *WargamingClient) ShipsBadges(accountID int) (data.WGShipsBadges, error) {
+func (c *WargamingClient) ShipsBadges(accountID data.AccountID) (data.WGShipsBadges, error) {
 	res, err := request[data.WGShipsBadges](
 		c,
 		"/wows/ships/badges/",
 		map[string]string{
-			"account_id": strconv.Itoa(accountID),
+			"account_id": strconv.Itoa(int(accountID)),
 			"fields":     c.fieldQuery(reflect.TypeFor[data.WGShipsBadgesData]()),
 		},
 	)

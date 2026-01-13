@@ -24,10 +24,10 @@ func TestWargamingClient_AccountInfo(t *testing.T) {
 		t.Parallel()
 
 		expected := data.WGAccountInfo{
-			WGResponseCommon: data.WGResponseCommon[map[int]data.WGAccountInfoData]{
+			WGResponseCommon: data.WGResponseCommon[map[data.AccountID]data.WGAccountInfoData]{
 				Status: "ok",
 				Error:  data.WGError{},
-				Data:   map[int]data.WGAccountInfoData{},
+				Data:   map[data.AccountID]data.WGAccountInfoData{},
 			},
 		}
 		server := simpleMockServer(t, 200, expected)
@@ -45,7 +45,7 @@ func TestWargamingClient_AccountInfo(t *testing.T) {
 		})
 		wargaming, err := NewWargamingClient(injector)
 		require.NoError(t, err)
-		result, err := wargaming.AccountInfo([]int{123, 456})
+		result, err := wargaming.AccountInfo([]data.AccountID{123, 456})
 
 		assert.NoError(t, err)
 		assert.Equal(t, expected, result)
@@ -75,7 +75,7 @@ func TestWargamingClient_AccountInfo(t *testing.T) {
 		})
 		instance, err := NewWargamingClient(injector)
 		require.NoError(t, err)
-		_, err = instance.AccountInfo([]int{123, 456})
+		_, err = instance.AccountInfo([]data.AccountID{123, 456})
 
 		assert.ErrorIs(t, err, context.DeadlineExceeded)
 	})
@@ -113,7 +113,7 @@ func TestWargamingClient_AccountInfo(t *testing.T) {
 		})
 		instance, err := NewWargamingClient(injector)
 		require.NoError(t, err)
-		_, err = instance.AccountInfo([]int{123, 456})
+		_, err = instance.AccountInfo([]data.AccountID{123, 456})
 
 		assert.Error(t, err, ErrErrorResponse)
 		assert.Equal(t, 1, calls)
@@ -151,10 +151,10 @@ func TestWargamingClient_AccountInfo(t *testing.T) {
 				}
 
 				body, err := json.Marshal(data.WGAccountInfo{
-					WGResponseCommon: data.WGResponseCommon[map[int]data.WGAccountInfoData]{
+					WGResponseCommon: data.WGResponseCommon[map[data.AccountID]data.WGAccountInfoData]{
 						Status: "ok",
 						Error:  data.WGError{},
-						Data:   map[int]data.WGAccountInfoData{},
+						Data:   map[data.AccountID]data.WGAccountInfoData{},
 					},
 				})
 				require.NoError(t, err)
@@ -174,7 +174,7 @@ func TestWargamingClient_AccountInfo(t *testing.T) {
 			})
 			instance, err := NewWargamingClient(injector)
 			require.NoError(t, err)
-			_, err = instance.AccountInfo([]int{123, 456})
+			_, err = instance.AccountInfo([]data.AccountID{123, 456})
 
 			assert.NoError(t, err)
 			assert.Equal(t, retry+1, calls)
@@ -221,7 +221,7 @@ func TestWargamingClient_AccountInfo(t *testing.T) {
 			})
 			instance, err := NewWargamingClient(injector)
 			require.NoError(t, err)
-			_, err = instance.AccountInfo([]int{123, 456})
+			_, err = instance.AccountInfo([]data.AccountID{123, 456})
 
 			assert.Error(t, err, ErrTemporaryUnavaillalble)
 			assert.Equal(t, retry+1, calls)
@@ -233,10 +233,10 @@ func TestWargamingClient_ClansAccountInfo(t *testing.T) {
 	t.Parallel()
 
 	expected := data.WGClansAccountInfo{
-		WGResponseCommon: data.WGResponseCommon[map[int]data.WGClansAccountInfoData]{
+		WGResponseCommon: data.WGResponseCommon[map[data.AccountID]data.WGClansAccountInfoData]{
 			Status: "ok",
 			Error:  data.WGError{},
-			Data:   map[int]data.WGClansAccountInfoData{},
+			Data:   map[data.AccountID]data.WGClansAccountInfoData{},
 		},
 	}
 	server := simpleMockServer(t, 200, expected)
@@ -254,7 +254,7 @@ func TestWargamingClient_ClansAccountInfo(t *testing.T) {
 	})
 	instance, err := NewWargamingClient(injector)
 	require.NoError(t, err)
-	result, err := instance.ClansAccountInfo([]int{123, 456})
+	result, err := instance.ClansAccountInfo([]data.AccountID{123, 456})
 
 	assert.NoError(t, err)
 	assert.Equal(t, expected, result)
@@ -264,10 +264,10 @@ func TestWargamingClient_ClansInfo(t *testing.T) {
 	t.Parallel()
 
 	expected := data.WGClansInfo{
-		WGResponseCommon: data.WGResponseCommon[map[int]data.WGClansInfoData]{
+		WGResponseCommon: data.WGResponseCommon[map[data.ClanID]data.WGClansInfoData]{
 			Status: "ok",
 			Error:  data.WGError{},
-			Data:   map[int]data.WGClansInfoData{},
+			Data:   map[data.ClanID]data.WGClansInfoData{},
 		},
 	}
 	server := simpleMockServer(t, 200, expected)
@@ -285,7 +285,7 @@ func TestWargamingClient_ClansInfo(t *testing.T) {
 	})
 	instance, err := NewWargamingClient(injector)
 	require.NoError(t, err)
-	result, err := instance.ClansInfo([]int{123, 456})
+	result, err := instance.ClansInfo([]data.ClanID{123, 456})
 
 	assert.NoError(t, err)
 	assert.Equal(t, expected, result)
@@ -295,10 +295,10 @@ func TestWargamingClient_ShipsStats(t *testing.T) {
 	t.Parallel()
 
 	expected := data.WGShipsStats{
-		WGResponseCommon: data.WGResponseCommon[map[int][]data.WGShipsStatsData]{
+		WGResponseCommon: data.WGResponseCommon[map[data.AccountID][]data.WGShipsStatsData]{
 			Status: "ok",
 			Error:  data.WGError{},
-			Data:   map[int][]data.WGShipsStatsData{},
+			Data:   map[data.AccountID][]data.WGShipsStatsData{},
 		},
 	}
 	server := simpleMockServer(t, 200, expected)
@@ -326,10 +326,10 @@ func TestWargamingClient_EncycShips(t *testing.T) {
 	t.Parallel()
 
 	expected := data.WGEncycShips{
-		WGResponseCommon: data.WGResponseCommon[map[int]data.WGEncycShipsData]{
+		WGResponseCommon: data.WGResponseCommon[map[data.ShipID]data.WGEncycShipsData]{
 			Status: "ok",
 			Error:  data.WGError{},
-			Data:   map[int]data.WGEncycShipsData{},
+			Data:   map[data.ShipID]data.WGEncycShipsData{},
 		},
 		Meta: struct {
 			PageTotal int `json:"page_total"`
@@ -423,10 +423,10 @@ func TestWargamingClient_ShipsBadges(t *testing.T) {
 	t.Parallel()
 
 	expected := data.WGShipsBadges{
-		WGResponseCommon: data.WGResponseCommon[map[int][]data.WGShipsBadgesData]{
+		WGResponseCommon: data.WGResponseCommon[map[data.AccountID][]data.WGShipsBadgesData]{
 			Status: "ok",
 			Error:  data.WGError{},
-			Data:   map[int][]data.WGShipsBadgesData{},
+			Data:   map[data.AccountID][]data.WGShipsBadgesData{},
 		},
 	}
 	server := simpleMockServer(t, 200, expected)

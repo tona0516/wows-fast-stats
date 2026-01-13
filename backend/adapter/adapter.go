@@ -59,15 +59,15 @@ type NumbersClient interface {
 
 //go:generate mockgen -source=$GOFILE -destination ../mock/$GOFILE -package mock
 type WargamingClient interface {
-	AccountInfo(accountIDs []int) (data.WGAccountInfo, error)
+	AccountInfo(accountIDs []data.AccountID) (data.WGAccountInfo, error)
 	AccountList(accountNames []string) (data.WGAccountList, error)
-	ClansAccountInfo(accountIDs []int) (data.WGClansAccountInfo, error)
-	ClansInfo(clanIDs []int) (data.WGClansInfo, error)
+	ClansAccountInfo(accountIDs []data.AccountID) (data.WGClansAccountInfo, error)
+	ClansInfo(clanIDs []data.ClanID) (data.WGClansInfo, error)
 	EncycShips(pageNo int) (data.WGEncycShips, error)
-	ShipsStats(accountID int) (data.WGShipsStats, error)
+	ShipsStats(accountID data.AccountID) (data.WGShipsStats, error)
 	BattleArenas() (data.WGBattleArenas, error)
 	BattleTypes() (data.WGBattleTypes, error)
-	ShipsBadges(accountID int) (data.WGShipsBadges, error)
+	ShipsBadges(accountID data.AccountID) (data.WGShipsBadges, error)
 }
 
 //go:generate mockgen -source=$GOFILE -destination ../mock/$GOFILE -package mock

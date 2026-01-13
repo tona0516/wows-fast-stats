@@ -1,13 +1,7 @@
 package data
 
-type AllPlayerShipsStats map[int]WGShipsStats
-
-func (w AllPlayerShipsStats) Player(accountID int) []WGShipsStatsData {
-	return w[accountID].Data[accountID]
-}
-
 type WGShipsStats struct {
-	WGResponseCommon[map[int][]WGShipsStatsData]
+	WGResponseCommon[map[AccountID][]WGShipsStatsData]
 }
 
 type WGShipsStatsData struct {
@@ -20,7 +14,7 @@ type WGShipsStatsData struct {
 		Battles uint `json:"battles"`
 	} `json:"pvp_div3"`
 	RankSolo WGShipStatsValues `json:"rank_solo"`
-	ShipID   int               `json:"ship_id"`
+	ShipID   ShipID            `json:"ship_id"`
 }
 
 type WGShipStatsValues struct {
@@ -41,3 +35,7 @@ type WGArmament struct {
 	Hits  uint `json:"hits"`
 	Shots uint `json:"shots"`
 }
+
+type AllPlayerShipStats map[AccountID]PlayerShipStats
+
+type PlayerShipStats map[ShipID]WGShipsStatsData

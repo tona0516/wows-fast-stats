@@ -1,7 +1,7 @@
 package data
 
 type WGEncycShips struct {
-	WGResponseCommon[map[int]WGEncycShipsData]
+	WGResponseCommon[map[ShipID]WGEncycShipsData]
 	Meta struct {
 		PageTotal int `json:"page_total"`
 		Page      int `json:"page"`

@@ -72,6 +72,11 @@ func injectDependency() *options.App {
 		)
 	})
 
+	// service
+	do.Provide(injector, usecase.NewStatsService)
+	do.Provide(injector, usecase.NewClanService)
+	do.Provide(injector, usecase.NewBadgeService)
+
 	// usecase
 	do.Provide(injector, usecase.NewPrefetch)
 	do.Provide(injector, usecase.NewFetchBattle)

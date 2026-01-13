@@ -10,10 +10,10 @@ func TestWGClansAccountInfo_ClanIDs(t *testing.T) {
 	t.Parallel()
 
 	w := WGClansAccountInfo{
-		WGResponseCommon: WGResponseCommon[map[int]WGClansAccountInfoData]{
+		WGResponseCommon: WGResponseCommon[map[AccountID]WGClansAccountInfoData]{
 			Status: "",
 			Error:  WGError{},
-			Data: map[int]WGClansAccountInfoData{
+			Data: map[AccountID]WGClansAccountInfoData{
 				1: {ClanID: 123},
 				2: {ClanID: 0},
 				3: {ClanID: 456},
@@ -23,7 +23,7 @@ func TestWGClansAccountInfo_ClanIDs(t *testing.T) {
 		},
 	}
 
-	expectedIDs := []int{123, 456, 789}
+	expectedIDs := []ClanID{123, 456, 789}
 	actualIDs := w.ClanIDs()
 
 	assert.Equal(t, expectedIDs, actualIDs, "should be equal")

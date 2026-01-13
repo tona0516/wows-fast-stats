@@ -1,10 +1,12 @@
 package data
 
+type AccountID int
+
 type PlayerInfo struct {
-	ID       int    `json:"id"`
-	Name     string `json:"name"`
-	Clan     Clan   `json:"clan"`
-	IsHidden bool   `json:"is_hidden"`
+	ID       AccountID `json:"id"`
+	Name     string    `json:"name"`
+	Clan     Clan      `json:"clan"`
+	IsHidden bool      `json:"is_hidden"`
 }
 
 type PlayerStats struct {
@@ -15,14 +17,12 @@ type PlayerStats struct {
 func NewPlayerStats(
 	statsPattern StatsPattern,
 	stats *PersonalStats,
-	accountID int,
-	shipID int,
+	shipID ShipID,
 	vehicles []Vehicle,
 	warships Warships,
 ) PlayerStats {
 	tlc := NewThreatLevelCalculator()
 	threatLevel := tlc.Calculate(NewThreatLevelInput(
-		accountID,
 		vehicles,
 		warships,
 		shipID,

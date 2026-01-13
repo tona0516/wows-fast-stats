@@ -16,8 +16,8 @@ func NewBattle(
 	accountInfo WGAccountInfo,
 	accountList WGAccountList,
 	clans Clans,
-	allPlayerShipsStats AllPlayerShipsStats,
-	allPlayerShipsBadges AllPlayerShipsBadges,
+	allPlayerShipsStats AllPlayerShipStats,
+	allPlayerShipsBadges AllPlayerShipBadges,
 ) Battle {
 	friends := make(Players, 0)
 	enemies := make(Players, 0)
@@ -35,10 +35,9 @@ func NewBattle(
 		stats := NewPersonalStats(
 			vehicle.ShipID,
 			accountInfo.Data[accountID],
-			allPlayerShipsStats.Player(accountID),
+			allPlayerShipsStats[accountID],
 			allPlayerShipsBadges[accountID],
 			prefetchResult.Warships,
-			tempArenaInfo,
 		)
 
 		player := Player{
@@ -52,7 +51,6 @@ func NewBattle(
 			PvPSolo: NewPlayerStats(
 				StatsPatternPvPSolo,
 				stats,
-				accountID,
 				vehicle.ShipID,
 				tempArenaInfo.Vehicles,
 				prefetchResult.Warships,
@@ -60,7 +58,6 @@ func NewBattle(
 			PvPAll: NewPlayerStats(
 				StatsPatternPvPAll,
 				stats,
-				accountID,
 				vehicle.ShipID,
 				tempArenaInfo.Vehicles,
 				prefetchResult.Warships,
@@ -68,7 +65,6 @@ func NewBattle(
 			RankSolo: NewPlayerStats(
 				StatsPatternRankSolo,
 				stats,
-				accountID,
 				vehicle.ShipID,
 				tempArenaInfo.Vehicles,
 				prefetchResult.Warships,

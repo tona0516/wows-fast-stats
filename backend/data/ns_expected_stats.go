@@ -20,7 +20,7 @@ type NSExpectedStats struct {
 	Data NSExpectedStatsData `json:"data"`
 }
 
-type NSExpectedStatsData map[int]NSExpectedStatsValues
+type NSExpectedStatsData map[ShipID]NSExpectedStatsValues
 
 type NSExpectedStatsValues struct {
 	AverageDamageDealt float64 `json:"average_damage_dealt"`
@@ -66,7 +66,7 @@ func (n *NSExpectedStats) UnmarshalJSON(b []byte) error {
 			continue
 		}
 
-		es[shipID] = NSExpectedStatsValues{
+		es[ShipID(shipID)] = NSExpectedStatsValues{
 			AverageDamageDealt: damage,
 			AverageFrags:       frags,
 			WinRate:            wr,

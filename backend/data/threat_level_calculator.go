@@ -5,11 +5,11 @@ type ThreatLevelCalculator struct {
 		rank      ThreatLevelRank
 		threshold float64
 	}
-	specialAAShips map[int]struct {
+	specialAAShips map[ShipID]struct {
 		avg  float64
 		coef float64
 	}
-	specialShipScores map[int]float64
+	specialShipScores map[ShipID]float64
 }
 
 func NewThreatLevelCalculator() ThreatLevelCalculator {
@@ -30,7 +30,7 @@ func NewThreatLevelCalculator() ThreatLevelCalculator {
 			{rank: ThreatLevelRankR, threshold: 8000 * coef},
 			{rank: ThreatLevelRankIR, threshold: 0},
 		},
-		specialAAShips: map[int]struct {
+		specialAAShips: map[ShipID]struct {
 			avg  float64
 			coef float64
 		}{
@@ -50,7 +50,7 @@ func NewThreatLevelCalculator() ThreatLevelCalculator {
 			4074649040: {avg: 1.9, coef: 0.025}, // Grozovoi
 			4181604048: {avg: 0.7, coef: 0.025}, // Akizuki
 		},
-		specialShipScores: map[int]float64{
+		specialShipScores: map[ShipID]float64{
 			3553540080: 1.25,  // Flint
 			3551410160: 1.3,   // Black
 			3763255248: 1.2,   // Belfast
@@ -292,7 +292,7 @@ func (c *ThreatLevelCalculator) playerOverallScore(
 //nolint:cyclop
 func (c *ThreatLevelCalculator) playerShipScore(
 	warships Warships,
-	shipID int,
+	shipID ShipID,
 	shipBattles uint,
 	shipAvgDamage float64,
 	shipSurvivedRate float64,
@@ -398,7 +398,7 @@ func (c *ThreatLevelCalculator) playerShipScore(
 }
 
 func (c *ThreatLevelCalculator) antiAirCoefficient(
-	shipID int,
+	shipID ShipID,
 	shipAvgPlanesKilled float64,
 ) float64 {
 	specialAAShip, ok := c.specialAAShips[shipID]
@@ -417,7 +417,7 @@ func (c *ThreatLevelCalculator) antiAirCoefficient(
 
 func (c *ThreatLevelCalculator) shipClassScore(
 	warships Warships,
-	shipID int,
+	shipID ShipID,
 ) float64 {
 	result := 1.0
 
@@ -445,7 +445,7 @@ func (c *ThreatLevelCalculator) shipClassScore(
 func (c *ThreatLevelCalculator) correctBasedOnMatch(
 	raw float64,
 	warships Warships,
-	shipID int,
+	shipID ShipID,
 	shipAAIndex float64,
 	isCVMatch bool,
 	topTier uint,

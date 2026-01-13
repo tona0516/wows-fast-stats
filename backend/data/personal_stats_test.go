@@ -12,11 +12,10 @@ const (
 
 //nolint:gochecknoglobals
 var (
-	emptyAccountInfo   = WGAccountInfoData{}
-	emptyShipsStats    = []WGShipsStatsData{}
-	emptyWarships      = Warships{}
-	emptyTempArenaInfo = TempArenaInfo{}
-	emptyShipsBadges   = []WGShipsBadgesData{}
+	emptyAccountInfo = WGAccountInfoData{}
+	emptyShipStats   = PlayerShipStats{}
+	emptyWarships    = Warships{}
+	emptyShipBadges  = PlayerShipBadges{}
 )
 
 // ref: https://asia.wows-numbers.com/personal/rating
@@ -31,13 +30,13 @@ func TestPersonalStats_PR_Ship(t *testing.T) {
 		{0, NewRatingValue(-1, RatingNone)},
 	}
 
-	useShipID := 0
+	useShipID := ShipID(0)
 	for _, p := range params {
 		stats := NewPersonalStats(
 			useShipID,
 			emptyAccountInfo,
-			[]WGShipsStatsData{
-				{
+			PlayerShipStats{
+				useShipID: {
 					Pvp: WGShipStatsValues{
 						Battles:     p.battles,
 						DamageDealt: 1000000,
@@ -47,7 +46,7 @@ func TestPersonalStats_PR_Ship(t *testing.T) {
 					ShipID: useShipID,
 				},
 			},
-			emptyShipsBadges,
+			emptyShipBadges,
 			Warships{
 				useShipID: {
 					ServerAverage: ServerAverage{
@@ -57,7 +56,6 @@ func TestPersonalStats_PR_Ship(t *testing.T) {
 					},
 				},
 			},
-			emptyTempArenaInfo,
 		)
 
 		actual := stats.PR(StatsCategoryShip, StatsPatternPvPAll)
@@ -70,12 +68,12 @@ func TestPersonalStats_PR_Ship(t *testing.T) {
 func TestPersonalStats_PR_Overall(t *testing.T) {
 	t.Parallel()
 
-	useShipID := 0
+	useShipID := ShipID(0)
 	stats := NewPersonalStats(
 		useShipID,
 		emptyAccountInfo,
-		[]WGShipsStatsData{
-			{
+		PlayerShipStats{
+			1: {
 				Pvp: WGShipStatsValues{
 					Battles:     2,
 					DamageDealt: 54468,
@@ -84,7 +82,7 @@ func TestPersonalStats_PR_Overall(t *testing.T) {
 				},
 				ShipID: 1,
 			},
-			{
+			2: {
 				Pvp: WGShipStatsValues{
 					Battles:     1,
 					DamageDealt: 155185,
@@ -93,7 +91,7 @@ func TestPersonalStats_PR_Overall(t *testing.T) {
 				},
 				ShipID: 2,
 			},
-			{
+			3: {
 				Pvp: WGShipStatsValues{
 					Battles:     1,
 					DamageDealt: 51576,
@@ -102,7 +100,7 @@ func TestPersonalStats_PR_Overall(t *testing.T) {
 				},
 				ShipID: 3,
 			},
-			{
+			4: {
 				Pvp: WGShipStatsValues{
 					Battles:     1,
 					DamageDealt: 117285,
@@ -112,14 +110,13 @@ func TestPersonalStats_PR_Overall(t *testing.T) {
 				ShipID: 4,
 			},
 		},
-		emptyShipsBadges,
+		emptyShipBadges,
 		Warships{
 			1: {ServerAverage: ServerAverage{Damage: 53792.23172971, Frags: 0.6935181784796, WinRate: 50.092406353286}},
 			2: {ServerAverage: ServerAverage{Damage: 46228.419395466, Frags: 0.80128883291351, WinRate: 51.202824307302}},
 			3: {ServerAverage: ServerAverage{Damage: 25864.417248367, Frags: 0.69715604593558, WinRate: 51.11762215717}},
 			4: {ServerAverage: ServerAverage{Damage: 77931.580907796, Frags: 0.68628943618969, WinRate: 50.386342357012}},
 		},
-		emptyTempArenaInfo,
 	)
 
 	actual := stats.PR(StatsCategoryOverall, StatsPatternPvPAll)
@@ -146,10 +143,9 @@ func TestPersonalStats_AvgDamage_Overall(t *testing.T) {
 				},
 			},
 		},
-		emptyShipsStats,
-		emptyShipsBadges,
+		emptyShipStats,
+		emptyShipBadges,
 		emptyWarships,
-		emptyTempArenaInfo,
 	)
 
 	actual := stats.AvgDamage(StatsCategoryOverall, StatsPatternPvPAll)
@@ -176,10 +172,9 @@ func TestPersonalStats_AvgDamage_Overall_Solo(t *testing.T) {
 				},
 			},
 		},
-		emptyShipsStats,
-		emptyShipsBadges,
+		emptyShipStats,
+		emptyShipBadges,
 		emptyWarships,
-		emptyTempArenaInfo,
 	)
 
 	actual := stats.AvgDamage(StatsCategoryOverall, StatsPatternPvPSolo)
@@ -206,10 +201,9 @@ func TestPersonalStats_AvgDamage_Overall_Rank(t *testing.T) {
 				},
 			},
 		},
-		emptyShipsStats,
-		emptyShipsBadges,
+		emptyShipStats,
+		emptyShipBadges,
 		emptyWarships,
-		emptyTempArenaInfo,
 	)
 
 	actual := stats.AvgDamage(StatsCategoryOverall, StatsPatternRankSolo)
@@ -223,8 +217,8 @@ func TestPersonalStats_AvgDamage_Ship(t *testing.T) {
 	stats := NewPersonalStats(
 		1,
 		emptyAccountInfo,
-		[]WGShipsStatsData{
-			{
+		PlayerShipStats{
+			1: {
 				Pvp: WGShipStatsValues{
 					Battles:     100,
 					DamageDealt: 1000000,
@@ -232,7 +226,7 @@ func TestPersonalStats_AvgDamage_Ship(t *testing.T) {
 				ShipID: 1,
 			},
 		},
-		emptyShipsBadges,
+		emptyShipBadges,
 		Warships{
 			1: {
 				ServerAverage: ServerAverage{
@@ -240,7 +234,6 @@ func TestPersonalStats_AvgDamage_Ship(t *testing.T) {
 				},
 			},
 		},
-		emptyTempArenaInfo,
 	)
 
 	actual := stats.AvgDamage(StatsCategoryShip, StatsPatternPvPAll)
@@ -254,8 +247,8 @@ func TestPersonalStats_AvgDamage_Ship_Solo(t *testing.T) {
 	stats := NewPersonalStats(
 		1,
 		emptyAccountInfo,
-		[]WGShipsStatsData{
-			{
+		PlayerShipStats{
+			1: {
 				PvpSolo: WGShipStatsValues{
 					Battles:     100,
 					DamageDealt: 1000000,
@@ -263,7 +256,7 @@ func TestPersonalStats_AvgDamage_Ship_Solo(t *testing.T) {
 				ShipID: 1,
 			},
 		},
-		emptyShipsBadges,
+		emptyShipBadges,
 		Warships{
 			1: {
 				ServerAverage: ServerAverage{
@@ -271,7 +264,6 @@ func TestPersonalStats_AvgDamage_Ship_Solo(t *testing.T) {
 				},
 			},
 		},
-		emptyTempArenaInfo,
 	)
 
 	actual := stats.AvgDamage(StatsCategoryShip, StatsPatternPvPSolo)
@@ -285,8 +277,8 @@ func TestPersonalStats_AvgDamage_Ship_Rank(t *testing.T) {
 	stats := NewPersonalStats(
 		1,
 		emptyAccountInfo,
-		[]WGShipsStatsData{
-			{
+		PlayerShipStats{
+			1: {
 				RankSolo: WGShipStatsValues{
 					Battles:     100,
 					DamageDealt: 1000000,
@@ -294,7 +286,7 @@ func TestPersonalStats_AvgDamage_Ship_Rank(t *testing.T) {
 				ShipID: 1,
 			},
 		},
-		emptyShipsBadges,
+		emptyShipBadges,
 		Warships{
 			1: {
 				ServerAverage: ServerAverage{
@@ -302,7 +294,6 @@ func TestPersonalStats_AvgDamage_Ship_Rank(t *testing.T) {
 				},
 			},
 		},
-		emptyTempArenaInfo,
 	)
 
 	actual := stats.AvgDamage(StatsCategoryShip, StatsPatternRankSolo)
@@ -317,21 +308,20 @@ func TestPersonalStats_MaxDamage_Ship(t *testing.T) {
 		Value: 200000,
 	}
 
-	useShipID := 100
+	useShipID := ShipID(100)
 	stats := NewPersonalStats(
 		useShipID,
 		emptyAccountInfo,
-		[]WGShipsStatsData{
-			{
+		PlayerShipStats{
+			useShipID: {
 				Pvp: WGShipStatsValues{
 					MaxDamageDealt: expected.Value,
 				},
 				ShipID: useShipID,
 			},
 		},
-		emptyShipsBadges,
+		emptyShipBadges,
 		emptyWarships,
-		emptyTempArenaInfo,
 	)
 
 	assert.Equal(t, expected, stats.MaxDamage(StatsCategoryShip, StatsPatternPvPAll))
@@ -363,15 +353,14 @@ func TestPersonalStats_MaxDamage_Overall(t *testing.T) {
 				},
 			},
 		},
-		emptyShipsStats,
-		emptyShipsBadges,
+		emptyShipStats,
+		emptyShipBadges,
 		Warships{
 			expected.ShipID: {
 				Name: expected.ShipName,
 				Tier: expected.ShipTier,
 			},
 		},
-		emptyTempArenaInfo,
 	)
 
 	assert.Equal(t, expected, stats.MaxDamage(StatsCategoryOverall, StatsPatternPvPAll))
@@ -395,10 +384,9 @@ func TestPersonalStats_Battles(t *testing.T) {
 				},
 			},
 		},
-		emptyShipsStats,
-		emptyShipsBadges,
+		emptyShipStats,
+		emptyShipBadges,
 		emptyWarships,
-		emptyTempArenaInfo,
 	)
 
 	assert.InDelta(t, 100, stats.Battles(StatsCategoryOverall, StatsPatternPvPAll), allowableDelta)
@@ -424,10 +412,9 @@ func TestPersonalStats_KdRate(t *testing.T) {
 				},
 			},
 		},
-		emptyShipsStats,
-		emptyShipsBadges,
+		emptyShipStats,
+		emptyShipBadges,
 		emptyWarships,
-		emptyTempArenaInfo,
 	)
 
 	assert.InDelta(t, 0.5, stats.KdRate(StatsCategoryOverall, StatsPatternPvPAll), allowableDelta)
@@ -452,10 +439,9 @@ func TestPersonalStats_AvgKill(t *testing.T) {
 				},
 			},
 		},
-		emptyShipsStats,
-		emptyShipsBadges,
+		emptyShipStats,
+		emptyShipBadges,
 		emptyWarships,
-		emptyTempArenaInfo,
 	)
 
 	assert.InDelta(t, 0.3, stats.AvgKill(StatsCategoryOverall, StatsPatternPvPAll), allowableDelta)
@@ -480,10 +466,9 @@ func TestPersonalStats_AvgExp(t *testing.T) {
 				},
 			},
 		},
-		emptyShipsStats,
-		emptyShipsBadges,
+		emptyShipStats,
+		emptyShipBadges,
 		emptyWarships,
-		emptyTempArenaInfo,
 	)
 
 	assert.InDelta(t, 1500, stats.AvgExp(StatsCategoryOverall, StatsPatternPvPAll), allowableDelta)
@@ -508,10 +493,9 @@ func TestPersonalStats_WinRate(t *testing.T) {
 				},
 			},
 		},
-		emptyShipsStats,
-		emptyShipsBadges,
+		emptyShipStats,
+		emptyShipBadges,
 		emptyWarships,
-		emptyTempArenaInfo,
 	)
 
 	actual := stats.WinRate(StatsCategoryOverall, StatsPatternPvPAll)
@@ -540,10 +524,9 @@ func TestPersonalStats_SurvivedRate(t *testing.T) {
 				},
 			},
 		},
-		emptyShipsStats,
-		emptyShipsBadges,
+		emptyShipStats,
+		emptyShipBadges,
 		emptyWarships,
-		emptyTempArenaInfo,
 	)
 
 	actual := stats.SurvivedRate(StatsCategoryOverall, StatsPatternPvPAll)
@@ -555,12 +538,12 @@ func TestPersonalStats_SurvivedRate(t *testing.T) {
 func TestPersonalStats_HitRate(t *testing.T) {
 	t.Parallel()
 
-	useShipID := 0
+	useShipID := ShipID(0)
 	stats := NewPersonalStats(
 		useShipID,
 		emptyAccountInfo,
-		[]WGShipsStatsData{
-			{
+		PlayerShipStats{
+			useShipID: {
 				Pvp: WGShipStatsValues{
 					MainBattery: struct {
 						Hits  uint `json:"hits"`
@@ -580,9 +563,8 @@ func TestPersonalStats_HitRate(t *testing.T) {
 				ShipID: useShipID,
 			},
 		},
-		emptyShipsBadges,
+		emptyShipBadges,
 		emptyWarships,
-		emptyTempArenaInfo,
 	)
 
 	actual := stats.HitRate(StatsPatternPvPAll)
@@ -593,12 +575,12 @@ func TestPersonalStats_HitRate(t *testing.T) {
 func TestPersonalStats_PlanesKilled(t *testing.T) {
 	t.Parallel()
 
-	useShipID := 0
+	useShipID := ShipID(0)
 	stats := NewPersonalStats(
 		useShipID,
 		emptyAccountInfo,
-		[]WGShipsStatsData{
-			{
+		PlayerShipStats{
+			useShipID: {
 				Pvp: WGShipStatsValues{
 					PlanesKilled: 334,
 					Battles:      10,
@@ -606,9 +588,8 @@ func TestPersonalStats_PlanesKilled(t *testing.T) {
 				ShipID: useShipID,
 			},
 		},
-		emptyShipsBadges,
+		emptyShipBadges,
 		emptyWarships,
-		emptyTempArenaInfo,
 	)
 
 	assert.InDelta(t, 33.4, stats.PlanesKilled(StatsPatternPvPAll), allowableDelta)
@@ -620,22 +601,21 @@ func TestPersonalStats_AvgTier(t *testing.T) {
 	stats := NewPersonalStats(
 		0,
 		emptyAccountInfo,
-		[]WGShipsStatsData{
-			{
+		PlayerShipStats{
+			100: {
 				Pvp:    WGShipStatsValues{Battles: 20},
 				ShipID: 100,
 			},
-			{
+			200: {
 				Pvp:    WGShipStatsValues{Battles: 50},
 				ShipID: 200,
 			},
 		},
-		emptyShipsBadges,
+		emptyShipBadges,
 		Warships{
 			100: {Tier: 5},
 			200: {Tier: 8},
 		},
-		emptyTempArenaInfo,
 	)
 
 	assert.InDelta(t, 7.14, stats.AvgTier(StatsPatternPvPAll), allowableDelta)
@@ -647,27 +627,26 @@ func TestPersonalStats_UsingTierRate(t *testing.T) {
 	stats := NewPersonalStats(
 		0,
 		emptyAccountInfo,
-		[]WGShipsStatsData{
-			{
+		PlayerShipStats{
+			100: {
 				Pvp:    WGShipStatsValues{Battles: 30},
 				ShipID: 100,
 			},
-			{
+			200: {
 				Pvp:    WGShipStatsValues{Battles: 50},
 				ShipID: 200,
 			},
-			{
+			300: {
 				Pvp:    WGShipStatsValues{Battles: 20},
 				ShipID: 300,
 			},
 		},
-		emptyShipsBadges,
+		emptyShipBadges,
 		Warships{
 			100: {Tier: 5},
 			200: {Tier: 8},
 			300: {Tier: 4},
 		},
-		emptyTempArenaInfo,
 	)
 
 	tierGroup := stats.UsingTierRate(StatsPatternPvPAll)
@@ -682,32 +661,31 @@ func TestPersonalStats_UsingShipTypeRate(t *testing.T) {
 	stats := NewPersonalStats(
 		0,
 		emptyAccountInfo,
-		[]WGShipsStatsData{
-			{
+		PlayerShipStats{
+			100: {
 				Pvp:    WGShipStatsValues{Battles: 30},
 				ShipID: 100,
 			},
-			{
+			200: {
 				Pvp:    WGShipStatsValues{Battles: 50},
 				ShipID: 200,
 			},
-			{
+			300: {
 				Pvp:    WGShipStatsValues{Battles: 20},
 				ShipID: 300,
 			},
-			{
+			400: {
 				Pvp:    WGShipStatsValues{Battles: 100},
 				ShipID: 400,
 			},
 		},
-		emptyShipsBadges,
+		emptyShipBadges,
 		Warships{
 			100: {Type: ShipTypeDD},
 			200: {Type: ShipTypeCL},
 			300: {Type: ShipTypeBB},
 			400: {Type: ShipTypeCV},
 		},
-		emptyTempArenaInfo,
 	)
 
 	shipTypeGroup := stats.UsingShipTypeRate(StatsPatternPvPAll)
@@ -745,10 +723,9 @@ func TestPersonalStats_PlatoonRate(t *testing.T) {
 				},
 			},
 		},
-		emptyShipsStats,
-		emptyShipsBadges,
+		emptyShipStats,
+		emptyShipBadges,
 		emptyWarships,
-		emptyTempArenaInfo,
 	)
 
 	assert.InDelta(t, 2.4, stats.PlatoonRate(StatsCategoryOverall), allowableDelta)
@@ -757,26 +734,25 @@ func TestPersonalStats_PlatoonRate(t *testing.T) {
 func TestPersonalStats_EfficiencyBadge(t *testing.T) {
 	t.Parallel()
 
-	useShipID := 0
+	useShipID := ShipID(0)
 	stats := NewPersonalStats(
 		useShipID,
 		emptyAccountInfo,
-		[]WGShipsStatsData{
-			{
+		PlayerShipStats{
+			useShipID: {
 				Pvp: WGShipStatsValues{
 					Battles: 100,
 				},
 				ShipID: useShipID,
 			},
 		},
-		[]WGShipsBadgesData{
-			{
+		PlayerShipBadges{
+			useShipID: {
 				ShipID:        useShipID,
 				TopGradeClass: 1,
 			},
 		},
 		emptyWarships,
-		emptyTempArenaInfo,
 	)
 
 	assert.Equal(t, EfficiencyBadge("E"), stats.EfficiencyBadge())
@@ -788,31 +764,30 @@ func TestPersonalStats_EfficiencyBadges(t *testing.T) {
 	stats := NewPersonalStats(
 		0,
 		emptyAccountInfo,
-		emptyShipsStats,
-		[]WGShipsBadgesData{
-			{
+		emptyShipStats,
+		PlayerShipBadges{
+			100: {
 				ShipID:        100,
 				TopGradeClass: 1,
 			},
-			{
+			200: {
 				ShipID:        200,
 				TopGradeClass: 2,
 			},
-			{
+			300: {
 				ShipID:        300,
 				TopGradeClass: 2,
 			},
-			{
+			400: {
 				ShipID:        400,
 				TopGradeClass: 3,
 			},
-			{
+			500: {
 				ShipID:        500,
 				TopGradeClass: 4,
 			},
 		},
 		emptyWarships,
-		emptyTempArenaInfo,
 	)
 
 	badges := stats.EfficiencyBadges()

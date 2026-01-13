@@ -23,7 +23,6 @@ func TestThreatLevel_CalculateThreatLevel_CV_CVあり_Tierミドル(t *testing.T
 
 	instance := NewThreatLevelCalculator()
 	actual := instance.Calculate(NewThreatLevelInput(
-		0,
 		[]Vehicle{
 			{ShipID: shipIDNagato},
 			{ShipID: shipIDYorktown},
@@ -73,7 +72,6 @@ func TestThreatLevel_CalculateThreatLevel_BB_CVあり_Tierトップ(t *testing.T
 
 	instance := NewThreatLevelCalculator()
 	actual := instance.Calculate(NewThreatLevelInput(
-		0,
 		[]Vehicle{
 			{ShipID: shipIDMutsuki},
 			{ShipID: shipIDRanger},
@@ -123,7 +121,6 @@ func TestThreatLevel_CalculateThreatLevel_CL_CVなし_Tierミドル(t *testing.T
 
 	instance := NewThreatLevelCalculator()
 	actual := instance.Calculate(NewThreatLevelInput(
-		0,
 		[]Vehicle{
 			{ShipID: shipIDYoshino},
 		},
@@ -161,7 +158,6 @@ func TestThreatLevel_CalculateThreatLevel_DD_CVあり_Tierボトム_特殊補正
 
 	instance := NewThreatLevelCalculator()
 	actual := instance.Calculate(NewThreatLevelInput(
-		0,
 		[]Vehicle{
 			{ShipID: shipIDSims},
 			{ShipID: shipIDYorktown},

@@ -1,9 +1,11 @@
 package data
 
-type Warships map[int]Warship
+type ShipID int
+
+type Warships map[ShipID]Warship
 
 type Warship struct {
-	ID            int           `json:"id"`
+	ID            ShipID        `json:"id"`
 	Name          string        `json:"name"`
 	Tier          uint          `json:"tier"`
 	Type          ShipType      `json:"type"`
@@ -14,7 +16,7 @@ type Warship struct {
 }
 
 func NewWarship(
-	id int,
+	id ShipID,
 	name string,
 	tier uint,
 	shipType ShipType,

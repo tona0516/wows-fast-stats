@@ -6,20 +6,20 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestUWGClansAutocomplete_HexColor(t *testing.T) {
+func TestClanAutocomplete_HexColor(t *testing.T) {
 	t.Parallel()
 
 	instance := ClanAutocomplete{
 		SearchAutocompleteResult: []struct {
 			HexColor string `json:"hex_color"`
 			Tag      string `json:"tag"`
-			ID       int    `json:"id"`
+			ID       ClanID `json:"id"`
 		}{
 			{HexColor: "#000000", Tag: "TEST", ID: 1},
 			{HexColor: "#000001", Tag: "TEST2", ID: 2},
 		},
 	}
 
-	assert.Equal(t, "#000000", instance.HexColor("TEST"))
-	assert.Empty(t, instance.HexColor("INVALID"))
+	assert.Equal(t, "#000000", instance.HexColor(1))
+	assert.Empty(t, instance.HexColor(999))
 }

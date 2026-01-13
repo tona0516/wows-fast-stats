@@ -22,9 +22,9 @@ func TestReplayReader_TempArenaInfo(t *testing.T) {
 
 		expected := data.TempArenaInfo{
 			Vehicles: []data.Vehicle{
-				{ShipID: 1, Relation: 0, ID: 100, Name: "player_1"},
-				{ShipID: 2, Relation: 1, ID: 200, Name: "player_2"},
-				{ShipID: 3, Relation: 2, ID: 300, Name: "player_3"},
+				{ShipID: 1, Relation: 0, Name: "player_1"},
+				{ShipID: 2, Relation: 1, Name: "player_2"},
+				{ShipID: 3, Relation: 2, Name: "player_3"},
 			},
 			DateTime:   "22.05.2023 12:34:56",
 			MapID:      10,
@@ -56,9 +56,9 @@ func TestReplayReader_TempArenaInfo(t *testing.T) {
 
 		older := data.TempArenaInfo{
 			Vehicles: []data.Vehicle{
-				{ShipID: 1, Relation: 0, ID: 100, Name: "player_1"},
-				{ShipID: 2, Relation: 1, ID: 200, Name: "player_2"},
-				{ShipID: 3, Relation: 2, ID: 300, Name: "player_3"},
+				{ShipID: 1, Relation: 0, Name: "player_1"},
+				{ShipID: 2, Relation: 1, Name: "player_2"},
+				{ShipID: 3, Relation: 2, Name: "player_3"},
 			},
 			DateTime:   "22.05.2022 12:34:56", // older than expected
 			MapID:      10,
@@ -68,9 +68,9 @@ func TestReplayReader_TempArenaInfo(t *testing.T) {
 
 		expected := data.TempArenaInfo{
 			Vehicles: []data.Vehicle{
-				{ShipID: 1, Relation: 0, ID: 100, Name: "player_1"},
-				{ShipID: 2, Relation: 1, ID: 200, Name: "player_2"},
-				{ShipID: 3, Relation: 2, ID: 300, Name: "player_3"},
+				{ShipID: 1, Relation: 0, Name: "player_1"},
+				{ShipID: 2, Relation: 1, Name: "player_2"},
+				{ShipID: 3, Relation: 2, Name: "player_3"},
 			},
 			DateTime:   "22.05.2023 12:34:56",
 			MapID:      10,

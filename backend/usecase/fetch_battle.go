@@ -3,13 +3,9 @@ package usecase
 import (
 	"context"
 	"regexp"
-	"strings"
-	"sync"
 	"wfs/backend/adapter"
 	"wfs/backend/data"
 
-	"github.com/abadojack/whatlanggo"
-	"github.com/morikuni/failure"
 	"github.com/samber/do/v2"
 	"golang.org/x/sync/errgroup"
 )
@@ -19,19 +15,23 @@ var urlRegex = regexp.MustCompile(`https?://[^\s]+`)
 
 type FetchBattle struct {
 	wargamingClient adapter.WargamingClient
-	clanClient      adapter.ClanClient
 	wails           adapter.Wails
 	cacheStore      adapter.CacheStore
 	logger          adapter.Logger
+	statsService    *statsService
+	clanService     *clanService
+	badgeService    *badgeService
 }
 
 func NewFetchBattle(i do.Injector) (*FetchBattle, error) {
 	return &FetchBattle{
 		wargamingClient: do.MustInvoke[adapter.WargamingClient](i),
-		clanClient:      do.MustInvoke[adapter.ClanClient](i),
 		wails:           do.MustInvoke[adapter.Wails](i),
 		cacheStore:      do.MustInvoke[adapter.CacheStore](i),
 		logger:          do.MustInvoke[adapter.Logger](i),
+		statsService:    do.MustInvoke[*statsService](i),
+		clanService:     do.MustInvoke[*clanService](i),
+		badgeService:    do.MustInvoke[*badgeService](i),
 	}, nil
 }
 
@@ -67,20 +67,20 @@ func (b *FetchBattle) Invoke(
 		return err
 	})
 
-	var allShipStats data.AllPlayerShipsStats
+	var allShipStats data.AllPlayerShipStats
 	eg.Go(func() error {
 		var err error
-		measure("fetchAllPlayerShipsStats", func() {
-			allShipStats, err = b.fetchAllPlayerShipsStats(accountIDs)
+		measure("statsService.fetchAll", func() {
+			allShipStats, err = b.statsService.fetchAll(accountIDs)
 		})
 		return err
 	})
 
-	var allShipBadges data.AllPlayerShipsBadges
+	var allShipBadges data.AllPlayerShipBadges
 	eg.Go(func() error {
 		var err error
-		measure("fetchAllPlayerShipsBadges", func() {
-			allShipBadges, err = b.fetchAllPlayerShipsBadges(accountIDs)
+		measure("badgeService.fetchAll", func() {
+			allShipBadges, err = b.badgeService.fetchAll(accountIDs)
 		})
 		return err
 	})
@@ -88,8 +88,8 @@ func (b *FetchBattle) Invoke(
 	var clans data.Clans
 	eg.Go(func() error {
 		var err error
-		measure("fetchClan", func() {
-			clans, err = b.fetchClan(accountIDs)
+		measure("clanService.fetchAll", func() {
+			clans, err = b.clanService.fetchAll(accountIDs)
 		})
 		return err
 	})
@@ -110,158 +110,4 @@ func (b *FetchBattle) Invoke(
 	)
 
 	b.wails.EmitEvent(ctx, EventFetchDone, result)
-}
-
-func (b *FetchBattle) fetchAllPlayerShipsStats(accountIDs []int) (data.AllPlayerShipsStats, error) {
-	result := make(data.AllPlayerShipsStats)
-	var mu sync.Mutex
-
-	eg := errgroup.Group{}
-
-	for _, accountID := range accountIDs {
-		eg.Go(func() error {
-			resp, err := b.wargamingClient.ShipsStats(accountID)
-			if err != nil {
-				return failure.Wrap(err)
-			}
-
-			mu.Lock()
-			result[accountID] = resp
-			mu.Unlock()
-
-			return nil
-		})
-	}
-
-	if err := eg.Wait(); err != nil {
-		return nil, failure.Wrap(err)
-	}
-
-	return result, nil
-}
-
-func (b *FetchBattle) fetchClan(accountIDs []int) (data.Clans, error) {
-	result := make(data.Clans)
-
-	clansAccountInfo, err := b.wargamingClient.ClansAccountInfo(accountIDs)
-	if err != nil {
-		return nil, failure.Wrap(err)
-	}
-
-	clanIDs := clansAccountInfo.ClanIDs()
-	clansInfo, err := b.wargamingClient.ClansInfo(clanIDs)
-	if err != nil {
-		return nil, failure.Wrap(err)
-	}
-
-	clanInfoArray := clansInfo.ToArray()
-	colorMap, err := b.fetchClanColor(clanInfoArray)
-	if err != nil {
-		return nil, failure.Wrap(err)
-	}
-
-	languageMap := b.fetchClanLanguage(clanInfoArray)
-
-	for _, accountID := range accountIDs {
-		clanID := clansAccountInfo.Data[accountID].ClanID
-		clanTag := clansInfo.Data[clanID].Tag
-		hexColor := colorMap[clanTag]
-		language := languageMap[clanTag]
-
-		result[accountID] = data.Clan{
-			ID:       clanID,
-			Tag:      clanTag,
-			HexColor: hexColor,
-			Language: language,
-		}
-	}
-
-	return result, nil
-}
-
-func (b *FetchBattle) fetchClanColor(clanInfoSlice []data.WGClansInfoData) (map[string]string, error) {
-	result := make(map[string]string)
-	var mu sync.Mutex
-
-	eg := errgroup.Group{}
-	for _, clanInfo := range clanInfoSlice {
-		eg.Go(func() error {
-			autocomplete, err := b.clanClient.ClanAutoComplete(clanInfo.Tag)
-			if err != nil {
-				return err
-			}
-
-			hexColor := autocomplete.HexColor(clanInfo.Tag)
-			if hexColor == "" {
-				return nil
-			}
-
-			mu.Lock()
-			result[clanInfo.Tag] = hexColor
-			mu.Unlock()
-
-			return nil
-		})
-	}
-
-	if err := eg.Wait(); err != nil {
-		return nil, failure.Wrap(err)
-	}
-
-	return result, nil
-}
-
-func (b *FetchBattle) fetchClanLanguage(clanInfoSilce []data.WGClansInfoData) map[string]string {
-	result := make(map[string]string)
-
-	options := whatlanggo.Options{
-		Whitelist: map[whatlanggo.Lang]bool{
-			whatlanggo.Jpn: true,
-			whatlanggo.Kor: true,
-			whatlanggo.Cmn: true,
-		},
-	}
-
-	for _, clanInfo := range clanInfoSilce {
-		// URLを空文字に
-		description := urlRegex.ReplaceAllString(clanInfo.Description, "")
-		// 改行を空文字に
-		description = strings.ReplaceAll(description, "\n", "")
-
-		if len(description) == 0 {
-			continue
-		}
-
-		info := whatlanggo.DetectWithOptions(description, options)
-		result[clanInfo.Tag] = info.Lang.Iso6391()
-	}
-
-	return result
-}
-
-func (b *FetchBattle) fetchAllPlayerShipsBadges(accountIDs []int) (data.AllPlayerShipsBadges, error) {
-	result := make(data.AllPlayerShipsBadges)
-	var mu sync.Mutex
-
-	eg := errgroup.Group{}
-	for _, accountID := range accountIDs {
-		eg.Go(func() error {
-			shipsBadges, err := b.wargamingClient.ShipsBadges(accountID)
-			if err != nil {
-				return failure.Wrap(err)
-			}
-
-			mu.Lock()
-			result[accountID] = shipsBadges.Data[accountID]
-			mu.Unlock()
-
-			return nil
-		})
-	}
-
-	if err := eg.Wait(); err != nil {
-		return nil, failure.Wrap(err)
-	}
-
-	return result, nil
 }

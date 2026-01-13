@@ -9,10 +9,10 @@ import (
 func TestTempArenaInfo_AccountNames(t *testing.T) {
 	t.Parallel()
 	vehicles := []Vehicle{
-		{ShipID: 1, Relation: 0, ID: 1001, Name: "Player1"},
-		{ShipID: 2, Relation: 0, ID: 1002, Name: ":Bot1:"},
-		{ShipID: 3, Relation: 1, ID: 1003, Name: "Player2"},
-		{ShipID: 4, Relation: 0, ID: 1004, Name: "IDS_OP1"},
+		{ShipID: 1, Relation: 0, Name: "Player1"},
+		{ShipID: 2, Relation: 0, Name: ":Bot1:"},
+		{ShipID: 3, Relation: 1, Name: "Player2"},
+		{ShipID: 4, Relation: 0, Name: "IDS_OP1"},
 	}
 
 	info := &TempArenaInfo{

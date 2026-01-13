@@ -51,9 +51,8 @@ func (t *TempArenaInfo) BattleType(battleTypes map[string]string) string {
 }
 
 type Vehicle struct {
-	ShipID   int    `json:"shipId"`
+	ShipID   ShipID `json:"shipId"`
 	Relation int    `json:"relation"`
-	ID       int    `json:"id"`
 	Name     string `json:"name"`
 }
 

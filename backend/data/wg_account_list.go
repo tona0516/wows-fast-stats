@@ -2,26 +2,25 @@ package data
 
 import (
 	"slices"
-	"sort"
 )
 
 type WGAccountList struct {
 	WGResponseCommon[[]WGAccountListData]
 }
 
-func (w WGAccountList) AccountIDs() []int {
-	accountIDs := make([]int, 0)
+func (w WGAccountList) AccountIDs() []AccountID {
+	accountIDs := make([]AccountID, 0)
 	for _, v := range w.Data {
 		if v.AccountID != 0 && !slices.Contains(accountIDs, v.AccountID) {
 			accountIDs = append(accountIDs, v.AccountID)
 		}
 	}
 
-	sort.Ints(accountIDs)
+	slices.Sort(accountIDs)
 	return accountIDs
 }
 
-func (w WGAccountList) AccountID(nickname string) int {
+func (w WGAccountList) AccountID(nickname string) AccountID {
 	for _, v := range w.Data {
 		if v.NickName == nickname {
 			return v.AccountID
@@ -32,6 +31,6 @@ func (w WGAccountList) AccountID(nickname string) int {
 }
 
 type WGAccountListData struct {
-	NickName  string `json:"nickname"`
-	AccountID int    `json:"account_id"`
+	NickName  string    `json:"nickname"`
+	AccountID AccountID `json:"account_id"`
 }
