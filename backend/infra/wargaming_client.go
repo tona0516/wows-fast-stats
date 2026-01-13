@@ -1,6 +1,7 @@
 package infra
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"reflect"
@@ -62,13 +63,17 @@ func NewWargamingClient(i do.Injector) (*WargamingClient, error) {
 	}, nil
 }
 
-func (c *WargamingClient) AccountInfo(accountIDs []data.AccountID) (data.WGAccountInfo, error) {
+func (c *WargamingClient) AccountInfo(
+	ctx context.Context,
+	accountIDs []data.AccountID,
+) (data.WGAccountInfo, error) {
 	strAccountIDs := make([]string, len(accountIDs))
 	for i, v := range accountIDs {
 		strAccountIDs[i] = strconv.Itoa(int(v))
 	}
 
 	res, err := request[data.WGAccountInfo](
+		ctx,
 		c,
 		"/wows/account/info/",
 		map[string]string{
@@ -86,8 +91,12 @@ func (c *WargamingClient) AccountInfo(accountIDs []data.AccountID) (data.WGAccou
 	return res, err
 }
 
-func (c *WargamingClient) AccountList(accountNames []string) (data.WGAccountList, error) {
+func (c *WargamingClient) AccountList(
+	ctx context.Context,
+	accountNames []string,
+) (data.WGAccountList, error) {
 	res, err := request[data.WGAccountList](
+		ctx,
 		c,
 		"/wows/account/list/",
 		map[string]string{
@@ -100,13 +109,17 @@ func (c *WargamingClient) AccountList(accountNames []string) (data.WGAccountList
 	return res, err
 }
 
-func (c *WargamingClient) ClansAccountInfo(accountIDs []data.AccountID) (data.WGClansAccountInfo, error) {
+func (c *WargamingClient) ClansAccountInfo(
+	ctx context.Context,
+	accountIDs []data.AccountID,
+) (data.WGClansAccountInfo, error) {
 	strAccountIDs := make([]string, len(accountIDs))
 	for i, v := range accountIDs {
 		strAccountIDs[i] = strconv.Itoa(int(v))
 	}
 
 	res, err := request[data.WGClansAccountInfo](
+		ctx,
 		c,
 		"/wows/clans/accountinfo/",
 		map[string]string{
@@ -118,7 +131,10 @@ func (c *WargamingClient) ClansAccountInfo(accountIDs []data.AccountID) (data.WG
 	return res, err
 }
 
-func (c *WargamingClient) ClansInfo(clanIDs []data.ClanID) (data.WGClansInfo, error) {
+func (c *WargamingClient) ClansInfo(
+	ctx context.Context,
+	clanIDs []data.ClanID,
+) (data.WGClansInfo, error) {
 	strClanIDs := make([]string, len(clanIDs))
 	for i, v := range clanIDs {
 		strClanIDs[i] = strconv.Itoa(int(v))
@@ -129,6 +145,7 @@ func (c *WargamingClient) ClansInfo(clanIDs []data.ClanID) (data.WGClansInfo, er
 	}
 
 	res, err := request[data.WGClansInfo](
+		ctx,
 		c,
 		"/wows/clans/info/",
 		map[string]string{
@@ -140,8 +157,12 @@ func (c *WargamingClient) ClansInfo(clanIDs []data.ClanID) (data.WGClansInfo, er
 	return res, err
 }
 
-func (c *WargamingClient) ShipsStats(accountID data.AccountID) (data.WGShipsStats, error) {
+func (c *WargamingClient) ShipsStats(
+	ctx context.Context,
+	accountID data.AccountID,
+) (data.WGShipsStats, error) {
 	res, err := request[data.WGShipsStats](
+		ctx,
 		c,
 		"/wows/ships/stats/",
 		map[string]string{
@@ -159,8 +180,12 @@ func (c *WargamingClient) ShipsStats(accountID data.AccountID) (data.WGShipsStat
 	return res, err
 }
 
-func (c *WargamingClient) EncycShips(pageNo int) (data.WGEncycShips, error) {
+func (c *WargamingClient) EncycShips(
+	ctx context.Context,
+	pageNo int,
+) (data.WGEncycShips, error) {
 	res, err := request[data.WGEncycShips](
+		ctx,
 		c,
 		"/wows/encyclopedia/ships/",
 		map[string]string{
@@ -173,8 +198,9 @@ func (c *WargamingClient) EncycShips(pageNo int) (data.WGEncycShips, error) {
 	return res, err
 }
 
-func (c *WargamingClient) BattleArenas() (data.WGBattleArenas, error) {
+func (c *WargamingClient) BattleArenas(ctx context.Context) (data.WGBattleArenas, error) {
 	res, err := request[data.WGBattleArenas](
+		ctx,
 		c,
 		"/wows/encyclopedia/battlearenas/",
 		map[string]string{
@@ -186,8 +212,9 @@ func (c *WargamingClient) BattleArenas() (data.WGBattleArenas, error) {
 	return res, err
 }
 
-func (c *WargamingClient) BattleTypes() (data.WGBattleTypes, error) {
+func (c *WargamingClient) BattleTypes(ctx context.Context) (data.WGBattleTypes, error) {
 	res, err := request[data.WGBattleTypes](
+		ctx,
 		c,
 		"/wows/encyclopedia/battletypes/",
 		map[string]string{
@@ -199,8 +226,12 @@ func (c *WargamingClient) BattleTypes() (data.WGBattleTypes, error) {
 	return res, err
 }
 
-func (c *WargamingClient) ShipsBadges(accountID data.AccountID) (data.WGShipsBadges, error) {
+func (c *WargamingClient) ShipsBadges(
+	ctx context.Context,
+	accountID data.AccountID,
+) (data.WGShipsBadges, error) {
 	res, err := request[data.WGShipsBadges](
+		ctx,
 		c,
 		"/wows/ships/badges/",
 		map[string]string{
@@ -259,13 +290,17 @@ func (c *WargamingClient) toSnakeCase(s string) string {
 }
 
 func request[T data.WGResponse](
+	ctx context.Context,
 	c *WargamingClient,
 	path string,
 	queries map[string]string,
 ) (T, error) {
 	var result T
 
-	client := c.client.R().SetSuccessResult(&result)
+	client := c.client.R().
+		SetContext(ctx).
+		SetSuccessResult(&result)
+
 	for k, v := range queries {
 		client.AddQueryParam(k, v)
 	}

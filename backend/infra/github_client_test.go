@@ -36,7 +36,7 @@ func TestGithubClient_LatestRelease(t *testing.T) {
 		})
 		instance, err := NewGithubClient(injector)
 		require.NoError(t, err)
-		result, err := instance.LatestRelease()
+		result, err := instance.LatestRelease(context.Background())
 
 		assert.NoError(t, err)
 		assert.Equal(t, expected, result)
@@ -62,7 +62,7 @@ func TestGithubClient_LatestRelease(t *testing.T) {
 		})
 		instance, err := NewGithubClient(injector)
 		require.NoError(t, err)
-		_, err = instance.LatestRelease()
+		_, err = instance.LatestRelease(context.Background())
 
 		assert.Error(t, err, ErrErrorResponse)
 	})
@@ -89,7 +89,7 @@ func TestGithubClient_LatestRelease(t *testing.T) {
 		})
 		instance, err := NewGithubClient(injector)
 		require.NoError(t, err)
-		_, err = instance.LatestRelease()
+		_, err = instance.LatestRelease(context.Background())
 
 		assert.ErrorIs(t, err, context.DeadlineExceeded)
 	})

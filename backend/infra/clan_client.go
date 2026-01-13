@@ -1,6 +1,7 @@
 package infra
 
 import (
+	"context"
 	"wfs/backend/config"
 	"wfs/backend/data"
 
@@ -23,9 +24,10 @@ func NewClanClient(i do.Injector) (*ClanClient, error) {
 	}, nil
 }
 
-func (c *ClanClient) ClanAutoComplete(search string) (data.ClanAutocomplete, error) {
+func (c *ClanClient) ClanAutoComplete(ctx context.Context, search string) (data.ClanAutocomplete, error) {
 	var result data.ClanAutocomplete
 	resp, err := c.client.R().
+		SetContext(ctx).
 		SetSuccessResult(&result).
 		SetQueryParams(map[string]string{
 			"search": search,

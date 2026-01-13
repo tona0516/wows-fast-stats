@@ -42,7 +42,7 @@ func TestClanClient_ClanAutoComplete(t *testing.T) {
 		})
 		instance, err := NewClanClient(injector)
 		require.NoError(t, err)
-		result, err := instance.ClanAutoComplete("TEST")
+		result, err := instance.ClanAutoComplete(context.Background(), "TEST")
 
 		assert.NoError(t, err)
 		assert.Equal(t, expected, result)
@@ -72,7 +72,7 @@ func TestClanClient_ClanAutoComplete(t *testing.T) {
 		})
 		instance, err := NewClanClient(injector)
 		require.NoError(t, err)
-		_, err = instance.ClanAutoComplete("")
+		_, err = instance.ClanAutoComplete(context.Background(), "")
 
 		assert.Error(t, err, ErrErrorResponse)
 	})
@@ -99,7 +99,7 @@ func TestClanClient_ClanAutoComplete(t *testing.T) {
 		})
 		instance, err := NewClanClient(injector)
 		require.NoError(t, err)
-		_, err = instance.ClanAutoComplete("")
+		_, err = instance.ClanAutoComplete(context.Background(), "")
 
 		assert.ErrorIs(t, err, context.DeadlineExceeded)
 	})

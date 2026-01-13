@@ -48,7 +48,7 @@ func TestNumbersClient_ExpectedStats(t *testing.T) {
 		})
 		instance, err := NewNumbersClient(injector)
 		require.NoError(t, err)
-		actual, err := instance.ExpectedStats()
+		actual, err := instance.ExpectedStats(context.Background())
 
 		assert.NoError(t, err)
 		assert.Equal(t, data.NSExpectedStats{
@@ -87,7 +87,7 @@ func TestNumbersClient_ExpectedStats(t *testing.T) {
 		})
 		instance, err := NewNumbersClient(injector)
 		require.NoError(t, err)
-		_, err = instance.ExpectedStats()
+		_, err = instance.ExpectedStats(context.Background())
 
 		assert.Error(t, err, ErrErrorResponse)
 	})
@@ -114,7 +114,7 @@ func TestNumbersClient_ExpectedStats(t *testing.T) {
 		})
 		instance, err := NewNumbersClient(injector)
 		require.NoError(t, err)
-		_, err = instance.ExpectedStats()
+		_, err = instance.ExpectedStats(context.Background())
 
 		assert.ErrorIs(t, err, context.DeadlineExceeded)
 	})

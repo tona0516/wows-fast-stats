@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"context"
 	"errors"
 	"testing"
 	"wfs/backend/adapter"
@@ -21,7 +22,7 @@ func TestUpdateCheck_Invoke(t *testing.T) {
 
 		ctrl := gomock.NewController(t)
 		mockGithubClient := mock.NewMockGithubClient(ctrl)
-		mockGithubClient.EXPECT().LatestRelease().Return(data.GHLatestRelease{
+		mockGithubClient.EXPECT().LatestRelease(gomock.Any()).Return(data.GHLatestRelease{
 			TagName: "2.0.0",
 			HTMLURL: "https://hoge.com",
 		}, nil)
@@ -38,7 +39,7 @@ func TestUpdateCheck_Invoke(t *testing.T) {
 		do.Provide(injector, NewUpdateCheck)
 
 		uc := do.MustInvoke[*UpdateCheck](injector)
-		actual := uc.Invoke()
+		actual := uc.Invoke(context.Background())
 
 		assert.Equal(t, data.NewVersion{
 			Version:     "2.0.0",
@@ -52,7 +53,7 @@ func TestUpdateCheck_Invoke(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		mockGithubClient := mock.NewMockGithubClient(ctrl)
 		response := data.GHLatestRelease{TagName: "1.0.0", HTMLURL: "https://hoge.com"}
-		mockGithubClient.EXPECT().LatestRelease().Return(response, nil)
+		mockGithubClient.EXPECT().LatestRelease(gomock.Any()).Return(response, nil)
 
 		injector := do.New()
 		do.ProvideValue(injector, config.Config{
@@ -65,7 +66,7 @@ func TestUpdateCheck_Invoke(t *testing.T) {
 		})
 		do.Provide(injector, NewUpdateCheck)
 		uc := do.MustInvoke[*UpdateCheck](injector)
-		actual := uc.Invoke()
+		actual := uc.Invoke(context.Background())
 
 		assert.Nil(t, actual)
 	})
@@ -75,7 +76,7 @@ func TestUpdateCheck_Invoke(t *testing.T) {
 
 		ctrl := gomock.NewController(t)
 		mockGithubClient := mock.NewMockGithubClient(ctrl)
-		mockGithubClient.EXPECT().LatestRelease().Return(data.GHLatestRelease{}, errors.New("some error"))
+		mockGithubClient.EXPECT().LatestRelease(gomock.Any()).Return(data.GHLatestRelease{}, errors.New("some error"))
 
 		injector := do.New()
 		do.ProvideValue(injector, config.Config{
@@ -88,7 +89,7 @@ func TestUpdateCheck_Invoke(t *testing.T) {
 		})
 		do.Provide(injector, NewUpdateCheck)
 		uc := do.MustInvoke[*UpdateCheck](injector)
-		actual := uc.Invoke()
+		actual := uc.Invoke(context.Background())
 
 		assert.Nil(t, actual)
 	})

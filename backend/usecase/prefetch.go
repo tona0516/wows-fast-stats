@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"context"
 	"sync"
 	"wfs/backend/adapter"
 	"wfs/backend/data"
@@ -24,14 +25,14 @@ func NewPrefetch(i do.Injector) (*Prefetch, error) {
 	}, nil
 }
 
-func (p *Prefetch) Invoke() (*data.PrefetchResult, error) {
-	eg := errgroup.Group{}
+func (p *Prefetch) Invoke(ctx context.Context) (*data.PrefetchResult, error) {
+	eg, egCtx := errgroup.WithContext(ctx)
 
 	var warships data.Warships
 	eg.Go(func() error {
 		var err error
 		measure("fetchWarships", func() {
-			warships, err = p.fetchWarships()
+			warships, err = p.fetchWarships(egCtx)
 		})
 		return err
 	})
@@ -40,7 +41,7 @@ func (p *Prefetch) Invoke() (*data.PrefetchResult, error) {
 	eg.Go(func() error {
 		var err error
 		measure("fetchBattleArenas", func() {
-			battleArenas, err = p.fetchBattleArenas()
+			battleArenas, err = p.fetchBattleArenas(egCtx)
 		})
 		return err
 	})
@@ -49,7 +50,7 @@ func (p *Prefetch) Invoke() (*data.PrefetchResult, error) {
 	eg.Go(func() error {
 		var err error
 		measure("fetchBattleTypes", func() {
-			battleTypes, err = p.fetchBattleTypes()
+			battleTypes, err = p.fetchBattleTypes(egCtx)
 		})
 		return err
 	})
@@ -65,12 +66,12 @@ func (p *Prefetch) Invoke() (*data.PrefetchResult, error) {
 	}, nil
 }
 
-func (p *Prefetch) fetchWarships() (data.Warships, error) {
-	eg := errgroup.Group{}
+func (p *Prefetch) fetchWarships(ctx context.Context) (data.Warships, error) {
+	eg, egCtx := errgroup.WithContext(ctx)
 
 	var encycShips map[int]data.WGEncycShips
 	eg.Go(func() error {
-		resp, err := p.fetchEncycShips()
+		resp, err := p.fetchEncycShips(egCtx)
 		if err != nil {
 			return failure.Wrap(err)
 		}
@@ -80,7 +81,7 @@ func (p *Prefetch) fetchWarships() (data.Warships, error) {
 
 	var expectedStats data.NSExpectedStats
 	eg.Go(func() error {
-		resp, err := p.numbersClient.ExpectedStats()
+		resp, err := p.numbersClient.ExpectedStats(egCtx)
 		if err != nil {
 			return failure.Wrap(err)
 		}
@@ -103,8 +104,8 @@ func (p *Prefetch) fetchWarships() (data.Warships, error) {
 	return warships, nil
 }
 
-func (p *Prefetch) fetchBattleArenas() (map[int]string, error) {
-	resp, err := p.wargamingClient.BattleArenas()
+func (p *Prefetch) fetchBattleArenas(ctx context.Context) (map[int]string, error) {
+	resp, err := p.wargamingClient.BattleArenas(ctx)
 	if err != nil {
 		cache, errCache := p.cacheStore.BattleArenas()
 		if errCache != nil {
@@ -123,8 +124,8 @@ func (p *Prefetch) fetchBattleArenas() (map[int]string, error) {
 	return result, nil
 }
 
-func (p *Prefetch) fetchBattleTypes() (map[string]string, error) {
-	resp, err := p.wargamingClient.BattleTypes()
+func (p *Prefetch) fetchBattleTypes(ctx context.Context) (map[string]string, error) {
+	resp, err := p.wargamingClient.BattleTypes(ctx)
 	if err != nil {
 		cache, errCache := p.cacheStore.BattleTypes()
 		if errCache != nil {
@@ -143,12 +144,13 @@ func (p *Prefetch) fetchBattleTypes() (map[string]string, error) {
 	return result, nil
 }
 
-func (p *Prefetch) fetchEncycShips() (map[int]data.WGEncycShips, error) {
+func (p *Prefetch) fetchEncycShips(ctx context.Context) (map[int]data.WGEncycShips, error) {
 	result := make(map[int]data.WGEncycShips)
 
 	var mu sync.Mutex
-	fetch := func(page int) (int, error) {
-		res, err := p.wargamingClient.EncycShips(page)
+	fetch := func(ctx context.Context,
+		page int) (int, error) {
+		res, err := p.wargamingClient.EncycShips(ctx, page)
 		if err != nil {
 			return 0, failure.Wrap(err)
 		}
@@ -160,15 +162,16 @@ func (p *Prefetch) fetchEncycShips() (map[int]data.WGEncycShips, error) {
 		return res.Meta.PageTotal, nil
 	}
 
-	pageTotal, err := fetch(1)
+	pageTotal, err := fetch(ctx, 1)
 	if err != nil {
 		return nil, failure.Wrap(err)
 	}
 
-	eg := errgroup.Group{}
+	eg, egCtx := errgroup.WithContext(ctx)
+
 	for i := 2; i < pageTotal+1; i++ {
 		eg.Go(func() error {
-			_, err := fetch(i)
+			_, err := fetch(egCtx, i)
 			if err != nil {
 				return failure.Wrap(err)
 			}

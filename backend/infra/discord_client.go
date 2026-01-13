@@ -1,6 +1,7 @@
 package infra
 
 import (
+	"context"
 	"time"
 
 	"github.com/imroc/req/v3"
@@ -24,8 +25,9 @@ func NewDiscordClient(
 	}, nil
 }
 
-func (c *DiscordClient) Comment(message string) error {
+func (c *DiscordClient) Comment(ctx context.Context, message string) error {
 	resp, err := c.client.R().
+		SetContext(ctx).
 		SetHeader("Content-Type", "application/json").
 		SetBody(map[string]string{"content": message}).
 		Post("")

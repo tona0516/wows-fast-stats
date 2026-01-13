@@ -48,7 +48,7 @@ func (b *FetchBattle) Invoke(
 	var accountList data.WGAccountList
 	var err error
 	measure("AccountList", func() {
-		accountList, err = b.wargamingClient.AccountList(accountNames)
+		accountList, err = b.wargamingClient.AccountList(ctx, accountNames)
 	})
 	if err != nil {
 		b.wails.EmitEvent(ctx, EventErr, err)
@@ -56,13 +56,13 @@ func (b *FetchBattle) Invoke(
 	}
 	accountIDs := accountList.AccountIDs()
 
-	eg := errgroup.Group{}
+	eg, egCtx := errgroup.WithContext(ctx)
 
 	var accountInfo data.WGAccountInfo
 	eg.Go(func() error {
 		var err error
 		measure("AccountInfo", func() {
-			accountInfo, err = b.wargamingClient.AccountInfo(accountIDs)
+			accountInfo, err = b.wargamingClient.AccountInfo(egCtx, accountIDs)
 		})
 		return err
 	})
@@ -71,7 +71,7 @@ func (b *FetchBattle) Invoke(
 	eg.Go(func() error {
 		var err error
 		measure("statsService.fetchAll", func() {
-			allShipStats, err = b.statsService.fetchAll(accountIDs)
+			allShipStats, err = b.statsService.fetchAll(egCtx, accountIDs)
 		})
 		return err
 	})
@@ -80,7 +80,7 @@ func (b *FetchBattle) Invoke(
 	eg.Go(func() error {
 		var err error
 		measure("badgeService.fetchAll", func() {
-			allShipBadges, err = b.badgeService.fetchAll(accountIDs)
+			allShipBadges, err = b.badgeService.fetchAll(egCtx, accountIDs)
 		})
 		return err
 	})
@@ -89,7 +89,7 @@ func (b *FetchBattle) Invoke(
 	eg.Go(func() error {
 		var err error
 		measure("clanService.fetchAll", func() {
-			clans, err = b.clanService.fetchAll(accountIDs)
+			clans, err = b.clanService.fetchAll(egCtx, accountIDs)
 		})
 		return err
 	})

@@ -21,7 +21,7 @@ func TestDiscordClient_Comment(t *testing.T) {
 
 		instance, err := NewDiscordClient(server.URL, 0, 0)
 		require.NoError(t, err)
-		err = instance.Comment("test message")
+		err = instance.Comment(context.Background(), "test message")
 
 		assert.NoError(t, err)
 	})
@@ -38,7 +38,7 @@ func TestDiscordClient_Comment(t *testing.T) {
 
 		instance, err := NewDiscordClient(server.URL, 0, 0)
 		require.NoError(t, err)
-		err = instance.Comment("test message")
+		err = instance.Comment(context.Background(), "test message")
 
 		assert.Error(t, err, ErrErrorResponse)
 	})
@@ -57,7 +57,7 @@ func TestDiscordClient_Comment(t *testing.T) {
 
 		instance, err := NewDiscordClient(server.URL, 0, timeout-1)
 		require.NoError(t, err)
-		err = instance.Comment("test message")
+		err = instance.Comment(context.Background(), "test message")
 
 		assert.ErrorIs(t, err, context.DeadlineExceeded)
 	})

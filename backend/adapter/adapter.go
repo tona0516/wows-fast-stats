@@ -39,35 +39,35 @@ type ReplayReader interface {
 
 //go:generate mockgen -source=$GOFILE -destination ../mock/$GOFILE -package mock
 type ClanClient interface {
-	ClanAutoComplete(search string) (data.ClanAutocomplete, error)
+	ClanAutoComplete(ctx context.Context, search string) (data.ClanAutocomplete, error)
 }
 
 //go:generate mockgen -source=$GOFILE -destination ../mock/$GOFILE -package mock
 type DiscordClient interface {
-	Comment(message string) error
+	Comment(ctx context.Context, message string) error
 }
 
 //go:generate mockgen -source=$GOFILE -destination ../mock/$GOFILE -package mock
 type GithubClient interface {
-	LatestRelease() (data.GHLatestRelease, error)
+	LatestRelease(ctx context.Context) (data.GHLatestRelease, error)
 }
 
 //go:generate mockgen -source=$GOFILE -destination ../mock/$GOFILE -package mock
 type NumbersClient interface {
-	ExpectedStats() (data.NSExpectedStats, error)
+	ExpectedStats(ctx context.Context) (data.NSExpectedStats, error)
 }
 
 //go:generate mockgen -source=$GOFILE -destination ../mock/$GOFILE -package mock
 type WargamingClient interface {
-	AccountInfo(accountIDs []data.AccountID) (data.WGAccountInfo, error)
-	AccountList(accountNames []string) (data.WGAccountList, error)
-	ClansAccountInfo(accountIDs []data.AccountID) (data.WGClansAccountInfo, error)
-	ClansInfo(clanIDs []data.ClanID) (data.WGClansInfo, error)
-	EncycShips(pageNo int) (data.WGEncycShips, error)
-	ShipsStats(accountID data.AccountID) (data.WGShipsStats, error)
-	BattleArenas() (data.WGBattleArenas, error)
-	BattleTypes() (data.WGBattleTypes, error)
-	ShipsBadges(accountID data.AccountID) (data.WGShipsBadges, error)
+	AccountInfo(ctx context.Context, accountIDs []data.AccountID) (data.WGAccountInfo, error)
+	AccountList(ctx context.Context, accountNames []string) (data.WGAccountList, error)
+	ClansAccountInfo(ctx context.Context, accountIDs []data.AccountID) (data.WGClansAccountInfo, error)
+	ClansInfo(ctx context.Context, clanIDs []data.ClanID) (data.WGClansInfo, error)
+	EncycShips(ctx context.Context, pageNo int) (data.WGEncycShips, error)
+	ShipsStats(ctx context.Context, accountID data.AccountID) (data.WGShipsStats, error)
+	BattleArenas(ctx context.Context) (data.WGBattleArenas, error)
+	BattleTypes(ctx context.Context) (data.WGBattleTypes, error)
+	ShipsBadges(ctx context.Context, accountID data.AccountID) (data.WGShipsBadges, error)
 }
 
 //go:generate mockgen -source=$GOFILE -destination ../mock/$GOFILE -package mock

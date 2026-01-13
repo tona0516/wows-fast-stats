@@ -2,6 +2,7 @@
 package usecase
 
 import (
+	"context"
 	"sync"
 	"wfs/backend/adapter"
 	"wfs/backend/data"
@@ -21,14 +22,14 @@ func NewBadgeService(i do.Injector) (*badgeService, error) {
 	}, nil
 }
 
-func (s *badgeService) fetchAll(accountIDs []data.AccountID) (data.AllPlayerShipBadges, error) {
+func (s *badgeService) fetchAll(ctx context.Context, accountIDs []data.AccountID) (data.AllPlayerShipBadges, error) {
 	result := make(data.AllPlayerShipBadges)
-	var mu sync.Mutex
+	eg, egCtx := errgroup.WithContext(ctx)
 
-	eg := errgroup.Group{}
+	var mu sync.Mutex
 	for _, accountID := range accountIDs {
 		eg.Go(func() error {
-			resp, err := s.wargamingClient.ShipsBadges(accountID)
+			resp, err := s.wargamingClient.ShipsBadges(egCtx, accountID)
 			if err != nil {
 				return failure.Wrap(err)
 			}

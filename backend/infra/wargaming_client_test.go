@@ -45,7 +45,7 @@ func TestWargamingClient_AccountInfo(t *testing.T) {
 		})
 		wargaming, err := NewWargamingClient(injector)
 		require.NoError(t, err)
-		result, err := wargaming.AccountInfo([]data.AccountID{123, 456})
+		result, err := wargaming.AccountInfo(context.Background(), []data.AccountID{123, 456})
 
 		assert.NoError(t, err)
 		assert.Equal(t, expected, result)
@@ -75,7 +75,7 @@ func TestWargamingClient_AccountInfo(t *testing.T) {
 		})
 		instance, err := NewWargamingClient(injector)
 		require.NoError(t, err)
-		_, err = instance.AccountInfo([]data.AccountID{123, 456})
+		_, err = instance.AccountInfo(context.Background(), []data.AccountID{123, 456})
 
 		assert.ErrorIs(t, err, context.DeadlineExceeded)
 	})
@@ -113,7 +113,7 @@ func TestWargamingClient_AccountInfo(t *testing.T) {
 		})
 		instance, err := NewWargamingClient(injector)
 		require.NoError(t, err)
-		_, err = instance.AccountInfo([]data.AccountID{123, 456})
+		_, err = instance.AccountInfo(context.Background(), []data.AccountID{123, 456})
 
 		assert.Error(t, err, ErrErrorResponse)
 		assert.Equal(t, 1, calls)
@@ -174,7 +174,7 @@ func TestWargamingClient_AccountInfo(t *testing.T) {
 			})
 			instance, err := NewWargamingClient(injector)
 			require.NoError(t, err)
-			_, err = instance.AccountInfo([]data.AccountID{123, 456})
+			_, err = instance.AccountInfo(context.Background(), []data.AccountID{123, 456})
 
 			assert.NoError(t, err)
 			assert.Equal(t, retry+1, calls)
@@ -221,7 +221,7 @@ func TestWargamingClient_AccountInfo(t *testing.T) {
 			})
 			instance, err := NewWargamingClient(injector)
 			require.NoError(t, err)
-			_, err = instance.AccountInfo([]data.AccountID{123, 456})
+			_, err = instance.AccountInfo(context.Background(), []data.AccountID{123, 456})
 
 			assert.Error(t, err, ErrTemporaryUnavaillalble)
 			assert.Equal(t, retry+1, calls)
@@ -254,7 +254,7 @@ func TestWargamingClient_ClansAccountInfo(t *testing.T) {
 	})
 	instance, err := NewWargamingClient(injector)
 	require.NoError(t, err)
-	result, err := instance.ClansAccountInfo([]data.AccountID{123, 456})
+	result, err := instance.ClansAccountInfo(context.Background(), []data.AccountID{123, 456})
 
 	assert.NoError(t, err)
 	assert.Equal(t, expected, result)
@@ -285,7 +285,7 @@ func TestWargamingClient_ClansInfo(t *testing.T) {
 	})
 	instance, err := NewWargamingClient(injector)
 	require.NoError(t, err)
-	result, err := instance.ClansInfo([]data.ClanID{123, 456})
+	result, err := instance.ClansInfo(context.Background(), []data.ClanID{123, 456})
 
 	assert.NoError(t, err)
 	assert.Equal(t, expected, result)
@@ -316,7 +316,7 @@ func TestWargamingClient_ShipsStats(t *testing.T) {
 	})
 	instance, err := NewWargamingClient(injector)
 	require.NoError(t, err)
-	result, err := instance.ShipsStats(123)
+	result, err := instance.ShipsStats(context.Background(), 123)
 
 	assert.NoError(t, err)
 	assert.Equal(t, expected, result)
@@ -351,7 +351,7 @@ func TestWargamingClient_EncycShips(t *testing.T) {
 	})
 	instance, err := NewWargamingClient(injector)
 	require.NoError(t, err)
-	result, err := instance.EncycShips(1)
+	result, err := instance.EncycShips(context.Background(), 1)
 
 	assert.NoError(t, err)
 	assert.Equal(t, expected, result)
@@ -382,7 +382,7 @@ func TestWargamingClient_BattleArena(t *testing.T) {
 	})
 	instance, err := NewWargamingClient(injector)
 	require.NoError(t, err)
-	result, err := instance.BattleArenas()
+	result, err := instance.BattleArenas(context.Background())
 
 	assert.NoError(t, err)
 	assert.Equal(t, expected, result)
@@ -413,7 +413,7 @@ func TestWargamingClient_BattleTypes(t *testing.T) {
 	})
 	instance, err := NewWargamingClient(injector)
 	require.NoError(t, err)
-	result, err := instance.BattleTypes()
+	result, err := instance.BattleTypes(context.Background())
 
 	assert.NoError(t, err)
 	assert.Equal(t, expected, result)
@@ -444,7 +444,7 @@ func TestWargamingClient_ShipsBadges(t *testing.T) {
 	})
 	instance, err := NewWargamingClient(injector)
 	require.NoError(t, err)
-	result, err := instance.ShipsBadges(123)
+	result, err := instance.ShipsBadges(context.Background(), 123)
 
 	assert.NoError(t, err)
 	assert.Equal(t, expected, result)

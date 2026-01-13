@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"context"
 	"strings"
 	"sync"
 	"wfs/backend/adapter"
@@ -24,26 +25,29 @@ func NewClanService(i do.Injector) (*clanService, error) {
 	}, nil
 }
 
-func (s *clanService) fetchAll(accountIDs []data.AccountID) (data.Clans, error) {
+func (s *clanService) fetchAll(
+	ctx context.Context,
+	accountIDs []data.AccountID,
+) (data.Clans, error) {
 	result := make(data.Clans)
 
-	clansAccountInfo, err := s.wargamingClient.ClansAccountInfo(accountIDs)
+	clansAccountInfo, err := s.wargamingClient.ClansAccountInfo(ctx, accountIDs)
 	if err != nil {
 		return nil, failure.Wrap(err)
 	}
 
 	clanIDs := clansAccountInfo.ClanIDs()
-	clansInfo, err := s.wargamingClient.ClansInfo(clanIDs)
+	clansInfo, err := s.wargamingClient.ClansInfo(ctx, clanIDs)
 	if err != nil {
 		return nil, failure.Wrap(err)
 	}
 
-	colorMap, err := s.fetchClanColor(clansInfo)
+	colorMap, err := s.fetchClanColor(ctx, clansInfo)
 	if err != nil {
 		return nil, failure.Wrap(err)
 	}
 
-	languageMap := s.fetchClanLanguage(clansInfo)
+	languageMap := s.clanLanguage(clansInfo)
 
 	for _, accountID := range accountIDs {
 		clanID := clansAccountInfo.Data[accountID].ClanID
@@ -62,14 +66,17 @@ func (s *clanService) fetchAll(accountIDs []data.AccountID) (data.Clans, error) 
 	return result, nil
 }
 
-func (s *clanService) fetchClanColor(clansInfo data.WGClansInfo) (map[data.ClanID]string, error) {
+func (s *clanService) fetchClanColor(
+	ctx context.Context,
+	clansInfo data.WGClansInfo,
+) (map[data.ClanID]string, error) {
 	result := make(map[data.ClanID]string)
-	var mu sync.Mutex
+	eg, egCtx := errgroup.WithContext(ctx)
 
-	eg := errgroup.Group{}
+	var mu sync.Mutex
 	for clanID, clanInfo := range clansInfo.Data {
 		eg.Go(func() error {
-			autocomplete, err := s.clanClient.ClanAutoComplete(clanInfo.Tag)
+			autocomplete, err := s.clanClient.ClanAutoComplete(egCtx, clanInfo.Tag)
 			if err != nil {
 				return err
 			}
@@ -94,7 +101,7 @@ func (s *clanService) fetchClanColor(clansInfo data.WGClansInfo) (map[data.ClanI
 	return result, nil
 }
 
-func (s *clanService) fetchClanLanguage(clansInfo data.WGClansInfo) map[data.ClanID]string {
+func (s *clanService) clanLanguage(clansInfo data.WGClansInfo) map[data.ClanID]string {
 	result := make(map[data.ClanID]string)
 
 	options := whatlanggo.Options{

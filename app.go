@@ -41,7 +41,7 @@ func NewApp(i do.Injector) (*App, error) {
 }
 
 func (a *App) Prefetch() {
-	result, err := a.prefetchUsecase.Invoke()
+	result, err := a.prefetchUsecase.Invoke(a.ctx)
 	if err != nil {
 		return
 	}
@@ -80,7 +80,7 @@ func (a *App) CurrentVersion() string {
 }
 
 func (a *App) NewVersion() *data.NewVersion {
-	return a.updateCheckUsecase.Invoke()
+	return a.updateCheckUsecase.Invoke(a.ctx)
 }
 
 func (a *App) ShowMessageDialog(message string) {

@@ -1,6 +1,7 @@
 package infra
 
 import (
+	"context"
 	"encoding/json"
 	"wfs/backend/config"
 	"wfs/backend/data"
@@ -25,10 +26,11 @@ func NewNumbersClient(i do.Injector) (*NumbersClient, error) {
 	}, nil
 }
 
-func (c *NumbersClient) ExpectedStats() (data.NSExpectedStats, error) {
+func (c *NumbersClient) ExpectedStats(ctx context.Context) (data.NSExpectedStats, error) {
 	var result data.NSExpectedStats
 
 	resp, err := c.client.R().
+		SetContext(ctx).
 		Get("/personal/rating/expected/json/")
 	if err != nil {
 		return result, failure.Wrap(err)

@@ -2,6 +2,7 @@ package infra
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"wfs/backend/adapter"
@@ -28,7 +29,7 @@ func (w *remoteWriter) WriteLevel(level zerolog.Level, p []byte) (int, error) {
 	} else {
 		client = w.infoDiscord
 	}
-	err := client.Comment(formatted)
+	err := client.Comment(context.Background(), formatted)
 	if err != nil {
 		fmt.Printf("Failed to send to discord: %s\n", err.Error())
 	}

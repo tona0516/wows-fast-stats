@@ -108,7 +108,7 @@ func TestLogger_Info(t *testing.T) {
 
 			ctrl := gomock.NewController(t)
 			mockInfoDiscord := mock.NewMockDiscordClient(ctrl)
-			mockInfoDiscord.EXPECT().Comment(gomock.Any()).Return(nil).Times(1)
+			mockInfoDiscord.EXPECT().Comment(gomock.Any(), gomock.Any()).Return(nil).Times(1)
 
 			injector := do.New()
 			do.ProvideValue(injector, config.Config{
@@ -143,7 +143,7 @@ func TestLogger_Info_DicordError(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	mockInfoDiscord := mock.NewMockDiscordClient(ctrl)
-	mockInfoDiscord.EXPECT().Comment(gomock.Any()).Return(errors.New("discord error"))
+	mockInfoDiscord.EXPECT().Comment(gomock.Any(), gomock.Any()).Return(errors.New("discord error"))
 
 	injector := do.New()
 	do.ProvideValue(injector, config.Config{
@@ -205,7 +205,7 @@ func TestLogger_Error(t *testing.T) {
 
 			ctrl := gomock.NewController(t)
 			mockAlertDiscord := mock.NewMockDiscordClient(ctrl)
-			mockAlertDiscord.EXPECT().Comment(gomock.Any()).Return(nil).AnyTimes()
+			mockAlertDiscord.EXPECT().Comment(gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
 
 			injector := do.New()
 			do.ProvideValue(injector, config.Config{
@@ -240,7 +240,7 @@ func TestLogger_Error_DicordError(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	mockAlertDiscord := mock.NewMockDiscordClient(ctrl)
-	mockAlertDiscord.EXPECT().Comment(gomock.Any()).Return(errors.New("discord error"))
+	mockAlertDiscord.EXPECT().Comment(gomock.Any(), gomock.Any()).Return(errors.New("discord error"))
 
 	injector := do.New()
 	do.ProvideValue(injector, config.Config{

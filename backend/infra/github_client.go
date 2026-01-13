@@ -1,6 +1,7 @@
 package infra
 
 import (
+	"context"
 	"wfs/backend/config"
 	"wfs/backend/data"
 
@@ -23,9 +24,10 @@ func NewGithubClient(i do.Injector) (*GithubClient, error) {
 	}, nil
 }
 
-func (c *GithubClient) LatestRelease() (data.GHLatestRelease, error) {
+func (c *GithubClient) LatestRelease(ctx context.Context) (data.GHLatestRelease, error) {
 	result := data.GHLatestRelease{}
 	resp, err := c.client.R().
+		SetContext(ctx).
 		SetSuccessResult(&result).
 		Get("/repos/tona0516/wows-fast-stats/releases/latest")
 	if err != nil {

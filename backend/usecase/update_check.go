@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"context"
 	"wfs/backend/adapter"
 	"wfs/backend/config"
 	"wfs/backend/data"
@@ -22,13 +23,13 @@ func NewUpdateCheck(i do.Injector) (*UpdateCheck, error) {
 	}, nil
 }
 
-func (c *UpdateCheck) Invoke() *data.NewVersion {
+func (c *UpdateCheck) Invoke(ctx context.Context) *data.NewVersion {
 	constraint, err := semver.NewConstraint("> " + c.currentVersion)
 	if err != nil {
 		return nil
 	}
 
-	latestRelease, err := c.githubClient.LatestRelease()
+	latestRelease, err := c.githubClient.LatestRelease(ctx)
 	if err != nil {
 		return nil
 	}
