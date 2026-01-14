@@ -36,9 +36,9 @@
     try {
       const newVersion = (await NewVersion()) as data.NewVersion | null;
 
-      if (newVersion?.semver && newVersion.url) {
+      if (newVersion?.version && newVersion.url) {
         await ShowMessageDialog(
-          `新しいバージョン ${newVersion.semver} が利用可能です。\n${newVersion.url}`,
+          `新しいバージョン ${newVersion.version} が利用可能です。\n${newVersion.url}`,
         );
         return;
       }

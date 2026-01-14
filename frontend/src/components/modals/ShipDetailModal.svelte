@@ -23,7 +23,7 @@
       return undefined;
     }
 
-    return player.warship.damageRatings.map((dr) => {
+    return player.warship.damageRatings?.map((dr) => {
       return {
         displayName: RATING_NAMES[dr.rating],
         colorCode: RATING_COLORS[dr.rating]?.getFixedTextColor(),

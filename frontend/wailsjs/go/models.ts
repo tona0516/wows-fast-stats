@@ -733,7 +733,7 @@ export namespace data {
 	
 	
 	export class NewVersion {
-	    semver: string;
+	    version: string;
 	    url: string;
 	
 	    static createFrom(source: any = {}) {
@@ -742,7 +742,7 @@ export namespace data {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.semver = source["semver"];
+	        this.version = source["version"];
 	        this.url = source["url"];
 	    }
 	}
