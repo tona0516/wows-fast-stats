@@ -65,8 +65,7 @@ type DiscordClientConfig struct {
 }
 
 type LocalFileConfig struct {
-	ConfigDir string
-	CacheDir  string
+	RootDir string
 }
 
 type LoggerConfig struct {
@@ -121,8 +120,7 @@ func newProdConfig(appName, version string) Config {
 			Timeout:         time.Duration(10) * time.Second,
 		},
 		LocalFile: LocalFileConfig{
-			ConfigDir: "./user_data",
-			CacheDir:  "./cache",
+			RootDir: "./_data",
 		},
 		Logger: LoggerConfig{
 			Level: zerolog.InfoLevel,

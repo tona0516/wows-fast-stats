@@ -57,7 +57,7 @@ func TestLogger_Debug(t *testing.T) {
 					Level: zerolog.DebugLevel,
 				},
 				LocalFile: config.LocalFileConfig{
-					ConfigDir: t.TempDir(),
+					RootDir: t.TempDir(),
 				},
 			})
 			do.ProvideNamed(injector, "alert-discord-client", func(i do.Injector) (adapter.DiscordClient, error) {
@@ -121,7 +121,7 @@ func TestLogger_Info(t *testing.T) {
 					Level: zerolog.InfoLevel,
 				},
 				LocalFile: config.LocalFileConfig{
-					ConfigDir: t.TempDir(),
+					RootDir: t.TempDir(),
 				},
 			})
 			do.ProvideNamed(injector, "alert-discord-client", func(i do.Injector) (adapter.DiscordClient, error) {
@@ -157,7 +157,7 @@ func TestLogger_Info_DicordError(t *testing.T) {
 			Level: zerolog.InfoLevel,
 		},
 		LocalFile: config.LocalFileConfig{
-			ConfigDir: t.TempDir(),
+			RootDir: t.TempDir(),
 		},
 	})
 	do.ProvideNamed(injector, "alert-discord-client", func(i do.Injector) (adapter.DiscordClient, error) {
@@ -219,7 +219,7 @@ func TestLogger_Error(t *testing.T) {
 					Level: zerolog.ErrorLevel,
 				},
 				LocalFile: config.LocalFileConfig{
-					ConfigDir: t.TempDir(),
+					RootDir: t.TempDir(),
 				},
 			})
 			do.ProvideNamed(injector, "alert-discord-client", func(i do.Injector) (adapter.DiscordClient, error) {
@@ -255,7 +255,7 @@ func TestLogger_Error_DicordError(t *testing.T) {
 			Level: zerolog.ErrorLevel,
 		},
 		LocalFile: config.LocalFileConfig{
-			ConfigDir: t.TempDir(),
+			RootDir: t.TempDir(),
 		},
 	})
 	do.ProvideNamed(injector, "alert-discord-client", func(i do.Injector) (adapter.DiscordClient, error) {

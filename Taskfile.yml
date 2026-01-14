@@ -60,12 +60,7 @@ tasks:
     desc: clean project
     cmds:
       - for:
-          - config/
-          - cache/
-          - temp_arena_info/
-          - screenshot/
-          - persistent_data/
-          - user_data/
+          - ./_data
         cmd: rm -rf {{.ITEM}}
   update:
     desc: update dependencies

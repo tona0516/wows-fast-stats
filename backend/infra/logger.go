@@ -33,7 +33,7 @@ func NewLogger(i do.Injector) (*Logger, error) {
 		infoDiscord:  infoDiscord,
 	}
 	logFile, _ := os.OpenFile(
-		filepath.Join(config.LocalFile.ConfigDir, config.Basic.Name+".log"),
+		filepath.Join(config.LocalFile.RootDir, config.Basic.Name+".log"),
 		os.O_APPEND|os.O_CREATE|os.O_WRONLY,
 		os.ModePerm,
 	)

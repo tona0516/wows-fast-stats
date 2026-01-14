@@ -19,7 +19,7 @@ type CacheStore struct {
 func NewCacheStore(i do.Injector) (*CacheStore, error) {
 	config := do.MustInvoke[config.Config](i)
 	return &CacheStore{
-		dir:              config.LocalFile.CacheDir,
+		dir:              config.LocalFile.RootDir,
 		ownIGNFile:       "own_ign.txt",
 		warshipsFile:     "warships.json",
 		battleArenasFile: "battle_arenas.json",

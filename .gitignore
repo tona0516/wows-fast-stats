@@ -5,18 +5,7 @@ node_modules
 /wows-fast-stats.zip
 
 # created directories by app
-/config/
-/screenshot/
-/temp_arena_info/
-/cache/
-/persistent_data/
-/user_data/
-
-# created files by app
-/wows-fast-stats.log
-
-# credential
-/discord_webhook_*
+/_data/
 
 # test
 /test_install_dir/replays/tempArenaInfo.json

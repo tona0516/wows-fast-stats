@@ -16,7 +16,7 @@ type PrefStore struct {
 func NewPrefStore(i do.Injector) (*PrefStore, error) {
 	config := do.MustInvoke[config.Config](i)
 	return &PrefStore{
-		dir:      config.LocalFile.ConfigDir,
+		dir:      config.LocalFile.RootDir,
 		prefFile: "pref.json",
 	}, nil
 }
