@@ -31,9 +31,14 @@ func round(value float64, places int) float64 {
 	return math.Round(value*pow) / pow
 }
 
-func safeDivide(numerator float64, denominator uint) float64 {
+type Number interface {
+	float64 | int | int64 | uint | uint64
+}
+
+func safeDivide[T, U Number](numerator T, denominator U) float64 {
 	if denominator == 0 {
 		return 0
 	}
-	return numerator / float64(denominator)
+
+	return float64(numerator) / float64(denominator)
 }

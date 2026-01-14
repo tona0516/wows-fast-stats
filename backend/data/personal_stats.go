@@ -33,19 +33,31 @@ func (s *PersonalStats) PR(category StatsCategory, pattern StatsPattern) RatingV
 	case StatsCategoryShip:
 		values, _ := s.statsValues(pattern)
 		battles := values.Battles
+		if battles == 0 {
+			return NewRatingValueNone()
+		}
+
+		warship, ok := s.warships[s.useShipID]
+		if !ok {
+			return NewRatingValueNone()
+		}
+
+		if warship.ServerAverage == nil {
+			return NewRatingValueNone()
+		}
+		serverAverage := *warship.ServerAverage
 
 		return s.pr(
 			PRFactor{
-				damage: avgDamage(values.DamageDealt, battles),
-				frags:  avgKill(values.Frags, battles),
-				wins:   winRate(values.Wins, battles),
+				damage: safeDivide(values.DamageDealt, battles),
+				frags:  safeDivide(values.Frags, battles),
+				wins:   safeDivide(values.Wins, battles) * 100,
 			},
 			PRFactor{
-				damage: s.warships[s.useShipID].ServerAverage.Damage,
-				frags:  s.warships[s.useShipID].ServerAverage.Frags,
-				wins:   s.warships[s.useShipID].ServerAverage.WinRate,
+				damage: serverAverage.Damage,
+				frags:  serverAverage.Frags,
+				wins:   serverAverage.WinRate,
 			},
-			battles,
 		)
 
 	case StatsCategoryOverall:
@@ -59,23 +71,36 @@ func (s *PersonalStats) PR(category StatsCategory, pattern StatsPattern) RatingV
 			values := s.statsValuesForm(ship, pattern)
 			battles := values.Battles
 
+			if battles == 0 {
+				continue
+			}
+
 			warship, ok := s.warships[ship.ShipID]
 			if !ok {
 				continue
 			}
 
+			if warship.ServerAverage == nil {
+				continue
+			}
+			serverAverage := *warship.ServerAverage
+
 			actual.damage += float64(values.DamageDealt)
 			actual.frags += float64(values.Frags)
 			actual.wins += float64(values.Wins)
 
-			expected.damage += warship.ServerAverage.Damage * float64(battles)
-			expected.frags += warship.ServerAverage.Frags * float64(battles)
-			expected.wins += warship.ServerAverage.WinRate / 100 * float64(battles)
+			expected.damage += serverAverage.Damage * float64(battles)
+			expected.frags += serverAverage.Frags * float64(battles)
+			expected.wins += serverAverage.WinRate / 100 * float64(battles)
 
 			allBattles += battles
 		}
 
-		return s.pr(actual, expected, allBattles)
+		if allBattles == 0 {
+			return NewRatingValueNone()
+		}
+
+		return s.pr(actual, expected)
 	}
 
 	return NewRatingValueNone()
@@ -97,11 +122,11 @@ func (s *PersonalStats) AvgDamage(category StatsCategory, pattern StatsPattern) 
 	ship, player := s.statsValues(pattern)
 	switch category {
 	case StatsCategoryShip:
-		value := avgDamage(ship.DamageDealt, ship.Battles)
+		value := safeDivide(ship.DamageDealt, ship.Battles)
 		rating := NewRatingFromShipDamage(value, s.warships[s.useShipID].ServerAverage.Damage)
 		return NewRatingValue(value, rating)
 	case StatsCategoryOverall:
-		value := avgDamage(player.DamageDealt, player.Battles)
+		value := safeDivide(player.DamageDealt, player.Battles)
 		return NewRatingValue(value, RatingNone)
 	}
 
@@ -157,9 +182,9 @@ func (s *PersonalStats) AvgKill(category StatsCategory, pattern StatsPattern) fl
 	ship, player := s.statsValues(pattern)
 	switch category {
 	case StatsCategoryShip:
-		return avgKill(ship.Frags, ship.Battles)
+		return safeDivide(ship.Frags, ship.Battles)
 	case StatsCategoryOverall:
-		return avgKill(player.Frags, player.Battles)
+		return safeDivide(player.Frags, player.Battles)
 	}
 
 	return 0
@@ -169,9 +194,9 @@ func (s *PersonalStats) AvgExp(category StatsCategory, pattern StatsPattern) flo
 	ship, player := s.statsValues(pattern)
 	switch category {
 	case StatsCategoryShip:
-		return div(ship.Xp, ship.Battles)
+		return safeDivide(ship.Xp, ship.Battles)
 	case StatsCategoryOverall:
-		return div(player.Xp, player.Battles)
+		return safeDivide(player.Xp, player.Battles)
 	}
 
 	return 0
@@ -183,9 +208,9 @@ func (s *PersonalStats) WinRate(category StatsCategory, pattern StatsPattern) Ra
 	var value float64
 	switch category {
 	case StatsCategoryShip:
-		value = winRate(ship.Wins, ship.Battles)
+		value = safeDivide(ship.Wins, ship.Battles) * 100
 	case StatsCategoryOverall:
-		value = winRate(player.Wins, player.Battles)
+		value = safeDivide(player.Wins, player.Battles) * 100
 	}
 
 	rating := NewRatingFromWinRate(value)
@@ -197,15 +222,15 @@ func (s *PersonalStats) SurvivedRate(category StatsCategory, pattern StatsPatter
 	switch category {
 	case StatsCategoryShip:
 		return SurvivedRate{
-			All:  percentage(ship.SurvivedBattles, ship.Battles),
-			Win:  percentage(ship.SurvivedWins, ship.Wins),
-			Lose: percentage(ship.SurvivedBattles-ship.SurvivedWins, ship.Battles-ship.Wins),
+			All:  safeDivide(ship.SurvivedBattles, ship.Battles) * 100,
+			Win:  safeDivide(ship.SurvivedWins, ship.Wins) * 100,
+			Lose: safeDivide(ship.SurvivedBattles-ship.SurvivedWins, ship.Battles-ship.Wins) * 100,
 		}
 	case StatsCategoryOverall:
 		return SurvivedRate{
-			All:  percentage(player.SurvivedBattles, player.Battles),
-			Win:  percentage(player.SurvivedWins, player.Wins),
-			Lose: percentage(player.SurvivedBattles-player.SurvivedWins, player.Battles-player.Wins),
+			All:  safeDivide(player.SurvivedBattles, player.Battles) * 100,
+			Win:  safeDivide(player.SurvivedWins, player.Wins) * 100,
+			Lose: safeDivide(player.SurvivedBattles-player.SurvivedWins, player.Battles-player.Wins) * 100,
 		}
 	}
 
@@ -215,14 +240,14 @@ func (s *PersonalStats) SurvivedRate(category StatsCategory, pattern StatsPatter
 func (s *PersonalStats) HitRate(pattern StatsPattern) HitRate {
 	ship, _ := s.statsValues(pattern)
 	return HitRate{
-		MainBattery: percentage(ship.MainBattery.Hits, ship.MainBattery.Shots),
-		Torpedoes:   percentage(ship.Torpedoes.Hits, ship.Torpedoes.Shots),
+		MainBattery: safeDivide(ship.MainBattery.Hits, ship.MainBattery.Shots) * 100,
+		Torpedoes:   safeDivide(ship.Torpedoes.Hits, ship.Torpedoes.Shots) * 100,
 	}
 }
 
 func (s *PersonalStats) PlanesKilled(pattern StatsPattern) float64 {
 	ship, _ := s.statsValues(pattern)
-	return div(ship.PlanesKilled, ship.Battles)
+	return safeDivide(ship.PlanesKilled, ship.Battles)
 }
 
 func (s *PersonalStats) AvgTier(
@@ -244,7 +269,7 @@ func (s *PersonalStats) AvgTier(
 		allBattles += values.Battles
 	}
 
-	return div(sum, allBattles)
+	return safeDivide(sum, allBattles)
 }
 
 func (s *PersonalStats) UsingTierRate(
@@ -277,9 +302,9 @@ func (s *PersonalStats) UsingTierRate(
 	}
 
 	return TierGroup{
-		Low:    percentage(tierGroupMap["low"], allBattles),
-		Middle: percentage(tierGroupMap["middle"], allBattles),
-		High:   percentage(tierGroupMap["high"], allBattles),
+		Low:    safeDivide(tierGroupMap["low"], allBattles) * 100,
+		Middle: safeDivide(tierGroupMap["middle"], allBattles) * 100,
+		High:   safeDivide(tierGroupMap["high"], allBattles) * 100,
 	}
 }
 
@@ -304,37 +329,43 @@ func (s *PersonalStats) UsingShipTypeRate(
 	}
 
 	return ShipTypeGroup{
-		SS: percentage(shipTypeMap[ShipTypeSS], allBattles),
-		DD: percentage(shipTypeMap[ShipTypeDD], allBattles),
-		CL: percentage(shipTypeMap[ShipTypeCL], allBattles),
-		BB: percentage(shipTypeMap[ShipTypeBB], allBattles),
-		CV: percentage(shipTypeMap[ShipTypeCV], allBattles),
+		SS: safeDivide(shipTypeMap[ShipTypeSS], allBattles) * 100,
+		DD: safeDivide(shipTypeMap[ShipTypeDD], allBattles) * 100,
+		CL: safeDivide(shipTypeMap[ShipTypeCL], allBattles) * 100,
+		BB: safeDivide(shipTypeMap[ShipTypeBB], allBattles) * 100,
+		CV: safeDivide(shipTypeMap[ShipTypeCV], allBattles) * 100,
 	}
 }
 
 func (s *PersonalStats) PlatoonRate(
 	category StatsCategory,
 ) float64 {
+	var (
+		allBattles  uint
+		soloBattles uint
+		div2Battles uint
+		div3Battles uint
+	)
+
 	switch category {
 	case StatsCategoryShip:
 		stats := s.playerShipStats[s.useShipID]
-		return platoonRate(
-			stats.Pvp.Battles,
-			stats.PvpSolo.Battles,
-			stats.PvpDiv2.Battles,
-			stats.PvpDiv3.Battles,
-		)
+		allBattles = stats.Pvp.Battles
+		soloBattles = stats.PvpSolo.Battles
+		div2Battles = stats.PvpDiv2.Battles
+		div3Battles = stats.PvpDiv3.Battles
 	case StatsCategoryOverall:
 		stats := s.accountInfo.Statistics
-		return platoonRate(
-			stats.Pvp.Battles,
-			stats.PvpSolo.Battles,
-			stats.PvpDiv2.Battles,
-			stats.PvpDiv3.Battles,
-		)
+		allBattles = stats.Pvp.Battles
+		soloBattles = stats.PvpSolo.Battles
+		div2Battles = stats.PvpDiv2.Battles
+		div3Battles = stats.PvpDiv3.Battles
 	}
 
-	return 0
+	soloRate := safeDivide(soloBattles, allBattles) * 1
+	div2Rate := safeDivide(div2Battles, allBattles) * 2
+	div3Rate := safeDivide(div3Battles, allBattles) * 3
+	return soloRate + div2Rate + div3Rate
 }
 
 func (s *PersonalStats) EfficiencyBadge() EfficiencyBadge {
@@ -410,12 +441,7 @@ func (s *PersonalStats) statsValuesForm(statsData WGShipsStatsData, pattern Stat
 func (s *PersonalStats) pr(
 	actual PRFactor,
 	expected PRFactor,
-	battles uint,
 ) RatingValue {
-	if battles < 1 {
-		return NewRatingValueNone()
-	}
-
 	ratio := PRFactor{
 		damage: actual.damage / expected.damage,
 		frags:  actual.frags / expected.frags,
@@ -436,35 +462,4 @@ func (s *PersonalStats) pr(
 	rating := NewRatingFromPR(value)
 
 	return NewRatingValue(value, rating)
-}
-
-func avgDamage(damageDealt uint, battles uint) float64 {
-	return div(damageDealt, battles)
-}
-
-func avgKill(frags uint, battles uint) float64 {
-	return div(frags, battles)
-}
-
-func winRate(wins uint, battles uint) float64 {
-	return percentage(wins, battles)
-}
-
-func platoonRate(allBattles uint, soloBattles uint, div2Battles uint, div3Battles uint) float64 {
-	soloRate := div(soloBattles, allBattles) * 1
-	div2Rate := div(div2Battles, allBattles) * 2
-	div3Rate := div(div3Battles, allBattles) * 3
-	return soloRate + div2Rate + div3Rate
-}
-
-func div(a uint, b uint) float64 {
-	if b <= 0 {
-		return 0
-	}
-
-	return float64(a) / float64(b)
-}
-
-func percentage(a uint, b uint) float64 {
-	return div(a, b) * 100
 }
