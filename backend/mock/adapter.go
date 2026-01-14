@@ -143,11 +143,9 @@ func (mr *MockCacheStoreMockRecorder) OwnIGN() *gomock.Call {
 }
 
 // SetBattleArenas mocks base method.
-func (m *MockCacheStore) SetBattleArenas(arg0 map[int]string) error {
+func (m *MockCacheStore) SetBattleArenas(arg0 map[int]string) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SetBattleArenas", arg0)
-	ret0, _ := ret[0].(error)
-	return ret0
+	m.ctrl.Call(m, "SetBattleArenas", arg0)
 }
 
 // SetBattleArenas indicates an expected call of SetBattleArenas.
@@ -157,11 +155,9 @@ func (mr *MockCacheStoreMockRecorder) SetBattleArenas(arg0 any) *gomock.Call {
 }
 
 // SetBattleTypes mocks base method.
-func (m *MockCacheStore) SetBattleTypes(arg0 map[string]string) error {
+func (m *MockCacheStore) SetBattleTypes(arg0 map[string]string) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SetBattleTypes", arg0)
-	ret0, _ := ret[0].(error)
-	return ret0
+	m.ctrl.Call(m, "SetBattleTypes", arg0)
 }
 
 // SetBattleTypes indicates an expected call of SetBattleTypes.
@@ -171,11 +167,9 @@ func (mr *MockCacheStoreMockRecorder) SetBattleTypes(arg0 any) *gomock.Call {
 }
 
 // SetOwnIGN mocks base method.
-func (m *MockCacheStore) SetOwnIGN(ign string) error {
+func (m *MockCacheStore) SetOwnIGN(ign string) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SetOwnIGN", ign)
-	ret0, _ := ret[0].(error)
-	return ret0
+	m.ctrl.Call(m, "SetOwnIGN", ign)
 }
 
 // SetOwnIGN indicates an expected call of SetOwnIGN.
@@ -185,11 +179,9 @@ func (mr *MockCacheStoreMockRecorder) SetOwnIGN(ign any) *gomock.Call {
 }
 
 // SetWarships mocks base method.
-func (m *MockCacheStore) SetWarships(arg0 data.Warships) error {
+func (m *MockCacheStore) SetWarships(arg0 data.Warships) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SetWarships", arg0)
-	ret0, _ := ret[0].(error)
-	return ret0
+	m.ctrl.Call(m, "SetWarships", arg0)
 }
 
 // SetWarships indicates an expected call of SetWarships.

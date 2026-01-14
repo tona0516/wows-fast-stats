@@ -14,16 +14,16 @@ type Wails interface {
 //go:generate mockgen -source=$GOFILE -destination ../mock/$GOFILE -package mock
 type CacheStore interface {
 	OwnIGN() (string, error)
-	SetOwnIGN(ign string) error
+	SetOwnIGN(ign string)
 
 	Warships() (data.Warships, error)
-	SetWarships(data data.Warships) error
+	SetWarships(data data.Warships)
 
 	BattleArenas() (map[int]string, error)
-	SetBattleArenas(data map[int]string) error
+	SetBattleArenas(data map[int]string)
 
 	BattleTypes() (map[string]string, error)
-	SetBattleTypes(data map[string]string) error
+	SetBattleTypes(data map[string]string)
 }
 
 //go:generate mockgen -source=$GOFILE -destination ../mock/$GOFILE -package mock

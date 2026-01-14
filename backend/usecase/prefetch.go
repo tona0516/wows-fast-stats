@@ -98,7 +98,7 @@ func (p *Prefetch) fetchWarships(ctx context.Context) (data.Warships, error) {
 	}
 
 	warships := p.composeWarships(encycShips, expectedStats)
-	_ = p.cacheStore.SetWarships(warships)
+	p.cacheStore.SetWarships(warships)
 
 	return warships, nil
 }
@@ -118,7 +118,7 @@ func (p *Prefetch) fetchBattleArenas(ctx context.Context) (map[int]string, error
 		result[id] = arena.Name
 	}
 
-	_ = p.cacheStore.SetBattleArenas(result)
+	p.cacheStore.SetBattleArenas(result)
 
 	return result, nil
 }
@@ -138,7 +138,7 @@ func (p *Prefetch) fetchBattleTypes(ctx context.Context) (map[string]string, err
 		result[key] = battleType.Name
 	}
 
-	_ = p.cacheStore.SetBattleTypes(result)
+	p.cacheStore.SetBattleTypes(result)
 
 	return result, nil
 }

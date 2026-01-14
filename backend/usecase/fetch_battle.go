@@ -40,7 +40,7 @@ func (b *FetchBattle) Invoke(
 	tempArenaInfo data.TempArenaInfo,
 	prefetchResult *data.PrefetchResult,
 ) {
-	_ = b.cacheStore.SetOwnIGN(tempArenaInfo.PlayerName)
+	b.cacheStore.SetOwnIGN(tempArenaInfo.PlayerName)
 	b.logger.SetOwnIGN(tempArenaInfo.PlayerName)
 
 	accountNames := tempArenaInfo.AccountNames()
