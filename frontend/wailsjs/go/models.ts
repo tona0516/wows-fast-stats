@@ -373,8 +373,8 @@ export namespace data {
 	    type: string;
 	    nation: string;
 	    isPremium: boolean;
-	    serverAverage: ServerAverage;
-	    damageRatings: RatingValue[];
+	    serverAverage?: ServerAverage;
+	    damageRatings?: RatingValue[];
 	
 	    static createFrom(source: any = {}) {
 	        return new Warship(source);

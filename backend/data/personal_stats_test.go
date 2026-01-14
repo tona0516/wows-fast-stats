@@ -49,7 +49,7 @@ func TestPersonalStats_PR_Ship(t *testing.T) {
 			emptyShipBadges,
 			Warships{
 				useShipID: {
-					ServerAverage: ServerAverage{
+					ServerAverage: &ServerAverage{
 						Damage:  8000,
 						Frags:   1,
 						WinRate: 50,
@@ -112,10 +112,10 @@ func TestPersonalStats_PR_Overall(t *testing.T) {
 		},
 		emptyShipBadges,
 		Warships{
-			1: {ServerAverage: ServerAverage{Damage: 53792.23172971, Frags: 0.6935181784796, WinRate: 50.092406353286}},
-			2: {ServerAverage: ServerAverage{Damage: 46228.419395466, Frags: 0.80128883291351, WinRate: 51.202824307302}},
-			3: {ServerAverage: ServerAverage{Damage: 25864.417248367, Frags: 0.69715604593558, WinRate: 51.11762215717}},
-			4: {ServerAverage: ServerAverage{Damage: 77931.580907796, Frags: 0.68628943618969, WinRate: 50.386342357012}},
+			1: {ServerAverage: &ServerAverage{Damage: 53792.23172971, Frags: 0.6935181784796, WinRate: 50.092406353286}},
+			2: {ServerAverage: &ServerAverage{Damage: 46228.419395466, Frags: 0.80128883291351, WinRate: 51.202824307302}},
+			3: {ServerAverage: &ServerAverage{Damage: 25864.417248367, Frags: 0.69715604593558, WinRate: 51.11762215717}},
+			4: {ServerAverage: &ServerAverage{Damage: 77931.580907796, Frags: 0.68628943618969, WinRate: 50.386342357012}},
 		},
 	)
 
@@ -229,7 +229,7 @@ func TestPersonalStats_AvgDamage_Ship(t *testing.T) {
 		emptyShipBadges,
 		Warships{
 			1: {
-				ServerAverage: ServerAverage{
+				ServerAverage: &ServerAverage{
 					Damage: 12000,
 				},
 			},
@@ -259,7 +259,7 @@ func TestPersonalStats_AvgDamage_Ship_Solo(t *testing.T) {
 		emptyShipBadges,
 		Warships{
 			1: {
-				ServerAverage: ServerAverage{
+				ServerAverage: &ServerAverage{
 					Damage: 12000,
 				},
 			},
@@ -289,7 +289,7 @@ func TestPersonalStats_AvgDamage_Ship_Rank(t *testing.T) {
 		emptyShipBadges,
 		Warships{
 			1: {
-				ServerAverage: ServerAverage{
+				ServerAverage: &ServerAverage{
 					Damage: 12000,
 				},
 			},

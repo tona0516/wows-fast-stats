@@ -192,13 +192,15 @@ func (p *Prefetch) composeWarships(
 	warships := make(data.Warships)
 	for _, resp := range encycShips {
 		for shipID, ship := range resp.Data {
-			var serverAverageDamage, serverAverageFrags, serverAverageWinRate float64
+			var serverAverage *data.ServerAverage
 
 			expected, ok := expectedStats.Data[shipID]
 			if ok {
-				serverAverageDamage = expected.AverageDamageDealt
-				serverAverageFrags = expected.AverageFrags
-				serverAverageWinRate = expected.WinRate
+				serverAverage = &data.ServerAverage{
+					Damage:  expected.AverageDamageDealt,
+					Frags:   expected.AverageFrags,
+					WinRate: expected.WinRate,
+				}
 			}
 
 			warship := data.NewWarship(
@@ -208,11 +210,7 @@ func (p *Prefetch) composeWarships(
 				data.NewShipType(ship.Type),
 				data.Nation(ship.Nation),
 				ship.IsPremium,
-				data.ServerAverage{
-					Damage:  serverAverageDamage,
-					Frags:   serverAverageFrags,
-					WinRate: serverAverageWinRate,
-				},
+				serverAverage,
 			)
 			warships[shipID] = *warship
 		}
