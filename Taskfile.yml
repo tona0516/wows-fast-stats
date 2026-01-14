@@ -43,12 +43,12 @@ tasks:
   dev:
     desc: run app in development mode
     cmds:
-      - wails dev -ldflags="-X main.appName={{.APP_NAME}} -X main.semver={{.VERSION}} -X main.env=dev"
+      - wails dev -ldflags="-X main.appName={{.APP_NAME}} -X main.appVersion={{.VERSION}} -X main.env=dev"
   build:
     desc: build
     deps: [test]
     cmds:
-      - wails build -ldflags="-X main.appName={{.APP_NAME}} -X main.semver={{.VERSION}} -X main.env=prod" -platform windows/amd64 -o {{.APP_NAME}}-{{.VERSION}}.exe -trimpath -webview2 embed
+      - wails build -ldflags="-X main.appName={{.APP_NAME}} -X main.appVersion={{.VERSION}} -X main.env=prod" -platform windows/amd64 -o {{.APP_NAME}}-{{.VERSION}}.exe -trimpath -webview2 embed
   chbtl:
     desc: change battle
     vars:

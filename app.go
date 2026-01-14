@@ -3,8 +3,10 @@ package main
 import (
 	"context"
 	"os"
+	"wfs/backend/adapter"
 	"wfs/backend/config"
 	"wfs/backend/data"
+	"wfs/backend/infra"
 	"wfs/backend/usecase"
 
 	"github.com/mitchellh/go-ps"
@@ -13,7 +15,6 @@ import (
 )
 
 type App struct {
-	appConfig                 config.Config
 	prefetchUsecase           *usecase.Prefetch
 	fetchBattleUsecase        *usecase.FetchBattle
 	pollMatchUsecase          *usecase.PollMatch
@@ -21,23 +22,16 @@ type App struct {
 	updateCheckUsecase        *usecase.UpdateCheck
 	loadPrefUsecase           *usecase.LoadPref
 	savePrefUsecase           *usecase.SavePref
+	logger                    adapter.Logger
 
 	ctx                 context.Context
+	config              config.Config
 	pollMatchCancelFunc context.CancelFunc
 	prefetchResult      *data.PrefetchResult
 }
 
-func NewApp(i do.Injector) (*App, error) {
-	return &App{
-		appConfig:                 do.MustInvoke[config.Config](i),
-		prefetchUsecase:           do.MustInvoke[*usecase.Prefetch](i),
-		fetchBattleUsecase:        do.MustInvoke[*usecase.FetchBattle](i),
-		pollMatchUsecase:          do.MustInvoke[*usecase.PollMatch](i),
-		installPathSettingUsecase: do.MustInvoke[*usecase.InstallPathSetting](i),
-		updateCheckUsecase:        do.MustInvoke[*usecase.UpdateCheck](i),
-		loadPrefUsecase:           do.MustInvoke[*usecase.LoadPref](i),
-		savePrefUsecase:           do.MustInvoke[*usecase.SavePref](i),
-	}, nil
+func NewApp(config config.Config) *App {
+	return &App{config: config}
 }
 
 func (a *App) Prefetch() {
@@ -76,7 +70,7 @@ func (a *App) TrySaveInstallPath() (bool, error) {
 }
 
 func (a *App) CurrentVersion() string {
-	return a.appConfig.Basic.Version
+	return a.config.Basic.Version
 }
 
 func (a *App) NewVersion() *data.NewVersion {
@@ -85,7 +79,7 @@ func (a *App) NewVersion() *data.NewVersion {
 
 func (a *App) ShowMessageDialog(message string) {
 	_, _ = runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
-		Title:   a.appConfig.Basic.Name,
+		Title:   a.config.Basic.Name,
 		Message: message,
 	})
 }
@@ -98,14 +92,89 @@ func (a *App) EmptyBattle() data.Battle {
 func (a *App) OnStartup(ctx context.Context) {
 	a.ctx = ctx
 
-	if isAlreadyRunning() {
-		a.ShowMessageDialog("すでに起動しています。")
+	if a.isAlreadyRunning() {
+		a.ShowMessageDialog("すでに起動しています")
 		os.Exit(1)
 		return
 	}
+
+	injector := a.getInjector()
+	a.prefetchUsecase = do.MustInvoke[*usecase.Prefetch](injector)
+	a.fetchBattleUsecase = do.MustInvoke[*usecase.FetchBattle](injector)
+	a.pollMatchUsecase = do.MustInvoke[*usecase.PollMatch](injector)
+	a.installPathSettingUsecase = do.MustInvoke[*usecase.InstallPathSetting](injector)
+	a.updateCheckUsecase = do.MustInvoke[*usecase.UpdateCheck](injector)
+	a.loadPrefUsecase = do.MustInvoke[*usecase.LoadPref](injector)
+	a.savePrefUsecase = do.MustInvoke[*usecase.SavePref](injector)
+	a.logger = do.MustInvoke[adapter.Logger](injector)
 }
 
-func isAlreadyRunning() bool {
+func (a *App) getInjector() do.Injector {
+	injector := do.New()
+
+	do.ProvideValue(injector, a.config)
+
+	// infra
+	do.Provide(injector, func(i do.Injector) (adapter.Wails, error) {
+		return infra.NewWails(i)
+	})
+	do.Provide(injector, func(i do.Injector) (adapter.CacheStore, error) {
+		return infra.NewCacheStore(i)
+	})
+	do.Provide(injector, func(i do.Injector) (adapter.PrefStore, error) {
+		return infra.NewPrefStore(i)
+	})
+	do.Provide(injector, func(i do.Injector) (adapter.ReplayReader, error) {
+		return infra.NewReplayReader(i)
+	})
+	do.Provide(injector, func(i do.Injector) (adapter.ClanClient, error) {
+		return infra.NewClanClient(i)
+	})
+	do.Provide(injector, func(i do.Injector) (adapter.GithubClient, error) {
+		return infra.NewGithubClient(i)
+	})
+	do.Provide(injector, func(i do.Injector) (adapter.NumbersClient, error) {
+		return infra.NewNumbersClient(i)
+	})
+	do.Provide(injector, func(i do.Injector) (adapter.WargamingClient, error) {
+		return infra.NewWargamingClient(i)
+	})
+	do.Provide(injector, func(i do.Injector) (adapter.Logger, error) {
+		return infra.NewLogger(i)
+	})
+	do.ProvideNamed(injector, "alert-discord-client", func(i do.Injector) (adapter.DiscordClient, error) {
+		return infra.NewDiscordClient(
+			a.config.DiscordClient.AlertWebhookURL,
+			a.config.DiscordClient.RetryCount,
+			a.config.DiscordClient.Timeout,
+		)
+	})
+	do.ProvideNamed(injector, "info-discord-client", func(i do.Injector) (adapter.DiscordClient, error) {
+		return infra.NewDiscordClient(
+			a.config.DiscordClient.InfoWebhookURL,
+			a.config.DiscordClient.RetryCount,
+			a.config.DiscordClient.Timeout,
+		)
+	})
+
+	// service
+	do.Provide(injector, usecase.NewStatsService)
+	do.Provide(injector, usecase.NewClanService)
+	do.Provide(injector, usecase.NewBadgeService)
+
+	// usecase
+	do.Provide(injector, usecase.NewPrefetch)
+	do.Provide(injector, usecase.NewFetchBattle)
+	do.Provide(injector, usecase.NewPollMatch)
+	do.Provide(injector, usecase.NewInstallPathSetting)
+	do.Provide(injector, usecase.NewUpdateCheck)
+	do.Provide(injector, usecase.NewLoadPref)
+	do.Provide(injector, usecase.NewSavePref)
+
+	return injector
+}
+
+func (a *App) isAlreadyRunning() bool {
 	ownPid := os.Getpid()
 	ownPidInfo, err := ps.FindProcess(ownPid)
 	if err != nil {
