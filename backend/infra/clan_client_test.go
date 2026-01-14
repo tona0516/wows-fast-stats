@@ -23,11 +23,10 @@ func TestClanClient_ClanAutoComplete(t *testing.T) {
 		expected := data.ClanAutocomplete{
 			SearchAutocompleteResult: []struct {
 				HexColor string      `json:"hex_color"`
-				Tag      string      `json:"tag"`
 				ID       data.ClanID `json:"id"`
 			}{
-				{HexColor: "#000000", Tag: "TEST", ID: 0},
-				{HexColor: "#000001", Tag: "TEST2", ID: 1},
+				{HexColor: "#000000", ID: 0},
+				{HexColor: "#000001", ID: 1},
 			},
 		}
 		server := simpleMockServer(t, 200, expected)

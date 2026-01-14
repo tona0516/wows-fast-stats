@@ -3,7 +3,6 @@ package data
 type ClanAutocomplete struct {
 	SearchAutocompleteResult []struct {
 		HexColor string `json:"hex_color"`
-		Tag      string `json:"tag"`
 		ID       ClanID `json:"id"`
 	} `json:"search_autocomplete_result"`
 }

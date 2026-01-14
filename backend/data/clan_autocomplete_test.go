@@ -12,11 +12,10 @@ func TestClanAutocomplete_HexColor(t *testing.T) {
 	instance := ClanAutocomplete{
 		SearchAutocompleteResult: []struct {
 			HexColor string `json:"hex_color"`
-			Tag      string `json:"tag"`
 			ID       ClanID `json:"id"`
 		}{
-			{HexColor: "#000000", Tag: "TEST", ID: 1},
-			{HexColor: "#000001", Tag: "TEST2", ID: 2},
+			{HexColor: "#000000", ID: 1},
+			{HexColor: "#000001", ID: 2},
 		},
 	}
 
