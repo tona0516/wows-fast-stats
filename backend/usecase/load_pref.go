@@ -1,8 +1,6 @@
 package usecase
 
 import (
-	"errors"
-	"io/fs"
 	"wfs/backend/adapter"
 	"wfs/backend/data"
 
@@ -23,10 +21,11 @@ func NewLoadPref(i do.Injector) (*LoadPref, error) {
 func (lp *LoadPref) Invoke() (data.Pref, error) {
 	config, err := lp.configStore.Pref()
 	if err != nil {
-		if errors.Is(err, fs.ErrNotExist) {
+		if failure.Is(err, data.ErrJSONNotFound) {
 			return data.DefaultPref(), nil
 		}
-		return data.Pref{}, failure.Wrap(err)
+
+		return data.Pref{}, err
 	}
 
 	return config, nil

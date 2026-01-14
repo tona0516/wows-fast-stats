@@ -8,7 +8,6 @@ import (
 	"wfs/backend/data"
 
 	"github.com/abadojack/whatlanggo"
-	"github.com/morikuni/failure"
 	"github.com/samber/do/v2"
 	"golang.org/x/sync/errgroup"
 )
@@ -33,18 +32,18 @@ func (s *clanService) fetchAll(
 
 	clansAccountInfo, err := s.wargamingClient.ClansAccountInfo(ctx, accountIDs)
 	if err != nil {
-		return nil, failure.Wrap(err)
+		return nil, err
 	}
 
 	clanIDs := clansAccountInfo.ClanIDs()
 	clansInfo, err := s.wargamingClient.ClansInfo(ctx, clanIDs)
 	if err != nil {
-		return nil, failure.Wrap(err)
+		return nil, err
 	}
 
 	colorMap, err := s.fetchClanColor(ctx, clansInfo)
 	if err != nil {
-		return nil, failure.Wrap(err)
+		return nil, err
 	}
 
 	languageMap := s.clanLanguage(clansInfo)
@@ -95,7 +94,7 @@ func (s *clanService) fetchClanColor(
 	}
 
 	if err := eg.Wait(); err != nil {
-		return nil, failure.Wrap(err)
+		return nil, err
 	}
 
 	return result, nil

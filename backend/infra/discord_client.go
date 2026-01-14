@@ -3,6 +3,7 @@ package infra
 import (
 	"context"
 	"time"
+	"wfs/backend/data"
 
 	"github.com/imroc/req/v3"
 	"github.com/morikuni/failure"
@@ -32,11 +33,14 @@ func (c *DiscordClient) Comment(ctx context.Context, message string) error {
 		SetBody(map[string]string{"content": message}).
 		Post("")
 	if err != nil {
-		return failure.Wrap(err)
+		return failure.Translate(err, data.ErrDiscordAPI)
 	}
 
 	if resp.IsErrorState() {
-		return failure.Wrap(ErrErrorResponse)
+		return failure.New(data.ErrDiscordAPI, failure.Context{
+			"status_code": resp.Status,
+			"body":        resp.String(),
+		})
 	}
 
 	return nil

@@ -35,11 +35,14 @@ func (c *ClanClient) ClanAutoComplete(ctx context.Context, search string) (data.
 		}).
 		Get("/api/search/autocomplete/")
 	if err != nil {
-		return result, failure.Wrap(err)
+		return result, failure.Translate(err, data.ErrClanAPI)
 	}
 
 	if resp.IsErrorState() {
-		return result, failure.Wrap(ErrErrorResponse)
+		return result, failure.New(data.ErrClanAPI, failure.Context{
+			"status_code": resp.Status,
+			"body":        resp.String(),
+		})
 	}
 
 	return result, nil

@@ -2,7 +2,6 @@ package data
 
 import (
 	"encoding/json"
-	"errors"
 	"strconv"
 
 	"github.com/morikuni/failure"
@@ -13,8 +12,6 @@ const (
 	NumbersAvgFrags  = "average_frags"
 	NumbersWinrate   = "win_rate"
 )
-
-var ErrNSExpectedStatsNoDataKey = errors.New("NSExpectedStats: no data key")
 
 type NSExpectedStats struct {
 	Data NSExpectedStatsData `json:"data"`
@@ -31,12 +28,12 @@ type NSExpectedStatsValues struct {
 func (n *NSExpectedStats) UnmarshalJSON(b []byte) error {
 	root := make(map[string]any)
 	if err := json.Unmarshal(b, &root); err != nil {
-		return failure.Wrap(err)
+		return failure.Translate(err, ErrInvalidExpectedStats)
 	}
 
 	data, ok := root["data"].(map[string]any)
 	if !ok {
-		return failure.Wrap(ErrNSExpectedStatsNoDataKey)
+		return failure.New(ErrInvalidExpectedStats)
 	}
 
 	es := make(NSExpectedStatsData)

@@ -3,14 +3,13 @@ package usecase
 import (
 	"context"
 	"crypto/sha256"
-	"errors"
 	"fmt"
-	"io/fs"
 	"time"
 	"wfs/backend/adapter"
 	"wfs/backend/config"
 	"wfs/backend/data"
 
+	"github.com/morikuni/failure"
 	"github.com/samber/do/v2"
 )
 
@@ -38,7 +37,7 @@ func (pm *PollMatch) Invoke(
 ) {
 	pref, err := pm.configStore.Pref()
 	if err != nil {
-		if errors.Is(err, fs.ErrNotExist) {
+		if failure.Is(err, data.ErrJSONNotFound) {
 			pm.emitNeedInitialSetting(ctx)
 			return
 		}
@@ -64,7 +63,7 @@ func (pm *PollMatch) Invoke(
 
 			tempArenaInfo, err := pm.replayReader.TempArenaInfo(pref.InstallPath)
 			if err != nil {
-				if errors.Is(err, fs.ErrNotExist) {
+				if failure.Is(err, data.ErrTempArenaInfoNotFound) {
 					continue
 				}
 

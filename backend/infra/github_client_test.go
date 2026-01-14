@@ -8,6 +8,7 @@ import (
 	"wfs/backend/config"
 	"wfs/backend/data"
 
+	"github.com/morikuni/failure"
 	"github.com/samber/do/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -64,7 +65,7 @@ func TestGithubClient_LatestRelease(t *testing.T) {
 		require.NoError(t, err)
 		_, err = instance.LatestRelease(context.Background())
 
-		assert.Error(t, err, ErrErrorResponse)
+		assert.True(t, failure.Is(err, data.ErrGithubAPI))
 	})
 
 	t.Run("異常系_タイムアウト", func(t *testing.T) {

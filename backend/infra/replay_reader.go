@@ -28,7 +28,7 @@ func (r *ReplayReader) TempArenaInfo(installPath string) (data.TempArenaInfo, er
 	tempArenaInfoPaths := []string{}
 	root := filepath.Join(installPath, r.replayDir)
 	if _, err := os.Stat(root); err != nil {
-		return tempArenaInfo, failure.Wrap(err)
+		return tempArenaInfo, failure.Translate(err, data.ErrTempArenaInfoNotFound)
 	}
 
 	err := filepath.WalkDir(root, func(path string, info fs.DirEntry, err error) error {
@@ -48,7 +48,7 @@ func (r *ReplayReader) TempArenaInfo(installPath string) (data.TempArenaInfo, er
 		return nil
 	})
 	if err != nil {
-		return tempArenaInfo, failure.Wrap(err)
+		return tempArenaInfo, failure.Translate(err, data.ErrTempArenaInfoSearch)
 	}
 
 	return r.decideTempArenaInfo(tempArenaInfoPaths)
@@ -59,7 +59,7 @@ func (r *ReplayReader) decideTempArenaInfo(paths []string) (data.TempArenaInfo, 
 	size := len(paths)
 
 	if size == 0 {
-		return result, failure.Wrap(fs.ErrNotExist)
+		return result, failure.New(data.ErrTempArenaInfoNotFound)
 	}
 
 	if size == 1 {
@@ -79,7 +79,7 @@ func (r *ReplayReader) decideTempArenaInfo(paths []string) (data.TempArenaInfo, 
 	}
 
 	if latest.Unixtime() == 0 {
-		return result, failure.Wrap(fs.ErrNotExist)
+		return result, failure.New(data.ErrTempArenaInfoNotFound)
 	}
 
 	return latest, nil

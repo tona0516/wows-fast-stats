@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"wfs/backend/adapter"
+	"wfs/backend/data"
 
 	"github.com/morikuni/failure"
 	"github.com/samber/do/v2"
@@ -27,7 +28,7 @@ func NewInstallPathSetting(i do.Injector) (*InstallPathSetting, error) {
 func (s *InstallPathSetting) Invoke(ctx context.Context) (bool, error) {
 	selected, err := s.wails.OpenDirectoryDialog(ctx)
 	if err != nil {
-		return false, failure.Wrap(err)
+		return false, err
 	}
 
 	if selected == "" {
@@ -35,18 +36,18 @@ func (s *InstallPathSetting) Invoke(ctx context.Context) (bool, error) {
 	}
 
 	if _, err := os.Stat(filepath.Join(selected, s.gameClientFile)); err != nil {
-		return false, failure.Wrap(err)
+		return false, failure.Translate(err, data.ErrInvalidInstallPath)
 	}
 
 	config, err := s.configStore.Pref()
 	if err != nil {
-		return false, failure.Wrap(err)
+		return false, err
 	}
 
 	config.InstallPath = selected
 
 	if err = s.configStore.SetPref(config); err != nil {
-		return false, failure.Wrap(err)
+		return false, err
 	}
 
 	return true, nil

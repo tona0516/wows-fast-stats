@@ -31,10 +31,13 @@ func (c *GithubClient) LatestRelease(ctx context.Context) (data.GHLatestRelease,
 		SetSuccessResult(&result).
 		Get("/repos/tona0516/wows-fast-stats/releases/latest")
 	if err != nil {
-		return result, failure.Wrap(err)
+		return result, failure.Translate(err, data.ErrGithubAPI)
 	}
 	if resp.IsErrorState() {
-		return result, failure.Wrap(ErrErrorResponse)
+		return result, failure.New(data.ErrGithubAPI, failure.Context{
+			"status_code": resp.Status,
+			"body":        resp.String(),
+		})
 	}
 
 	return result, nil

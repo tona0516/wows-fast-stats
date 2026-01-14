@@ -3,7 +3,6 @@ package infra
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"reflect"
 	"slices"
 	"strconv"
@@ -44,14 +43,12 @@ func NewWargamingClient(i do.Injector) (*WargamingClient, error) {
 				}
 
 				var body data.WGResponseCommon[any]
-				if err := json.Unmarshal(resp.Bytes(), &body); err == nil {
-					err := convertError(body.Status, body.Error.Message)
-					if errors.Is(err, ErrTemporaryUnavaillalble) {
-						return true
-					}
+				if err := json.Unmarshal(resp.Bytes(), &body); err != nil {
+					return true
 				}
 
-				return false
+				err = handleError(resp, err, body)
+				return failure.Is(err, data.ErrWGAPITemporaryUnavailable)
 			}).
 			OnBeforeRequest(func(client *req.Client, req *req.Request) error {
 				limiter.Take()
@@ -72,7 +69,7 @@ func (c *WargamingClient) AccountInfo(
 		strAccountIDs[i] = strconv.Itoa(int(v))
 	}
 
-	res, err := request[data.WGAccountInfo](
+	return request[data.WGAccountInfo](
 		ctx,
 		c,
 		"/wows/account/info/",
@@ -87,15 +84,13 @@ func (c *WargamingClient) AccountInfo(
 			}, ","),
 		},
 	)
-
-	return res, err
 }
 
 func (c *WargamingClient) AccountList(
 	ctx context.Context,
 	accountNames []string,
 ) (data.WGAccountList, error) {
-	res, err := request[data.WGAccountList](
+	return request[data.WGAccountList](
 		ctx,
 		c,
 		"/wows/account/list/",
@@ -105,8 +100,6 @@ func (c *WargamingClient) AccountList(
 			"type":   "exact",
 		},
 	)
-
-	return res, err
 }
 
 func (c *WargamingClient) ClansAccountInfo(
@@ -118,7 +111,7 @@ func (c *WargamingClient) ClansAccountInfo(
 		strAccountIDs[i] = strconv.Itoa(int(v))
 	}
 
-	res, err := request[data.WGClansAccountInfo](
+	return request[data.WGClansAccountInfo](
 		ctx,
 		c,
 		"/wows/clans/accountinfo/",
@@ -127,8 +120,6 @@ func (c *WargamingClient) ClansAccountInfo(
 			"fields":     c.fieldQuery(reflect.TypeFor[data.WGClansAccountInfoData]()),
 		},
 	)
-
-	return res, err
 }
 
 func (c *WargamingClient) ClansInfo(
@@ -144,7 +135,7 @@ func (c *WargamingClient) ClansInfo(
 		return data.WGClansInfo{}, nil
 	}
 
-	res, err := request[data.WGClansInfo](
+	return request[data.WGClansInfo](
 		ctx,
 		c,
 		"/wows/clans/info/",
@@ -153,15 +144,13 @@ func (c *WargamingClient) ClansInfo(
 			"fields":  c.fieldQuery(reflect.TypeFor[data.WGClansInfoData]()),
 		},
 	)
-
-	return res, err
 }
 
 func (c *WargamingClient) ShipsStats(
 	ctx context.Context,
 	accountID data.AccountID,
 ) (data.WGShipsStats, error) {
-	res, err := request[data.WGShipsStats](
+	return request[data.WGShipsStats](
 		ctx,
 		c,
 		"/wows/ships/stats/",
@@ -176,15 +165,13 @@ func (c *WargamingClient) ShipsStats(
 			}, ","),
 		},
 	)
-
-	return res, err
 }
 
 func (c *WargamingClient) EncycShips(
 	ctx context.Context,
 	pageNo int,
 ) (data.WGEncycShips, error) {
-	res, err := request[data.WGEncycShips](
+	return request[data.WGEncycShips](
 		ctx,
 		c,
 		"/wows/encyclopedia/ships/",
@@ -194,12 +181,10 @@ func (c *WargamingClient) EncycShips(
 			"page_no":  strconv.Itoa(pageNo),
 		},
 	)
-
-	return res, err
 }
 
 func (c *WargamingClient) BattleArenas(ctx context.Context) (data.WGBattleArenas, error) {
-	res, err := request[data.WGBattleArenas](
+	return request[data.WGBattleArenas](
 		ctx,
 		c,
 		"/wows/encyclopedia/battlearenas/",
@@ -208,12 +193,10 @@ func (c *WargamingClient) BattleArenas(ctx context.Context) (data.WGBattleArenas
 			"language": "ja",
 		},
 	)
-
-	return res, err
 }
 
 func (c *WargamingClient) BattleTypes(ctx context.Context) (data.WGBattleTypes, error) {
-	res, err := request[data.WGBattleTypes](
+	return request[data.WGBattleTypes](
 		ctx,
 		c,
 		"/wows/encyclopedia/battletypes/",
@@ -222,15 +205,13 @@ func (c *WargamingClient) BattleTypes(ctx context.Context) (data.WGBattleTypes, 
 			"language": "ja",
 		},
 	)
-
-	return res, err
 }
 
 func (c *WargamingClient) ShipsBadges(
 	ctx context.Context,
 	accountID data.AccountID,
 ) (data.WGShipsBadges, error) {
-	res, err := request[data.WGShipsBadges](
+	return request[data.WGShipsBadges](
 		ctx,
 		c,
 		"/wows/ships/badges/",
@@ -239,8 +220,6 @@ func (c *WargamingClient) ShipsBadges(
 			"fields":     c.fieldQuery(reflect.TypeFor[data.WGShipsBadgesData]()),
 		},
 	)
-
-	return res, err
 }
 
 func (c *WargamingClient) fieldQuery(target reflect.Type) string {
@@ -306,31 +285,44 @@ func request[T data.WGResponse](
 	}
 
 	resp, err := client.Get(path)
+	err = handleError(resp, err, result)
 	if err != nil {
-		return result, failure.Wrap(err)
-	}
-
-	if resp.IsErrorState() {
-		return result, failure.Wrap(ErrErrorResponse)
-	}
-
-	if err := convertError(result.GetStatus(), result.GetError().Message); err != nil {
-		return result, failure.Wrap(err)
+		return result, err
 	}
 
 	return result, nil
 }
 
-func convertError(status string, message string) error {
-	if status == "ok" {
-		return nil
+func handleError[T data.WGResponse](resp *req.Response, err error, result T) error {
+	if err != nil {
+		return failure.Translate(err, data.ErrWGAPI)
 	}
 
-	// Note:
-	// https://developers.wargaming.net/documentation/guide/getting-started/#common-errors
-	if slices.Contains(temporaryUnavaillalbleMessages, message) {
-		return failure.Wrap(ErrTemporaryUnavaillalble)
+	if resp.IsErrorState() {
+		return failure.New(data.ErrWGAPI, failure.Context{
+			"status_code": resp.Status,
+			"body":        string(resp.Bytes()),
+		})
 	}
 
-	return failure.Wrap(ErrErrorResponse)
+	errResp := result.GetError()
+	errCtx := failure.Context{
+		"status":        result.GetStatus(),
+		"error.code":    strconv.Itoa(errResp.Code),
+		"error.message": errResp.Message,
+		"error.field":   errResp.Field,
+		"error.value":   errResp.Value,
+	}
+
+	if result.GetStatus() == "error" {
+		// Note:
+		// https://developers.wargaming.net/documentation/guide/getting-started/#common-errors
+		if slices.Contains(temporaryUnavaillalbleMessages, errResp.Message) {
+			return failure.New(data.ErrWGAPITemporaryUnavailable, errCtx)
+		}
+
+		return failure.New(data.ErrWGAPI, errCtx)
+	}
+
+	return nil
 }

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"testing"
 
+	"github.com/morikuni/failure"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -81,7 +82,7 @@ func TestNSExpectedStats_UnmarshalJSON(t *testing.T) {
 
 		for _, input := range inputs {
 			err := json.Unmarshal([]byte(input), &NSExpectedStats{})
-			assert.ErrorIs(t, err, ErrNSExpectedStatsNoDataKey)
+			assert.True(t, failure.Is(err, ErrInvalidExpectedStats))
 		}
 	})
 }

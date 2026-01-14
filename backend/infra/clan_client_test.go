@@ -8,6 +8,7 @@ import (
 	"wfs/backend/config"
 	"wfs/backend/data"
 
+	"github.com/morikuni/failure"
 	"github.com/samber/do/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -74,7 +75,7 @@ func TestClanClient_ClanAutoComplete(t *testing.T) {
 		require.NoError(t, err)
 		_, err = instance.ClanAutoComplete(context.Background(), "")
 
-		assert.Error(t, err, ErrErrorResponse)
+		assert.True(t, failure.Is(err, data.ErrClanAPI))
 	})
 
 	t.Run("異常系_タイムアウト", func(t *testing.T) {

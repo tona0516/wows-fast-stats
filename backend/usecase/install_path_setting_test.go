@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"context"
-	"errors"
 	"os"
 	"path/filepath"
 	"testing"
@@ -10,6 +9,7 @@ import (
 	"wfs/backend/data"
 	"wfs/backend/mock"
 
+	"github.com/morikuni/failure"
 	"github.com/samber/do/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -81,7 +81,7 @@ func TestInstallPathSetting_Invoke(t *testing.T) {
 		mockConfigStore.EXPECT().Pref().Times(0)
 		mockConfigStore.EXPECT().SetPref(gomock.Any()).Times(0)
 
-		mockWails.EXPECT().OpenDirectoryDialog(gomock.Any()).Return("", errors.New("dialog error"))
+		mockWails.EXPECT().OpenDirectoryDialog(gomock.Any()).Return("", failure.New(data.ErrWailsOpenDirectoryDialog))
 
 		injector := do.New()
 		do.Provide(injector, func(i do.Injector) (adapter.PrefStore, error) {
@@ -130,7 +130,7 @@ func TestInstallPathSetting_Invoke(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		mockConfigStore := mock.NewMockPrefStore(ctrl)
 		mockWails := mock.NewMockWails(ctrl)
-		expectedErr := errors.New("user config read error")
+		expectedErr := failure.New(data.ErrJSONRead)
 		mockConfigStore.EXPECT().Pref().Return(data.Pref{}, expectedErr)
 		mockConfigStore.EXPECT().SetPref(gomock.Any()).Times(0)
 
@@ -166,7 +166,7 @@ func TestInstallPathSetting_Invoke(t *testing.T) {
 
 		gomock.InOrder(
 			mockConfigStore.EXPECT().Pref().Return(originalConfig, nil),
-			mockConfigStore.EXPECT().SetPref(gomock.Any()).Return(errors.New("user config write error")),
+			mockConfigStore.EXPECT().SetPref(gomock.Any()).Return(failure.New(data.ErrJSONWrite)),
 		)
 
 		tempDir := createWorldOfWarshipsExeDir(t)

@@ -2,13 +2,13 @@ package usecase
 
 import (
 	"context"
-	"errors"
 	"testing"
 	"wfs/backend/adapter"
 	"wfs/backend/config"
 	"wfs/backend/data"
 	"wfs/backend/mock"
 
+	"github.com/morikuni/failure"
 	"github.com/samber/do/v2"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
@@ -76,7 +76,8 @@ func TestUpdateCheck_Invoke(t *testing.T) {
 
 		ctrl := gomock.NewController(t)
 		mockGithubClient := mock.NewMockGithubClient(ctrl)
-		mockGithubClient.EXPECT().LatestRelease(gomock.Any()).Return(data.GHLatestRelease{}, errors.New("some error"))
+		expectedErr := failure.New(data.ErrGithubAPI)
+		mockGithubClient.EXPECT().LatestRelease(gomock.Any()).Return(data.GHLatestRelease{}, expectedErr)
 
 		injector := do.New()
 		do.ProvideValue(injector, config.Config{

@@ -2,8 +2,6 @@ package usecase
 
 import (
 	"context"
-	"errors"
-	"io/fs"
 	"slices"
 	"sync"
 	"testing"
@@ -13,6 +11,7 @@ import (
 	"wfs/backend/data"
 	"wfs/backend/mock"
 
+	"github.com/morikuni/failure"
 	"github.com/samber/do/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -32,7 +31,7 @@ func TestPollMatch_Invoke(t *testing.T) {
 			setupMock: func(m *mock.MockPrefStore) {
 				m.EXPECT().
 					Pref().
-					Return(data.Pref{}, fs.ErrNotExist)
+					Return(data.Pref{}, failure.New(data.ErrJSONNotFound))
 			},
 			expectEventNames: []string{EventNeedInitialSetting},
 		},
@@ -41,7 +40,7 @@ func TestPollMatch_Invoke(t *testing.T) {
 			setupMock: func(m *mock.MockPrefStore) {
 				m.EXPECT().
 					Pref().
-					Return(data.Pref{}, errors.New("read error"))
+					Return(data.Pref{}, failure.New(data.ErrJSONRead))
 			},
 			expectEventNames: []string{EventErr},
 		},

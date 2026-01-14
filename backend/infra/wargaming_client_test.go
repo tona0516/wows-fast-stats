@@ -12,6 +12,7 @@ import (
 	"wfs/backend/config"
 	"wfs/backend/data"
 
+	"github.com/morikuni/failure"
 	"github.com/samber/do/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -115,7 +116,7 @@ func TestWargamingClient_AccountInfo(t *testing.T) {
 		require.NoError(t, err)
 		_, err = instance.AccountInfo(context.Background(), []data.AccountID{123, 456})
 
-		assert.Error(t, err, ErrErrorResponse)
+		assert.True(t, failure.Is(err, data.ErrWGAPI))
 		assert.Equal(t, 1, calls)
 	})
 
@@ -223,7 +224,7 @@ func TestWargamingClient_AccountInfo(t *testing.T) {
 			require.NoError(t, err)
 			_, err = instance.AccountInfo(context.Background(), []data.AccountID{123, 456})
 
-			assert.Error(t, err, ErrTemporaryUnavaillalble)
+			assert.True(t, failure.Is(err, data.ErrWGAPITemporaryUnavailable))
 			assert.Equal(t, retry+1, calls)
 		}
 	})

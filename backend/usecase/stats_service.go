@@ -7,7 +7,6 @@ import (
 	"wfs/backend/adapter"
 	"wfs/backend/data"
 
-	"github.com/morikuni/failure"
 	"github.com/samber/do/v2"
 	"golang.org/x/sync/errgroup"
 )
@@ -34,7 +33,7 @@ func (s *statsService) fetchAll(
 		eg.Go(func() error {
 			resp, err := s.wargamingClient.ShipsStats(egCtx, accountID)
 			if err != nil {
-				return failure.Wrap(err)
+				return err
 			}
 
 			mu.Lock()
@@ -50,7 +49,7 @@ func (s *statsService) fetchAll(
 	}
 
 	if err := eg.Wait(); err != nil {
-		return nil, failure.Wrap(err)
+		return nil, err
 	}
 
 	return result, nil

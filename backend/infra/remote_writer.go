@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"wfs/backend/adapter"
 
 	"github.com/rs/zerolog"
@@ -31,7 +32,7 @@ func (w *remoteWriter) WriteLevel(level zerolog.Level, p []byte) (int, error) {
 	}
 	err := client.Comment(context.Background(), formatted)
 	if err != nil {
-		fmt.Printf("Failed to send to discord: %s\n", err.Error())
+		log.Printf("Failed to send to discord: %s\n", err.Error())
 	}
 
 	return len(p), nil

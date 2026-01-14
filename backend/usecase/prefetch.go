@@ -6,7 +6,6 @@ import (
 	"wfs/backend/adapter"
 	"wfs/backend/data"
 
-	"github.com/morikuni/failure"
 	"github.com/samber/do/v2"
 	"golang.org/x/sync/errgroup"
 )
@@ -56,7 +55,7 @@ func (p *Prefetch) Invoke(ctx context.Context) (*data.PrefetchResult, error) {
 	})
 
 	if err := eg.Wait(); err != nil {
-		return nil, failure.Wrap(err)
+		return nil, err
 	}
 
 	return &data.PrefetchResult{
@@ -73,7 +72,7 @@ func (p *Prefetch) fetchWarships(ctx context.Context) (data.Warships, error) {
 	eg.Go(func() error {
 		resp, err := p.fetchEncycShips(egCtx)
 		if err != nil {
-			return failure.Wrap(err)
+			return err
 		}
 		encycShips = resp
 		return nil
@@ -83,7 +82,7 @@ func (p *Prefetch) fetchWarships(ctx context.Context) (data.Warships, error) {
 	eg.Go(func() error {
 		resp, err := p.numbersClient.ExpectedStats(egCtx)
 		if err != nil {
-			return failure.Wrap(err)
+			return err
 		}
 		expectedStats = resp
 		return nil
@@ -92,7 +91,7 @@ func (p *Prefetch) fetchWarships(ctx context.Context) (data.Warships, error) {
 	if err := eg.Wait(); err != nil {
 		cache, errCache := p.cacheStore.Warships()
 		if errCache != nil {
-			return nil, failure.Wrap(err)
+			return nil, err
 		}
 
 		return cache, nil
@@ -109,7 +108,7 @@ func (p *Prefetch) fetchBattleArenas(ctx context.Context) (map[int]string, error
 	if err != nil {
 		cache, errCache := p.cacheStore.BattleArenas()
 		if errCache != nil {
-			return nil, failure.Wrap(err)
+			return nil, err
 		}
 		return cache, nil
 	}
@@ -129,7 +128,7 @@ func (p *Prefetch) fetchBattleTypes(ctx context.Context) (map[string]string, err
 	if err != nil {
 		cache, errCache := p.cacheStore.BattleTypes()
 		if errCache != nil {
-			return nil, failure.Wrap(err)
+			return nil, err
 		}
 		return cache, nil
 	}
@@ -152,7 +151,7 @@ func (p *Prefetch) fetchEncycShips(ctx context.Context) (map[int]data.WGEncycShi
 		page int) (int, error) {
 		res, err := p.wargamingClient.EncycShips(ctx, page)
 		if err != nil {
-			return 0, failure.Wrap(err)
+			return 0, err
 		}
 
 		mu.Lock()
@@ -164,7 +163,7 @@ func (p *Prefetch) fetchEncycShips(ctx context.Context) (map[int]data.WGEncycShi
 
 	pageTotal, err := fetch(ctx, 1)
 	if err != nil {
-		return nil, failure.Wrap(err)
+		return nil, err
 	}
 
 	eg, egCtx := errgroup.WithContext(ctx)
@@ -173,14 +172,14 @@ func (p *Prefetch) fetchEncycShips(ctx context.Context) (map[int]data.WGEncycShi
 		eg.Go(func() error {
 			_, err := fetch(egCtx, i)
 			if err != nil {
-				return failure.Wrap(err)
+				return err
 			}
 			return nil
 		})
 	}
 
 	if err := eg.Wait(); err != nil {
-		return nil, failure.Wrap(err)
+		return nil, err
 	}
 
 	return result, nil

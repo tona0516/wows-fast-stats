@@ -33,15 +33,18 @@ func (c *NumbersClient) ExpectedStats(ctx context.Context) (data.NSExpectedStats
 		SetContext(ctx).
 		Get("/personal/rating/expected/json/")
 	if err != nil {
-		return result, failure.Wrap(err)
+		return result, failure.Translate(err, data.ErrNumbersAPI)
 	}
 
 	if resp.IsErrorState() {
-		return result, failure.Wrap(ErrErrorResponse)
+		return result, failure.New(data.ErrNumbersAPI, failure.Context{
+			"status_code": resp.Status,
+			"body":        resp.String(),
+		})
 	}
 
 	if err := json.Unmarshal(resp.Bytes(), &result); err != nil {
-		return result, failure.Wrap(err)
+		return result, failure.Translate(err, data.ErrNumbersAPI)
 	}
 
 	return result, nil

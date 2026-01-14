@@ -5,8 +5,10 @@ import (
 	"testing"
 	"wfs/backend/adapter"
 	"wfs/backend/config"
+	"wfs/backend/data"
 	"wfs/backend/mock"
 
+	"github.com/morikuni/failure"
 	"github.com/rs/zerolog"
 	"github.com/samber/do/v2"
 	"github.com/stretchr/testify/assert"
@@ -143,7 +145,8 @@ func TestLogger_Info_DicordError(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	mockInfoDiscord := mock.NewMockDiscordClient(ctrl)
-	mockInfoDiscord.EXPECT().Comment(gomock.Any(), gomock.Any()).Return(errors.New("discord error"))
+	expectedErr := failure.New(data.ErrDiscordAPI)
+	mockInfoDiscord.EXPECT().Comment(gomock.Any(), gomock.Any()).Return(expectedErr)
 
 	injector := do.New()
 	do.ProvideValue(injector, config.Config{
@@ -240,7 +243,8 @@ func TestLogger_Error_DicordError(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	mockAlertDiscord := mock.NewMockDiscordClient(ctrl)
-	mockAlertDiscord.EXPECT().Comment(gomock.Any(), gomock.Any()).Return(errors.New("discord error"))
+	expectedErr := failure.New(data.ErrDiscordAPI)
+	mockAlertDiscord.EXPECT().Comment(gomock.Any(), gomock.Any()).Return(expectedErr)
 
 	injector := do.New()
 	do.ProvideValue(injector, config.Config{
@@ -254,10 +258,10 @@ func TestLogger_Error_DicordError(t *testing.T) {
 			ConfigDir: t.TempDir(),
 		},
 	})
-	do.ProvideNamed[adapter.DiscordClient](injector, "alert-discord-client", func(i do.Injector) (adapter.DiscordClient, error) {
+	do.ProvideNamed(injector, "alert-discord-client", func(i do.Injector) (adapter.DiscordClient, error) {
 		return mockAlertDiscord, nil
 	})
-	do.ProvideNamed[adapter.DiscordClient](injector, "info-discord-client", func(i do.Injector) (adapter.DiscordClient, error) {
+	do.ProvideNamed(injector, "info-discord-client", func(i do.Injector) (adapter.DiscordClient, error) {
 		return (*mock.MockDiscordClient)(nil), nil
 	})
 	instance, err := NewLogger(injector)

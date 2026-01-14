@@ -8,6 +8,7 @@ import (
 	"wfs/backend/config"
 	"wfs/backend/data"
 
+	"github.com/morikuni/failure"
 	"github.com/samber/do/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -89,7 +90,7 @@ func TestNumbersClient_ExpectedStats(t *testing.T) {
 		require.NoError(t, err)
 		_, err = instance.ExpectedStats(context.Background())
 
-		assert.Error(t, err, ErrErrorResponse)
+		assert.True(t, failure.Is(err, data.ErrNumbersAPI))
 	})
 
 	t.Run("異常系_タイムアウト", func(t *testing.T) {
