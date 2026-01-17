@@ -8,7 +8,7 @@ import (
 	"time"
 	"wfs/backend/adapter"
 	"wfs/backend/config"
-	"wfs/backend/data"
+	"wfs/backend/core"
 	"wfs/backend/mock"
 
 	"github.com/morikuni/failure"
@@ -31,7 +31,7 @@ func TestPollMatch_Invoke(t *testing.T) {
 			setupMock: func(m *mock.MockPrefStore) {
 				m.EXPECT().
 					Pref().
-					Return(data.Pref{}, failure.New(data.ErrJSONNotFound))
+					Return(core.Pref{}, failure.New(core.ErrJSONNotFound))
 			},
 			expectEventNames: []string{EventNeedInitialSetting},
 		},
@@ -40,14 +40,14 @@ func TestPollMatch_Invoke(t *testing.T) {
 			setupMock: func(m *mock.MockPrefStore) {
 				m.EXPECT().
 					Pref().
-					Return(data.Pref{}, failure.New(data.ErrJSONRead))
+					Return(core.Pref{}, failure.New(core.ErrJSONRead))
 			},
 			expectEventNames: []string{EventErr},
 		},
 		{
 			name: "InstallPathが空文字の場合",
 			setupMock: func(m *mock.MockPrefStore) {
-				pref := data.Pref{InstallPath: ""}
+				pref := core.Pref{InstallPath: ""}
 				m.EXPECT().
 					Pref().
 					Return(pref, nil)
@@ -101,7 +101,7 @@ func TestPollMatch_Invoke(t *testing.T) {
 			cancelCtx, cancel := context.WithTimeout(context.Background(), 300*time.Millisecond)
 			defer cancel()
 
-			channel := make(chan data.TempArenaInfo, 10)
+			channel := make(chan core.TempArenaInfo, 10)
 			go pm.Invoke(ctx, cancelCtx, channel)
 
 			// チャンネルのデータを受け取る（タイムアウトで終了）
@@ -129,13 +129,13 @@ func TestPollMatch_InvokeWithDataChange(t *testing.T) {
 	mockReplayReader := mock.NewMockReplayReader(ctrl)
 	mockWails := mock.NewMockWails(ctrl)
 
-	pref := data.Pref{InstallPath: "/path/to/install"}
+	pref := core.Pref{InstallPath: "/path/to/install"}
 	MockConfigStore.EXPECT().
 		Pref().
 		Return(pref, nil)
 
-	tempArenaInfo1 := data.TempArenaInfo{
-		Vehicles: []data.Vehicle{
+	tempArenaInfo1 := core.TempArenaInfo{
+		Vehicles: []core.Vehicle{
 			{ShipID: 1, Relation: 0, Name: "player1"},
 		},
 		DateTime:   "22.05.2023 12:34:56",
@@ -148,12 +148,12 @@ func TestPollMatch_InvokeWithDataChange(t *testing.T) {
 	callCount := 0
 	mockReplayReader.EXPECT().
 		TempArenaInfo("/path/to/install").
-		DoAndReturn(func(path string) (data.TempArenaInfo, error) {
+		DoAndReturn(func(path string) (core.TempArenaInfo, error) {
 			callCount++
 			if callCount > 2 {
 				// 3回目以降は異なるデータを返す
-				return data.TempArenaInfo{
-					Vehicles: []data.Vehicle{
+				return core.TempArenaInfo{
+					Vehicles: []core.Vehicle{
 						{ShipID: 2, Relation: 0, Name: "player1"},
 					},
 					DateTime:   "22.05.2023 12:35:00",
@@ -198,11 +198,11 @@ func TestPollMatch_InvokeWithDataChange(t *testing.T) {
 	cancelCtx, cancel := context.WithTimeout(context.Background(), 300*time.Millisecond)
 	defer cancel()
 
-	channel := make(chan data.TempArenaInfo, 10)
+	channel := make(chan core.TempArenaInfo, 10)
 	go pm.Invoke(ctx, cancelCtx, channel)
 
 	// チャンネルのデータを受け取る
-	receivedData := []data.TempArenaInfo{}
+	receivedData := []core.TempArenaInfo{}
 	<-cancelCtx.Done()
 	close(channel)
 	for data := range channel {

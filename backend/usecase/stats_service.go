@@ -5,7 +5,7 @@ import (
 	"context"
 	"sync"
 	"wfs/backend/adapter"
-	"wfs/backend/data"
+	"wfs/backend/core"
 
 	"github.com/samber/do/v2"
 	"golang.org/x/sync/errgroup"
@@ -23,9 +23,9 @@ func NewStatsService(i do.Injector) (*statsService, error) {
 
 func (s *statsService) fetchAll(
 	ctx context.Context,
-	accountIDs []data.AccountID,
-) (data.AllPlayerShipStats, error) {
-	result := make(data.AllPlayerShipStats)
+	accountIDs []core.AccountID,
+) (core.AllPlayerShipStats, error) {
+	result := make(core.AllPlayerShipStats)
 	eg, egCtx := errgroup.WithContext(ctx)
 
 	var mu sync.Mutex
@@ -37,7 +37,7 @@ func (s *statsService) fetchAll(
 			}
 
 			mu.Lock()
-			shipMap := make(data.PlayerShipStats)
+			shipMap := make(core.PlayerShipStats)
 			for _, ship := range resp.Data[accountID] {
 				shipMap[ship.ShipID] = ship
 			}

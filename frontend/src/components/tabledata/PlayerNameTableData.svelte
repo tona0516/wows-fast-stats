@@ -1,10 +1,10 @@
 <script lang="ts">
   import type { PlayerNameColumn } from "@libs/columns/PlayerNameColumn";
   import { ModalManager } from "@libs/ModalManager";
-  import type { data } from "@wails/go/models";
+  import type { core } from "@wails/go/models";
 
   export let column: PlayerNameColumn;
-  export let player: data.Player;
+  export let player: core.Player;
 
   $: clanTag = column.getClanTag(player);
   $: nationFlagClass = column.getNationFlagClass(player);

@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 	"wfs/backend/config"
-	"wfs/backend/data"
+	"wfs/backend/core"
 
 	"github.com/morikuni/failure"
 	"github.com/samber/do/v2"
@@ -52,14 +52,14 @@ func TestNumbersClient_ExpectedStats(t *testing.T) {
 		actual, err := instance.ExpectedStats(context.Background())
 
 		assert.NoError(t, err)
-		assert.Equal(t, data.NSExpectedStats{
-			Data: data.NSExpectedStatsData{
-				1234: data.NSExpectedStatsValues{
+		assert.Equal(t, core.NSExpectedStats{
+			Data: core.NSExpectedStatsData{
+				1234: core.NSExpectedStatsValues{
 					AverageDamageDealt: 50000,
 					AverageFrags:       1.2,
 					WinRate:            52.3,
 				},
-				5678: data.NSExpectedStatsValues{
+				5678: core.NSExpectedStatsValues{
 					AverageDamageDealt: 60000,
 					AverageFrags:       1.5,
 					WinRate:            56.8,
@@ -90,7 +90,7 @@ func TestNumbersClient_ExpectedStats(t *testing.T) {
 		require.NoError(t, err)
 		_, err = instance.ExpectedStats(context.Background())
 
-		assert.True(t, failure.Is(err, data.ErrNumbersAPI))
+		assert.True(t, failure.Is(err, core.ErrNumbersAPI))
 	})
 
 	t.Run("異常系_タイムアウト", func(t *testing.T) {

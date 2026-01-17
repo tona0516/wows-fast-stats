@@ -12,7 +12,7 @@ package mock
 import (
 	context "context"
 	reflect "reflect"
-	data "wfs/backend/data"
+	core "wfs/backend/core"
 
 	gomock "go.uber.org/mock/gomock"
 )
@@ -143,27 +143,27 @@ func (mr *MockCacheStoreMockRecorder) OwnIGN() *gomock.Call {
 }
 
 // SetBattleArenas mocks base method.
-func (m *MockCacheStore) SetBattleArenas(arg0 map[int]string) {
+func (m *MockCacheStore) SetBattleArenas(data map[int]string) {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "SetBattleArenas", arg0)
+	m.ctrl.Call(m, "SetBattleArenas", data)
 }
 
 // SetBattleArenas indicates an expected call of SetBattleArenas.
-func (mr *MockCacheStoreMockRecorder) SetBattleArenas(arg0 any) *gomock.Call {
+func (mr *MockCacheStoreMockRecorder) SetBattleArenas(data any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetBattleArenas", reflect.TypeOf((*MockCacheStore)(nil).SetBattleArenas), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetBattleArenas", reflect.TypeOf((*MockCacheStore)(nil).SetBattleArenas), data)
 }
 
 // SetBattleTypes mocks base method.
-func (m *MockCacheStore) SetBattleTypes(arg0 map[string]string) {
+func (m *MockCacheStore) SetBattleTypes(data map[string]string) {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "SetBattleTypes", arg0)
+	m.ctrl.Call(m, "SetBattleTypes", data)
 }
 
 // SetBattleTypes indicates an expected call of SetBattleTypes.
-func (mr *MockCacheStoreMockRecorder) SetBattleTypes(arg0 any) *gomock.Call {
+func (mr *MockCacheStoreMockRecorder) SetBattleTypes(data any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetBattleTypes", reflect.TypeOf((*MockCacheStore)(nil).SetBattleTypes), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetBattleTypes", reflect.TypeOf((*MockCacheStore)(nil).SetBattleTypes), data)
 }
 
 // SetOwnIGN mocks base method.
@@ -179,22 +179,22 @@ func (mr *MockCacheStoreMockRecorder) SetOwnIGN(ign any) *gomock.Call {
 }
 
 // SetWarships mocks base method.
-func (m *MockCacheStore) SetWarships(arg0 data.Warships) {
+func (m *MockCacheStore) SetWarships(data core.Warships) {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "SetWarships", arg0)
+	m.ctrl.Call(m, "SetWarships", data)
 }
 
 // SetWarships indicates an expected call of SetWarships.
-func (mr *MockCacheStoreMockRecorder) SetWarships(arg0 any) *gomock.Call {
+func (mr *MockCacheStoreMockRecorder) SetWarships(data any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetWarships", reflect.TypeOf((*MockCacheStore)(nil).SetWarships), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetWarships", reflect.TypeOf((*MockCacheStore)(nil).SetWarships), data)
 }
 
 // Warships mocks base method.
-func (m *MockCacheStore) Warships() (data.Warships, error) {
+func (m *MockCacheStore) Warships() (core.Warships, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Warships")
-	ret0, _ := ret[0].(data.Warships)
+	ret0, _ := ret[0].(core.Warships)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -230,10 +230,10 @@ func (m *MockPrefStore) EXPECT() *MockPrefStoreMockRecorder {
 }
 
 // Pref mocks base method.
-func (m *MockPrefStore) Pref() (data.Pref, error) {
+func (m *MockPrefStore) Pref() (core.Pref, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Pref")
-	ret0, _ := ret[0].(data.Pref)
+	ret0, _ := ret[0].(core.Pref)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -245,17 +245,17 @@ func (mr *MockPrefStoreMockRecorder) Pref() *gomock.Call {
 }
 
 // SetPref mocks base method.
-func (m *MockPrefStore) SetPref(arg0 data.Pref) error {
+func (m *MockPrefStore) SetPref(data core.Pref) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SetPref", arg0)
+	ret := m.ctrl.Call(m, "SetPref", data)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // SetPref indicates an expected call of SetPref.
-func (mr *MockPrefStoreMockRecorder) SetPref(arg0 any) *gomock.Call {
+func (mr *MockPrefStoreMockRecorder) SetPref(data any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetPref", reflect.TypeOf((*MockPrefStore)(nil).SetPref), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetPref", reflect.TypeOf((*MockPrefStore)(nil).SetPref), data)
 }
 
 // MockReplayReader is a mock of ReplayReader interface.
@@ -283,10 +283,10 @@ func (m *MockReplayReader) EXPECT() *MockReplayReaderMockRecorder {
 }
 
 // TempArenaInfo mocks base method.
-func (m *MockReplayReader) TempArenaInfo(installPath string) (data.TempArenaInfo, error) {
+func (m *MockReplayReader) TempArenaInfo(installPath string) (core.TempArenaInfo, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "TempArenaInfo", installPath)
-	ret0, _ := ret[0].(data.TempArenaInfo)
+	ret0, _ := ret[0].(core.TempArenaInfo)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -322,10 +322,10 @@ func (m *MockClanClient) EXPECT() *MockClanClientMockRecorder {
 }
 
 // ClanAutoComplete mocks base method.
-func (m *MockClanClient) ClanAutoComplete(ctx context.Context, search string) (data.ClanAutocomplete, error) {
+func (m *MockClanClient) ClanAutoComplete(ctx context.Context, search string) (core.ClanAutocomplete, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ClanAutoComplete", ctx, search)
-	ret0, _ := ret[0].(data.ClanAutocomplete)
+	ret0, _ := ret[0].(core.ClanAutocomplete)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -399,10 +399,10 @@ func (m *MockGithubClient) EXPECT() *MockGithubClientMockRecorder {
 }
 
 // LatestRelease mocks base method.
-func (m *MockGithubClient) LatestRelease(ctx context.Context) (data.GHLatestRelease, error) {
+func (m *MockGithubClient) LatestRelease(ctx context.Context) (core.GHLatestRelease, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "LatestRelease", ctx)
-	ret0, _ := ret[0].(data.GHLatestRelease)
+	ret0, _ := ret[0].(core.GHLatestRelease)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -438,10 +438,10 @@ func (m *MockNumbersClient) EXPECT() *MockNumbersClientMockRecorder {
 }
 
 // ExpectedStats mocks base method.
-func (m *MockNumbersClient) ExpectedStats(ctx context.Context) (data.NSExpectedStats, error) {
+func (m *MockNumbersClient) ExpectedStats(ctx context.Context) (core.NSExpectedStats, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ExpectedStats", ctx)
-	ret0, _ := ret[0].(data.NSExpectedStats)
+	ret0, _ := ret[0].(core.NSExpectedStats)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -477,10 +477,10 @@ func (m *MockWargamingClient) EXPECT() *MockWargamingClientMockRecorder {
 }
 
 // AccountInfo mocks base method.
-func (m *MockWargamingClient) AccountInfo(ctx context.Context, accountIDs []data.AccountID) (data.WGAccountInfo, error) {
+func (m *MockWargamingClient) AccountInfo(ctx context.Context, accountIDs []core.AccountID) (core.WGAccountInfo, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "AccountInfo", ctx, accountIDs)
-	ret0, _ := ret[0].(data.WGAccountInfo)
+	ret0, _ := ret[0].(core.WGAccountInfo)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -492,10 +492,10 @@ func (mr *MockWargamingClientMockRecorder) AccountInfo(ctx, accountIDs any) *gom
 }
 
 // AccountList mocks base method.
-func (m *MockWargamingClient) AccountList(ctx context.Context, accountNames []string) (data.WGAccountList, error) {
+func (m *MockWargamingClient) AccountList(ctx context.Context, accountNames []string) (core.WGAccountList, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "AccountList", ctx, accountNames)
-	ret0, _ := ret[0].(data.WGAccountList)
+	ret0, _ := ret[0].(core.WGAccountList)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -507,10 +507,10 @@ func (mr *MockWargamingClientMockRecorder) AccountList(ctx, accountNames any) *g
 }
 
 // BattleArenas mocks base method.
-func (m *MockWargamingClient) BattleArenas(ctx context.Context) (data.WGBattleArenas, error) {
+func (m *MockWargamingClient) BattleArenas(ctx context.Context) (core.WGBattleArenas, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "BattleArenas", ctx)
-	ret0, _ := ret[0].(data.WGBattleArenas)
+	ret0, _ := ret[0].(core.WGBattleArenas)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -522,10 +522,10 @@ func (mr *MockWargamingClientMockRecorder) BattleArenas(ctx any) *gomock.Call {
 }
 
 // BattleTypes mocks base method.
-func (m *MockWargamingClient) BattleTypes(ctx context.Context) (data.WGBattleTypes, error) {
+func (m *MockWargamingClient) BattleTypes(ctx context.Context) (core.WGBattleTypes, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "BattleTypes", ctx)
-	ret0, _ := ret[0].(data.WGBattleTypes)
+	ret0, _ := ret[0].(core.WGBattleTypes)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -537,10 +537,10 @@ func (mr *MockWargamingClientMockRecorder) BattleTypes(ctx any) *gomock.Call {
 }
 
 // ClansAccountInfo mocks base method.
-func (m *MockWargamingClient) ClansAccountInfo(ctx context.Context, accountIDs []data.AccountID) (data.WGClansAccountInfo, error) {
+func (m *MockWargamingClient) ClansAccountInfo(ctx context.Context, accountIDs []core.AccountID) (core.WGClansAccountInfo, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ClansAccountInfo", ctx, accountIDs)
-	ret0, _ := ret[0].(data.WGClansAccountInfo)
+	ret0, _ := ret[0].(core.WGClansAccountInfo)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -552,10 +552,10 @@ func (mr *MockWargamingClientMockRecorder) ClansAccountInfo(ctx, accountIDs any)
 }
 
 // ClansInfo mocks base method.
-func (m *MockWargamingClient) ClansInfo(ctx context.Context, clanIDs []data.ClanID) (data.WGClansInfo, error) {
+func (m *MockWargamingClient) ClansInfo(ctx context.Context, clanIDs []core.ClanID) (core.WGClansInfo, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ClansInfo", ctx, clanIDs)
-	ret0, _ := ret[0].(data.WGClansInfo)
+	ret0, _ := ret[0].(core.WGClansInfo)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -567,10 +567,10 @@ func (mr *MockWargamingClientMockRecorder) ClansInfo(ctx, clanIDs any) *gomock.C
 }
 
 // EncycShips mocks base method.
-func (m *MockWargamingClient) EncycShips(ctx context.Context, pageNo int) (data.WGEncycShips, error) {
+func (m *MockWargamingClient) EncycShips(ctx context.Context, pageNo int) (core.WGEncycShips, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "EncycShips", ctx, pageNo)
-	ret0, _ := ret[0].(data.WGEncycShips)
+	ret0, _ := ret[0].(core.WGEncycShips)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -582,10 +582,10 @@ func (mr *MockWargamingClientMockRecorder) EncycShips(ctx, pageNo any) *gomock.C
 }
 
 // ShipsBadges mocks base method.
-func (m *MockWargamingClient) ShipsBadges(ctx context.Context, accountID data.AccountID) (data.WGShipsBadges, error) {
+func (m *MockWargamingClient) ShipsBadges(ctx context.Context, accountID core.AccountID) (core.WGShipsBadges, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ShipsBadges", ctx, accountID)
-	ret0, _ := ret[0].(data.WGShipsBadges)
+	ret0, _ := ret[0].(core.WGShipsBadges)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -597,10 +597,10 @@ func (mr *MockWargamingClientMockRecorder) ShipsBadges(ctx, accountID any) *gomo
 }
 
 // ShipsStats mocks base method.
-func (m *MockWargamingClient) ShipsStats(ctx context.Context, accountID data.AccountID) (data.WGShipsStats, error) {
+func (m *MockWargamingClient) ShipsStats(ctx context.Context, accountID core.AccountID) (core.WGShipsStats, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ShipsStats", ctx, accountID)
-	ret0, _ := ret[0].(data.WGShipsStats)
+	ret0, _ := ret[0].(core.WGShipsStats)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

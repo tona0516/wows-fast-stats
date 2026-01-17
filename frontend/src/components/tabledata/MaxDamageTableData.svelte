@@ -1,9 +1,9 @@
 <script lang="ts">
   import type { MaxDamageColumn } from "@libs/columns/MaxDamageColumn";
-  import type { data } from "@wails/go/models";
+  import type { core } from "@wails/go/models";
 
   export let column: MaxDamageColumn;
-  export let player: data.Player;
+  export let player: core.Player;
 
   const param = column.getDisplayValue(player);
 </script>

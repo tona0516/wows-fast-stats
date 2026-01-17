@@ -1,10 +1,10 @@
 import StackedBarGraphTableData from "@components/tabledata/StackedBarGraphTableData.svelte";
 import { ColorCode } from "@libs/ColorCode";
 import type { StackedBarChartParam } from "@libs/types";
-import type { data } from "@wails/go/models";
+import type { core } from "@wails/go/models";
 import { AbstractStatsColumn } from "./AbstractStatsColumn";
 
-type TierGroup = Readonly<keyof data.TierGroup>;
+type TierGroup = Readonly<keyof core.TierGroup>;
 
 const DISPLAY_NAMES: { [tierGroup in TierGroup]: string } = {
   low: "1~4",
@@ -29,7 +29,7 @@ export class TierRateColumn extends AbstractStatsColumn<
     return StackedBarGraphTableData;
   }
 
-  override getDisplayValue(player: data.Player): StackedBarChartParam[] {
+  override getDisplayValue(player: core.Player): StackedBarChartParam[] {
     const tierRateGroup = this.getPlayerStats(player).overall.using_tier_rate;
 
     const params: StackedBarChartParam[] = [];

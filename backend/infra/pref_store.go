@@ -3,7 +3,7 @@ package infra
 import (
 	"path/filepath"
 	"wfs/backend/config"
-	"wfs/backend/data"
+	"wfs/backend/core"
 
 	"github.com/samber/do/v2"
 )
@@ -21,10 +21,10 @@ func NewPrefStore(i do.Injector) (*PrefStore, error) {
 	}, nil
 }
 
-func (ps *PrefStore) Pref() (data.Pref, error) {
-	return readJSON[data.Pref](filepath.Join(ps.dir, ps.prefFile))
+func (ps *PrefStore) Pref() (core.Pref, error) {
+	return readJSON[core.Pref](filepath.Join(ps.dir, ps.prefFile))
 }
 
-func (ps *PrefStore) SetPref(data data.Pref) error {
+func (ps *PrefStore) SetPref(data core.Pref) error {
 	return writeJSON(filepath.Join(ps.dir, ps.prefFile), data)
 }

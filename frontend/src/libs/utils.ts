@@ -1,4 +1,4 @@
-import { data } from "@wails/go/models";
+import { core } from "@wails/go/models";
 import { ROMAN_NUMERALS } from "./constants";
 import type { RowPattern, ShipType, StatsExtra } from "./types";
 
@@ -8,7 +8,7 @@ export const toTierString = (value: number): string => {
 };
 
 export const toShipType = (type: string): type is ShipType => {
-  return Object.keys(new data.ShipTypeGroup()).includes(type);
+  return Object.keys(new core.ShipTypeGroup()).includes(type);
 };
 
 const formatNumber = (value: number, digit: number): string => {
@@ -39,7 +39,7 @@ export const formatWithSuffix = (num: number): string => {
 };
 
 export const getRowPattern = (
-  player: data.Player,
+  player: core.Player,
   statsExtra: string,
   shipColumnCount: number,
   overallColumnCount: number,

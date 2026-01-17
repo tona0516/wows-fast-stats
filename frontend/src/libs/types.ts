@@ -1,18 +1,18 @@
-import type { data } from "@wails/go/models";
+import type { core } from "@wails/go/models";
 import type { ColorCode } from "./ColorCode";
 import type { Tonako } from "./Tonako";
 
 type BasicKey = "player_info" | "warship";
 type CommonMethod = "convertValues";
 
-export type StatsCategory = Exclude<keyof data.PlayerStats, CommonMethod>;
+export type StatsCategory = Exclude<keyof core.PlayerStats, CommonMethod>;
 export type ColumnCategory = Readonly<"basic" | StatsCategory>;
 
-export type ShipType = Readonly<keyof data.ShipTypeGroup>;
-export type StatsExtra = Exclude<keyof data.Player, BasicKey | CommonMethod>;
+export type ShipType = Readonly<keyof core.ShipTypeGroup>;
+export type StatsExtra = Exclude<keyof core.Player, BasicKey | CommonMethod>;
 
-export type ShipStatsKey = Exclude<keyof data.ShipStats, CommonMethod>;
-export type OverallStatsKey = Exclude<keyof data.OverallStats, CommonMethod>;
+export type ShipStatsKey = Exclude<keyof core.ShipStats, CommonMethod>;
+export type OverallStatsKey = Exclude<keyof core.OverallStats, CommonMethod>;
 export type StatsKey = ShipStatsKey | OverallStatsKey;
 
 export type Optional<T> = T | undefined;

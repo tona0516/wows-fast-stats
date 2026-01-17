@@ -2,7 +2,7 @@ import SingleTableData from "@components/tabledata/SingleTableData.svelte";
 import type { ColorCode } from "@libs/ColorCode";
 import { RATING_COLORS } from "@libs/constants";
 import type { Optional, StatsCategory } from "@libs/types";
-import type { data } from "@wails/go/models";
+import type { core } from "@wails/go/models";
 import { AbstractStatsColumn } from "./AbstractStatsColumn";
 
 export class WinRateColumn extends AbstractStatsColumn<string> {
@@ -14,12 +14,12 @@ export class WinRateColumn extends AbstractStatsColumn<string> {
     return SingleTableData;
   }
 
-  override getTextColorCode(player: data.Player): Optional<ColorCode> {
+  override getTextColorCode(player: core.Player): Optional<ColorCode> {
     const rating = this.getPlayerStats(player)[this.category].win_rate.rating;
     return RATING_COLORS[rating]?.getFixedTextColor();
   }
 
-  override getDisplayValue(player: data.Player): string {
+  override getDisplayValue(player: core.Player): string {
     const value = this.getPlayerStats(player)[this.category].win_rate.value;
     return `${value.toFixed(this.getDigit())}%`;
   }

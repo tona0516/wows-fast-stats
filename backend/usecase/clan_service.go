@@ -5,7 +5,7 @@ import (
 	"strings"
 	"sync"
 	"wfs/backend/adapter"
-	"wfs/backend/data"
+	"wfs/backend/core"
 
 	"github.com/abadojack/whatlanggo"
 	"github.com/samber/do/v2"
@@ -26,9 +26,9 @@ func NewClanService(i do.Injector) (*clanService, error) {
 
 func (s *clanService) fetchAll(
 	ctx context.Context,
-	accountIDs []data.AccountID,
-) (data.Clans, error) {
-	result := make(data.Clans)
+	accountIDs []core.AccountID,
+) (core.Clans, error) {
+	result := make(core.Clans)
 
 	clansAccountInfo, err := s.wargamingClient.ClansAccountInfo(ctx, accountIDs)
 	if err != nil {
@@ -54,7 +54,7 @@ func (s *clanService) fetchAll(
 		hexColor := colorMap[clanID]
 		language := languageMap[clanID]
 
-		result[accountID] = data.Clan{
+		result[accountID] = core.Clan{
 			ID:       clanID,
 			Tag:      clanTag,
 			HexColor: hexColor,
@@ -67,9 +67,9 @@ func (s *clanService) fetchAll(
 
 func (s *clanService) fetchClanColor(
 	ctx context.Context,
-	clansInfo data.WGClansInfo,
-) (map[data.ClanID]string, error) {
-	result := make(map[data.ClanID]string)
+	clansInfo core.WGClansInfo,
+) (map[core.ClanID]string, error) {
+	result := make(map[core.ClanID]string)
 	eg, egCtx := errgroup.WithContext(ctx)
 
 	var mu sync.Mutex
@@ -100,8 +100,8 @@ func (s *clanService) fetchClanColor(
 	return result, nil
 }
 
-func (s *clanService) clanLanguage(clansInfo data.WGClansInfo) map[data.ClanID]string {
-	result := make(map[data.ClanID]string)
+func (s *clanService) clanLanguage(clansInfo core.WGClansInfo) map[core.ClanID]string {
+	result := make(map[core.ClanID]string)
 
 	options := whatlanggo.Options{
 		Whitelist: map[whatlanggo.Lang]bool{

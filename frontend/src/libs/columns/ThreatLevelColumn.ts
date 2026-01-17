@@ -1,6 +1,6 @@
 import SingleTableData from "@components/tabledata/SingleTableData.svelte";
 import { THREAT_LEVEL_COLORS } from "@libs/constants";
-import type { data } from "@wails/go/models";
+import type { core } from "@wails/go/models";
 import type { ColorCode } from "../ColorCode";
 import type { Optional } from "../types";
 import { AbstractStatsColumn } from "./AbstractStatsColumn";
@@ -10,11 +10,11 @@ export class ThreatLevelColumn extends AbstractStatsColumn<string> {
     super("threat_level", "overall");
   }
 
-  override getTextColorCode(player: data.Player): Optional<ColorCode> {
+  override getTextColorCode(player: core.Player): Optional<ColorCode> {
     return THREAT_LEVEL_COLORS[player.pvp_all.overall.threat_level.rank].text;
   }
 
-  override getBgColorCode(player: data.Player): Optional<ColorCode> {
+  override getBgColorCode(player: core.Player): Optional<ColorCode> {
     return THREAT_LEVEL_COLORS[player.pvp_all.overall.threat_level.rank]
       .background;
   }
@@ -23,7 +23,7 @@ export class ThreatLevelColumn extends AbstractStatsColumn<string> {
     return SingleTableData;
   }
 
-  override getDisplayValue(player: data.Player): string {
+  override getDisplayValue(player: core.Player): string {
     const value = this.getPlayerStats(player).overall.threat_level.modified;
     if (value === -1) {
       return "N/A";

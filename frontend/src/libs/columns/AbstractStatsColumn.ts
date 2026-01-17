@@ -1,7 +1,7 @@
 import { STATS_COLUMN_INFO } from "@libs/constants";
 import { storedPref } from "@libs/stores";
 import type { StatsCategory, StatsExtra, StatsKey } from "@libs/types";
-import type { data } from "@wails/go/models";
+import type { core } from "@wails/go/models";
 import { get } from "svelte/store";
 import { AbstractColumn } from "./AbstractColumn";
 
@@ -13,7 +13,7 @@ export abstract class AbstractStatsColumn<T> extends AbstractColumn {
     super(key, STATS_COLUMN_INFO[key].min ?? key);
   }
 
-  abstract getDisplayValue(player: data.Player): T;
+  abstract getDisplayValue(player: core.Player): T;
 
   override needsShow(): boolean {
     const cs = get(storedPref).column.stats[this.key];
@@ -29,7 +29,7 @@ export abstract class AbstractStatsColumn<T> extends AbstractColumn {
     return get(storedPref).column.stats[this.key].digit;
   }
 
-  getPlayerStats(player: data.Player): data.PlayerStats {
+  getPlayerStats(player: core.Player): core.PlayerStats {
     return player[get(storedPref).stats_extra as StatsExtra];
   }
 

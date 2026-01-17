@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"testing"
 	"time"
-	"wfs/backend/data"
+	"wfs/backend/core"
 
 	"github.com/morikuni/failure"
 	"github.com/stretchr/testify/assert"
@@ -42,7 +42,7 @@ func TestDiscordClient_Comment(t *testing.T) {
 		require.NoError(t, err)
 		err = instance.Comment(context.Background(), "test message")
 
-		assert.True(t, failure.Is(err, data.ErrDiscordAPI))
+		assert.True(t, failure.Is(err, core.ErrDiscordAPI))
 	})
 
 	t.Run("異常系_タイムアウト", func(t *testing.T) {

@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"testing"
 	"wfs/backend/adapter"
-	"wfs/backend/data"
+	"wfs/backend/core"
 	"wfs/backend/mock"
 
 	"github.com/morikuni/failure"
@@ -32,7 +32,7 @@ func TestInstallPathSetting_Invoke(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		mockConfigStore := mock.NewMockPrefStore(ctrl)
 		mockWails := mock.NewMockWails(ctrl)
-		originalConfig := data.Pref{
+		originalConfig := core.Pref{
 			Version:      1,
 			InstallPath:  "/old/path",
 			ZoomRate:     100,
@@ -42,7 +42,7 @@ func TestInstallPathSetting_Invoke(t *testing.T) {
 
 		tempDir := createWorldOfWarshipsExeDir(t)
 
-		expectedUpdatedConfig := data.Pref{
+		expectedUpdatedConfig := core.Pref{
 			Version:      1,
 			InstallPath:  tempDir,
 			ZoomRate:     100,
@@ -81,7 +81,7 @@ func TestInstallPathSetting_Invoke(t *testing.T) {
 		mockConfigStore.EXPECT().Pref().Times(0)
 		mockConfigStore.EXPECT().SetPref(gomock.Any()).Times(0)
 
-		mockWails.EXPECT().OpenDirectoryDialog(gomock.Any()).Return("", failure.New(data.ErrWailsOpenDirectoryDialog))
+		mockWails.EXPECT().OpenDirectoryDialog(gomock.Any()).Return("", failure.New(core.ErrWailsOpenDirectoryDialog))
 
 		injector := do.New()
 		do.Provide(injector, func(i do.Injector) (adapter.PrefStore, error) {
@@ -130,8 +130,8 @@ func TestInstallPathSetting_Invoke(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		mockConfigStore := mock.NewMockPrefStore(ctrl)
 		mockWails := mock.NewMockWails(ctrl)
-		expectedErr := failure.New(data.ErrJSONRead)
-		mockConfigStore.EXPECT().Pref().Return(data.Pref{}, expectedErr)
+		expectedErr := failure.New(core.ErrJSONRead)
+		mockConfigStore.EXPECT().Pref().Return(core.Pref{}, expectedErr)
 		mockConfigStore.EXPECT().SetPref(gomock.Any()).Times(0)
 
 		tempDir := createWorldOfWarshipsExeDir(t)
@@ -159,14 +159,14 @@ func TestInstallPathSetting_Invoke(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		mockConfigStore := mock.NewMockPrefStore(ctrl)
 		mockWails := mock.NewMockWails(ctrl)
-		originalConfig := data.Pref{
+		originalConfig := core.Pref{
 			Version:     1,
 			InstallPath: "/old/path",
 		}
 
 		gomock.InOrder(
 			mockConfigStore.EXPECT().Pref().Return(originalConfig, nil),
-			mockConfigStore.EXPECT().SetPref(gomock.Any()).Return(failure.New(data.ErrJSONWrite)),
+			mockConfigStore.EXPECT().SetPref(gomock.Any()).Return(failure.New(core.ErrJSONWrite)),
 		)
 
 		tempDir := createWorldOfWarshipsExeDir(t)

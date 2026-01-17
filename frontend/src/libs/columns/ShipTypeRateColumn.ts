@@ -2,7 +2,7 @@ import StackedBarGraphTableData from "@components/tabledata/StackedBarGraphTable
 import { ColorCode } from "@libs/ColorCode";
 import { SHIP_TYPE_COLORS, SHIP_TYPES } from "@libs/constants";
 import type { StackedBarChartParam } from "@libs/types";
-import type { data } from "@wails/go/models";
+import type { core } from "@wails/go/models";
 import { AbstractStatsColumn } from "./AbstractStatsColumn";
 
 export class ShipTypeRateColumn extends AbstractStatsColumn<
@@ -16,7 +16,7 @@ export class ShipTypeRateColumn extends AbstractStatsColumn<
     return StackedBarGraphTableData;
   }
 
-  override getDisplayValue(player: data.Player): StackedBarChartParam[] {
+  override getDisplayValue(player: core.Player): StackedBarChartParam[] {
     const shipTypeGroup =
       this.getPlayerStats(player).overall.using_ship_type_rate;
 

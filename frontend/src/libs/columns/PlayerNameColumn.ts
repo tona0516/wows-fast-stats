@@ -3,7 +3,7 @@ import { ColorCode } from "@libs/ColorCode";
 import { RATING_COLORS, THREAT_LEVEL_COLORS } from "@libs/constants";
 import { storedPref } from "@libs/stores";
 import type { Optional, StatsExtra } from "@libs/types";
-import type { data } from "@wails/go/models";
+import type { core } from "@wails/go/models";
 import { get } from "svelte/store";
 import { AbstractColumn } from "./AbstractColumn";
 
@@ -16,7 +16,7 @@ export class PlayerNameColumn extends AbstractColumn {
     return true;
   }
 
-  override getTextColorCode(player: data.Player): Optional<ColorCode> {
+  override getTextColorCode(player: core.Player): Optional<ColorCode> {
     const cfg = get(storedPref);
     const statsExtra = cfg.stats_extra as StatsExtra;
     const pattern = cfg.column.player.color_pattern;
@@ -50,14 +50,14 @@ export class PlayerNameColumn extends AbstractColumn {
     return PlayerNameTableData;
   }
 
-  getClanTag(player: data.Player): string {
+  getClanTag(player: core.Player): string {
     const clanID = player.player_info.clan.id;
     const clanTag = player.player_info.clan.tag;
 
     return clanID !== 0 ? `[${clanTag}]` : "";
   }
 
-  getNationFlagClass(player: data.Player): string {
+  getNationFlagClass(player: core.Player): string {
     if (!get(storedPref).column.player.enable_nation_flag) {
       return "";
     }
@@ -66,15 +66,15 @@ export class PlayerNameColumn extends AbstractColumn {
     return fragIcon ? `fi fi-${fragIcon}` : "";
   }
 
-  getPlayerName(player: data.Player): string {
+  getPlayerName(player: core.Player): string {
     return player.player_info.name;
   }
 
-  isNPC(player: data.Player): boolean {
+  isNPC(player: core.Player): boolean {
     return player.player_info.id === 0;
   }
 
-  getClanColorCode(player: data.Player): Optional<ColorCode> {
+  getClanColorCode(player: core.Player): Optional<ColorCode> {
     const color = player.player_info.clan.hex_color;
 
     let colorCode: ColorCode;

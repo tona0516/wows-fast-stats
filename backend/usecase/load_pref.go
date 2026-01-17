@@ -2,7 +2,7 @@ package usecase
 
 import (
 	"wfs/backend/adapter"
-	"wfs/backend/data"
+	"wfs/backend/core"
 
 	"github.com/morikuni/failure"
 	"github.com/samber/do/v2"
@@ -18,14 +18,14 @@ func NewLoadPref(i do.Injector) (*LoadPref, error) {
 	}, nil
 }
 
-func (lp *LoadPref) Invoke() (data.Pref, error) {
+func (lp *LoadPref) Invoke() (core.Pref, error) {
 	config, err := lp.configStore.Pref()
 	if err != nil {
-		if failure.Is(err, data.ErrJSONNotFound) {
-			return data.DefaultPref(), nil
+		if failure.Is(err, core.ErrJSONNotFound) {
+			return core.DefaultPref(), nil
 		}
 
-		return data.Pref{}, err
+		return core.Pref{}, err
 	}
 
 	return config, nil

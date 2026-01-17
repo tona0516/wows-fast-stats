@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 	"wfs/backend/config"
-	"wfs/backend/data"
+	"wfs/backend/core"
 
 	"github.com/morikuni/failure"
 	"github.com/samber/do/v2"
@@ -20,10 +20,10 @@ func TestClanClient_ClanAutoComplete(t *testing.T) {
 	t.Run("正常系", func(t *testing.T) {
 		t.Parallel()
 
-		expected := data.ClanAutocomplete{
+		expected := core.ClanAutocomplete{
 			SearchAutocompleteResult: []struct {
 				HexColor string      `json:"hex_color"`
-				ID       data.ClanID `json:"id"`
+				ID       core.ClanID `json:"id"`
 			}{
 				{HexColor: "#000000", ID: 0},
 				{HexColor: "#000001", ID: 1},
@@ -74,7 +74,7 @@ func TestClanClient_ClanAutoComplete(t *testing.T) {
 		require.NoError(t, err)
 		_, err = instance.ClanAutoComplete(context.Background(), "")
 
-		assert.True(t, failure.Is(err, data.ErrClanAPI))
+		assert.True(t, failure.Is(err, core.ErrClanAPI))
 	})
 
 	t.Run("異常系_タイムアウト", func(t *testing.T) {

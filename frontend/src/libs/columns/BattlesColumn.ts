@@ -1,6 +1,6 @@
 import SingleTableData from "@components/tabledata/SingleTableData.svelte";
 import type { StatsCategory } from "@libs/types";
-import type { data } from "@wails/go/models";
+import type { core } from "@wails/go/models";
 import { AbstractStatsColumn } from "./AbstractStatsColumn";
 
 export class BattlesColumn extends AbstractStatsColumn<string> {
@@ -12,7 +12,7 @@ export class BattlesColumn extends AbstractStatsColumn<string> {
     return SingleTableData;
   }
 
-  override getDisplayValue(player: data.Player): string {
+  override getDisplayValue(player: core.Player): string {
     const value = this.getPlayerStats(player)[this.category].battles;
     return value.toFixed(this.getDigit());
   }

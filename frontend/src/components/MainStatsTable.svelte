@@ -4,7 +4,7 @@
   import { getColumnText, getRowPattern } from "@libs/utils";
 
   import type { ColumnCategory, StatsExtra } from "@libs/types";
-  import type { data } from "@wails/go/models";
+  import type { core } from "@wails/go/models";
   import ColspanTableData from "./tabledata/ColspanTableData.svelte";
   import { AvgTierColumn } from "@libs/columns/AvgTierColumn";
   import { BattlesColumn } from "@libs/columns/BattlesColumn";
@@ -27,7 +27,7 @@
   import { EfficiencyBadgeColumn } from "@libs/columns/EfficiencyBadgeColumn";
   import { storedPref } from "@libs/stores";
 
-  export let teams: data.Team[];
+  export let teams: core.Team[];
 
   class Category {
     constructor(

@@ -1,4 +1,4 @@
-import type { data } from "@wails/go/models";
+import type { core } from "@wails/go/models";
 import {
   storedPlayerDetail,
   storedPlayerShipDetail as storedShipDetail,
@@ -16,7 +16,7 @@ export class ModalManager {
     return ModalManager._instance;
   }
 
-  openForPlayerDetail(player: data.Player) {
+  openForPlayerDetail(player: core.Player) {
     storedPlayerDetail.set(player);
   }
 
@@ -24,7 +24,7 @@ export class ModalManager {
     storedPlayerDetail.set(undefined);
   }
 
-  openForShipDetail(player: data.Player) {
+  openForShipDetail(player: core.Player) {
     storedShipDetail.set(player);
   }
 

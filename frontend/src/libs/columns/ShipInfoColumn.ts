@@ -4,7 +4,7 @@ import { SHIP_TYPE_COLORS } from "@libs/constants";
 import { storedPref } from "@libs/stores";
 import type { Optional } from "@libs/types";
 import { toShipType, toTierString } from "@libs/utils";
-import type { data } from "@wails/go/models";
+import type { core } from "@wails/go/models";
 import FlagCommonWealth from "src/assets/images/flag_Commonwealth.png";
 import FlagEurope from "src/assets/images/flag_Europe.png";
 import FlagFrance from "src/assets/images/flag_France.png";
@@ -78,7 +78,7 @@ export class ShipInfoColumn extends AbstractColumn {
     return ShipInfoTableData;
   }
 
-  override getBgColorCode(player: data.Player): Optional<ColorCode> {
+  override getBgColorCode(player: core.Player): Optional<ColorCode> {
     if (!get(storedPref).column.ship.is_colored) {
       return undefined;
     }
@@ -92,11 +92,11 @@ export class ShipInfoColumn extends AbstractColumn {
     return color?.getFixedBgColor(ColorCode.SHIP_TYPE_BG_FIXED_RATE);
   }
 
-  getDisplayValue(player: data.Player): string {
+  getDisplayValue(player: core.Player): string {
     return `${toTierString(player.warship.tier)} ${player.warship.name}`;
   }
 
-  getShipIconPath(player: data.Player): string {
+  getShipIconPath(player: core.Player): string {
     const warship = player.warship;
     const type = warship.type;
     if (!toShipType(type)) {
@@ -106,7 +106,7 @@ export class ShipInfoColumn extends AbstractColumn {
     return warship.isPremium ? PREMIUM_SHIP_ICONS[type] : SHIP_ICONS[type];
   }
 
-  getNationIconPath(player: data.Player): string {
+  getNationIconPath(player: core.Player): string {
     if (!get(storedPref).column.ship.enable_nation_flag) {
       return "";
     }

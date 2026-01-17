@@ -1,22 +1,22 @@
 import { SavePref } from "@wails/go/main/App";
-import type { data } from "@wails/go/models";
+import type { core } from "@wails/go/models";
 import { type Writable, writable } from "svelte/store";
 import type { Optional, TonakoParam } from "./types";
 
-export const storedPref = writable() as Writable<data.Pref>;
+export const storedPref = writable() as Writable<core.Pref>;
 storedPref.subscribe(async (value) => {
   if (!value) return;
   await SavePref(value);
 });
 
 export const storedBattle = writable(undefined) as Writable<
-  Optional<data.Battle>
+  Optional<core.Battle>
 >;
 export const storedPlayerDetail = writable(undefined) as Writable<
-  Optional<data.Player>
+  Optional<core.Player>
 >;
 export const storedPlayerShipDetail = writable(undefined) as Writable<
-  Optional<data.Player>
+  Optional<core.Player>
 >;
 export const storedTonako = writable(undefined) as Writable<
   Optional<TonakoParam>

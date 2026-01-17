@@ -3,7 +3,7 @@ package infra
 import (
 	"context"
 	"wfs/backend/config"
-	"wfs/backend/data"
+	"wfs/backend/core"
 
 	"github.com/imroc/req/v3"
 	"github.com/morikuni/failure"
@@ -24,17 +24,17 @@ func NewGithubClient(i do.Injector) (*GithubClient, error) {
 	}, nil
 }
 
-func (c *GithubClient) LatestRelease(ctx context.Context) (data.GHLatestRelease, error) {
-	result := data.GHLatestRelease{}
+func (c *GithubClient) LatestRelease(ctx context.Context) (core.GHLatestRelease, error) {
+	result := core.GHLatestRelease{}
 	resp, err := c.client.R().
 		SetContext(ctx).
 		SetSuccessResult(&result).
 		Get("/repos/tona0516/wows-fast-stats/releases/latest")
 	if err != nil {
-		return result, failure.Translate(err, data.ErrGithubAPI)
+		return result, failure.Translate(err, core.ErrGithubAPI)
 	}
 	if resp.IsErrorState() {
-		return result, failure.New(data.ErrGithubAPI, failure.Context{
+		return result, failure.New(core.ErrGithubAPI, failure.Context{
 			"status_code": resp.Status,
 			"body":        resp.String(),
 		})

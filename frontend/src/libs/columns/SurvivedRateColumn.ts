@@ -1,6 +1,6 @@
 import SingleTableData from "@components/tabledata/SingleTableData.svelte";
 import type { StatsCategory } from "@libs/types";
-import type { data } from "@wails/go/models";
+import type { core } from "@wails/go/models";
 import { AbstractStatsColumn } from "./AbstractStatsColumn";
 
 export class SurvivedRateColumn extends AbstractStatsColumn<string> {
@@ -12,7 +12,7 @@ export class SurvivedRateColumn extends AbstractStatsColumn<string> {
     return SingleTableData;
   }
 
-  override getDisplayValue(player: data.Player): string {
+  override getDisplayValue(player: core.Player): string {
     const sv = this.getPlayerStats(player)[this.category].survived_rate;
 
     const all = sv.all.toFixed(this.getDigit());

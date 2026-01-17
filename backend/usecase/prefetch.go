@@ -4,7 +4,7 @@ import (
 	"context"
 	"sync"
 	"wfs/backend/adapter"
-	"wfs/backend/data"
+	"wfs/backend/core"
 
 	"github.com/samber/do/v2"
 	"golang.org/x/sync/errgroup"
@@ -24,10 +24,10 @@ func NewPrefetch(i do.Injector) (*Prefetch, error) {
 	}, nil
 }
 
-func (p *Prefetch) Invoke(ctx context.Context) (*data.PrefetchResult, error) {
+func (p *Prefetch) Invoke(ctx context.Context) (*core.PrefetchResult, error) {
 	eg, egCtx := errgroup.WithContext(ctx)
 
-	var warships data.Warships
+	var warships core.Warships
 	eg.Go(func() error {
 		var err error
 		measure("fetchWarships", func() {
@@ -58,17 +58,17 @@ func (p *Prefetch) Invoke(ctx context.Context) (*data.PrefetchResult, error) {
 		return nil, err
 	}
 
-	return &data.PrefetchResult{
+	return &core.PrefetchResult{
 		Warships:     warships,
 		BattleArenas: battleArenas,
 		BattleTypes:  battleTypes,
 	}, nil
 }
 
-func (p *Prefetch) fetchWarships(ctx context.Context) (data.Warships, error) {
+func (p *Prefetch) fetchWarships(ctx context.Context) (core.Warships, error) {
 	eg, egCtx := errgroup.WithContext(ctx)
 
-	var encycShips map[int]data.WGEncycShips
+	var encycShips map[int]core.WGEncycShips
 	eg.Go(func() error {
 		resp, err := p.fetchEncycShips(egCtx)
 		if err != nil {
@@ -78,7 +78,7 @@ func (p *Prefetch) fetchWarships(ctx context.Context) (data.Warships, error) {
 		return nil
 	})
 
-	var expectedStats data.NSExpectedStats
+	var expectedStats core.NSExpectedStats
 	eg.Go(func() error {
 		resp, err := p.numbersClient.ExpectedStats(egCtx)
 		if err != nil {
@@ -143,8 +143,8 @@ func (p *Prefetch) fetchBattleTypes(ctx context.Context) (map[string]string, err
 	return result, nil
 }
 
-func (p *Prefetch) fetchEncycShips(ctx context.Context) (map[int]data.WGEncycShips, error) {
-	result := make(map[int]data.WGEncycShips)
+func (p *Prefetch) fetchEncycShips(ctx context.Context) (map[int]core.WGEncycShips, error) {
+	result := make(map[int]core.WGEncycShips)
 
 	var mu sync.Mutex
 	fetch := func(ctx context.Context,
@@ -186,29 +186,29 @@ func (p *Prefetch) fetchEncycShips(ctx context.Context) (map[int]data.WGEncycShi
 }
 
 func (p *Prefetch) composeWarships(
-	encycShips map[int]data.WGEncycShips,
-	expectedStats data.NSExpectedStats,
-) data.Warships {
-	warships := make(data.Warships)
+	encycShips map[int]core.WGEncycShips,
+	expectedStats core.NSExpectedStats,
+) core.Warships {
+	warships := make(core.Warships)
 	for _, resp := range encycShips {
 		for shipID, ship := range resp.Data {
-			var serverAverage *data.ServerAverage
+			var serverAverage *core.ServerAverage
 
 			expected, ok := expectedStats.Data[shipID]
 			if ok {
-				serverAverage = &data.ServerAverage{
+				serverAverage = &core.ServerAverage{
 					Damage:  expected.AverageDamageDealt,
 					Frags:   expected.AverageFrags,
 					WinRate: expected.WinRate,
 				}
 			}
 
-			warship := data.NewWarship(
+			warship := core.NewWarship(
 				shipID,
 				ship.Name,
 				ship.Tier,
-				data.NewShipType(ship.Type),
-				data.Nation(ship.Nation),
+				core.NewShipType(ship.Type),
+				core.Nation(ship.Nation),
 				ship.IsPremium,
 				serverAverage,
 			)

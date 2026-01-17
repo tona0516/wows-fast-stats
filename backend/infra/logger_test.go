@@ -5,7 +5,7 @@ import (
 	"testing"
 	"wfs/backend/adapter"
 	"wfs/backend/config"
-	"wfs/backend/data"
+	"wfs/backend/core"
 	"wfs/backend/mock"
 
 	"github.com/morikuni/failure"
@@ -145,7 +145,7 @@ func TestLogger_Info_DicordError(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	mockInfoDiscord := mock.NewMockDiscordClient(ctrl)
-	expectedErr := failure.New(data.ErrDiscordAPI)
+	expectedErr := failure.New(core.ErrDiscordAPI)
 	mockInfoDiscord.EXPECT().Comment(gomock.Any(), gomock.Any()).Return(expectedErr)
 
 	injector := do.New()
@@ -243,7 +243,7 @@ func TestLogger_Error_DicordError(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	mockAlertDiscord := mock.NewMockDiscordClient(ctrl)
-	expectedErr := failure.New(data.ErrDiscordAPI)
+	expectedErr := failure.New(core.ErrDiscordAPI)
 	mockAlertDiscord.EXPECT().Comment(gomock.Any(), gomock.Any()).Return(expectedErr)
 
 	injector := do.New()

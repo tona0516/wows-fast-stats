@@ -1,9 +1,9 @@
 import SingleTableData from "@components/tabledata/SingleTableData.svelte";
 import type { StatsCategory } from "@libs/types";
-import type { data } from "@wails/go/models";
+import type { core } from "@wails/go/models";
 import { AbstractStatsColumn } from "./AbstractStatsColumn";
 
-type EfficiencyBadge = Readonly<data.EfficiencyBadgeGroup>;
+type EfficiencyBadge = Readonly<core.EfficiencyBadgeGroup>;
 
 const EFFICIENCY_BADGES: { [key in keyof EfficiencyBadge]: string } = {
   expert: "E",
@@ -21,7 +21,7 @@ export class EfficiencyBadgeColumn extends AbstractStatsColumn<string> {
     return SingleTableData;
   }
 
-  override getDisplayValue(player: data.Player): string {
+  override getDisplayValue(player: core.Player): string {
     const playerStats = this.getPlayerStats(player);
 
     switch (this.category) {

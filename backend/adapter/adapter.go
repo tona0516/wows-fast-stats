@@ -2,7 +2,7 @@ package adapter
 
 import (
 	"context"
-	"wfs/backend/data"
+	"wfs/backend/core"
 )
 
 //go:generate mockgen -source=$GOFILE -destination ../mock/$GOFILE -package mock
@@ -16,8 +16,8 @@ type CacheStore interface {
 	OwnIGN() (string, error)
 	SetOwnIGN(ign string)
 
-	Warships() (data.Warships, error)
-	SetWarships(data data.Warships)
+	Warships() (core.Warships, error)
+	SetWarships(data core.Warships)
 
 	BattleArenas() (map[int]string, error)
 	SetBattleArenas(data map[int]string)
@@ -28,18 +28,18 @@ type CacheStore interface {
 
 //go:generate mockgen -source=$GOFILE -destination ../mock/$GOFILE -package mock
 type PrefStore interface {
-	Pref() (data.Pref, error)
-	SetPref(data data.Pref) error
+	Pref() (core.Pref, error)
+	SetPref(data core.Pref) error
 }
 
 //go:generate mockgen -source=$GOFILE -destination ../mock/$GOFILE -package mock
 type ReplayReader interface {
-	TempArenaInfo(installPath string) (data.TempArenaInfo, error)
+	TempArenaInfo(installPath string) (core.TempArenaInfo, error)
 }
 
 //go:generate mockgen -source=$GOFILE -destination ../mock/$GOFILE -package mock
 type ClanClient interface {
-	ClanAutoComplete(ctx context.Context, search string) (data.ClanAutocomplete, error)
+	ClanAutoComplete(ctx context.Context, search string) (core.ClanAutocomplete, error)
 }
 
 //go:generate mockgen -source=$GOFILE -destination ../mock/$GOFILE -package mock
@@ -49,25 +49,25 @@ type DiscordClient interface {
 
 //go:generate mockgen -source=$GOFILE -destination ../mock/$GOFILE -package mock
 type GithubClient interface {
-	LatestRelease(ctx context.Context) (data.GHLatestRelease, error)
+	LatestRelease(ctx context.Context) (core.GHLatestRelease, error)
 }
 
 //go:generate mockgen -source=$GOFILE -destination ../mock/$GOFILE -package mock
 type NumbersClient interface {
-	ExpectedStats(ctx context.Context) (data.NSExpectedStats, error)
+	ExpectedStats(ctx context.Context) (core.NSExpectedStats, error)
 }
 
 //go:generate mockgen -source=$GOFILE -destination ../mock/$GOFILE -package mock
 type WargamingClient interface {
-	AccountInfo(ctx context.Context, accountIDs []data.AccountID) (data.WGAccountInfo, error)
-	AccountList(ctx context.Context, accountNames []string) (data.WGAccountList, error)
-	ClansAccountInfo(ctx context.Context, accountIDs []data.AccountID) (data.WGClansAccountInfo, error)
-	ClansInfo(ctx context.Context, clanIDs []data.ClanID) (data.WGClansInfo, error)
-	EncycShips(ctx context.Context, pageNo int) (data.WGEncycShips, error)
-	ShipsStats(ctx context.Context, accountID data.AccountID) (data.WGShipsStats, error)
-	BattleArenas(ctx context.Context) (data.WGBattleArenas, error)
-	BattleTypes(ctx context.Context) (data.WGBattleTypes, error)
-	ShipsBadges(ctx context.Context, accountID data.AccountID) (data.WGShipsBadges, error)
+	AccountInfo(ctx context.Context, accountIDs []core.AccountID) (core.WGAccountInfo, error)
+	AccountList(ctx context.Context, accountNames []string) (core.WGAccountList, error)
+	ClansAccountInfo(ctx context.Context, accountIDs []core.AccountID) (core.WGClansAccountInfo, error)
+	ClansInfo(ctx context.Context, clanIDs []core.ClanID) (core.WGClansInfo, error)
+	EncycShips(ctx context.Context, pageNo int) (core.WGEncycShips, error)
+	ShipsStats(ctx context.Context, accountID core.AccountID) (core.WGShipsStats, error)
+	BattleArenas(ctx context.Context) (core.WGBattleArenas, error)
+	BattleTypes(ctx context.Context) (core.WGBattleTypes, error)
+	ShipsBadges(ctx context.Context, accountID core.AccountID) (core.WGShipsBadges, error)
 }
 
 //go:generate mockgen -source=$GOFILE -destination ../mock/$GOFILE -package mock

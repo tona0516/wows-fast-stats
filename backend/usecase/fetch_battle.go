@@ -4,7 +4,7 @@ import (
 	"context"
 	"regexp"
 	"wfs/backend/adapter"
-	"wfs/backend/data"
+	"wfs/backend/core"
 
 	"github.com/samber/do/v2"
 	"golang.org/x/sync/errgroup"
@@ -37,15 +37,15 @@ func NewFetchBattle(i do.Injector) (*FetchBattle, error) {
 
 func (b *FetchBattle) Invoke(
 	ctx context.Context,
-	tempArenaInfo data.TempArenaInfo,
-	prefetchResult *data.PrefetchResult,
+	tempArenaInfo core.TempArenaInfo,
+	prefetchResult *core.PrefetchResult,
 ) {
 	b.cacheStore.SetOwnIGN(tempArenaInfo.PlayerName)
 	b.logger.SetOwnIGN(tempArenaInfo.PlayerName)
 
 	accountNames := tempArenaInfo.AccountNames()
 
-	var accountList data.WGAccountList
+	var accountList core.WGAccountList
 	var err error
 	measure("AccountList", func() {
 		accountList, err = b.wargamingClient.AccountList(ctx, accountNames)
@@ -58,7 +58,7 @@ func (b *FetchBattle) Invoke(
 
 	eg, egCtx := errgroup.WithContext(ctx)
 
-	var accountInfo data.WGAccountInfo
+	var accountInfo core.WGAccountInfo
 	eg.Go(func() error {
 		var err error
 		measure("AccountInfo", func() {
@@ -67,7 +67,7 @@ func (b *FetchBattle) Invoke(
 		return err
 	})
 
-	var allShipStats data.AllPlayerShipStats
+	var allShipStats core.AllPlayerShipStats
 	eg.Go(func() error {
 		var err error
 		measure("statsService.fetchAll", func() {
@@ -76,7 +76,7 @@ func (b *FetchBattle) Invoke(
 		return err
 	})
 
-	var allShipBadges data.AllPlayerShipBadges
+	var allShipBadges core.AllPlayerShipBadges
 	eg.Go(func() error {
 		var err error
 		measure("badgeService.fetchAll", func() {
@@ -85,7 +85,7 @@ func (b *FetchBattle) Invoke(
 		return err
 	})
 
-	var clans data.Clans
+	var clans core.Clans
 	eg.Go(func() error {
 		var err error
 		measure("clanService.fetchAll", func() {
@@ -99,7 +99,7 @@ func (b *FetchBattle) Invoke(
 		return
 	}
 
-	result := data.NewBattle(
+	result := core.NewBattle(
 		prefetchResult,
 		tempArenaInfo,
 		accountInfo,

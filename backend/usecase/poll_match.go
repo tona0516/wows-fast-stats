@@ -7,7 +7,7 @@ import (
 	"time"
 	"wfs/backend/adapter"
 	"wfs/backend/config"
-	"wfs/backend/data"
+	"wfs/backend/core"
 
 	"github.com/morikuni/failure"
 	"github.com/samber/do/v2"
@@ -33,11 +33,11 @@ func NewPollMatch(i do.Injector) (*PollMatch, error) {
 func (pm *PollMatch) Invoke(
 	ctx context.Context,
 	cancelCtx context.Context,
-	channel chan data.TempArenaInfo,
+	channel chan core.TempArenaInfo,
 ) {
 	pref, err := pm.configStore.Pref()
 	if err != nil {
-		if failure.Is(err, data.ErrJSONNotFound) {
+		if failure.Is(err, core.ErrJSONNotFound) {
 			pm.emitNeedInitialSetting(ctx)
 			return
 		}
@@ -63,7 +63,7 @@ func (pm *PollMatch) Invoke(
 
 			tempArenaInfo, err := pm.replayReader.TempArenaInfo(pref.InstallPath)
 			if err != nil {
-				if failure.Is(err, data.ErrTempArenaInfoNotFound) {
+				if failure.Is(err, core.ErrTempArenaInfoNotFound) {
 					continue
 				}
 

@@ -5,7 +5,7 @@ import (
 	"os"
 	"wfs/backend/adapter"
 	"wfs/backend/config"
-	"wfs/backend/data"
+	"wfs/backend/core"
 	"wfs/backend/infra"
 	"wfs/backend/usecase"
 
@@ -27,7 +27,7 @@ type App struct {
 	ctx                 context.Context
 	config              config.Config
 	pollMatchCancelFunc context.CancelFunc
-	prefetchResult      *data.PrefetchResult
+	prefetchResult      *core.PrefetchResult
 }
 
 func NewApp(config config.Config) *App {
@@ -49,7 +49,7 @@ func (a *App) StartPollingMatch() {
 
 	cancelCtx, cancelFunc := context.WithCancel(context.Background())
 	a.pollMatchCancelFunc = cancelFunc
-	channel := make(chan data.TempArenaInfo)
+	channel := make(chan core.TempArenaInfo)
 
 	go a.pollMatchUsecase.Invoke(a.ctx, cancelCtx, channel)
 	for tempArenaInfo := range channel {
@@ -57,11 +57,11 @@ func (a *App) StartPollingMatch() {
 	}
 }
 
-func (a *App) LoadPref() (data.Pref, error) {
+func (a *App) LoadPref() (core.Pref, error) {
 	return a.loadPrefUsecase.Invoke()
 }
 
-func (a *App) SavePref(pref data.Pref) error {
+func (a *App) SavePref(pref core.Pref) error {
 	return a.savePrefUsecase.Invoke(pref)
 }
 
@@ -73,7 +73,7 @@ func (a *App) CurrentVersion() string {
 	return a.config.Basic.Version
 }
 
-func (a *App) NewVersion() *data.NewVersion {
+func (a *App) NewVersion() *core.NewVersion {
 	return a.updateCheckUsecase.Invoke(a.ctx)
 }
 
@@ -85,8 +85,8 @@ func (a *App) ShowMessageDialog(message string) {
 }
 
 // 構造体のバインド用のメソッド.
-func (a *App) EmptyBattle() data.Battle {
-	return data.Battle{}
+func (a *App) EmptyBattle() core.Battle {
+	return core.Battle{}
 }
 
 func (a *App) OnStartup(ctx context.Context) {

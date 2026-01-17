@@ -5,7 +5,7 @@ import (
 	"testing"
 	"wfs/backend/adapter"
 	"wfs/backend/config"
-	"wfs/backend/data"
+	"wfs/backend/core"
 	"wfs/backend/mock"
 
 	"github.com/morikuni/failure"
@@ -22,7 +22,7 @@ func TestUpdateCheck_Invoke(t *testing.T) {
 
 		ctrl := gomock.NewController(t)
 		mockGithubClient := mock.NewMockGithubClient(ctrl)
-		mockGithubClient.EXPECT().LatestRelease(gomock.Any()).Return(data.GHLatestRelease{
+		mockGithubClient.EXPECT().LatestRelease(gomock.Any()).Return(core.GHLatestRelease{
 			TagName: "2.0.0",
 			HTMLURL: "https://hoge.com",
 		}, nil)
@@ -41,7 +41,7 @@ func TestUpdateCheck_Invoke(t *testing.T) {
 		uc := do.MustInvoke[*UpdateCheck](injector)
 		actual := uc.Invoke(context.Background())
 
-		assert.Equal(t, data.NewVersion{
+		assert.Equal(t, core.NewVersion{
 			Version:     "2.0.0",
 			DownloadURL: "https://hoge.com",
 		}, *actual)
@@ -52,7 +52,7 @@ func TestUpdateCheck_Invoke(t *testing.T) {
 
 		ctrl := gomock.NewController(t)
 		mockGithubClient := mock.NewMockGithubClient(ctrl)
-		response := data.GHLatestRelease{TagName: "1.0.0", HTMLURL: "https://hoge.com"}
+		response := core.GHLatestRelease{TagName: "1.0.0", HTMLURL: "https://hoge.com"}
 		mockGithubClient.EXPECT().LatestRelease(gomock.Any()).Return(response, nil)
 
 		injector := do.New()
@@ -76,8 +76,8 @@ func TestUpdateCheck_Invoke(t *testing.T) {
 
 		ctrl := gomock.NewController(t)
 		mockGithubClient := mock.NewMockGithubClient(ctrl)
-		expectedErr := failure.New(data.ErrGithubAPI)
-		mockGithubClient.EXPECT().LatestRelease(gomock.Any()).Return(data.GHLatestRelease{}, expectedErr)
+		expectedErr := failure.New(core.ErrGithubAPI)
+		mockGithubClient.EXPECT().LatestRelease(gomock.Any()).Return(core.GHLatestRelease{}, expectedErr)
 
 		injector := do.New()
 		do.ProvideValue(injector, config.Config{

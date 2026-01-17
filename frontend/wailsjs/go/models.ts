@@ -1,4 +1,4 @@
-export namespace data {
+export namespace core {
 	
 	export class TeamThreatLevel {
 	    average: number;

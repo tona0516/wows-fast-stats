@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"wfs/backend/data"
+	"wfs/backend/core"
 
 	"github.com/morikuni/failure"
 )
@@ -20,7 +20,7 @@ func readString(path string) (string, error) {
 
 	f, err := os.ReadFile(path)
 	if err != nil {
-		return "", failure.Translate(err, data.ErrStringRead, errCtx)
+		return "", failure.Translate(err, core.ErrStringRead, errCtx)
 	}
 
 	return string(f), nil
@@ -30,11 +30,11 @@ func writeString(path string, value string) error {
 	errCtx := failure.Context{pathKey: path, dataKey: value}
 
 	if err := os.MkdirAll(filepath.Dir(path), os.ModePerm); err != nil {
-		return failure.Translate(err, data.ErrStringWrite, errCtx)
+		return failure.Translate(err, core.ErrStringWrite, errCtx)
 	}
 
 	if err := os.WriteFile(path, []byte(value), os.ModePerm); err != nil {
-		return failure.Translate(err, data.ErrStringWrite, errCtx)
+		return failure.Translate(err, core.ErrStringWrite, errCtx)
 	}
 
 	return nil
@@ -47,14 +47,14 @@ func readJSON[T any](path string) (T, error) {
 	f, err := os.ReadFile(path)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return result, failure.Translate(err, data.ErrJSONNotFound, errCtx)
+			return result, failure.Translate(err, core.ErrJSONNotFound, errCtx)
 		}
-		return result, failure.Translate(err, data.ErrJSONRead, errCtx)
+		return result, failure.Translate(err, core.ErrJSONRead, errCtx)
 	}
 	errCtx[dataKey] = string(f)
 
 	if err = json.Unmarshal(f, &result); err != nil {
-		return result, failure.Translate(err, data.ErrJSONRead, errCtx)
+		return result, failure.Translate(err, core.ErrJSONRead, errCtx)
 	}
 
 	return result, nil
@@ -66,12 +66,12 @@ func writeJSON[T any](path string, value T) error {
 	errCtx := failure.Context{pathKey: path, dataKey: string(b)}
 
 	if err := os.MkdirAll(filepath.Dir(path), os.ModePerm); err != nil {
-		return failure.Translate(err, data.ErrJSONWrite, errCtx)
+		return failure.Translate(err, core.ErrJSONWrite, errCtx)
 	}
 
 	file, err := os.Create(path)
 	if err != nil {
-		return failure.Translate(err, data.ErrJSONWrite, errCtx)
+		return failure.Translate(err, core.ErrJSONWrite, errCtx)
 	}
 	//nolint:errcheck
 	defer file.Close()
@@ -80,7 +80,7 @@ func writeJSON[T any](path string, value T) error {
 	encoder.SetIndent("", strings.Repeat(" ", 2))
 
 	if err = encoder.Encode(value); err != nil {
-		return failure.Translate(err, data.ErrJSONWrite, errCtx)
+		return failure.Translate(err, core.ErrJSONWrite, errCtx)
 	}
 
 	return nil

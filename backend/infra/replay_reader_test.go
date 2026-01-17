@@ -4,7 +4,7 @@ import (
 	"io/fs"
 	"path/filepath"
 	"testing"
-	"wfs/backend/data"
+	"wfs/backend/core"
 
 	"github.com/samber/do/v2"
 	"github.com/stretchr/testify/assert"
@@ -20,8 +20,8 @@ func TestReplayReader_TempArenaInfo(t *testing.T) {
 	t.Run("正常系", func(t *testing.T) {
 		t.Parallel()
 
-		expected := data.TempArenaInfo{
-			Vehicles: []data.Vehicle{
+		expected := core.TempArenaInfo{
+			Vehicles: []core.Vehicle{
 				{ShipID: 1, Relation: 0, Name: "player_1"},
 				{ShipID: 2, Relation: 1, Name: "player_2"},
 				{ShipID: 3, Relation: 2, Name: "player_3"},
@@ -54,8 +54,8 @@ func TestReplayReader_TempArenaInfo(t *testing.T) {
 	t.Run("正常系_該当ファイルが複数存在する場合_最新を返す", func(t *testing.T) {
 		t.Parallel()
 
-		older := data.TempArenaInfo{
-			Vehicles: []data.Vehicle{
+		older := core.TempArenaInfo{
+			Vehicles: []core.Vehicle{
 				{ShipID: 1, Relation: 0, Name: "player_1"},
 				{ShipID: 2, Relation: 1, Name: "player_2"},
 				{ShipID: 3, Relation: 2, Name: "player_3"},
@@ -66,8 +66,8 @@ func TestReplayReader_TempArenaInfo(t *testing.T) {
 			PlayerName: "player_1",
 		}
 
-		expected := data.TempArenaInfo{
-			Vehicles: []data.Vehicle{
+		expected := core.TempArenaInfo{
+			Vehicles: []core.Vehicle{
 				{ShipID: 1, Relation: 0, Name: "player_1"},
 				{ShipID: 2, Relation: 1, Name: "player_2"},
 				{ShipID: 3, Relation: 2, Name: "player_3"},
@@ -105,7 +105,7 @@ func TestReplayReader_TempArenaInfo(t *testing.T) {
 
 		for _, path := range paths {
 			var err error
-			err = writeJSON(path, data.TempArenaInfo{})
+			err = writeJSON(path, core.TempArenaInfo{})
 			require.NoError(t, err)
 
 			injector := do.New()

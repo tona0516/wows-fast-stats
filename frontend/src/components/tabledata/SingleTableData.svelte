@@ -1,9 +1,9 @@
 <script lang="ts">
   import type { AbstractStatsColumn } from "@libs/columns/AbstractStatsColumn";
-  import type { data } from "@wails/go/models";
+  import type { core } from "@wails/go/models";
 
   export let column: AbstractStatsColumn<string>;
-  export let player: data.Player;
+  export let player: core.Player;
 </script>
 
 {#if column.needsShow()}

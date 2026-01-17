@@ -4,7 +4,7 @@ import (
 	"context"
 	"wfs/backend/adapter"
 	"wfs/backend/config"
-	"wfs/backend/data"
+	"wfs/backend/core"
 
 	"github.com/Masterminds/semver/v3"
 	"github.com/samber/do/v2"
@@ -23,7 +23,7 @@ func NewUpdateCheck(i do.Injector) (*UpdateCheck, error) {
 	}, nil
 }
 
-func (c *UpdateCheck) Invoke(ctx context.Context) *data.NewVersion {
+func (c *UpdateCheck) Invoke(ctx context.Context) *core.NewVersion {
 	constraint, err := semver.NewConstraint("> " + c.currentVersion)
 	if err != nil {
 		return nil
@@ -43,7 +43,7 @@ func (c *UpdateCheck) Invoke(ctx context.Context) *data.NewVersion {
 		return nil
 	}
 
-	return &data.NewVersion{
+	return &core.NewVersion{
 		Version:     latestRelease.TagName,
 		DownloadURL: latestRelease.HTMLURL,
 	}

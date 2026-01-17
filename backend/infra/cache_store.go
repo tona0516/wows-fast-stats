@@ -3,7 +3,7 @@ package infra
 import (
 	"path/filepath"
 	"wfs/backend/config"
-	"wfs/backend/data"
+	"wfs/backend/core"
 
 	"github.com/samber/do/v2"
 )
@@ -35,11 +35,11 @@ func (s *CacheStore) SetOwnIGN(ign string) {
 	_ = writeString(filepath.Join(s.dir, s.ownIGNFile), ign)
 }
 
-func (s *CacheStore) Warships() (data.Warships, error) {
-	return readJSON[data.Warships](filepath.Join(s.dir, s.warshipsFile))
+func (s *CacheStore) Warships() (core.Warships, error) {
+	return readJSON[core.Warships](filepath.Join(s.dir, s.warshipsFile))
 }
 
-func (s *CacheStore) SetWarships(data data.Warships) {
+func (s *CacheStore) SetWarships(data core.Warships) {
 	_ = writeJSON(filepath.Join(s.dir, s.warshipsFile), data)
 }
 

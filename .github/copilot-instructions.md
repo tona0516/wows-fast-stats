@@ -29,7 +29,7 @@
 - `backend/adapter/`: 外部APIインターフェース。
 - `backend/config/`: アプリ設定管理。
 - `backend/controller/`: Wails ハンドラ。
-- `backend/data/`: 外部APIレスポンスのマッピングや計算ロジック。
+- `backend/core/`: 外部APIレスポンスのマッピングや計算ロジック。
 - `backend/infra/`: 外部サービス接続 (Discord, GitHub, ローカルファイル等)。
 - `backend/usecase/`: ユースケース実装 (必要なら階層化)。
 - `backend/mock/`: `go.uber.org/mock`で自動生成されたモック。この配下は手動編集禁止。
@@ -62,10 +62,10 @@
 - `task test` でフロントエンド/バックエンドテスト実行。
 
 ## 11. 既存計算ロジック参照
-- 新規指標追加時は `backend/data/rating.go`, `pr_factor.go`, `stats_pattern.go` 等の既存式/パターンを参照し整合性を確保。
+- 新規指標追加時は `backend/core/rating.go`, `pr_factor.go`, `stats_pattern.go` 等の既存式/パターンを参照し整合性を確保。
 
 ## 12. 新バージョン検出
-- `backend/data/new_version.go` 付近の処理を拡張する際は API レート/キャッシュを考慮。
+- `backend/core/new_version.go` 付近の処理を拡張する際は API レート/キャッシュを考慮。
 
 ## 13. ドキュメント更新
 - 公開 API/構造変更時は `README.md` とここ (必要なら) を更新。

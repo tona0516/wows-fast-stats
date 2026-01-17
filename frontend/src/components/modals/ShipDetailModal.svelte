@@ -1,6 +1,6 @@
 <script lang="ts">
   import { showToast, storedPlayerShipDetail } from "@libs/stores";
-  import type { data } from "@wails/go/models";
+  import type { core } from "@wails/go/models";
   import { ClipboardSetText, BrowserOpenURL } from "@wails/runtime/runtime";
   import ModalCommon from "./ModalCommon.svelte";
   import { ModalManager } from "@libs/ModalManager";
@@ -17,7 +17,7 @@
   $: damageRatings = getDamageRatings($storedPlayerShipDetail);
 
   function getDamageRatings(
-    player: data.Player | undefined,
+    player: core.Player | undefined,
   ): DamageRating[] | undefined {
     if (!player) {
       return undefined;

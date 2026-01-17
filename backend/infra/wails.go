@@ -2,7 +2,7 @@ package infra
 
 import (
 	"context"
-	"wfs/backend/data"
+	"wfs/backend/core"
 
 	"github.com/morikuni/failure"
 	"github.com/samber/do/v2"
@@ -22,7 +22,7 @@ func (w *Wails) EmitEvent(ctx context.Context, eventName string, optionalData ..
 func (w *Wails) OpenDirectoryDialog(ctx context.Context) (string, error) {
 	selected, err := runtime.OpenDirectoryDialog(ctx, runtime.OpenDialogOptions{})
 	if err != nil {
-		return "", failure.Translate(err, data.ErrWailsOpenDirectoryDialog)
+		return "", failure.Translate(err, core.ErrWailsOpenDirectoryDialog)
 	}
 
 	return selected, nil

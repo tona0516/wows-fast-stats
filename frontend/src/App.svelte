@@ -14,7 +14,7 @@
     StartPollingMatch,
     Prefetch,
   } from "@wails/go/main/App";
-  import type { data } from "@wails/go/models";
+  import type { core } from "@wails/go/models";
   import { EventsOn, LogInfo } from "@wails/runtime/runtime";
   import { onMount } from "svelte";
   import { themeChange } from "theme-change";
@@ -60,7 +60,7 @@
     LogInfo("BATTLE_FETCH_PLAYERS");
     TonakoManager.getInstance.setFetchPlayerDataState();
   });
-  EventsOn("BATTLE_FETCH_DONE", (battle: data.Battle) => {
+  EventsOn("BATTLE_FETCH_DONE", (battle: core.Battle) => {
     LogInfo("BATTLE_FETCH_DONE");
     TonakoManager.getInstance.setHidden();
     storedBattle.set(battle);

@@ -5,7 +5,7 @@
     NewVersion,
     ShowMessageDialog,
   } from "@wails/go/main/App";
-  import type { data } from "@wails/go/models";
+  import type { core } from "@wails/go/models";
   import iconApp from "src/assets/images/appicon.png";
 
   const LINKS = [
@@ -34,7 +34,7 @@
     checkingUpdate = true;
 
     try {
-      const newVersion = (await NewVersion()) as data.NewVersion | null;
+      const newVersion = (await NewVersion()) as core.NewVersion | null;
 
       if (newVersion?.version && newVersion.url) {
         await ShowMessageDialog(

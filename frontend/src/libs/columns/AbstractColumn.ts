@@ -1,6 +1,6 @@
 import type { ColorCode } from "@libs/ColorCode";
 import type { Optional } from "@libs/types";
-import type { data } from "@wails/go/models";
+import type { core } from "@wails/go/models";
 
 export abstract class AbstractColumn {
   constructor(
@@ -11,11 +11,11 @@ export abstract class AbstractColumn {
   abstract needsShow(): boolean;
   abstract getTableDataComponent(): any;
 
-  getTextColorCode(_: data.Player): Optional<ColorCode> {
+  getTextColorCode(_: core.Player): Optional<ColorCode> {
     return undefined;
   }
 
-  getBgColorCode(_: data.Player): Optional<ColorCode> {
+  getBgColorCode(_: core.Player): Optional<ColorCode> {
     return undefined;
   }
 }

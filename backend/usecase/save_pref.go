@@ -2,7 +2,7 @@ package usecase
 
 import (
 	"wfs/backend/adapter"
-	"wfs/backend/data"
+	"wfs/backend/core"
 
 	"github.com/samber/do/v2"
 )
@@ -17,7 +17,7 @@ func NewSavePref(i do.Injector) (*SavePref, error) {
 	}, nil
 }
 
-func (sp *SavePref) Invoke(config data.Pref) error {
+func (sp *SavePref) Invoke(config core.Pref) error {
 	if err := sp.configStore.SetPref(config); err != nil {
 		return err
 	}

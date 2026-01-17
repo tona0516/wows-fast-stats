@@ -1,12 +1,12 @@
 <script lang="ts">
-  import type { data } from "@wails/go/models";
+  import type { core } from "@wails/go/models";
   import BarChart from "./BarChart.svelte";
   import { storedPref } from "@libs/stores";
   import { get } from "svelte/store";
   import type { StatsExtra } from "@libs/types";
 
-  export let friendTeam: data.Team;
-  export let enemyTeam: data.Team;
+  export let friendTeam: core.Team;
+  export let enemyTeam: core.Team;
 
   type ChartData = {
     label: string;
@@ -14,8 +14,8 @@
     enemyValue: number;
   };
 
-  let friendTeamStats: data.TeamStats;
-  let enemyTeamStats: data.TeamStats;
+  let friendTeamStats: core.TeamStats;
+  let enemyTeamStats: core.TeamStats;
 
   let shipChartData: ChartData[] = [];
   let overallChartData: ChartData[] = [];
@@ -94,7 +94,7 @@
     ];
   }
 
-  function getTeamStats(team: data.Team): data.TeamStats {
+  function getTeamStats(team: core.Team): core.TeamStats {
     const statsExtra = get(storedPref).stats_extra as StatsExtra;
     return team[statsExtra];
   }

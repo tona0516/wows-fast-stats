@@ -5,7 +5,7 @@ import (
 	"context"
 	"sync"
 	"wfs/backend/adapter"
-	"wfs/backend/data"
+	"wfs/backend/core"
 
 	"github.com/samber/do/v2"
 	"golang.org/x/sync/errgroup"
@@ -21,8 +21,8 @@ func NewBadgeService(i do.Injector) (*badgeService, error) {
 	}, nil
 }
 
-func (s *badgeService) fetchAll(ctx context.Context, accountIDs []data.AccountID) (data.AllPlayerShipBadges, error) {
-	result := make(data.AllPlayerShipBadges)
+func (s *badgeService) fetchAll(ctx context.Context, accountIDs []core.AccountID) (core.AllPlayerShipBadges, error) {
+	result := make(core.AllPlayerShipBadges)
 	eg, egCtx := errgroup.WithContext(ctx)
 
 	var mu sync.Mutex
@@ -34,7 +34,7 @@ func (s *badgeService) fetchAll(ctx context.Context, accountIDs []data.AccountID
 			}
 
 			mu.Lock()
-			shipMap := make(data.PlayerShipBadges)
+			shipMap := make(core.PlayerShipBadges)
 			for _, ship := range resp.Data[accountID] {
 				shipMap[ship.ShipID] = ship
 			}

@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"wfs/backend/adapter"
-	"wfs/backend/data"
+	"wfs/backend/core"
 
 	"github.com/morikuni/failure"
 	"github.com/samber/do/v2"
@@ -36,7 +36,7 @@ func (s *InstallPathSetting) Invoke(ctx context.Context) (bool, error) {
 	}
 
 	if _, err := os.Stat(filepath.Join(selected, s.gameClientFile)); err != nil {
-		return false, failure.Translate(err, data.ErrInvalidInstallPath)
+		return false, failure.Translate(err, core.ErrInvalidInstallPath)
 	}
 
 	config, err := s.configStore.Pref()

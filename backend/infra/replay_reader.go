@@ -4,7 +4,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
-	"wfs/backend/data"
+	"wfs/backend/core"
 
 	"github.com/morikuni/failure"
 	"github.com/samber/do/v2"
@@ -22,13 +22,13 @@ func NewReplayReader(i do.Injector) (*ReplayReader, error) {
 	}, nil
 }
 
-func (r *ReplayReader) TempArenaInfo(installPath string) (data.TempArenaInfo, error) {
-	var tempArenaInfo data.TempArenaInfo
+func (r *ReplayReader) TempArenaInfo(installPath string) (core.TempArenaInfo, error) {
+	var tempArenaInfo core.TempArenaInfo
 
 	tempArenaInfoPaths := []string{}
 	root := filepath.Join(installPath, r.replayDir)
 	if _, err := os.Stat(root); err != nil {
-		return tempArenaInfo, failure.Translate(err, data.ErrTempArenaInfoNotFound)
+		return tempArenaInfo, failure.Translate(err, core.ErrTempArenaInfoNotFound)
 	}
 
 	err := filepath.WalkDir(root, func(path string, info fs.DirEntry, err error) error {
@@ -48,27 +48,27 @@ func (r *ReplayReader) TempArenaInfo(installPath string) (data.TempArenaInfo, er
 		return nil
 	})
 	if err != nil {
-		return tempArenaInfo, failure.Translate(err, data.ErrTempArenaInfoSearch)
+		return tempArenaInfo, failure.Translate(err, core.ErrTempArenaInfoSearch)
 	}
 
 	return r.decideTempArenaInfo(tempArenaInfoPaths)
 }
 
-func (r *ReplayReader) decideTempArenaInfo(paths []string) (data.TempArenaInfo, error) {
-	var result data.TempArenaInfo
+func (r *ReplayReader) decideTempArenaInfo(paths []string) (core.TempArenaInfo, error) {
+	var result core.TempArenaInfo
 	size := len(paths)
 
 	if size == 0 {
-		return result, failure.New(data.ErrTempArenaInfoNotFound)
+		return result, failure.New(core.ErrTempArenaInfoNotFound)
 	}
 
 	if size == 1 {
-		return readJSON[data.TempArenaInfo](paths[0])
+		return readJSON[core.TempArenaInfo](paths[0])
 	}
 
-	var latest data.TempArenaInfo
+	var latest core.TempArenaInfo
 	for _, path := range paths {
-		tempArenaInfo, err := readJSON[data.TempArenaInfo](path)
+		tempArenaInfo, err := readJSON[core.TempArenaInfo](path)
 		if err != nil {
 			continue
 		}
@@ -79,7 +79,7 @@ func (r *ReplayReader) decideTempArenaInfo(paths []string) (data.TempArenaInfo, 
 	}
 
 	if latest.Unixtime() == 0 {
-		return result, failure.New(data.ErrTempArenaInfoNotFound)
+		return result, failure.New(core.ErrTempArenaInfoNotFound)
 	}
 
 	return latest, nil
