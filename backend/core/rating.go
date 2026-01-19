@@ -67,11 +67,7 @@ func NewRatingFromWinRate(value float64) Rating {
 }
 
 func NewRatingFromShipDamage(value, expected float64) Rating {
-	if expected <= 0 {
-		return RatingNone
-	}
-
-	ratio := value / expected
+	ratio := safeDivide(value, expected)
 	for _, t := range ratingThresholds {
 		if ratio >= t.ShipDamageRatio {
 			return t.Rating

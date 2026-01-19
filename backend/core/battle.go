@@ -32,14 +32,6 @@ func NewBattle(
 			warship = *NewUnknownWarship()
 		}
 
-		stats := NewPersonalStats(
-			vehicle.ShipID,
-			accountInfo.Data[accountID],
-			allPlayerShipsStats[accountID],
-			allPlayerShipsBadges[accountID],
-			prefetchResult.Warships,
-		)
-
 		player := Player{
 			PlayerInfo: PlayerInfo{
 				ID:       accountID,
@@ -50,22 +42,31 @@ func NewBattle(
 			Warship: warship,
 			PvPSolo: NewPlayerStats(
 				StatsPatternPvPSolo,
-				stats,
+				accountInfo.Data[accountID],
+				allPlayerShipsStats[accountID],
+				allPlayerShipsBadges[accountID],
 				vehicle.ShipID,
+				accountID,
 				tempArenaInfo.Vehicles,
 				prefetchResult.Warships,
 			),
 			PvPAll: NewPlayerStats(
 				StatsPatternPvPAll,
-				stats,
+				accountInfo.Data[accountID],
+				allPlayerShipsStats[accountID],
+				allPlayerShipsBadges[accountID],
 				vehicle.ShipID,
+				accountID,
 				tempArenaInfo.Vehicles,
 				prefetchResult.Warships,
 			),
 			RankSolo: NewPlayerStats(
 				StatsPatternRankSolo,
-				stats,
+				accountInfo.Data[accountID],
+				allPlayerShipsStats[accountID],
+				allPlayerShipsBadges[accountID],
 				vehicle.ShipID,
+				accountID,
 				tempArenaInfo.Vehicles,
 				prefetchResult.Warships,
 			),
@@ -188,11 +189,11 @@ func NewTeamAverageStats(players Players, statsPattern StatsPattern) TeamAverage
 		ShipPR:         safeDivide(shipPRSum, shipStatsCount),
 		ShipDamage:     safeDivide(shipDamageSum, shipStatsCount),
 		ShipWinRate:    safeDivide(shipWinRateSum, shipStatsCount),
-		ShipBattles:    uint(safeDivide(float64(shipBattlesSum), shipStatsCount)),
+		ShipBattles:    uint(safeDivide(shipBattlesSum, shipStatsCount)),
 		OverallPR:      safeDivide(overallPRSum, overallStatsCount),
 		OverallDamage:  safeDivide(overallDamageSum, overallStatsCount),
 		OverallWinRate: safeDivide(overallWinRateSum, overallStatsCount),
-		OverallBattles: uint(safeDivide(float64(overallBattlesSum), overallStatsCount)),
+		OverallBattles: uint(safeDivide(overallBattlesSum, overallStatsCount)),
 	}
 }
 
@@ -241,8 +242,8 @@ func NewTeamThreatLevel(players Players, statsPattern StatsPattern) TeamThreatLe
 
 	return TeamThreatLevel{
 		Average:            mean,
-		DissociationDegree: (maxScore/mean - 1) * 100,
-		Accuracy:           float64(len(scores)) / float64(len(players)) * 100,
+		DissociationDegree: (safeDivide(maxScore, mean) - 1) * 100,
+		Accuracy:           safeDivide(len(scores), len(players)) * 100,
 	}
 }
 

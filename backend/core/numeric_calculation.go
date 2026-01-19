@@ -32,7 +32,7 @@ func round(value float64, places int) float64 {
 }
 
 type Number interface {
-	float64 | int | int64 | uint | uint64
+	float64 | int | uint
 }
 
 func safeDivide[T, U Number](numerator T, denominator U) float64 {
