@@ -538,13 +538,13 @@ export namespace core {
 		    return a;
 		}
 	}
-	export class BattleMetaData {
+	export class BattleMetadata {
 	    unixtime: number;
 	    arena: string;
 	    type: string;
 	
 	    static createFrom(source: any = {}) {
-	        return new BattleMetaData(source);
+	        return new BattleMetadata(source);
 	    }
 	
 	    constructor(source: any = {}) {
@@ -555,7 +555,7 @@ export namespace core {
 	    }
 	}
 	export class Battle {
-	    metadata: BattleMetaData;
+	    metadata: BattleMetadata;
 	    teams: Team[];
 	
 	    static createFrom(source: any = {}) {
@@ -564,7 +564,7 @@ export namespace core {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.metadata = this.convertValues(source["metadata"], BattleMetaData);
+	        this.metadata = this.convertValues(source["metadata"], BattleMetadata);
 	        this.teams = this.convertValues(source["teams"], Team);
 	    }
 	

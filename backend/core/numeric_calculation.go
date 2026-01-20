@@ -42,3 +42,29 @@ func safeDivide[T, U Number](numerator T, denominator U) float64 {
 
 	return float64(numerator) / float64(denominator)
 }
+
+func max(values []float64) float64 {
+	if len(values) == 0 {
+		return 0
+	}
+
+	maxValue := values[0]
+	for _, value := range values {
+		if value > maxValue {
+			maxValue = value
+		}
+	}
+	return maxValue
+}
+
+func geometricMean(values []float64) float64 {
+	if len(values) == 0 {
+		return 0
+	}
+
+	product := 1.0
+	for _, value := range values {
+		product *= value
+	}
+	return math.Pow(product, 1/float64(len(values)))
+}

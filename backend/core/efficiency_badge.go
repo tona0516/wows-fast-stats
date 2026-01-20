@@ -9,13 +9,3 @@ const (
 	EfficiencyBadgeThird  = "3"
 	EfficiencyBadgeNone   = ""
 )
-
-func EfficiencyBadges() []string {
-	return []string{
-		EfficiencyBadgeExpert,
-		EfficiencyBadgeFirst,
-		EfficiencyBadgeSecond,
-		EfficiencyBadgeThird,
-		EfficiencyBadgeNone,
-	}
-}

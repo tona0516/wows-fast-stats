@@ -7,8 +7,7 @@ import (
 	"github.com/rs/zerolog"
 )
 
-//nolint:gochecknoglobals
-var discordWebhookURL = "https://discord.com/api/webhooks"
+const discordWebhookURL = "https://discord.com/api/webhooks"
 
 type Config struct {
 	Basic           BasicConfig

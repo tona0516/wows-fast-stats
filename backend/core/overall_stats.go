@@ -62,21 +62,23 @@ func NewOverallStats(
 	if ok {
 		shipValues := shipStats.shipStatsValues(statsPattern)
 		tlc := NewThreatLevelCalculator()
-		threatLevel = tlc.Calculate(NewThreatLevelInput(
-			vehicles,
-			warships,
-			shipID,
-			shipValues.Battles,
-			shipValues.avgDamage(),
-			shipValues.winRate(),
-			shipValues.survivedRate().All,
-			shipValues.avgPlanesKilled(),
-			values.Battles,
-			values.avgDamage(),
-			values.winRate(),
-			values.avgKills(),
-			values.kdRate(),
-		))
+
+		tti := ThreatLevelInput{
+			Vehicles:         vehicles,
+			Warships:         warships,
+			ShipID:           shipID,
+			ShipBattles:      shipValues.Battles,
+			ShipDamage:       shipValues.avgDamage(),
+			ShipWinRate:      shipValues.winRate(),
+			ShipSurvivedRate: shipValues.survivedRate().All,
+			ShipPlanesKilled: shipValues.avgPlanesKilled(),
+			OverallBattles:   values.Battles,
+			OverallDamage:    values.avgDamage(),
+			OverallWinRate:   values.winRate(),
+			OverallKill:      values.avgKills(),
+			OverallKdRate:    values.kdRate(),
+		}
+		threatLevel = tlc.Calculate(tti)
 	}
 
 	return OverallStats{

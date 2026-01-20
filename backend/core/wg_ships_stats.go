@@ -1,5 +1,7 @@
 package core
 
+import "math"
+
 type WGShipsStats struct {
 	WGResponseCommon[map[AccountID][]WGShipsStatsData]
 }
@@ -66,7 +68,7 @@ func (v WGShipStatsValues) winRate() float64 {
 }
 
 func (v WGShipStatsValues) kdRate() float64 {
-	deaths := max(v.Battles-v.SurvivedBattles, 1)
+	deaths := math.Max(float64(v.Battles-v.SurvivedBattles), 1)
 	return safeDivide(v.Frags, deaths)
 }
 

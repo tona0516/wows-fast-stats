@@ -17,7 +17,6 @@ import (
 	"go.uber.org/ratelimit"
 )
 
-//nolint:gochecknoglobals
 var temporaryUnavaillalbleMessages = []string{
 	"REQUEST_LIMIT_EXCEEDED",
 	"SOURCE_NOT_AVAILABLE",

@@ -12,7 +12,6 @@ import (
 //go:embed all:frontend/dist
 var assets embed.FS
 
-//nolint:gochecknoglobals
 var (
 	appName    string
 	appVersion string
