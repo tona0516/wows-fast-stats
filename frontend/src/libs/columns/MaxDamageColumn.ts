@@ -15,7 +15,7 @@ export interface MaxDamageParam {
 
 export class MaxDamageColumn extends AbstractStatsColumn<MaxDamageParam> {
   constructor(category: StatsCategory) {
-    super("max_damage", category);
+    super("maxDamage", category);
   }
 
   override getTableDataComponent() {
@@ -23,15 +23,15 @@ export class MaxDamageColumn extends AbstractStatsColumn<MaxDamageParam> {
   }
 
   override getDisplayValue(player: core.Player): MaxDamageParam {
-    const maxDamage = this.getPlayerStats(player)[this.category].max_damage;
+    const maxDamage = this.getPlayerStats(player)[this.category].maxDamage;
     const value = maxDamage.value.toFixed(this.getDigit());
 
     switch (this.category) {
       case "ship":
         return { damage: value };
       case "overall": {
-        const url = NumbersURL.getShip(maxDamage.ship_id);
-        const name = `${toTierString(maxDamage.ship_tier)} ${maxDamage.ship_name}`;
+        const url = NumbersURL.getShip(maxDamage.shipID);
+        const name = `${toTierString(maxDamage.shipTier)} ${maxDamage.shipName}`;
         return {
           damage: value,
           shipInfo: { url, name },

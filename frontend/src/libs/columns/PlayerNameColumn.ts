@@ -18,8 +18,8 @@ export class PlayerNameColumn extends AbstractColumn {
 
   override getTextColorCode(player: core.Player): Optional<ColorCode> {
     const cfg = get(storedPref);
-    const statsExtra = cfg.stats_extra as StatsExtra;
-    const pattern = cfg.column.player.color_pattern;
+    const statsExtra = cfg.statsExtra as StatsExtra;
+    const pattern = cfg.column.player.colorPattern;
 
     if (pattern === "none") {
       return undefined;
@@ -36,8 +36,8 @@ export class PlayerNameColumn extends AbstractColumn {
         const code = RATING_COLORS[rating];
         return code ? code.getFixedTextColor() : undefined;
       }
-      case "threat_level": {
-        const threat = player[statsExtra].overall.threat_level;
+      case "threatLevel": {
+        const threat = player[statsExtra].overall.threatLevel;
         const pair = THREAT_LEVEL_COLORS[threat.rank];
         return pair ? pair.background : undefined;
       }
@@ -51,31 +51,31 @@ export class PlayerNameColumn extends AbstractColumn {
   }
 
   getClanTag(player: core.Player): string {
-    const clanID = player.player_info.clan.id;
-    const clanTag = player.player_info.clan.tag;
+    const clanID = player.playerInfo.clan.id;
+    const clanTag = player.playerInfo.clan.tag;
 
     return clanID !== 0 ? `[${clanTag}]` : "";
   }
 
   getNationFlagClass(player: core.Player): string {
-    if (!get(storedPref).column.player.enable_nation_flag) {
+    if (!get(storedPref).column.player.enableNationFlag) {
       return "";
     }
     const langMap: Record<string, string> = { ja: "jp", zh: "cn", ko: "kr" };
-    const fragIcon = langMap[player.player_info.clan.language] ?? "";
+    const fragIcon = langMap[player.playerInfo.clan.language] ?? "";
     return fragIcon ? `fi fi-${fragIcon}` : "";
   }
 
   getPlayerName(player: core.Player): string {
-    return player.player_info.name;
+    return player.playerInfo.name;
   }
 
   isNPC(player: core.Player): boolean {
-    return player.player_info.id === 0;
+    return player.playerInfo.id === 0;
   }
 
   getClanColorCode(player: core.Player): Optional<ColorCode> {
-    const color = player.player_info.clan.hex_color;
+    const color = player.playerInfo.clan.colorCode;
 
     let colorCode: ColorCode;
     try {

@@ -2,7 +2,7 @@ package core
 
 type TeamThreatLevel struct {
 	Average            float64 `json:"average"`
-	DissociationDegree float64 `json:"dissociation_degree"`
+	DissociationDegree float64 `json:"dissociationDegree"`
 	Accuracy           float64 `json:"accuracy"`
 }
 

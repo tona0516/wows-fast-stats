@@ -19,9 +19,9 @@ export abstract class AbstractStatsColumn<T> extends AbstractColumn {
     const cs = get(storedPref).column.stats[this.key];
     switch (this.category) {
       case "ship":
-        return cs.is_show_ship;
+        return cs.isShowShip;
       case "overall":
-        return cs.is_show_overall;
+        return cs.isShowOverall;
     }
   }
 
@@ -30,7 +30,7 @@ export abstract class AbstractStatsColumn<T> extends AbstractColumn {
   }
 
   getPlayerStats(player: core.Player): core.PlayerStats {
-    return player[get(storedPref).stats_extra as StatsExtra];
+    return player[get(storedPref).statsExtra as StatsExtra];
   }
 
   getCssClass(): string {

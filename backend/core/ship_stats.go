@@ -3,17 +3,17 @@ package core
 type ShipStats struct {
 	Battles         uint            `json:"battles"`
 	Damage          RatingValue     `json:"damage"`
-	MaxDamage       MaxDamage       `json:"max_damage"`
-	WinRate         RatingValue     `json:"win_rate"`
-	SurvivedRate    SurvivedRate    `json:"survived_rate"`
-	KdRate          float64         `json:"kd_rate"`
+	MaxDamage       MaxDamage       `json:"maxDamage"`
+	WinRate         RatingValue     `json:"winRate"`
+	SurvivedRate    SurvivedRate    `json:"survivedRate"`
+	KdRate          float64         `json:"kdRate"`
 	Kill            float64         `json:"kill"`
 	Exp             float64         `json:"exp"`
 	PR              RatingValue     `json:"pr"`
-	HitRate         HitRate         `json:"hit_rate"`
-	PlanesKilled    float64         `json:"planes_killed"`
-	PlatoonRate     float64         `json:"platoon_rate"`
-	EfficiencyBadge EfficiencyBadge `json:"efficiency_badge"`
+	HitRate         HitRate         `json:"hitRate"`
+	PlanesKilled    float64         `json:"planesKilled"`
+	PlatoonRate     float64         `json:"platoonRate"`
+	EfficiencyBadge EfficiencyBadge `json:"efficiencyBadge"`
 }
 
 func NewShipStats(

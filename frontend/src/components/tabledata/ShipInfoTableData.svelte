@@ -19,14 +19,14 @@
     {#if nationIconPath}
       <img
         class="w-icon"
-        style="width: {(1.25 * $storedPref.zoom_rate) / 100}rem"
+        style="width: {(1.25 * $storedPref.zoomRate) / 100}rem"
         src={nationIconPath}
         alt=""
       />
     {/if}
     <img
       class="w-icon"
-      style="width: {(1.25 * $storedPref.zoom_rate) / 100}rem"
+      style="width: {(1.25 * $storedPref.zoomRate) / 100}rem"
       src={column.getShipIconPath(player)}
       alt=""
     />

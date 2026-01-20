@@ -3,19 +3,19 @@ package core
 type OverallStats struct {
 	Battles           uint                 `json:"battles"`
 	Damage            RatingValue          `json:"damage"`
-	MaxDamage         MaxDamage            `json:"max_damage"`
-	WinRate           RatingValue          `json:"win_rate"`
-	SurvivedRate      SurvivedRate         `json:"survived_rate"`
-	KdRate            float64              `json:"kd_rate"`
+	MaxDamage         MaxDamage            `json:"maxDamage"`
+	WinRate           RatingValue          `json:"winRate"`
+	SurvivedRate      SurvivedRate         `json:"survivedRate"`
+	KdRate            float64              `json:"kdRate"`
 	Kill              float64              `json:"kill"`
 	Exp               float64              `json:"exp"`
 	PR                RatingValue          `json:"pr"`
-	ThreatLevel       ThreatLevel          `json:"threat_level"`
-	AvgTier           float64              `json:"avg_tier"`
-	UsingShipTypeRate ShipTypeGroup        `json:"using_ship_type_rate"`
-	UsingTierRate     TierGroup            `json:"using_tier_rate"`
-	PlatoonRate       float64              `json:"platoon_rate"`
-	EfficiencyBadge   EfficiencyBadgeGroup `json:"efficiency_badge"`
+	ThreatLevel       ThreatLevel          `json:"threatLevel"`
+	AvgTier           float64              `json:"avgTier"`
+	UsingShipTypeRate ShipTypeGroup        `json:"usingShipTypeRate"`
+	UsingTierRate     TierGroup            `json:"usingTierRate"`
+	PlatoonRate       float64              `json:"platoonRate"`
+	EfficiencyBadge   EfficiencyBadgeGroup `json:"efficiencyBadge"`
 }
 
 func NewOverallStats(

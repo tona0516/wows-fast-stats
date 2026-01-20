@@ -1,8 +1,8 @@
 package core
 
 type MaxDamage struct {
-	ShipID   ShipID `json:"ship_id"`
-	ShipName string `json:"ship_name"`
-	ShipTier uint   `json:"ship_tier"`
+	ShipID   ShipID `json:"shipID"`
+	ShipName string `json:"shipName"`
+	ShipTier uint   `json:"shipTier"`
 	Value    uint   `json:"value"`
 }

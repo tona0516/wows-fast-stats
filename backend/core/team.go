@@ -2,9 +2,9 @@ package core
 
 type Team struct {
 	Players  Players   `json:"players"`
-	PvPSolo  TeamStats `json:"pvp_solo"`
-	PvPAll   TeamStats `json:"pvp_all"`
-	RankSolo TeamStats `json:"rank_solo"`
+	PvPSolo  TeamStats `json:"pvpSolo"`
+	PvPAll   TeamStats `json:"pvpAll"`
+	RankSolo TeamStats `json:"rankSolo"`
 }
 
 func NewTeam(players Players) Team {

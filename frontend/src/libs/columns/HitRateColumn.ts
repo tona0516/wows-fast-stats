@@ -4,7 +4,7 @@ import { AbstractStatsColumn } from "./AbstractStatsColumn";
 
 export class HitRateColumn extends AbstractStatsColumn<string> {
   constructor() {
-    super("hit_rate", "ship");
+    super("hitRate", "ship");
   }
 
   override getTableDataComponent() {
@@ -12,9 +12,9 @@ export class HitRateColumn extends AbstractStatsColumn<string> {
   }
 
   override getDisplayValue(player: core.Player): string {
-    const hitRate = this.getPlayerStats(player).ship.hit_rate;
+    const hitRate = this.getPlayerStats(player).ship.hitRate;
 
-    const main = hitRate.main_battery.toFixed(this.getDigit());
+    const main = hitRate.mainBattery.toFixed(this.getDigit());
     const torps = hitRate.torpedoes.toFixed(this.getDigit());
 
     return `${main}|${torps}`;

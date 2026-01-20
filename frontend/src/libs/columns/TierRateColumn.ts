@@ -22,7 +22,7 @@ export class TierRateColumn extends AbstractStatsColumn<
   StackedBarChartParam[]
 > {
   constructor() {
-    super("using_tier_rate", "overall");
+    super("usingTierRate", "overall");
   }
 
   override getTableDataComponent() {
@@ -30,7 +30,7 @@ export class TierRateColumn extends AbstractStatsColumn<
   }
 
   override getDisplayValue(player: core.Player): StackedBarChartParam[] {
-    const tierRateGroup = this.getPlayerStats(player).overall.using_tier_rate;
+    const tierRateGroup = this.getPlayerStats(player).overall.usingTierRate;
 
     const params: StackedBarChartParam[] = [];
     Object.keys(DISPLAY_NAMES).forEach((key) => {

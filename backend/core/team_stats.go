@@ -1,8 +1,8 @@
 package core
 
 type TeamStats struct {
-	TeamAverageStats TeamAverageStats `json:"team_average_stats"`
-	TeamThreatLevel  TeamThreatLevel  `json:"team_threat_level"`
+	TeamAverageStats TeamAverageStats `json:"teamAverageStats"`
+	TeamThreatLevel  TeamThreatLevel  `json:"teamThreatLevel"`
 }
 
 func NewTeamStats(players Players, pattern StatsPattern) TeamStats {

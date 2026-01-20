@@ -29,7 +29,7 @@
 
   $: {
     // @ts-ignore
-    document.body.style.zoom = ($storedPref?.zoom_rate || 1.0) / 100;
+    document.body.style.zoom = ($storedPref?.zoomRate || 1.0) / 100;
   }
 
   onMount(() => {

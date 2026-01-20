@@ -9,7 +9,7 @@ export class ShipTypeRateColumn extends AbstractStatsColumn<
   StackedBarChartParam[]
 > {
   constructor() {
-    super("using_ship_type_rate", "overall");
+    super("usingShipTypeRate", "overall");
   }
 
   override getTableDataComponent() {
@@ -17,8 +17,7 @@ export class ShipTypeRateColumn extends AbstractStatsColumn<
   }
 
   override getDisplayValue(player: core.Player): StackedBarChartParam[] {
-    const shipTypeGroup =
-      this.getPlayerStats(player).overall.using_ship_type_rate;
+    const shipTypeGroup = this.getPlayerStats(player).overall.usingShipTypeRate;
 
     const params: StackedBarChartParam[] = [];
     SHIP_TYPES.forEach((label, shipType) => {

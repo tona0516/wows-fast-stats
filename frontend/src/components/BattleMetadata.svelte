@@ -1,7 +1,7 @@
 <script lang="ts">
   import { core } from "@wails/go/models";
 
-  export let metadata: core.BattleMetaData;
+  export let metadata: core.BattleMetadata;
 
   const metaTexts = [
     {

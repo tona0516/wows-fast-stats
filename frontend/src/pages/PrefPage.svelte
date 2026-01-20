@@ -39,12 +39,12 @@
     <p class="text-sm text-gray-500 mb-2">
       WorldOfWarships.exeが存在するフォルダを選択してください
     </p>
-    {#if $storedPref.install_path}
+    {#if $storedPref.installPath}
       <div class="stats shadow w-full mb-2">
         <div class="stat">
           <div class="stat-title">ゲームクライアント インストールパス</div>
           <div class="stat-value text-lg break-all">
-            {$storedPref.install_path}
+            {$storedPref.installPath}
           </div>
         </div>
       </div>
@@ -71,10 +71,10 @@
       <label class="label font-bold">UIサイズ</label>
       <select
         class="select select-bordered w-full"
-        bind:value={$storedPref.zoom_rate}
+        bind:value={$storedPref.zoomRate}
       >
         {#each ZOOM_RATES as zr}
-          <option selected={zr === $storedPref.zoom_rate} value={zr}
+          <option selected={zr === $storedPref.zoomRate} value={zr}
             >{zr}%</option
           >
         {/each}
@@ -85,10 +85,10 @@
       <label class="label font-bold">統計パターン</label>
       <select
         class="select select-bordered w-full my-2"
-        bind:value={$storedPref.stats_extra}
+        bind:value={$storedPref.statsExtra}
       >
         {#each STATS_EXTRAS as se}
-          <option selected={se[0] === $storedPref.stats_extra} value={se[0]}
+          <option selected={se[0] === $storedPref.statsExtra} value={se[0]}
             >{se[1]}</option
           >
         {/each}
@@ -119,7 +119,7 @@
                   <input
                     class="toggle toggle-success"
                     type="checkbox"
-                    bind:checked={$storedPref.column.player.enable_nation_flag}
+                    bind:checked={$storedPref.column.player.enableNationFlag}
                   />
                   <span
                     >クラン国籍の国旗を表示する（クラン説明から言語検出）</span
@@ -129,12 +129,12 @@
                   <span>成績に基づく背景色</span>
                   <select
                     class="select select-sm select-bordered"
-                    bind:value={$storedPref.column.player.color_pattern}
+                    bind:value={$storedPref.column.player.colorPattern}
                   >
                     {#each PLAYER_NAME_COLORS as color}
                       <option
                         selected={color[0] ===
-                          $storedPref.column.player.color_pattern}
+                          $storedPref.column.player.colorPattern}
                         value={color[0]}>{color[1]}</option
                       >
                     {/each}
@@ -151,7 +151,7 @@
                   <input
                     class="toggle toggle-success"
                     type="checkbox"
-                    bind:checked={$storedPref.column.ship.enable_nation_flag}
+                    bind:checked={$storedPref.column.ship.enableNationFlag}
                   />
                   <span>国旗を表示する</span>
                 </label>
@@ -159,7 +159,7 @@
                   <input
                     class="toggle toggle-success"
                     type="checkbox"
-                    bind:checked={$storedPref.column.ship.is_colored}
+                    bind:checked={$storedPref.column.ship.isColored}
                   />
                   <span>艦種に基づく背景色にする</span>
                 </label>
@@ -190,9 +190,7 @@
                   <input
                     class="toggle toggle-success"
                     type="checkbox"
-                    bind:checked={
-                      $storedPref.column.stats[statsKey].is_show_ship
-                    }
+                    bind:checked={$storedPref.column.stats[statsKey].isShowShip}
                   />
                 </td>
               {:else}
@@ -204,14 +202,14 @@
                     class="toggle toggle-success"
                     type="checkbox"
                     bind:checked={
-                      $storedPref.column.stats[statsKey].is_show_overall
+                      $storedPref.column.stats[statsKey].isShowOverall
                     }
                   />
                 </td>
               {:else}
                 <td></td>
               {/if}
-              {#if statsKey !== "efficiency_badge"}
+              {#if statsKey !== "efficiencyBadge"}
                 <td class="text-center px-4 py-2">
                   <select
                     class="select select-sm select-bordered"
@@ -244,7 +242,7 @@
         <input
           class="toggle toggle-success"
           type="checkbox"
-          bind:checked={$storedPref.is_send_report}
+          bind:checked={$storedPref.isSendReport}
         />
         <span>アプリ改善のためのデータ送信を許可する</span>
       </li>

@@ -2,7 +2,7 @@ import type { core } from "@wails/go/models";
 import type { ColorCode } from "./ColorCode";
 import type { Tonako } from "./Tonako";
 
-type BasicKey = "player_info" | "warship";
+type BasicKey = "playerInfo" | "warship";
 type CommonMethod = "convertValues";
 
 export type StatsCategory = Exclude<keyof core.PlayerStats, CommonMethod>;
@@ -24,7 +24,7 @@ export type ColumnSettingPattern = "ship" | "overall" | "both";
 export type PlayerNameColorPattern =
   | "pr_ship"
   | "pr_overall"
-  | "threat_level"
+  | "threatLevel"
   | "none";
 
 export type RowPattern =

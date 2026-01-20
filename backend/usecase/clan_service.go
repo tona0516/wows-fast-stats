@@ -55,10 +55,10 @@ func (s *clanService) fetchAll(
 		language := languageMap[clanID]
 
 		result[accountID] = core.Clan{
-			ID:       clanID,
-			Tag:      clanTag,
-			HexColor: hexColor,
-			Language: language,
+			ID:        clanID,
+			Tag:       clanTag,
+			ColorCode: hexColor,
+			Language:  language,
 		}
 	}
 

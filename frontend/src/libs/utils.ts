@@ -48,12 +48,12 @@ export const getRowPattern = (
     return "no_column";
   }
 
-  if (player.player_info.is_hidden === true) {
+  if (player.playerInfo.isHidden === true) {
     return "private";
   }
 
   const stats = player[statsExtra as StatsExtra];
-  if (player.player_info.id === 0 || stats.overall.battles === 0) {
+  if (player.playerInfo.id === 0 || stats.overall.battles === 0) {
     return "no_stats";
   }
 

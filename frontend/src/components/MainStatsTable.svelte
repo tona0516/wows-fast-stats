@@ -88,9 +88,9 @@
     basicCategory.showCount() +
     shipCategory.showCount() +
     overallCategory.showCount();
-  const showThreatLevel = $storedPref.column.stats.threat_level.is_show_overall;
+  const showThreatLevel = $storedPref.column.stats.threatLevel.isShowOverall;
 
-  $: statsExtra = $storedPref.stats_extra as StatsExtra;
+  $: statsExtra = $storedPref.statsExtra as StatsExtra;
 </script>
 
 <div class="overflow-x-auto rounded-xl border border-base-300 bg-base-200">
@@ -128,7 +128,7 @@
           {#each team.players as player}
             {@const rowPattern = getRowPattern(
               player,
-              $storedPref.stats_extra,
+              $storedPref.statsExtra,
               shipCategory.showCount(),
               overallCategory.showCount(),
             )}

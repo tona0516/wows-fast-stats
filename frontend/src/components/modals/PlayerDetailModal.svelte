@@ -10,9 +10,9 @@
 </script>
 
 {#if $storedPlayerDetail}
-  {@const accountID = $storedPlayerDetail.player_info.id}
-  {@const playerName = $storedPlayerDetail.player_info.name}
-  {@const clan = $storedPlayerDetail.player_info.clan}
+  {@const accountID = $storedPlayerDetail.playerInfo.id}
+  {@const playerName = $storedPlayerDetail.playerInfo.name}
+  {@const clan = $storedPlayerDetail.playerInfo.clan}
   <ModalCommon zValue={50} close={ModalManager.instance.closeForPlayerDetail}>
     <h2 class="text-lg font-bold">
       <span>

@@ -2,7 +2,7 @@ export namespace core {
 	
 	export class TeamThreatLevel {
 	    average: number;
-	    dissociation_degree: number;
+	    dissociationDegree: number;
 	    accuracy: number;
 	
 	    static createFrom(source: any = {}) {
@@ -12,7 +12,7 @@ export namespace core {
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.average = source["average"];
-	        this.dissociation_degree = source["dissociation_degree"];
+	        this.dissociationDegree = source["dissociationDegree"];
 	        this.accuracy = source["accuracy"];
 	    }
 	}
@@ -43,8 +43,8 @@ export namespace core {
 	    }
 	}
 	export class TeamStats {
-	    team_average_stats: TeamAverageStats;
-	    team_threat_level: TeamThreatLevel;
+	    teamAverageStats: TeamAverageStats;
+	    teamThreatLevel: TeamThreatLevel;
 	
 	    static createFrom(source: any = {}) {
 	        return new TeamStats(source);
@@ -52,8 +52,8 @@ export namespace core {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.team_average_stats = this.convertValues(source["team_average_stats"], TeamAverageStats);
-	        this.team_threat_level = this.convertValues(source["team_threat_level"], TeamThreatLevel);
+	        this.teamAverageStats = this.convertValues(source["teamAverageStats"], TeamAverageStats);
+	        this.teamThreatLevel = this.convertValues(source["teamThreatLevel"], TeamThreatLevel);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -109,11 +109,11 @@ export namespace core {
 	    }
 	}
 	export class ShipTypeGroup {
-	    ss: number;
-	    dd: number;
-	    cl: number;
-	    bb: number;
 	    cv: number;
+	    bb: number;
+	    cl: number;
+	    dd: number;
+	    ss: number;
 	
 	    static createFrom(source: any = {}) {
 	        return new ShipTypeGroup(source);
@@ -121,11 +121,11 @@ export namespace core {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.ss = source["ss"];
-	        this.dd = source["dd"];
-	        this.cl = source["cl"];
-	        this.bb = source["bb"];
 	        this.cv = source["cv"];
+	        this.bb = source["bb"];
+	        this.cl = source["cl"];
+	        this.dd = source["dd"];
+	        this.ss = source["ss"];
 	    }
 	}
 	export class ThreatLevel {
@@ -147,19 +147,19 @@ export namespace core {
 	export class OverallStats {
 	    battles: number;
 	    damage: RatingValue;
-	    max_damage: MaxDamage;
-	    win_rate: RatingValue;
-	    survived_rate: SurvivedRate;
-	    kd_rate: number;
+	    maxDamage: MaxDamage;
+	    winRate: RatingValue;
+	    survivedRate: SurvivedRate;
+	    kdRate: number;
 	    kill: number;
 	    exp: number;
 	    pr: RatingValue;
-	    threat_level: ThreatLevel;
-	    avg_tier: number;
-	    using_ship_type_rate: ShipTypeGroup;
-	    using_tier_rate: TierGroup;
-	    platoon_rate: number;
-	    efficiency_badge: EfficiencyBadgeGroup;
+	    threatLevel: ThreatLevel;
+	    avgTier: number;
+	    usingShipTypeRate: ShipTypeGroup;
+	    usingTierRate: TierGroup;
+	    platoonRate: number;
+	    efficiencyBadge: EfficiencyBadgeGroup;
 	
 	    static createFrom(source: any = {}) {
 	        return new OverallStats(source);
@@ -169,19 +169,19 @@ export namespace core {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.battles = source["battles"];
 	        this.damage = this.convertValues(source["damage"], RatingValue);
-	        this.max_damage = this.convertValues(source["max_damage"], MaxDamage);
-	        this.win_rate = this.convertValues(source["win_rate"], RatingValue);
-	        this.survived_rate = this.convertValues(source["survived_rate"], SurvivedRate);
-	        this.kd_rate = source["kd_rate"];
+	        this.maxDamage = this.convertValues(source["maxDamage"], MaxDamage);
+	        this.winRate = this.convertValues(source["winRate"], RatingValue);
+	        this.survivedRate = this.convertValues(source["survivedRate"], SurvivedRate);
+	        this.kdRate = source["kdRate"];
 	        this.kill = source["kill"];
 	        this.exp = source["exp"];
 	        this.pr = this.convertValues(source["pr"], RatingValue);
-	        this.threat_level = this.convertValues(source["threat_level"], ThreatLevel);
-	        this.avg_tier = source["avg_tier"];
-	        this.using_ship_type_rate = this.convertValues(source["using_ship_type_rate"], ShipTypeGroup);
-	        this.using_tier_rate = this.convertValues(source["using_tier_rate"], TierGroup);
-	        this.platoon_rate = source["platoon_rate"];
-	        this.efficiency_badge = this.convertValues(source["efficiency_badge"], EfficiencyBadgeGroup);
+	        this.threatLevel = this.convertValues(source["threatLevel"], ThreatLevel);
+	        this.avgTier = source["avgTier"];
+	        this.usingShipTypeRate = this.convertValues(source["usingShipTypeRate"], ShipTypeGroup);
+	        this.usingTierRate = this.convertValues(source["usingTierRate"], TierGroup);
+	        this.platoonRate = source["platoonRate"];
+	        this.efficiencyBadge = this.convertValues(source["efficiencyBadge"], EfficiencyBadgeGroup);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -203,7 +203,7 @@ export namespace core {
 		}
 	}
 	export class HitRate {
-	    main_battery: number;
+	    mainBattery: number;
 	    torpedoes: number;
 	
 	    static createFrom(source: any = {}) {
@@ -212,7 +212,7 @@ export namespace core {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.main_battery = source["main_battery"];
+	        this.mainBattery = source["mainBattery"];
 	        this.torpedoes = source["torpedoes"];
 	    }
 	}
@@ -233,9 +233,9 @@ export namespace core {
 	    }
 	}
 	export class MaxDamage {
-	    ship_id: number;
-	    ship_name: string;
-	    ship_tier: number;
+	    shipID: number;
+	    shipName: string;
+	    shipTier: number;
 	    value: number;
 	
 	    static createFrom(source: any = {}) {
@@ -244,26 +244,26 @@ export namespace core {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.ship_id = source["ship_id"];
-	        this.ship_name = source["ship_name"];
-	        this.ship_tier = source["ship_tier"];
+	        this.shipID = source["shipID"];
+	        this.shipName = source["shipName"];
+	        this.shipTier = source["shipTier"];
 	        this.value = source["value"];
 	    }
 	}
 	export class ShipStats {
 	    battles: number;
 	    damage: RatingValue;
-	    max_damage: MaxDamage;
-	    win_rate: RatingValue;
-	    survived_rate: SurvivedRate;
-	    kd_rate: number;
+	    maxDamage: MaxDamage;
+	    winRate: RatingValue;
+	    survivedRate: SurvivedRate;
+	    kdRate: number;
 	    kill: number;
 	    exp: number;
 	    pr: RatingValue;
-	    hit_rate: HitRate;
-	    planes_killed: number;
-	    platoon_rate: number;
-	    efficiency_badge: string;
+	    hitRate: HitRate;
+	    planesKilled: number;
+	    platoonRate: number;
+	    efficiencyBadge: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new ShipStats(source);
@@ -273,17 +273,17 @@ export namespace core {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.battles = source["battles"];
 	        this.damage = this.convertValues(source["damage"], RatingValue);
-	        this.max_damage = this.convertValues(source["max_damage"], MaxDamage);
-	        this.win_rate = this.convertValues(source["win_rate"], RatingValue);
-	        this.survived_rate = this.convertValues(source["survived_rate"], SurvivedRate);
-	        this.kd_rate = source["kd_rate"];
+	        this.maxDamage = this.convertValues(source["maxDamage"], MaxDamage);
+	        this.winRate = this.convertValues(source["winRate"], RatingValue);
+	        this.survivedRate = this.convertValues(source["survivedRate"], SurvivedRate);
+	        this.kdRate = source["kdRate"];
 	        this.kill = source["kill"];
 	        this.exp = source["exp"];
 	        this.pr = this.convertValues(source["pr"], RatingValue);
-	        this.hit_rate = this.convertValues(source["hit_rate"], HitRate);
-	        this.planes_killed = source["planes_killed"];
-	        this.platoon_rate = source["platoon_rate"];
-	        this.efficiency_badge = source["efficiency_badge"];
+	        this.hitRate = this.convertValues(source["hitRate"], HitRate);
+	        this.planesKilled = source["planesKilled"];
+	        this.platoonRate = source["platoonRate"];
+	        this.efficiencyBadge = source["efficiencyBadge"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -413,7 +413,7 @@ export namespace core {
 	export class Clan {
 	    id: number;
 	    tag: string;
-	    hex_color: string;
+	    colorCode: string;
 	    language: string;
 	
 	    static createFrom(source: any = {}) {
@@ -424,7 +424,7 @@ export namespace core {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.id = source["id"];
 	        this.tag = source["tag"];
-	        this.hex_color = source["hex_color"];
+	        this.colorCode = source["colorCode"];
 	        this.language = source["language"];
 	    }
 	}
@@ -432,7 +432,7 @@ export namespace core {
 	    id: number;
 	    name: string;
 	    clan: Clan;
-	    is_hidden: boolean;
+	    isHidden: boolean;
 	
 	    static createFrom(source: any = {}) {
 	        return new PlayerInfo(source);
@@ -443,7 +443,7 @@ export namespace core {
 	        this.id = source["id"];
 	        this.name = source["name"];
 	        this.clan = this.convertValues(source["clan"], Clan);
-	        this.is_hidden = source["is_hidden"];
+	        this.isHidden = source["isHidden"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -465,11 +465,11 @@ export namespace core {
 		}
 	}
 	export class Player {
-	    player_info: PlayerInfo;
+	    playerInfo: PlayerInfo;
 	    warship: Warship;
-	    pvp_solo: PlayerStats;
-	    pvp_all: PlayerStats;
-	    rank_solo: PlayerStats;
+	    pvpSolo: PlayerStats;
+	    pvpAll: PlayerStats;
+	    rankSolo: PlayerStats;
 	
 	    static createFrom(source: any = {}) {
 	        return new Player(source);
@@ -477,11 +477,11 @@ export namespace core {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.player_info = this.convertValues(source["player_info"], PlayerInfo);
+	        this.playerInfo = this.convertValues(source["playerInfo"], PlayerInfo);
 	        this.warship = this.convertValues(source["warship"], Warship);
-	        this.pvp_solo = this.convertValues(source["pvp_solo"], PlayerStats);
-	        this.pvp_all = this.convertValues(source["pvp_all"], PlayerStats);
-	        this.rank_solo = this.convertValues(source["rank_solo"], PlayerStats);
+	        this.pvpSolo = this.convertValues(source["pvpSolo"], PlayerStats);
+	        this.pvpAll = this.convertValues(source["pvpAll"], PlayerStats);
+	        this.rankSolo = this.convertValues(source["rankSolo"], PlayerStats);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -504,9 +504,9 @@ export namespace core {
 	}
 	export class Team {
 	    players: Player[];
-	    pvp_solo: TeamStats;
-	    pvp_all: TeamStats;
-	    rank_solo: TeamStats;
+	    pvpSolo: TeamStats;
+	    pvpAll: TeamStats;
+	    rankSolo: TeamStats;
 	
 	    static createFrom(source: any = {}) {
 	        return new Team(source);
@@ -515,9 +515,9 @@ export namespace core {
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.players = this.convertValues(source["players"], Player);
-	        this.pvp_solo = this.convertValues(source["pvp_solo"], TeamStats);
-	        this.pvp_all = this.convertValues(source["pvp_all"], TeamStats);
-	        this.rank_solo = this.convertValues(source["rank_solo"], TeamStats);
+	        this.pvpSolo = this.convertValues(source["pvpSolo"], TeamStats);
+	        this.pvpAll = this.convertValues(source["pvpAll"], TeamStats);
+	        this.rankSolo = this.convertValues(source["rankSolo"], TeamStats);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -589,8 +589,8 @@ export namespace core {
 	
 	
 	export class DetailStatsColumnConfig {
-	    is_show_ship: boolean;
-	    is_show_overall: boolean;
+	    isShowShip: boolean;
+	    isShowOverall: boolean;
 	    digit: number;
 	
 	    static createFrom(source: any = {}) {
@@ -599,29 +599,29 @@ export namespace core {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.is_show_ship = source["is_show_ship"];
-	        this.is_show_overall = source["is_show_overall"];
+	        this.isShowShip = source["isShowShip"];
+	        this.isShowOverall = source["isShowOverall"];
 	        this.digit = source["digit"];
 	    }
 	}
 	export class StatsColumnConfig {
 	    battles: DetailStatsColumnConfig;
 	    damage: DetailStatsColumnConfig;
-	    max_damage: DetailStatsColumnConfig;
-	    win_rate: DetailStatsColumnConfig;
-	    survived_rate: DetailStatsColumnConfig;
-	    kd_rate: DetailStatsColumnConfig;
+	    maxDamage: DetailStatsColumnConfig;
+	    winRate: DetailStatsColumnConfig;
+	    survivedRate: DetailStatsColumnConfig;
+	    kdRate: DetailStatsColumnConfig;
 	    kill: DetailStatsColumnConfig;
 	    exp: DetailStatsColumnConfig;
 	    pr: DetailStatsColumnConfig;
-	    hit_rate: DetailStatsColumnConfig;
-	    planes_killed: DetailStatsColumnConfig;
-	    platoon_rate: DetailStatsColumnConfig;
-	    efficiency_badge: DetailStatsColumnConfig;
-	    threat_level: DetailStatsColumnConfig;
-	    avg_tier: DetailStatsColumnConfig;
-	    using_ship_type_rate: DetailStatsColumnConfig;
-	    using_tier_rate: DetailStatsColumnConfig;
+	    hitRate: DetailStatsColumnConfig;
+	    planesKilled: DetailStatsColumnConfig;
+	    platoonRate: DetailStatsColumnConfig;
+	    efficiencyBadge: DetailStatsColumnConfig;
+	    threatLevel: DetailStatsColumnConfig;
+	    avgTier: DetailStatsColumnConfig;
+	    usingShipTypeRate: DetailStatsColumnConfig;
+	    usingTierRate: DetailStatsColumnConfig;
 	
 	    static createFrom(source: any = {}) {
 	        return new StatsColumnConfig(source);
@@ -631,21 +631,21 @@ export namespace core {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.battles = this.convertValues(source["battles"], DetailStatsColumnConfig);
 	        this.damage = this.convertValues(source["damage"], DetailStatsColumnConfig);
-	        this.max_damage = this.convertValues(source["max_damage"], DetailStatsColumnConfig);
-	        this.win_rate = this.convertValues(source["win_rate"], DetailStatsColumnConfig);
-	        this.survived_rate = this.convertValues(source["survived_rate"], DetailStatsColumnConfig);
-	        this.kd_rate = this.convertValues(source["kd_rate"], DetailStatsColumnConfig);
+	        this.maxDamage = this.convertValues(source["maxDamage"], DetailStatsColumnConfig);
+	        this.winRate = this.convertValues(source["winRate"], DetailStatsColumnConfig);
+	        this.survivedRate = this.convertValues(source["survivedRate"], DetailStatsColumnConfig);
+	        this.kdRate = this.convertValues(source["kdRate"], DetailStatsColumnConfig);
 	        this.kill = this.convertValues(source["kill"], DetailStatsColumnConfig);
 	        this.exp = this.convertValues(source["exp"], DetailStatsColumnConfig);
 	        this.pr = this.convertValues(source["pr"], DetailStatsColumnConfig);
-	        this.hit_rate = this.convertValues(source["hit_rate"], DetailStatsColumnConfig);
-	        this.planes_killed = this.convertValues(source["planes_killed"], DetailStatsColumnConfig);
-	        this.platoon_rate = this.convertValues(source["platoon_rate"], DetailStatsColumnConfig);
-	        this.efficiency_badge = this.convertValues(source["efficiency_badge"], DetailStatsColumnConfig);
-	        this.threat_level = this.convertValues(source["threat_level"], DetailStatsColumnConfig);
-	        this.avg_tier = this.convertValues(source["avg_tier"], DetailStatsColumnConfig);
-	        this.using_ship_type_rate = this.convertValues(source["using_ship_type_rate"], DetailStatsColumnConfig);
-	        this.using_tier_rate = this.convertValues(source["using_tier_rate"], DetailStatsColumnConfig);
+	        this.hitRate = this.convertValues(source["hitRate"], DetailStatsColumnConfig);
+	        this.planesKilled = this.convertValues(source["planesKilled"], DetailStatsColumnConfig);
+	        this.platoonRate = this.convertValues(source["platoonRate"], DetailStatsColumnConfig);
+	        this.efficiencyBadge = this.convertValues(source["efficiencyBadge"], DetailStatsColumnConfig);
+	        this.threatLevel = this.convertValues(source["threatLevel"], DetailStatsColumnConfig);
+	        this.avgTier = this.convertValues(source["avgTier"], DetailStatsColumnConfig);
+	        this.usingShipTypeRate = this.convertValues(source["usingShipTypeRate"], DetailStatsColumnConfig);
+	        this.usingTierRate = this.convertValues(source["usingTierRate"], DetailStatsColumnConfig);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -667,8 +667,8 @@ export namespace core {
 		}
 	}
 	export class ShipColumnConfig {
-	    enable_nation_flag: boolean;
-	    is_colored: boolean;
+	    enableNationFlag: boolean;
+	    isColored: boolean;
 	
 	    static createFrom(source: any = {}) {
 	        return new ShipColumnConfig(source);
@@ -676,13 +676,13 @@ export namespace core {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.enable_nation_flag = source["enable_nation_flag"];
-	        this.is_colored = source["is_colored"];
+	        this.enableNationFlag = source["enableNationFlag"];
+	        this.isColored = source["isColored"];
 	    }
 	}
 	export class PlayerColumnConfig {
-	    enable_nation_flag: boolean;
-	    color_pattern: string;
+	    enableNationFlag: boolean;
+	    colorPattern: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new PlayerColumnConfig(source);
@@ -690,8 +690,8 @@ export namespace core {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.enable_nation_flag = source["enable_nation_flag"];
-	        this.color_pattern = source["color_pattern"];
+	        this.enableNationFlag = source["enableNationFlag"];
+	        this.colorPattern = source["colorPattern"];
 	    }
 	}
 	export class ColumnConfig {
@@ -734,7 +734,7 @@ export namespace core {
 	
 	export class NewVersion {
 	    version: string;
-	    url: string;
+	    downloadURL: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new NewVersion(source);
@@ -743,7 +743,7 @@ export namespace core {
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.version = source["version"];
-	        this.url = source["url"];
+	        this.downloadURL = source["downloadURL"];
 	    }
 	}
 	
@@ -753,10 +753,10 @@ export namespace core {
 	
 	export class Pref {
 	    version: number;
-	    install_path: string;
-	    zoom_rate: number;
-	    stats_extra: string;
-	    is_send_report: boolean;
+	    installPath: string;
+	    zoomRate: number;
+	    statsExtra: string;
+	    isSendReport: boolean;
 	    column: ColumnConfig;
 	
 	    static createFrom(source: any = {}) {
@@ -766,10 +766,10 @@ export namespace core {
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.version = source["version"];
-	        this.install_path = source["install_path"];
-	        this.zoom_rate = source["zoom_rate"];
-	        this.stats_extra = source["stats_extra"];
-	        this.is_send_report = source["is_send_report"];
+	        this.installPath = source["installPath"];
+	        this.zoomRate = source["zoomRate"];
+	        this.statsExtra = source["statsExtra"];
+	        this.isSendReport = source["isSendReport"];
 	        this.column = this.convertValues(source["column"], ColumnConfig);
 	    }
 	

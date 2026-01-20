@@ -4,7 +4,7 @@ import { AbstractStatsColumn } from "./AbstractStatsColumn";
 
 export class AvgTierColumn extends AbstractStatsColumn<string> {
   constructor() {
-    super("avg_tier", "overall");
+    super("avgTier", "overall");
   }
 
   override getTableDataComponent() {
@@ -12,7 +12,7 @@ export class AvgTierColumn extends AbstractStatsColumn<string> {
   }
 
   override getDisplayValue(player: core.Player): string {
-    const value = this.getPlayerStats(player).overall.avg_tier;
+    const value = this.getPlayerStats(player).overall.avgTier;
     return value.toFixed(this.getDigit());
   }
 

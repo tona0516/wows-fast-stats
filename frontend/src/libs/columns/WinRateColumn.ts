@@ -7,7 +7,7 @@ import { AbstractStatsColumn } from "./AbstractStatsColumn";
 
 export class WinRateColumn extends AbstractStatsColumn<string> {
   constructor(category: StatsCategory) {
-    super("win_rate", category);
+    super("winRate", category);
   }
 
   override getTableDataComponent() {
@@ -15,12 +15,12 @@ export class WinRateColumn extends AbstractStatsColumn<string> {
   }
 
   override getTextColorCode(player: core.Player): Optional<ColorCode> {
-    const rating = this.getPlayerStats(player)[this.category].win_rate.rating;
+    const rating = this.getPlayerStats(player)[this.category].winRate.rating;
     return RATING_COLORS[rating]?.getFixedTextColor();
   }
 
   override getDisplayValue(player: core.Player): string {
-    const value = this.getPlayerStats(player)[this.category].win_rate.value;
+    const value = this.getPlayerStats(player)[this.category].winRate.value;
     return `${value.toFixed(this.getDigit())}%`;
   }
 

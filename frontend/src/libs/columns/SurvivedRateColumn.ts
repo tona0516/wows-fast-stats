@@ -5,7 +5,7 @@ import { AbstractStatsColumn } from "./AbstractStatsColumn";
 
 export class SurvivedRateColumn extends AbstractStatsColumn<string> {
   constructor(category: StatsCategory) {
-    super("survived_rate", category);
+    super("survivedRate", category);
   }
 
   override getTableDataComponent() {
@@ -13,7 +13,7 @@ export class SurvivedRateColumn extends AbstractStatsColumn<string> {
   }
 
   override getDisplayValue(player: core.Player): string {
-    const sv = this.getPlayerStats(player)[this.category].survived_rate;
+    const sv = this.getPlayerStats(player)[this.category].survivedRate;
 
     const all = sv.all.toFixed(this.getDigit());
     const win = sv.win.toFixed(this.getDigit());

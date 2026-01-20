@@ -7,15 +7,15 @@ import { AbstractStatsColumn } from "./AbstractStatsColumn";
 
 export class ThreatLevelColumn extends AbstractStatsColumn<string> {
   constructor() {
-    super("threat_level", "overall");
+    super("threatLevel", "overall");
   }
 
   override getTextColorCode(player: core.Player): Optional<ColorCode> {
-    return THREAT_LEVEL_COLORS[player.pvp_all.overall.threat_level.rank].text;
+    return THREAT_LEVEL_COLORS[player.pvpAll.overall.threatLevel.rank].text;
   }
 
   override getBgColorCode(player: core.Player): Optional<ColorCode> {
-    return THREAT_LEVEL_COLORS[player.pvp_all.overall.threat_level.rank]
+    return THREAT_LEVEL_COLORS[player.pvpAll.overall.threatLevel.rank]
       .background;
   }
 
@@ -24,7 +24,7 @@ export class ThreatLevelColumn extends AbstractStatsColumn<string> {
   }
 
   override getDisplayValue(player: core.Player): string {
-    const value = this.getPlayerStats(player).overall.threat_level.modified;
+    const value = this.getPlayerStats(player).overall.threatLevel.modified;
     if (value === -1) {
       return "N/A";
     }

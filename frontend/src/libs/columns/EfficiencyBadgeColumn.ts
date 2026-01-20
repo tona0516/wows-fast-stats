@@ -14,7 +14,7 @@ const EFFICIENCY_BADGES: { [key in keyof EfficiencyBadge]: string } = {
 
 export class EfficiencyBadgeColumn extends AbstractStatsColumn<string> {
   constructor(category: StatsCategory) {
-    super("efficiency_badge", category);
+    super("efficiencyBadge", category);
   }
 
   override getTableDataComponent() {
@@ -26,9 +26,9 @@ export class EfficiencyBadgeColumn extends AbstractStatsColumn<string> {
 
     switch (this.category) {
       case "ship":
-        return playerStats.ship.efficiency_badge;
+        return playerStats.ship.efficiencyBadge;
       case "overall":
-        return Object.entries(playerStats.overall.efficiency_badge)
+        return Object.entries(playerStats.overall.efficiencyBadge)
           .map(
             (entry) =>
               `${EFFICIENCY_BADGES[entry[0] as keyof EfficiencyBadge]}:${entry[1]}`,

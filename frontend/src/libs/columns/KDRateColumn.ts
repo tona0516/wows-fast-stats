@@ -5,7 +5,7 @@ import { AbstractStatsColumn } from "./AbstractStatsColumn";
 
 export class KDRateColumn extends AbstractStatsColumn<string> {
   constructor(category: StatsCategory) {
-    super("kd_rate", category);
+    super("kdRate", category);
   }
 
   override getTableDataComponent() {
@@ -13,7 +13,7 @@ export class KDRateColumn extends AbstractStatsColumn<string> {
   }
 
   override getDisplayValue(player: core.Player): string {
-    const value = this.getPlayerStats(player)[this.category].kd_rate;
+    const value = this.getPlayerStats(player)[this.category].kdRate;
     return value.toFixed(this.getDigit());
   }
 

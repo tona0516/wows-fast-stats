@@ -79,7 +79,7 @@ export class ShipInfoColumn extends AbstractColumn {
   }
 
   override getBgColorCode(player: core.Player): Optional<ColorCode> {
-    if (!get(storedPref).column.ship.is_colored) {
+    if (!get(storedPref).column.ship.isColored) {
       return undefined;
     }
 
@@ -107,7 +107,7 @@ export class ShipInfoColumn extends AbstractColumn {
   }
 
   getNationIconPath(player: core.Player): string {
-    if (!get(storedPref).column.ship.enable_nation_flag) {
+    if (!get(storedPref).column.ship.enableNationFlag) {
       return "";
     }
     return FLAGS[player.warship.nation] ?? FlagNone;

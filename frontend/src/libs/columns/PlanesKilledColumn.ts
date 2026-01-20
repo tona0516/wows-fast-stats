@@ -4,7 +4,7 @@ import { AbstractStatsColumn } from "./AbstractStatsColumn";
 
 export class PlanesKilledColumn extends AbstractStatsColumn<string> {
   constructor() {
-    super("planes_killed", "ship");
+    super("planesKilled", "ship");
   }
 
   override getTableDataComponent() {
@@ -12,7 +12,7 @@ export class PlanesKilledColumn extends AbstractStatsColumn<string> {
   }
 
   override getDisplayValue(player: core.Player): string {
-    const value = this.getPlayerStats(player).ship.planes_killed;
+    const value = this.getPlayerStats(player).ship.planesKilled;
     return value.toFixed(this.getDigit());
   }
 

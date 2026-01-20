@@ -15,16 +15,16 @@ export const STATS_EXTRAS: Readonly<Map<string, string>> = new Map<
   string,
   string
 >([
-  ["pvp_all", "ランダム戦"],
-  ["pvp_solo", "ランダム戦(ソロ)"],
-  ["rank_solo", "ランク戦"],
+  ["pvpAll", "ランダム戦"],
+  ["pvpSolo", "ランダム戦(ソロ)"],
+  ["rankSolo", "ランク戦"],
 ]);
 
 export const PLAYER_NAME_COLORS: Readonly<Map<PlayerNameColorPattern, string>> =
   new Map<PlayerNameColorPattern, string>([
     ["pr_ship", "艦成績のPR"],
     ["pr_overall", "総合成績のPR"],
-    ["threat_level", "戦力評価"],
+    ["threatLevel", "戦力評価"],
     ["none", "なし"],
   ]);
 
@@ -32,38 +32,38 @@ export const STATS_COLUMN_INFO: {
   [key in StatsKey]: ColumnInfo;
 } = {
   pr: { min: "PR", full: "Personal Rating", pattern: "both" },
-  win_rate: { min: "勝率", full: "勝率", pattern: "both" },
+  winRate: { min: "勝率", full: "勝率", pattern: "both" },
   damage: { min: "Dmg", full: "与ダメージ", pattern: "both" },
-  max_damage: { min: "最大Dmg", full: "最大与ダメージ", pattern: "both" },
-  kd_rate: { min: "K/D", full: "キルデス比", pattern: "both" },
+  maxDamage: { min: "最大Dmg", full: "最大与ダメージ", pattern: "both" },
+  kdRate: { min: "K/D", full: "キルデス比", pattern: "both" },
   kill: { min: "撃沈", full: "撃沈", pattern: "both" },
   exp: { min: "Exp", full: "経験値(プレミアム補正含む)", pattern: "both" },
   battles: { min: "戦闘数", full: "戦闘数", pattern: "both" },
-  platoon_rate: { min: "分艦隊比", full: "分艦隊比率", pattern: "both" },
-  avg_tier: { min: "平均T", full: "平均Tier", pattern: "both" },
-  planes_killed: { min: "撃墜", full: "撃墜", pattern: "ship" },
-  survived_rate: {
+  platoonRate: { min: "分艦隊比", full: "分艦隊比率", pattern: "both" },
+  avgTier: { min: "平均T", full: "平均Tier", pattern: "both" },
+  planesKilled: { min: "撃墜", full: "撃墜", pattern: "ship" },
+  survivedRate: {
     min: "生存率",
     full: "生存率(全戦|勝利|敗北)",
     pattern: "ship",
   },
-  hit_rate: { min: "命中率", full: "命中率(主砲|魚雷)", pattern: "ship" },
-  threat_level: {
+  hitRate: { min: "命中率", full: "命中率(主砲|魚雷)", pattern: "ship" },
+  threatLevel: {
     min: "戦力評価",
     full: "戦力評価(闇深XVM算出ロジック)",
     pattern: "overall",
   },
-  using_ship_type_rate: {
+  usingShipTypeRate: {
     min: "艦種割合",
     full: "使用艦種割合",
     pattern: "overall",
   },
-  using_tier_rate: {
+  usingTierRate: {
     min: "T割合",
     full: "プレイTier割合",
     pattern: "overall",
   },
-  efficiency_badge: { min: "技能バッジ", full: "技能バッジ", pattern: "both" },
+  efficiencyBadge: { min: "技能バッジ", full: "技能バッジ", pattern: "both" },
 } as const;
 
 export const STATS_KEYS = Object.keys(STATS_COLUMN_INFO) as readonly StatsKey[];

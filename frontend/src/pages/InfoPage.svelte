@@ -36,9 +36,9 @@
     try {
       const newVersion = (await NewVersion()) as core.NewVersion | null;
 
-      if (newVersion?.version && newVersion.url) {
+      if (newVersion?.version && newVersion.downloadURL) {
         await ShowMessageDialog(
-          `新しいバージョン ${newVersion.version} が利用可能です。\n${newVersion.url}`,
+          `新しいバージョン ${newVersion.version} が利用可能です。\n${newVersion.downloadURL}`,
         );
         return;
       }

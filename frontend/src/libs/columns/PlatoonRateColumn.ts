@@ -5,7 +5,7 @@ import { AbstractStatsColumn } from "./AbstractStatsColumn";
 
 export class PlatoonRateColumn extends AbstractStatsColumn<string> {
   constructor(category: StatsCategory) {
-    super("platoon_rate", category);
+    super("platoonRate", category);
   }
 
   override getTableDataComponent() {
@@ -13,7 +13,7 @@ export class PlatoonRateColumn extends AbstractStatsColumn<string> {
   }
 
   override getDisplayValue(player: core.Player): string {
-    const value = this.getPlayerStats(player)[this.category].platoon_rate;
+    const value = this.getPlayerStats(player)[this.category].platoonRate;
     return value.toFixed(this.getDigit());
   }
 

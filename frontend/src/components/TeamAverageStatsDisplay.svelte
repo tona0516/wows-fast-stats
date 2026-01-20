@@ -32,70 +32,70 @@
     shipChartData = [
       {
         label: "PR",
-        friendValue: friendTeamStats.team_average_stats.ship_pr,
-        enemyValue: enemyTeamStats.team_average_stats.ship_pr,
+        friendValue: friendTeamStats.teamAverageStats.ship_pr,
+        enemyValue: enemyTeamStats.teamAverageStats.ship_pr,
       },
       {
         label: "Dmg",
-        friendValue: friendTeamStats.team_average_stats.ship_damage,
-        enemyValue: enemyTeamStats.team_average_stats.ship_damage,
+        friendValue: friendTeamStats.teamAverageStats.ship_damage,
+        enemyValue: enemyTeamStats.teamAverageStats.ship_damage,
       },
       {
         label: "勝率",
-        friendValue: friendTeamStats.team_average_stats.ship_win_rate,
-        enemyValue: enemyTeamStats.team_average_stats.ship_win_rate,
+        friendValue: friendTeamStats.teamAverageStats.ship_win_rate,
+        enemyValue: enemyTeamStats.teamAverageStats.ship_win_rate,
       },
       {
         label: "戦闘数",
-        friendValue: friendTeamStats.team_average_stats.ship_battles,
-        enemyValue: enemyTeamStats.team_average_stats.ship_battles,
+        friendValue: friendTeamStats.teamAverageStats.ship_battles,
+        enemyValue: enemyTeamStats.teamAverageStats.ship_battles,
       },
     ];
 
     overallChartData = [
       {
         label: "PR",
-        friendValue: friendTeamStats.team_average_stats.overall_pr,
-        enemyValue: enemyTeamStats.team_average_stats.overall_pr,
+        friendValue: friendTeamStats.teamAverageStats.overall_pr,
+        enemyValue: enemyTeamStats.teamAverageStats.overall_pr,
       },
       {
         label: "Dmg",
-        friendValue: friendTeamStats.team_average_stats.overall_damage,
-        enemyValue: enemyTeamStats.team_average_stats.overall_damage,
+        friendValue: friendTeamStats.teamAverageStats.overall_damage,
+        enemyValue: enemyTeamStats.teamAverageStats.overall_damage,
       },
       {
         label: "勝率",
-        friendValue: friendTeamStats.team_average_stats.overall_win_rate,
-        enemyValue: enemyTeamStats.team_average_stats.overall_win_rate,
+        friendValue: friendTeamStats.teamAverageStats.overall_win_rate,
+        enemyValue: enemyTeamStats.teamAverageStats.overall_win_rate,
       },
       {
         label: "戦闘数",
-        friendValue: friendTeamStats.team_average_stats.overall_battles,
-        enemyValue: enemyTeamStats.team_average_stats.overall_battles,
+        friendValue: friendTeamStats.teamAverageStats.overall_battles,
+        enemyValue: enemyTeamStats.teamAverageStats.overall_battles,
       },
     ];
 
     threatChartData = [
       {
         label: "脅威度",
-        friendValue: friendTeam.pvp_all.team_threat_level.average,
-        enemyValue: enemyTeam.pvp_all.team_threat_level.average,
+        friendValue: friendTeam.pvpAll.teamThreatLevel.average,
+        enemyValue: enemyTeam.pvpAll.teamThreatLevel.average,
       },
       {
         label: "確度",
-        friendValue: friendTeam.pvp_all.team_threat_level.accuracy,
-        enemyValue: enemyTeam.pvp_all.team_threat_level.accuracy,
+        friendValue: friendTeam.pvpAll.teamThreatLevel.accuracy,
+        enemyValue: enemyTeam.pvpAll.teamThreatLevel.accuracy,
       },
       {
         label: "介護指数",
-        friendValue: friendTeam.pvp_all.team_threat_level.dissociation_degree,
-        enemyValue: enemyTeam.pvp_all.team_threat_level.dissociation_degree,
+        friendValue: friendTeam.pvpAll.teamThreatLevel.dissociationDegree,
+        enemyValue: enemyTeam.pvpAll.teamThreatLevel.dissociationDegree,
       },
     ];
   }
 
   function getTeamStats(team: core.Team): core.TeamStats {
-    const statsExtra = get(storedPref).stats_extra as StatsExtra;
+    const statsExtra = get(storedPref).statsExtra as StatsExtra;
     return team[statsExtra];
   }
 </script>

@@ -2,10 +2,10 @@ package core
 
 type Pref struct {
 	Version      int          `json:"version"`
-	InstallPath  string       `json:"install_path"`
-	ZoomRate     int          `json:"zoom_rate"`
-	StatsExtra   string       `json:"stats_extra"`
-	IsSendReport bool         `json:"is_send_report"`
+	InstallPath  string       `json:"installPath"`
+	ZoomRate     int          `json:"zoomRate"`
+	StatsExtra   string       `json:"statsExtra"`
+	IsSendReport bool         `json:"isSendReport"`
 	Column       ColumnConfig `json:"column"`
 }
 
@@ -16,38 +16,38 @@ type ColumnConfig struct {
 }
 
 type PlayerColumnConfig struct {
-	EnableNationFlag bool   `json:"enable_nation_flag"`
-	ColorPattern     string `json:"color_pattern"`
+	EnableNationFlag bool   `json:"enableNationFlag"`
+	ColorPattern     string `json:"colorPattern"`
 }
 
 type ShipColumnConfig struct {
-	EnableNationFlag bool `json:"enable_nation_flag"`
-	IsColored        bool `json:"is_colored"`
+	EnableNationFlag bool `json:"enableNationFlag"`
+	IsColored        bool `json:"isColored"`
 }
 
 type StatsColumnConfig struct {
 	Battles           DetailStatsColumnConfig `json:"battles"`
 	Damage            DetailStatsColumnConfig `json:"damage"`
-	MaxDamage         DetailStatsColumnConfig `json:"max_damage"`
-	WinRate           DetailStatsColumnConfig `json:"win_rate"`
-	SurvivedRate      DetailStatsColumnConfig `json:"survived_rate"`
-	KdRate            DetailStatsColumnConfig `json:"kd_rate"`
+	MaxDamage         DetailStatsColumnConfig `json:"maxDamage"`
+	WinRate           DetailStatsColumnConfig `json:"winRate"`
+	SurvivedRate      DetailStatsColumnConfig `json:"survivedRate"`
+	KdRate            DetailStatsColumnConfig `json:"kdRate"`
 	Kill              DetailStatsColumnConfig `json:"kill"`
 	Exp               DetailStatsColumnConfig `json:"exp"`
 	PR                DetailStatsColumnConfig `json:"pr"`
-	HitRate           DetailStatsColumnConfig `json:"hit_rate"`
-	PlanesKilled      DetailStatsColumnConfig `json:"planes_killed"`
-	PlatoonRate       DetailStatsColumnConfig `json:"platoon_rate"`
-	EfficiencyBadge   DetailStatsColumnConfig `json:"efficiency_badge"`
-	ThreatLevel       DetailStatsColumnConfig `json:"threat_level"`
-	AvgTier           DetailStatsColumnConfig `json:"avg_tier"`
-	UsingShipTypeRate DetailStatsColumnConfig `json:"using_ship_type_rate"`
-	UsingTierRate     DetailStatsColumnConfig `json:"using_tier_rate"`
+	HitRate           DetailStatsColumnConfig `json:"hitRate"`
+	PlanesKilled      DetailStatsColumnConfig `json:"planesKilled"`
+	PlatoonRate       DetailStatsColumnConfig `json:"platoonRate"`
+	EfficiencyBadge   DetailStatsColumnConfig `json:"efficiencyBadge"`
+	ThreatLevel       DetailStatsColumnConfig `json:"threatLevel"`
+	AvgTier           DetailStatsColumnConfig `json:"avgTier"`
+	UsingShipTypeRate DetailStatsColumnConfig `json:"usingShipTypeRate"`
+	UsingTierRate     DetailStatsColumnConfig `json:"usingTierRate"`
 }
 
 type DetailStatsColumnConfig struct {
-	IsShowShip    bool `json:"is_show_ship"`
-	IsShowOverall bool `json:"is_show_overall"`
+	IsShowShip    bool `json:"isShowShip"`
+	IsShowOverall bool `json:"isShowOverall"`
 	Digit         int  `json:"digit"`
 }
 
@@ -56,7 +56,7 @@ func DefaultPref() Pref {
 		Version:      1,
 		InstallPath:  "",
 		ZoomRate:     100,
-		StatsExtra:   "pvp_all",
+		StatsExtra:   StatsPatternPvPAll,
 		IsSendReport: true,
 		Column: ColumnConfig{
 			Player: PlayerColumnConfig{
