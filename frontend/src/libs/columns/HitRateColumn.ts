@@ -17,7 +17,7 @@ export class HitRateColumn extends AbstractStatsColumn<string> {
     const main = hitRate.mainBattery.toFixed(this.getDigit());
     const torps = hitRate.torpedoes.toFixed(this.getDigit());
 
-    return `${main}|${torps}`;
+    return `${main}% | ${torps}%`;
   }
 
   override getCssClass(): string {

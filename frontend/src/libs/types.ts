@@ -22,8 +22,8 @@ export type Page = "stats" | "pref" | "info";
 export type ColumnSettingPattern = "ship" | "overall" | "both";
 
 export type PlayerNameColorPattern =
-  | "pr_ship"
-  | "pr_overall"
+  | "shipPR"
+  | "overallPR"
   | "threatLevel"
   | "none";
 

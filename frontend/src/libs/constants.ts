@@ -22,8 +22,8 @@ export const STATS_EXTRAS: Readonly<Map<string, string>> = new Map<
 
 export const PLAYER_NAME_COLORS: Readonly<Map<PlayerNameColorPattern, string>> =
   new Map<PlayerNameColorPattern, string>([
-    ["pr_ship", "艦成績のPR"],
-    ["pr_overall", "総合成績のPR"],
+    ["shipPR", "艦成績のPR"],
+    ["overallPR", "総合成績のPR"],
     ["threatLevel", "戦力評価"],
     ["none", "なし"],
   ]);
@@ -43,11 +43,11 @@ export const STATS_COLUMN_INFO: {
   avgTier: { min: "平均T", full: "平均Tier", pattern: "both" },
   planesKilled: { min: "撃墜", full: "撃墜", pattern: "ship" },
   survivedRate: {
-    min: "生存率",
+    min: "生存率(全|勝|敗)",
     full: "生存率(全戦|勝利|敗北)",
     pattern: "ship",
   },
-  hitRate: { min: "命中率", full: "命中率(主砲|魚雷)", pattern: "ship" },
+  hitRate: { min: "命中率(主|魚)", full: "命中率(主砲|魚雷)", pattern: "ship" },
   threatLevel: {
     min: "戦力評価",
     full: "戦力評価(闇深XVM算出ロジック)",
@@ -63,7 +63,11 @@ export const STATS_COLUMN_INFO: {
     full: "プレイTier割合",
     pattern: "overall",
   },
-  efficiencyBadge: { min: "技能バッジ", full: "技能バッジ", pattern: "both" },
+  efficiencyBadge: {
+    min: "技能バッジ(E|1|2|3)",
+    full: "技能バッジ(Expert|1st|2nd|3rd)",
+    pattern: "both",
+  },
 } as const;
 
 export const STATS_KEYS = Object.keys(STATS_COLUMN_INFO) as readonly StatsKey[];

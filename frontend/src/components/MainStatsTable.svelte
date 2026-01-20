@@ -18,7 +18,7 @@
   import { PlatoonRateColumn } from "@libs/columns/PlatoonRateColumn";
   import { PlayerNameColumn } from "@libs/columns/PlayerNameColumn";
   import { PRColumn } from "@libs/columns/PRColumn";
-  import { ShipInfoColumn } from "@libs/columns/ShipInfoColumn";
+  import { WarshipColumn } from "@libs/columns/WarshipColumn";
   import { ShipTypeRateColumn } from "@libs/columns/ShipTypeRateColumn";
   import { SurvivedRateColumn } from "@libs/columns/SurvivedRateColumn";
   import { ThreatLevelColumn } from "@libs/columns/ThreatLevelColumn";
@@ -46,7 +46,7 @@
 
   const basicCategory = new Category("basic", [
     new PlayerNameColumn(),
-    new ShipInfoColumn(),
+    new WarshipColumn(),
   ]);
 
   const shipCategory = new Category("ship", [

@@ -1,10 +1,10 @@
 <script lang="ts">
-  import type { ShipInfoColumn } from "@libs/columns/ShipInfoColumn";
+  import type { WarshipColumn } from "@libs/columns/WarshipColumn";
   import { ModalManager } from "@libs/ModalManager";
     import { storedPref } from "@libs/stores";
   import type { core } from "@wails/go/models";
 
-  export let column: ShipInfoColumn;
+  export let column: WarshipColumn;
   export let player: core.Player;
 
   const nationIconPath = column.getNationIconPath(player);

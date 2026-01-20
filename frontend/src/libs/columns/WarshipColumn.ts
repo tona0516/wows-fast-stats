@@ -65,7 +65,7 @@ const PREMIUM_SHIP_ICONS: { [key: string]: string } = {
   ss: ShipPremiumSS,
 };
 
-export class ShipInfoColumn extends AbstractColumn {
+export class WarshipColumn extends AbstractColumn {
   constructor() {
     super("warship", "艦");
   }
