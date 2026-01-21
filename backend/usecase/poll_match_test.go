@@ -62,10 +62,10 @@ func TestPollMatch_Invoke(t *testing.T) {
 
 			ctrl := gomock.NewController(t)
 
-			configStore := mock.NewMockPrefStore(ctrl)
+			mockPrefStore := mock.NewMockPrefStore(ctrl)
 			mockReplayReader := mock.NewMockReplayReader(ctrl)
 			mockWails := mock.NewMockWails(ctrl)
-			tt.setupMock(configStore)
+			tt.setupMock(mockPrefStore)
 
 			var emittedEvents []string
 			var eventsMutex sync.Mutex
@@ -86,7 +86,7 @@ func TestPollMatch_Invoke(t *testing.T) {
 			}
 			do.ProvideValue(injector, cfg)
 			do.Provide(injector, func(i do.Injector) (adapter.PrefStore, error) {
-				return configStore, nil
+				return mockPrefStore, nil
 			})
 			do.Provide(injector, func(i do.Injector) (adapter.ReplayReader, error) {
 				return mockReplayReader, nil
@@ -125,12 +125,12 @@ func TestPollMatch_InvokeWithDataChange(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 
-	MockConfigStore := mock.NewMockPrefStore(ctrl)
+	mockPrefStore := mock.NewMockPrefStore(ctrl)
 	mockReplayReader := mock.NewMockReplayReader(ctrl)
 	mockWails := mock.NewMockWails(ctrl)
 
 	pref := core.Pref{InstallPath: "/path/to/install"}
-	MockConfigStore.EXPECT().
+	mockPrefStore.EXPECT().
 		Pref().
 		Return(pref, nil)
 
@@ -183,7 +183,7 @@ func TestPollMatch_InvokeWithDataChange(t *testing.T) {
 	}
 	do.ProvideValue(injector, cfg)
 	do.Provide(injector, func(i do.Injector) (adapter.PrefStore, error) {
-		return MockConfigStore, nil
+		return mockPrefStore, nil
 	})
 	do.Provide(injector, func(i do.Injector) (adapter.ReplayReader, error) {
 		return mockReplayReader, nil

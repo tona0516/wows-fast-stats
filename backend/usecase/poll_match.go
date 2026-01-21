@@ -16,7 +16,7 @@ import (
 type PollMatch struct {
 	pollingInterval time.Duration
 	wails           adapter.Wails
-	configStore     adapter.PrefStore
+	prefStore       adapter.PrefStore
 	replayReader    adapter.ReplayReader
 }
 
@@ -25,7 +25,7 @@ func NewPollMatch(i do.Injector) (*PollMatch, error) {
 	return &PollMatch{
 		pollingInterval: config.Basic.PollingInterval,
 		wails:           do.MustInvoke[adapter.Wails](i),
-		configStore:     do.MustInvoke[adapter.PrefStore](i),
+		prefStore:       do.MustInvoke[adapter.PrefStore](i),
 		replayReader:    do.MustInvoke[adapter.ReplayReader](i),
 	}, nil
 }
@@ -35,7 +35,7 @@ func (pm *PollMatch) Invoke(
 	cancelCtx context.Context,
 	channel chan core.TempArenaInfo,
 ) {
-	pref, err := pm.configStore.Pref()
+	pref, err := pm.prefStore.Pref()
 	if err != nil {
 		if failure.Is(err, core.ErrJSONNotFound) {
 			pm.emitNeedInitialSetting(ctx)

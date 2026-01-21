@@ -9,17 +9,17 @@ import (
 )
 
 type LoadPref struct {
-	configStore adapter.PrefStore
+	prefStore adapter.PrefStore
 }
 
 func NewLoadPref(i do.Injector) (*LoadPref, error) {
 	return &LoadPref{
-		configStore: do.MustInvoke[adapter.PrefStore](i),
+		prefStore: do.MustInvoke[adapter.PrefStore](i),
 	}, nil
 }
 
 func (lp *LoadPref) Invoke() (core.Pref, error) {
-	config, err := lp.configStore.Pref()
+	config, err := lp.prefStore.Pref()
 	if err != nil {
 		if failure.Is(err, core.ErrJSONNotFound) {
 			return core.DefaultPref(), nil

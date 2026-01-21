@@ -13,14 +13,14 @@ import (
 
 type InstallPathSetting struct {
 	wails          adapter.Wails
-	configStore    adapter.PrefStore
+	prefStore      adapter.PrefStore
 	gameClientFile string
 }
 
 func NewInstallPathSetting(i do.Injector) (*InstallPathSetting, error) {
 	return &InstallPathSetting{
 		wails:          do.MustInvoke[adapter.Wails](i),
-		configStore:    do.MustInvoke[adapter.PrefStore](i),
+		prefStore:      do.MustInvoke[adapter.PrefStore](i),
 		gameClientFile: "WorldOfWarships.exe",
 	}, nil
 }
@@ -39,14 +39,14 @@ func (s *InstallPathSetting) Invoke(ctx context.Context) (bool, error) {
 		return false, failure.Translate(err, core.ErrInvalidInstallPath)
 	}
 
-	config, err := s.configStore.Pref()
+	config, err := s.prefStore.Pref()
 	if err != nil {
 		return false, err
 	}
 
 	config.InstallPath = selected
 
-	if err = s.configStore.SetPref(config); err != nil {
+	if err = s.prefStore.SetPref(config); err != nil {
 		return false, err
 	}
 
