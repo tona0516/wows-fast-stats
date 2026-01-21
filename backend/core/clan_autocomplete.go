@@ -7,7 +7,7 @@ type ClanAutocomplete struct {
 	} `json:"search_autocomplete_result"`
 }
 
-func (u ClanAutocomplete) HexColor(clanID ClanID) string {
+func (u ClanAutocomplete) ColorCode(clanID ClanID) string {
 	for _, v := range u.SearchAutocompleteResult {
 		if clanID == v.ID {
 			return v.HexColor

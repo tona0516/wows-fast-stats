@@ -80,7 +80,7 @@ func (s *clanService) fetchClanColor(
 				return err
 			}
 
-			hexColor := autocomplete.HexColor(clanID)
+			hexColor := autocomplete.ColorCode(clanID)
 			if hexColor == "" {
 				return nil
 			}

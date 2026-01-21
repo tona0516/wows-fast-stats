@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestClanAutocomplete_HexColor(t *testing.T) {
+func TestClanAutocomplete_ColorCode(t *testing.T) {
 	t.Parallel()
 
 	instance := ClanAutocomplete{
@@ -19,6 +19,6 @@ func TestClanAutocomplete_HexColor(t *testing.T) {
 		},
 	}
 
-	assert.Equal(t, "#000000", instance.HexColor(1))
-	assert.Empty(t, instance.HexColor(999))
+	assert.Equal(t, "#000000", instance.ColorCode(1))
+	assert.Empty(t, instance.ColorCode(999))
 }
