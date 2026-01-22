@@ -1,51 +1,51 @@
 package core
 
 type Pref struct {
-	Version      int          `json:"version"`
-	InstallPath  string       `json:"installPath"`
-	ZoomRate     int          `json:"zoomRate"`
-	StatsExtra   string       `json:"statsExtra"`
-	IsSendReport bool         `json:"isSendReport"`
-	Column       ColumnConfig `json:"column"`
+	Version      int        `json:"version"`
+	InstallPath  string     `json:"installPath"`
+	ZoomRate     int        `json:"zoomRate"`
+	StatsExtra   string     `json:"statsExtra"`
+	IsSendReport bool       `json:"isSendReport"`
+	Column       ColumnPref `json:"column"`
 }
 
-type ColumnConfig struct {
-	Player PlayerColumnConfig `json:"player"`
-	Ship   ShipColumnConfig   `json:"ship"`
-	Stats  StatsColumnConfig  `json:"stats"`
+type ColumnPref struct {
+	Player PlayerColumnPref `json:"player"`
+	Ship   ShipColumnPref   `json:"ship"`
+	Stats  StatsColumnPref  `json:"stats"`
 }
 
-type PlayerColumnConfig struct {
+type PlayerColumnPref struct {
 	EnableNationFlag bool   `json:"enableNationFlag"`
 	ColorPattern     string `json:"colorPattern"`
 }
 
-type ShipColumnConfig struct {
+type ShipColumnPref struct {
 	EnableNationFlag bool `json:"enableNationFlag"`
 	IsColored        bool `json:"isColored"`
 }
 
-type StatsColumnConfig struct {
-	Battles           DetailStatsColumnConfig `json:"battles"`
-	Damage            DetailStatsColumnConfig `json:"damage"`
-	MaxDamage         DetailStatsColumnConfig `json:"maxDamage"`
-	WinRate           DetailStatsColumnConfig `json:"winRate"`
-	SurvivedRate      DetailStatsColumnConfig `json:"survivedRate"`
-	KdRate            DetailStatsColumnConfig `json:"kdRate"`
-	Kill              DetailStatsColumnConfig `json:"kill"`
-	Exp               DetailStatsColumnConfig `json:"exp"`
-	PR                DetailStatsColumnConfig `json:"pr"`
-	HitRate           DetailStatsColumnConfig `json:"hitRate"`
-	PlanesKilled      DetailStatsColumnConfig `json:"planesKilled"`
-	PlatoonRate       DetailStatsColumnConfig `json:"platoonRate"`
-	EfficiencyBadge   DetailStatsColumnConfig `json:"efficiencyBadge"`
-	ThreatLevel       DetailStatsColumnConfig `json:"threatLevel"`
-	AvgTier           DetailStatsColumnConfig `json:"avgTier"`
-	UsingShipTypeRate DetailStatsColumnConfig `json:"usingShipTypeRate"`
-	UsingTierRate     DetailStatsColumnConfig `json:"usingTierRate"`
+type StatsColumnPref struct {
+	Battles           DetailStatsColumnPref `json:"battles"`
+	Damage            DetailStatsColumnPref `json:"damage"`
+	MaxDamage         DetailStatsColumnPref `json:"maxDamage"`
+	WinRate           DetailStatsColumnPref `json:"winRate"`
+	SurvivedRate      DetailStatsColumnPref `json:"survivedRate"`
+	KdRate            DetailStatsColumnPref `json:"kdRate"`
+	Kill              DetailStatsColumnPref `json:"kill"`
+	Exp               DetailStatsColumnPref `json:"exp"`
+	PR                DetailStatsColumnPref `json:"pr"`
+	HitRate           DetailStatsColumnPref `json:"hitRate"`
+	PlanesKilled      DetailStatsColumnPref `json:"planesKilled"`
+	PlatoonRate       DetailStatsColumnPref `json:"platoonRate"`
+	EfficiencyBadge   DetailStatsColumnPref `json:"efficiencyBadge"`
+	ThreatLevel       DetailStatsColumnPref `json:"threatLevel"`
+	AvgTier           DetailStatsColumnPref `json:"avgTier"`
+	UsingShipTypeRate DetailStatsColumnPref `json:"usingShipTypeRate"`
+	UsingTierRate     DetailStatsColumnPref `json:"usingTierRate"`
 }
 
-type DetailStatsColumnConfig struct {
+type DetailStatsColumnPref struct {
 	IsShowShip    bool `json:"isShowShip"`
 	IsShowOverall bool `json:"isShowOverall"`
 	Digit         int  `json:"digit"`
@@ -58,97 +58,97 @@ func DefaultPref() Pref {
 		ZoomRate:     100,
 		StatsExtra:   StatsPatternPvPAll,
 		IsSendReport: true,
-		Column: ColumnConfig{
-			Player: PlayerColumnConfig{
+		Column: ColumnPref{
+			Player: PlayerColumnPref{
 				EnableNationFlag: false,
 				ColorPattern:     "none",
 			},
-			Ship: ShipColumnConfig{
+			Ship: ShipColumnPref{
 				EnableNationFlag: true,
 				IsColored:        false,
 			},
-			Stats: StatsColumnConfig{
-				Battles: DetailStatsColumnConfig{
+			Stats: StatsColumnPref{
+				Battles: DetailStatsColumnPref{
 					IsShowShip:    true,
 					IsShowOverall: true,
 					Digit:         0,
 				},
-				Damage: DetailStatsColumnConfig{
+				Damage: DetailStatsColumnPref{
 					IsShowShip:    true,
 					IsShowOverall: true,
 					Digit:         0,
 				},
-				MaxDamage: DetailStatsColumnConfig{
+				MaxDamage: DetailStatsColumnPref{
 					IsShowShip:    true,
 					IsShowOverall: true,
 					Digit:         0,
 				},
-				WinRate: DetailStatsColumnConfig{
+				WinRate: DetailStatsColumnPref{
 					IsShowShip:    true,
 					IsShowOverall: true,
 					Digit:         1,
 				},
-				SurvivedRate: DetailStatsColumnConfig{
+				SurvivedRate: DetailStatsColumnPref{
 					IsShowShip:    false,
 					IsShowOverall: false,
 					Digit:         1,
 				},
-				KdRate: DetailStatsColumnConfig{
+				KdRate: DetailStatsColumnPref{
 					IsShowShip:    false,
 					IsShowOverall: false,
 					Digit:         2,
 				},
-				Kill: DetailStatsColumnConfig{
+				Kill: DetailStatsColumnPref{
 					IsShowShip:    true,
 					IsShowOverall: true,
 					Digit:         2,
 				},
-				Exp: DetailStatsColumnConfig{
+				Exp: DetailStatsColumnPref{
 					IsShowShip:    true,
 					IsShowOverall: true,
 					Digit:         0,
 				},
-				PR: DetailStatsColumnConfig{
+				PR: DetailStatsColumnPref{
 					IsShowShip:    false,
 					IsShowOverall: false,
 					Digit:         0,
 				},
-				HitRate: DetailStatsColumnConfig{
+				HitRate: DetailStatsColumnPref{
 					IsShowShip:    false,
 					IsShowOverall: false,
 					Digit:         1,
 				},
-				PlanesKilled: DetailStatsColumnConfig{
+				PlanesKilled: DetailStatsColumnPref{
 					IsShowShip:    false,
 					IsShowOverall: false,
 					Digit:         0,
 				},
-				PlatoonRate: DetailStatsColumnConfig{
+				PlatoonRate: DetailStatsColumnPref{
 					IsShowShip:    false,
 					IsShowOverall: false,
 					Digit:         1,
 				},
-				EfficiencyBadge: DetailStatsColumnConfig{
+				EfficiencyBadge: DetailStatsColumnPref{
 					IsShowShip:    false,
 					IsShowOverall: false,
 					Digit:         0,
 				},
-				ThreatLevel: DetailStatsColumnConfig{
+				ThreatLevel: DetailStatsColumnPref{
 					IsShowShip:    false,
 					IsShowOverall: false,
 					Digit:         1,
 				},
-				AvgTier: DetailStatsColumnConfig{
+				AvgTier: DetailStatsColumnPref{
 					IsShowShip:    false,
 					IsShowOverall: false,
 					Digit:         1,
 				},
-				UsingShipTypeRate: DetailStatsColumnConfig{
+				UsingShipTypeRate: DetailStatsColumnPref{
 					IsShowShip:    false,
 					IsShowOverall: false,
 					Digit:         1,
 				},
-				UsingTierRate: DetailStatsColumnConfig{
+				UsingTierRate: DetailStatsColumnPref{
 					IsShowShip:    false,
 					IsShowOverall: false,
 					Digit:         1,
