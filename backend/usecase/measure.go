@@ -1,12 +1,11 @@
 package usecase
 
 import (
-	"log"
 	"time"
 )
 
-func measure(label string, fn func()) {
+func measure(fn func()) int64 {
 	start := time.Now()
 	fn()
-	log.Printf("%s: %dms\n", label, time.Since(start).Milliseconds())
+	return time.Since(start).Milliseconds()
 }

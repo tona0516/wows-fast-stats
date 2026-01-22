@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"fmt"
 	"sync"
 	"wfs/backend/adapter"
 	"wfs/backend/core"
@@ -14,6 +15,7 @@ type Prefetch struct {
 	cacheStore      adapter.CacheStore
 	wargamingClient adapter.WargamingClient
 	numbersClient   adapter.NumbersClient
+	logger          adapter.Logger
 }
 
 func NewPrefetch(i do.Injector) (*Prefetch, error) {
@@ -21,6 +23,7 @@ func NewPrefetch(i do.Injector) (*Prefetch, error) {
 		cacheStore:      do.MustInvoke[adapter.CacheStore](i),
 		wargamingClient: do.MustInvoke[adapter.WargamingClient](i),
 		numbersClient:   do.MustInvoke[adapter.NumbersClient](i),
+		logger:          do.MustInvoke[adapter.Logger](i),
 	}, nil
 }
 
@@ -30,27 +33,30 @@ func (p *Prefetch) Invoke(ctx context.Context) (*core.PrefetchResult, error) {
 	var warships core.Warships
 	eg.Go(func() error {
 		var err error
-		measure("fetchWarships", func() {
+		elapsed := measure(func() {
 			warships, err = p.fetchWarships(egCtx)
 		})
+		p.logger.Debug(fmt.Sprintf("fetchWarships took %dms", elapsed), nil)
 		return err
 	})
 
 	var battleArenas map[int]string
 	eg.Go(func() error {
 		var err error
-		measure("fetchBattleArenas", func() {
+		elapsed := measure(func() {
 			battleArenas, err = p.fetchBattleArenas(egCtx)
 		})
+		p.logger.Debug(fmt.Sprintf("fetchBattleArenas took %dms", elapsed), nil)
 		return err
 	})
 
 	var battleTypes map[string]string
 	eg.Go(func() error {
 		var err error
-		measure("fetchBattleTypes", func() {
+		elapsed := measure(func() {
 			battleTypes, err = p.fetchBattleTypes(egCtx)
 		})
+		p.logger.Debug(fmt.Sprintf("fetchBattleTypes took %dms", elapsed), nil)
 		return err
 	})
 

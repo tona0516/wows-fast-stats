@@ -1,7 +1,11 @@
 package infra
 
 import (
+	"bytes"
+	"context"
+	"encoding/json"
 	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 	"time"
@@ -84,4 +88,40 @@ func (l *Logger) addContext(e *zerolog.Event, contexts map[string]string) {
 	for key, value := range contexts {
 		e = e.Str(key, value)
 	}
+}
+
+type remoteWriter struct {
+	zerolog.FilteredLevelWriter
+	alertDiscord adapter.DiscordClient
+	infoDiscord  adapter.DiscordClient
+}
+
+func (w *remoteWriter) WriteLevel(level zerolog.Level, p []byte) (int, error) {
+	if level < zerolog.InfoLevel {
+		return 0, nil
+	}
+
+	var client adapter.DiscordClient
+	if level > zerolog.InfoLevel {
+		client = w.alertDiscord
+	} else {
+		client = w.infoDiscord
+	}
+
+	formatted := fmt.Sprintf("```%s```", w.pretty(string(p)))
+
+	err := client.Comment(context.Background(), formatted)
+	if err != nil {
+		log.Printf("Failed to send report: %s\n", err.Error())
+	}
+
+	return len(p), nil
+}
+
+func (w *remoteWriter) pretty(str string) string {
+	var prettyJSON bytes.Buffer
+	if err := json.Indent(&prettyJSON, []byte(str), "", "    "); err != nil {
+		return str
+	}
+	return prettyJSON.String()
 }

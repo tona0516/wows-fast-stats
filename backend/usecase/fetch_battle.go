@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"fmt"
 	"regexp"
 	"wfs/backend/adapter"
 	"wfs/backend/core"
@@ -17,10 +18,10 @@ type FetchBattle struct {
 	wargamingClient adapter.WargamingClient
 	wails           adapter.Wails
 	cacheStore      adapter.CacheStore
-	logger          adapter.Logger
 	statsService    *statsService
 	clanService     *clanService
 	badgeService    *badgeService
+	logger          adapter.Logger
 }
 
 func NewFetchBattle(i do.Injector) (*FetchBattle, error) {
@@ -28,10 +29,10 @@ func NewFetchBattle(i do.Injector) (*FetchBattle, error) {
 		wargamingClient: do.MustInvoke[adapter.WargamingClient](i),
 		wails:           do.MustInvoke[adapter.Wails](i),
 		cacheStore:      do.MustInvoke[adapter.CacheStore](i),
-		logger:          do.MustInvoke[adapter.Logger](i),
 		statsService:    do.MustInvoke[*statsService](i),
 		clanService:     do.MustInvoke[*clanService](i),
 		badgeService:    do.MustInvoke[*badgeService](i),
+		logger:          do.MustInvoke[adapter.Logger](i),
 	}, nil
 }
 
@@ -47,9 +48,11 @@ func (b *FetchBattle) Invoke(
 
 	var accountList core.WGAccountList
 	var err error
-	measure("AccountList", func() {
+	elapsed := measure(func() {
 		accountList, err = b.wargamingClient.AccountList(ctx, accountNames)
 	})
+	b.logger.Debug(fmt.Sprintf("AccountList took %dms", elapsed), nil)
+
 	if err != nil {
 		b.wails.EmitEvent(ctx, EventErr, err)
 		return
@@ -61,36 +64,40 @@ func (b *FetchBattle) Invoke(
 	var accountInfo core.WGAccountInfo
 	eg.Go(func() error {
 		var err error
-		measure("AccountInfo", func() {
+		elapsed := measure(func() {
 			accountInfo, err = b.wargamingClient.AccountInfo(egCtx, accountIDs)
 		})
+		b.logger.Debug(fmt.Sprintf("AccountInfo took %dms", elapsed), nil)
 		return err
 	})
 
 	var allShipStats core.AllPlayerShipStats
 	eg.Go(func() error {
 		var err error
-		measure("statsService.fetchAll", func() {
+		elapsed := measure(func() {
 			allShipStats, err = b.statsService.fetchAll(egCtx, accountIDs)
 		})
+		b.logger.Debug(fmt.Sprintf("statsService.fetchAll took %dms", elapsed), nil)
 		return err
 	})
 
 	var allShipBadges core.AllPlayerShipBadges
 	eg.Go(func() error {
 		var err error
-		measure("badgeService.fetchAll", func() {
+		elapsed := measure(func() {
 			allShipBadges, err = b.badgeService.fetchAll(egCtx, accountIDs)
 		})
+		b.logger.Debug(fmt.Sprintf("badgeService.fetchAll took %dms", elapsed), nil)
 		return err
 	})
 
 	var clans core.Clans
 	eg.Go(func() error {
 		var err error
-		measure("clanService.fetchAll", func() {
+		elapsed := measure(func() {
 			clans, err = b.clanService.fetchAll(egCtx, accountIDs)
 		})
+		b.logger.Debug(fmt.Sprintf("clanService.fetchAll took %dms", elapsed), nil)
 		return err
 	})
 

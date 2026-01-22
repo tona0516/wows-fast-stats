@@ -588,13 +588,13 @@ export namespace core {
 	}
 	
 	
-	export class DetailStatsColumnConfig {
+	export class DetailStatsColumnPref {
 	    isShowShip: boolean;
 	    isShowOverall: boolean;
 	    digit: number;
 	
 	    static createFrom(source: any = {}) {
-	        return new DetailStatsColumnConfig(source);
+	        return new DetailStatsColumnPref(source);
 	    }
 	
 	    constructor(source: any = {}) {
@@ -604,48 +604,48 @@ export namespace core {
 	        this.digit = source["digit"];
 	    }
 	}
-	export class StatsColumnConfig {
-	    battles: DetailStatsColumnConfig;
-	    damage: DetailStatsColumnConfig;
-	    maxDamage: DetailStatsColumnConfig;
-	    winRate: DetailStatsColumnConfig;
-	    survivedRate: DetailStatsColumnConfig;
-	    kdRate: DetailStatsColumnConfig;
-	    kill: DetailStatsColumnConfig;
-	    exp: DetailStatsColumnConfig;
-	    pr: DetailStatsColumnConfig;
-	    hitRate: DetailStatsColumnConfig;
-	    planesKilled: DetailStatsColumnConfig;
-	    platoonRate: DetailStatsColumnConfig;
-	    efficiencyBadge: DetailStatsColumnConfig;
-	    threatLevel: DetailStatsColumnConfig;
-	    avgTier: DetailStatsColumnConfig;
-	    usingShipTypeRate: DetailStatsColumnConfig;
-	    usingTierRate: DetailStatsColumnConfig;
+	export class StatsColumnPref {
+	    battles: DetailStatsColumnPref;
+	    damage: DetailStatsColumnPref;
+	    maxDamage: DetailStatsColumnPref;
+	    winRate: DetailStatsColumnPref;
+	    survivedRate: DetailStatsColumnPref;
+	    kdRate: DetailStatsColumnPref;
+	    kill: DetailStatsColumnPref;
+	    exp: DetailStatsColumnPref;
+	    pr: DetailStatsColumnPref;
+	    hitRate: DetailStatsColumnPref;
+	    planesKilled: DetailStatsColumnPref;
+	    platoonRate: DetailStatsColumnPref;
+	    efficiencyBadge: DetailStatsColumnPref;
+	    threatLevel: DetailStatsColumnPref;
+	    avgTier: DetailStatsColumnPref;
+	    usingShipTypeRate: DetailStatsColumnPref;
+	    usingTierRate: DetailStatsColumnPref;
 	
 	    static createFrom(source: any = {}) {
-	        return new StatsColumnConfig(source);
+	        return new StatsColumnPref(source);
 	    }
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.battles = this.convertValues(source["battles"], DetailStatsColumnConfig);
-	        this.damage = this.convertValues(source["damage"], DetailStatsColumnConfig);
-	        this.maxDamage = this.convertValues(source["maxDamage"], DetailStatsColumnConfig);
-	        this.winRate = this.convertValues(source["winRate"], DetailStatsColumnConfig);
-	        this.survivedRate = this.convertValues(source["survivedRate"], DetailStatsColumnConfig);
-	        this.kdRate = this.convertValues(source["kdRate"], DetailStatsColumnConfig);
-	        this.kill = this.convertValues(source["kill"], DetailStatsColumnConfig);
-	        this.exp = this.convertValues(source["exp"], DetailStatsColumnConfig);
-	        this.pr = this.convertValues(source["pr"], DetailStatsColumnConfig);
-	        this.hitRate = this.convertValues(source["hitRate"], DetailStatsColumnConfig);
-	        this.planesKilled = this.convertValues(source["planesKilled"], DetailStatsColumnConfig);
-	        this.platoonRate = this.convertValues(source["platoonRate"], DetailStatsColumnConfig);
-	        this.efficiencyBadge = this.convertValues(source["efficiencyBadge"], DetailStatsColumnConfig);
-	        this.threatLevel = this.convertValues(source["threatLevel"], DetailStatsColumnConfig);
-	        this.avgTier = this.convertValues(source["avgTier"], DetailStatsColumnConfig);
-	        this.usingShipTypeRate = this.convertValues(source["usingShipTypeRate"], DetailStatsColumnConfig);
-	        this.usingTierRate = this.convertValues(source["usingTierRate"], DetailStatsColumnConfig);
+	        this.battles = this.convertValues(source["battles"], DetailStatsColumnPref);
+	        this.damage = this.convertValues(source["damage"], DetailStatsColumnPref);
+	        this.maxDamage = this.convertValues(source["maxDamage"], DetailStatsColumnPref);
+	        this.winRate = this.convertValues(source["winRate"], DetailStatsColumnPref);
+	        this.survivedRate = this.convertValues(source["survivedRate"], DetailStatsColumnPref);
+	        this.kdRate = this.convertValues(source["kdRate"], DetailStatsColumnPref);
+	        this.kill = this.convertValues(source["kill"], DetailStatsColumnPref);
+	        this.exp = this.convertValues(source["exp"], DetailStatsColumnPref);
+	        this.pr = this.convertValues(source["pr"], DetailStatsColumnPref);
+	        this.hitRate = this.convertValues(source["hitRate"], DetailStatsColumnPref);
+	        this.planesKilled = this.convertValues(source["planesKilled"], DetailStatsColumnPref);
+	        this.platoonRate = this.convertValues(source["platoonRate"], DetailStatsColumnPref);
+	        this.efficiencyBadge = this.convertValues(source["efficiencyBadge"], DetailStatsColumnPref);
+	        this.threatLevel = this.convertValues(source["threatLevel"], DetailStatsColumnPref);
+	        this.avgTier = this.convertValues(source["avgTier"], DetailStatsColumnPref);
+	        this.usingShipTypeRate = this.convertValues(source["usingShipTypeRate"], DetailStatsColumnPref);
+	        this.usingTierRate = this.convertValues(source["usingTierRate"], DetailStatsColumnPref);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -666,12 +666,12 @@ export namespace core {
 		    return a;
 		}
 	}
-	export class ShipColumnConfig {
+	export class ShipColumnPref {
 	    enableNationFlag: boolean;
 	    isColored: boolean;
 	
 	    static createFrom(source: any = {}) {
-	        return new ShipColumnConfig(source);
+	        return new ShipColumnPref(source);
 	    }
 	
 	    constructor(source: any = {}) {
@@ -680,12 +680,12 @@ export namespace core {
 	        this.isColored = source["isColored"];
 	    }
 	}
-	export class PlayerColumnConfig {
+	export class PlayerColumnPref {
 	    enableNationFlag: boolean;
 	    colorPattern: string;
 	
 	    static createFrom(source: any = {}) {
-	        return new PlayerColumnConfig(source);
+	        return new PlayerColumnPref(source);
 	    }
 	
 	    constructor(source: any = {}) {
@@ -694,20 +694,20 @@ export namespace core {
 	        this.colorPattern = source["colorPattern"];
 	    }
 	}
-	export class ColumnConfig {
-	    player: PlayerColumnConfig;
-	    ship: ShipColumnConfig;
-	    stats: StatsColumnConfig;
+	export class ColumnPref {
+	    player: PlayerColumnPref;
+	    ship: ShipColumnPref;
+	    stats: StatsColumnPref;
 	
 	    static createFrom(source: any = {}) {
-	        return new ColumnConfig(source);
+	        return new ColumnPref(source);
 	    }
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.player = this.convertValues(source["player"], PlayerColumnConfig);
-	        this.ship = this.convertValues(source["ship"], ShipColumnConfig);
-	        this.stats = this.convertValues(source["stats"], StatsColumnConfig);
+	        this.player = this.convertValues(source["player"], PlayerColumnPref);
+	        this.ship = this.convertValues(source["ship"], ShipColumnPref);
+	        this.stats = this.convertValues(source["stats"], StatsColumnPref);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -757,7 +757,7 @@ export namespace core {
 	    zoomRate: number;
 	    statsExtra: string;
 	    isSendReport: boolean;
-	    column: ColumnConfig;
+	    column: ColumnPref;
 	
 	    static createFrom(source: any = {}) {
 	        return new Pref(source);
@@ -770,7 +770,7 @@ export namespace core {
 	        this.zoomRate = source["zoomRate"];
 	        this.statsExtra = source["statsExtra"];
 	        this.isSendReport = source["isSendReport"];
-	        this.column = this.convertValues(source["column"], ColumnConfig);
+	        this.column = this.convertValues(source["column"], ColumnPref);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
