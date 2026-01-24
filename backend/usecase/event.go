@@ -1,11 +1,11 @@
 package usecase
 
 const (
-	EventNeedInitialSetting = "NEED_INITIAL_SETTING"
-	EventPollingStart       = "POLLING_START"
-	EventBattleStart        = "BATTLE_START"
-	EventErr                = "BATTLE_ERR"
-	EventFetchOthers        = "BATTLE_FETCH_OTHERS"
-	EventFetchPlayers       = "BATTLE_FETCH_PLAYERS"
-	EventFetchDone          = "BATTLE_FETCH_DONE"
+	EventOnStartPrefetch      = "ON_START_PREFETCH"
+	EventOnPrefetchFailure    = "ON_START_PREFETCH_FAILURE"
+	EventOnPromote            = "ON_PROMOTE"
+	EventOnStartPolling       = "ON_START_POLLING"
+	EventOnStartBattle        = "ON_START_BATTLE"
+	EventOnFetchBattleSuccess = "ON_FETCH_BATTLE_SUCCESS"
+	EventOnFetchBattleFailre  = "ON_FETCH_BATTLE_FAILURE"
 )

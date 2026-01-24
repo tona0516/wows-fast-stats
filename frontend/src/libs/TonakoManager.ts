@@ -13,51 +13,35 @@ export class TonakoManager {
     return TonakoManager.instance;
   }
 
-  setNeedInitialSettingState() {
+  setPromoteState(message: string) {
     storedTonako.set({
-      message: "設定画面から初期設定をおこなってください",
+      message: message,
       isLoading: false,
       tonako: Tonako.Pointing,
     });
   }
 
-  setStartBattleState() {
+  setStandbyState(message: string) {
     storedTonako.set({
-      message: "戦闘データを読み込み中",
-      isLoading: true,
-      tonako: Tonako.Standby,
-    });
-  }
-
-  setPollingStartState() {
-    storedTonako.set({
-      message: "戦闘開始時に自動的にリロードします",
+      message: message,
       isLoading: false,
       tonako: Tonako.Standby,
     });
   }
 
-  setBattleErrorState(message: string) {
+  setLoadingState(message: string) {
+    storedTonako.set({
+      message: message,
+      isLoading: true,
+      tonako: Tonako.Standby,
+    });
+  }
+
+  setErrorState(message: string) {
     storedTonako.set({
       message: message,
       isLoading: false,
       tonako: Tonako.Sorry,
-    });
-  }
-
-  setFetchOtherDataState() {
-    storedTonako.set({
-      message: "艦・マップ情報を取得中",
-      isLoading: true,
-      tonako: Tonako.Standby,
-    });
-  }
-
-  setFetchPlayerDataState() {
-    storedTonako.set({
-      message: "プレイヤー情報を取得中",
-      isLoading: true,
-      tonako: Tonako.Standby,
     });
   }
 

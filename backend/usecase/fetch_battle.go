@@ -16,7 +16,6 @@ var urlRegex = regexp.MustCompile(`https?://[^\s]+`)
 
 type FetchBattle struct {
 	wargamingClient adapter.WargamingClient
-	wails           adapter.Wails
 	cacheStore      adapter.CacheStore
 	statsService    *statsService
 	clanService     *clanService
@@ -27,7 +26,6 @@ type FetchBattle struct {
 func NewFetchBattle(i do.Injector) (*FetchBattle, error) {
 	return &FetchBattle{
 		wargamingClient: do.MustInvoke[adapter.WargamingClient](i),
-		wails:           do.MustInvoke[adapter.Wails](i),
 		cacheStore:      do.MustInvoke[adapter.CacheStore](i),
 		statsService:    do.MustInvoke[*statsService](i),
 		clanService:     do.MustInvoke[*clanService](i),
@@ -40,7 +38,7 @@ func (b *FetchBattle) Invoke(
 	ctx context.Context,
 	tempArenaInfo core.TempArenaInfo,
 	prefetchResult *core.PrefetchResult,
-) {
+) (*core.Battle, error) {
 	b.cacheStore.SetOwnIGN(tempArenaInfo.PlayerName)
 	b.logger.SetOwnIGN(tempArenaInfo.PlayerName)
 
@@ -54,8 +52,7 @@ func (b *FetchBattle) Invoke(
 	b.logger.Debug(fmt.Sprintf("AccountList took %dms", elapsed), nil)
 
 	if err != nil {
-		b.wails.EmitEvent(ctx, EventErr, err)
-		return
+		return nil, err
 	}
 	accountIDs := accountList.AccountIDs()
 
@@ -102,8 +99,7 @@ func (b *FetchBattle) Invoke(
 	})
 
 	if err := eg.Wait(); err != nil {
-		b.wails.EmitEvent(ctx, EventErr, err)
-		return
+		return nil, err
 	}
 
 	result := core.NewBattle(
@@ -116,5 +112,5 @@ func (b *FetchBattle) Invoke(
 		allShipBadges,
 	)
 
-	b.wails.EmitEvent(ctx, EventFetchDone, result)
+	return &result, nil
 }

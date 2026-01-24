@@ -9,21 +9,17 @@
   import InfoPage from "@pages/InfoPage.svelte";
   import StatsPage from "@pages/StatsPage.svelte";
   import {
-    ShowMessageDialog,
     LoadPref,
     StartPollingMatch,
     Prefetch,
   } from "@wails/go/main/App";
   import type { core } from "@wails/go/models";
-  import { EventsOn, LogInfo } from "@wails/runtime/runtime";
+  import { EventsOn } from "@wails/runtime/runtime";
   import { onMount } from "svelte";
   import { themeChange } from "theme-change";
   import { TonakoManager } from "@libs/TonakoManager";
   import ShipDetailModal from "@components/modals/ShipDetailModal.svelte";
   import PlayerDetailModal from "@components/modals/PlayerDetailModal.svelte";
-
-  let statsPage: StatsPage | undefined;
-  let initialized = false;
 
   let page: Page = "stats";
 
@@ -36,53 +32,41 @@
     themeChange(false);
   });
 
-  EventsOn("NEED_INITIAL_SETTING", () => {
-    LogInfo("NEED_INITIAL_SETTING");
-    TonakoManager.getInstance.setNeedInitialSettingState();
+  EventsOn("ON_START_PREFETCH", (message: string) => {
+    TonakoManager.getInstance.setLoadingState(message);
   });
-  EventsOn("POLLING_START", () => {
-    LogInfo("POLLING_START");
-    TonakoManager.getInstance.setPollingStartState();
+  EventsOn("ON_START_PREFETCH_FAILURE", (message: string) => {
+    TonakoManager.getInstance.setErrorState(message);
   });
-  EventsOn("BATTLE_START", () => {
-    LogInfo("BATTLE_START");
-    TonakoManager.getInstance.setStartBattleState();
+  EventsOn("ON_PROMOTE", (message: string) => {
+    TonakoManager.getInstance.setPromoteState(message);
   });
-  EventsOn("BATTLE_ERR", (message: string) => {
-    LogInfo("BATTLE_ERR");
-    TonakoManager.getInstance.setBattleErrorState(message);
+  EventsOn("ON_START_POLLING", (message: string) => {
+    TonakoManager.getInstance.setStandbyState(message);
   });
-  EventsOn("BATTLE_FETCH_OTHERS", () => {
-    LogInfo("BATTLE_FETCH_OTHERS");
-    TonakoManager.getInstance.setFetchOtherDataState();
+  EventsOn("ON_START_BATTLE", (message: string) => {
+    TonakoManager.getInstance.setLoadingState(message);
   });
-  EventsOn("BATTLE_FETCH_PLAYERS", () => {
-    LogInfo("BATTLE_FETCH_PLAYERS");
-    TonakoManager.getInstance.setFetchPlayerDataState();
-  });
-  EventsOn("BATTLE_FETCH_DONE", (battle: core.Battle) => {
-    LogInfo("BATTLE_FETCH_DONE");
+  EventsOn("ON_FETCH_BATTLE_SUCCESS", (battle: core.Battle) => {
     TonakoManager.getInstance.setHidden();
     storedBattle.set(battle);
   });
+  EventsOn("ON_FETCH_BATTLE_FAILURE", (message: string) => {
+    TonakoManager.getInstance.setErrorState(message);
+  });
 
-  const initialize = async (): Promise<void> => {
+  const main = async () => {
     try {
       const pref = await LoadPref();
       storedPref.set(pref);
 
       await Prefetch();
-
-      StartPollingMatch();
-
-      initialized = true;
     } catch (error) {
-      ShowMessageDialog(`初期化に失敗しました: ${error as string}`);
+      TonakoManager.getInstance.setErrorState(error as string);
+      return
     }
-  };
 
-  const main = async () => {
-    await initialize();
+    StartPollingMatch();
   };
 
   main();
@@ -100,21 +84,13 @@
       </div>
 
       <div class="flex-1 min-w-px m-4">
-        {#if initialized}
           {#if page === "stats"}
-            <StatsPage bind:this={statsPage} />
+            <StatsPage />
           {:else if page === "pref"}
             <PrefPage />
           {:else if page === "info"}
             <InfoPage />
           {/if}
-        {:else}
-          <div
-            class="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-20"
-          >
-            <span class="loading loading-spinner"></span>
-          </div>
-        {/if}
       </div>
     </div>
   </div>

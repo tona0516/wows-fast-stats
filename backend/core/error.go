@@ -19,4 +19,5 @@ const (
 	ErrStringWrite               failure.StringCode = "string_write_error"
 	ErrInvalidExpectedStats      failure.StringCode = "invalid_expected_stats_error"
 	ErrInvalidInstallPath        failure.StringCode = "invalid_install_path_error"
+	ErrInitialSettingRequired    failure.StringCode = "initial_setting_required_error"
 )

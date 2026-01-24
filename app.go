@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"wfs/backend/adapter"
 	"wfs/backend/config"
@@ -10,6 +11,7 @@ import (
 	"wfs/backend/usecase"
 
 	"github.com/mitchellh/go-ps"
+	"github.com/morikuni/failure"
 	"github.com/samber/do/v2"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
@@ -35,8 +37,14 @@ func NewApp(config config.Config) *App {
 }
 
 func (a *App) Prefetch() {
+	runtime.EventsEmit(a.ctx, usecase.EventOnStartPrefetch, "艦・マップ情報を取得中")
+
 	result, err := a.prefetchUsecase.Invoke(a.ctx)
 	if err != nil {
+		code, _ := failure.CodeOf(err)
+		message := fmt.Sprintf("[%s] 艦・マップ情報に失敗しました\n再起動してください", code.ErrorCode())
+		runtime.EventsEmit(a.ctx, usecase.EventOnPrefetchFailure, message)
+		// TODO: キャッシュの削除
 		return
 	}
 	a.prefetchResult = result
@@ -47,13 +55,43 @@ func (a *App) StartPollingMatch() {
 		a.pollMatchCancelFunc()
 	}
 
-	cancelCtx, cancelFunc := context.WithCancel(context.Background())
+	cancelCtx, cancelFunc := context.WithCancel(a.ctx)
 	a.pollMatchCancelFunc = cancelFunc
-	channel := make(chan core.TempArenaInfo)
 
-	go a.pollMatchUsecase.Invoke(a.ctx, cancelCtx, channel)
-	for tempArenaInfo := range channel {
-		a.fetchBattleUsecase.Invoke(a.ctx, tempArenaInfo, a.prefetchResult)
+	installPath, err := a.pollMatchUsecase.GetInstallPath()
+	if err != nil {
+		if failure.Is(err, core.ErrInitialSettingRequired) {
+			runtime.EventsEmit(a.ctx, usecase.EventOnPromote, "設定から初期設定をおこなってください")
+		} else {
+			code, _ := failure.CodeOf(err)
+			message := fmt.Sprintf("[%s] 戦闘検知開始に失敗しました\n再起動してください", code.ErrorCode())
+			runtime.EventsEmit(a.ctx, usecase.EventOnFetchBattleFailre, message)
+		}
+		return
+	}
+
+	pollingResult := make(chan usecase.PollingResult)
+
+	go a.pollMatchUsecase.Invoke(a.ctx, cancelCtx, installPath, pollingResult)
+	runtime.EventsEmit(a.ctx, usecase.EventOnStartPolling, "戦闘開始時に自動的にリロードします")
+
+	for result := range pollingResult {
+		if result.Error != nil {
+			code, _ := failure.CodeOf(result.Error)
+			message := fmt.Sprintf("[%s] 戦闘検知に失敗しました\nリトライしてください", code.ErrorCode())
+			runtime.EventsEmit(a.ctx, usecase.EventOnFetchBattleFailre, message)
+			continue
+		}
+
+		runtime.EventsEmit(a.ctx, usecase.EventOnStartBattle, "戦闘データを読み込み中")
+		battle, err := a.fetchBattleUsecase.Invoke(a.ctx, *result.TempArenaInfo, a.prefetchResult)
+		if err != nil {
+			code, _ := failure.CodeOf(err)
+			message := fmt.Sprintf("[%s] 戦闘データの取得に失敗しました\nリトライしてください", code.ErrorCode())
+			runtime.EventsEmit(a.ctx, usecase.EventOnFetchBattleFailre, message)
+			continue
+		}
+		runtime.EventsEmit(a.ctx, usecase.EventOnFetchBattleSuccess, battle)
 	}
 }
 

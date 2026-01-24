@@ -15,7 +15,6 @@ import (
 
 type PollMatch struct {
 	pollingInterval time.Duration
-	wails           adapter.Wails
 	prefStore       adapter.PrefStore
 	replayReader    adapter.ReplayReader
 }
@@ -24,35 +23,34 @@ func NewPollMatch(i do.Injector) (*PollMatch, error) {
 	config := do.MustInvoke[config.Config](i)
 	return &PollMatch{
 		pollingInterval: config.Basic.PollingInterval,
-		wails:           do.MustInvoke[adapter.Wails](i),
 		prefStore:       do.MustInvoke[adapter.PrefStore](i),
 		replayReader:    do.MustInvoke[adapter.ReplayReader](i),
 	}, nil
 }
 
-func (pm *PollMatch) Invoke(
-	ctx context.Context,
-	cancelCtx context.Context,
-	channel chan core.TempArenaInfo,
-) {
+func (pm *PollMatch) GetInstallPath() (string, error) {
 	pref, err := pm.prefStore.Pref()
 	if err != nil {
 		if failure.Is(err, core.ErrJSONNotFound) {
-			pm.emitNeedInitialSetting(ctx)
-			return
+			return "", failure.Translate(err, core.ErrInitialSettingRequired)
 		}
 
-		pm.emitError(ctx, err)
-		return
+		return "", err
 	}
 
 	if pref.InstallPath == "" {
-		pm.emitNeedInitialSetting(ctx)
-		return
+		return "", failure.New(core.ErrInitialSettingRequired)
 	}
 
-	pm.emitPollingStart(ctx)
+	return pref.InstallPath, nil
+}
 
+func (pm *PollMatch) Invoke(
+	ctx context.Context,
+	cancelCtx context.Context,
+	installPath string,
+	result chan PollingResult,
+) {
 	var latestHash string
 	for {
 		select {
@@ -61,14 +59,17 @@ func (pm *PollMatch) Invoke(
 		default:
 			time.Sleep(pm.pollingInterval)
 
-			tempArenaInfo, err := pm.replayReader.TempArenaInfo(pref.InstallPath)
+			tempArenaInfo, err := pm.replayReader.TempArenaInfo(installPath)
 			if err != nil {
 				if failure.Is(err, core.ErrTempArenaInfoNotFound) {
 					continue
 				}
 
-				pm.emitError(ctx, err)
-				continue
+				result <- PollingResult{
+					TempArenaInfo: nil,
+					Error:         err,
+				}
+				return
 			}
 
 			hash := fmt.Sprintf("%x", sha256.Sum256(fmt.Append(nil, tempArenaInfo)))
@@ -77,24 +78,10 @@ func (pm *PollMatch) Invoke(
 			}
 
 			latestHash = hash
-			pm.emitBattleStart(ctx)
-			channel <- tempArenaInfo
+			result <- PollingResult{
+				TempArenaInfo: &tempArenaInfo,
+				Error:         nil,
+			}
 		}
 	}
-}
-
-func (pm *PollMatch) emitNeedInitialSetting(ctx context.Context) {
-	pm.wails.EmitEvent(ctx, EventNeedInitialSetting)
-}
-
-func (pm *PollMatch) emitPollingStart(ctx context.Context) {
-	pm.wails.EmitEvent(ctx, EventPollingStart)
-}
-
-func (pm *PollMatch) emitBattleStart(ctx context.Context) {
-	pm.wails.EmitEvent(ctx, EventBattleStart)
-}
-
-func (pm *PollMatch) emitError(ctx context.Context, err error) {
-	pm.wails.EmitEvent(ctx, EventErr, err)
 }

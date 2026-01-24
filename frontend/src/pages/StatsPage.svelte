@@ -3,7 +3,7 @@
   import MainStatsTable from "@components/MainStatsTable.svelte";
   import TeamAverageStatsDisplay from "@components/TeamAverageStatsDisplay.svelte";
   import MessagingTonako from "@components/MessagingTonako.svelte";
-  import { storedTonako, storedBattle, storedPref } from "@libs/stores";
+  import { storedTonako, storedBattle } from "@libs/stores";
 </script>
 
 <div>
