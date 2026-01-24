@@ -6,7 +6,7 @@ require (
 	github.com/mitchellh/go-ps v1.0.0
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/stretchr/testify v1.11.1
-	github.com/wailsapp/wails/v2 v2.10.2
+	github.com/wailsapp/wails/v2 v2.11.0
 	golang.org/x/sync v0.19.0
 )
 
