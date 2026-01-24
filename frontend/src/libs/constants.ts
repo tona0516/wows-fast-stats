@@ -40,7 +40,11 @@ export const STATS_COLUMN_INFO: {
   exp: { min: "Exp", full: "経験値(プレミアム補正含む)", pattern: "both" },
   battles: { min: "戦闘数", full: "戦闘数", pattern: "both" },
   platoonRate: { min: "分艦隊比", full: "分艦隊比率", pattern: "both" },
-  avgTier: { min: "平均T", full: "平均Tier", pattern: "both" },
+  efficiencyBadge: {
+    min: "技能バッジ(E|1|2|3)",
+    full: "技能バッジ(Expert|1st|2nd|3rd)",
+    pattern: "both",
+  },
   planesKilled: { min: "撃墜", full: "撃墜", pattern: "ship" },
   survivedRate: {
     min: "生存率(全|勝|敗)",
@@ -48,6 +52,8 @@ export const STATS_COLUMN_INFO: {
     pattern: "ship",
   },
   hitRate: { min: "命中率(主|魚)", full: "命中率(主砲|魚雷)", pattern: "ship" },
+  avgTier: { min: "平均T", full: "平均Tier", pattern: "overall" },
+
   threatLevel: {
     min: "戦力評価",
     full: "戦力評価(闇深XVM算出ロジック)",
@@ -62,11 +68,6 @@ export const STATS_COLUMN_INFO: {
     min: "T割合",
     full: "プレイTier割合",
     pattern: "overall",
-  },
-  efficiencyBadge: {
-    min: "技能バッジ(E|1|2|3)",
-    full: "技能バッジ(Expert|1st|2nd|3rd)",
-    pattern: "both",
   },
 } as const;
 
