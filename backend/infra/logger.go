@@ -98,7 +98,7 @@ type remoteWriter struct {
 
 func (w *remoteWriter) WriteLevel(level zerolog.Level, p []byte) (int, error) {
 	if level < zerolog.InfoLevel {
-		return 0, nil
+		return len(p), nil
 	}
 
 	var client adapter.DiscordClient
