@@ -13,8 +13,8 @@
         <img src={tonako.getImgPath()} alt="" />
       </div>
     </div>
-    <p class="p-4 text-center">
-      {message}
+    <p class="p-4">
+      <span class="text-lg">{message}</span>
       {#if showLoading}
         <span class="mx-1 loading"></span>
       {/if}

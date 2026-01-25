@@ -15,42 +15,42 @@ import (
 
 type PollMatch struct {
 	pollingInterval time.Duration
-	prefStore       adapter.PrefStore
 	replayReader    adapter.ReplayReader
+	prefStore       adapter.PrefStore
+	wails           adapter.Wails
+	validator       *ValidateInstallPathService
 }
 
 func NewPollMatch(i do.Injector) (*PollMatch, error) {
 	config := do.MustInvoke[config.Config](i)
 	return &PollMatch{
 		pollingInterval: config.Basic.PollingInterval,
-		prefStore:       do.MustInvoke[adapter.PrefStore](i),
 		replayReader:    do.MustInvoke[adapter.ReplayReader](i),
+		prefStore:       do.MustInvoke[adapter.PrefStore](i),
+		wails:           do.MustInvoke[adapter.Wails](i),
+		validator:       do.MustInvoke[*ValidateInstallPathService](i),
 	}, nil
-}
-
-func (pm *PollMatch) GetInstallPath() (string, error) {
-	pref, err := pm.prefStore.Pref()
-	if err != nil {
-		if failure.Is(err, core.ErrJSONNotFound) {
-			return "", failure.Translate(err, core.ErrInitialSettingRequired)
-		}
-
-		return "", err
-	}
-
-	if pref.InstallPath == "" {
-		return "", failure.New(core.ErrInitialSettingRequired)
-	}
-
-	return pref.InstallPath, nil
 }
 
 func (pm *PollMatch) Invoke(
 	ctx context.Context,
 	cancelCtx context.Context,
-	installPath string,
-	result chan PollingResult,
 ) {
+	pref, err := pm.prefStore.Pref()
+	if err != nil {
+		pm.wails.EmitEvent(ctx, EventOnGameClientPathRequired)
+		return
+	}
+
+	if err := pm.validator.Validate(pref.InstallPath); err != nil {
+		pm.wails.EmitEvent(ctx, EventOnGameClientPathRequired)
+		return
+	}
+
+	pm.wails.EmitEvent(ctx, EventOnStartPolling)
+
+	installPath := pref.InstallPath
+
 	var latestHash string
 	for {
 		select {
@@ -65,10 +65,7 @@ func (pm *PollMatch) Invoke(
 					continue
 				}
 
-				result <- PollingResult{
-					TempArenaInfo: nil,
-					Error:         err,
-				}
+				pm.wails.EmitEvent(ctx, EventOnFailPolling, core.ErrorForDisplay(err))
 				return
 			}
 
@@ -78,10 +75,7 @@ func (pm *PollMatch) Invoke(
 			}
 
 			latestHash = hash
-			result <- PollingResult{
-				TempArenaInfo: &tempArenaInfo,
-				Error:         nil,
-			}
+			pm.wails.EmitEvent(ctx, EventOnStartBattle, tempArenaInfo)
 		}
 	}
 }

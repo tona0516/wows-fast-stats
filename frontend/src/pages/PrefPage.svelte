@@ -6,10 +6,15 @@
     STATS_COLUMN_INFO,
     PLAYER_NAME_COLORS,
   } from "@libs/constants";
-  import { showToast, storedPref } from "@libs/stores";
+  import {
+    showToast,
+    storedGameClientPathError,
+    storedPref,
+  } from "@libs/stores";
   import { Theme } from "@libs/Theme";
-  import { StartPollingMatch, TrySaveInstallPath } from "@wails/go/main/App";
+  import { LoadPref, SavePref, SelectInstallPath } from "@wails/go/main/App";
   import { onMount } from "svelte";
+  import { get } from "svelte/store";
   import { themeChange } from "theme-change";
 
   onMount(async () => {
@@ -18,22 +23,34 @@
 
   const onClickSelectDirectory = async () => {
     try {
-      const isSuccess = await TrySaveInstallPath();
-      if (isSuccess) {
-        showToast("インストールパスを設定しました");
-        StartPollingMatch();
-      }
+      await SelectInstallPath();
+      const pref = await LoadPref();
+      storedPref.set(pref);
+      storedGameClientPathError.set("");
+
+      showToast("ゲームクライアントパスを設定しました");
     } catch (error) {
-      showToast(`設定できませんでした: " + ${error as string}`);
+      const errorString = error as string;
+      if (errorString.includes("C103")) {
+        return;
+      }
+
+      storedGameClientPathError.set(errorString);
     }
+  };
+
+  const onChange = async () => {
+    const pref = get(storedPref);
+    if (!pref) return;
+    await SavePref(pref);
   };
 </script>
 
 <div class="container mx-auto max-w-3xl py-3 flex flex-col gap-4">
-  <!-- インストールパス設定 -->
+  <!-- ゲームクライアントパス設定 -->
   <div class="card bg-base-100 shadow-xl rounded-xl p-6">
     <div class="flex items-center mb-2">
-      <span class="text-2xl font-bold">インストールパス設定</span>
+      <span class="text-2xl font-bold">ゲームクライアントパス設定</span>
       <span class="ml-2 badge badge-outline badge-error">必須</span>
     </div>
     <p class="text-sm text-gray-500 mb-2">
@@ -42,11 +59,16 @@
     {#if $storedPref.installPath}
       <div class="stats shadow w-full mb-2">
         <div class="stat">
-          <div class="stat-title">ゲームクライアント インストールパス</div>
+          <div class="stat-title">パス</div>
           <div class="stat-value text-lg break-all">
             {$storedPref.installPath}
           </div>
         </div>
+      </div>
+    {/if}
+    {#if $storedGameClientPathError}
+      <div class="alert alert-error mb-2">
+        <span>{$storedGameClientPathError}</span>
       </div>
     {/if}
     <button class="btn btn-primary w-full" on:click={onClickSelectDirectory}>
@@ -72,6 +94,7 @@
       <select
         class="select select-bordered w-full"
         bind:value={$storedPref.zoomRate}
+        on:change={onChange}
       >
         {#each ZOOM_RATES as zr}
           <option selected={zr === $storedPref.zoomRate} value={zr}
@@ -86,6 +109,7 @@
       <select
         class="select select-bordered w-full my-2"
         bind:value={$storedPref.statsExtra}
+        on:change={onChange}
       >
         {#each STATS_EXTRAS as se}
           <option selected={se[0] === $storedPref.statsExtra} value={se[0]}
@@ -120,6 +144,7 @@
                     class="toggle toggle-success"
                     type="checkbox"
                     bind:checked={$storedPref.column.player.enableNationFlag}
+                    on:change={onChange}
                   />
                   <span
                     >クラン国籍の国旗を表示する（クラン説明から言語検出）</span
@@ -130,6 +155,7 @@
                   <select
                     class="select select-sm select-bordered"
                     bind:value={$storedPref.column.player.colorPattern}
+                    on:change={onChange}
                   >
                     {#each PLAYER_NAME_COLORS as color}
                       <option
@@ -152,6 +178,7 @@
                     class="toggle toggle-success"
                     type="checkbox"
                     bind:checked={$storedPref.column.ship.enableNationFlag}
+                    on:change={onChange}
                   />
                   <span>国旗を表示する</span>
                 </label>
@@ -160,6 +187,7 @@
                     class="toggle toggle-success"
                     type="checkbox"
                     bind:checked={$storedPref.column.ship.isColored}
+                    on:change={onChange}
                   />
                   <span>艦種に基づく背景色にする</span>
                 </label>
@@ -191,6 +219,7 @@
                     class="toggle toggle-success"
                     type="checkbox"
                     bind:checked={$storedPref.column.stats[statsKey].isShowShip}
+                    on:change={onChange}
                   />
                 </td>
               {:else}
@@ -204,6 +233,7 @@
                     bind:checked={
                       $storedPref.column.stats[statsKey].isShowOverall
                     }
+                    on:change={onChange}
                   />
                 </td>
               {:else}
@@ -214,6 +244,7 @@
                   <select
                     class="select select-sm select-bordered"
                     bind:value={$storedPref.column.stats[statsKey].digit}
+                    on:change={onChange}
                   >
                     {#each [0, 1, 2] as digit}
                       <option
@@ -243,6 +274,7 @@
           class="toggle toggle-success"
           type="checkbox"
           bind:checked={$storedPref.isSendReport}
+          on:change={onChange}
         />
         <span>アプリ改善のためのデータ送信を許可する</span>
       </li>

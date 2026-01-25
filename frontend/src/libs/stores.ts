@@ -1,14 +1,8 @@
-import { SavePref } from "@wails/go/main/App";
 import type { core } from "@wails/go/models";
 import { type Writable, writable } from "svelte/store";
 import type { Optional, TonakoParam } from "./types";
 
 export const storedPref = writable() as Writable<core.Pref>;
-storedPref.subscribe(async (value) => {
-  if (!value) return;
-  await SavePref(value);
-});
-
 export const storedBattle = writable(undefined) as Writable<
   Optional<core.Battle>
 >;
@@ -23,9 +17,11 @@ export const storedTonako = writable(undefined) as Writable<
 >;
 
 export const storedToastText = writable("");
-export function showToast(text: string, intervalSeconds = 3) {
+export function showToast(text: string, intervalSeconds = 5) {
   storedToastText.set(text);
   setTimeout(() => {
     storedToastText.set("");
   }, intervalSeconds * 1000);
 }
+
+export const storedGameClientPathError = writable("") as Writable<string>;

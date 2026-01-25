@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"wfs/backend/adapter"
 	"wfs/backend/config"
@@ -11,7 +10,6 @@ import (
 	"wfs/backend/usecase"
 
 	"github.com/mitchellh/go-ps"
-	"github.com/morikuni/failure"
 	"github.com/samber/do/v2"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
@@ -36,18 +34,14 @@ func NewApp(config config.Config) *App {
 	return &App{config: config}
 }
 
-func (a *App) Prefetch() {
-	runtime.EventsEmit(a.ctx, usecase.EventOnStartPrefetch, "艦・マップ情報を取得中")
-
+func (a *App) Prefetch() error {
 	result, err := a.prefetchUsecase.Invoke(a.ctx)
 	if err != nil {
-		code, _ := failure.CodeOf(err)
-		message := fmt.Sprintf("[%s] 艦・マップ情報に失敗しました\n再起動してください", code.ErrorCode())
-		runtime.EventsEmit(a.ctx, usecase.EventOnPrefetchFailure, message)
-		// TODO: キャッシュの削除
-		return
+		return core.ErrorForDisplay(err)
 	}
+
 	a.prefetchResult = result
+	return nil
 }
 
 func (a *App) StartPollingMatch() {
@@ -58,41 +52,18 @@ func (a *App) StartPollingMatch() {
 	cancelCtx, cancelFunc := context.WithCancel(a.ctx)
 	a.pollMatchCancelFunc = cancelFunc
 
-	installPath, err := a.pollMatchUsecase.GetInstallPath()
+	go a.pollMatchUsecase.Invoke(a.ctx, cancelCtx)
+}
+
+func (a *App) FetchBattle(tempArenaInfo core.TempArenaInfo) (*core.Battle, error) {
+	battle, err := a.fetchBattleUsecase.Invoke(a.ctx, tempArenaInfo, a.prefetchResult)
 	if err != nil {
-		if failure.Is(err, core.ErrInitialSettingRequired) {
-			runtime.EventsEmit(a.ctx, usecase.EventOnPromote, "設定から初期設定をおこなってください")
-		} else {
-			code, _ := failure.CodeOf(err)
-			message := fmt.Sprintf("[%s] 戦闘検知開始に失敗しました\n再起動してください", code.ErrorCode())
-			runtime.EventsEmit(a.ctx, usecase.EventOnFetchBattleFailre, message)
-		}
-		return
+		a.pollMatchCancelFunc()
+		errForDisplay := core.ErrorForDisplay(err)
+		return nil, errForDisplay
 	}
 
-	pollingResult := make(chan usecase.PollingResult)
-
-	go a.pollMatchUsecase.Invoke(a.ctx, cancelCtx, installPath, pollingResult)
-	runtime.EventsEmit(a.ctx, usecase.EventOnStartPolling, "戦闘開始時に自動的にリロードします")
-
-	for result := range pollingResult {
-		if result.Error != nil {
-			code, _ := failure.CodeOf(result.Error)
-			message := fmt.Sprintf("[%s] 戦闘検知に失敗しました\nリトライしてください", code.ErrorCode())
-			runtime.EventsEmit(a.ctx, usecase.EventOnFetchBattleFailre, message)
-			continue
-		}
-
-		runtime.EventsEmit(a.ctx, usecase.EventOnStartBattle, "戦闘データを読み込み中")
-		battle, err := a.fetchBattleUsecase.Invoke(a.ctx, *result.TempArenaInfo, a.prefetchResult)
-		if err != nil {
-			code, _ := failure.CodeOf(err)
-			message := fmt.Sprintf("[%s] 戦闘データの取得に失敗しました\nリトライしてください", code.ErrorCode())
-			runtime.EventsEmit(a.ctx, usecase.EventOnFetchBattleFailre, message)
-			continue
-		}
-		runtime.EventsEmit(a.ctx, usecase.EventOnFetchBattleSuccess, battle)
-	}
+	return battle, nil
 }
 
 func (a *App) LoadPref() (core.Pref, error) {
@@ -100,11 +71,17 @@ func (a *App) LoadPref() (core.Pref, error) {
 }
 
 func (a *App) SavePref(pref core.Pref) error {
+	a.logger.Debug("SavePref called", nil)
 	return a.savePrefUsecase.Invoke(pref)
 }
 
-func (a *App) TrySaveInstallPath() (bool, error) {
-	return a.installPathSettingUsecase.Invoke(a.ctx)
+func (a *App) SelectInstallPath() error {
+	if err := a.installPathSettingUsecase.Invoke(a.ctx); err != nil {
+		return core.ErrorForDisplay(err)
+	}
+
+	a.StartPollingMatch()
+	return nil
 }
 
 func (a *App) CurrentVersion() string {
@@ -120,11 +97,6 @@ func (a *App) ShowMessageDialog(message string) {
 		Title:   a.config.Basic.Name,
 		Message: message,
 	})
-}
-
-// 構造体のバインド用のメソッド.
-func (a *App) EmptyBattle() core.Battle {
-	return core.Battle{}
 }
 
 func (a *App) OnStartup(ctx context.Context) {
@@ -199,6 +171,7 @@ func (a *App) getInjector() do.Injector {
 	do.Provide(injector, usecase.NewStatsService)
 	do.Provide(injector, usecase.NewClanService)
 	do.Provide(injector, usecase.NewBadgeService)
+	do.Provide(injector, usecase.NewValidateInstallPathService)
 
 	// usecase
 	do.Provide(injector, usecase.NewPrefetch)

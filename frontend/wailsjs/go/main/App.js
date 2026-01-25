@@ -6,8 +6,8 @@ export function CurrentVersion() {
   return window['go']['main']['App']['CurrentVersion']();
 }
 
-export function EmptyBattle() {
-  return window['go']['main']['App']['EmptyBattle']();
+export function FetchBattle(arg1) {
+  return window['go']['main']['App']['FetchBattle'](arg1);
 }
 
 export function LoadPref() {
@@ -26,14 +26,14 @@ export function SavePref(arg1) {
   return window['go']['main']['App']['SavePref'](arg1);
 }
 
+export function SelectInstallPath() {
+  return window['go']['main']['App']['SelectInstallPath']();
+}
+
 export function ShowMessageDialog(arg1) {
   return window['go']['main']['App']['ShowMessageDialog'](arg1);
 }
 
 export function StartPollingMatch() {
   return window['go']['main']['App']['StartPollingMatch']();
-}
-
-export function TrySaveInstallPath() {
-  return window['go']['main']['App']['TrySaveInstallPath']();
 }

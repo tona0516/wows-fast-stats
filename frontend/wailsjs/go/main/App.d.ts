@@ -4,7 +4,7 @@ import {core} from '../models';
 
 export function CurrentVersion():Promise<string>;
 
-export function EmptyBattle():Promise<core.Battle>;
+export function FetchBattle(arg1:core.TempArenaInfo):Promise<core.Battle>;
 
 export function LoadPref():Promise<core.Pref>;
 
@@ -14,8 +14,8 @@ export function Prefetch():Promise<void>;
 
 export function SavePref(arg1:core.Pref):Promise<void>;
 
+export function SelectInstallPath():Promise<void>;
+
 export function ShowMessageDialog(arg1:string):Promise<void>;
 
 export function StartPollingMatch():Promise<void>;
-
-export function TrySaveInstallPath():Promise<boolean>;

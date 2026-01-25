@@ -3,7 +3,12 @@
   import "charts.css";
   import SideMenu from "@components/SideMenu.svelte";
   import Toast from "@components/Toast.svelte";
-  import { storedBattle, storedPref } from "@libs/stores";
+  import {
+    showToast,
+    storedBattle,
+    storedGameClientPathError,
+    storedPref,
+  } from "@libs/stores";
   import type { Page } from "@libs/types";
   import PrefPage from "@pages/PrefPage.svelte";
   import InfoPage from "@pages/InfoPage.svelte";
@@ -12,6 +17,7 @@
     LoadPref,
     StartPollingMatch,
     Prefetch,
+    FetchBattle,
   } from "@wails/go/main/App";
   import type { core } from "@wails/go/models";
   import { EventsOn } from "@wails/runtime/runtime";
@@ -32,38 +38,47 @@
     themeChange(false);
   });
 
-  EventsOn("ON_START_PREFETCH", (message: string) => {
-    TonakoManager.getInstance.setLoadingState(message);
-  });
-  EventsOn("ON_START_PREFETCH_FAILURE", (message: string) => {
-    TonakoManager.getInstance.setErrorState(message);
-  });
-  EventsOn("ON_PROMOTE", (message: string) => {
+  EventsOn("ON_GAME_CLIENT_PATH_REQUIRED", () => {
+    const message = "ゲームクライアントパスを設定してください";
+    storedGameClientPathError.set(message);
     TonakoManager.getInstance.setPromoteState(message);
   });
-  EventsOn("ON_START_POLLING", (message: string) => {
-    TonakoManager.getInstance.setStandbyState(message);
+  EventsOn("ON_START_POLLING", () => {
+    TonakoManager.getInstance.setStandbyState("戦闘開始時に自動的にリロードします");
   });
-  EventsOn("ON_START_BATTLE", (message: string) => {
-    TonakoManager.getInstance.setLoadingState(message);
+  EventsOn("ON_FAIL_POLLING", (error) => {
+    TonakoManager.getInstance.setErrorState(error.Error());
   });
-  EventsOn("ON_FETCH_BATTLE_SUCCESS", (battle: core.Battle) => {
-    TonakoManager.getInstance.setHidden();
-    storedBattle.set(battle);
-  });
-  EventsOn("ON_FETCH_BATTLE_FAILURE", (message: string) => {
-    TonakoManager.getInstance.setErrorState(message);
+  EventsOn("ON_START_BATTLE", async (tempArenaInfo: core.TempArenaInfo) => {
+    TonakoManager.getInstance.setLoadingState("戦闘データを読み込み中");
+
+    try {
+      const battle =  await FetchBattle(tempArenaInfo)
+      storedBattle.set(battle);
+      TonakoManager.getInstance.setHidden();
+    } catch (error) {
+      TonakoManager.getInstance.setErrorState(error as string);
+      return;
+    }
   });
 
   const main = async () => {
+    TonakoManager.getInstance.setLoadingState("設定ファイルの読み込み中");
+    let pref: core.Pref;
     try {
-      const pref = await LoadPref();
+      pref = await LoadPref();
       storedPref.set(pref);
+    } catch (error) {
+      TonakoManager.getInstance.setErrorState(error as string);
+      return;
+    }
 
+    TonakoManager.getInstance.setLoadingState("艦艇・マップの読み込み中");
+    try {
       await Prefetch();
     } catch (error) {
       TonakoManager.getInstance.setErrorState(error as string);
-      return
+      return;
     }
 
     StartPollingMatch();
@@ -84,13 +99,13 @@
       </div>
 
       <div class="flex-1 min-w-px m-4">
-          {#if page === "stats"}
-            <StatsPage />
-          {:else if page === "pref"}
-            <PrefPage />
-          {:else if page === "info"}
-            <InfoPage />
-          {/if}
+        {#if page === "stats"}
+          <StatsPage />
+        {:else if page === "pref"}
+          <PrefPage />
+        {:else if page === "info"}
+          <InfoPage />
+        {/if}
       </div>
     </div>
   </div>

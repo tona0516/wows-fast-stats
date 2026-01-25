@@ -802,6 +802,61 @@ export namespace core {
 	
 	
 	
+	export class Vehicle {
+	    shipId: number;
+	    relation: number;
+	    name: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new Vehicle(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.shipId = source["shipId"];
+	        this.relation = source["relation"];
+	        this.name = source["name"];
+	    }
+	}
+	export class TempArenaInfo {
+	    vehicles: Vehicle[];
+	    dateTime: string;
+	    mapId: number;
+	    matchGroup: string;
+	    playerName: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new TempArenaInfo(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.vehicles = this.convertValues(source["vehicles"], Vehicle);
+	        this.dateTime = source["dateTime"];
+	        this.mapId = source["mapId"];
+	        this.matchGroup = source["matchGroup"];
+	        this.playerName = source["playerName"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	
 	
 	
 
