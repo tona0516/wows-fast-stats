@@ -3,23 +3,20 @@ package usecase
 import (
 	"context"
 	"fmt"
-	"regexp"
 	"wfs/backend/adapter"
 	"wfs/backend/core"
+	"wfs/backend/usecase/service"
 
 	"github.com/samber/do/v2"
 	"golang.org/x/sync/errgroup"
 )
 
-// URLを検出する正規表現パターン.
-var urlRegex = regexp.MustCompile(`https?://[^\s]+`)
-
 type FetchBattle struct {
 	wargamingClient adapter.WargamingClient
 	cacheStore      adapter.CacheStore
-	statsService    *statsService
-	clanService     *clanService
-	badgeService    *badgeService
+	statsFetcher    *service.StatsFetcher
+	clanFetcher     *service.ClanFetcher
+	badgeFetcher    *service.BadgeFetcher
 	logger          adapter.Logger
 }
 
@@ -27,9 +24,9 @@ func NewFetchBattle(i do.Injector) (*FetchBattle, error) {
 	return &FetchBattle{
 		wargamingClient: do.MustInvoke[adapter.WargamingClient](i),
 		cacheStore:      do.MustInvoke[adapter.CacheStore](i),
-		statsService:    do.MustInvoke[*statsService](i),
-		clanService:     do.MustInvoke[*clanService](i),
-		badgeService:    do.MustInvoke[*badgeService](i),
+		statsFetcher:    do.MustInvoke[*service.StatsFetcher](i),
+		clanFetcher:     do.MustInvoke[*service.ClanFetcher](i),
+		badgeFetcher:    do.MustInvoke[*service.BadgeFetcher](i),
 		logger:          do.MustInvoke[adapter.Logger](i),
 	}, nil
 }
@@ -72,9 +69,9 @@ func (b *FetchBattle) Invoke(
 	eg.Go(func() error {
 		var err error
 		elapsed := measure(func() {
-			allShipStats, err = b.statsService.fetchAll(egCtx, accountIDs)
+			allShipStats, err = b.statsFetcher.FetchAll(egCtx, accountIDs)
 		})
-		b.logger.Debug(fmt.Sprintf("statsService.fetchAll took %dms", elapsed), nil)
+		b.logger.Debug(fmt.Sprintf("statsFetcher.FetchAll took %dms", elapsed), nil)
 		return err
 	})
 
@@ -82,9 +79,9 @@ func (b *FetchBattle) Invoke(
 	eg.Go(func() error {
 		var err error
 		elapsed := measure(func() {
-			allShipBadges, err = b.badgeService.fetchAll(egCtx, accountIDs)
+			allShipBadges, err = b.badgeFetcher.FetchAll(egCtx, accountIDs)
 		})
-		b.logger.Debug(fmt.Sprintf("badgeService.fetchAll took %dms", elapsed), nil)
+		b.logger.Debug(fmt.Sprintf("badgeFetcher.FetchAll took %dms", elapsed), nil)
 		return err
 	})
 
@@ -92,9 +89,9 @@ func (b *FetchBattle) Invoke(
 	eg.Go(func() error {
 		var err error
 		elapsed := measure(func() {
-			clans, err = b.clanService.fetchAll(egCtx, accountIDs)
+			clans, err = b.clanFetcher.FetchAll(egCtx, accountIDs)
 		})
-		b.logger.Debug(fmt.Sprintf("clanService.fetchAll took %dms", elapsed), nil)
+		b.logger.Debug(fmt.Sprintf("clanFetcher.FetchAll took %dms", elapsed), nil)
 		return err
 	})
 

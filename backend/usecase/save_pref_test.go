@@ -22,11 +22,11 @@ func TestSavePref_Invoke(t *testing.T) {
 		mockPrefStore := mock.NewMockPrefStore(ctrl)
 
 		prefToSave := core.Pref{
-			Version:      1,
-			InstallPath:  "/path/to/wows",
-			ZoomRate:     150,
-			StatsExtra:   "extra_value",
-			IsSendReport: true,
+			Version:        1,
+			GameClientPath: "/path/to/wows",
+			ZoomRate:       150,
+			StatsExtra:     "extra_value",
+			IsSendReport:   true,
 		}
 
 		mockPrefStore.EXPECT().
@@ -52,14 +52,14 @@ func TestSavePref_Invoke(t *testing.T) {
 		mockPrefStore := mock.NewMockPrefStore(ctrl)
 
 		pref1 := core.Pref{
-			Version:     1,
-			InstallPath: "/path1",
-			ZoomRate:    100,
+			Version:        1,
+			GameClientPath: "/path1",
+			ZoomRate:       100,
 		}
 		pref2 := core.Pref{
-			Version:     1,
-			InstallPath: "/path2",
-			ZoomRate:    200,
+			Version:        1,
+			GameClientPath: "/path2",
+			ZoomRate:       200,
 		}
 
 		gomock.InOrder(
@@ -92,8 +92,8 @@ func TestSavePref_Invoke(t *testing.T) {
 		mockPrefStore := mock.NewMockPrefStore(ctrl)
 
 		prefToSave := core.Pref{
-			Version:     1,
-			InstallPath: "/path/to/wows",
+			Version:        1,
+			GameClientPath: "/path/to/wows",
 		}
 
 		expectedErr := failure.New(core.ErrJSONWrite)
@@ -145,8 +145,8 @@ func TestSavePref_Invoke(t *testing.T) {
 		mockPrefStore := mock.NewMockPrefStore(ctrl)
 
 		prefToSave := core.Pref{
-			Version:     1,
-			InstallPath: "/path/to/wows",
+			Version:        1,
+			GameClientPath: "/path/to/wows",
 		}
 
 		expectedErr := failure.New(core.ErrJSONWrite)

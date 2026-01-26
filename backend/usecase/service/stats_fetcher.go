@@ -1,5 +1,5 @@
 //nolint:dupl
-package usecase
+package service
 
 import (
 	"context"
@@ -11,17 +11,17 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-type statsService struct {
+type StatsFetcher struct {
 	wargamingClient adapter.WargamingClient
 }
 
-func NewStatsService(i do.Injector) (*statsService, error) {
-	return &statsService{
+func NewStatsFetcher(i do.Injector) (*StatsFetcher, error) {
+	return &StatsFetcher{
 		wargamingClient: do.MustInvoke[adapter.WargamingClient](i),
 	}, nil
 }
 
-func (s *statsService) fetchAll(
+func (f *StatsFetcher) FetchAll(
 	ctx context.Context,
 	accountIDs []core.AccountID,
 ) (core.AllPlayerShipStats, error) {
@@ -31,7 +31,7 @@ func (s *statsService) fetchAll(
 	var mu sync.Mutex
 	for _, accountID := range accountIDs {
 		eg.Go(func() error {
-			resp, err := s.wargamingClient.ShipsStats(egCtx, accountID)
+			resp, err := f.wargamingClient.ShipsStats(egCtx, accountID)
 			if err != nil {
 				return err
 			}

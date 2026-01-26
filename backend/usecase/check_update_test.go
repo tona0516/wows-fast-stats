@@ -36,9 +36,9 @@ func TestUpdateCheck_Invoke(t *testing.T) {
 		do.Provide(injector, func(i do.Injector) (adapter.GithubClient, error) {
 			return mockGithubClient, nil
 		})
-		do.Provide(injector, NewUpdateCheck)
+		do.Provide(injector, NewCheckUpdate)
 
-		uc := do.MustInvoke[*UpdateCheck](injector)
+		uc := do.MustInvoke[*CheckUpdate](injector)
 		actual := uc.Invoke(context.Background())
 
 		assert.Equal(t, core.NewVersion{
@@ -64,8 +64,8 @@ func TestUpdateCheck_Invoke(t *testing.T) {
 		do.Provide(injector, func(i do.Injector) (adapter.GithubClient, error) {
 			return mockGithubClient, nil
 		})
-		do.Provide(injector, NewUpdateCheck)
-		uc := do.MustInvoke[*UpdateCheck](injector)
+		do.Provide(injector, NewCheckUpdate)
+		uc := do.MustInvoke[*CheckUpdate](injector)
 		actual := uc.Invoke(context.Background())
 
 		assert.Nil(t, actual)
@@ -88,8 +88,8 @@ func TestUpdateCheck_Invoke(t *testing.T) {
 		do.Provide(injector, func(i do.Injector) (adapter.GithubClient, error) {
 			return mockGithubClient, nil
 		})
-		do.Provide(injector, NewUpdateCheck)
-		uc := do.MustInvoke[*UpdateCheck](injector)
+		do.Provide(injector, NewCheckUpdate)
+		uc := do.MustInvoke[*CheckUpdate](injector)
 		actual := uc.Invoke(context.Background())
 
 		assert.Nil(t, actual)

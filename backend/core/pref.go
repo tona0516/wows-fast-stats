@@ -1,12 +1,12 @@
 package core
 
 type Pref struct {
-	Version      int        `json:"version"`
-	InstallPath  string     `json:"installPath"`
-	ZoomRate     int        `json:"zoomRate"`
-	StatsExtra   string     `json:"statsExtra"`
-	IsSendReport bool       `json:"isSendReport"`
-	Column       ColumnPref `json:"column"`
+	Version        int        `json:"version"`
+	GameClientPath string     `json:"gameClientPath"`
+	ZoomRate       int        `json:"zoomRate"`
+	StatsExtra     string     `json:"statsExtra"`
+	IsSendReport   bool       `json:"isSendReport"`
+	Column         ColumnPref `json:"column"`
 }
 
 type ColumnPref struct {
@@ -53,11 +53,11 @@ type DetailStatsColumnPref struct {
 
 func DefaultPref() Pref {
 	return Pref{
-		Version:      1,
-		InstallPath:  "",
-		ZoomRate:     100,
-		StatsExtra:   StatsPatternPvPAll,
-		IsSendReport: true,
+		Version:        1,
+		GameClientPath: "",
+		ZoomRate:       100,
+		StatsExtra:     StatsPatternPvPAll,
+		IsSendReport:   true,
 		Column: ColumnPref{
 			Player: PlayerColumnPref{
 				EnableNationFlag: false,

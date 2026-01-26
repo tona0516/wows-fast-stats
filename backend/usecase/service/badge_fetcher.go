@@ -1,5 +1,5 @@
 //nolint:dupl
-package usecase
+package service
 
 import (
 	"context"
@@ -11,24 +11,24 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-type badgeService struct {
+type BadgeFetcher struct {
 	wargamingClient adapter.WargamingClient
 }
 
-func NewBadgeService(i do.Injector) (*badgeService, error) {
-	return &badgeService{
+func NewBadgeFetcher(i do.Injector) (*BadgeFetcher, error) {
+	return &BadgeFetcher{
 		wargamingClient: do.MustInvoke[adapter.WargamingClient](i),
 	}, nil
 }
 
-func (s *badgeService) fetchAll(ctx context.Context, accountIDs []core.AccountID) (core.AllPlayerShipBadges, error) {
+func (f *BadgeFetcher) FetchAll(ctx context.Context, accountIDs []core.AccountID) (core.AllPlayerShipBadges, error) {
 	result := make(core.AllPlayerShipBadges)
 	eg, egCtx := errgroup.WithContext(ctx)
 
 	var mu sync.Mutex
 	for _, accountID := range accountIDs {
 		eg.Go(func() error {
-			resp, err := s.wargamingClient.ShipsBadges(egCtx, accountID)
+			resp, err := f.wargamingClient.ShipsBadges(egCtx, accountID)
 			if err != nil {
 				return err
 			}

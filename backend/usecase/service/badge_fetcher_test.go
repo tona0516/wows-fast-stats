@@ -1,4 +1,4 @@
-package usecase
+package service
 
 import (
 	"context"
@@ -14,7 +14,7 @@ import (
 	"go.uber.org/mock/gomock"
 )
 
-func TestBadgeService_FetchAll(t *testing.T) {
+func TestBadgeFetcher_FetchAll(t *testing.T) {
 	t.Parallel()
 
 	t.Run("正常系_複数のアカウントIDに対してバッジを取得", func(t *testing.T) {
@@ -68,10 +68,10 @@ func TestBadgeService_FetchAll(t *testing.T) {
 		do.Provide(injector, func(i do.Injector) (adapter.WargamingClient, error) {
 			return mockWargamingClient, nil
 		})
-		svc, err := NewBadgeService(injector)
+		svc, err := NewBadgeFetcher(injector)
 		require.NoError(t, err)
 
-		result, err := svc.fetchAll(context.Background(), accountIDs)
+		result, err := svc.FetchAll(context.Background(), accountIDs)
 
 		assert.NoError(t, err)
 		assert.NotNil(t, result)
@@ -101,10 +101,10 @@ func TestBadgeService_FetchAll(t *testing.T) {
 		do.Provide(injector, func(i do.Injector) (adapter.WargamingClient, error) {
 			return mockWargamingClient, nil
 		})
-		svc, err := NewBadgeService(injector)
+		svc, err := NewBadgeFetcher(injector)
 		require.NoError(t, err)
 
-		result, err := svc.fetchAll(context.Background(), []core.AccountID{})
+		result, err := svc.FetchAll(context.Background(), []core.AccountID{})
 
 		assert.NoError(t, err)
 		assert.NotNil(t, result)
@@ -129,10 +129,10 @@ func TestBadgeService_FetchAll(t *testing.T) {
 		do.Provide(injector, func(i do.Injector) (adapter.WargamingClient, error) {
 			return mockWargamingClient, nil
 		})
-		svc, err := NewBadgeService(injector)
+		svc, err := NewBadgeFetcher(injector)
 		require.NoError(t, err)
 
-		result, err := svc.fetchAll(context.Background(), accountIDs)
+		result, err := svc.FetchAll(context.Background(), accountIDs)
 
 		assert.Error(t, err)
 		assert.Nil(t, result)
@@ -157,10 +157,10 @@ func TestBadgeService_FetchAll(t *testing.T) {
 		do.Provide(injector, func(i do.Injector) (adapter.WargamingClient, error) {
 			return mockWargamingClient, nil
 		})
-		svc, err := NewBadgeService(injector)
+		svc, err := NewBadgeFetcher(injector)
 		require.NoError(t, err)
 
-		result, err := svc.fetchAll(context.Background(), accountIDs)
+		result, err := svc.FetchAll(context.Background(), accountIDs)
 
 		assert.Error(t, err)
 		assert.Nil(t, result)

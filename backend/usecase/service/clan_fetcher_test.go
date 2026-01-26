@@ -1,4 +1,4 @@
-package usecase
+package service
 
 import (
 	"context"
@@ -13,7 +13,7 @@ import (
 	"go.uber.org/mock/gomock"
 )
 
-func TestClanService_FetchAll(t *testing.T) {
+func TestClanFetcher_FetchAll(t *testing.T) {
 	t.Parallel()
 
 	t.Run("正常系_全データが正常に取得できる場合", func(t *testing.T) {
@@ -108,13 +108,13 @@ func TestClanService_FetchAll(t *testing.T) {
 		})
 		do.ProvideValue(injector, mockClanClient)
 
-		service := &clanService{
+		service := &ClanFetcher{
 			wargamingClient: mockWargamingClient,
 			clanClient:      mockClanClient,
 		}
 
 		// テスト実行
-		result, err := service.fetchAll(context.Background(), accountIDs)
+		result, err := service.FetchAll(context.Background(), accountIDs)
 
 		// アサーション
 		require.NoError(t, err)
@@ -160,13 +160,13 @@ func TestClanService_FetchAll(t *testing.T) {
 			ClansAccountInfo(gomock.Any(), accountIDs).
 			Return(core.WGClansAccountInfo{}, assert.AnError)
 
-		service := &clanService{
+		service := &ClanFetcher{
 			wargamingClient: mockWargamingClient,
 			clanClient:      mockClanClient,
 		}
 
 		// テスト実行
-		result, err := service.fetchAll(context.Background(), accountIDs)
+		result, err := service.FetchAll(context.Background(), accountIDs)
 
 		// アサーション
 		assert.Error(t, err)
@@ -201,13 +201,13 @@ func TestClanService_FetchAll(t *testing.T) {
 				Return(core.WGClansInfo{}, assert.AnError),
 		)
 
-		service := &clanService{
+		service := &ClanFetcher{
 			wargamingClient: mockWargamingClient,
 			clanClient:      mockClanClient,
 		}
 
 		// テスト実行
-		result, err := service.fetchAll(context.Background(), accountIDs)
+		result, err := service.FetchAll(context.Background(), accountIDs)
 
 		// アサーション
 		assert.Error(t, err)
@@ -254,13 +254,13 @@ func TestClanService_FetchAll(t *testing.T) {
 			ClanAutoComplete(gomock.Any(), "TAG1").
 			Return(core.ClanAutocomplete{}, assert.AnError)
 
-		service := &clanService{
+		service := &ClanFetcher{
 			wargamingClient: mockWargamingClient,
 			clanClient:      mockClanClient,
 		}
 
 		// テスト実行
-		result, err := service.fetchAll(context.Background(), accountIDs)
+		result, err := service.FetchAll(context.Background(), accountIDs)
 
 		// アサーション
 		assert.Error(t, err)
@@ -320,13 +320,13 @@ func TestClanService_FetchAll(t *testing.T) {
 			ClanAutoComplete(gomock.Any(), "TAG1").
 			Return(autocomplete1, nil)
 
-		service := &clanService{
+		service := &ClanFetcher{
 			wargamingClient: mockWargamingClient,
 			clanClient:      mockClanClient,
 		}
 
 		// テスト実行
-		result, err := service.fetchAll(context.Background(), accountIDs)
+		result, err := service.FetchAll(context.Background(), accountIDs)
 
 		// アサーション
 		require.NoError(t, err)

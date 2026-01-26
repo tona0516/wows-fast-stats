@@ -8,6 +8,7 @@ import (
 	"wfs/backend/adapter"
 	"wfs/backend/config"
 	"wfs/backend/core"
+	"wfs/backend/usecase/service"
 
 	"github.com/morikuni/failure"
 	"github.com/samber/do/v2"
@@ -18,7 +19,7 @@ type PollMatch struct {
 	replayReader    adapter.ReplayReader
 	prefStore       adapter.PrefStore
 	wails           adapter.Wails
-	validator       *ValidateInstallPathService
+	validator       *service.GameClientPathValidator
 }
 
 func NewPollMatch(i do.Injector) (*PollMatch, error) {
@@ -28,7 +29,7 @@ func NewPollMatch(i do.Injector) (*PollMatch, error) {
 		replayReader:    do.MustInvoke[adapter.ReplayReader](i),
 		prefStore:       do.MustInvoke[adapter.PrefStore](i),
 		wails:           do.MustInvoke[adapter.Wails](i),
-		validator:       do.MustInvoke[*ValidateInstallPathService](i),
+		validator:       do.MustInvoke[*service.GameClientPathValidator](i),
 	}, nil
 }
 
@@ -42,14 +43,14 @@ func (pm *PollMatch) Invoke(
 		return
 	}
 
-	if err := pm.validator.Validate(pref.InstallPath); err != nil {
+	if err := pm.validator.Validate(pref.GameClientPath); err != nil {
 		pm.wails.EmitEvent(ctx, EventOnGameClientPathRequired)
 		return
 	}
 
 	pm.wails.EmitEvent(ctx, EventOnStartPolling)
 
-	installPath := pref.InstallPath
+	gameClientPath := pref.GameClientPath
 
 	var latestHash string
 	for {
@@ -59,7 +60,7 @@ func (pm *PollMatch) Invoke(
 		default:
 			time.Sleep(pm.pollingInterval)
 
-			tempArenaInfo, err := pm.replayReader.TempArenaInfo(installPath)
+			tempArenaInfo, err := pm.replayReader.TempArenaInfo(gameClientPath)
 			if err != nil {
 				if failure.Is(err, core.ErrTempArenaInfoNotFound) {
 					continue

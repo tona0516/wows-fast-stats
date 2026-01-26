@@ -22,11 +22,11 @@ func TestLoadPref_Invoke(t *testing.T) {
 		mockPrefStore := mock.NewMockPrefStore(ctrl)
 
 		expectedPref := core.Pref{
-			Version:      1,
-			InstallPath:  "/path/to/wows",
-			ZoomRate:     150,
-			StatsExtra:   "extra_value",
-			IsSendReport: true,
+			Version:        1,
+			GameClientPath: "/path/to/wows",
+			ZoomRate:       150,
+			StatsExtra:     "extra_value",
+			IsSendReport:   true,
 		}
 
 		mockPrefStore.EXPECT().

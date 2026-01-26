@@ -283,18 +283,18 @@ func (m *MockReplayReader) EXPECT() *MockReplayReaderMockRecorder {
 }
 
 // TempArenaInfo mocks base method.
-func (m *MockReplayReader) TempArenaInfo(installPath string) (core.TempArenaInfo, error) {
+func (m *MockReplayReader) TempArenaInfo(gameClientPath string) (core.TempArenaInfo, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "TempArenaInfo", installPath)
+	ret := m.ctrl.Call(m, "TempArenaInfo", gameClientPath)
 	ret0, _ := ret[0].(core.TempArenaInfo)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // TempArenaInfo indicates an expected call of TempArenaInfo.
-func (mr *MockReplayReaderMockRecorder) TempArenaInfo(installPath any) *gomock.Call {
+func (mr *MockReplayReaderMockRecorder) TempArenaInfo(gameClientPath any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TempArenaInfo", reflect.TypeOf((*MockReplayReader)(nil).TempArenaInfo), installPath)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TempArenaInfo", reflect.TypeOf((*MockReplayReader)(nil).TempArenaInfo), gameClientPath)
 }
 
 // MockClanClient is a mock of ClanClient interface.

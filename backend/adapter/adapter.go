@@ -34,7 +34,7 @@ type PrefStore interface {
 
 //go:generate mockgen -source=$GOFILE -destination ../mock/$GOFILE -package mock
 type ReplayReader interface {
-	TempArenaInfo(installPath string) (core.TempArenaInfo, error)
+	TempArenaInfo(gameClientPath string) (core.TempArenaInfo, error)
 }
 
 //go:generate mockgen -source=$GOFILE -destination ../mock/$GOFILE -package mock

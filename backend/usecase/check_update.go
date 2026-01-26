@@ -10,20 +10,20 @@ import (
 	"github.com/samber/do/v2"
 )
 
-type UpdateCheck struct {
+type CheckUpdate struct {
 	currentVersion string
 	githubClient   adapter.GithubClient
 }
 
-func NewUpdateCheck(i do.Injector) (*UpdateCheck, error) {
+func NewCheckUpdate(i do.Injector) (*CheckUpdate, error) {
 	config := do.MustInvoke[config.Config](i)
-	return &UpdateCheck{
+	return &CheckUpdate{
 		currentVersion: config.Basic.Version,
 		githubClient:   do.MustInvoke[adapter.GithubClient](i),
 	}, nil
 }
 
-func (c *UpdateCheck) Invoke(ctx context.Context) *core.NewVersion {
+func (c *CheckUpdate) Invoke(ctx context.Context) *core.NewVersion {
 	constraint, err := semver.NewConstraint("> " + c.currentVersion)
 	if err != nil {
 		return nil

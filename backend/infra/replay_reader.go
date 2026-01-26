@@ -22,11 +22,11 @@ func NewReplayReader(i do.Injector) (*ReplayReader, error) {
 	}, nil
 }
 
-func (r *ReplayReader) TempArenaInfo(installPath string) (core.TempArenaInfo, error) {
+func (r *ReplayReader) TempArenaInfo(gameClientPath string) (core.TempArenaInfo, error) {
 	var tempArenaInfo core.TempArenaInfo
 
 	tempArenaInfoPaths := []string{}
-	root := filepath.Join(installPath, r.replayDir)
+	root := filepath.Join(gameClientPath, r.replayDir)
 	if _, err := os.Stat(root); err != nil {
 		return tempArenaInfo, failure.Translate(err, core.ErrTempArenaInfoNotFound)
 	}

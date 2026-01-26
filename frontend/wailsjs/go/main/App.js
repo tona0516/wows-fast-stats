@@ -26,8 +26,8 @@ export function SavePref(arg1) {
   return window['go']['main']['App']['SavePref'](arg1);
 }
 
-export function SelectInstallPath() {
-  return window['go']['main']['App']['SelectInstallPath']();
+export function SelectGameClientPath() {
+  return window['go']['main']['App']['SelectGameClientPath']();
 }
 
 export function ShowMessageDialog(arg1) {

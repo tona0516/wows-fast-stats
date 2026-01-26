@@ -21,7 +21,7 @@ const (
 	ErrJSONWrite                 failure.StringCode = "[B203] ファイル書き込みに失敗しました"
 	ErrStringRead                failure.StringCode = "[B304] ファイル読み込みに失敗しました"
 	ErrStringWrite               failure.StringCode = "[B305] ファイル書き込みに失敗しました"
-	ErrEmptyInstallPath          failure.StringCode = "[C101] ゲームクライアントパスが設定されていません"
+	ErrEmptyGameClientPath       failure.StringCode = "[C101] ゲームクライアントパスが設定されていません"
 	ErrNotGameClientPath         failure.StringCode = "[C102] ゲームクライアントパスが正しくありません"
 	ErrSelectFolderCancelled     failure.StringCode = "[C103] フォルダの選択がキャンセルされました"
 	ErrWailsOpenDirectoryDialog  failure.StringCode = "[E101] フォルダ選択ダイアログの表示に失敗しました"

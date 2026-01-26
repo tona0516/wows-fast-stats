@@ -753,7 +753,7 @@ export namespace core {
 	
 	export class Pref {
 	    version: number;
-	    installPath: string;
+	    gameClientPath: string;
 	    zoomRate: number;
 	    statsExtra: string;
 	    isSendReport: boolean;
@@ -766,7 +766,7 @@ export namespace core {
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.version = source["version"];
-	        this.installPath = source["installPath"];
+	        this.gameClientPath = source["gameClientPath"];
 	        this.zoomRate = source["zoomRate"];
 	        this.statsExtra = source["statsExtra"];
 	        this.isSendReport = source["isSendReport"];

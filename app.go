@@ -8,6 +8,7 @@ import (
 	"wfs/backend/core"
 	"wfs/backend/infra"
 	"wfs/backend/usecase"
+	"wfs/backend/usecase/service"
 
 	"github.com/mitchellh/go-ps"
 	"github.com/samber/do/v2"
@@ -15,14 +16,14 @@ import (
 )
 
 type App struct {
-	prefetchUsecase           *usecase.Prefetch
-	fetchBattleUsecase        *usecase.FetchBattle
-	pollMatchUsecase          *usecase.PollMatch
-	installPathSettingUsecase *usecase.InstallPathSetting
-	updateCheckUsecase        *usecase.UpdateCheck
-	loadPrefUsecase           *usecase.LoadPref
-	savePrefUsecase           *usecase.SavePref
-	logger                    adapter.Logger
+	prefetchUsecase             *usecase.Prefetch
+	fetchBattleUsecase          *usecase.FetchBattle
+	pollMatchUsecase            *usecase.PollMatch
+	selectGameClientPathUsecase *usecase.SelectGameClientPath
+	checkUpdateUsecase          *usecase.CheckUpdate
+	loadPrefUsecase             *usecase.LoadPref
+	savePrefUsecase             *usecase.SavePref
+	logger                      adapter.Logger
 
 	ctx                 context.Context
 	config              config.Config
@@ -71,12 +72,11 @@ func (a *App) LoadPref() (core.Pref, error) {
 }
 
 func (a *App) SavePref(pref core.Pref) error {
-	a.logger.Debug("SavePref called", nil)
 	return a.savePrefUsecase.Invoke(pref)
 }
 
-func (a *App) SelectInstallPath() error {
-	if err := a.installPathSettingUsecase.Invoke(a.ctx); err != nil {
+func (a *App) SelectGameClientPath() error {
+	if err := a.selectGameClientPathUsecase.Invoke(a.ctx); err != nil {
 		return core.ErrorForDisplay(err)
 	}
 
@@ -89,7 +89,7 @@ func (a *App) CurrentVersion() string {
 }
 
 func (a *App) NewVersion() *core.NewVersion {
-	return a.updateCheckUsecase.Invoke(a.ctx)
+	return a.checkUpdateUsecase.Invoke(a.ctx)
 }
 
 func (a *App) ShowMessageDialog(message string) {
@@ -112,8 +112,8 @@ func (a *App) OnStartup(ctx context.Context) {
 	a.prefetchUsecase = do.MustInvoke[*usecase.Prefetch](injector)
 	a.fetchBattleUsecase = do.MustInvoke[*usecase.FetchBattle](injector)
 	a.pollMatchUsecase = do.MustInvoke[*usecase.PollMatch](injector)
-	a.installPathSettingUsecase = do.MustInvoke[*usecase.InstallPathSetting](injector)
-	a.updateCheckUsecase = do.MustInvoke[*usecase.UpdateCheck](injector)
+	a.selectGameClientPathUsecase = do.MustInvoke[*usecase.SelectGameClientPath](injector)
+	a.checkUpdateUsecase = do.MustInvoke[*usecase.CheckUpdate](injector)
 	a.loadPrefUsecase = do.MustInvoke[*usecase.LoadPref](injector)
 	a.savePrefUsecase = do.MustInvoke[*usecase.SavePref](injector)
 	a.logger = do.MustInvoke[adapter.Logger](injector)
@@ -167,18 +167,18 @@ func (a *App) getInjector() do.Injector {
 		)
 	})
 
-	// service
-	do.Provide(injector, usecase.NewStatsService)
-	do.Provide(injector, usecase.NewClanService)
-	do.Provide(injector, usecase.NewBadgeService)
-	do.Provide(injector, usecase.NewValidateInstallPathService)
+	// application service
+	do.Provide(injector, service.NewBadgeFetcher)
+	do.Provide(injector, service.NewClanFetcher)
+	do.Provide(injector, service.NewGameClientPathValidator)
+	do.Provide(injector, service.NewStatsFetcher)
 
 	// usecase
 	do.Provide(injector, usecase.NewPrefetch)
 	do.Provide(injector, usecase.NewFetchBattle)
 	do.Provide(injector, usecase.NewPollMatch)
-	do.Provide(injector, usecase.NewInstallPathSetting)
-	do.Provide(injector, usecase.NewUpdateCheck)
+	do.Provide(injector, usecase.NewSelectGameClientPath)
+	do.Provide(injector, usecase.NewCheckUpdate)
 	do.Provide(injector, usecase.NewLoadPref)
 	do.Provide(injector, usecase.NewSavePref)
 

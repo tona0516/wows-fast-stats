@@ -12,7 +12,7 @@
     storedPref,
   } from "@libs/stores";
   import { Theme } from "@libs/Theme";
-  import { LoadPref, SavePref, SelectInstallPath } from "@wails/go/main/App";
+  import { LoadPref, SavePref, SelectGameClientPath } from "@wails/go/main/App";
   import { onMount } from "svelte";
   import { get } from "svelte/store";
   import { themeChange } from "theme-change";
@@ -21,9 +21,9 @@
     themeChange(false);
   });
 
-  const onClickSelectDirectory = async () => {
+  const onClickSelectGameClientPath = async () => {
     try {
-      await SelectInstallPath();
+      await SelectGameClientPath();
       const pref = await LoadPref();
       storedPref.set(pref);
       storedGameClientPathError.set("");
@@ -39,7 +39,7 @@
     }
   };
 
-  const onChange = async () => {
+  const onChangePref = async () => {
     const pref = get(storedPref);
     if (!pref) return;
     await SavePref(pref);
@@ -56,12 +56,12 @@
     <p class="text-sm text-gray-500 mb-2">
       WorldOfWarships.exeが存在するフォルダを選択してください
     </p>
-    {#if $storedPref.installPath}
+    {#if $storedPref.gameClientPath}
       <div class="stats shadow w-full mb-2">
         <div class="stat">
           <div class="stat-title">パス</div>
           <div class="stat-value text-lg break-all">
-            {$storedPref.installPath}
+            {$storedPref.gameClientPath}
           </div>
         </div>
       </div>
@@ -71,7 +71,7 @@
         <span>{$storedGameClientPathError}</span>
       </div>
     {/if}
-    <button class="btn btn-primary w-full" on:click={onClickSelectDirectory}>
+    <button class="btn btn-primary w-full" on:click={onClickSelectGameClientPath}>
       フォルダ選択
     </button>
   </div>
@@ -94,7 +94,7 @@
       <select
         class="select select-bordered w-full"
         bind:value={$storedPref.zoomRate}
-        on:change={onChange}
+        on:change={onChangePref}
       >
         {#each ZOOM_RATES as zr}
           <option selected={zr === $storedPref.zoomRate} value={zr}
@@ -109,7 +109,7 @@
       <select
         class="select select-bordered w-full my-2"
         bind:value={$storedPref.statsExtra}
-        on:change={onChange}
+        on:change={onChangePref}
       >
         {#each STATS_EXTRAS as se}
           <option selected={se[0] === $storedPref.statsExtra} value={se[0]}
@@ -144,7 +144,7 @@
                     class="toggle toggle-success"
                     type="checkbox"
                     bind:checked={$storedPref.column.player.enableNationFlag}
-                    on:change={onChange}
+                    on:change={onChangePref}
                   />
                   <span
                     >クラン国籍の国旗を表示する（クラン説明から言語検出）</span
@@ -155,7 +155,7 @@
                   <select
                     class="select select-sm select-bordered"
                     bind:value={$storedPref.column.player.colorPattern}
-                    on:change={onChange}
+                    on:change={onChangePref}
                   >
                     {#each PLAYER_NAME_COLORS as color}
                       <option
@@ -178,7 +178,7 @@
                     class="toggle toggle-success"
                     type="checkbox"
                     bind:checked={$storedPref.column.ship.enableNationFlag}
-                    on:change={onChange}
+                    on:change={onChangePref}
                   />
                   <span>国旗を表示する</span>
                 </label>
@@ -187,7 +187,7 @@
                     class="toggle toggle-success"
                     type="checkbox"
                     bind:checked={$storedPref.column.ship.isColored}
-                    on:change={onChange}
+                    on:change={onChangePref}
                   />
                   <span>艦種に基づく背景色にする</span>
                 </label>
@@ -219,7 +219,7 @@
                     class="toggle toggle-success"
                     type="checkbox"
                     bind:checked={$storedPref.column.stats[statsKey].isShowShip}
-                    on:change={onChange}
+                    on:change={onChangePref}
                   />
                 </td>
               {:else}
@@ -233,7 +233,7 @@
                     bind:checked={
                       $storedPref.column.stats[statsKey].isShowOverall
                     }
-                    on:change={onChange}
+                    on:change={onChangePref}
                   />
                 </td>
               {:else}
@@ -244,7 +244,7 @@
                   <select
                     class="select select-sm select-bordered"
                     bind:value={$storedPref.column.stats[statsKey].digit}
-                    on:change={onChange}
+                    on:change={onChangePref}
                   >
                     {#each [0, 1, 2] as digit}
                       <option
@@ -274,7 +274,7 @@
           class="toggle toggle-success"
           type="checkbox"
           bind:checked={$storedPref.isSendReport}
-          on:change={onChange}
+          on:change={onChangePref}
         />
         <span>アプリ改善のためのデータ送信を許可する</span>
       </li>

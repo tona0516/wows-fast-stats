@@ -1,7 +1,8 @@
-package usecase
+package service
 
 import (
 	"context"
+	"regexp"
 	"strings"
 	"sync"
 	"wfs/backend/adapter"
@@ -12,41 +13,44 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-type clanService struct {
+// URLを検出する正規表現パターン.
+var urlRegex = regexp.MustCompile(`https?://[^\s]+`)
+
+type ClanFetcher struct {
 	wargamingClient adapter.WargamingClient
 	clanClient      adapter.ClanClient
 }
 
-func NewClanService(i do.Injector) (*clanService, error) {
-	return &clanService{
+func NewClanFetcher(i do.Injector) (*ClanFetcher, error) {
+	return &ClanFetcher{
 		wargamingClient: do.MustInvoke[adapter.WargamingClient](i),
 		clanClient:      do.MustInvoke[adapter.ClanClient](i),
 	}, nil
 }
 
-func (s *clanService) fetchAll(
+func (f *ClanFetcher) FetchAll(
 	ctx context.Context,
 	accountIDs []core.AccountID,
 ) (core.Clans, error) {
 	result := make(core.Clans)
 
-	clansAccountInfo, err := s.wargamingClient.ClansAccountInfo(ctx, accountIDs)
+	clansAccountInfo, err := f.wargamingClient.ClansAccountInfo(ctx, accountIDs)
 	if err != nil {
 		return nil, err
 	}
 
 	clanIDs := clansAccountInfo.ClanIDs()
-	clansInfo, err := s.wargamingClient.ClansInfo(ctx, clanIDs)
+	clansInfo, err := f.wargamingClient.ClansInfo(ctx, clanIDs)
 	if err != nil {
 		return nil, err
 	}
 
-	colorMap, err := s.fetchClanColor(ctx, clansInfo)
+	colorMap, err := f.fetchClanColor(ctx, clansInfo)
 	if err != nil {
 		return nil, err
 	}
 
-	languageMap := s.clanLanguage(clansInfo)
+	languageMap := f.clanLanguage(clansInfo)
 
 	for _, accountID := range accountIDs {
 		clanID := clansAccountInfo.Data[accountID].ClanID
@@ -65,7 +69,7 @@ func (s *clanService) fetchAll(
 	return result, nil
 }
 
-func (s *clanService) fetchClanColor(
+func (f *ClanFetcher) fetchClanColor(
 	ctx context.Context,
 	clansInfo core.WGClansInfo,
 ) (map[core.ClanID]string, error) {
@@ -75,7 +79,7 @@ func (s *clanService) fetchClanColor(
 	var mu sync.Mutex
 	for clanID, clanInfo := range clansInfo.Data {
 		eg.Go(func() error {
-			autocomplete, err := s.clanClient.ClanAutoComplete(egCtx, clanInfo.Tag)
+			autocomplete, err := f.clanClient.ClanAutoComplete(egCtx, clanInfo.Tag)
 			if err != nil {
 				return err
 			}
@@ -100,7 +104,7 @@ func (s *clanService) fetchClanColor(
 	return result, nil
 }
 
-func (s *clanService) clanLanguage(clansInfo core.WGClansInfo) map[core.ClanID]string {
+func (f *ClanFetcher) clanLanguage(clansInfo core.WGClansInfo) map[core.ClanID]string {
 	result := make(map[core.ClanID]string)
 
 	options := whatlanggo.Options{

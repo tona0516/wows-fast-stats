@@ -14,7 +14,7 @@ export function Prefetch():Promise<void>;
 
 export function SavePref(arg1:core.Pref):Promise<void>;
 
-export function SelectInstallPath():Promise<void>;
+export function SelectGameClientPath():Promise<void>;
 
 export function ShowMessageDialog(arg1:string):Promise<void>;
 
