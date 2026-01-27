@@ -25,8 +25,8 @@
 </script>
 
 <div class="card bg-base-100 shadow-xl rounded-xl p-6">
-  <span class="text-2xl font-bold mb-4">全体表示設定</span>
-  <div class="form-control mb-2">
+  <span class="text-2xl font-bold mb-6">全体表示設定</span>
+  <div class="form-control mb-4">
     <!-- svelte-ignore a11y-label-has-associated-control -->
     <label class="label font-bold">テーマ</label>
     <select class="select select-bordered w-full" data-choose-theme>
@@ -35,7 +35,7 @@
       {/each}
     </select>
   </div>
-  <div class="form-control mb-2">
+  <div class="form-control mb-4">
     <!-- svelte-ignore a11y-label-has-associated-control -->
     <label class="label font-bold">UIサイズ</label>
     <select
@@ -50,11 +50,11 @@
       {/each}
     </select>
   </div>
-  <div class="form-control">
+  <div class="form-control mb-4">
     <!-- svelte-ignore a11y-label-has-associated-control -->
     <label class="label font-bold">統計パターン</label>
     <select
-      class="select select-bordered w-full my-2"
+      class="select select-bordered w-full"
       bind:value={$storedDisplayPref.statsExtra}
       on:change={onChangePref}
     >
@@ -64,5 +64,17 @@
         >
       {/each}
     </select>
+  </div>
+  <div class="form-control">
+    <!-- svelte-ignore a11y-label-has-associated-control -->
+    <label class="label cursor-pointer">
+      <input
+        class="toggle toggle-success"
+        type="checkbox"
+        bind:checked={$storedDisplayPref.showBoarder}
+        on:change={onChangePref}
+      />
+      <span class="label-text font-bold">テーブルの枠線を表示する</span>
+    </label>
   </div>
 </div>

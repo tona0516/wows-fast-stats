@@ -8,6 +8,7 @@ export interface DisplayPref {
   version: number;
   zoomRate: number;
   statsExtra: StatsExtra;
+  showBoarder: boolean;
   player: {
     enableNationFlag: boolean;
     colorType: PlayerNameColorType;
@@ -104,6 +105,7 @@ export const DEFAULT_DISPLAY_PREF: DisplayPref = {
   version: 1,
   zoomRate: 100,
   statsExtra: "pvpAll",
+  showBoarder: false,
   player: {
     enableNationFlag: true,
     colorType: "none",

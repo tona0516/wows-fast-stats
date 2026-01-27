@@ -144,8 +144,12 @@
   };
 </script>
 
-<div class="overflow-x-auto rounded-xl border border-base-300 bg-base-200">
-  <table class="table table-zebra text-nowrap w-full">
+<div class="overflow-x-auto">
+  <table
+    class="{$storedDisplayPref.showBoarder
+      ? 'border border-gray-500'
+      : ''} border-collapse table text-nowrap w-full"
+  >
     {#each teams as team, i}
       {#if team.players.length !== 0}
         <thead>
@@ -153,7 +157,9 @@
             {#each categories as category}
               {#if category.showCount() > 0}
                 <th
-                  class="p-2 text-center font-bold tracking-wide"
+                  class="{$storedDisplayPref.showBoarder
+                    ? 'border border-gray-500'
+                    : ''} p-2 text-center font-bold tracking-wide"
                   colspan={category.showCount()}
                   scope="colgroup"
                 >
@@ -167,7 +173,9 @@
               {#each category.columns as column}
                 {#if column.needsShow()}
                   <th
-                    class="px-2 py-1 text-center font-medium whitespace-nowrap"
+                    class="{$storedDisplayPref.showBoarder
+                      ? 'border border-gray-500'
+                      : ''} p-1 text-center font-medium whitespace-nowrap"
                     scope="col">{column.header}</th
                   >
                 {/if}

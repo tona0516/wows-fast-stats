@@ -10,7 +10,7 @@
   const nationIconPath = column.getNationIconPath(player);
 </script>
 
-<td class="p-1" style="background-color: {column.getBgColorCode(player)?.raw}">
+<td class="{$storedDisplayPref.showBoarder ? "border border-gray-500" : ""} p-1" style="background-color: {column.getBgColorCode(player)?.raw}">
   <div class="w-48 flex place-items-center">
     <button
       class="btn btn-xs bi bi-info-square p-1 mr-1"

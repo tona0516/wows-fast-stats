@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { PlayerNameColumn } from "@libs/columns/PlayerNameColumn";
   import { ModalManager } from "@libs/ModalManager";
+    import { storedDisplayPref } from "@libs/stores";
   import type { core } from "@wails/go/models";
 
   export let column: PlayerNameColumn;
@@ -11,7 +12,7 @@
   $: isNPC = column.isNPC(player);
 </script>
 
-<td class="p-1">
+<td class="{$storedDisplayPref.showBoarder ? "border border-gray-500" : ""} p-1">
   <div class="w-48 flex place-items-center">
     {#if isNPC}
       <div class="truncate">

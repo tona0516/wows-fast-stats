@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { AbstractStatsColumn } from "@libs/columns/AbstractStatsColumn";
+    import { storedDisplayPref } from "@libs/stores";
   import type { StackedBarChartParam } from "@libs/types";
   import type { core } from "@wails/go/models";
 
@@ -11,7 +12,7 @@
 
 {#if column.needsShow()}
   <td
-    class="p-1"
+    class="{$storedDisplayPref.showBoarder ? "border border-gray-500" : ""} p-1"
     style="background-color: {column.getBgColorCode(player)?.raw}"
   >
     <div class="w-20">
