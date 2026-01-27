@@ -14,6 +14,14 @@ import (
 	"github.com/samber/do/v2"
 )
 
+const (
+	eventStartPolling               = "START_POLLING"
+	eventStartBattle                = "START_BATTLE"
+	eventEmptyGameClientPathError   = "EMPTY_GAME_CLIENT_PATH_ERROR"
+	eventInvalidGameClientPathError = "INVALID_GAME_CLIENT_PATH_ERROR"
+	eventUnexpectedError            = "UNEXPECTED_ERROR"
+)
+
 type PollMatch struct {
 	pollingInterval time.Duration
 	replayReader    adapter.ReplayReader
@@ -39,16 +47,21 @@ func (pm *PollMatch) Invoke(
 ) {
 	gameClientPath, err := pm.prefStore.GameClientPath()
 	if err != nil {
-		pm.wails.EmitEvent(ctx, EventOnGameClientPathRequired)
+		if failure.Is(err, core.ErrStringNotFound) {
+			pm.wails.EmitEvent(ctx, eventEmptyGameClientPathError)
+			return
+		}
+
+		pm.wails.EmitEvent(ctx, eventUnexpectedError, core.ErrorForDisplay(err))
 		return
 	}
 
 	if err := pm.validator.Validate(gameClientPath); err != nil {
-		pm.wails.EmitEvent(ctx, EventOnGameClientPathRequired)
+		pm.wails.EmitEvent(ctx, eventInvalidGameClientPathError)
 		return
 	}
 
-	pm.wails.EmitEvent(ctx, EventOnStartPolling)
+	pm.wails.EmitEvent(ctx, eventStartPolling)
 
 	var latestHash string
 	for {
@@ -64,7 +77,7 @@ func (pm *PollMatch) Invoke(
 					continue
 				}
 
-				pm.wails.EmitEvent(ctx, EventOnFailPolling, core.ErrorForDisplay(err))
+				pm.wails.EmitEvent(ctx, eventUnexpectedError, core.ErrorForDisplay(err))
 				return
 			}
 
@@ -74,7 +87,7 @@ func (pm *PollMatch) Invoke(
 			}
 
 			latestHash = hash
-			pm.wails.EmitEvent(ctx, EventOnStartBattle, tempArenaInfo)
+			pm.wails.EmitEvent(ctx, eventStartBattle, tempArenaInfo)
 		}
 	}
 }

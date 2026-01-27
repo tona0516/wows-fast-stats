@@ -40,19 +40,12 @@
     themeChange(false);
   });
 
-  EventsOn("ON_GAME_CLIENT_PATH_REQUIRED", () => {
-    const message = "ゲームクライアントパスを設定してください";
-    storedGameClientPathError.set(message);
-    TonakoManager.getInstance.setPromoteState(message);
+  // see poll_match.go for event emitters
+  EventsOn("START_POLLING", () => {
+    TonakoManager.getInstance.setStandbyState("待機中。戦闘開始時にオートリロードします");
   });
-  EventsOn("ON_START_POLLING", () => {
-    TonakoManager.getInstance.setStandbyState("戦闘開始時に自動的にリロードします");
-  });
-  EventsOn("ON_FAIL_POLLING", (error) => {
-    TonakoManager.getInstance.setErrorState(error.Error());
-  });
-  EventsOn("ON_START_BATTLE", async (tempArenaInfo: core.TempArenaInfo) => {
-    TonakoManager.getInstance.setLoadingState("戦闘データを読み込み中");
+  EventsOn("START_BATTLE", async (tempArenaInfo: core.TempArenaInfo) => {
+    TonakoManager.getInstance.setLoadingState("統計データの読み込み中");
 
     try {
       const battle =  await FetchBattle(tempArenaInfo)
@@ -63,6 +56,20 @@
       return;
     }
   });
+  EventsOn("EMPTY_GAME_CLIENT_PATH_ERROR", () => {
+    const message = "ゲームクライアントパスを設定してください";
+    storedGameClientPathError.set(message);
+    TonakoManager.getInstance.setPromoteState(message);
+  });
+  EventsOn("INVALID_GAME_CLIENT_PATH_ERROR", () => {
+    const message = "ゲームクライアントパスが正しくありません。再設定してください";
+    storedGameClientPathError.set(message);
+    TonakoManager.getInstance.setPromoteState(message);
+  });
+  EventsOn("UNEXPECTED_ERROR", (error) => {
+    TonakoManager.getInstance.setErrorState(error.Error());
+  });
+
 
   const main = async () => {
     TonakoManager.getInstance.setLoadingState("設定ファイルの読み込み中");

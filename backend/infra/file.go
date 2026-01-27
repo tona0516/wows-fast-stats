@@ -20,6 +20,9 @@ func readString(path string) (string, error) {
 
 	f, err := os.ReadFile(path)
 	if err != nil {
+		if os.IsNotExist(err) {
+			return "", failure.Translate(err, core.ErrStringNotFound, errCtx)
+		}
 		return "", failure.Translate(err, core.ErrStringRead, errCtx)
 	}
 
