@@ -1,8 +1,11 @@
 import SingleTableData from "@components/tabledata/SingleTableData.svelte";
 import { THREAT_LEVEL_COLORS } from "@libs/constants";
+import { storedDisplayPref } from "@libs/stores";
 import type { core } from "@wails/go/models";
+import { get } from "svelte/store";
 import type { ColorCode } from "../ColorCode";
 import type { Optional } from "../types";
+import { formatWithSuffix } from "../utils";
 import { AbstractStatsColumn } from "./AbstractStatsColumn";
 
 export class ThreatLevelColumn extends AbstractStatsColumn<string> {
@@ -29,7 +32,14 @@ export class ThreatLevelColumn extends AbstractStatsColumn<string> {
       return "N/A";
     }
 
-    return value.toFixed(this.getDigit());
+    const pref = get(storedDisplayPref).threatLevel;
+    const digit = this.getDigit();
+
+    if (pref.siPrefix) {
+      return formatWithSuffix(value, digit);
+    }
+
+    return value.toFixed(digit);
   }
 
   override getCssClass(): string {

@@ -31,12 +31,12 @@ export interface DisplayPref {
     showShip: boolean;
     showOverall: boolean;
     digit: number;
-    kmgUnit: boolean;
+    siPrefix: boolean;
   };
   maxDamage: {
     showShip: boolean;
     showOverall: boolean;
-    kmgUnit: boolean;
+    siPrefix: boolean;
   };
   kdRate: {
     showShip: boolean;
@@ -56,7 +56,7 @@ export interface DisplayPref {
   battles: {
     showShip: boolean;
     showOverall: boolean;
-    kmgUnit: boolean;
+    siPrefix: boolean;
   };
   platoonRate: {
     showShip: boolean;
@@ -88,7 +88,7 @@ export interface DisplayPref {
   threatLevel: {
     showOverall: boolean;
     digit: number;
-    kmgUnit: boolean;
+    siPrefix: boolean;
   };
   usingShipTypeRate: {
     showOverall: boolean;
@@ -126,12 +126,12 @@ export const DEFAULT_DISPLAY_PREF: DisplayPref = {
     showShip: true,
     showOverall: false,
     digit: 0,
-    kmgUnit: false,
+    siPrefix: false,
   },
   maxDamage: {
     showShip: false,
     showOverall: false,
-    kmgUnit: false,
+    siPrefix: false,
   },
   kdRate: {
     showShip: true,
@@ -151,7 +151,7 @@ export const DEFAULT_DISPLAY_PREF: DisplayPref = {
   battles: {
     showShip: true,
     showOverall: true,
-    kmgUnit: false,
+    siPrefix: false,
   },
   platoonRate: {
     showShip: false,
@@ -181,7 +181,7 @@ export const DEFAULT_DISPLAY_PREF: DisplayPref = {
   threatLevel: {
     showOverall: false,
     digit: 0,
-    kmgUnit: false,
+    siPrefix: false,
   },
   usingShipTypeRate: {
     showOverall: false,

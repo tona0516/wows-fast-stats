@@ -20,7 +20,7 @@
   <table class="table w-full text-nowrap">
     <thead>
       <tr class="bg-base-300 text-base-content font-semibold">
-        {#each ["カラム名", "艦成績", "総合成績", "小数点以下の桁数"] as columns}
+        {#each ["カラム名", "艦成績", "総合成績", "小数点以下の桁数", "K(キロ)表示"] as columns}
           <th class="text-center px-4 py-2">{columns}</th>
         {/each}
       </tr>
@@ -71,6 +71,18 @@
                   >
                 {/each}
               </select>
+            </td>
+          {:else}
+            <td></td>
+          {/if}
+          {#if "siPrefix" in $storedDisplayPref[statsKey] && typeof $storedDisplayPref[statsKey].siPrefix === 'boolean'}
+            <td class="text-center px-4 py-2">
+              <input
+                class="toggle toggle-success"
+                type="checkbox"
+                bind:checked={$storedDisplayPref[statsKey].siPrefix}
+                on:change={onChangePref}
+              />
             </td>
           {:else}
             <td></td>

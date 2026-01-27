@@ -1,8 +1,10 @@
 import MaxDamageTableData from "@components/tabledata/MaxDamageTableData.svelte";
 import { NumbersURL } from "@libs/NumbersURL";
+import { storedDisplayPref } from "@libs/stores";
 import type { StatsCategory } from "@libs/types";
-import { toTierString } from "@libs/utils";
+import { formatWithSuffix, toTierString } from "@libs/utils";
 import type { core } from "@wails/go/models";
+import { get } from "svelte/store";
 import { AbstractStatsColumn } from "./AbstractStatsColumn";
 
 export interface MaxDamageParam {
@@ -24,7 +26,12 @@ export class MaxDamageColumn extends AbstractStatsColumn<MaxDamageParam> {
 
   override getDisplayValue(player: core.Player): MaxDamageParam {
     const maxDamage = this.getPlayerStats(player)[this.category].maxDamage;
-    const value = maxDamage.value.toFixed(this.getDigit());
+    const pref = get(storedDisplayPref).maxDamage;
+    const digit = this.getDigit();
+
+    const value = pref.siPrefix
+      ? formatWithSuffix(maxDamage.value, digit)
+      : maxDamage.value.toFixed(digit);
 
     switch (this.category) {
       case "ship":

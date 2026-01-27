@@ -12,21 +12,21 @@ const formatNumber = (value: number, digit: number): string => {
   });
 };
 
-export const formatWithSuffix = (num: number): string => {
+export const formatWithSuffix = (num: number, digit: number): string => {
   const G = 1_000_000_000;
   const M = 1_000_000;
   const K = 1_000;
 
   if (num >= G) {
-    return `${formatNumber(num / G, 1)}G`;
+    return `${formatNumber(num / G, digit)}G`;
   }
 
   if (num >= M) {
-    return `${formatNumber(num / M, 1)}M`;
+    return `${formatNumber(num / M, digit)}M`;
   }
 
   if (num >= K) {
-    return `${formatNumber(num / K, 1)}K`;
+    return `${formatNumber(num / K, digit)}K`;
   }
 
   return formatNumber(num, 0);
