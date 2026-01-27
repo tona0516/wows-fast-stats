@@ -2,9 +2,9 @@ import ShipInfoTableData from "@components/tabledata/ShipInfoTableData.svelte";
 import { ColorCode } from "@libs/ColorCode";
 import { SHIP_TYPE_COLORS } from "@libs/constants";
 import { storedDisplayPref } from "@libs/stores";
-import type { Optional } from "@libs/types";
-import { toShipType, toTierString } from "@libs/utils";
-import type { core } from "@wails/go/models";
+import type { Optional, ShipType } from "@libs/types";
+import { toTierString } from "@libs/utils";
+import { core } from "@wails/go/models";
 import FlagCommonWealth from "src/assets/images/flag_Commonwealth.png";
 import FlagEurope from "src/assets/images/flag_Europe.png";
 import FlagFrance from "src/assets/images/flag_France.png";
@@ -63,6 +63,10 @@ const PREMIUM_SHIP_ICONS: { [key: string]: string } = {
   cl: ShipPremiumCL,
   dd: ShipPremiumDD,
   ss: ShipPremiumSS,
+};
+
+const toShipType = (type: string): type is ShipType => {
+  return Object.keys(new core.ShipTypeGroup()).includes(type);
 };
 
 export class WarshipColumn extends AbstractColumn {

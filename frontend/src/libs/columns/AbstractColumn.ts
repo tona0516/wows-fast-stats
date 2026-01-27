@@ -9,6 +9,7 @@ export abstract class AbstractColumn {
   ) {}
 
   abstract needsShow(): boolean;
+  // biome-ignore lint/suspicious/noExplicitAny: Svelte component
   abstract getTableDataComponent(): any;
 
   getTextColorCode(_: core.Player): Optional<ColorCode> {

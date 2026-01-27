@@ -3,7 +3,7 @@
 
   export let metadata: core.BattleMetadata;
 
-  const metaTexts = [
+  const METADATA_TEXTS = [
     {
       title: "マップ",
       text: metadata.arena,
@@ -20,7 +20,7 @@
 </script>
 
 <div class="stats shadow">
-  {#each metaTexts as md}
+  {#each METADATA_TEXTS as md}
     <div class="stat px-4 py-2">
       <div class="stat-title">{md.title}</div>
       <div class="stat-value text-sm">{md.text}</div>

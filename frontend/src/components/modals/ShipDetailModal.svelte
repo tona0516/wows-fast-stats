@@ -6,7 +6,18 @@
   import { ModalManager } from "@libs/ModalManager";
   import type { ColorCode } from "@libs/ColorCode";
   import { NumbersURL } from "@libs/NumbersURL";
-  import { RATING_COLORS, RATING_NAMES } from "@libs/constants";
+  import { RATING_COLORS } from "@libs/constants";
+
+  const RATING_NAMES: { [key: string]: string } = {
+  bad: "Bad",
+  below_avg: "Below Average",
+  avg: "Average",
+  good: "Good",
+  very_good: "Very Good",
+  great: "Great",
+  unicum: "Unicum",
+  super_unicum: "Super Unicum",
+} as const;
 
   interface DamageRating {
     displayName: string;

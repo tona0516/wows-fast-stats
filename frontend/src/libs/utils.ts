@@ -1,14 +1,8 @@
-import { core } from "@wails/go/models";
 import { ROMAN_NUMERALS } from "./constants";
-import type { RowPattern, ShipType, StatsExtra } from "./types";
 
 export const toTierString = (value: number): string => {
   if (value === 11) return "★";
   return ROMAN_NUMERALS[value] ?? "";
-};
-
-export const toShipType = (type: string): type is ShipType => {
-  return Object.keys(new core.ShipTypeGroup()).includes(type);
 };
 
 const formatNumber = (value: number, digit: number): string => {
@@ -36,43 +30,4 @@ export const formatWithSuffix = (num: number): string => {
   }
 
   return formatNumber(num, 0);
-};
-
-export const getRowPattern = (
-  player: core.Player,
-  statsExtra: string,
-  shipColumnCount: number,
-  overallColumnCount: number,
-): RowPattern => {
-  if (shipColumnCount + overallColumnCount === 0) {
-    return "no_column";
-  }
-
-  if (player.playerInfo.isHidden === true) {
-    return "private";
-  }
-
-  const stats = player[statsExtra as StatsExtra];
-  if (player.playerInfo.id === 0 || stats.overall.battles === 0) {
-    return "no_stats";
-  }
-
-  if (stats.ship.battles === 0 && shipColumnCount > 0) {
-    return "no_ship_stats";
-  }
-
-  return "full";
-};
-
-export const getColumnText = (pattern: RowPattern): string => {
-  switch (pattern) {
-    case "private":
-      return "PRIVAYE";
-    case "no_stats":
-      return "N/A";
-    case "no_ship_stats":
-      return "N/A";
-    default:
-      return "";
-  }
 };

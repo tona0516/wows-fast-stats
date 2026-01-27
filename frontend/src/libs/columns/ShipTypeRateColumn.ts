@@ -1,9 +1,17 @@
 import StackedBarGraphTableData from "@components/tabledata/StackedBarGraphTableData.svelte";
 import { ColorCode } from "@libs/ColorCode";
-import { SHIP_TYPE_COLORS, SHIP_TYPES } from "@libs/constants";
-import type { StackedBarChartParam } from "@libs/types";
+import { SHIP_TYPE_COLORS } from "@libs/constants";
+import type { ShipType, StackedBarChartParam } from "@libs/types";
 import type { core } from "@wails/go/models";
 import { AbstractStatsColumn } from "./AbstractStatsColumn";
+
+const SHIP_TYPES: Readonly<Map<ShipType, string>> = new Map<ShipType, string>([
+  ["ss", "潜水艦"],
+  ["dd", "駆逐艦"],
+  ["cl", "巡洋艦"],
+  ["bb", "戦艦"],
+  ["cv", "空母"],
+]);
 
 export class ShipTypeRateColumn extends AbstractStatsColumn<
   StackedBarChartParam[]

@@ -13,7 +13,7 @@ export class ColorCode {
 
   getFixedTextColor(rate: number = 1.0): ColorCode {
     const chromaColor = chroma(this.raw);
-    const fixed = Theme.isLighter()
+    const fixed = Theme.isLight()
       ? chromaColor.darken(rate)
       : chromaColor.brighten(rate);
     return new ColorCode(fixed.hex());
@@ -21,7 +21,7 @@ export class ColorCode {
 
   getFixedBgColor(rate: number = 1.0): ColorCode {
     const chromaColor = chroma(this.raw);
-    const fixed = Theme.isLighter()
+    const fixed = Theme.isLight()
       ? chromaColor.brighten(rate)
       : chromaColor.darken(rate);
     return new ColorCode(fixed.hex());

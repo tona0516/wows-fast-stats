@@ -3,7 +3,7 @@ export namespace Theme {
   const LIGHT = "light";
   const DARK = "dark";
 
-  export const isLighter = (): boolean => {
+  export const isLight = (): boolean => {
     return getCurrent() === LIGHT;
   };
 

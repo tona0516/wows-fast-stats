@@ -1,39 +1,10 @@
 import { ColorCode } from "./ColorCode";
-import type {
-  ColumnCategory,
-  ColumnInfo,
-  PlayerNameColorType,
-  ShipType,
-  StatsKey,
-  WarshipNamesColorType,
-} from "./types";
+import type { ShipType, StatsKey } from "./types";
 
-export const ZOOM_RATES = [
-  50, 67, 75, 80, 90, 100, 110, 120, 125, 133, 150, 167, 175, 200,
-] as const;
-
-export const STATS_EXTRAS: Readonly<Map<string, string>> = new Map<
-  string,
-  string
->([
-  ["pvpAll", "ランダム戦"],
-  ["pvpSolo", "ランダム戦(ソロ)"],
-  ["rankSolo", "ランク戦"],
-]);
-
-export const PLAYER_NAME_COLORS: Readonly<Map<PlayerNameColorType, string>> =
-  new Map<PlayerNameColorType, string>([
-    ["shipPR", "艦成績のPR"],
-    ["overallPR", "総合成績のPR"],
-    ["threatLevel", "戦力評価"],
-    ["none", "なし"],
-  ]);
-
-export const WARSHIP_NAME_COLORS: Readonly<Map<WarshipNamesColorType, string>> =
-  new Map<WarshipNamesColorType, string>([
-    ["shipType", "艦種"],
-    ["none", "なし"],
-  ]);
+type ColumnInfo = {
+  readonly minName: string;
+  readonly fullName: string;
+};
 
 export const STATS_COLUMN_INFO: {
   [key in StatsKey]: ColumnInfo;
@@ -108,28 +79,6 @@ export const STATS_COLUMN_INFO: {
   },
 } as const;
 
-export const STATS_KEYS = Object.keys(STATS_COLUMN_INFO) as readonly StatsKey[];
-
-export const CATEGORY_NAMES: Readonly<Map<ColumnCategory, string>> = new Map<
-  ColumnCategory,
-  string
->([
-  ["basic", "基本情報"],
-  ["ship", "艦成績"],
-  ["overall", "総合成績"],
-]);
-
-export const SHIP_TYPES: Readonly<Map<ShipType, string>> = new Map<
-  ShipType,
-  string
->([
-  ["ss", "潜水艦"],
-  ["dd", "駆逐艦"],
-  ["cl", "巡洋艦"],
-  ["bb", "戦艦"],
-  ["cv", "空母"],
-]);
-
 export const SHIP_TYPE_COLORS: Readonly<Map<ShipType, ColorCode>> = new Map<
   ShipType,
   ColorCode
@@ -163,17 +112,6 @@ export const RATING_COLORS: { [key: string]: ColorCode } = {
   great: new ColorCode("#02C9B3"),
   unicum: new ColorCode("#D042F3"),
   super_unicum: new ColorCode("#A00DC5"),
-} as const;
-
-export const RATING_NAMES: { [key: string]: string } = {
-  bad: "Bad",
-  below_avg: "Below Average",
-  avg: "Average",
-  good: "Good",
-  very_good: "Very Good",
-  great: "Great",
-  unicum: "Unicum",
-  super_unicum: "Super Unicum",
 } as const;
 
 type ColorPair = {

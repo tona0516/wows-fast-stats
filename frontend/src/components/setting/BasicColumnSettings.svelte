@@ -1,8 +1,22 @@
 <script lang="ts">
-  import { PLAYER_NAME_COLORS, WARSHIP_NAME_COLORS } from "@libs/constants";
   import { storedDisplayPref } from "@libs/stores";
+    import type { PlayerNameColorType, WarshipNamesColorType } from "@libs/types";
   import { SaveDisplayPref } from "@wails/go/main/App";
   import { get } from "svelte/store";
+
+  const PLAYER_NAME_COLORS: Readonly<Map<PlayerNameColorType, string>> =
+  new Map<PlayerNameColorType, string>([
+    ["shipPR", "艦成績のPR"],
+    ["overallPR", "総合成績のPR"],
+    ["threatLevel", "戦力評価"],
+    ["none", "なし"],
+  ]);
+
+  const WARSHIP_NAME_COLORS: Readonly<Map<WarshipNamesColorType, string>> =
+  new Map<WarshipNamesColorType, string>([
+    ["shipType", "艦種"],
+    ["none", "なし"],
+  ]);
 
   const onChangePref = async () => {
     const pref = get(storedDisplayPref);

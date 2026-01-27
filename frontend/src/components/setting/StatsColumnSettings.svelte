@@ -1,8 +1,11 @@
 <script lang="ts">
-  import { STATS_KEYS, STATS_COLUMN_INFO } from "@libs/constants";
+  import { STATS_COLUMN_INFO } from "@libs/constants";
   import { storedDisplayPref } from "@libs/stores";
+  import type { StatsKey } from "@libs/types";
   import { SaveDisplayPref } from "@wails/go/main/App";
   import { get } from "svelte/store";
+
+  const STATS_KEYS = Object.keys(STATS_COLUMN_INFO) as readonly StatsKey[];
 
   const onChangePref = async () => {
     const pref = get(storedDisplayPref);

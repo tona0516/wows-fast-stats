@@ -1,9 +1,6 @@
 <script lang="ts">
   import type { AbstractColumn } from "@libs/columns/AbstractColumn";
-  import { CATEGORY_NAMES } from "@libs/constants";
-  import { getColumnText, getRowPattern } from "@libs/utils";
-
-  import type { ColumnCategory, StatsExtra } from "@libs/types";
+  import type { StatsCategory, StatsExtra } from "@libs/types";
   import type { core } from "@wails/go/models";
   import ColspanTableData from "./tabledata/ColspanTableData.svelte";
   import { AvgTierColumn } from "@libs/columns/AvgTierColumn";
@@ -28,6 +25,24 @@
   import { storedDisplayPref } from "@libs/stores";
 
   export let teams: core.Team[];
+
+  type ColumnCategory = Readonly<"basic" | StatsCategory>;
+
+  type RowPattern =
+    | "no_column"
+    | "private"
+    | "no_stats"
+    | "no_ship_stats"
+    | "full";
+
+  const CATEGORY_NAMES: Readonly<Map<ColumnCategory, string>> = new Map<
+    ColumnCategory,
+    string
+  >([
+    ["basic", "基本情報"],
+    ["ship", "艦成績"],
+    ["overall", "総合成績"],
+  ]);
 
   class Category {
     constructor(
@@ -88,6 +103,45 @@
     basicCategory.showCount() +
     shipCategory.showCount() +
     overallCategory.showCount();
+
+  const getRowPattern = (
+    player: core.Player,
+    statsExtra: string,
+    shipColumnCount: number,
+    overallColumnCount: number,
+  ): RowPattern => {
+    if (shipColumnCount + overallColumnCount === 0) {
+      return "no_column";
+    }
+
+    if (player.playerInfo.isHidden === true) {
+      return "private";
+    }
+
+    const stats = player[statsExtra as StatsExtra];
+    if (player.playerInfo.id === 0 || stats.overall.battles === 0) {
+      return "no_stats";
+    }
+
+    if (stats.ship.battles === 0 && shipColumnCount > 0) {
+      return "no_ship_stats";
+    }
+
+    return "full";
+  };
+
+  const getColumnText = (pattern: RowPattern): string => {
+    switch (pattern) {
+      case "private":
+        return "PRIVAYE";
+      case "no_stats":
+        return "N/A";
+      case "no_ship_stats":
+        return "N/A";
+      default:
+        return "";
+    }
+  };
 </script>
 
 <div class="overflow-x-auto rounded-xl border border-base-300 bg-base-200">

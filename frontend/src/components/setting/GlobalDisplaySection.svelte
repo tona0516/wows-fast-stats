@@ -1,9 +1,21 @@
 <script lang="ts">
-  import { STATS_EXTRAS, ZOOM_RATES } from "@libs/constants";
   import { storedDisplayPref } from "@libs/stores";
   import { Theme } from "@libs/Theme";
   import { SaveDisplayPref } from "@wails/go/main/App";
   import { get } from "svelte/store";
+
+  const ZOOM_RATES = [
+  50, 67, 75, 80, 90, 100, 110, 120, 125, 133, 150, 167, 175, 200,
+  ] as const;
+
+  const STATS_EXTRAS: Readonly<Map<string, string>> = new Map<
+  string,
+  string
+>([
+  ["pvpAll", "ランダム戦"],
+  ["pvpSolo", "ランダム戦(ソロ)"],
+  ["rankSolo", "ランク戦"],
+]);
 
   const onChangePref = async () => {
     const pref = get(storedDisplayPref);
