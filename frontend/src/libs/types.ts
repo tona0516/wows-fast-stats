@@ -17,7 +17,7 @@ export type StatsKey = ShipStatsKey | OverallStatsKey;
 
 export type Optional<T> = T | undefined;
 
-export type Page = "stats" | "pref" | "info";
+export type Page = "stats" | "setting" | "info";
 
 export type ColumnSettingPattern = "ship" | "overall" | "both";
 
@@ -27,9 +27,7 @@ export type PlayerNameColorType =
   | "threatLevel"
   | "none";
 
-export type WarshipNamesColorType =
-  | "shipType"
-  | "none";
+export type WarshipNamesColorType = "shipType" | "none";
 
 export type RowPattern =
   | "no_column"

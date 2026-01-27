@@ -1,9 +1,9 @@
 import { STATS_COLUMN_INFO } from "@libs/constants";
-import type { StatsCategory, StatsExtra, StatsKey } from "@libs/types";
+import { storedDisplayPref } from "@libs/stores";
+import type { StatsCategory, StatsKey } from "@libs/types";
 import type { core } from "@wails/go/models";
 import { get } from "svelte/store";
 import { AbstractColumn } from "./AbstractColumn";
-import { storedDisplayPref } from "@libs/stores";
 
 export abstract class AbstractStatsColumn<T> extends AbstractColumn {
   constructor(

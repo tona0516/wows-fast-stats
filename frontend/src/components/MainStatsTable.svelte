@@ -25,7 +25,7 @@
   import { TierRateColumn } from "@libs/columns/TierRateColumn";
   import { WinRateColumn } from "@libs/columns/WinRateColumn";
   import { EfficiencyBadgeColumn } from "@libs/columns/EfficiencyBadgeColumn";
-    import { storedDisplayPref } from "@libs/stores";
+  import { storedDisplayPref } from "@libs/stores";
 
   export let teams: core.Team[];
 

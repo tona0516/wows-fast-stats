@@ -1,11 +1,11 @@
 import PlayerNameTableData from "@components/tabledata/PlayerNameTableData.svelte";
 import { ColorCode } from "@libs/ColorCode";
 import { RATING_COLORS, THREAT_LEVEL_COLORS } from "@libs/constants";
+import { storedDisplayPref } from "@libs/stores";
 import type { Optional, PlayerNameColorType, StatsExtra } from "@libs/types";
 import type { core } from "@wails/go/models";
 import { get } from "svelte/store";
 import { AbstractColumn } from "./AbstractColumn";
-import { storedDisplayPref } from "@libs/stores";
 
 export class PlayerNameColumn extends AbstractColumn {
   constructor() {

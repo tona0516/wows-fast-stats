@@ -1,7 +1,7 @@
 import type { core } from "@wails/go/models";
 import { type Writable, writable } from "svelte/store";
-import type { Optional, TonakoParam } from "./types";
 import type { DisplayPref } from "./DisplayPref";
+import type { Optional, TonakoParam } from "./types";
 
 export const storedGameClientPath = writable("") as Writable<string>;
 export const storedDisplayPref = writable() as Writable<DisplayPref>;

@@ -10,7 +10,7 @@
     storedGameClientPath,
   } from "@libs/stores";
   import type { Page } from "@libs/types";
-  import PrefPage from "@pages/PrefPage.svelte";
+  import PrefPage from "@pages/SettingPage.svelte";
   import InfoPage from "@pages/InfoPage.svelte";
   import StatsPage from "@pages/StatsPage.svelte";
   import {
@@ -126,7 +126,7 @@
       <div class="flex-1 min-w-px m-4">
         {#if page === "stats"}
           <StatsPage />
-        {:else if page === "pref"}
+        {:else if page === "setting"}
           <PrefPage />
         {:else if page === "info"}
           <InfoPage />

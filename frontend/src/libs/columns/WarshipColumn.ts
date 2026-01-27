@@ -1,6 +1,7 @@
 import ShipInfoTableData from "@components/tabledata/ShipInfoTableData.svelte";
 import { ColorCode } from "@libs/ColorCode";
 import { SHIP_TYPE_COLORS } from "@libs/constants";
+import { storedDisplayPref } from "@libs/stores";
 import type { Optional } from "@libs/types";
 import { toShipType, toTierString } from "@libs/utils";
 import type { core } from "@wails/go/models";
@@ -31,7 +32,6 @@ import ShipSS from "src/assets/images/ship_ss.png";
 import ShipPremiumSS from "src/assets/images/ship_ss_premium.png";
 import { get } from "svelte/store";
 import { AbstractColumn } from "./AbstractColumn";
-import { storedDisplayPref } from "@libs/stores";
 
 const FLAGS: { [key: string]: string } = {
   japan: FlagJapan,

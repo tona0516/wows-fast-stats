@@ -3,7 +3,7 @@
   import BarChart from "./BarChart.svelte";
   import { get } from "svelte/store";
   import type { StatsExtra } from "@libs/types";
-    import { storedDisplayPref } from "@libs/stores";
+  import { storedDisplayPref } from "@libs/stores";
 
   export let friendTeam: core.Team;
   export let enemyTeam: core.Team;

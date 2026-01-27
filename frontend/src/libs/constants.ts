@@ -71,7 +71,7 @@ export const STATS_COLUMN_INFO: {
     fullName: "戦闘数",
   },
   platoonRate: {
-    minName: "分艦隊比", 
+    minName: "分艦隊比",
     fullName: "分艦隊比率",
   },
   efficiencyBadge: {
