@@ -10,7 +10,7 @@
 </script>
 
 {#if column.needsShow()}
-  <td class="{$storedDisplayPref.showBoarder ? "border border-gray-500" : ""} p-1" style="background-color: {column.getBgColorCode(player)}">
+  <td class="{$storedDisplayPref.showBoarder ? "border border-gray-500" : ""} px-1 py-0.5" style="background-color: {column.getBgColorCode(player)}">
     <div class="text-right">
       <div class="tooltip" data-tip={param.shipInfo?.name}>
         {param.damage}

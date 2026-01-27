@@ -10,10 +10,10 @@
   const nationIconPath = column.getNationIconPath(player);
 </script>
 
-<td class="{$storedDisplayPref.showBoarder ? "border border-gray-500" : ""} p-1" style="background-color: {column.getBgColorCode(player)?.raw}">
+<td class="{$storedDisplayPref.showBoarder ? "border border-gray-500" : ""} px-1 py-0.5" style="background-color: {column.getBgColorCode(player)?.raw}">
   <div class="w-48 flex place-items-center">
     <button
-      class="btn btn-xs bi bi-info-square p-1 mr-1"
+      class="btn btn-xs bi bi-info-square px-1 py-0.5 mr-1"
       on:click={() => ModalManager.instance.openForShipDetail(player)}
     />
     {#if nationIconPath}

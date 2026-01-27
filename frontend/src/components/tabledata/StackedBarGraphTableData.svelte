@@ -12,7 +12,7 @@
 
 {#if column.needsShow()}
   <td
-    class="{$storedDisplayPref.showBoarder ? "border border-gray-500" : ""} p-1"
+    class="{$storedDisplayPref.showBoarder ? "border border-gray-500" : ""} px-1 py-0.5"
     style="background-color: {column.getBgColorCode(player)?.raw}"
   >
     <div class="w-20">

@@ -77,17 +77,17 @@
           <table class="table text-nowrap" style="width: 1px;">
             <thead>
               {#each ["ダメージレーティング", "値"] as column}
-                <th class="p-1 text-center">{column}</th>
+                <th class="px-1 py-0.5 text-center">{column}</th>
               {/each}
             </thead>
             <tbody>
               {#each damageRatings as dr}
                 <tr>
                   <td
-                    class="p-1 text-center font-bold"
+                    class="px-1 py-0.5 text-center font-bold"
                     style="color: {dr.colorCode?.raw}">{dr.displayName}</td
                   >
-                  <td class="p-1 text-right">{dr.value}</td>
+                  <td class="px-1 py-0.5 text-right">{dr.value}</td>
                 </tr>
               {/each}
             </tbody>

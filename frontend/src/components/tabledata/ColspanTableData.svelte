@@ -5,4 +5,4 @@
   export let text: string;
 </script>
 
-<td class="{$storedDisplayPref.showBoarder ? "border border-gray-500" : ""} p-1 text-center" {colspan}>{text}</td>
+<td class="{$storedDisplayPref.showBoarder ? "border border-gray-500" : ""} px-1 py-0.5 text-center" {colspan}>{text}</td>

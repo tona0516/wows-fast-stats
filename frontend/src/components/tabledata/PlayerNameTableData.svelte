@@ -12,7 +12,7 @@
   $: isNPC = column.isNPC(player);
 </script>
 
-<td class="{$storedDisplayPref.showBoarder ? "border border-gray-500" : ""} p-1">
+<td class="{$storedDisplayPref.showBoarder ? "border border-gray-500" : ""} px-1 py-0.5">
   <div class="w-48 flex place-items-center">
     {#if isNPC}
       <div class="truncate">
@@ -20,7 +20,7 @@
       </div>
     {:else}
       <button
-        class="btn btn-xs bi bi-info-square p-1 mr-1"
+        class="btn btn-xs bi bi-info-square px-1 py-0.5 mr-1"
         on:click={() => ModalManager.instance.openForPlayerDetail(player)}
       />
 

@@ -175,7 +175,7 @@
                   <th
                     class="{$storedDisplayPref.showBoarder
                       ? 'border border-gray-500'
-                      : ''} p-1 text-center font-medium whitespace-nowrap"
+                      : ''} px-1 py-0.5 text-center font-medium whitespace-nowrap"
                     scope="col">{column.header}</th
                   >
                 {/if}
