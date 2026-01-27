@@ -10,8 +10,12 @@ export function FetchBattle(arg1) {
   return window['go']['main']['App']['FetchBattle'](arg1);
 }
 
-export function LoadPref() {
-  return window['go']['main']['App']['LoadPref']();
+export function LoadDisplayPref() {
+  return window['go']['main']['App']['LoadDisplayPref']();
+}
+
+export function LoadGameClientPath() {
+  return window['go']['main']['App']['LoadGameClientPath']();
 }
 
 export function NewVersion() {
@@ -22,8 +26,8 @@ export function Prefetch() {
   return window['go']['main']['App']['Prefetch']();
 }
 
-export function SavePref(arg1) {
-  return window['go']['main']['App']['SavePref'](arg1);
+export function SaveDisplayPref(arg1) {
+  return window['go']['main']['App']['SaveDisplayPref'](arg1);
 }
 
 export function SelectGameClientPath() {

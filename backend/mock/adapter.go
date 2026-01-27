@@ -229,33 +229,57 @@ func (m *MockPrefStore) EXPECT() *MockPrefStoreMockRecorder {
 	return m.recorder
 }
 
-// Pref mocks base method.
-func (m *MockPrefStore) Pref() (core.Pref, error) {
+// DisplayPref mocks base method.
+func (m *MockPrefStore) DisplayPref() (string, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Pref")
-	ret0, _ := ret[0].(core.Pref)
+	ret := m.ctrl.Call(m, "DisplayPref")
+	ret0, _ := ret[0].(string)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// Pref indicates an expected call of Pref.
-func (mr *MockPrefStoreMockRecorder) Pref() *gomock.Call {
+// DisplayPref indicates an expected call of DisplayPref.
+func (mr *MockPrefStoreMockRecorder) DisplayPref() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Pref", reflect.TypeOf((*MockPrefStore)(nil).Pref))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DisplayPref", reflect.TypeOf((*MockPrefStore)(nil).DisplayPref))
 }
 
-// SetPref mocks base method.
-func (m *MockPrefStore) SetPref(data core.Pref) error {
+// GameClientPath mocks base method.
+func (m *MockPrefStore) GameClientPath() {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SetPref", data)
+	m.ctrl.Call(m, "GameClientPath")
+}
+
+// GameClientPath indicates an expected call of GameClientPath.
+func (mr *MockPrefStoreMockRecorder) GameClientPath() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GameClientPath", reflect.TypeOf((*MockPrefStore)(nil).GameClientPath))
+}
+
+// SetDisplayPref mocks base method.
+func (m *MockPrefStore) SetDisplayPref(pref string) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "SetDisplayPref", pref)
+}
+
+// SetDisplayPref indicates an expected call of SetDisplayPref.
+func (mr *MockPrefStoreMockRecorder) SetDisplayPref(pref any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetDisplayPref", reflect.TypeOf((*MockPrefStore)(nil).SetDisplayPref), pref)
+}
+
+// SetGameClientPath mocks base method.
+func (m *MockPrefStore) SetGameClientPath(path string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SetGameClientPath", path)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// SetPref indicates an expected call of SetPref.
-func (mr *MockPrefStoreMockRecorder) SetPref(data any) *gomock.Call {
+// SetGameClientPath indicates an expected call of SetGameClientPath.
+func (mr *MockPrefStoreMockRecorder) SetGameClientPath(path any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetPref", reflect.TypeOf((*MockPrefStore)(nil).SetPref), data)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetGameClientPath", reflect.TypeOf((*MockPrefStore)(nil).SetGameClientPath), path)
 }
 
 // MockReplayReader is a mock of ReplayReader interface.

@@ -21,10 +21,14 @@ export type Page = "stats" | "pref" | "info";
 
 export type ColumnSettingPattern = "ship" | "overall" | "both";
 
-export type PlayerNameColorPattern =
+export type PlayerNameColorType =
   | "shipPR"
   | "overallPR"
   | "threatLevel"
+  | "none";
+
+export type WarshipNamesColorType =
+  | "shipType"
   | "none";
 
 export type RowPattern =
@@ -35,9 +39,8 @@ export type RowPattern =
   | "full";
 
 export type ColumnInfo = {
-  readonly min: string;
-  readonly full: string;
-  readonly pattern: ColumnSettingPattern;
+  readonly minName: string;
+  readonly fullName: string;
 };
 
 export type StackedBarChartParam = {

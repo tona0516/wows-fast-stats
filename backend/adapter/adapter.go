@@ -28,8 +28,10 @@ type CacheStore interface {
 
 //go:generate mockgen -source=$GOFILE -destination ../mock/$GOFILE -package mock
 type PrefStore interface {
-	Pref() (core.Pref, error)
-	SetPref(data core.Pref) error
+	GameClientPath() (string, error)
+	SetGameClientPath(path string) error
+	DisplayPref() (string, error)
+	SetDisplayPref(pref string) error
 }
 
 //go:generate mockgen -source=$GOFILE -destination ../mock/$GOFILE -package mock

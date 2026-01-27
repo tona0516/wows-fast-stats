@@ -4,20 +4,21 @@
   import SideMenu from "@components/SideMenu.svelte";
   import Toast from "@components/Toast.svelte";
   import {
-    showToast,
+    storedDisplayPref,
     storedBattle,
     storedGameClientPathError,
-    storedPref,
+    storedGameClientPath,
   } from "@libs/stores";
   import type { Page } from "@libs/types";
   import PrefPage from "@pages/PrefPage.svelte";
   import InfoPage from "@pages/InfoPage.svelte";
   import StatsPage from "@pages/StatsPage.svelte";
   import {
-    LoadPref,
     StartPollingMatch,
     Prefetch,
     FetchBattle,
+    LoadDisplayPref,
+    LoadGameClientPath,
   } from "@wails/go/main/App";
   import type { core } from "@wails/go/models";
   import { EventsOn } from "@wails/runtime/runtime";
@@ -26,12 +27,13 @@
   import { TonakoManager } from "@libs/TonakoManager";
   import ShipDetailModal from "@components/modals/ShipDetailModal.svelte";
   import PlayerDetailModal from "@components/modals/PlayerDetailModal.svelte";
+    import { DEFAULT_DISPLAY_PREF, type DisplayPref } from "@libs/DisplayPref";
 
   let page: Page = "stats";
 
   $: {
     // @ts-ignore
-    document.body.style.zoom = ($storedPref?.zoomRate || 1.0) / 100;
+    document.body.style.zoom = ($storedDisplayPref?.zoomRate || 1.0) / 100;
   }
 
   onMount(() => {
@@ -64,10 +66,26 @@
 
   const main = async () => {
     TonakoManager.getInstance.setLoadingState("設定ファイルの読み込み中");
-    let pref: core.Pref;
+    
     try {
-      pref = await LoadPref();
-      storedPref.set(pref);
+      const displayPrefString = await LoadDisplayPref()
+
+      let displayPref: DisplayPref;
+      if (displayPrefString === "") {
+        displayPref = DEFAULT_DISPLAY_PREF;
+      } else {
+        displayPref = JSON.parse(displayPrefString) as DisplayPref;
+      }
+      
+      storedDisplayPref.set(displayPref);
+    } catch (error) {
+      TonakoManager.getInstance.setErrorState(error as string);
+      return;
+    }
+
+    try {
+      const gameClientPath = await LoadGameClientPath();
+      storedGameClientPath.set(gameClientPath);
     } catch (error) {
       TonakoManager.getInstance.setErrorState(error as string);
       return;

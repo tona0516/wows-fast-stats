@@ -25,7 +25,7 @@
   import { TierRateColumn } from "@libs/columns/TierRateColumn";
   import { WinRateColumn } from "@libs/columns/WinRateColumn";
   import { EfficiencyBadgeColumn } from "@libs/columns/EfficiencyBadgeColumn";
-  import { storedPref } from "@libs/stores";
+    import { storedDisplayPref } from "@libs/stores";
 
   export let teams: core.Team[];
 
@@ -88,9 +88,6 @@
     basicCategory.showCount() +
     shipCategory.showCount() +
     overallCategory.showCount();
-  const showThreatLevel = $storedPref.column.stats.threatLevel.isShowOverall;
-
-  $: statsExtra = $storedPref.statsExtra as StatsExtra;
 </script>
 
 <div class="overflow-x-auto rounded-xl border border-base-300 bg-base-200">
@@ -128,7 +125,7 @@
           {#each team.players as player}
             {@const rowPattern = getRowPattern(
               player,
-              $storedPref.statsExtra,
+              $storedDisplayPref.statsExtra,
               shipCategory.showCount(),
               overallCategory.showCount(),
             )}

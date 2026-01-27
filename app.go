@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"os"
 	"wfs/backend/adapter"
 	"wfs/backend/config"
@@ -21,8 +22,7 @@ type App struct {
 	pollMatchUsecase            *usecase.PollMatch
 	selectGameClientPathUsecase *usecase.SelectGameClientPath
 	checkUpdateUsecase          *usecase.CheckUpdate
-	loadPrefUsecase             *usecase.LoadPref
-	savePrefUsecase             *usecase.SavePref
+	prefStore                   adapter.PrefStore
 	logger                      adapter.Logger
 
 	ctx                 context.Context
@@ -67,12 +67,34 @@ func (a *App) FetchBattle(tempArenaInfo core.TempArenaInfo) (*core.Battle, error
 	return battle, nil
 }
 
-func (a *App) LoadPref() (core.Pref, error) {
-	return a.loadPrefUsecase.Invoke()
+func (a *App) LoadGameClientPath() (string, error) {
+	pathString, err := a.prefStore.GameClientPath()
+	if err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			return "", nil
+		}
+
+		return "", core.ErrorForDisplay(err)
+	}
+
+	return pathString, nil
 }
 
-func (a *App) SavePref(pref core.Pref) error {
-	return a.savePrefUsecase.Invoke(pref)
+func (a *App) LoadDisplayPref() (string, error) {
+	jsonString, err := a.prefStore.DisplayPref()
+	if err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			return "", nil
+		}
+
+		return "", core.ErrorForDisplay(err)
+	}
+
+	return jsonString, nil
+}
+
+func (a *App) SaveDisplayPref(pref string) error {
+	return a.prefStore.SetDisplayPref(pref)
 }
 
 func (a *App) SelectGameClientPath() error {
@@ -114,8 +136,7 @@ func (a *App) OnStartup(ctx context.Context) {
 	a.pollMatchUsecase = do.MustInvoke[*usecase.PollMatch](injector)
 	a.selectGameClientPathUsecase = do.MustInvoke[*usecase.SelectGameClientPath](injector)
 	a.checkUpdateUsecase = do.MustInvoke[*usecase.CheckUpdate](injector)
-	a.loadPrefUsecase = do.MustInvoke[*usecase.LoadPref](injector)
-	a.savePrefUsecase = do.MustInvoke[*usecase.SavePref](injector)
+	a.prefStore = do.MustInvoke[adapter.PrefStore](injector)
 	a.logger = do.MustInvoke[adapter.Logger](injector)
 }
 
@@ -179,8 +200,6 @@ func (a *App) getInjector() do.Injector {
 	do.Provide(injector, usecase.NewPollMatch)
 	do.Provide(injector, usecase.NewSelectGameClientPath)
 	do.Provide(injector, usecase.NewCheckUpdate)
-	do.Provide(injector, usecase.NewLoadPref)
-	do.Provide(injector, usecase.NewSavePref)
 
 	return injector
 }

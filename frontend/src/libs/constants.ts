@@ -2,9 +2,10 @@ import { ColorCode } from "./ColorCode";
 import type {
   ColumnCategory,
   ColumnInfo,
-  PlayerNameColorPattern,
+  PlayerNameColorType,
   ShipType,
   StatsKey,
+  WarshipNamesColorType,
 } from "./types";
 
 export const ZOOM_RATES = [
@@ -20,54 +21,90 @@ export const STATS_EXTRAS: Readonly<Map<string, string>> = new Map<
   ["rankSolo", "ランク戦"],
 ]);
 
-export const PLAYER_NAME_COLORS: Readonly<Map<PlayerNameColorPattern, string>> =
-  new Map<PlayerNameColorPattern, string>([
+export const PLAYER_NAME_COLORS: Readonly<Map<PlayerNameColorType, string>> =
+  new Map<PlayerNameColorType, string>([
     ["shipPR", "艦成績のPR"],
     ["overallPR", "総合成績のPR"],
     ["threatLevel", "戦力評価"],
     ["none", "なし"],
   ]);
 
+export const WARSHIP_NAME_COLORS: Readonly<Map<WarshipNamesColorType, string>> =
+  new Map<WarshipNamesColorType, string>([
+    ["shipType", "艦種"],
+    ["none", "なし"],
+  ]);
+
 export const STATS_COLUMN_INFO: {
   [key in StatsKey]: ColumnInfo;
 } = {
-  pr: { min: "PR", full: "Personal Rating", pattern: "both" },
-  winRate: { min: "勝率", full: "勝率", pattern: "both" },
-  damage: { min: "Dmg", full: "与ダメージ", pattern: "both" },
-  maxDamage: { min: "最大Dmg", full: "最大与ダメージ", pattern: "both" },
-  kdRate: { min: "K/D", full: "キルデス比", pattern: "both" },
-  kill: { min: "撃沈", full: "撃沈", pattern: "both" },
-  exp: { min: "Exp", full: "経験値(プレミアム補正含む)", pattern: "both" },
-  battles: { min: "戦闘数", full: "戦闘数", pattern: "both" },
-  platoonRate: { min: "分艦隊比", full: "分艦隊比率", pattern: "both" },
+  pr: {
+    minName: "PR",
+    fullName: "Personal Rating",
+  },
+  winRate: {
+    minName: "勝率",
+    fullName: "勝率",
+  },
+  damage: {
+    minName: "Dmg",
+    fullName: "与ダメージ",
+  },
+  maxDamage: {
+    minName: "最大Dmg",
+    fullName: "最大与ダメージ",
+  },
+  kdRate: {
+    minName: "K/D",
+    fullName: "キルデス比",
+  },
+  kill: {
+    minName: "撃沈",
+    fullName: "撃沈",
+  },
+  exp: {
+    minName: "Exp",
+    fullName: "経験値(プレミアム補正含む)",
+  },
+  battles: {
+    minName: "戦闘数",
+    fullName: "戦闘数",
+  },
+  platoonRate: {
+    minName: "分艦隊比", 
+    fullName: "分艦隊比率",
+  },
   efficiencyBadge: {
-    min: "技能バッジ(E|1|2|3)",
-    full: "技能バッジ(Expert|1st|2nd|3rd)",
-    pattern: "both",
+    minName: "技能バッジ(E|1|2|3)",
+    fullName: "技能バッジ(Expert|1st|2nd|3rd)",
   },
-  planesKilled: { min: "撃墜", full: "撃墜", pattern: "ship" },
+  planesKilled: {
+    minName: "撃墜",
+    fullName: "撃墜",
+  },
   survivedRate: {
-    min: "生存率(全|勝|敗)",
-    full: "生存率(全戦|勝利|敗北)",
-    pattern: "ship",
+    minName: "生存率(全|勝|敗)",
+    fullName: "生存率(全戦|勝利|敗北)",
   },
-  hitRate: { min: "命中率(主|魚)", full: "命中率(主砲|魚雷)", pattern: "ship" },
-  avgTier: { min: "平均T", full: "平均Tier", pattern: "overall" },
-
+  hitRate: {
+    minName: "命中率(主|魚)",
+    fullName: "命中率(主砲|魚雷)",
+  },
+  avgTier: {
+    minName: "平均T",
+    fullName: "平均Tier",
+  },
   threatLevel: {
-    min: "戦力評価",
-    full: "戦力評価(闇深XVM算出ロジック)",
-    pattern: "overall",
+    minName: "戦力評価",
+    fullName: "戦力評価(闇深XVM算出ロジック)",
   },
   usingShipTypeRate: {
-    min: "艦種割合",
-    full: "使用艦種割合",
-    pattern: "overall",
+    minName: "艦種割合",
+    fullName: "使用艦種割合",
   },
   usingTierRate: {
-    min: "T割合",
-    full: "プレイTier割合",
-    pattern: "overall",
+    minName: "T割合",
+    fullName: "プレイTier割合",
   },
 } as const;
 

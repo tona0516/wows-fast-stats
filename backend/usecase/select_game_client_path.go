@@ -38,14 +38,7 @@ func (s *SelectGameClientPath) Invoke(ctx context.Context) error {
 		return err
 	}
 
-	pref, err := s.prefStore.Pref()
-	if err != nil {
-		return err
-	}
-
-	pref.GameClientPath = selectedPath
-
-	if err := s.prefStore.SetPref(pref); err != nil {
+	if err := s.prefStore.SetGameClientPath(selectedPath); err != nil {
 		return err
 	}
 

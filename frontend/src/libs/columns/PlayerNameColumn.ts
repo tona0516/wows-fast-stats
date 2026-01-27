@@ -1,11 +1,11 @@
 import PlayerNameTableData from "@components/tabledata/PlayerNameTableData.svelte";
 import { ColorCode } from "@libs/ColorCode";
 import { RATING_COLORS, THREAT_LEVEL_COLORS } from "@libs/constants";
-import { storedPref } from "@libs/stores";
-import type { Optional, PlayerNameColorPattern, StatsExtra } from "@libs/types";
+import type { Optional, PlayerNameColorType, StatsExtra } from "@libs/types";
 import type { core } from "@wails/go/models";
 import { get } from "svelte/store";
 import { AbstractColumn } from "./AbstractColumn";
+import { storedDisplayPref } from "@libs/stores";
 
 export class PlayerNameColumn extends AbstractColumn {
   constructor() {
@@ -17,9 +17,9 @@ export class PlayerNameColumn extends AbstractColumn {
   }
 
   override getTextColorCode(player: core.Player): Optional<ColorCode> {
-    const cfg = get(storedPref);
-    const statsExtra = cfg.statsExtra as StatsExtra;
-    const pattern = cfg.column.player.colorPattern as PlayerNameColorPattern;
+    const pref = get(storedDisplayPref);
+    const statsExtra = pref.statsExtra as StatsExtra;
+    const pattern = pref.player.colorType as PlayerNameColorType;
 
     switch (pattern) {
       case "shipPR": {
@@ -54,7 +54,7 @@ export class PlayerNameColumn extends AbstractColumn {
   }
 
   getNationFlagClass(player: core.Player): string {
-    if (!get(storedPref).column.player.enableNationFlag) {
+    if (!get(storedDisplayPref).player.enableNationFlag) {
       return "";
     }
     const langMap: Record<string, string> = { ja: "jp", zh: "cn", ko: "kr" };

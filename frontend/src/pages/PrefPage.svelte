@@ -5,14 +5,16 @@
     STATS_KEYS,
     STATS_COLUMN_INFO,
     PLAYER_NAME_COLORS,
+    WARSHIP_NAME_COLORS,
   } from "@libs/constants";
   import {
     showToast,
+    storedDisplayPref,
+    storedGameClientPath,
     storedGameClientPathError,
-    storedPref,
   } from "@libs/stores";
   import { Theme } from "@libs/Theme";
-  import { LoadPref, SavePref, SelectGameClientPath } from "@wails/go/main/App";
+  import { SaveDisplayPref, SelectGameClientPath } from "@wails/go/main/App";
   import { onMount } from "svelte";
   import { get } from "svelte/store";
   import { themeChange } from "theme-change";
@@ -24,8 +26,6 @@
   const onClickSelectGameClientPath = async () => {
     try {
       await SelectGameClientPath();
-      const pref = await LoadPref();
-      storedPref.set(pref);
       storedGameClientPathError.set("");
 
       showToast("ゲームクライアントパスを設定しました");
@@ -40,9 +40,9 @@
   };
 
   const onChangePref = async () => {
-    const pref = get(storedPref);
+    const pref = get(storedDisplayPref);
     if (!pref) return;
-    await SavePref(pref);
+    await SaveDisplayPref(JSON.stringify(pref, null, 2));
   };
 </script>
 
@@ -56,12 +56,12 @@
     <p class="text-sm text-gray-500 mb-2">
       WorldOfWarships.exeが存在するフォルダを選択してください
     </p>
-    {#if $storedPref.gameClientPath}
+    {#if $storedGameClientPath}
       <div class="stats shadow w-full mb-2">
         <div class="stat">
           <div class="stat-title">パス</div>
           <div class="stat-value text-lg break-all">
-            {$storedPref.gameClientPath}
+            {$storedGameClientPath}
           </div>
         </div>
       </div>
@@ -71,7 +71,10 @@
         <span>{$storedGameClientPathError}</span>
       </div>
     {/if}
-    <button class="btn btn-primary w-full" on:click={onClickSelectGameClientPath}>
+    <button
+      class="btn btn-primary w-full"
+      on:click={onClickSelectGameClientPath}
+    >
       フォルダ選択
     </button>
   </div>
@@ -93,11 +96,11 @@
       <label class="label font-bold">UIサイズ</label>
       <select
         class="select select-bordered w-full"
-        bind:value={$storedPref.zoomRate}
+        bind:value={$storedDisplayPref.zoomRate}
         on:change={onChangePref}
       >
         {#each ZOOM_RATES as zr}
-          <option selected={zr === $storedPref.zoomRate} value={zr}
+          <option selected={zr === $storedDisplayPref.zoomRate} value={zr}
             >{zr}%</option
           >
         {/each}
@@ -108,11 +111,11 @@
       <label class="label font-bold">統計パターン</label>
       <select
         class="select select-bordered w-full my-2"
-        bind:value={$storedPref.statsExtra}
+        bind:value={$storedDisplayPref.statsExtra}
         on:change={onChangePref}
       >
         {#each STATS_EXTRAS as se}
-          <option selected={se[0] === $storedPref.statsExtra} value={se[0]}
+          <option selected={se[0] === $storedDisplayPref.statsExtra} value={se[0]}
             >{se[1]}</option
           >
         {/each}
@@ -143,7 +146,7 @@
                   <input
                     class="toggle toggle-success"
                     type="checkbox"
-                    bind:checked={$storedPref.column.player.enableNationFlag}
+                    bind:checked={$storedDisplayPref.player.enableNationFlag}
                     on:change={onChangePref}
                   />
                   <span
@@ -151,16 +154,16 @@
                   >
                 </label>
                 <label class="flex items-center gap-2">
-                  <span>成績に基づく背景色</span>
+                  <span>背景色タイプ</span>
                   <select
                     class="select select-sm select-bordered"
-                    bind:value={$storedPref.column.player.colorPattern}
+                    bind:value={$storedDisplayPref.player.colorType}
                     on:change={onChangePref}
                   >
                     {#each PLAYER_NAME_COLORS as color}
                       <option
                         selected={color[0] ===
-                          $storedPref.column.player.colorPattern}
+                          $storedDisplayPref.player.colorType}
                         value={color[0]}>{color[1]}</option
                       >
                     {/each}
@@ -177,19 +180,26 @@
                   <input
                     class="toggle toggle-success"
                     type="checkbox"
-                    bind:checked={$storedPref.column.ship.enableNationFlag}
+                    bind:checked={$storedDisplayPref.warship.enableNationFlag}
                     on:change={onChangePref}
                   />
                   <span>国旗を表示する</span>
                 </label>
                 <label class="flex items-center gap-2">
-                  <input
-                    class="toggle toggle-success"
-                    type="checkbox"
-                    bind:checked={$storedPref.column.ship.isColored}
+                  <span>背景色タイプ</span>
+                  <select
+                    class="select select-sm select-bordered"
+                    bind:value={$storedDisplayPref.warship.colorType}
                     on:change={onChangePref}
-                  />
-                  <span>艦種に基づく背景色にする</span>
+                  >
+                    {#each WARSHIP_NAME_COLORS as color}
+                      <option
+                        selected={color[0] ===
+                          $storedDisplayPref.warship.colorType}
+                        value={color[0]}>{color[1]}</option
+                      >
+                    {/each}
+                  </select>
                 </label>
               </div>
             </td>
@@ -212,26 +222,26 @@
           {#each STATS_KEYS as statsKey}
             {@const info = STATS_COLUMN_INFO[statsKey]}
             <tr class="hover:bg-base-100">
-              <td class="px-4 py-2">{info.full ?? statsKey}</td>
-              {#if ["both", "ship"].includes(info.pattern)}
+              <td class="px-4 py-2">{info.fullName}</td>
+              {#if "showShip" in $storedDisplayPref[statsKey] && typeof $storedDisplayPref[statsKey].showShip === 'boolean'}
                 <td class="text-center px-4 py-2">
                   <input
                     class="toggle toggle-success"
                     type="checkbox"
-                    bind:checked={$storedPref.column.stats[statsKey].isShowShip}
+                    bind:checked={$storedDisplayPref[statsKey].showShip}
                     on:change={onChangePref}
                   />
                 </td>
               {:else}
                 <td></td>
               {/if}
-              {#if ["both", "overall"].includes(info.pattern)}
+              {#if "showOverall" in $storedDisplayPref[statsKey] && typeof $storedDisplayPref[statsKey].showOverall === 'boolean'}
                 <td class="text-center px-4 py-2">
                   <input
                     class="toggle toggle-success"
                     type="checkbox"
                     bind:checked={
-                      $storedPref.column.stats[statsKey].isShowOverall
+                      $storedDisplayPref[statsKey].showOverall
                     }
                     on:change={onChangePref}
                   />
@@ -239,17 +249,17 @@
               {:else}
                 <td></td>
               {/if}
-              {#if statsKey !== "efficiencyBadge"}
+              {#if "digit" in $storedDisplayPref[statsKey] && typeof $storedDisplayPref[statsKey].digit === 'number'}
                 <td class="text-center px-4 py-2">
                   <select
                     class="select select-sm select-bordered"
-                    bind:value={$storedPref.column.stats[statsKey].digit}
+                    bind:value={$storedDisplayPref[statsKey].digit}
                     on:change={onChangePref}
                   >
                     {#each [0, 1, 2] as digit}
                       <option
                         selected={digit ===
-                          $storedPref.column.stats[statsKey].digit}
+                          $storedDisplayPref[statsKey].digit}
                         value={digit}>{digit}</option
                       >
                     {/each}
@@ -263,21 +273,5 @@
         </tbody>
       </table>
     </div>
-  </div>
-
-  <!-- その他 -->
-  <div class="card bg-base-100 shadow-xl rounded-xl p-6">
-    <span class="text-2xl font-bold mb-4">その他</span>
-    <ul class="list">
-      <li class="list-row flex items-center gap-2">
-        <input
-          class="toggle toggle-success"
-          type="checkbox"
-          bind:checked={$storedPref.isSendReport}
-          on:change={onChangePref}
-        />
-        <span>アプリ改善のためのデータ送信を許可する</span>
-      </li>
-    </ul>
   </div>
 </div>

@@ -37,20 +37,18 @@ func (pm *PollMatch) Invoke(
 	ctx context.Context,
 	cancelCtx context.Context,
 ) {
-	pref, err := pm.prefStore.Pref()
+	gameClientPath, err := pm.prefStore.GameClientPath()
 	if err != nil {
 		pm.wails.EmitEvent(ctx, EventOnGameClientPathRequired)
 		return
 	}
 
-	if err := pm.validator.Validate(pref.GameClientPath); err != nil {
+	if err := pm.validator.Validate(gameClientPath); err != nil {
 		pm.wails.EmitEvent(ctx, EventOnGameClientPathRequired)
 		return
 	}
 
 	pm.wails.EmitEvent(ctx, EventOnStartPolling)
-
-	gameClientPath := pref.GameClientPath
 
 	var latestHash string
 	for {

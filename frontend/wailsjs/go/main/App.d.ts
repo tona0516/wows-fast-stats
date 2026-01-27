@@ -6,13 +6,15 @@ export function CurrentVersion():Promise<string>;
 
 export function FetchBattle(arg1:core.TempArenaInfo):Promise<core.Battle>;
 
-export function LoadPref():Promise<core.Pref>;
+export function LoadDisplayPref():Promise<string>;
+
+export function LoadGameClientPath():Promise<string>;
 
 export function NewVersion():Promise<core.NewVersion>;
 
 export function Prefetch():Promise<void>;
 
-export function SavePref(arg1:core.Pref):Promise<void>;
+export function SaveDisplayPref(arg1:string):Promise<void>;
 
 export function SelectGameClientPath():Promise<void>;
 
