@@ -23,8 +23,6 @@ export type PlayerNameColorType =
   | "threatLevel"
   | "none";
 
-export type WarshipNamesColorType = "shipType" | "none";
-
 export type StackedBarChartParam = {
   readonly label: string;
   readonly colorCode?: ColorCode;

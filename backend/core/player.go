@@ -15,4 +15,5 @@ type PlayerInfo struct {
 	Name     string    `json:"name"`
 	Clan     Clan      `json:"clan"`
 	IsHidden bool      `json:"isHidden"`
+	IsAlly   bool      `json:"isAlly"`
 }

@@ -37,6 +37,7 @@ func NewBattle(
 				Name:     nickname,
 				Clan:     clan,
 				IsHidden: accountInfo.Data[accountID].HiddenProfile,
+				IsAlly:   vehicle.IsFriend(),
 			},
 			Warship: warship,
 			PvPSolo: NewPlayerStats(

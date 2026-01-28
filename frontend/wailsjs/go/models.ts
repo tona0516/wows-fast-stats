@@ -433,6 +433,7 @@ export namespace core {
 	    name: string;
 	    clan: Clan;
 	    isHidden: boolean;
+	    isAlly: boolean;
 	
 	    static createFrom(source: any = {}) {
 	        return new PlayerInfo(source);
@@ -444,6 +445,7 @@ export namespace core {
 	        this.name = source["name"];
 	        this.clan = this.convertValues(source["clan"], Clan);
 	        this.isHidden = source["isHidden"];
+	        this.isAlly = source["isAlly"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

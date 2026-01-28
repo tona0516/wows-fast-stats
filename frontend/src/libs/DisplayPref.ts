@@ -1,8 +1,4 @@
-import type {
-  PlayerNameColorType,
-  StatsExtra,
-  WarshipNamesColorType,
-} from "./types";
+import type { PlayerNameColorType, StatsExtra } from "./types";
 
 export interface DisplayPref {
   version: number;
@@ -15,7 +11,6 @@ export interface DisplayPref {
   };
   warship: {
     enableNationFlag: boolean;
-    colorType: WarshipNamesColorType;
   };
   // ship/overall columns
   pr: {
@@ -112,7 +107,6 @@ export const DEFAULT_DISPLAY_PREF: DisplayPref = {
   },
   warship: {
     enableNationFlag: true,
-    colorType: "none",
   },
   pr: {
     showShip: true,

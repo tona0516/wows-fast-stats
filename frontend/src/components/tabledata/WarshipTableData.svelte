@@ -26,7 +26,7 @@
     {/if}
     <img
       class="w-icon"
-      style="width: {(1.25 * $storedDisplayPref.zoomRate) / 100}rem"
+      style="width: {(1.5 * $storedDisplayPref.zoomRate) / 100}rem"
       src={column.getShipIconPath(player)}
       alt=""
     />

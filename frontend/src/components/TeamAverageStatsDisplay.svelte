@@ -112,7 +112,9 @@
         <BarChart data={overallChartData} />
       </div>
       <div class="bg-base-100 p-4">
-        <h4 class="font-semibold text-center mb-4 text-sm">戦力評価(by 178usagi)</h4>
+        <h4 class="font-semibold text-center mb-4 text-sm">
+          戦力評価(by 178usagi)
+        </h4>
         <BarChart data={threatChartData} />
       </div>
     </div>

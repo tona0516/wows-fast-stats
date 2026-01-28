@@ -1,6 +1,6 @@
 <script lang="ts">
   import { storedDisplayPref } from "@libs/stores";
-    import type { PlayerNameColorType, WarshipNamesColorType } from "@libs/types";
+    import type { PlayerNameColorType } from "@libs/types";
   import { SaveDisplayPref } from "@wails/go/main/App";
   import { get } from "svelte/store";
 
@@ -9,12 +9,6 @@
     ["shipPR", "艦成績のPR"],
     ["overallPR", "総合成績のPR"],
     ["threatLevel", "戦力評価"],
-    ["none", "なし"],
-  ]);
-
-  const WARSHIP_NAME_COLORS: Readonly<Map<WarshipNamesColorType, string>> =
-  new Map<WarshipNamesColorType, string>([
-    ["shipType", "艦種"],
     ["none", "なし"],
   ]);
 
@@ -82,22 +76,6 @@
                 on:change={onChangePref}
               />
               <span>国旗を表示する</span>
-            </label>
-            <label class="flex items-center gap-2">
-              <span>背景色タイプ</span>
-              <select
-                class="select select-sm select-bordered"
-                bind:value={$storedDisplayPref.warship.colorType}
-                on:change={onChangePref}
-              >
-                {#each WARSHIP_NAME_COLORS as color}
-                  <option
-                    selected={color[0] ===
-                      $storedDisplayPref.warship.colorType}
-                    value={color[0]}>{color[1]}</option
-                  >
-                {/each}
-              </select>
             </label>
           </div>
         </td>
