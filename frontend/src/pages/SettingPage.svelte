@@ -10,8 +10,10 @@
   });
 </script>
 
-<div class="container mx-auto max-w-3xl py-3 flex flex-col gap-4">
-  <GameClientPathSection />
-  <GlobalDisplaySection />
-  <ColumnDisplaySection />
+<div class="min-h-full w-full bg-base-200/40 p-6">
+  <div class="mx-auto flex w-full max-w-3xl flex-col gap-6">
+    <GameClientPathSection />
+    <GlobalDisplaySection />
+    <ColumnDisplaySection />
+  </div>
 </div>
