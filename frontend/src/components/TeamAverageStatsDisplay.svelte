@@ -2,7 +2,6 @@
   import type { core } from "@wails/go/models";
   import BarChart from "./BarChart.svelte";
   import { get } from "svelte/store";
-  import type { StatsExtra } from "@libs/types";
   import { storedDisplayPref } from "@libs/stores";
 
   export let friendTeam: core.Team;
@@ -101,20 +100,19 @@
 </script>
 
 <div class="mt-4 px-4 space-y-6">
-  <!-- Charts Section -->
-  <div class="bg-base-200 rounded-xl border border-base-300 p-6">
-    <h3 class="font-semibold text-xl mb-6 text-center">チーム平均比較</h3>
-    <div class="grid grid-cols-1 gap-8">
-      <div>
-        <h4 class="font-medium text-center mb-4">艦成績</h4>
+  <div class="bg-base-200 border border-base-300 p-4 space-y-4">
+    <h3 class="font-bold text-lg text-center">チーム平均</h3>
+    <div class="grid grid-cols-3 gap-5">
+      <div class="bg-base-100 p-4">
+        <h4 class="font-semibold text-center mb-4 text-sm">艦成績</h4>
         <BarChart data={shipChartData} />
       </div>
-      <div>
-        <h4 class="font-medium text-center mb-4">総合成績</h4>
+      <div class="bg-base-100 p-4">
+        <h4 class="font-semibold text-center mb-4 text-sm">総合成績</h4>
         <BarChart data={overallChartData} />
       </div>
-      <div>
-        <h4 class="font-medium text-center mb-4">戦力評価(by 178usagi)</h4>
+      <div class="bg-base-100 p-4">
+        <h4 class="font-semibold text-center mb-4 text-sm">戦力評価(by 178usagi)</h4>
         <BarChart data={threatChartData} />
       </div>
     </div>
