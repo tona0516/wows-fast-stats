@@ -182,30 +182,6 @@ func (c *WargamingClient) EncycShips(
 	)
 }
 
-func (c *WargamingClient) BattleArenas(ctx context.Context) (core.WGBattleArenas, error) {
-	return request[core.WGBattleArenas](
-		ctx,
-		c,
-		"/wows/encyclopedia/battlearenas/",
-		map[string]string{
-			"fields":   c.fieldQuery(reflect.TypeFor[core.WGBattleArenasData]()),
-			"language": "ja",
-		},
-	)
-}
-
-func (c *WargamingClient) BattleTypes(ctx context.Context) (core.WGBattleTypes, error) {
-	return request[core.WGBattleTypes](
-		ctx,
-		c,
-		"/wows/encyclopedia/battletypes/",
-		map[string]string{
-			"fields":   c.fieldQuery(reflect.TypeFor[core.WGBattleTypesData]()),
-			"language": "ja",
-		},
-	)
-}
-
 func (c *WargamingClient) ShipsBadges(
 	ctx context.Context,
 	accountID core.AccountID,

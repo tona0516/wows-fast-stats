@@ -67,8 +67,6 @@ type WargamingClient interface {
 	ClansInfo(ctx context.Context, clanIDs []core.ClanID) (core.WGClansInfo, error)
 	EncycShips(ctx context.Context, pageNo int) (core.WGEncycShips, error)
 	ShipsStats(ctx context.Context, accountID core.AccountID) (core.WGShipsStats, error)
-	BattleArenas(ctx context.Context) (core.WGBattleArenas, error)
-	BattleTypes(ctx context.Context) (core.WGBattleTypes, error)
 	ShipsBadges(ctx context.Context, accountID core.AccountID) (core.WGShipsBadges, error)
 }
 

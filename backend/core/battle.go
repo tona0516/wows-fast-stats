@@ -5,8 +5,7 @@ import (
 )
 
 type Battle struct {
-	Metadata BattleMetadata `json:"metadata"`
-	Teams    []Team         `json:"teams"`
+	Teams []Team `json:"teams"`
 }
 
 func NewBattle(
@@ -88,11 +87,6 @@ func NewBattle(
 	}
 
 	battle := Battle{
-		Metadata: BattleMetadata{
-			Unixtime: tempArenaInfo.Unixtime(),
-			Arena:    tempArenaInfo.BattleArena(prefetchResult.BattleArenas),
-			Type:     tempArenaInfo.BattleType(prefetchResult.BattleTypes),
-		},
 		Teams: teams,
 	}
 

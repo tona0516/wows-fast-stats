@@ -40,34 +40,12 @@ func (p *Prefetch) Invoke(ctx context.Context) (*core.PrefetchResult, error) {
 		return err
 	})
 
-	var battleArenas map[int]string
-	eg.Go(func() error {
-		var err error
-		elapsed := measure(func() {
-			battleArenas, err = p.fetchBattleArenas(egCtx)
-		})
-		p.logger.Debug(fmt.Sprintf("fetchBattleArenas took %dms", elapsed), nil)
-		return err
-	})
-
-	var battleTypes map[string]string
-	eg.Go(func() error {
-		var err error
-		elapsed := measure(func() {
-			battleTypes, err = p.fetchBattleTypes(egCtx)
-		})
-		p.logger.Debug(fmt.Sprintf("fetchBattleTypes took %dms", elapsed), nil)
-		return err
-	})
-
 	if err := eg.Wait(); err != nil {
 		return nil, err
 	}
 
 	return &core.PrefetchResult{
-		Warships:     warships,
-		BattleArenas: battleArenas,
-		BattleTypes:  battleTypes,
+		Warships: warships,
 	}, nil
 }
 
@@ -107,46 +85,6 @@ func (p *Prefetch) fetchWarships(ctx context.Context) (core.Warships, error) {
 	p.cacheStore.SetWarships(warships)
 
 	return warships, nil
-}
-
-func (p *Prefetch) fetchBattleArenas(ctx context.Context) (map[int]string, error) {
-	resp, err := p.wargamingClient.BattleArenas(ctx)
-	if err != nil {
-		cache, errCache := p.cacheStore.BattleArenas()
-		if errCache != nil {
-			return nil, err
-		}
-		return cache, nil
-	}
-
-	result := make(map[int]string)
-	for id, arena := range resp.Data {
-		result[id] = arena.Name
-	}
-
-	p.cacheStore.SetBattleArenas(result)
-
-	return result, nil
-}
-
-func (p *Prefetch) fetchBattleTypes(ctx context.Context) (map[string]string, error) {
-	resp, err := p.wargamingClient.BattleTypes(ctx)
-	if err != nil {
-		cache, errCache := p.cacheStore.BattleTypes()
-		if errCache != nil {
-			return nil, err
-		}
-		return cache, nil
-	}
-
-	result := make(map[string]string)
-	for key, battleType := range resp.Data {
-		result[key] = battleType.Name
-	}
-
-	p.cacheStore.SetBattleTypes(result)
-
-	return result, nil
 }
 
 func (p *Prefetch) fetchEncycShips(ctx context.Context) (map[int]core.WGEncycShips, error) {

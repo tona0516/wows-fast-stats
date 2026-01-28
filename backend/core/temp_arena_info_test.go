@@ -36,39 +36,3 @@ func TestTempArenaInfo_Unixtime(t *testing.T) {
 
 	assert.Equal(t, expected, actual)
 }
-
-func TestTempArenaInfo_BattleArena(t *testing.T) {
-	t.Parallel()
-
-	battleArenas := map[int]string{
-		1: "Arena1",
-		2: "Arena2",
-	}
-
-	info := &TempArenaInfo{
-		MapID: 2,
-	}
-
-	expectedBattleArena := "Arena2"
-	actualBattleArena := info.BattleArena(battleArenas)
-
-	assert.Equal(t, expectedBattleArena, actualBattleArena)
-}
-
-func TestTempArenaInfo_BattleType(t *testing.T) {
-	t.Parallel()
-
-	battleTypes := map[string]string{
-		"RANDOM": "Random Battle",
-		"COOP":   "o-op Battle",
-	}
-
-	info := &TempArenaInfo{
-		MatchGroup: "random",
-	}
-
-	expectedBattleType := "RandomBattle"
-	actualBattleType := info.BattleType(battleTypes)
-
-	assert.Equal(t, expectedBattleType, actualBattleType)
-}

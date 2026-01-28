@@ -98,7 +98,7 @@
       return;
     }
 
-    TonakoManager.getInstance.setLoadingState("艦艇・マップの読み込み中");
+    TonakoManager.getInstance.setLoadingState("艦艇データの読み込み中");
     try {
       await Prefetch();
     } catch (error) {

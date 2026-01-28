@@ -17,14 +17,6 @@ func TestNewBattle_正常系(t *testing.T) {
 			789: {ID: 789, Name: "Conqueror", Type: ShipTypeBB, Tier: 10, Nation: "uk"},
 			101: {ID: 101, Name: "Republique", Type: ShipTypeBB, Tier: 10, Nation: "france"},
 		},
-		BattleArenas: map[int]string{
-			1: "Strait",
-			2: "Sleeping Giant",
-		},
-		BattleTypes: map[string]string{
-			"PVE": "Operation",
-			"PVP": "Randoms",
-		},
 	}
 
 	tempArenaInfo := TempArenaInfo{
@@ -97,10 +89,6 @@ func TestNewBattle_正常系(t *testing.T) {
 	assert.NotNil(t, battle)
 	assert.Equal(t, 2, len(battle.Teams))
 
-	// メタデータの確認
-	assert.Equal(t, "Strait", battle.Metadata.Arena)
-	assert.Equal(t, "Randoms", battle.Metadata.Type)
-
 	// 友軍チーム（Team 0）の確認
 	assert.Equal(t, 2, len(battle.Teams[0].Players))
 	assert.Equal(t, "Player1", battle.Teams[0].Players[0].PlayerInfo.Name)
@@ -127,12 +115,6 @@ func TestNewBattle_未知の戦艦(t *testing.T) {
 	prefetchResult := &PrefetchResult{
 		Warships: Warships{
 			123: {ID: 123, Name: "Yamato", Type: ShipTypeBB, Tier: 10, Nation: "japan"},
-		},
-		BattleArenas: map[int]string{
-			1: "Strait",
-		},
-		BattleTypes: map[string]string{
-			"PVP": "Randoms",
 		},
 	}
 

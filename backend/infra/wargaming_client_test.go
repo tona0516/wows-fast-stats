@@ -358,68 +358,6 @@ func TestWargamingClient_EncycShips(t *testing.T) {
 	assert.Equal(t, expected, result)
 }
 
-func TestWargamingClient_BattleArena(t *testing.T) {
-	t.Parallel()
-
-	expected := core.WGBattleArenas{
-		WGResponseCommon: core.WGResponseCommon[map[int]core.WGBattleArenasData]{
-			Status: "ok",
-			Error:  core.WGError{},
-			Data:   map[int]core.WGBattleArenasData{},
-		},
-	}
-	server := simpleMockServer(t, 200, expected)
-	defer server.Close()
-
-	injector := do.New()
-	do.ProvideValue(injector, config.Config{
-		WargamingClient: config.WargamingConfig{
-			URL:          server.URL,
-			RetryCount:   0,
-			Timeout:      0,
-			RateLimitRPS: 1,
-			AppID:        "",
-		},
-	})
-	instance, err := NewWargamingClient(injector)
-	require.NoError(t, err)
-	result, err := instance.BattleArenas(context.Background())
-
-	assert.NoError(t, err)
-	assert.Equal(t, expected, result)
-}
-
-func TestWargamingClient_BattleTypes(t *testing.T) {
-	t.Parallel()
-
-	expected := core.WGBattleTypes{
-		WGResponseCommon: core.WGResponseCommon[map[string]core.WGBattleTypesData]{
-			Status: "ok",
-			Error:  core.WGError{},
-			Data:   map[string]core.WGBattleTypesData{},
-		},
-	}
-	server := simpleMockServer(t, 200, expected)
-	defer server.Close()
-
-	injector := do.New()
-	do.ProvideValue(injector, config.Config{
-		WargamingClient: config.WargamingConfig{
-			URL:          server.URL,
-			RetryCount:   0,
-			Timeout:      0,
-			RateLimitRPS: 1,
-			AppID:        "",
-		},
-	})
-	instance, err := NewWargamingClient(injector)
-	require.NoError(t, err)
-	result, err := instance.BattleTypes(context.Background())
-
-	assert.NoError(t, err)
-	assert.Equal(t, expected, result)
-}
-
 func TestWargamingClient_ShipsBadges(t *testing.T) {
 	t.Parallel()
 

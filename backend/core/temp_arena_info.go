@@ -41,15 +41,6 @@ func (t *TempArenaInfo) Unixtime() int64 {
 	return date.Unix()
 }
 
-func (t *TempArenaInfo) BattleArena(battleArenas map[int]string) string {
-	return battleArenas[t.MapID]
-}
-
-func (t *TempArenaInfo) BattleType(battleTypes map[string]string) string {
-	rawBattleType := battleTypes[strings.ToUpper(t.MatchGroup)]
-	return strings.ReplaceAll(rawBattleType, " ", "")
-}
-
 type Vehicle struct {
 	ShipID   ShipID `json:"shipId"`
 	Relation int    `json:"relation"`
