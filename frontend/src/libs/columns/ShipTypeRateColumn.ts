@@ -1,5 +1,4 @@
 import StackedBarGraphTableData from "@components/tabledata/StackedBarGraphTableData.svelte";
-import { ColorCode } from "@libs/ColorCode";
 import { SHIP_TYPE_COLORS } from "@libs/constants";
 import type { ShipType, StackedBarChartParam } from "@libs/types";
 import type { core } from "@wails/go/models";
@@ -32,7 +31,7 @@ export class ShipTypeRateColumn extends AbstractStatsColumn<
       const color = SHIP_TYPE_COLORS.get(shipType);
       params.push({
         label: label,
-        colorCode: color?.getFixedBgColor(ColorCode.SHIP_TYPE_BG_FIXED_RATE),
+        colorCode: color?.getFixedBgColor(),
         value: shipTypeGroup[shipType] || 0,
       });
     });
