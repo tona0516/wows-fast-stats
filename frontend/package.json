@@ -20,6 +20,7 @@
     "@types/clone": "^2.1.2",
     "@types/jest": "^29.5.5",
     "@types/node": "^20.11.28",
+    "@types/sortablejs": "^1.15.8",
     "daisyui": "^5.0.43",
     "jest": "^29.7.0",
     "jest-transform-stub": "^2.0.0",
@@ -41,6 +42,7 @@
     "chroma-js": "^3.1.2",
     "flag-icons": "^7.2.3",
     "html-to-image": "^1.11.11",
+    "sortablejs": "^1.15.2",
     "svelte": "^4.2.20",
     "tailwindcss": "^4.1.10",
     "theme-change": "^2.5.0"

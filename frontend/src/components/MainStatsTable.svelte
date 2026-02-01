@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { AbstractColumn } from "@libs/columns/AbstractColumn";
-  import type { StatsCategory, StatsExtra } from "@libs/types";
+  import type { StatsCategory, StatsExtra, StatsKey } from "@libs/types";
   import type { core } from "@wails/go/models";
   import ColspanTableData from "./tabledata/ColspanTableData.svelte";
   import { AvgTierColumn } from "@libs/columns/AvgTierColumn";
@@ -64,7 +64,7 @@
     new WarshipColumn(),
   ]);
 
-  const shipCategory = new Category("ship", [
+  const shipColumns = [
     new PRColumn("ship"),
     new WinRateColumn("ship"),
     new DamageColumn("ship"),
@@ -78,9 +78,9 @@
     new EfficiencyBadgeColumn("ship"),
     new PlanesKilledColumn(),
     new HitRateColumn(),
-  ]);
+  ];
 
-  const overallCategory = new Category("overall", [
+  const overallColumns = [
     new PRColumn("overall"),
     new WinRateColumn("overall"),
     new DamageColumn("overall"),
@@ -96,13 +96,65 @@
     new AvgTierColumn(),
     new TierRateColumn(),
     new ShipTypeRateColumn(),
-  ]);
+  ];
 
-  const categories = [basicCategory, shipCategory, overallCategory];
-  const allColumnCount =
+  const buildColumnMap = (columns: AbstractColumn[]) => {
+    const map = new Map<StatsKey, AbstractColumn>();
+    columns.forEach((column) => {
+      map.set(column.key as StatsKey, column);
+    });
+    return map;
+  };
+
+  const normalizeOrder = (
+    order: StatsKey[] | undefined,
+    columns: AbstractColumn[],
+  ): StatsKey[] => {
+    const defaultOrder = columns.map((column) => column.key as StatsKey);
+    if (!order || order.length === 0) return defaultOrder;
+
+    const defaultSet = new Set(defaultOrder);
+    const normalized = order.filter((key) => defaultSet.has(key));
+    const missing = defaultOrder.filter((key) => !normalized.includes(key));
+    return [...normalized, ...missing];
+  };
+
+  const shipColumnMap = buildColumnMap(shipColumns);
+  const overallColumnMap = buildColumnMap(overallColumns);
+
+  let shipCategory = new Category("ship", shipColumns);
+  let overallCategory = new Category("overall", overallColumns);
+  let categories = [basicCategory, shipCategory, overallCategory];
+  let allColumnCount =
     basicCategory.showCount() +
     shipCategory.showCount() +
     overallCategory.showCount();
+
+  $: {
+    const shipOrder = normalizeOrder(
+      $storedDisplayPref?.columnOrder?.ship,
+      shipColumns,
+    );
+    const overallOrder = normalizeOrder(
+      $storedDisplayPref?.columnOrder?.overall,
+      overallColumns,
+    );
+
+    const orderedShipColumns = shipOrder
+      .map((key) => shipColumnMap.get(key))
+      .filter((column): column is AbstractColumn => Boolean(column));
+    const orderedOverallColumns = overallOrder
+      .map((key) => overallColumnMap.get(key))
+      .filter((column): column is AbstractColumn => Boolean(column));
+
+    shipCategory = new Category("ship", orderedShipColumns);
+    overallCategory = new Category("overall", orderedOverallColumns);
+    categories = [basicCategory, shipCategory, overallCategory];
+    allColumnCount =
+      basicCategory.showCount() +
+      shipCategory.showCount() +
+      overallCategory.showCount();
+  }
 
   const getRowPattern = (
     player: core.Player,
@@ -200,7 +252,7 @@
                 />
               {/each}
 
-              {#if ["no_column", "private", "no_stats"].includes(rowPattern)}
+              {#if ["private", "no_stats"].includes(rowPattern)}
                 <ColspanTableData
                   colspan={allColumnCount}
                   text={getColumnText(rowPattern)}

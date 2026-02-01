@@ -1,4 +1,4 @@
-import type { PlayerNameColorType, StatsExtra } from "./types";
+import type { PlayerNameColorType, StatsExtra, StatsKey } from "./types";
 
 export interface DisplayPref {
   version: number;
@@ -94,6 +94,10 @@ export interface DisplayPref {
     showOverall: boolean;
     digit: number;
   };
+  columnOrder: {
+    ship: StatsKey[];
+    overall: StatsKey[];
+  };
 }
 
 export const DEFAULT_DISPLAY_PREF: DisplayPref = {
@@ -186,5 +190,39 @@ export const DEFAULT_DISPLAY_PREF: DisplayPref = {
   usingTierRate: {
     showOverall: false,
     digit: 1,
+  },
+  columnOrder: {
+    ship: [
+      "pr",
+      "maxDamage",
+      "damage",
+      "winRate",
+      "kdRate",
+      "kill",
+      "exp",
+      "battles",
+      "survivedRate",
+      "platoonRate",
+      "efficiencyBadge",
+      "planesKilled",
+      "hitRate",
+    ],
+    overall: [
+      "pr",
+      "winRate",
+      "damage",
+      "maxDamage",
+      "kdRate",
+      "kill",
+      "exp",
+      "battles",
+      "survivedRate",
+      "platoonRate",
+      "efficiencyBadge",
+      "threatLevel",
+      "avgTier",
+      "usingTierRate",
+      "usingShipTypeRate",
+    ],
   },
 };
