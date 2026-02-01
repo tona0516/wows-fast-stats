@@ -16,9 +16,10 @@
   let friendTeamStats: core.TeamStats;
   let enemyTeamStats: core.TeamStats;
 
-  let shipChartData: ChartData[] = [];
-  let overallChartData: ChartData[] = [];
-  let threatChartData: ChartData[] = [];
+  let allChartData: {
+    title: string;
+    data: ChartData[];
+  }[] = [];
 
   $: if (friendTeam) {
     friendTeamStats = getTeamStats(friendTeam);
@@ -27,68 +28,87 @@
     enemyTeamStats = getTeamStats(enemyTeam);
   }
 
-  $: if (friendTeam && enemyTeam) {
-    shipChartData = [
+  $: if (friendTeamStats && enemyTeamStats) {
+    allChartData = [
       {
-        label: "PR",
-        friendValue: friendTeamStats.teamAverageStats.ship_pr,
-        enemyValue: enemyTeamStats.teamAverageStats.ship_pr,
+        title: "PR",
+        data: [
+          {
+            label: "艦成績",
+            friendValue: friendTeamStats.teamAverageStats.ship_pr,
+            enemyValue: enemyTeamStats.teamAverageStats.ship_pr,
+          },
+          {
+            label: "総合成績",
+            friendValue: friendTeamStats.teamAverageStats.overall_pr,
+            enemyValue: enemyTeamStats.teamAverageStats.overall_pr,
+          },
+        ],
       },
       {
-        label: "Dmg",
-        friendValue: friendTeamStats.teamAverageStats.ship_damage,
-        enemyValue: enemyTeamStats.teamAverageStats.ship_damage,
+        title: "ダメージ",
+        data: [
+          {
+            label: "艦成績",
+            friendValue: friendTeamStats.teamAverageStats.ship_damage,
+            enemyValue: enemyTeamStats.teamAverageStats.ship_damage,
+          },
+          {
+            label: "総合成績",
+            friendValue: friendTeamStats.teamAverageStats.overall_damage,
+            enemyValue: enemyTeamStats.teamAverageStats.overall_damage,
+          },
+        ],
       },
       {
-        label: "勝率",
-        friendValue: friendTeamStats.teamAverageStats.ship_win_rate,
-        enemyValue: enemyTeamStats.teamAverageStats.ship_win_rate,
+        title: "勝率",
+        data: [
+          {
+            label: "艦成績",
+            friendValue: friendTeamStats.teamAverageStats.ship_win_rate,
+            enemyValue: enemyTeamStats.teamAverageStats.ship_win_rate,
+          },
+          {
+            label: "総合成績",
+            friendValue: friendTeamStats.teamAverageStats.overall_win_rate,
+            enemyValue: enemyTeamStats.teamAverageStats.overall_win_rate,
+          },
+        ],
       },
       {
-        label: "戦闘数",
-        friendValue: friendTeamStats.teamAverageStats.ship_battles,
-        enemyValue: enemyTeamStats.teamAverageStats.ship_battles,
-      },
-    ];
-
-    overallChartData = [
-      {
-        label: "PR",
-        friendValue: friendTeamStats.teamAverageStats.overall_pr,
-        enemyValue: enemyTeamStats.teamAverageStats.overall_pr,
-      },
-      {
-        label: "Dmg",
-        friendValue: friendTeamStats.teamAverageStats.overall_damage,
-        enemyValue: enemyTeamStats.teamAverageStats.overall_damage,
+        title: "戦闘数",
+        data: [
+          {
+            label: "艦成績",
+            friendValue: friendTeamStats.teamAverageStats.ship_battles,
+            enemyValue: enemyTeamStats.teamAverageStats.ship_battles,
+          },
+          {
+            label: "総合成績",
+            friendValue: friendTeamStats.teamAverageStats.overall_battles,
+            enemyValue: enemyTeamStats.teamAverageStats.overall_battles,
+          },
+        ],
       },
       {
-        label: "勝率",
-        friendValue: friendTeamStats.teamAverageStats.overall_win_rate,
-        enemyValue: enemyTeamStats.teamAverageStats.overall_win_rate,
-      },
-      {
-        label: "戦闘数",
-        friendValue: friendTeamStats.teamAverageStats.overall_battles,
-        enemyValue: enemyTeamStats.teamAverageStats.overall_battles,
-      },
-    ];
-
-    threatChartData = [
-      {
-        label: "脅威度",
-        friendValue: friendTeam.pvpAll.teamThreatLevel.average,
-        enemyValue: enemyTeam.pvpAll.teamThreatLevel.average,
-      },
-      {
-        label: "確度",
-        friendValue: friendTeam.pvpAll.teamThreatLevel.accuracy,
-        enemyValue: enemyTeam.pvpAll.teamThreatLevel.accuracy,
-      },
-      {
-        label: "介護指数",
-        friendValue: friendTeam.pvpAll.teamThreatLevel.dissociationDegree,
-        enemyValue: enemyTeam.pvpAll.teamThreatLevel.dissociationDegree,
+        title: "戦力評価 (by 178usagi)",
+        data: [
+          {
+            label: "脅威度",
+            friendValue: friendTeam.pvpAll.teamThreatLevel.average,
+            enemyValue: enemyTeam.pvpAll.teamThreatLevel.average,
+          },
+          {
+            label: "確度",
+            friendValue: friendTeam.pvpAll.teamThreatLevel.accuracy,
+            enemyValue: enemyTeam.pvpAll.teamThreatLevel.accuracy,
+          },
+          {
+            label: "介護指数",
+            friendValue: friendTeam.pvpAll.teamThreatLevel.dissociationDegree,
+            enemyValue: enemyTeam.pvpAll.teamThreatLevel.dissociationDegree,
+          },
+        ],
       },
     ];
   }
@@ -99,51 +119,33 @@
   }
 </script>
 
-<div class="mt-6 px-4">
+<div class="mt-4">
   <section
-    class="bg-base-200/70 border border-base-300/80 rounded-2xl p-6 shadow-sm"
+    class="bg-base-200/70 border border-base-300/80 p-2 shadow-sm rounded-md"
   >
-    <div class="flex items-center justify-between mb-6">
-      <h3 class="font-bold text-xl">チーム平均</h3>
-      <div
-        class="hidden md:flex items-center gap-2 text-xs text-base-content/60"
-      >
-        <span class="inline-flex h-2 w-2 rounded-full bg-success/70"></span>
+    <div class="flex items-center justify-between mb-2">
+      <span class="w-full text-center font-bold">チーム平均値の比較</span>
+      <div class="hidden md:flex items-center gap-2 whitespace-nowrap">
+        <span class="inline-flex h-2 w-2 rounded-full bg-ally"></span>
         味方
-        <span class="inline-flex h-2 w-2 rounded-full bg-error/70 ml-3"></span>
+        <span class="inline-flex h-2 w-2 rounded-full bg-enemy"></span>
         敵
       </div>
     </div>
 
-    <div class="grid gap-5 grid-cols-3">
-      <div
-        class="relative overflow-hidden rounded-xl border border-base-300 bg-base-100 p-5 shadow-sm"
-      >
-        <div class="flex items-center justify-between mb-4">
-          <h4 class="font-semibold text-base">艦成績</h4>
+    <div class="grid gap-2 grid-cols-5">
+      {#each allChartData as chartData}
+        <div
+          class="relative overflow-hidden border border-base-300 bg-base-100/70 p-4 shadow-sm rounded-md"
+        >
+          <div class="flex items-center justify-between mb-2">
+            <h4 class="w-full text-center font-semibold line-clamp-1">
+              {chartData.title}
+            </h4>
+          </div>
+          <BarChart data={chartData.data} />
         </div>
-        <BarChart data={shipChartData} />
-      </div>
-
-      <div
-        class="relative overflow-hidden rounded-xl border border-base-300 bg-base-100 p-5 shadow-sm"
-      >
-        <div class="flex items-center justify-between mb-4">
-          <h4 class="font-semibold text-base">総合成績</h4>
-        </div>
-        <BarChart data={overallChartData} />
-      </div>
-
-      <div
-        class="relative overflow-hidden rounded-xl border border-base-300 bg-base-100 p-5 shadow-sm"
-      >
-        <div class="flex items-center justify-between mb-4">
-          <h4 class="font-semibold text-base line-clamp-1">
-            戦力評価 (by 178usagi)
-          </h4>
-        </div>
-        <BarChart data={threatChartData} />
-      </div>
+      {/each}
     </div>
   </section>
 </div>

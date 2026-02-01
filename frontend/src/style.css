@@ -27,3 +27,11 @@ body {
     local(""),
     url("assets/fonts/nunito-v16-latin-regular.woff2") format("woff2");
 }
+
+.bg-ally {
+  background: rgb(77, 233, 170);
+}
+
+.bg-enemy {
+  background: rgb(255, 76, 42);
+}

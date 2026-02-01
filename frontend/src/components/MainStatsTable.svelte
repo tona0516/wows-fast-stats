@@ -196,7 +196,7 @@
   };
 </script>
 
-<div class="overflow-x-auto">
+<div class="overflow-x-auto rounded-md">
   <table
     class="{$storedDisplayPref.showBoarder
       ? 'border border-gray-500'
