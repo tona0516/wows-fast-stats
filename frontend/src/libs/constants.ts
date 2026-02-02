@@ -46,7 +46,7 @@ export const STATS_COLUMN_INFO: {
     fullName: "分艦隊比率",
   },
   efficiencyBadge: {
-    minName: "技能バッジ(E|1|2|3)",
+    minName: "技能バッジ",
     fullName: "技能バッジ(Expert|1st|2nd|3rd)",
   },
   planesKilled: {
