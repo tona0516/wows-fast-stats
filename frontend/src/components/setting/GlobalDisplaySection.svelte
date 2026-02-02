@@ -5,17 +5,14 @@
   import { get } from "svelte/store";
 
   const ZOOM_RATES = [
-  50, 67, 75, 80, 90, 100, 110, 120, 125, 133, 150, 167, 175, 200,
+    50, 67, 75, 80, 90, 100, 110, 120, 125, 133, 150, 167, 175, 200,
   ] as const;
 
-  const STATS_EXTRAS: Readonly<Map<string, string>> = new Map<
-  string,
-  string
->([
-  ["pvpAll", "ランダム戦"],
-  ["pvpSolo", "ランダム戦(ソロ)"],
-  ["rankSolo", "ランク戦"],
-]);
+  const STATS_EXTRAS: Readonly<Map<string, string>> = new Map<string, string>([
+    ["pvpAll", "ランダム戦"],
+    ["pvpSolo", "ランダム戦(ソロ)"],
+    ["rankSolo", "ランク戦"],
+  ]);
 
   const onChangePref = async () => {
     const pref = get(storedDisplayPref);
@@ -24,22 +21,22 @@
   };
 </script>
 
-<div class="card bg-base-100 shadow-xl rounded-xl p-6">
-  <span class="text-2xl font-bold mb-6">全体表示設定</span>
-  <div class="form-control mb-4">
+<div class="bg-base-100 shadow-xl rounded-xl p-4">
+  <span class="text-xl font-bold mb-6">全体表示設定</span>
+  <div class="form-control mt-4">
     <!-- svelte-ignore a11y-label-has-associated-control -->
     <label class="label font-bold">テーマ</label>
-    <select class="select select-bordered w-full" data-choose-theme>
+    <select class="select" data-choose-theme>
       {#each Theme.getAll() as theme}
         <option value={theme}>{theme}</option>
       {/each}
     </select>
   </div>
-  <div class="form-control mb-4">
+  <div class="form-control mt-4">
     <!-- svelte-ignore a11y-label-has-associated-control -->
     <label class="label font-bold">UIサイズ</label>
     <select
-      class="select select-bordered w-full"
+      class="select"
       bind:value={$storedDisplayPref.zoomRate}
       on:change={onChangePref}
     >
@@ -50,11 +47,11 @@
       {/each}
     </select>
   </div>
-  <div class="form-control mb-4">
+  <div class="form-control mt-4">
     <!-- svelte-ignore a11y-label-has-associated-control -->
     <label class="label font-bold">統計パターン</label>
     <select
-      class="select select-bordered w-full"
+      class="select select-bordered"
       bind:value={$storedDisplayPref.statsExtra}
       on:change={onChangePref}
     >
@@ -65,7 +62,7 @@
       {/each}
     </select>
   </div>
-  <div class="form-control">
+  <div class="form-control mt-4">
     <!-- svelte-ignore a11y-label-has-associated-control -->
     <label class="label cursor-pointer">
       <input

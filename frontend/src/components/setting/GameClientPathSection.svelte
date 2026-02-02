@@ -23,16 +23,16 @@
   };
 </script>
 
-<div class="card bg-base-100 shadow-xl rounded-xl p-6">
+<div class="bg-base-100 shadow-xl rounded-xl p-4">
   <div class="flex items-center mb-2">
-    <span class="text-2xl font-bold">ゲームクライアントパス設定</span>
+    <span class="text-xl font-bold">ゲームクライアントパス設定</span>
     <span class="ml-2 badge badge-outline badge-error">必須</span>
   </div>
   <p class="text-sm text-gray-500 mb-2">
     WorldOfWarships.exeが存在するフォルダを選択してください
   </p>
   {#if $storedGameClientPath}
-    <div class="stats shadow w-full mb-2">
+    <div class="stats shadow mb-2">
       <div class="stat">
         <div class="stat-title">パス</div>
         <div class="stat-value text-lg break-all">
@@ -46,10 +46,9 @@
       <span>{$storedGameClientPathError}</span>
     </div>
   {/if}
-  <button
-    class="btn btn-primary w-full"
-    on:click={onClickSelect}
-  >
-    フォルダ選択
-  </button>
+  <div class="flex justify-end">
+    <button class="btn btn-primary" on:click={onClickSelect}>
+      フォルダ選択
+    </button>
+  </div>
 </div>

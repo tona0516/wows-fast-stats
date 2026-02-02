@@ -6,7 +6,7 @@
 </script>
 
 <div class="card bg-base-100 shadow-xl rounded-xl p-6">
-  <span class="mb-4 text-2xl font-bold">カラム別表示設定</span>
+  <span class="mb-4 text-xl font-bold">カラム別表示設定</span>
   <BasicColumnSettings />
   {#key resetToken}
     <StatsColumnSettings />
