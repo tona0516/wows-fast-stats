@@ -37,7 +37,7 @@
   {#each chartData as item}
     <div class="mb-2 last:mb-0">
       <div class="flex items-center justify-between">
-        <span class="font-semibold text-base-content/80 text-sm"
+        <span class="font-semibold text-base-content/80 text-sm line-clamp-1"
           >{item.label}</span
         >
         <span
