@@ -5,6 +5,7 @@
 
 body {
   font-family:
+    "NotoSansJP",
     "Nunito",
     -apple-system,
     BlinkMacSystemFont,
@@ -17,6 +18,15 @@ body {
     "Droid Sans",
     "Helvetica Neue",
     sans-serif;
+}
+
+@font-face {
+  font-family: "NotoSansJP";
+  font-style: normal;
+  font-weight: normal;
+  src:
+    local(""),
+    url("assets/fonts/NotoSansJP-Regular.ttf") format("ttf");
 }
 
 @font-face {
