@@ -34,8 +34,8 @@
   };
 </script>
 
-<div class="min-h-full w-full bg-base-200/40 p-6">
-  <div class="mx-auto flex w-full max-w-3xl flex-col gap-6">
+<div class="min-h-full w-full bg-base-200/40 p-4">
+  <div class="mx-auto flex w-full max-w-3xl flex-col gap-4">
     <GameClientPathSection />
     <GlobalDisplaySection />
     <ColumnDisplaySection {resetToken} />

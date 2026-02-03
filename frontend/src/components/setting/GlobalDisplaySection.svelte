@@ -22,7 +22,7 @@
 </script>
 
 <div class="bg-base-100 shadow-xl rounded-xl p-4">
-  <span class="text-xl font-bold mb-6">全体表示設定</span>
+  <span class="text-xl font-bold">全体表示設定</span>
   <table class="table">
     <tbody>
       <tr>

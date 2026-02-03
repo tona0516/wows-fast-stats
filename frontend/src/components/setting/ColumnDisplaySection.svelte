@@ -5,8 +5,8 @@
   export let resetToken = 0;
 </script>
 
-<div class="card bg-base-100 shadow-xl rounded-xl p-6">
-  <span class="mb-4 text-xl font-bold">カラム別表示設定</span>
+<div class="card bg-base-100 shadow-xl rounded-xl p-4">
+  <span class="text-xl font-bold">カラム別表示設定</span>
   <BasicColumnSettings />
   {#key resetToken}
     <StatsColumnSettings />
