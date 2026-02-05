@@ -1,6 +1,5 @@
 <script lang="ts">
   import Sortable from "sortablejs";
-  import { STATS_COLUMN_INFO } from "@libs/constants";
   import { DEFAULT_DISPLAY_PREF } from "@libs/DisplayPref";
   import { storedDisplayPref } from "@libs/stores";
   import type { StatsKey } from "@libs/types";
@@ -9,7 +8,6 @@
   import { get } from "svelte/store";
   import { onDestroy, onMount } from "svelte";
 
-  const STATS_KEYS = Object.keys(STATS_COLUMN_INFO) as readonly StatsKey[];
   type StatsColumnCategory = "ship" | "overall";
 
   let shipListElement: HTMLUListElement | null = null;
@@ -164,70 +162,7 @@
     splitOrder("ship"));
   $: ({ visible: overallVisibleOrder, hidden: overallHiddenOrder } =
     splitOrder("overall"));
-
-  const onChangePref = async () => {
-    const pref = get(storedDisplayPref);
-    if (!pref) return;
-    await SaveDisplayPref(JSON.stringify(pref, null, 2));
-  };
 </script>
-
-<div
-  class="overflow-x-auto rounded-xl border border-base-300 bg-base-200 shadow-sm"
->
-  <table class="table w-full text-nowrap">
-    <thead>
-      <tr class="bg-base-300 text-base-content font-semibold">
-        {#each ["カラム名", "小数点以下の桁数", "K(キロ)表示"] as columns}
-          <th
-            class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide"
-          >
-            {columns}
-          </th>
-        {/each}
-      </tr>
-    </thead>
-    <tbody>
-      {#each STATS_KEYS as statsKey}
-        {@const info = STATS_COLUMN_INFO[statsKey]}
-        <tr class="hover:bg-base-100">
-          <td class="px-4 py-3 text-sm font-medium">{info.fullName}</td>
-
-          {#if "digit" in $storedDisplayPref[statsKey] && typeof $storedDisplayPref[statsKey].digit === "number"}
-            <td class="px-4 py-3 text-center">
-              <select
-                class="select select-sm select-bordered"
-                bind:value={$storedDisplayPref[statsKey].digit}
-                on:change={onChangePref}
-              >
-                {#each [0, 1, 2] as digit}
-                  <option
-                    selected={digit === $storedDisplayPref[statsKey].digit}
-                    value={digit}>{digit}</option
-                  >
-                {/each}
-              </select>
-            </td>
-          {:else}
-            <td></td>
-          {/if}
-          {#if "siPrefix" in $storedDisplayPref[statsKey] && typeof $storedDisplayPref[statsKey].siPrefix === "boolean"}
-            <td class="px-4 py-3 text-center">
-              <input
-                class="toggle toggle-success"
-                type="checkbox"
-                bind:checked={$storedDisplayPref[statsKey].siPrefix}
-                on:change={onChangePref}
-              />
-            </td>
-          {:else}
-            <td></td>
-          {/if}
-        </tr>
-      {/each}
-    </tbody>
-  </table>
-</div>
 
 <div class="mt-6 grid grid-cols-1 gap-6">
   <StatsColumnOrderSection

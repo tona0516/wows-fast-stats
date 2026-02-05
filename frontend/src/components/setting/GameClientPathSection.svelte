@@ -34,13 +34,15 @@
     WorldOfWarships.exeが存在するフォルダを選択してください
   </p>
   {#if $storedGameClientPath}
-    <div class="mb-2">
-      <div class="flex items-center justify-between gap-2">
-        <div class="">{$storedGameClientPath}</div>
-        <button class="btn btn-primary shrink-0" on:click={onClickSelect}>
-          フォルダ選択
-        </button>
+    <div class="mb-2 flex items-center justify-between gap-2">
+      <div
+        class="rounded-xl border border-base-300 bg-base-200 shadow-sm p-2 flex-1 overflow-x-auto"
+      >
+        {$storedGameClientPath}
       </div>
+      <button class="btn btn-primary shrink-0" on:click={onClickSelect}>
+        フォルダ選択
+      </button>
     </div>
   {/if}
   {#if $storedGameClientPathError}
