@@ -509,6 +509,7 @@ export namespace core {
 	    pvpSolo: TeamStats;
 	    pvpAll: TeamStats;
 	    rankSolo: TeamStats;
+	    isAlly: boolean;
 	
 	    static createFrom(source: any = {}) {
 	        return new Team(source);
@@ -520,6 +521,7 @@ export namespace core {
 	        this.pvpSolo = this.convertValues(source["pvpSolo"], TeamStats);
 	        this.pvpAll = this.convertValues(source["pvpAll"], TeamStats);
 	        this.rankSolo = this.convertValues(source["rankSolo"], TeamStats);
+	        this.isAlly = source["isAlly"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

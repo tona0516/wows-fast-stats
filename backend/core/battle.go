@@ -82,8 +82,8 @@ func NewBattle(
 	sort.Sort(enemies)
 
 	teams := []Team{
-		NewTeam(friends),
-		NewTeam(enemies),
+		NewTeam(friends, true),
+		NewTeam(enemies, false),
 	}
 
 	battle := Battle{

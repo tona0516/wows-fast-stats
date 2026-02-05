@@ -198,20 +198,22 @@
 
 <div class="overflow-x-auto rounded-md">
   <table
-    class="{$storedDisplayPref.showBoarder
+    class="table text-nowrap w-full border-collapse {$storedDisplayPref.showBoarder
       ? 'border border-gray-500'
-      : ''} border-collapse table text-nowrap w-full"
+      : ''}"
   >
-    {#each teams as team, i}
+    {#each teams as team}
       {#if team.players.length !== 0}
         <thead>
-          <tr class="bg-base-300 text-xs">
+          <tr>
             {#each categories as category}
               {#if category.showCount() > 0}
                 <th
                   class="{$storedDisplayPref.showBoarder
                     ? 'border border-gray-500'
-                    : ''} p-2 text-center font-bold tracking-wide"
+                    : ''} px-1 py-0.5 text-center text-black {team.isAlly
+                    ? 'bg-ally'
+                    : 'bg-enemy'}"
                   colspan={category.showCount()}
                   scope="colgroup"
                 >
@@ -220,14 +222,14 @@
               {/if}
             {/each}
           </tr>
-          <tr class="bg-base-200 text-[11px]">
+          <tr>
             {#each categories as category}
               {#each category.columns as column}
                 {#if column.needsShow()}
                   <th
                     class="{$storedDisplayPref.showBoarder
                       ? 'border border-gray-500'
-                      : ''} px-1 py-0.5 text-center font-medium whitespace-nowrap"
+                      : ''} px-1 py-0.5 text-center bg-base-300"
                     scope="col">{column.header}</th
                   >
                 {/if}
