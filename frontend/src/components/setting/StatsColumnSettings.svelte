@@ -5,6 +5,7 @@
   import { storedDisplayPref } from "@libs/stores";
   import type { StatsKey } from "@libs/types";
   import { SaveDisplayPref } from "@wails/go/main/App";
+  import StatsColumnOrderSection from "@components/setting/StatsColumnOrderSection.svelte";
   import { get } from "svelte/store";
   import { onDestroy, onMount } from "svelte";
 
@@ -229,87 +230,19 @@
 </div>
 
 <div class="mt-6 grid grid-cols-1 gap-6">
-  <div class="rounded-xl border border-base-300 bg-base-200 p-5 shadow-sm">
-    <div class="mb-3 text-sm font-semibold">艦成績の表示項目</div>
-    <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
-      <div>
-        <div class="mb-2 text-xs font-semibold text-base-content/70">
-          表示中
-        </div>
-        <ul
-          bind:this={shipListElement}
-          class="space-y-2 min-h-60 rounded-lg border border-base-300 bg-base-100/60 p-2"
-        >
-          {#each shipVisibleOrder as key (key)}
-            <li
-              class="flex items-center gap-2 rounded-lg border border-base-300 bg-base-100 px-3 py-2 text-sm"
-              data-key={key}
-            >
-              <span>{STATS_COLUMN_INFO[key].fullName}</span>
-            </li>
-          {/each}
-        </ul>
-      </div>
-      <div>
-        <div class="mb-2 text-xs font-semibold text-base-content/70">
-          非表示
-        </div>
-        <ul
-          bind:this={shipHiddenListElement}
-          class="space-y-2 min-h-60 rounded-lg border border-base-300 bg-base-100/60 p-2"
-        >
-          {#each shipHiddenOrder as key (key)}
-            <li
-              class="flex items-center gap-2 rounded-lg border border-base-300 bg-base-100 px-3 py-2 text-sm"
-              data-key={key}
-            >
-              <span>{STATS_COLUMN_INFO[key].fullName}</span>
-            </li>
-          {/each}
-        </ul>
-      </div>
-    </div>
-  </div>
+  <StatsColumnOrderSection
+    title="艦成績の表示項目"
+    visibleOrder={shipVisibleOrder}
+    hiddenOrder={shipHiddenOrder}
+    bind:visibleListElement={shipListElement}
+    bind:hiddenListElement={shipHiddenListElement}
+  />
 
-  <div class="rounded-xl border border-base-300 bg-base-200 p-5 shadow-sm">
-    <div class="mb-3 text-sm font-semibold">総合成績の表示項目</div>
-    <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
-      <div>
-        <div class="mb-2 text-xs font-semibold text-base-content/70">
-          表示中
-        </div>
-        <ul
-          bind:this={overallListElement}
-          class="space-y-2 min-h-60 rounded-lg border border-base-300 bg-base-100/60 p-2"
-        >
-          {#each overallVisibleOrder as key (key)}
-            <li
-              class="flex items-center gap-2 rounded-lg border border-base-300 bg-base-100 px-3 py-2 text-sm"
-              data-key={key}
-            >
-              <span>{STATS_COLUMN_INFO[key].fullName}</span>
-            </li>
-          {/each}
-        </ul>
-      </div>
-      <div>
-        <div class="mb-2 text-xs font-semibold text-base-content/70">
-          非表示
-        </div>
-        <ul
-          bind:this={overallHiddenListElement}
-          class="space-y-2 min-h-60 rounded-lg border border-base-300 bg-base-100/60 p-2"
-        >
-          {#each overallHiddenOrder as key (key)}
-            <li
-              class="flex items-center gap-2 rounded-lg border border-base-300 bg-base-100 px-3 py-2 text-sm"
-              data-key={key}
-            >
-              <span>{STATS_COLUMN_INFO[key].fullName}</span>
-            </li>
-          {/each}
-        </ul>
-      </div>
-    </div>
-  </div>
+  <StatsColumnOrderSection
+    title="総合成績の表示項目"
+    visibleOrder={overallVisibleOrder}
+    hiddenOrder={overallHiddenOrder}
+    bind:visibleListElement={overallListElement}
+    bind:hiddenListElement={overallHiddenListElement}
+  />
 </div>
