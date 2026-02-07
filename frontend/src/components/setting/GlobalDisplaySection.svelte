@@ -19,61 +19,60 @@
     if (!pref) return;
     await SaveDisplayPref(JSON.stringify(pref, null, 2));
   };
+
+  const rows = [
+    { label: "テーマ", type: "theme" as const },
+    { label: "UIサイズ", type: "zoom" as const },
+    { label: "統計パターン", type: "stats" as const },
+    { label: "テーブルの枠線を表示する", type: "border" as const },
+  ];
 </script>
 
 <div class="bg-base-100 shadow-xl rounded-xl p-4">
   <span class="text-xl font-bold">全体表示設定</span>
   <table class="table">
     <tbody>
-      <tr>
-        <td class="font-bold">テーマ</td>
-        <td class="text-right">
-          <select class="select" data-choose-theme>
-            {#each Theme.getAll() as theme}
-              <option value={theme}>{theme}</option>
-            {/each}
-          </select>
-        </td>
-      </tr>
-      <tr>
-        <td class="font-bold">UIサイズ</td>
-        <td class="text-right">
-          <select
-            class="select"
-            bind:value={$storedDisplayPref.zoomRate}
-            on:change={onChangePref}
-          >
-            {#each ZOOM_RATES as zr}
-              <option value={zr}>{zr}%</option>
-            {/each}
-          </select>
-        </td>
-      </tr>
-      <tr>
-        <td class="font-bold">統計パターン</td>
-        <td class="text-right">
-          <select
-            class="select"
-            bind:value={$storedDisplayPref.statsExtra}
-            on:change={onChangePref}
-          >
-            {#each STATS_EXTRAS as [value, label]}
-              <option {value}>{label}</option>
-            {/each}
-          </select>
-        </td>
-      </tr>
-      <tr>
-        <td class="font-bold">テーブルの枠線を表示する</td>
-        <td class="text-right">
-          <input
-            class="toggle toggle-success"
-            type="checkbox"
-            bind:checked={$storedDisplayPref.showBoarder}
-            on:change={onChangePref}
-          />
-        </td>
-      </tr>
+      {#each rows as row}
+        <tr>
+          <td class="font-bold">{row.label}</td>
+          <td class={row.type === "border" ? "text-right" : ""}>
+            {#if row.type === "theme"}
+              <select class="select" data-choose-theme>
+                {#each Theme.getAll() as theme}
+                  <option value={theme}>{theme}</option>
+                {/each}
+              </select>
+            {:else if row.type === "zoom"}
+              <select
+                class="select"
+                bind:value={$storedDisplayPref.zoomRate}
+                on:change={onChangePref}
+              >
+                {#each ZOOM_RATES as zr}
+                  <option value={zr}>{zr}%</option>
+                {/each}
+              </select>
+            {:else if row.type === "stats"}
+              <select
+                class="select"
+                bind:value={$storedDisplayPref.statsExtra}
+                on:change={onChangePref}
+              >
+                {#each STATS_EXTRAS as [value, label]}
+                  <option {value}>{label}</option>
+                {/each}
+              </select>
+            {:else}
+              <input
+                class="toggle toggle-success"
+                type="checkbox"
+                bind:checked={$storedDisplayPref.showBoarder}
+                on:change={onChangePref}
+              />
+            {/if}
+          </td>
+        </tr>
+      {/each}
     </tbody>
   </table>
 </div>
