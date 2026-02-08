@@ -26,10 +26,10 @@ export class MaxDamageColumn extends AbstractStatsColumn<MaxDamageParam> {
 
   override getDisplayValue(player: core.Player): MaxDamageParam {
     const maxDamage = this.getPlayerStats(player)[this.category].maxDamage;
-    const pref = get(storedDisplayPref).maxDamage;
     const digit = this.getDigit();
 
-    const value = pref.siPrefix
+    const pref = get(storedDisplayPref);
+    const value = pref.showSiPrefix
       ? formatWithSuffix(maxDamage.value, digit)
       : maxDamage.value.toFixed(digit);
 

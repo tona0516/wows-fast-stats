@@ -37,7 +37,6 @@
             />
           </label>
         </div>
-        <div class="divider my-1" />
         <div class="py-1 flex items-center gap-2">
           <div>背景色タイプ</div>
           <div>
@@ -91,19 +90,6 @@
                   {/each}
                 </select>
               </div>
-            </div>
-          {/if}
-          {#if "siPrefix" in $storedDisplayPref[statsKey] && typeof $storedDisplayPref[statsKey].siPrefix === "boolean"}
-            <div class="py-1">
-              <label class="label text-base-content">
-                K(キロ)表示
-                <input
-                  class="toggle toggle-success"
-                  type="checkbox"
-                  bind:checked={$storedDisplayPref[statsKey].siPrefix}
-                  on:change={onChangePref}
-                />
-              </label>
             </div>
           {/if}
         </td>

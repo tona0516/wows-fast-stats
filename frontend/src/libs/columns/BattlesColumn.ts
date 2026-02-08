@@ -17,10 +17,10 @@ export class BattlesColumn extends AbstractStatsColumn<string> {
 
   override getDisplayValue(player: core.Player): string {
     const value = this.getPlayerStats(player)[this.category].battles;
-    const pref = get(storedDisplayPref).battles;
     const digit = this.getDigit();
 
-    if (pref.siPrefix) {
+    const pref = get(storedDisplayPref);
+    if (pref.showSiPrefix) {
       return formatWithSuffix(value, digit);
     }
 

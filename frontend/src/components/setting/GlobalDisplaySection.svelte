@@ -25,7 +25,8 @@
     { label: "テーマ", type: "theme" as const },
     { label: "UIサイズ", type: "zoom" as const },
     { label: "統計パターン", type: "stats" as const },
-    { label: "テーブルの枠線を表示する", type: "border" as const },
+    { label: "テーブルの枠線を表示", type: "border" as const },
+    { label: "K(キロ)表示", type: "prefix" as const },
   ];
 </script>
 
@@ -35,7 +36,7 @@
       {#each rows as row}
         <tr>
           <td class="font-bold">{row.label}</td>
-          <td class={row.type === "border" ? "text-right" : ""}>
+          <td class="text-right">
             {#if row.type === "theme"}
               <select class="select" data-choose-theme>
                 {#each Theme.getAll() as theme}
@@ -62,11 +63,18 @@
                   <option {value}>{label}</option>
                 {/each}
               </select>
-            {:else}
+            {:else if row.type === "border"}
               <input
                 class="toggle toggle-success"
                 type="checkbox"
                 bind:checked={$storedDisplayPref.showBoarder}
+                on:change={onChangePref}
+              />
+            {:else if row.type === "prefix"}
+              <input
+                class="toggle toggle-success"
+                type="checkbox"
+                bind:checked={$storedDisplayPref.showSiPrefix}
                 on:change={onChangePref}
               />
             {/if}

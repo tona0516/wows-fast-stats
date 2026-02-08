@@ -5,6 +5,7 @@ export interface DisplayPref {
   zoomRate: number;
   statsExtra: StatsExtra;
   showBoarder: boolean;
+  showSiPrefix: boolean;
   player: {
     enableNationFlag: boolean;
     colorType: PlayerNameColorType;
@@ -27,12 +28,10 @@ export interface DisplayPref {
     showShip: boolean;
     showOverall: boolean;
     digit: number;
-    siPrefix: boolean;
   };
   maxDamage: {
     showShip: boolean;
     showOverall: boolean;
-    siPrefix: boolean;
   };
   kdRate: {
     showShip: boolean;
@@ -52,7 +51,6 @@ export interface DisplayPref {
   battles: {
     showShip: boolean;
     showOverall: boolean;
-    siPrefix: boolean;
   };
   platoonRate: {
     showShip: boolean;
@@ -84,7 +82,6 @@ export interface DisplayPref {
   threatLevel: {
     showOverall: boolean;
     digit: number;
-    siPrefix: boolean;
   };
   usingShipTypeRate: {
     showOverall: boolean;
@@ -105,6 +102,7 @@ export const DEFAULT_DISPLAY_PREF: DisplayPref = {
   zoomRate: 100,
   statsExtra: "pvpAll",
   showBoarder: false,
+  showSiPrefix: false,
   player: {
     enableNationFlag: true,
     colorType: "none",
@@ -126,12 +124,10 @@ export const DEFAULT_DISPLAY_PREF: DisplayPref = {
     showShip: true,
     showOverall: false,
     digit: 0,
-    siPrefix: false,
   },
   maxDamage: {
     showShip: false,
     showOverall: false,
-    siPrefix: false,
   },
   kdRate: {
     showShip: true,
@@ -151,7 +147,6 @@ export const DEFAULT_DISPLAY_PREF: DisplayPref = {
   battles: {
     showShip: true,
     showOverall: true,
-    siPrefix: false,
   },
   platoonRate: {
     showShip: false,
@@ -181,7 +176,6 @@ export const DEFAULT_DISPLAY_PREF: DisplayPref = {
   threatLevel: {
     showOverall: false,
     digit: 0,
-    siPrefix: false,
   },
   usingShipTypeRate: {
     showOverall: false,

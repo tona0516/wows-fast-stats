@@ -19,10 +19,10 @@ export class DamageColumn extends AbstractStatsColumn<string> {
 
   override getDisplayValue(player: core.Player): string {
     const value = this.getPlayerStats(player)[this.category].damage.value;
-    const pref = get(storedDisplayPref).damage;
     const digit = this.getDigit();
 
-    if (pref.siPrefix) {
+    const pref = get(storedDisplayPref);
+    if (pref.showSiPrefix) {
       return formatWithSuffix(value, digit);
     }
 

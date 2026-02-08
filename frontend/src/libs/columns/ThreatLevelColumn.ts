@@ -32,10 +32,10 @@ export class ThreatLevelColumn extends AbstractStatsColumn<string> {
       return "N/A";
     }
 
-    const pref = get(storedDisplayPref).threatLevel;
     const digit = this.getDigit();
 
-    if (pref.siPrefix) {
+    const pref = get(storedDisplayPref);
+    if (pref.showSiPrefix) {
       return formatWithSuffix(value, digit);
     }
 
