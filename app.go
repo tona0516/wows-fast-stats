@@ -97,13 +97,14 @@ func (a *App) SaveDisplayPref(pref string) error {
 	return a.prefStore.SetDisplayPref(pref)
 }
 
-func (a *App) SelectGameClientPath() error {
-	if err := a.selectGameClientPathUsecase.Invoke(a.ctx); err != nil {
-		return core.ErrorForDisplay(err)
+func (a *App) SelectGameClientPath() (string, error) {
+	selectedPath, err := a.selectGameClientPathUsecase.Invoke(a.ctx)
+	if err != nil {
+		return "", core.ErrorForDisplay(err)
 	}
 
 	a.StartPollingMatch()
-	return nil
+	return selectedPath, nil
 }
 
 func (a *App) CurrentVersion() string {

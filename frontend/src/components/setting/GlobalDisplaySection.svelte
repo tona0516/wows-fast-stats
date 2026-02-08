@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Section from "@components/commons/Section.svelte";
   import { storedDisplayPref } from "@libs/stores";
   import { Theme } from "@libs/Theme";
   import { SaveDisplayPref } from "@wails/go/main/App";
@@ -28,8 +29,7 @@
   ];
 </script>
 
-<div class="bg-base-100 shadow-xl rounded-xl p-4">
-  <span class="text-xl font-bold">全体表示設定</span>
+<Section title="全体表示設定">
   <table class="table">
     <tbody>
       {#each rows as row}
@@ -75,4 +75,4 @@
       {/each}
     </tbody>
   </table>
-</div>
+</Section>

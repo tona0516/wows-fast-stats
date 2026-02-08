@@ -24,23 +24,23 @@ func NewSelectGameClientPath(i do.Injector) (*SelectGameClientPath, error) {
 	}, nil
 }
 
-func (s *SelectGameClientPath) Invoke(ctx context.Context) error {
+func (s *SelectGameClientPath) Invoke(ctx context.Context) (string, error) {
 	selectedPath, err := s.wails.OpenDirectoryDialog(ctx)
 	if err != nil {
-		return failure.Translate(err, core.ErrWailsOpenDirectoryDialog)
+		return "", failure.Translate(err, core.ErrWailsOpenDirectoryDialog)
 	}
 
 	if selectedPath == "" {
-		return failure.New(core.ErrSelectFolderCancelled)
+		return "", failure.New(core.ErrSelectFolderCancelled)
 	}
 
 	if err := s.validator.Validate(selectedPath); err != nil {
-		return err
+		return "", err
 	}
 
 	if err := s.prefStore.SetGameClientPath(selectedPath); err != nil {
-		return err
+		return "", err
 	}
 
-	return nil
+	return selectedPath, nil
 }

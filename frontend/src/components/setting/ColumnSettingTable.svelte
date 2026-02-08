@@ -26,7 +26,7 @@
     <tr>
       <td class="font-semibold">プレイヤー名</td>
       <td>
-        <div class="p-1">
+        <div class="py-1">
           <label class="label text-base-content">
             クラン国籍の国旗を表示（クラン説明から言語検出）
             <input
@@ -37,20 +37,19 @@
             />
           </label>
         </div>
-        <div class="p-1">
-          <div class="flex items-center gap-2">
-            <div>背景色タイプ</div>
-            <div>
-              <select
-                class="select select-sm"
-                bind:value={$storedDisplayPref.player.colorType}
-                on:change={onChangePref}
-              >
-                {#each PLAYER_NAME_COLORS as color}
-                  <option value={color[0]}>{color[1]}</option>
-                {/each}
-              </select>
-            </div>
+        <div class="divider my-1" />
+        <div class="py-1 flex items-center gap-2">
+          <div>背景色タイプ</div>
+          <div>
+            <select
+              class="select select-sm"
+              bind:value={$storedDisplayPref.player.colorType}
+              on:change={onChangePref}
+            >
+              {#each PLAYER_NAME_COLORS as color}
+                <option value={color[0]}>{color[1]}</option>
+              {/each}
+            </select>
           </div>
         </div>
       </td>
@@ -59,7 +58,7 @@
     <tr>
       <td class="font-semibold">艦名</td>
       <td>
-        <div class="p-1">
+        <div class="py-1">
           <label class="label text-base-content">
             国旗を表示
             <input
@@ -79,25 +78,23 @@
         <td class="font-semibold">{info.fullName}</td>
         <td>
           {#if "digit" in $storedDisplayPref[statsKey] && typeof $storedDisplayPref[statsKey].digit === "number"}
-            <div class="p-1">
-              <div class="flex items-center gap-2">
-                <div>小数部桁数</div>
-                <div>
-                  <select
-                    class="select select-sm"
-                    bind:value={$storedDisplayPref[statsKey].digit}
-                    on:change={onChangePref}
-                  >
-                    {#each [0, 1, 2] as digit}
-                      <option value={digit}>{digit}</option>
-                    {/each}
-                  </select>
-                </div>
+            <div class="py-1 flex items-center gap-2">
+              <div>小数部桁数</div>
+              <div>
+                <select
+                  class="select select-sm"
+                  bind:value={$storedDisplayPref[statsKey].digit}
+                  on:change={onChangePref}
+                >
+                  {#each [0, 1, 2] as digit}
+                    <option value={digit}>{digit}</option>
+                  {/each}
+                </select>
               </div>
             </div>
           {/if}
           {#if "siPrefix" in $storedDisplayPref[statsKey] && typeof $storedDisplayPref[statsKey].siPrefix === "boolean"}
-            <div class="p-1">
+            <div class="py-1">
               <label class="label text-base-content">
                 K(キロ)表示
                 <input

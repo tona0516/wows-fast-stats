@@ -7,6 +7,7 @@
   import StatsColumnOrderSection from "@components/setting/StatsColumnOrderSection.svelte";
   import { get } from "svelte/store";
   import { onDestroy, onMount } from "svelte";
+  import SubSection from "@components/commons/SubSection.svelte";
 
   type StatsColumnCategory = "ship" | "overall";
 
@@ -164,20 +165,22 @@
     splitOrder("overall"));
 </script>
 
-<div class="mt-6 grid grid-cols-1 gap-6">
-  <StatsColumnOrderSection
-    title="艦成績の表示項目"
-    visibleOrder={shipVisibleOrder}
-    hiddenOrder={shipHiddenOrder}
-    bind:visibleListElement={shipListElement}
-    bind:hiddenListElement={shipHiddenListElement}
-  />
+<div class="flex flex-col gap-4">
+  <SubSection title="艦成績の表示項目">
+    <StatsColumnOrderSection
+      visibleOrder={shipVisibleOrder}
+      hiddenOrder={shipHiddenOrder}
+      bind:visibleListElement={shipListElement}
+      bind:hiddenListElement={shipHiddenListElement}
+    />
+  </SubSection>
 
-  <StatsColumnOrderSection
-    title="総合成績の表示項目"
-    visibleOrder={overallVisibleOrder}
-    hiddenOrder={overallHiddenOrder}
-    bind:visibleListElement={overallListElement}
-    bind:hiddenListElement={overallHiddenListElement}
-  />
+  <SubSection title="総合成績の表示項目">
+    <StatsColumnOrderSection
+      visibleOrder={overallVisibleOrder}
+      hiddenOrder={overallHiddenOrder}
+      bind:visibleListElement={overallListElement}
+      bind:hiddenListElement={overallHiddenListElement}
+    />
+  </SubSection>
 </div>

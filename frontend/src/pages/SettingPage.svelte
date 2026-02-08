@@ -3,11 +3,14 @@
   import { onMount } from "svelte";
   import { themeChange } from "theme-change";
   import GlobalDisplaySection from "@components/setting/GlobalDisplaySection.svelte";
-  import ColumnDisplaySection from "@components/setting/ColumnDisplaySection.svelte";
   import ModalCommon from "@components/modals/ModalCommon.svelte";
   import { DEFAULT_DISPLAY_PREF } from "@libs/DisplayPref";
   import { showToast, storedDisplayPref } from "@libs/stores";
   import { SaveDisplayPref } from "@wails/go/main/App";
+  import Section from "@components/commons/Section.svelte";
+  import SubSection from "@components/commons/SubSection.svelte";
+  import ColumnSettingTable from "@components/setting/ColumnSettingTable.svelte";
+  import StatsColumnOrderSettings from "@components/setting/StatsColumnOrderSettings.svelte";
 
   onMount(async () => {
     themeChange(false);
@@ -34,16 +37,26 @@
   };
 </script>
 
-<div class="min-h-full w-full bg-base-200/40 p-4">
-  <div class="mx-auto flex w-full max-w-3xl flex-col gap-4">
-    <GameClientPathSection />
-    <GlobalDisplaySection />
-    <ColumnDisplaySection {resetToken} />
-    <div class="flex justify-end">
-      <button class="btn btn-outline" on:click={openConfirm} type="button">
-        表示設定をデフォルトに戻す
-      </button>
-    </div>
+<div class="p-4 mx-auto max-w-3xl flex flex-col gap-4">
+  <GameClientPathSection />
+  <GlobalDisplaySection />
+
+  {#key resetToken}
+    <Section title="カラム別表示設定">
+      <div class="flex flex-col gap-4">
+        <SubSection title="詳細設定">
+          <ColumnSettingTable />
+        </SubSection>
+
+        <StatsColumnOrderSettings />
+      </div>
+    </Section>
+  {/key}
+
+  <div class="flex justify-end">
+    <button class="btn btn-outline" on:click={openConfirm} type="button">
+      表示設定をデフォルトに戻す
+    </button>
   </div>
 </div>
 

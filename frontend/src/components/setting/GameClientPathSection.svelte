@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Section from "@components/commons/Section.svelte";
   import {
     showToast,
     storedGameClientPath,
@@ -8,7 +9,8 @@
 
   const onClickSelect = async () => {
     try {
-      await SelectGameClientPath();
+      const selectedPath = await SelectGameClientPath();
+      storedGameClientPath.set(selectedPath);
       storedGameClientPathError.set("");
 
       showToast("ゲームクライアントパスを設定しました");
@@ -23,36 +25,29 @@
   };
 </script>
 
-<div class="bg-base-100 shadow-xl rounded-xl p-4">
-  <div class="flex items-center">
-    <span class="text-xl font-bold">ゲームクライアントパス設定</span>
-    <span class="ml-2 badge badge-outline badge-error whitespace-nowrap"
-      >必須</span
-    >
-  </div>
-  <p class="text-sm text-gray-500 mt-2">
-    WorldOfWarships.exeが存在するフォルダを選択してください
-  </p>
-  {#if $storedGameClientPath}
-    <div class="mb-2 flex items-center justify-between gap-2">
-      <div
-        class="rounded-xl border border-base-300 bg-base-200 shadow-sm p-2 flex-1 overflow-x-auto"
-      >
-        {$storedGameClientPath}
-      </div>
+<Section title="ゲームクライアントパス設定" badgeText="必須">
+  <div class="flex flex-col gap-2">
+    <div class="flex items-center">
+      <i class="bi bi-info-circle"></i>
+      <p class="ml-1 text-sm">
+        WorldOfWarships.exeがあるフォルダを選択してください
+      </p>
+    </div>
+    <div class="flex items-center gap-2">
+      <input
+        type="text"
+        class="rounded-sm border border-base-300 bg-base-200 shadow-sm p-2 flex-1 overflow-x-auto"
+        value={$storedGameClientPath}
+        disabled
+      />
       <button class="btn btn-primary shrink-0" on:click={onClickSelect}>
         フォルダ選択
       </button>
     </div>
-  {/if}
-  {#if $storedGameClientPathError}
-    <div class="alert alert-error mt-2">
-      <span>{$storedGameClientPathError}</span>
-    </div>
-  {/if}
-  {#if !$storedGameClientPath}
-    <button class="btn btn-primary" on:click={onClickSelect}>
-      フォルダ選択
-    </button>
-  {/if}
-</div>
+    {#if $storedGameClientPathError}
+      <div class="alert alert-error alert-outline">
+        <span>{$storedGameClientPathError}</span>
+      </div>
+    {/if}
+  </div>
+</Section>

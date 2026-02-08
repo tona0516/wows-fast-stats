@@ -16,7 +16,7 @@ export function Prefetch():Promise<void>;
 
 export function SaveDisplayPref(arg1:string):Promise<void>;
 
-export function SelectGameClientPath():Promise<void>;
+export function SelectGameClientPath():Promise<string>;
 
 export function ShowMessageDialog(arg1:string):Promise<void>;
 
