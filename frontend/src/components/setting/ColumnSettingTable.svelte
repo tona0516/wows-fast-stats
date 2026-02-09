@@ -28,7 +28,10 @@
       <td>
         <div class="py-1">
           <label class="label text-base-content">
-            クラン国籍の国旗を表示（クラン説明から言語検出）
+            <div class="flex flex-col whitespace-nowrap">
+              <span>クラン国籍の国旗を表示</span>
+              <span>(クラン説明から言語検出)</span>
+            </div>
             <input
               class="toggle toggle-success"
               type="checkbox"
@@ -37,7 +40,7 @@
             />
           </label>
         </div>
-        <div class="py-1 flex items-center gap-2">
+        <div class="py-1 flex items-center gap-2 whitespace-nowrap">
           <div>背景色タイプ</div>
           <div>
             <select
@@ -57,7 +60,7 @@
     <tr>
       <td class="font-semibold">艦名</td>
       <td>
-        <div class="py-1">
+        <div class="py-1 whitespace-nowrap">
           <label class="label text-base-content">
             国旗を表示
             <input
@@ -77,7 +80,7 @@
         <td class="font-semibold">{info.fullName}</td>
         <td>
           {#if "digit" in $storedDisplayPref[statsKey] && typeof $storedDisplayPref[statsKey].digit === "number"}
-            <div class="py-1 flex items-center gap-2">
+            <div class="py-1 flex items-center gap-2 whitespace-nowrap">
               <div>小数部桁数</div>
               <div>
                 <select
