@@ -79,10 +79,6 @@ export interface DisplayPref {
     showOverall: boolean;
     digit: number;
   };
-  threatLevel: {
-    showOverall: boolean;
-    digit: number;
-  };
   usingShipTypeRate: {
     showOverall: boolean;
     digit: number;
@@ -173,10 +169,6 @@ export const DEFAULT_DISPLAY_PREF: DisplayPref = {
     showOverall: true,
     digit: 2,
   },
-  threatLevel: {
-    showOverall: false,
-    digit: 0,
-  },
   usingShipTypeRate: {
     showOverall: false,
     digit: 1,
@@ -213,7 +205,6 @@ export const DEFAULT_DISPLAY_PREF: DisplayPref = {
       "survivedRate",
       "platoonRate",
       "efficiencyBadge",
-      "threatLevel",
       "avgTier",
       "usingTierRate",
       "usingShipTypeRate",

@@ -18,7 +18,6 @@
   import { WarshipColumn } from "@libs/columns/WarshipColumn";
   import { ShipTypeRateColumn } from "@libs/columns/ShipTypeRateColumn";
   import { SurvivedRateColumn } from "@libs/columns/SurvivedRateColumn";
-  import { ThreatLevelColumn } from "@libs/columns/ThreatLevelColumn";
   import { TierRateColumn } from "@libs/columns/TierRateColumn";
   import { WinRateColumn } from "@libs/columns/WinRateColumn";
   import { EfficiencyBadgeColumn } from "@libs/columns/EfficiencyBadgeColumn";
@@ -92,7 +91,6 @@
     new SurvivedRateColumn("overall"),
     new PlatoonRateColumn("overall"),
     new EfficiencyBadgeColumn("overall"),
-    new ThreatLevelColumn(),
     new AvgTierColumn(),
     new TierRateColumn(),
     new ShipTypeRateColumn(),

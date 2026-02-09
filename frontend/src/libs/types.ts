@@ -17,11 +17,7 @@ export type Optional<T> = T | undefined;
 
 export type Page = "stats" | "setting" | "info";
 
-export type PlayerNameColorType =
-  | "shipPR"
-  | "overallPR"
-  | "threatLevel"
-  | "none";
+export type PlayerNameColorType = "shipPR" | "overallPR" | "none";
 
 export type StackedBarChartParam = {
   readonly label: string;

@@ -69,10 +69,6 @@ export const STATS_COLUMN_INFO: {
     minName: "平均ティア",
     discription: "出撃した戦闘の平均ティア(1~11)",
   },
-  threatLevel: {
-    minName: "戦力評価",
-    discription: "178usagi氏が導入した評価指標\n詳細は以下を参照してください",
-  },
   usingShipTypeRate: {
     minName: "艦種割合",
     discription: "各艦種で出撃した戦闘数の割合(%)",
@@ -116,21 +112,4 @@ export const RATING_COLORS: { [key: string]: ColorCode } = {
   great: new ColorCode("#02C9B3"),
   unicum: new ColorCode("#D042F3"),
   super_unicum: new ColorCode("#A00DC5"),
-} as const;
-
-type ColorPair = {
-  readonly text: ColorCode;
-  readonly background: ColorCode;
-};
-
-export const THREAT_LEVEL_COLORS: { [rank: string]: ColorPair } = {
-  ir: { text: new ColorCode("#FFFFFF"), background: new ColorCode("#000000") },
-  r: { text: new ColorCode("#FFFFFF"), background: new ColorCode("#FF0000") },
-  o: { text: new ColorCode("#331100"), background: new ColorCode("#FFA500") },
-  y: { text: new ColorCode("#331100"), background: new ColorCode("#FFFF00") },
-  g: { text: new ColorCode("#FFFFFF"), background: new ColorCode("#008000") },
-  b: { text: new ColorCode("#FFFFFF"), background: new ColorCode("#2255FF") },
-  i: { text: new ColorCode("#FFFFFF"), background: new ColorCode("#234794") },
-  v: { text: new ColorCode("#FFFFFF"), background: new ColorCode("#705DA8") },
-  uv: { text: new ColorCode("#FFFFFF"), background: new ColorCode("#800080") },
 } as const;

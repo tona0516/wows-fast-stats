@@ -10,7 +10,6 @@ type OverallStats struct {
 	Kill              float64              `json:"kill"`
 	Exp               float64              `json:"exp"`
 	PR                RatingValue          `json:"pr"`
-	ThreatLevel       ThreatLevel          `json:"threatLevel"`
 	AvgTier           float64              `json:"avgTier"`
 	UsingShipTypeRate ShipTypeGroup        `json:"usingShipTypeRate"`
 	UsingTierRate     TierGroup            `json:"usingTierRate"`
@@ -57,30 +56,6 @@ func NewOverallStats(
 		NewRatingFromPR(overallPR),
 	)
 
-	var threatLevel ThreatLevel
-	shipStats, ok := playerShipStats[shipID]
-	if ok {
-		shipValues := shipStats.shipStatsValues(statsPattern)
-		tlc := NewThreatLevelCalculator()
-
-		tti := ThreatLevelInput{
-			Vehicles:         vehicles,
-			Warships:         warships,
-			ShipID:           shipID,
-			ShipBattles:      shipValues.Battles,
-			ShipDamage:       shipValues.avgDamage(),
-			ShipWinRate:      shipValues.winRate(),
-			ShipSurvivedRate: shipValues.survivedRate().All,
-			ShipPlanesKilled: shipValues.avgPlanesKilled(),
-			OverallBattles:   values.Battles,
-			OverallDamage:    values.avgDamage(),
-			OverallWinRate:   values.winRate(),
-			OverallKill:      values.avgKills(),
-			OverallKdRate:    values.kdRate(),
-		}
-		threatLevel = tlc.Calculate(tti)
-	}
-
 	return OverallStats{
 		Battles: values.Battles,
 		Damage: NewRatingValue(
@@ -94,7 +69,6 @@ func NewOverallStats(
 		Kill:              values.avgKills(),
 		Exp:               values.exp(),
 		PR:                pr,
-		ThreatLevel:       threatLevel,
 		AvgTier:           playerShipStats.avgTier(statsPattern, warships),
 		UsingShipTypeRate: playerShipStats.usingShipTypeRate(statsPattern, warships),
 		UsingTierRate:     playerShipStats.usingTierRate(statsPattern, warships),

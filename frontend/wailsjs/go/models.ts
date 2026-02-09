@@ -1,21 +1,5 @@
 export namespace core {
 	
-	export class TeamThreatLevel {
-	    average: number;
-	    dissociationDegree: number;
-	    accuracy: number;
-	
-	    static createFrom(source: any = {}) {
-	        return new TeamThreatLevel(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.average = source["average"];
-	        this.dissociationDegree = source["dissociationDegree"];
-	        this.accuracy = source["accuracy"];
-	    }
-	}
 	export class TeamAverageStats {
 	    ship_pr: number;
 	    ship_damage: number;
@@ -44,7 +28,6 @@ export namespace core {
 	}
 	export class TeamStats {
 	    teamAverageStats: TeamAverageStats;
-	    teamThreatLevel: TeamThreatLevel;
 	
 	    static createFrom(source: any = {}) {
 	        return new TeamStats(source);
@@ -53,7 +36,6 @@ export namespace core {
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.teamAverageStats = this.convertValues(source["teamAverageStats"], TeamAverageStats);
-	        this.teamThreatLevel = this.convertValues(source["teamThreatLevel"], TeamThreatLevel);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -128,22 +110,6 @@ export namespace core {
 	        this.ss = source["ss"];
 	    }
 	}
-	export class ThreatLevel {
-	    rank: string;
-	    raw: number;
-	    modified: number;
-	
-	    static createFrom(source: any = {}) {
-	        return new ThreatLevel(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.rank = source["rank"];
-	        this.raw = source["raw"];
-	        this.modified = source["modified"];
-	    }
-	}
 	export class OverallStats {
 	    battles: number;
 	    damage: RatingValue;
@@ -154,7 +120,6 @@ export namespace core {
 	    kill: number;
 	    exp: number;
 	    pr: RatingValue;
-	    threatLevel: ThreatLevel;
 	    avgTier: number;
 	    usingShipTypeRate: ShipTypeGroup;
 	    usingTierRate: TierGroup;
@@ -176,7 +141,6 @@ export namespace core {
 	        this.kill = source["kill"];
 	        this.exp = source["exp"];
 	        this.pr = this.convertValues(source["pr"], RatingValue);
-	        this.threatLevel = this.convertValues(source["threatLevel"], ThreatLevel);
 	        this.avgTier = source["avgTier"];
 	        this.usingShipTypeRate = this.convertValues(source["usingShipTypeRate"], ShipTypeGroup);
 	        this.usingTierRate = this.convertValues(source["usingTierRate"], TierGroup);
@@ -602,7 +566,6 @@ export namespace core {
 	
 	
 	
-	
 	export class Vehicle {
 	    shipId: number;
 	    relation: number;
@@ -657,7 +620,6 @@ export namespace core {
 		    return a;
 		}
 	}
-	
 	
 	
 

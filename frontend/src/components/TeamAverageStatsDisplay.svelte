@@ -90,26 +90,6 @@
           },
         ],
       },
-      {
-        title: "戦力評価 (by 178usagi)",
-        data: [
-          {
-            label: "脅威度",
-            friendValue: friendTeam.pvpAll.teamThreatLevel.average,
-            enemyValue: enemyTeam.pvpAll.teamThreatLevel.average,
-          },
-          {
-            label: "確度",
-            friendValue: friendTeam.pvpAll.teamThreatLevel.accuracy,
-            enemyValue: enemyTeam.pvpAll.teamThreatLevel.accuracy,
-          },
-          {
-            label: "介護指数",
-            friendValue: friendTeam.pvpAll.teamThreatLevel.dissociationDegree,
-            enemyValue: enemyTeam.pvpAll.teamThreatLevel.dissociationDegree,
-          },
-        ],
-      },
     ];
   }
 
@@ -133,7 +113,7 @@
       </div>
     </div>
 
-    <div class="grid gap-2 grid-cols-5">
+    <div class="grid gap-2 grid-cols-4">
       {#each allChartData as chartData}
         <div
           class="relative overflow-hidden border border-base-300 bg-base-100/70 p-4 shadow-sm rounded-md"

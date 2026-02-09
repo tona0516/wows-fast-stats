@@ -9,7 +9,6 @@
     new Map<PlayerNameColorType, string>([
       ["shipPR", "艦成績のPR"],
       ["overallPR", "総合成績のPR"],
-      ["threatLevel", "戦力評価"],
       ["none", "なし"],
     ]);
   const STATS_KEYS = Object.keys(STATS_COLUMN_INFO) as readonly StatsKey[];
