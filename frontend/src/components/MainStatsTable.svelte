@@ -196,7 +196,7 @@
 
 <div class="overflow-x-auto rounded-md">
   <table
-    class="table text-nowrap w-full border-collapse {$storedDisplayPref.showBoarder
+    class="table text-nowrap w-full border-collapse {$storedDisplayPref.isBorderVisible
       ? 'border border-gray-500'
       : ''}"
   >
@@ -207,7 +207,7 @@
             {#each categories as category}
               {#if category.showCount() > 0}
                 <th
-                  class="{$storedDisplayPref.showBoarder
+                  class="{$storedDisplayPref.isBorderVisible
                     ? 'border border-gray-500'
                     : ''} px-1 py-0.5 text-center text-black {team.isAlly
                     ? 'bg-ally'
@@ -225,7 +225,7 @@
               {#each category.columns as column}
                 {#if column.needsShow()}
                   <th
-                    class="{$storedDisplayPref.showBoarder
+                    class="{$storedDisplayPref.isBorderVisible
                       ? 'border border-gray-500'
                       : ''} px-1 py-0.5 text-center bg-base-300"
                     scope="col">{column.header}</th

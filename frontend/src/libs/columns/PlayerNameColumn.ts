@@ -49,7 +49,7 @@ export class PlayerNameColumn extends AbstractColumn {
   }
 
   getNationFlagClass(player: core.Player): string {
-    if (!get(storedDisplayPref).player.enableNationFlag) {
+    if (!get(storedDisplayPref).player.isNationFlagEnabled) {
       return "";
     }
     const langMap: Record<string, string> = { ja: "jp", zh: "cn", ko: "kr" };

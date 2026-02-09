@@ -36,7 +36,7 @@ export const STATS_COLUMN_INFO: {
     discription: "1戦あたりの平均撃沈数",
   },
   exp: {
-    minName: "Exp",
+    minName: "経験値",
     discription: "プレミアムアカウント補正された1戦あたりの平均取得経験値",
   },
   battles: {

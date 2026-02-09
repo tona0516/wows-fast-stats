@@ -58,11 +58,11 @@
 
     const updateVisibility = (key: StatsKey, isVisible: boolean) => {
       const setting = pref[key];
-      if (category === "ship" && "showShip" in setting) {
-        setting.showShip = isVisible;
+      if (category === "ship" && "isShipVisible" in setting) {
+        setting.isShipVisible = isVisible;
       }
-      if (category === "overall" && "showOverall" in setting) {
-        setting.showOverall = isVisible;
+      if (category === "overall" && "isOverallVisible" in setting) {
+        setting.isOverallVisible = isVisible;
       }
     };
 
@@ -110,11 +110,11 @@
 
     const isVisible = (key: StatsKey) => {
       const setting = pref[key];
-      if (category === "ship" && "showShip" in setting) {
-        return setting.showShip === true;
+      if (category === "ship" && "isShipVisible" in setting) {
+        return setting.isShipVisible === true;
       }
-      if (category === "overall" && "showOverall" in setting) {
-        return setting.showOverall === true;
+      if (category === "overall" && "isOverallVisible" in setting) {
+        return setting.isOverallVisible === true;
       }
       return false;
     };

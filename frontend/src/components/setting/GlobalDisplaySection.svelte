@@ -25,7 +25,7 @@
     { label: "テーマ", type: "theme" as const },
     { label: "UIサイズ", type: "zoom" as const },
     { label: "統計パターン", type: "stats" as const },
-    { label: "テーブルの枠線を表示", type: "border" as const },
+    { label: "表の枠線を表示", type: "border" as const },
     { label: "K(キロ)表示", type: "prefix" as const },
   ];
 </script>
@@ -67,14 +67,14 @@
               <input
                 class="toggle toggle-success"
                 type="checkbox"
-                bind:checked={$storedDisplayPref.showBoarder}
+                bind:checked={$storedDisplayPref.isBorderVisible}
                 on:change={onChangePref}
               />
             {:else if row.type === "prefix"}
               <input
                 class="toggle toggle-success"
                 type="checkbox"
-                bind:checked={$storedDisplayPref.showSiPrefix}
+                bind:checked={$storedDisplayPref.isSiPrefixEnabled}
                 on:change={onChangePref}
               />
             {/if}

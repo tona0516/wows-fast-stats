@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { WarshipColumn } from "@libs/columns/WarshipColumn";
   import { ModalManager } from "@libs/ModalManager";
-    import { storedDisplayPref } from "@libs/stores";
+  import { storedDisplayPref } from "@libs/stores";
   import type { core } from "@wails/go/models";
 
   export let column: WarshipColumn;
@@ -10,7 +10,12 @@
   const nationIconPath = column.getNationIconPath(player);
 </script>
 
-<td class="{$storedDisplayPref.showBoarder ? "border border-gray-500" : ""} px-1 py-0.5" style="background-color: {column.getBgColorCode(player)?.raw}">
+<td
+  class="{$storedDisplayPref.isBorderVisible
+    ? 'border border-gray-500'
+    : ''} px-1 py-0.5"
+  style="background-color: {column.getBgColorCode(player)?.raw}"
+>
   <div class="w-48 flex place-items-center">
     <button
       class="btn btn-xs bi bi-info-square px-1 py-0.5 mr-1"

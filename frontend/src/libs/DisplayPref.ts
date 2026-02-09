@@ -4,87 +4,87 @@ export interface DisplayPref {
   version: number;
   zoomRate: number;
   statsExtra: StatsExtra;
-  showBoarder: boolean;
-  showSiPrefix: boolean;
+  isBorderVisible: boolean;
+  isSiPrefixEnabled: boolean;
   player: {
-    enableNationFlag: boolean;
+    isNationFlagEnabled: boolean;
     colorType: PlayerNameColorType;
   };
   warship: {
-    enableNationFlag: boolean;
+    isNationFlagEnabled: boolean;
   };
   // ship/overall columns
   pr: {
-    showShip: boolean;
-    showOverall: boolean;
+    isShipVisible: boolean;
+    isOverallVisible: boolean;
     digit: number;
   };
   winRate: {
-    showShip: boolean;
-    showOverall: boolean;
+    isShipVisible: boolean;
+    isOverallVisible: boolean;
     digit: number;
   };
   damage: {
-    showShip: boolean;
-    showOverall: boolean;
+    isShipVisible: boolean;
+    isOverallVisible: boolean;
     digit: number;
   };
   maxDamage: {
-    showShip: boolean;
-    showOverall: boolean;
+    isShipVisible: boolean;
+    isOverallVisible: boolean;
   };
   kdRate: {
-    showShip: boolean;
-    showOverall: boolean;
+    isShipVisible: boolean;
+    isOverallVisible: boolean;
     digit: number;
   };
   kill: {
-    showShip: boolean;
-    showOverall: boolean;
+    isShipVisible: boolean;
+    isOverallVisible: boolean;
     digit: number;
   };
   exp: {
-    showShip: boolean;
-    showOverall: boolean;
+    isShipVisible: boolean;
+    isOverallVisible: boolean;
     digit: number;
   };
   battles: {
-    showShip: boolean;
-    showOverall: boolean;
+    isShipVisible: boolean;
+    isOverallVisible: boolean;
   };
   platoonRate: {
-    showShip: boolean;
-    showOverall: boolean;
+    isShipVisible: boolean;
+    isOverallVisible: boolean;
     digit: number;
   };
   efficiencyBadge: {
-    showShip: boolean;
-    showOverall: boolean;
+    isShipVisible: boolean;
+    isOverallVisible: boolean;
   };
   // ship only columns
   planesKilled: {
-    showShip: boolean;
+    isShipVisible: boolean;
     digit: number;
   };
   survivedRate: {
-    showShip: boolean;
+    isShipVisible: boolean;
     digit: number;
   };
   hitRate: {
-    showShip: boolean;
+    isShipVisible: boolean;
     digit: number;
   };
   // overall only columns
   avgTier: {
-    showOverall: boolean;
+    isOverallVisible: boolean;
     digit: number;
   };
   usingShipTypeRate: {
-    showOverall: boolean;
+    isOverallVisible: boolean;
     digit: number;
   };
   usingTierRate: {
-    showOverall: boolean;
+    isOverallVisible: boolean;
     digit: number;
   };
   columnOrder: {
@@ -97,84 +97,84 @@ export const DEFAULT_DISPLAY_PREF: DisplayPref = {
   version: 1,
   zoomRate: 100,
   statsExtra: "pvpAll",
-  showBoarder: false,
-  showSiPrefix: false,
+  isBorderVisible: false,
+  isSiPrefixEnabled: false,
   player: {
-    enableNationFlag: true,
+    isNationFlagEnabled: true,
     colorType: "none",
   },
   warship: {
-    enableNationFlag: true,
+    isNationFlagEnabled: true,
   },
   pr: {
-    showShip: true,
-    showOverall: true,
+    isShipVisible: true,
+    isOverallVisible: true,
     digit: 0,
   },
   winRate: {
-    showShip: true,
-    showOverall: true,
+    isShipVisible: true,
+    isOverallVisible: true,
     digit: 1,
   },
   damage: {
-    showShip: true,
-    showOverall: false,
+    isShipVisible: true,
+    isOverallVisible: false,
     digit: 0,
   },
   maxDamage: {
-    showShip: false,
-    showOverall: false,
+    isShipVisible: false,
+    isOverallVisible: false,
   },
   kdRate: {
-    showShip: true,
-    showOverall: false,
+    isShipVisible: true,
+    isOverallVisible: false,
     digit: 2,
   },
   kill: {
-    showShip: false,
-    showOverall: false,
+    isShipVisible: false,
+    isOverallVisible: false,
     digit: 2,
   },
   exp: {
-    showShip: false,
-    showOverall: false,
+    isShipVisible: false,
+    isOverallVisible: false,
     digit: 0,
   },
   battles: {
-    showShip: true,
-    showOverall: true,
+    isShipVisible: true,
+    isOverallVisible: true,
   },
   platoonRate: {
-    showShip: false,
-    showOverall: false,
+    isShipVisible: false,
+    isOverallVisible: false,
     digit: 2,
   },
   efficiencyBadge: {
-    showShip: true,
-    showOverall: false,
+    isShipVisible: true,
+    isOverallVisible: false,
   },
   planesKilled: {
-    showShip: false,
+    isShipVisible: false,
     digit: 1,
   },
   survivedRate: {
-    showShip: false,
+    isShipVisible: false,
     digit: 1,
   },
   hitRate: {
-    showShip: false,
+    isShipVisible: false,
     digit: 1,
   },
   avgTier: {
-    showOverall: true,
+    isOverallVisible: true,
     digit: 2,
   },
   usingShipTypeRate: {
-    showOverall: false,
+    isOverallVisible: false,
     digit: 1,
   },
   usingTierRate: {
-    showOverall: false,
+    isOverallVisible: false,
     digit: 1,
   },
   columnOrder: {

@@ -29,7 +29,7 @@ export class MaxDamageColumn extends AbstractStatsColumn<MaxDamageParam> {
     const digit = this.getDigit();
 
     const pref = get(storedDisplayPref);
-    const value = pref.showSiPrefix
+    const value = pref.isSiPrefixEnabled
       ? formatWithSuffix(maxDamage.value, digit)
       : maxDamage.value.toFixed(digit);
 

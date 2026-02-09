@@ -19,9 +19,9 @@ export abstract class AbstractStatsColumn<T> extends AbstractColumn {
     const pref = get(storedDisplayPref)[this.key];
     switch (this.category) {
       case "ship":
-        return "showShip" in pref ? pref.showShip : false;
+        return "isShipVisible" in pref ? pref.isShipVisible : false;
       case "overall":
-        return "showOverall" in pref ? pref.showOverall : false;
+        return "isOverallVisible" in pref ? pref.isOverallVisible : false;
     }
   }
 

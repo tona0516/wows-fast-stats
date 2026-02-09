@@ -24,7 +24,9 @@
   <tbody>
     <tr>
       <td class="font-semibold text-nowrap">プレイヤー名</td>
-      <td></td>
+      <td class="whitespace-break-spaces text-sm"
+        >{"クラン名、プレイヤー名を表示\nクラン名の文字色はリーグに基づいています"}</td
+      >
       <td>
         <div class="py-1">
           <label class="label text-base-content">
@@ -35,7 +37,7 @@
             <input
               class="toggle toggle-success"
               type="checkbox"
-              bind:checked={$storedDisplayPref.player.enableNationFlag}
+              bind:checked={$storedDisplayPref.player.isNationFlagEnabled}
               on:change={onChangePref}
             />
           </label>
@@ -59,7 +61,9 @@
 
     <tr>
       <td class="font-semibold text-nowrap">艦名</td>
-      <td></td>
+      <td class="whitespace-break-spaces text-sm"
+        >{"艦種アイコン、ティア、艦名を表示"}</td
+      >
       <td>
         <div class="py-1 text-nowrap">
           <label class="label text-base-content">
@@ -67,7 +71,7 @@
             <input
               class="toggle toggle-success"
               type="checkbox"
-              bind:checked={$storedDisplayPref.warship.enableNationFlag}
+              bind:checked={$storedDisplayPref.warship.isNationFlagEnabled}
               on:change={onChangePref}
             />
           </label>
@@ -79,7 +83,7 @@
       {@const info = STATS_COLUMN_INFO[statsKey]}
       <tr>
         <td class="font-semibold text-nowrap">{info.minName}</td>
-        <td class="whitespace-break-spaces">{info.discription}</td>
+        <td class="whitespace-break-spaces text-sm">{info.discription}</td>
         <td>
           {#if "digit" in $storedDisplayPref[statsKey] && typeof $storedDisplayPref[statsKey].digit === "number"}
             <div class="py-1 flex items-center gap-2 text-nowrap">

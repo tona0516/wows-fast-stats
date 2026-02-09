@@ -103,7 +103,7 @@ export class WarshipColumn extends AbstractColumn {
   }
 
   getNationIconPath(player: core.Player): string {
-    if (!get(storedDisplayPref).warship.enableNationFlag) {
+    if (!get(storedDisplayPref).warship.isNationFlagEnabled) {
       return "";
     }
     return FLAGS[player.warship.nation] ?? FlagNone;

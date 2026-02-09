@@ -22,7 +22,7 @@ export class DamageColumn extends AbstractStatsColumn<string> {
     const digit = this.getDigit();
 
     const pref = get(storedDisplayPref);
-    if (pref.showSiPrefix) {
+    if (pref.isSiPrefixEnabled) {
       return formatWithSuffix(value, digit);
     }
 
