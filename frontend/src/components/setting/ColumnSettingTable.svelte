@@ -24,11 +24,12 @@
 <table class="table">
   <tbody>
     <tr>
-      <td class="font-semibold">プレイヤー名</td>
+      <td class="font-semibold text-nowrap">プレイヤー名</td>
+      <td></td>
       <td>
         <div class="py-1">
           <label class="label text-base-content">
-            <div class="flex flex-col whitespace-nowrap">
+            <div class="flex flex-col text-nowrap">
               <span>クラン国籍の国旗を表示</span>
               <span>(クラン説明から言語検出)</span>
             </div>
@@ -58,9 +59,10 @@
     </tr>
 
     <tr>
-      <td class="font-semibold">艦名</td>
+      <td class="font-semibold text-nowrap">艦名</td>
+      <td></td>
       <td>
-        <div class="py-1 whitespace-nowrap">
+        <div class="py-1 text-nowrap">
           <label class="label text-base-content">
             国旗を表示
             <input
@@ -77,10 +79,11 @@
     {#each STATS_KEYS as statsKey}
       {@const info = STATS_COLUMN_INFO[statsKey]}
       <tr>
-        <td class="font-semibold">{info.fullName}</td>
+        <td class="font-semibold text-nowrap">{info.minName}</td>
+        <td class="whitespace-break-spaces">{info.discription}</td>
         <td>
           {#if "digit" in $storedDisplayPref[statsKey] && typeof $storedDisplayPref[statsKey].digit === "number"}
-            <div class="py-1 flex items-center gap-2 whitespace-nowrap">
+            <div class="py-1 flex items-center gap-2 text-nowrap">
               <div>小数部桁数</div>
               <div>
                 <select

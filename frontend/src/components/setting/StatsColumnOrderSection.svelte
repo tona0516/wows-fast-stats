@@ -25,7 +25,7 @@
           class="flex items-center gap-2 rounded-lg border border-base-300 bg-base-100 px-3 py-2 text-sm"
           data-key={key}
         >
-          <span>{STATS_COLUMN_INFO[key].fullName}</span>
+          <span>{STATS_COLUMN_INFO[key].minName}</span>
         </li>
       {/each}
     </ul>
@@ -43,7 +43,7 @@
           class="flex items-center gap-2 rounded-lg border border-base-300 bg-base-100 px-3 py-2 text-sm"
           data-key={key}
         >
-          <span>{STATS_COLUMN_INFO[key].fullName}</span>
+          <span>{STATS_COLUMN_INFO[key].minName}</span>
         </li>
       {/each}
     </ul>
