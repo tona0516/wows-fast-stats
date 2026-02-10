@@ -166,7 +166,7 @@
 </script>
 
 <div class="flex flex-col gap-4">
-  <SubSection title="艦成績の表示項目">
+  <SubSection title="艦成績の表示項目/表示順">
     <StatsColumnOrderSection
       visibleOrder={shipVisibleOrder}
       hiddenOrder={shipHiddenOrder}
@@ -175,7 +175,7 @@
     />
   </SubSection>
 
-  <SubSection title="総合成績の表示項目">
+  <SubSection title="総合成績の表示項目/表示順">
     <StatsColumnOrderSection
       visibleOrder={overallVisibleOrder}
       hiddenOrder={overallHiddenOrder}
